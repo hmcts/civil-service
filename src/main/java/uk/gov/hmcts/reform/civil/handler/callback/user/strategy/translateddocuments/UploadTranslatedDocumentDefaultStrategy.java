@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocum
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -21,6 +22,9 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
@@ -33,6 +37,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENCE_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.DQ_DEF1;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.CLAIMANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.COURT_OFFICER_ORDER;
@@ -48,6 +53,7 @@ import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.S
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.STANDARD_DIRECTION_ORDER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslatedDocumentStrategy {
@@ -76,6 +82,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     private final AssignCategoryId assignCategoryId;
     private final FeatureToggleService featureToggleService;
     private final DeadlinesCalculator deadlinesCalculator;
+    private final IStateFlowEngine stateFlowEngine;
     private static final String CATEGORY_ID = "caseManagementOrders";
 
     @Override
@@ -87,7 +94,41 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             callbackParams,
             aboutToStartOrSubmitCallbackResponseBuilder
         );
-        CaseEvent businessProcessEvent = getBusinessProcessEvent(caseData);
+
+        CaseData caseDataBefore = callbackParams.getCaseDataBefore();
+        BusinessProcess businessProcess = caseDataBefore.getBusinessProcess();
+
+        StateFlow evaluate = stateFlowEngine.evaluate(caseData);
+        State state = evaluate.getState();
+        boolean hasMissingBilingualDefendantResponseTranslation =
+            isMissingBilingualDefendantResponseTranslation(businessProcess, state, caseData);
+
+        if (hasMissingBilingualDefendantResponseTranslation) {
+            log.info("No translated documents found for translated documents for caseId {}",
+                caseData.getCcdCaseReference()
+            );
+
+            LocalDateTime applicant1ResponseDeadline =
+                deadlinesCalculator.calculateApplicantResponseDeadlineSpec(LocalDateTime.now());
+            caseData.setApplicant1ResponseDeadline(applicant1ResponseDeadline);
+            caseData.setNextDeadline(applicant1ResponseDeadline.toLocalDate());
+
+            List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
+            Element<CaseDocument> preTranslationDocumentsFirst = preTranslationDocuments.getFirst();
+            CaseDocument caseDocument = preTranslationDocumentsFirst.getValue();
+            caseData.setRespondent1ClaimResponseDocumentSpec(caseDocument);
+
+            List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
+            systemGeneratedDocuments.add(preTranslationDocumentsFirst);
+            systemGeneratedDocuments.add(element(caseDocument.setDocumentType(DEFENCE_TRANSLATED_DOCUMENT)
+                                                     .setDocumentName("Translated_" + caseDocument.getDocumentName())));
+
+            caseData.setPreTranslationDocuments(null);
+        }
+
+        CaseEvent businessProcessEvent = hasMissingBilingualDefendantResponseTranslation
+            ? CaseEvent.UPLOAD_TRANSLATED_DEFENDANT_SEALED_FORM
+            : getBusinessProcessEvent(caseData);
         updateNoticeOfDiscontinuanceTranslatedDoc(callbackParams);
         updateDocumentCollectionsWithTranslationDocuments(
             caseData);
@@ -113,6 +154,14 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
 
         aboutToStartOrSubmitCallbackResponseBuilder.data(caseData.toMap(objectMapper));
         return aboutToStartOrSubmitCallbackResponseBuilder.build();
+    }
+
+    private boolean isMissingBilingualDefendantResponseTranslation(BusinessProcess businessProcess,
+                                                                  State state,
+                                                                  CaseData caseData) {
+        return businessProcess.isFinished()
+            && "MAIN.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL".equals(state.getName())
+            && caseData.getTranslatedDocuments().isEmpty();
     }
 
     private void updateSystemGeneratedDocumentsWithOriginalDocuments(CallbackParams callbackParams,

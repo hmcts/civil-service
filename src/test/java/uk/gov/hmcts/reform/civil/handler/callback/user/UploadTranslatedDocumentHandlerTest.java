@@ -10,11 +10,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocuments.UploadTranslatedDocumentDefaultStrategy;
 import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocuments.UploadTranslatedDocumentStrategyFactory;
 import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocuments.UploadTranslatedDocumentV1Strategy;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
@@ -23,6 +25,9 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
@@ -50,6 +55,10 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
     private UploadTranslatedDocumentV1Strategy uploadTranslatedDocumentV1Strategy;
     @Mock
     private DeadlinesCalculator deadlinesCalculator;
+    @Mock
+    private IStateFlowEngine stateFlowEngine;
+    @Mock
+    private StateFlow stateFlow;
 
     private static final String FILE_NAME_1 = "Some file 1";
 
@@ -62,8 +71,11 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
             objectMapper,
             assignCategoryId,
             featureToggleService,
-            deadlinesCalculator
+            deadlinesCalculator,
+            stateFlowEngine
         );
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
+        when(stateFlow.getState()).thenReturn(State.from("MAIN.DEFAULT"));
         UploadTranslatedDocumentStrategyFactory uploadTranslatedDocumentStrategyFactory = new UploadTranslatedDocumentStrategyFactory(
             uploadTranslatedDocumentDefaultStrategy,
             uploadTranslatedDocumentV1Strategy
@@ -97,7 +109,9 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
             caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
             caseData.setCaseDataLiP(caseDataLiP);
 
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            CaseData caseDataBefore = CaseDataBuilder.builder().build();
+            caseDataBefore.setBusinessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY));
+            CallbackParams params = callbackParamsOf(caseData, caseDataBefore, ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
