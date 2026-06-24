@@ -1609,6 +1609,23 @@ class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralApplication
                 .params(null);
         }
 
+        private CallbackParams getCallbackParams(YesOrNo isConsented, YesOrNo isTobeNotified) {
+            return new CallbackParams()
+                .type(ABOUT_TO_SUBMIT)
+                .pageId(null)
+                .request(CallbackRequest.builder()
+                             .caseDetails(CaseDetails.builder()
+                                              .data(objectMapper.convertValue(
+                                                  getSampleGeneralApplicationCaseData(isConsented, isTobeNotified),
+                                                  new TypeReference<>() {
+                                                  })).id(CASE_ID).build())
+                             .eventId("END_BUSINESS_PROCESS_GASPEC")
+                             .build())
+                .caseData(getSampleGeneralApplicationCaseData(isConsented, isTobeNotified))
+                .version(null)
+                .params(null);
+        }
+
         private CallbackParams getCallbackParamsOfVary(YesOrNo isConsented, YesOrNo isTobeNotified) {
             List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
             return new CallbackParams()
@@ -1625,23 +1642,6 @@ class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralApplication
                 .caseData(getSampleGeneralApplicationCaseDataForVaryJudgement(isConsented, isTobeNotified, respondentsResponses))
                 .version(null)
                 .params(null);
-        }
-
-        private CallbackParams getCallbackParams(YesOrNo isConsented, YesOrNo isTobeNotified) {
-            return new CallbackParams()
-                    .type(ABOUT_TO_SUBMIT)
-                    .pageId(null)
-                    .request(CallbackRequest.builder()
-                            .caseDetails(CaseDetails.builder()
-                                    .data(objectMapper.convertValue(
-                                            getSampleGeneralApplicationCaseData(isConsented, isTobeNotified),
-                                            new TypeReference<>() {
-                                            })).id(CASE_ID).build())
-                            .eventId("END_BUSINESS_PROCESS_GASPEC")
-                            .build())
-                    .caseData(getSampleGeneralApplicationCaseData(isConsented, isTobeNotified))
-                    .version(null)
-                    .params(null);
         }
 
         private StartEventResponse getStartEventResponse(YesOrNo isConsented, YesOrNo isTobeNotified) {
