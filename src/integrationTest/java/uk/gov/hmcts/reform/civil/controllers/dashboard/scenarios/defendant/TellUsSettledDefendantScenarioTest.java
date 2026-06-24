@@ -46,9 +46,9 @@ public class TellUsSettledDefendantScenarioTest extends DashboardBaseIntegration
                 jsonPath("$[0].titleCy").value("Mae’r hawliad wedi’i setlo"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae’r hawlydd wedi cadarnhau bod yr achos hwn wedi’i setlo ar 19 Mawrth 2024.</p>"
-                        + "<p class=\"govuk-body\">Os nad ydych yn cytuno bod yr achos wedi’i setlo, " +
-                        "nodwch eich gwrthwynebiadau yn ysgrifenedig o fewn 19 diwrnod i’r dyddiad setlo, i’r " +
-                        "Ganolfan Busnes Llys Sirol Gyffredinol gan ddefnyddio’r cyfeiriad e-bost yn {cmcCourtEmailId}</p>")
+                        + "<p class=\"govuk-body\">Os nad ydych yn cytuno bod yr achos wedi’i setlo, "
+                        + "amlinellwch eich gwrthwynebiadau yn ysgrifenedig o fewn 19 diwrnod i’r dyddiad setlo, i’r "
+                        + "Ganolfan Busnes Sifil Cenedlaethol gan ddefnyddio’r cyfeiriad e-bost {cmcCourtEmailId}</p>")
             );
     }
 }

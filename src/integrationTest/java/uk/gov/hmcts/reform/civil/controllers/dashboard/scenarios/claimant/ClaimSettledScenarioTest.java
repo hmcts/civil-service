@@ -67,8 +67,8 @@ public class ClaimSettledScenarioTest extends DashboardBaseIntegrationTest {
                 jsonPath("$[0].titleCy").value("Mae’r hawliad wedi’i setlo"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">Rydych wedi cadarnhau bod yr hawliad yn erbyn Mr. Sole Trader T/A Sole Trader co wedi’i setlo ar 16 Mawrth 2024.</p>"
-                            + "<p class=\"govuk-body\">Mae gan y diffynnydd 19 diwrnod o’r dyddiad setlo i hysbysu’r llys am unrhyw wrthwynebarn.</p>")
+                        "<p class=\"govuk-body\">Rydych wedi cadarnhau bod yr hawliad yn erbyn Mr. Sole Trader T/A Sole Trader co wedi'i setlo ar 16 Mawrth 2024.</p>"
+                            + "<p class=\"govuk-body\">Mae gan y diffynnydd 19 diwrnod o ddyddiad y setliad i hysbysu'r llys am unrhyw wrthwynebiad.</p>")
             );
     }
 }
