@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.event.CvpJoinLinkEvent;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTask;
 import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerThrottleService;
@@ -15,7 +16,7 @@ import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerThrottleService;
 public class HearingCvpLinkScheduledTask implements ScheduledTask {
 
     private final ApplicationEventPublisher applicationEventPublisher;
-    private final SchedulerThrottleService schedulerThrottleService;
+    private final EventProperties eventProperties;
 
     @Override
     public void accept(CaseDetails caseDetails) {
@@ -26,6 +27,10 @@ public class HearingCvpLinkScheduledTask implements ScheduledTask {
         Long caseId = caseDetails.getId();
         log.info("HearingCvpLinkScheduledTask::accept case {}", caseId);
         applicationEventPublisher.publishEvent(new CvpJoinLinkEvent(caseId));
-        schedulerThrottleService.throttle(totalCases);
+        SchedulerThrottleService.throttle(
+            totalCases,
+            eventProperties.getDispatchDelay(),
+            eventProperties.getLockDuration()
+        );
     }
 }

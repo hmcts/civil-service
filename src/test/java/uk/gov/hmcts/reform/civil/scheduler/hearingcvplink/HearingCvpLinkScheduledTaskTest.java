@@ -3,14 +3,18 @@ package uk.gov.hmcts.reform.civil.scheduler.hearingcvplink;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.MockedStatic;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.event.CvpJoinLinkEvent;
 import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerThrottleService;
 
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class HearingCvpLinkScheduledTaskTest {
@@ -19,7 +23,7 @@ class HearingCvpLinkScheduledTaskTest {
     private ApplicationEventPublisher applicationEventPublisher;
 
     @Mock
-    private SchedulerThrottleService schedulerThrottleService;
+    private EventProperties eventProperties;
 
     @InjectMocks
     private HearingCvpLinkScheduledTask task;
@@ -38,10 +42,16 @@ class HearingCvpLinkScheduledTaskTest {
     void shouldThrottleUsingTotalCases() {
         Long caseId = 123L;
         CaseDetails caseDetails = CaseDetails.builder().id(caseId).build();
+        when(eventProperties.getDispatchDelay()).thenReturn(2000);
+        when(eventProperties.getLockDuration()).thenReturn(600000L);
 
-        task.accept(caseDetails, 26);
+        try (MockedStatic<SchedulerThrottleService> schedulerThrottleService = mockStatic(
+            SchedulerThrottleService.class
+        )) {
+            task.accept(caseDetails, 26);
 
-        verify(applicationEventPublisher).publishEvent(new CvpJoinLinkEvent(caseId));
-        verify(schedulerThrottleService).throttle(26);
+            verify(applicationEventPublisher).publishEvent(new CvpJoinLinkEvent(caseId));
+            schedulerThrottleService.verify(() -> SchedulerThrottleService.throttle(26, 2000, 600000L));
+        }
     }
 }
