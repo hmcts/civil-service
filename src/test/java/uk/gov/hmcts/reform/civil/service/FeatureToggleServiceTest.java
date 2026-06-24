@@ -291,4 +291,11 @@ class FeatureToggleServiceTest {
         givenToggle("judgment-buffer", toggleStat);
         assertThat(featureToggleService.isJudgmentBufferEnabled()).isEqualTo(toggleStat);
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenSpringSchedulerEnabled(Boolean toggleStat) {
+        givenToggle("spring-scheduler-enabled", toggleStat);
+        assertThat(featureToggleService.isSpringSchedulerEnabled()).isEqualTo(toggleStat);
+    }
 }
