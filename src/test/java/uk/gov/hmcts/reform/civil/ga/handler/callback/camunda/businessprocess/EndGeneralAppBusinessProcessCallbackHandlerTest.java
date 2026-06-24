@@ -958,6 +958,42 @@ class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralApplication
         }
 
         @Test
+        void shouldMoveLrConsentApplicationToJudicialDecision() {
+            ParentCaseUpdateHelper mockHelper = mock(ParentCaseUpdateHelper.class);
+            EndGeneralAppBusinessProcessCallbackHandler localHandler = new EndGeneralAppBusinessProcessCallbackHandler(
+                caseDetailsConverter,
+                gaForLipService,
+                mockHelper
+            );
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .ccdCaseReference(CHILD_CCD_REF)
+                .ccdState(PENDING_APPLICATION_ISSUED)
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CCD_REF.toString()))
+                .generalAppType(new GAApplicationType().setTypes(List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT)))
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setPaymentDetails(new PaymentDetails()))
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
+                .generalAppRespondentSolicitors(wrapElements(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL)))
+                .isMultiParty(NO)
+                .parentClaimantIsApplicant(YES)
+                .build();
+            CallbackParams callbackParams = getCallbackParams(caseData);
+
+            when(gaForLipService.isGaForLip(any())).thenReturn(false);
+            when(caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails()))
+                .thenReturn(caseData);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) localHandler.handle(callbackParams);
+
+            assertThat(response.getState()).isEqualTo(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.name());
+            verify(mockHelper).updateParentWithGAState(
+                caseData,
+                APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue()
+            );
+        }
+
+        @Test
         void theEndOfProcessShouldUpdateTheStateOfGAAndAlsoUpdateStateOnParentCaseGADetailsAndCollection_ToBeNotified() {
             when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponseForCollection(NO, YES));
             when(coreCaseDataService.caseDataContentFromStartEventResponse(any(), anyMap())).thenCallRealMethod();
@@ -1554,6 +1590,21 @@ class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralApplication
                              .build())
                 .caseData(getSampleGeneralApplicationCaseDataMulti(isConsented, isTobeNotified,
                                                                    respondentResponses, respondentDetails))
+                .version(null)
+                    .params(null);
+        }
+
+        private CallbackParams getCallbackParams(GeneralApplicationCaseData caseData) {
+            return new CallbackParams()
+                .type(ABOUT_TO_SUBMIT)
+                .pageId(null)
+                .request(CallbackRequest.builder()
+                             .caseDetails(CaseDetails.builder()
+                                              .data(objectMapper.convertValue(caseData, new TypeReference<>() {
+                                              })).id(CASE_ID).build())
+                             .eventId("END_BUSINESS_PROCESS_GASPEC")
+                             .build())
+                .caseData(caseData)
                 .version(null)
                 .params(null);
         }

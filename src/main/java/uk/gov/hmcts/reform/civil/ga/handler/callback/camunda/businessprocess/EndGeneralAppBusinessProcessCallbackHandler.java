@@ -162,6 +162,10 @@ public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler
             return PROCEEDS_IN_HERITAGE;
         }
 
+        if (isLRConsentApplication(data, types)) {
+            return APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION;
+        }
+
         return determineStandardState(data, respondentsSatisfied);
     }
 
@@ -177,6 +181,13 @@ public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler
         return NO.equals(data.getParentClaimantIsApplicant())
             && types.contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)
             && respondentsSatisfied;
+    }
+
+    // Generate Draft Document for LRvLR Consent application
+    private boolean isLRConsentApplication(GeneralApplicationCaseData caseData, List<GeneralApplicationTypes> types) {
+        return !gaForLipService.isGaForLip(caseData)
+            && types.size() == 1
+            && types.contains(GeneralApplicationTypes.SETTLE_BY_CONSENT);
     }
 
     private CaseState determineStandardState(GeneralApplicationCaseData data, boolean respondentsSatisfied) {
