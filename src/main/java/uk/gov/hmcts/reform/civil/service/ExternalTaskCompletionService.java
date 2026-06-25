@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.exception.BadRequestException;
+import org.camunda.bpm.client.exception.EngineException;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -57,6 +58,9 @@ public class ExternalTaskCompletionService {
             throw new NotRetryableException(e.getMessage());
         } catch (NoSuchElementException e) {
             log.error("Completing task '{}' No Such Element error, processInstanceId '{}'", topicName, processInstanceId, e);
+            throw new NotRetryableException(e.getMessage());
+        } catch (EngineException e) {
+            log.error("Completing task '{}' Camunda BPM client exception, processInstanceId '{}'", topicName, processInstanceId, e);
             throw new NotRetryableException(e.getMessage());
         } catch (Exception e) {
             // Inc EngineException | ConnectionLostException | UnknownHttpErrorException
