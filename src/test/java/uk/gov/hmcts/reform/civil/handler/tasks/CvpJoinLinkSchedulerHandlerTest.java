@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.config.properties.AsyncHandlerProperties;
 import uk.gov.hmcts.reform.civil.event.CvpJoinLinkEvent;
 import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.CaseHearingDateSearchService;
 
 import java.util.Map;
@@ -53,6 +54,9 @@ class CvpJoinLinkSchedulerHandlerTest {
     private ApplicationEventPublisher applicationEventPublisher;
 
     @Mock
+    private FeatureToggleService featureToggleService;
+
+    @Mock
     private AsyncHandlerProperties asyncHandlerProperties;
     @Spy
     private EventProperties eventProperties = configuredEventProperties();
@@ -62,6 +66,7 @@ class CvpJoinLinkSchedulerHandlerTest {
 
     @BeforeEach
     void init() {
+        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(false);
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
     }
@@ -87,6 +92,16 @@ class CvpJoinLinkSchedulerHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verifyNoInteractions(applicationEventPublisher);
+    }
+
+    @Test
+    void shouldNotProcessCasesWhenSpringSchedulerFeatureToggleIsEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(true);
+
+        handler.execute(mockTask, externalTaskService);
+
+        verifyNoInteractions(searchService, applicationEventPublisher);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test

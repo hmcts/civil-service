@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.CaseHearingDateSearchService;
 import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
@@ -23,6 +24,7 @@ public class HearingCvpLinkScheduler implements CivilScheduler {
     private final CaseHearingDateSearchService searchService;
     private final ScheduledTaskRunner scheduledTaskRunner;
     private final HearingCvpLinkScheduledTask hearingCvpLinkScheduledTask;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public String getName() {
@@ -35,13 +37,15 @@ public class HearingCvpLinkScheduler implements CivilScheduler {
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
     @Override
     public void runScheduledTask() {
-        log.info("Running {} scheduler", SCHEDULER_NAME);
-        ElasticSearchResult searchResult = searchService.getElasticSearchResult();
-        int totalCases = searchResult == null ? 0 : searchResult.totalResults();
-        scheduledTaskRunner.run(
-            new ScheduledTaskEventConfiguration(SCHEDULER_NAME),
-            searchResult,
-            caseDetails -> hearingCvpLinkScheduledTask.accept(caseDetails, totalCases)
-        );
+        if (featureToggleService.isSpringSchedulerEnabled()) {
+            log.info("Running {} scheduler", SCHEDULER_NAME);
+            ElasticSearchResult searchResult = searchService.getElasticSearchResult();
+            int totalCases = searchResult == null ? 0 : searchResult.totalResults();
+            scheduledTaskRunner.run(
+                new ScheduledTaskEventConfiguration(SCHEDULER_NAME),
+                searchResult,
+                caseDetails -> hearingCvpLinkScheduledTask.accept(caseDetails, totalCases)
+            );
+        }
     }
 }
