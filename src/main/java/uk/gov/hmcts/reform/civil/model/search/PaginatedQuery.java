@@ -58,6 +58,7 @@ public class PaginatedQuery {
             query.put("size", pageSize);
             query.put("from", searchAfterValue != null ? 0 : startIndex);
             query.put("sort", Collections.singletonList(Collections.singletonMap(sortField, "asc")));
+            query.put("track_total_hits", true);
 
             if (!initialSearch && searchAfterValue != null) {
                 query.put("search_after", Collections.singletonList(searchAfterValue));
