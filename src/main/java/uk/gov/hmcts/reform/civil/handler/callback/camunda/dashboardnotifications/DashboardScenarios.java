@@ -304,8 +304,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_GENERAL_APPLICATION_IN_PROGRESS_DEFENDANT("Scenario.AAA6.GeneralApplication.ViewApplicationInProgress.Defendant"),
     SCENARIO_AAA6_GENERAL_APPS_TRANSLATED_DOCUMENT_UPLOADED_APPLICANT("Scenario.AAA6.GeneralApps.TranslatedDocumentUploaded.Applicant"),
     SCENARIO_AAA6_GENERAL_APPS_TRANSLATED_DOCUMENT_UPLOADED_RESPONDENT("Scenario.AAA6.GeneralApps.TranslatedDocumentUploaded.Respondent"),
-    SCENARIO_AAA6_CASE_SETTLED_JR_CANCELLED_CLAIMANT("Scenario.Notice.AAA6.JR.Cancelled.Case.Settled.Claimant"),
-    SCENARIO_AAA6_CASE_STAYED_JR_CANCELLED_CLAIMANT("Scenario.Notice.AAA6.JR.Cancelled.Case.Stayed.Claimant");
+    SCENARIO_AAA6_CASE_SETTLED_JR_CANCELLED_CLAIMANT("Scenario.AAA6.JR.Cancelled.Case.Settled.Claimant"),
+    SCENARIO_AAA6_CASE_STAYED_JR_CANCELLED_CLAIMANT("Scenario.AAA6.JR.Cancelled.Case.Stayed.Claimant");
 
     private final String scenario;
 
