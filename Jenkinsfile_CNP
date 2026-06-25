@@ -112,6 +112,8 @@ withPipeline(type, product, component) {
   env.WIREMOCK_MAPPINGS_BRANCH = wiremockMappingsBranch
   env.UNASSIGN_CASES = true
   env.BEFTA_FORCE_IMPORT_RETRY = 'true'
+  env.PLAYWRIGHT_BROWSERS_PATH = ".cache/ms-playwright"
+  env.PLAYWRIGHT_SKIP_BROWSER_GC = "1"
 
   loadVaultSecrets(secrets)
 
