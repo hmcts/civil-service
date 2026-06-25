@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.scheduler.pollingeventemitter.PollingEventEmitterScheduledTask;
 import uk.gov.hmcts.reform.civil.scheduler.pollingeventemitter.PollingEventEmitterScheduler;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
 
 import java.util.List;
@@ -42,6 +43,9 @@ public class PollingEventEmitterSchedulerITest {
     private PollingEventEmitterScheduledTask pollingEventEmitterScheduledTask;
 
     @MockBean
+    private FeatureToggleService featureToggleService;
+
+    @MockBean
     private TelemetryService telemetryService;
 
     @Test
@@ -52,6 +56,7 @@ public class PollingEventEmitterSchedulerITest {
             .cases(List.of(caseDetails))
             .build();
         when(coreCaseDataService.searchCases(any(Query.class))).thenReturn(searchResult);
+        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(true);
 
         scheduler.runScheduledTask();
 

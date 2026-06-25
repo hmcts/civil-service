@@ -10,6 +10,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.CaseReadyBusinessProcessSearchService;
 import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
@@ -24,6 +25,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,6 +42,9 @@ class PollingEventEmitterSchedulerTest {
     @Mock
     private PollingEventEmitterScheduledTask pollingEventEmitterScheduledTask;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     private PollingEventEmitterScheduler scheduler;
 
     @BeforeEach
@@ -47,13 +52,15 @@ class PollingEventEmitterSchedulerTest {
         scheduler = new PollingEventEmitterScheduler(
             searchService,
             scheduledTaskRunner,
-            pollingEventEmitterScheduledTask
+            pollingEventEmitterScheduledTask,
+            featureToggleService
         );
         ReflectionTestUtils.setField(scheduler, "multiCasesExecutionDelayInSeconds", 30L);
     }
 
     @Test
     void shouldRunPollingEventEmitterScheduler() {
+        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(true);
         CaseDetails caseDetails = CaseDetails.builder().id(CASE_ID).build();
         ElasticSearchResult searchResult = new ElasticSearchResult(List.of(caseDetails).stream(), 1);
         when(searchService.getElasticSearchResult()).thenReturn(searchResult);
@@ -75,6 +82,7 @@ class PollingEventEmitterSchedulerTest {
 
     @Test
     void shouldLimitCasesToFitWithinFiftyMinuteProcessingWindow() {
+        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(true);
         ReflectionTestUtils.setField(scheduler, "multiCasesExecutionDelayInSeconds", 30L);
         List<CaseDetails> cases = IntStream.rangeClosed(1, 101)
             .mapToObj(caseId -> CaseDetails.builder().id((long) caseId).build())
@@ -97,6 +105,7 @@ class PollingEventEmitterSchedulerTest {
 
     @Test
     void shouldTreatConfiguredDelayBelowOneSecondAsOneSecond() {
+        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(true);
         ReflectionTestUtils.setField(scheduler, "multiCasesExecutionDelayInSeconds", 0L);
         List<CaseDetails> cases = IntStream.rangeClosed(1, 3001)
             .mapToObj(caseId -> CaseDetails.builder().id((long) caseId).build())
@@ -119,6 +128,7 @@ class PollingEventEmitterSchedulerTest {
 
     @Test
     void shouldPassNullSearchResultToRunner() {
+        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(true);
         when(searchService.getElasticSearchResult()).thenReturn(null);
 
         scheduler.runScheduledTask();
@@ -129,5 +139,14 @@ class PollingEventEmitterSchedulerTest {
             any()
         );
         verify(pollingEventEmitterScheduledTask, never()).accept(any(), anyLong(), anyLong());
+    }
+
+    @Test
+    void shouldNotRunPollingEventEmitterSchedulerWhenSpringSchedulerFeatureToggleIsDisabled() {
+        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(false);
+
+        scheduler.runScheduledTask();
+
+        verifyNoInteractions(searchService, scheduledTaskRunner, pollingEventEmitterScheduledTask);
     }
 }

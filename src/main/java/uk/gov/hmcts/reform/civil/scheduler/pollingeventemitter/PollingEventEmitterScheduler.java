@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.CaseReadyBusinessProcessSearchService;
 import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
@@ -27,6 +28,7 @@ public class PollingEventEmitterScheduler implements CivilScheduler {
     private final CaseReadyBusinessProcessSearchService searchService;
     private final ScheduledTaskRunner scheduledTaskRunner;
     private final PollingEventEmitterScheduledTask pollingEventEmitterScheduledTask;
+    private final FeatureToggleService featureToggleService;
 
     @Value("${polling.emitter.multiple.cases.delay.seconds:30}")
     private long multiCasesExecutionDelayInSeconds;
@@ -42,17 +44,19 @@ public class PollingEventEmitterScheduler implements CivilScheduler {
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
     @Override
     public void runScheduledTask() {
-        log.info("Running {} scheduler", SCHEDULER_NAME);
-        ElasticSearchResult searchResult = searchService.getElasticSearchResult();
-        ElasticSearchResult limitedSearchResult = limitToScheduledWindow(searchResult);
-        long totalCases = limitedSearchResult == null ? 0 : limitedSearchResult.totalResults();
-        long delayMs = TimeUnit.SECONDS.toMillis(getDelaySeconds());
+        if (featureToggleService.isSpringSchedulerEnabled()) {
+            log.info("Running {} scheduler", SCHEDULER_NAME);
+            ElasticSearchResult searchResult = searchService.getElasticSearchResult();
+            ElasticSearchResult limitedSearchResult = limitToScheduledWindow(searchResult);
+            long totalCases = limitedSearchResult == null ? 0 : limitedSearchResult.totalResults();
+            long delayMs = TimeUnit.SECONDS.toMillis(getDelaySeconds());
 
-        scheduledTaskRunner.run(
-            new ScheduledTaskEventConfiguration(SCHEDULER_NAME),
-            limitedSearchResult,
-            caseDetails -> pollingEventEmitterScheduledTask.accept(caseDetails, totalCases, delayMs)
-        );
+            scheduledTaskRunner.run(
+                new ScheduledTaskEventConfiguration(SCHEDULER_NAME),
+                limitedSearchResult,
+                caseDetails -> pollingEventEmitterScheduledTask.accept(caseDetails, totalCases, delayMs)
+            );
+        }
     }
 
     private ElasticSearchResult limitToScheduledWindow(ElasticSearchResult searchResult) {
