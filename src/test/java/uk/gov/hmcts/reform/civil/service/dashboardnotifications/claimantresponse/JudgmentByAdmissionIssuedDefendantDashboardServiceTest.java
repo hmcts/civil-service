@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -37,8 +36,6 @@ class JudgmentByAdmissionIssuedDefendantDashboardServiceTest {
     private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private JudgmentByAdmissionIssuedDefendantDashboardService service;
@@ -50,7 +47,6 @@ class JudgmentByAdmissionIssuedDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioWhenIndividualJudgmentIssued() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         Party respondent1 = new Party();
         respondent1.setType(Party.Type.INDIVIDUAL);
@@ -77,7 +73,6 @@ class JudgmentByAdmissionIssuedDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioWhenLrvLipPaymentRouteProvided() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -150,7 +145,6 @@ class JudgmentByAdmissionIssuedDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioWhenLipvLipCompanyAcceptedPlan() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         Party respondent1 = new Party();
         respondent1.setType(Party.Type.COMPANY);
@@ -174,7 +168,6 @@ class JudgmentByAdmissionIssuedDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioWhenAcceptedPlanAndPayBySetDate() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -197,7 +190,6 @@ class JudgmentByAdmissionIssuedDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioWhenAcceptedPlanAndPayByInstallment() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         Party respondent1 = new Party();
         respondent1.setType(Party.Type.INDIVIDUAL);
@@ -219,21 +211,6 @@ class JudgmentByAdmissionIssuedDefendantDashboardServiceTest {
             eq("1234"),
             any(ScenarioRequestParams.class)
         );
-    }
-
-    @Test
-    void shouldNotRecordWhenToggleDisabled() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
-
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setApplicant1Represented(YesOrNo.YES);
-        caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
-            RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
-
-        service.notifyDefendant(caseData, AUTH_TOKEN);
-
-        verifyNoInteractions(dashboardScenariosService);
     }
 
     @Test
