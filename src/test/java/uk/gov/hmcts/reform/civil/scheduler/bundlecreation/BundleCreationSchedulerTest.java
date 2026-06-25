@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.BundleCreationTriggerService;
 import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
@@ -19,6 +20,7 @@ import java.util.function.Consumer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +32,8 @@ class BundleCreationSchedulerTest {
     private ScheduledTaskRunner scheduledTaskRunner;
     @Mock
     private BundleCreationScheduledTask bundleCreationScheduledTask;
+    @Mock
+    private FeatureToggleService featureToggleService;
     @Captor
     private ArgumentCaptor<Consumer<CaseDetails>> taskCaptor;
     @InjectMocks
@@ -37,6 +41,7 @@ class BundleCreationSchedulerTest {
 
     @Test
     void shouldRunBundleCreationTask() {
+        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(true);
         CaseDetails caseDetails = CaseDetails.builder().id(123L).build();
         ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(caseDetails), 1);
         when(searchService.getElasticSearchResult()).thenReturn(searchResult);
@@ -51,5 +56,14 @@ class BundleCreationSchedulerTest {
         );
         taskCaptor.getValue().accept(caseDetails);
         verify(bundleCreationScheduledTask).accept(caseDetails, 1);
+    }
+
+    @Test
+    void shouldNotRunBundleCreationTaskWhenSpringSchedulerFeatureToggleIsDisabled() {
+        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(false);
+
+        scheduler.runScheduledTask();
+
+        verifyNoInteractions(searchService, scheduledTaskRunner, bundleCreationScheduledTask);
     }
 }

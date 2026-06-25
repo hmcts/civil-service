@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.NoCacheUserService;
 import uk.gov.hmcts.reform.civil.service.search.BundleCreationTriggerService;
 
@@ -67,6 +68,8 @@ class BundleCreationTriggerHandlerTest {
     private SystemUpdateUserConfiguration userConfig;
     @Mock
     private NoCacheUserService noCacheUserService;
+    @Mock
+    private FeatureToggleService featureToggleService;
     @Spy
     private EventProperties eventProperties = configuredEventProperties();
 
@@ -78,6 +81,7 @@ class BundleCreationTriggerHandlerTest {
 
     @BeforeEach
     void init() {
+        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(false);
         when(mockTask.getTopicName()).thenReturn(TEST);
         when(mockTask.getWorkerId()).thenReturn("worker");
         when(userConfig.getUserName()).thenReturn(TEST);
@@ -122,6 +126,16 @@ class BundleCreationTriggerHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verifyNoInteractions(applicationEventPublisher);
+    }
+
+    @Test
+    void shouldNotProcessCasesWhenSpringSchedulerFeatureToggleIsEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(true);
+
+        handler.execute(mockTask, externalTaskService);
+
+        verifyNoInteractions(searchService, applicationEventPublisher, noCacheUserService);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test
@@ -278,4 +292,3 @@ class BundleCreationTriggerHandlerTest {
     }
 
 }
-
