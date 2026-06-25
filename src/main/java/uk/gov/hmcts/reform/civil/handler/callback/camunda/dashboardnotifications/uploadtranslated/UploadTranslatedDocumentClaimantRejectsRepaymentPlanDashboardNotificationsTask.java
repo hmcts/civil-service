@@ -3,10 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotification
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardWorkflowTask;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.caseproceedsoffline.ApplicationsProceedOfflineClaimantDashboardTask;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.caseproceedsoffline.ApplicationsProceedOfflineDefendantDashboardTask;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimantresponse.ClaimantCcjResponseClaimantDashboardTask;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimantresponse.ClaimantCcjResponseDefendantDashboardTask;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimantresponse.ClaimantResponseClaimantDashboardTask;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimantresponse.ClaimantResponseDefendantDashboardTask;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimantresponse.JudgmentByAdmissionIssuedClaimantDashboardTask;
@@ -23,10 +19,6 @@ public class UploadTranslatedDocumentClaimantRejectsRepaymentPlanDashboardNotifi
     private final SimpleStateFlowEngine stateFlowEngine;
     private final ClaimantResponseClaimantDashboardTask claimantTask;
     private final ClaimantResponseDefendantDashboardTask defendantTask;
-    private final ClaimantCcjResponseClaimantDashboardTask claimantCcjTask;
-    private final ClaimantCcjResponseDefendantDashboardTask defendantCcjTask;
-    private final ApplicationsProceedOfflineClaimantDashboardTask claimantOfflineTask;
-    private final ApplicationsProceedOfflineDefendantDashboardTask defendantOfflineTask;
     private final JudgmentByAdmissionIssuedClaimantDashboardTask judgmentByAdmissionClaimantTask;
     private final JudgmentByAdmissionIssuedDefendantDashboardTask judgmentByAdmissionDefendantTask;
 
@@ -34,20 +26,12 @@ public class UploadTranslatedDocumentClaimantRejectsRepaymentPlanDashboardNotifi
         SimpleStateFlowEngine stateFlowEngine,
         ClaimantResponseClaimantDashboardTask claimantTask,
         ClaimantResponseDefendantDashboardTask defendantTask,
-        ClaimantCcjResponseClaimantDashboardTask claimantCcjTask,
-        ClaimantCcjResponseDefendantDashboardTask defendantCcjTask,
-        ApplicationsProceedOfflineClaimantDashboardTask claimantOfflineTask,
-        ApplicationsProceedOfflineDefendantDashboardTask defendantOfflineTask,
         JudgmentByAdmissionIssuedClaimantDashboardTask judgmentByAdmissionClaimantTask,
         JudgmentByAdmissionIssuedDefendantDashboardTask judgmentByAdmissionDefendantTask
     ) {
         this.stateFlowEngine = stateFlowEngine;
         this.claimantTask = claimantTask;
         this.defendantTask = defendantTask;
-        this.claimantCcjTask = claimantCcjTask;
-        this.defendantCcjTask = defendantCcjTask;
-        this.claimantOfflineTask = claimantOfflineTask;
-        this.defendantOfflineTask = defendantOfflineTask;
         this.judgmentByAdmissionClaimantTask = judgmentByAdmissionClaimantTask;
         this.judgmentByAdmissionDefendantTask = judgmentByAdmissionDefendantTask;
     }
@@ -62,7 +46,6 @@ public class UploadTranslatedDocumentClaimantRejectsRepaymentPlanDashboardNotifi
         StateFlowDTO stateFlow = stateFlowEngine.getStateFlow(caseData);
         boolean inMediation = isInMediation(stateFlow);
         boolean lipJudgmentAdmission = stateFlow.isFlagSet(FlowFlag.LIP_JUDGMENT_ADMISSION);
-        boolean joOnlineLiveEnabled = stateFlow.isFlagSet(FlowFlag.JO_ONLINE_LIVE_ENABLED);
 
         if (!inMediation && !lipJudgmentAdmission) {
             claimantTask.execute(context);
@@ -70,15 +53,7 @@ public class UploadTranslatedDocumentClaimantRejectsRepaymentPlanDashboardNotifi
             return;
         }
 
-        if (!inMediation && lipJudgmentAdmission && !joOnlineLiveEnabled) {
-            claimantOfflineTask.execute(context);
-            defendantOfflineTask.execute(context);
-            claimantCcjTask.execute(context);
-            defendantCcjTask.execute(context);
-            return;
-        }
-
-        if (lipJudgmentAdmission && joOnlineLiveEnabled) {
+        if (lipJudgmentAdmission) {
             judgmentByAdmissionClaimantTask.execute(context);
             judgmentByAdmissionDefendantTask.execute(context);
         }
