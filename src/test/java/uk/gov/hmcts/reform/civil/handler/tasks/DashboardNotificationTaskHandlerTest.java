@@ -16,6 +16,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
@@ -33,6 +34,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
@@ -83,6 +85,10 @@ class DashboardNotificationTaskHandlerTest {
     private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     @Spy
     private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
     @Captor
     private ArgumentCaptor<DashboardTaskContext> contextCaptor;
 
@@ -181,5 +187,14 @@ class DashboardNotificationTaskHandlerTest {
         assertThat(context.generalApplicationCaseData().getBusinessProcess().getActivityId())
             .isEqualTo(ACTIVITY_ID);
         assertThat(context.callbackParams()).isNull();
+    }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(1);
+        eventProperties.setBackoffDelay(1);
+        eventProperties.setLockDuration(1000L);
+        eventProperties.setDispatchDelay(0);
+        return eventProperties;
     }
 }
