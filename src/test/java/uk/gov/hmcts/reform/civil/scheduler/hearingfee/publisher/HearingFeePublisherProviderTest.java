@@ -1,0 +1,69 @@
+package uk.gov.hmcts.reform.civil.scheduler.hearingfee.publisher;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+
+import java.util.function.Consumer;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class HearingFeePublisherProviderTest {
+
+    @Mock
+    private MultiOrIntermediateTrackProvider multiOrIntermediateTrackProvider;
+    @Mock
+    private PreMultiIntermediateClaimProvider preMultiIntermediateClaimProvider;
+    @Mock
+    private FeatureToggleService featureToggleService;
+    @Mock
+    private CaseData caseData;
+    @Mock
+    private Consumer<Long> publisher;
+
+    private HearingFeePublisherProvider hearingFeePublisherProvider;
+
+    @BeforeEach
+    void setUp() {
+        hearingFeePublisherProvider = new HearingFeePublisherProvider(
+            multiOrIntermediateTrackProvider,
+            preMultiIntermediateClaimProvider,
+            featureToggleService
+        );
+    }
+
+    @Test
+    void shouldReturnMultiOrIntermediatePublisher_whenFeatureIsEnabled() {
+        // Given
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
+        when(multiOrIntermediateTrackProvider.getPublisher(caseData)).thenReturn(publisher);
+
+        // When
+        Consumer<Long> result = hearingFeePublisherProvider.provide(caseData);
+
+        // Then
+        assertThat(result).isEqualTo(publisher);
+        verify(multiOrIntermediateTrackProvider).getPublisher(caseData);
+    }
+
+    @Test
+    void shouldReturnPreMultiIntermediatePublisher_whenFeatureIsDisabled() {
+        // Given
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
+        when(preMultiIntermediateClaimProvider.getPublisher(caseData)).thenReturn(publisher);
+
+        // When
+        Consumer<Long> result = hearingFeePublisherProvider.provide(caseData);
+
+        // Then
+        assertThat(result).isEqualTo(publisher);
+        verify(preMultiIntermediateClaimProvider).getPublisher(caseData);
+    }
+}
