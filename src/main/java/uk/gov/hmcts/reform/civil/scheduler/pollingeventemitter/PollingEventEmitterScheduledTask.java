@@ -11,10 +11,16 @@ import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTask;
 import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerThrottleUtils;
 import uk.gov.hmcts.reform.civil.service.EventEmitterService;
 
+import java.util.concurrent.TimeUnit;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class PollingEventEmitterScheduledTask implements ScheduledTask {
+
+    static final long POLLING_WINDOW_MS = TimeUnit.SECONDS.toMillis(
+        PollingEventEmitterScheduler.FIFTY_MINUTES_IN_SECONDS
+    );
 
     private final CaseDetailsConverter caseDetailsConverter;
     private final EventEmitterService eventEmitterService;
@@ -34,6 +40,6 @@ public class PollingEventEmitterScheduledTask implements ScheduledTask {
         );
 
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
-        SchedulerThrottleUtils.throttle(totalCases, delayMs, eventProperties.getLockDuration());
+        SchedulerThrottleUtils.throttle(totalCases, delayMs, POLLING_WINDOW_MS);
     }
 }

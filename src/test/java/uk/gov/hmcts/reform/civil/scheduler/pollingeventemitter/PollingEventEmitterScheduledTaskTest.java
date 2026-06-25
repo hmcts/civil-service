@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerThrottleUtils;
 import uk.gov.hmcts.reform.civil.service.EventEmitterService;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -27,7 +28,10 @@ class PollingEventEmitterScheduledTaskTest {
     private static final long CASE_ID = 123L;
     private static final long TOTAL_CASES = 10L;
     private static final long DELAY_MS = 30000L;
-    private static final long LOCK_DURATION = 1980000L;
+    private static final long DEFAULT_LOCK_DURATION = 1980000L;
+    private static final long POLLING_WINDOW_MS = TimeUnit.SECONDS.toMillis(
+        PollingEventEmitterScheduler.FIFTY_MINUTES_IN_SECONDS
+    );
     private static final String CAMUNDA_EVENT = "TEST_EVENT";
 
     @Mock
@@ -44,7 +48,7 @@ class PollingEventEmitterScheduledTaskTest {
     void setUp() {
         EventProperties eventProperties = new EventProperties();
         eventProperties.setDispatchDelay((int) DELAY_MS);
-        eventProperties.setLockDuration(LOCK_DURATION);
+        eventProperties.setLockDuration(DEFAULT_LOCK_DURATION);
         task = new PollingEventEmitterScheduledTask(caseDetailsConverter, eventEmitterService, eventProperties);
 
         caseDetails = CaseDetails.builder().id(CASE_ID).data(Map.of()).build();
@@ -61,7 +65,7 @@ class PollingEventEmitterScheduledTaskTest {
             task.accept(caseDetails, TOTAL_CASES, DELAY_MS);
 
             verify(eventEmitterService).emitBusinessProcessCamundaEvent(caseData, true);
-            throttleUtils.verify(() -> SchedulerThrottleUtils.throttle(TOTAL_CASES, DELAY_MS, LOCK_DURATION));
+            throttleUtils.verify(() -> SchedulerThrottleUtils.throttle(TOTAL_CASES, DELAY_MS, POLLING_WINDOW_MS));
         }
     }
 
@@ -73,7 +77,7 @@ class PollingEventEmitterScheduledTaskTest {
             task.accept(caseDetails);
 
             verify(eventEmitterService).emitBusinessProcessCamundaEvent(caseData, true);
-            throttleUtils.verify(() -> SchedulerThrottleUtils.throttle(1, DELAY_MS, LOCK_DURATION));
+            throttleUtils.verify(() -> SchedulerThrottleUtils.throttle(1, DELAY_MS, POLLING_WINDOW_MS));
         }
     }
 }
