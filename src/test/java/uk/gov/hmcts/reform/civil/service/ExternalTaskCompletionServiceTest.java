@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import org.camunda.bpm.client.exception.BadRequestException;
+import org.camunda.bpm.client.exception.EngineException;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.exception.RestException;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -101,6 +102,17 @@ class ExternalTaskCompletionServiceTest {
             VariableMap variables = Variables.createVariables();
             when(handler.getVariableMap(data)).thenReturn(variables);
             doThrow(new BadRequestException("Bad Request", new RestException("", "", 400)))
+                .when(externalTaskService).complete(externalTask, variables);
+
+            assertThrows(NotRetryableException.class, () ->
+                service.completeTask(handler, externalTask, externalTaskService, data));
+        }
+
+        @Test
+        void shouldThrowNotRetryableException_whenEngineExceptionIsThrown() {
+            VariableMap variables = Variables.createVariables();
+            when(handler.getVariableMap(data)).thenReturn(variables);
+            doThrow(new EngineException("Engine Exception", new RestException("", "", 400)))
                 .when(externalTaskService).complete(externalTask, variables);
 
             assertThrows(NotRetryableException.class, () ->
