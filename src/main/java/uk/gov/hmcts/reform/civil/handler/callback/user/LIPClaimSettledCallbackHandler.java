@@ -72,7 +72,7 @@ public class LIPClaimSettledCallbackHandler extends CallbackHandler {
         boolean isJoRequested = featureToggleService.isJudgmentBufferEnabled()
             && YesOrNo.YES.equals(caseDataUpdated.getIsJoRequested());
         if (isJoRequested) {
-            log.info("Clearing JO fields for caseId {}" , caseDataUpdated.getCcdCaseReference());
+            log.info("Clearing JO fields for caseId {}", caseDataUpdated.getCcdCaseReference());
             JudgmentsOnlineHelper.clearJOCaseData(caseDataUpdated);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
