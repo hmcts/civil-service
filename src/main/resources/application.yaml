@@ -68,6 +68,9 @@ scheduler:
   defendantResponse:
     cronExpression: ${CRON_EXPRESSION_DEFENDANT_RESPONSE:0 1 16 * * ?}
     enabled: ${SCHEDULER_ENABLED_DEFENDANT_RESPONSE:false}
+  pollingEventEmitter:
+    cronExpression: ${CRON_EXPRESSION_POLLING_EVENT_EMITTER:0 0 8-20 * * ?}
+    enabled: ${SCHEDULER_ENABLED_POLLING_EVENT_EMITTER:false}
 
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
