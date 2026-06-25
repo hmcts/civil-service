@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Component
 @Slf4j
@@ -45,13 +46,14 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
     private final String encryptionSecret;
 
     public MigrateCasesEventHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         CaseReferenceCsvLoader caseReferenceCsvLoader,
         MigrationTaskFactory migrationTaskFactory,
         AsyncCaseMigrationService asyncCaseMigrationService,
         @Value("${migration.csvFile.decrypt.key:DUMMY_KEY}") String encryptionSecret
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.caseReferenceCsvLoader = caseReferenceCsvLoader;
         this.migrationTaskFactory = migrationTaskFactory;
         this.encryptionSecret = encryptionSecret;
