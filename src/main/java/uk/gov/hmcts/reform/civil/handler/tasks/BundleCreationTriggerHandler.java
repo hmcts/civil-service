@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
@@ -14,13 +15,13 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.NoCacheUserService;
 import uk.gov.hmcts.reform.civil.service.search.BundleCreationTriggerService;
 
 import java.util.List;
 import java.util.Set;
-import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 import static uk.gov.hmcts.reform.civil.service.tasklisteners.BundleCreationTriggerHandlerExternalTaskListener.LOCK_DURATION;
 
@@ -39,6 +40,7 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
     private final NoCacheUserService noCacheUserService;
 
     public BundleCreationTriggerHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         BundleCreationTriggerService bundleCreationTriggerService,
         ApplicationEventPublisher applicationEventPublisher,
@@ -48,7 +50,7 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
         NoCacheUserService noCacheUserService,
         FeatureToggleService featureToggleService
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.bundleCreationTriggerService = bundleCreationTriggerService;
         this.applicationEventPublisher = applicationEventPublisher;
         this.caseDetailsConverter = caseDetailsConverter;

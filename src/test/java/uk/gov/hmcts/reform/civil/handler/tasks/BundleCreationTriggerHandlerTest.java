@@ -7,11 +7,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
@@ -20,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.NoCacheUserService;
 import uk.gov.hmcts.reform.civil.service.search.BundleCreationTriggerService;
@@ -44,8 +47,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import org.mockito.Spy;
-import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @ExtendWith(SpringExtension.class)
 class BundleCreationTriggerHandlerTest {
@@ -72,6 +73,8 @@ class BundleCreationTriggerHandlerTest {
     private FeatureToggleService featureToggleService;
     @Spy
     private EventProperties eventProperties = configuredEventProperties();
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
 
     @InjectMocks
     private BundleCreationTriggerHandler handler;
