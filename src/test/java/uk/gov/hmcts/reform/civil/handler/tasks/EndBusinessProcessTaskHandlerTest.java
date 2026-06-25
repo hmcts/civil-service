@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 import java.util.Map;
 
@@ -55,6 +56,7 @@ class EndBusinessProcessTaskHandlerTest {
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
         handler = new EndBusinessProcessTaskHandler(
+            new ExternalTaskCompletionService(),
             new EventProperties(),
             coreCaseDataService,
             caseDetailsConverter,
@@ -99,6 +101,7 @@ class EndBusinessProcessTaskHandlerTest {
             anyInt(),
             anyLong()
         );
+        verify(externalTaskService).complete(mockExternalTask, null);
     }
 
     @Test

@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
@@ -51,8 +50,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 class JudgmentByAdmissionMapperTest {
 
     private RoboticsAddressMapper addressMapper;
-    @Mock
-    private FeatureToggleService featureToggleService;
     private InterestCalculator interestCalculator;
     private JudgementService judgementService;
     private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
@@ -64,7 +61,7 @@ class JudgmentByAdmissionMapperTest {
     void setUp() {
         addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
         interestCalculator = new InterestCalculator();
-        judgementService = new JudgementService(featureToggleService, interestCalculator);
+        judgementService = new JudgementService(interestCalculator);
         judgmentByAdmissionOnlineMapper =
             new JudgmentByAdmissionOnlineMapper(time, addressMapper, judgementService, interestCalculator);
     }
