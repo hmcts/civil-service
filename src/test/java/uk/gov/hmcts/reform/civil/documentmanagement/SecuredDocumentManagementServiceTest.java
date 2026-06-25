@@ -302,6 +302,30 @@ class SecuredDocumentManagementServiceTest {
         }
 
         @Test
+        void shouldThrowDocumentNotFound_whenDownloadBinaryReturns404() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8aef01";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getDocumentBinary(anyString(), anyString(), eq(documentId)))
+                .thenThrow(buildFeignException(404));
+
+            assertThrows(
+                DocumentNotFoundException.class,
+                () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath)
+            );
+        }
+
+        @Test
+        void shouldThrowInvalidDocumentReference_whenUuidMalformed() {
+            String documentPath = "documents/zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz";
+
+            assertThrows(
+                InvalidDocumentReferenceException.class,
+                () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath)
+            );
+        }
+
+        @Test
         void shouldDownloadDocumentByDocumentPathMetaData() throws JsonProcessingException {
             //Given
             Document document = mapper.readValue(
