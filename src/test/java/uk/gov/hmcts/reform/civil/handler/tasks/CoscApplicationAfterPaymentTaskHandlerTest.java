@@ -53,6 +53,7 @@ import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FL
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState.ISSUED;
 import static uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection.PAY_BY_DATE;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(MockitoExtension.class)
 public class CoscApplicationAfterPaymentTaskHandlerTest {
@@ -78,6 +79,9 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
     private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(mapper);
     @Spy
     private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
 
     @InjectMocks
     private CoscApplicationAfterPaymentTaskHandler handler;

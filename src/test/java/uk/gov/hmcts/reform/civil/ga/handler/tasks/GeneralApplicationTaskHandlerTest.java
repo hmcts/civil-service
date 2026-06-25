@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.ga.stateflow.GaStateFlow;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 import java.util.Map;
 
@@ -76,6 +77,7 @@ public class GeneralApplicationTaskHandlerTest extends GeneralApplicationBaseCal
         EventProperties eventProperties = new EventProperties();
         eventProperties.setRetryCount(3);
         generalApplicationTaskHandler = new GeneralApplicationTaskHandler(
+            new ExternalTaskCompletionService(),
             eventProperties,
             coreCaseDataService,
             caseDetailsConverter,

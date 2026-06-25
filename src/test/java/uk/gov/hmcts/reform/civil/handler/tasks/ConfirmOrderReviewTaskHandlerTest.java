@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,7 @@ class ConfirmOrderReviewTaskHandlerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
         caseEventTaskHandler = new ConfirmOrderReviewTaskHandler(
+            new ExternalTaskCompletionService(),
             new EventProperties(),
             coreCaseDataService,
             caseDetailsConverter,

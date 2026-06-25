@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_SCHEDULER_CHECK_STAY_ORDER_DEADLINE;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.ORDER_MADE;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.RELIEF_FROM_SANCTIONS;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STAY_THE_CLAIM;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT;
 
@@ -35,6 +34,7 @@ import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.time.LocalDate;
@@ -60,16 +60,12 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
     @Spy private ObjectMapper mapper = ObjectMapperFactory.instance();
 
     private CaseDetails caseDetailsWithTodayDeadlineNotProcessed;
-    private CaseDetails caseDetailsWithTodayDeadlineReliefFromSanctionOrder;
     private CaseDetails caseDetailsWithDeadlineCrossedNotProcessed;
-    private CaseDetails caseDetailsWithDeadlineCrossedProcessed;
 
     private CaseDetails caseDetailsWithNoDeadline;
     private CaseDetails caseDetailsWithFutureDeadline;
     private GeneralApplicationCaseData caseDataWithDeadlineCrossedNotProcessed;
     private GeneralApplicationCaseData caseDataWithTodayDeadlineNotProcessed;
-    private GeneralApplicationCaseData caseDataWithTodayDeadlineReliefFromSanctionOrder;
-    private GeneralApplicationCaseData caseDataWithDeadlineCrossedProcessed;
     private GeneralApplicationCaseData caseDataWithNoDeadline;
     private GeneralApplicationCaseData caseDataWithFutureDeadline;
 
@@ -82,6 +78,7 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
         EventProperties eventProperties = new EventProperties();
         eventProperties.setRetryCount(3);
         gaOrderMadeTaskHandler = new CheckStayOrderDeadlineEndTaskHandler(
+            new ExternalTaskCompletionService(),
             eventProperties,
             searchService,
             coreCaseDataService,
@@ -90,30 +87,20 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
         );
 
         caseDetailsWithTodayDeadlineNotProcessed =
-                getCaseDetails(1L, STAY_THE_CLAIM, deadLineToday, YesOrNo.NO);
+            getCaseDetails(1L, STAY_THE_CLAIM, deadLineToday, YesOrNo.NO);
         caseDataWithTodayDeadlineNotProcessed =
-                getCaseData(1L, STAY_THE_CLAIM, deadLineToday, YesOrNo.NO);
-
-        caseDetailsWithTodayDeadlineReliefFromSanctionOrder =
-                getCaseDetails(2L, RELIEF_FROM_SANCTIONS, deadLineToday, YesOrNo.NO);
-        caseDataWithTodayDeadlineReliefFromSanctionOrder =
-                getCaseData(2L, RELIEF_FROM_SANCTIONS, deadLineToday, YesOrNo.NO);
+            getCaseData(1L, STAY_THE_CLAIM, deadLineToday, YesOrNo.NO);
 
         caseDetailsWithDeadlineCrossedNotProcessed =
-                getCaseDetails(3L, STAY_THE_CLAIM, deadlineCrossed, YesOrNo.NO);
+            getCaseDetails(3L, STAY_THE_CLAIM, deadlineCrossed, YesOrNo.NO);
         caseDataWithDeadlineCrossedNotProcessed =
-                getCaseData(3L, STAY_THE_CLAIM, deadlineCrossed, YesOrNo.NO);
-
-        caseDetailsWithDeadlineCrossedProcessed =
-                getCaseDetails(4L, STAY_THE_CLAIM, deadlineCrossed, YesOrNo.YES);
-        caseDataWithDeadlineCrossedProcessed =
-                getCaseData(4L, STAY_THE_CLAIM, deadlineCrossed, YesOrNo.YES);
+            getCaseData(3L, STAY_THE_CLAIM, deadlineCrossed, YesOrNo.NO);
 
         caseDetailsWithNoDeadline = getCaseDetails(5L, STAY_THE_CLAIM, null, YesOrNo.NO);
         caseDataWithNoDeadline = getCaseData(5L, STAY_THE_CLAIM, null, YesOrNo.NO);
 
         caseDetailsWithFutureDeadline =
-                getCaseDetails(6L, STAY_THE_CLAIM, deadlineInFuture, YesOrNo.NO);
+            getCaseDetails(6L, STAY_THE_CLAIM, deadlineInFuture, YesOrNo.NO);
         caseDataWithFutureDeadline = getCaseData(6L, STAY_THE_CLAIM, deadlineInFuture, YesOrNo.NO);
     }
 

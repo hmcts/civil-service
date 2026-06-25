@@ -36,6 +36,7 @@ import static java.util.Optional.ofNullable;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.lang.reflect.Method;
@@ -87,6 +88,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         handler = new UpdateFromGACaseEventTaskHandler(
+            new ExternalTaskCompletionService(),
             new EventProperties(),
             coreCaseDataService,
             caseDetailsConverter,

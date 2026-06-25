@@ -46,10 +46,6 @@ public class FeatureToggleService {
                 );
     }
 
-    public boolean isJudgmentOnlineLive() {
-        return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
-    }
-
     public boolean isCjesServiceAvailable() {
         return featureToggleApi.isFeatureEnabled("isCjesServiceAvailable");
     }
@@ -106,8 +102,7 @@ public class FeatureToggleService {
     }
 
     public boolean isJOLiveFeedActive() {
-        return isJudgmentOnlineLive()
-            && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
+        return featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
     }
 
     public boolean isDefendantNoCOnlineForCase(CaseData caseData)  {
