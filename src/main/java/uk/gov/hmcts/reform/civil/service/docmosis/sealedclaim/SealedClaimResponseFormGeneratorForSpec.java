@@ -287,6 +287,9 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         for (TimelineOfEvents event : timelineOfEvents) {
             TimelineOfEventDetails timelineOfEventDetail = new TimelineOfEventDetails(
                 event.getValue().getTimelineDate(),
+                event.getValue().getTimelineDay(),
+                event.getValue().getTimelineMonth(),
+                event.getValue().getTimelineYear(),
                 event.getValue().getTimelineDescription()
             );
             timelineOfEventDetails.add(new TimelineEventDetailsDocmosis(timelineOfEventDetail));

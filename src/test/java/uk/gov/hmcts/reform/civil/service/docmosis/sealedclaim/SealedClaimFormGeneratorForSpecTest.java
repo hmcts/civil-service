@@ -296,8 +296,9 @@ class  SealedClaimFormGeneratorForSpecTest {
 
     private CaseData.CaseDataBuilder getCaseDataBuilderWithAllDetails() {
         List<TimelineOfEvents> timelines = new ArrayList<>();
+        LocalDate now = LocalDate.now();
         timelines.add(new TimelineOfEvents(
-            new TimelineOfEventDetails(LocalDate.now(), "test timeline"),
+            new TimelineOfEventDetails(now, String.valueOf(now.getDayOfMonth()), String.valueOf(now.getMonthValue()), String.valueOf(now.getDayOfYear()), "test timeline"),
             null
         ));
 
