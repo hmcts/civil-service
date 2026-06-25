@@ -238,8 +238,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         try {
             caseDocumentClientApi.deleteDocument(authorisation, authTokenGenerator.generate(), getDocumentIdFromSelfHref(documentPath), true);
         } catch (Exception ex) {
-            log.error("Failed deleting document {}", documentPath, ex);
-            throw new DocumentDownloadException(documentPath, ex);
+            throw classifyDownloadFailure(documentPath, ex);
         }
     }
 
@@ -288,6 +287,10 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     }
 
     private UUID getDocumentIdFromSelfHref(String selfHref) {
+        if (selfHref == null || selfHref.length() < DOC_UUID_LENGTH) {
+            log.error("Invalid document reference, cannot extract document id: {}", selfHref);
+            throw new InvalidDocumentReferenceException(selfHref);
+        }
         return UUID.fromString(selfHref.substring(selfHref.length() - DOC_UUID_LENGTH));
     }
 }

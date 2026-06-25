@@ -340,6 +340,31 @@ class SecuredDocumentManagementServiceTest {
         }
 
         @Test
+        void shouldThrowInvalidDocumentReference_whenSelfHrefShorterThanUuid() {
+            // EXC-CS-022: a reference shorter than a full document UUID (e.g. documents/null)
+            // previously threw StringIndexOutOfBoundsException in getDocumentIdFromSelfHref and was
+            // retried 5x. It is now a classified InvalidDocumentReferenceException, excluded from retry.
+            String documentPath = "documents/null"; // 14 chars, no trailing document UUID
+
+            assertThrows(
+                InvalidDocumentReferenceException.class,
+                () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath)
+            );
+            verify(caseDocumentClientApi, times(0))
+                .getMetadataForDocument(anyString(), anyString(), any());
+        }
+
+        @Test
+        void shouldThrowInvalidDocumentReference_whenSelfHrefNull() {
+            assertThrows(
+                InvalidDocumentReferenceException.class,
+                () -> documentManagementService.getDocumentMetaData(BEARER_TOKEN, null)
+            );
+            verify(caseDocumentClientApi, times(0))
+                .getMetadataForDocument(anyString(), anyString(), any());
+        }
+
+        @Test
         void shouldDownloadDocumentByDocumentPathMetaData() throws JsonProcessingException {
             //Given
             Document document = mapper.readValue(
