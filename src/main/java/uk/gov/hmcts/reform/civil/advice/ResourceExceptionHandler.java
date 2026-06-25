@@ -122,34 +122,26 @@ public class ResourceExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(value = DocumentNotFoundException.class)
-    public ResponseEntity<Object> documentNotFound(Exception exception,
-                                                   ContentCachingRequestWrapper contentCachingRequestWrapper) {
+    @ExceptionHandler({
+        DocumentNotFoundException.class,
+        DocumentAccessException.class,
+        InvalidDocumentReferenceException.class
+    })
+    public ResponseEntity<Object> documentManagementError(Exception exception,
+                                                          ContentCachingRequestWrapper contentCachingRequestWrapper) {
         log.info(exception.getMessage(), exception);
-        String errorMessage = "Document not found error with message: %s for case %s run by user %s";
+        String errorMessage = "Document management error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)));
-        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(value = DocumentAccessException.class)
-    public ResponseEntity<Object> documentAccessRefused(Exception exception,
-                                                        ContentCachingRequestWrapper contentCachingRequestWrapper) {
-        log.info(exception.getMessage(), exception);
-        String errorMessage = "Document access refused error with message: %s for case %s run by user %s";
-        log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
-                                         getUserId(contentCachingRequestWrapper)));
-        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN);
-    }
-
-    @ExceptionHandler(value = InvalidDocumentReferenceException.class)
-    public ResponseEntity<Object> invalidDocumentReference(Exception exception,
-                                                           ContentCachingRequestWrapper contentCachingRequestWrapper) {
-        log.info(exception.getMessage(), exception);
-        String errorMessage = "Invalid document reference error with message: %s for case %s run by user %s";
-        log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
-                                         getUserId(contentCachingRequestWrapper)));
-        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        HttpStatus status;
+        if (exception instanceof DocumentNotFoundException) {
+            status = HttpStatus.NOT_FOUND;
+        } else if (exception instanceof DocumentAccessException) {
+            status = HttpStatus.FORBIDDEN;
+        } else {
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), status);
     }
 
     @ExceptionHandler(value = NoSuchMethodError.class)

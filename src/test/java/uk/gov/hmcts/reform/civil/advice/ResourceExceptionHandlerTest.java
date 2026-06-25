@@ -221,7 +221,7 @@ public class ResourceExceptionHandlerTest {
     void shouldReturnNotFound_whenDocumentNotFoundExceptionThrown() {
         testTemplate(
             "could not be found in document management",
-            handler.documentNotFound(
+            handler.documentManagementError(
                 new DocumentNotFoundException("documents/abc", new RuntimeException("cdam 404")),
                 contentCachingRequestWrapper
             ),
@@ -233,7 +233,7 @@ public class ResourceExceptionHandlerTest {
     void shouldReturnForbidden_whenDocumentAccessExceptionThrown() {
         testTemplate(
             "was refused by document management",
-            handler.documentAccessRefused(
+            handler.documentManagementError(
                 new DocumentAccessException("documents/abc", new RuntimeException("cdam 403 ttl")),
                 contentCachingRequestWrapper
             ),
@@ -245,7 +245,7 @@ public class ResourceExceptionHandlerTest {
     void shouldReturnBadRequest_whenInvalidDocumentReferenceExceptionThrown() {
         testTemplate(
             "Invalid document reference",
-            handler.invalidDocumentReference(
+            handler.documentManagementError(
                 new InvalidDocumentReferenceException("documents/null"),
                 contentCachingRequestWrapper
             ),

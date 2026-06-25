@@ -316,6 +316,20 @@ class SecuredDocumentManagementServiceTest {
         }
 
         @Test
+        void shouldThrowDocumentNotFound_whenMetaDataReturns404DuringDownloadWithMetaData() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8aef02";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), eq(documentId)))
+                .thenThrow(buildFeignException(404));
+
+            assertThrows(
+                DocumentNotFoundException.class,
+                () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath)
+            );
+        }
+
+        @Test
         void shouldThrowInvalidDocumentReference_whenUuidMalformed() {
             String documentPath = "documents/zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz";
 
