@@ -22,6 +22,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import org.mockito.Spy;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(MockitoExtension.class)
 public class SettlementNoResponseFromDefendantHandlerTest {
@@ -36,6 +37,9 @@ public class SettlementNoResponseFromDefendantHandlerTest {
     private SettlementNoResponseFromDefendantSearchService caseSearchService;
     @Spy
     private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
 
     @InjectMocks
     private SettlementNoResponseFromDefendantHandler handler;

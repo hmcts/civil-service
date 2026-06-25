@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import static java.lang.Long.parseLong;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
@@ -32,11 +33,12 @@ public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
     private final ObjectMapper mapper;
 
     public RetriggerCasesEventHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         CoreCaseDataService coreCaseDataService,
         ObjectMapper mapper
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.coreCaseDataService = coreCaseDataService;
         this.mapper = mapper;
     }
