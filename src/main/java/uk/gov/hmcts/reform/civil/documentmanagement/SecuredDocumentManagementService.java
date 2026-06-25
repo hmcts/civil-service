@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.documentmanagement;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
@@ -158,6 +159,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     }
 
     @Retryable(retryFor = {DocumentDownloadException.class},
+        noRetryFor = {DocumentNotFoundException.class, DocumentAccessException.class,
+            InvalidDocumentReferenceException.class},
         maxAttempts = 5,
         backoff = @Backoff(delay = 1000, multiplier = 2))
     @Override
@@ -188,6 +191,17 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                 .map(ByteArrayResource.class::cast)
                 .map(ByteArrayResource::getByteArray)
                 .orElseThrow(RuntimeException::new);
+        } catch (DocumentNotFoundException | DocumentAccessException | InvalidDocumentReferenceException ex) {
+            throw ex;
+        } catch (FeignException.NotFound ex) {
+            log.error("Document {} not found in document management", documentPath, ex);
+            throw new DocumentNotFoundException(documentPath, ex);
+        } catch (FeignException.Forbidden ex) {
+            log.error("Access to document {} refused by document management", documentPath, ex);
+            throw new DocumentAccessException(documentPath, ex);
+        } catch (IllegalArgumentException ex) {
+            log.error("Invalid document reference {}", documentPath, ex);
+            throw new InvalidDocumentReferenceException(documentPath, ex);
         } catch (Exception ex) {
             log.error("Failed downloading document {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);
@@ -195,6 +209,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     }
 
     @Retryable(retryFor = {DocumentDownloadException.class},
+        noRetryFor = {DocumentNotFoundException.class, DocumentAccessException.class,
+            InvalidDocumentReferenceException.class},
         maxAttempts = 5,
         backoff = @Backoff(delay = 1000, multiplier = 2))
     @Override
@@ -223,6 +239,17 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
             return new DownloadedDocumentResponse(responseEntity.getBody(), documentMetadata.originalDocumentName,
                                                   tika.detect(documentMetadata.originalDocumentName));
+        } catch (DocumentNotFoundException | DocumentAccessException | InvalidDocumentReferenceException ex) {
+            throw ex;
+        } catch (FeignException.NotFound ex) {
+            log.error("Document {} not found in document management", documentPath, ex);
+            throw new DocumentNotFoundException(documentPath, ex);
+        } catch (FeignException.Forbidden ex) {
+            log.error("Access to document {} refused by document management", documentPath, ex);
+            throw new DocumentAccessException(documentPath, ex);
+        } catch (IllegalArgumentException ex) {
+            log.error("Invalid document reference {}", documentPath, ex);
+            throw new InvalidDocumentReferenceException(documentPath, ex);
         } catch (Exception ex) {
             log.error("Failed downloading document {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);
@@ -250,6 +277,15 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                 getDocumentIdFromSelfHref(documentPath)
             );
 
+        } catch (FeignException.NotFound ex) {
+            log.error("Document {} not found in document management", documentPath, ex);
+            throw new DocumentNotFoundException(documentPath, ex);
+        } catch (FeignException.Forbidden ex) {
+            log.error("Access to document {} refused by document management", documentPath, ex);
+            throw new DocumentAccessException(documentPath, ex);
+        } catch (IllegalArgumentException ex) {
+            log.error("Invalid document reference {}", documentPath, ex);
+            throw new InvalidDocumentReferenceException(documentPath, ex);
         } catch (Exception ex) {
             log.error("Failed getting metadata for {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);

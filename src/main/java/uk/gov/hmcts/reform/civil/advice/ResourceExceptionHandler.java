@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentAccessException;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentNotFoundException;
+import uk.gov.hmcts.reform.civil.documentmanagement.InvalidDocumentReferenceException;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
@@ -117,6 +120,36 @@ public class ResourceExceptionHandler {
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = DocumentNotFoundException.class)
+    public ResponseEntity<Object> documentNotFound(Exception exception,
+                                                   ContentCachingRequestWrapper contentCachingRequestWrapper) {
+        log.info(exception.getMessage(), exception);
+        String errorMessage = "Document not found error with message: %s for case %s run by user %s";
+        log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
+                                         getUserId(contentCachingRequestWrapper)));
+        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = DocumentAccessException.class)
+    public ResponseEntity<Object> documentAccessRefused(Exception exception,
+                                                        ContentCachingRequestWrapper contentCachingRequestWrapper) {
+        log.info(exception.getMessage(), exception);
+        String errorMessage = "Document access refused error with message: %s for case %s run by user %s";
+        log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
+                                         getUserId(contentCachingRequestWrapper)));
+        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(value = InvalidDocumentReferenceException.class)
+    public ResponseEntity<Object> invalidDocumentReference(Exception exception,
+                                                           ContentCachingRequestWrapper contentCachingRequestWrapper) {
+        log.info(exception.getMessage(), exception);
+        String errorMessage = "Invalid document reference error with message: %s for case %s run by user %s";
+        log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
+                                         getUserId(contentCachingRequestWrapper)));
+        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = NoSuchMethodError.class)

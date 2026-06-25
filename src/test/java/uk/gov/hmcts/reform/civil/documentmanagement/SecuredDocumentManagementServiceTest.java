@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.documentmanagement;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
+import feign.Request;
 import org.apache.tika.Tika;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +33,9 @@ import uk.gov.hmcts.reform.civil.utils.ResourceReader;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -485,6 +489,50 @@ class SecuredDocumentManagementServiceTest {
             verify(caseDocumentClientApi)
                 .getMetadataForDocument(anyString(), anyString(), eq(documentId));
         }
+
+        @Test
+        void shouldThrowDocumentNotFound_whenCdamReturns404() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b6";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi
+                     .getMetadataForDocument(anyString(), anyString(), eq(documentId))
+            ).thenThrow(buildFeignException(404));
+
+            assertThrows(
+                DocumentNotFoundException.class,
+                () -> documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath)
+            );
+
+            verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
+        }
+
+        @Test
+        void shouldThrowDocumentAccess_whenCdamReturns403() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b8";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi
+                     .getMetadataForDocument(anyString(), anyString(), eq(documentId))
+            ).thenThrow(buildFeignException(403));
+
+            assertThrows(
+                DocumentAccessException.class,
+                () -> documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath)
+            );
+
+            verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
+        }
+    }
+
+    private static FeignException buildFeignException(int status) {
+        Request request = Request.create(
+            Request.HttpMethod.GET, "/cases/documents/x", Map.of(), new byte[]{}, StandardCharsets.UTF_8, null);
+        return switch (status) {
+            case 404 -> new FeignException.NotFound("not found", request, new byte[]{}, Map.of());
+            case 403 -> new FeignException.Forbidden("forbidden", request, new byte[]{}, Map.of());
+            default -> new FeignException.GatewayTimeout("timeout", request, new byte[]{}, Map.of());
+        };
     }
 
     @Nested

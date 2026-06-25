@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.InvalidDocumentReferenceException;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 
@@ -16,6 +17,9 @@ public class DocumentDownloadService {
     private final DocumentManagementService documentManagementService;
 
     public DownloadedDocumentResponse downloadDocument(String authorisation, String documentId) {
+        if (documentId == null || documentId.isBlank()) {
+            throw new InvalidDocumentReferenceException(String.format("documents/%s", documentId));
+        }
         String documentPath = String.format("documents/%s", documentId);
         return documentManagementService.downloadDocumentWithMetaData(authorisation, documentPath);
     }
