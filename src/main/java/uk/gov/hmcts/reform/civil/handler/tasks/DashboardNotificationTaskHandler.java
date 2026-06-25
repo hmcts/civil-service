@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -42,6 +43,7 @@ public class DashboardNotificationTaskHandler extends BaseExternalTaskHandler {
     private final UserService userService;
 
     protected DashboardNotificationTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         CoreCaseDataService coreCaseDataService,
         GaCoreCaseDataService gaCoreCaseDataService,
@@ -53,7 +55,7 @@ public class DashboardNotificationTaskHandler extends BaseExternalTaskHandler {
         SystemUpdateUserConfiguration userConfig,
         UserService userService
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.coreCaseDataService = coreCaseDataService;
         this.gaCoreCaseDataService = gaCoreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;

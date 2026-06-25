@@ -49,8 +49,7 @@ public class DefendantNocClaimantDashboardService extends DashboardScenarioServi
         if (!featureToggleService.isDefendantNoCOnlineForCase(caseData)) {
             return SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario();
         }
-        if (featureToggleService.isJudgmentOnlineLive()
-            && CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getPreviousCCDState())
+        if (CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getPreviousCCDState())
             && nonNull(caseData.getActiveJudgment())) {
             return SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_JBA_CLAIM_MOVES_OFFLINE_CLAIMANT.getScenario();
         }
