@@ -35,6 +35,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
@@ -77,6 +78,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     private final CaseDetailsConverter caseDetailsConverter;
 
     public IncidentRetryEventHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         CasesStuckCheckSearchService casesStuckCheckSearchService,
         CamundaRuntimeApi camundaRuntimeApi,
@@ -85,7 +87,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         CoreCaseDataService coreCaseDataService,
         CaseDetailsConverter caseDetailsConverter
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.casesStuckCheckSearchService = casesStuckCheckSearchService;
         this.camundaRuntimeApi = camundaRuntimeApi;
         this.authTokenGenerator = authTokenGenerator;
