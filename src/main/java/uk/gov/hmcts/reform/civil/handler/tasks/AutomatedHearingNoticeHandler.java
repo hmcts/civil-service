@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.task.ExternalTask;
-import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -21,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
@@ -35,6 +34,7 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     public AutomatedHearingNoticeHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         UserService userService,
         SystemUpdateUserConfiguration userConfig,
@@ -43,7 +43,7 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
         ObjectMapper mapper,
         ApplicationEventPublisher applicationEventPublisher
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.userService = userService;
         this.userConfig = userConfig;
         this.hearingsService = hearingsService;
@@ -79,28 +79,6 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
         );
 
         return new ExternalTaskData();
-    }
-
-    @Override
-    public void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService, ExternalTaskData data) {
-        String topicName = externalTask.getTopicName();
-        String processInstanceId = externalTask.getProcessInstanceId();
-
-        log.info("Trying to complete external task '{}' with processInstanceId '{}'",
-                 topicName, processInstanceId);
-        try {
-            externalTaskService.complete(externalTask, getVariableMap(data));
-
-            log.info("External task '{}' finished with processInstanceId '{}'",
-                     topicName, processInstanceId
-            );
-        } catch (NotFoundException e) {
-            log.info("Completing external task '{}' was skipped as process instance '{}' has already completed.",
-                      topicName, processInstanceId);
-        } catch (Exception ex) {
-            log.error("Completing external task '{}' errored  with processInstanceId '{}'",
-                      topicName, processInstanceId, ex);
-        }
     }
 
     private UnNotifiedHearingResponse getUnnotifiedHearings(String serviceId) {
