@@ -158,7 +158,7 @@ class CvpJoinLinkSchedulerHandlerTest {
         String errorMessage = "there was an error";
 
         doThrow(new NullPointerException(errorMessage))
-            .when(applicationEventPublisher).publishEvent(eq(new CvpJoinLinkEvent(caseId)));
+            .when(applicationEventPublisher).publishEvent(new CvpJoinLinkEvent(caseId));
 
         handler.execute(mockTask, externalTaskService);
 
