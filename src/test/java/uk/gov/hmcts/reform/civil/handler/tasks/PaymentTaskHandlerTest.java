@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.civil.model.StateFlowDTO;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
@@ -60,8 +59,6 @@ class PaymentTaskHandlerTest {
     private IStateFlowEngine stateFlowEngine;
     @Mock
     private CoreCaseDataService coreCaseDataService;
-    @Mock
-    private FeatureToggleService featureToggleService;
     @Spy
     private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     @Spy
@@ -188,7 +185,6 @@ class PaymentTaskHandlerTest {
             Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
             Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
             Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-            Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
             Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
             Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
             Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
