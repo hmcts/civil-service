@@ -21,7 +21,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
@@ -58,9 +57,6 @@ class CaseCategoriesServiceTest {
     @Test
     void shouldReturnNull_whenCategorySearchResultNotPresent() {
         when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.empty());
-
-        caseData = caseData.toBuilder().allocatedTrack(FAST_CLAIM).build();
-
         CaseCategoryModel actual = caseCategoriesService.getCaseCategoriesFor(
             CategoryType.CASE_TYPE,
             caseData,
@@ -97,19 +93,19 @@ class CaseCategoriesServiceTest {
     }
 
     @Test
-    void shouldUseAllocatedTrackForCategoryLookup_whenJudgeReallocatedTrack() {
+    void shouldReturnCaseType_whenJudgeReallocatedTrack() {
         CategorySearchResult categorySearchResult = new CategorySearchResult();
         categorySearchResult.setCategories(List.of(
             new Category()
                 .setCategoryKey("caseType")
-                .setKey("AAA7-FAST_CLAIM")
+                .setKey("AAA7-MULTI_CLAIM")
         ));
         when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any()))
             .thenReturn(Optional.of(categorySearchResult));
         CaseCategoryModel expected = new CaseCategoryModel();
         expected.setCategoryParent(null);
         expected.setCategoryType(CategoryType.CASE_TYPE);
-        expected.setCategoryValue("AAA7-FAST_CLAIM");
+        expected.setCategoryValue("AAA7-MULTI_CLAIM");
 
         caseData = caseData.toBuilder()
             .allocatedTrack(FAST_CLAIM)
@@ -156,10 +152,22 @@ class CaseCategoriesServiceTest {
     }
 
     @Test
-    void shouldReturnNull_whenSpecClaimWithNoResponseTrack() {
+    void shouldReturnCaseType_whenSpecClaimWithNoResponseTrack() {
+        CategorySearchResult categorySearchResult = new CategorySearchResult();
+        categorySearchResult.setCategories(List.of(
+            new Category()
+                .setCategoryKey("caseType")
+                .setKey("AAA6-SMALL_CLAIM")
+        ));
+        when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any()))
+            .thenReturn(Optional.of(categorySearchResult));
+        CaseCategoryModel expected = new CaseCategoryModel();
+        expected.setCategoryParent(null);
+        expected.setCategoryType(CategoryType.CASE_TYPE);
+        expected.setCategoryValue("AAA6-SMALL_CLAIM");
+
         caseData = caseData.toBuilder()
             .caseAccessCategory(SPEC_CLAIM)
-            .allocatedTrack(null)
             .responseClaimTrack(null)
             .build();
 
@@ -169,8 +177,7 @@ class CaseCategoriesServiceTest {
             AUTH
         );
 
-        assertThat(actual).isNull();
-        verifyNoInteractions(categoryService);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test

@@ -47,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FL
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE;
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.BUSINESS_PROCESS;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(MockitoExtension.class)
 class StartHearingNoticeBusinessProcessTaskHandlerTest {
@@ -71,6 +72,9 @@ class StartHearingNoticeBusinessProcessTaskHandlerTest {
     private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
     @Spy
     private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
 
     @InjectMocks
     private StartHearingNoticeBusinessProcessTaskHandler handler;

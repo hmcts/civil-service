@@ -212,7 +212,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
         }
 
         @Test
@@ -273,7 +272,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenIndividualAddressLengthGreaterThanMaxLimit() {
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
             Address address = new Address();
             address.setAddressLine1("Line 1 test again for more than 35 characters");
             address.setAddressLine2("Line 2 test again for more than 35 characters");
@@ -300,7 +298,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenOrgNameExceedsMaxLength() {
             // Given
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Party party = new Party();
             party.setType(Party.Type.ORGANISATION);
@@ -320,7 +317,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotReturnError_whenOrgNameExceedsMaxlength_And_flagOff() {
+        void shouldReturnError_whenOrgNameExceedsMaxlength() {
             // Given
             Party party = new Party();
             party.setType(Party.Type.ORGANISATION);
@@ -335,7 +332,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
-            assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getErrors()).isNotEmpty();
         }
 
     }
@@ -347,7 +344,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
         }
 
         @Test
@@ -408,7 +404,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenSoleTraderPostCodeLengthExceedsMaxLimit() {
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
             Address address = new Address();
             address.setAddressLine1("Triple street");
             address.setPostCode("00000PCode");
@@ -433,7 +428,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenCompanyAddressExceedsMaxLength() {
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
             Address address = new Address();
             address.setAddressLine1("Line 1 test again for more than 35 characters");
             address.setAddressLine2("Line 2 test again for more than 35 characters");
@@ -458,7 +452,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotReturnError_whenOrgNameExceedsMaxlength_And_flagOff() {
+        void shouldReturnError_whenApplicant2OrgNameExceedsMaxlength() {
             // Given
             Party party = new Party();
             party.setType(Party.Type.ORGANISATION);
@@ -473,7 +467,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
-            assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getErrors()).isNotEmpty();
         }
     }
 
@@ -484,7 +478,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setUp() {
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         }
 
         @Test
@@ -595,9 +588,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotError_when_address_exceeds_max_length_in_org_name_when_flag_in_off() {
+        void shouldReturnError_whenRespondent1OrgNameExceedsMaxLength() {
             // Given
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
             Party party = new Party();
             party.setType(Party.Type.ORGANISATION);
@@ -612,7 +604,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
-            assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getErrors()).isNotEmpty();
         }
     }
 
@@ -623,7 +615,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setUp() {
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         }
 
         @Test
@@ -734,9 +725,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotError_when_address_exceeds_max_length_in_org_name_when_flag_in_off() {
+        void shouldNotError_whenRespondent1OrgNameExceedsMaxLengthOnRespondent2Page() {
             // Given
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
             Party party = new Party();
             party.setType(Party.Type.ORGANISATION);

@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDateTime;
@@ -82,6 +83,7 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
         EventProperties eventProperties = new EventProperties();
         eventProperties.setRetryCount(3);
         waitCivilDocUpdatedTaskHandler = new WaitCivilDocUpdatedTaskHandler(
+            new ExternalTaskCompletionService(),
             eventProperties,
             coreCaseDataService,
             caseDetailsConverter,

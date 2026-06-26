@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import static java.util.Optional.ofNullable;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 /**
  * Handles the external camunda task for updating contact information.
@@ -34,12 +35,13 @@ public class ContactInformationUpdatedTaskHandler extends BaseExternalTaskHandle
     private final ObjectMapper mapper;
 
     public ContactInformationUpdatedTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         CoreCaseDataService coreCaseDataService,
         CaseDetailsConverter caseDetailsConverter,
         ObjectMapper mapper
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.coreCaseDataService = coreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;
         this.mapper = mapper;
