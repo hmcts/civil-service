@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
 import uk.gov.hmcts.reform.civil.ga.stateflow.GaStateFlow;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardCaseType;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardNotificationDispatcher;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -36,6 +35,7 @@ import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationTransactionalService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
@@ -76,7 +76,7 @@ class DashboardNotificationTaskHandlerTest {
     @Mock
     private GaStateFlowEngine gaStateFlowEngine;
     @Mock
-    private DashboardNotificationDispatcher dashboardNotificationDispatcher;
+    private DashboardNotificationTransactionalService dashboardNotificationTransactionalService;
     @Mock
     private SystemUpdateUserConfiguration userConfig;
     @Mock
@@ -119,7 +119,7 @@ class DashboardNotificationTaskHandlerTest {
         verify(coreCaseDataService).getCase(Long.valueOf(CASE_ID));
         verify(coreCaseDataService, never()).startUpdate(any(), any());
         verify(coreCaseDataService, never()).submitUpdate(any(), any());
-        verify(dashboardNotificationDispatcher).dispatch(eq(ACTIVITY_ID), contextCaptor.capture());
+        verify(dashboardNotificationTransactionalService).dispatch(eq(ACTIVITY_ID), contextCaptor.capture());
         assertCivilContext(contextCaptor.getValue());
         verify(externalTaskService).complete(mockTask, expectedVariables);
     }
@@ -153,7 +153,7 @@ class DashboardNotificationTaskHandlerTest {
         verify(gaCoreCaseDataService).getCase(Long.valueOf(CASE_ID));
         verify(gaCoreCaseDataService, never()).startGaUpdate(any(), any());
         verify(gaCoreCaseDataService, never()).submitGaUpdate(any(), any());
-        verify(dashboardNotificationDispatcher).dispatch(eq(ACTIVITY_ID), contextCaptor.capture());
+        verify(dashboardNotificationTransactionalService).dispatch(eq(ACTIVITY_ID), contextCaptor.capture());
         assertGaContext(contextCaptor.getValue());
         verify(externalTaskService).complete(mockTask, expectedVariables);
     }
