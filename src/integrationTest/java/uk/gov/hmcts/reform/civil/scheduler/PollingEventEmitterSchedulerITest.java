@@ -32,6 +32,7 @@ import static org.mockito.Mockito.when;
 public class PollingEventEmitterSchedulerITest {
 
     private static final long CASE_ID = 123L;
+    private static final String SCHEDULER_NAME = "PollingEventEmitter";
 
     @Autowired
     private PollingEventEmitterScheduler scheduler;
@@ -56,7 +57,7 @@ public class PollingEventEmitterSchedulerITest {
             .cases(List.of(caseDetails))
             .build();
         when(coreCaseDataService.searchCases(any(Query.class))).thenReturn(searchResult);
-        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(true);
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
 
         scheduler.runScheduledTask();
 

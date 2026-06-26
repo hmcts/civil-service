@@ -25,7 +25,9 @@ import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 @ConditionalOnExpression("${polling.event.emitter.enabled:true}")
 public class PollingEventEmitterHandler extends BaseExternalTaskHandler {
 
+    private static final String SCHEDULER_NAME = "PollingEventEmitter";
     public static final int FIFTY_MINUTES = 3000;
+
     private final CaseReadyBusinessProcessSearchService caseSearchService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final EventEmitterService eventEmitterService;
@@ -51,7 +53,7 @@ public class PollingEventEmitterHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        if (!featureToggleService.isSpringSchedulerEnabled()) {
+        if (!featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
             Set<CaseDetails> cases = Set.copyOf(caseSearchService.getCases());
             if (log.isInfoEnabled()) {
                 log.info("Job '{}' found {} case(s) with IDs {}", externalTask.getTopicName(), cases.size(),

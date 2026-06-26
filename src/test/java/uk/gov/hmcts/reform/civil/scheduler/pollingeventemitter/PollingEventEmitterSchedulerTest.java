@@ -32,6 +32,7 @@ import static org.mockito.Mockito.when;
 class PollingEventEmitterSchedulerTest {
 
     private static final long CASE_ID = 123L;
+    private static final String SCHEDULER_NAME = "PollingEventEmitter";
 
     @Mock
     private CaseReadyBusinessProcessSearchService searchService;
@@ -60,7 +61,7 @@ class PollingEventEmitterSchedulerTest {
 
     @Test
     void shouldRunPollingEventEmitterScheduler() {
-        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(true);
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         CaseDetails caseDetails = CaseDetails.builder().id(CASE_ID).build();
         ElasticSearchResult searchResult = new ElasticSearchResult(List.of(caseDetails).stream(), 1);
         when(searchService.getElasticSearchResult()).thenReturn(searchResult);
@@ -82,7 +83,7 @@ class PollingEventEmitterSchedulerTest {
 
     @Test
     void shouldLimitCasesToFitWithinFiftyMinuteProcessingWindow() {
-        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(true);
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         ReflectionTestUtils.setField(scheduler, "multiCasesExecutionDelayInSeconds", 30L);
         List<CaseDetails> cases = IntStream.rangeClosed(1, 101)
             .mapToObj(caseId -> CaseDetails.builder().id((long) caseId).build())
@@ -105,7 +106,7 @@ class PollingEventEmitterSchedulerTest {
 
     @Test
     void shouldTreatConfiguredDelayBelowOneSecondAsOneSecond() {
-        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(true);
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         ReflectionTestUtils.setField(scheduler, "multiCasesExecutionDelayInSeconds", 0L);
         List<CaseDetails> cases = IntStream.rangeClosed(1, 3001)
             .mapToObj(caseId -> CaseDetails.builder().id((long) caseId).build())
@@ -128,7 +129,7 @@ class PollingEventEmitterSchedulerTest {
 
     @Test
     void shouldPassNullSearchResultToRunner() {
-        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(true);
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         when(searchService.getElasticSearchResult()).thenReturn(null);
 
         scheduler.runScheduledTask();
@@ -143,7 +144,7 @@ class PollingEventEmitterSchedulerTest {
 
     @Test
     void shouldNotRunPollingEventEmitterSchedulerWhenSpringSchedulerFeatureToggleIsDisabled() {
-        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(false);
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(false);
 
         scheduler.runScheduledTask();
 

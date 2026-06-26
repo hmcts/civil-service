@@ -39,6 +39,8 @@ import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 @ExtendWith(MockitoExtension.class)
 class PollingEventEmitterHandlerTest {
 
+    private static final String SCHEDULER_NAME = "PollingEventEmitter";
+
     @Spy
     private EventProperties eventProperties = configuredEventProperties();
 
@@ -75,7 +77,7 @@ class PollingEventEmitterHandlerTest {
 
     @BeforeEach
     void init() {
-        lenient().when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(false);
+        lenient().when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(false);
         caseDetails1 = new CaseDetailsBuilder().id(1L).data(
             Map.of("businessProcess", businessProcessWithCamundaEvent("TEST_EVENT1"))).build();
         caseDetails2 = new CaseDetailsBuilder().id(2L).data(
@@ -99,7 +101,7 @@ class PollingEventEmitterHandlerTest {
 
     @Test
     void shouldNotProcessCasesWhenSpringSchedulerFeatureToggleIsEnabled() {
-        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(true);
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
 
         pollingEventEmitterHandler.execute(externalTask, externalTaskService);
 
