@@ -36,7 +36,7 @@ class JudgementPaidInFullTest extends BpmnBaseTest {
         "false, false, false",
         "true, true, true",
     })
-    void shouldSuccessfullyCompleteJudgmentPaidInFull_whenCalled(boolean joFlag, boolean isCjesServiceEnabled,
+    void shouldSuccessfullyCompleteJudgmentPaidInFull_whenCalled(boolean joLiveFeedActive, boolean isCjesServiceEnabled,
                                                                  boolean isJudgmentMarkedPaidInFull) {
         //assert process has started
         assertFalse(processInstance.isEnded());
@@ -46,7 +46,7 @@ class JudgementPaidInFullTest extends BpmnBaseTest {
 
         VariableMap variables = Variables.createVariables();
         variables.put("flowFlags", Map.of(
-            IS_JO_LIVE_FEED_ACTIVE, joFlag,
+            IS_JO_LIVE_FEED_ACTIVE, joLiveFeedActive,
             IS_CJES_SERVICE_ENABLED, isCjesServiceEnabled
         ));
 
@@ -103,7 +103,7 @@ class JudgementPaidInFullTest extends BpmnBaseTest {
             UPDATE_DASHBOARD_ACTIVITY_ID
         );
 
-        if (joFlag) {
+        if (joLiveFeedActive) {
             ExternalTask notifyRPA = assertNextExternalTask(PROCESS_CASE_EVENT);
             assertCompleteExternalTask(
                 notifyRPA,

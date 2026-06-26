@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
@@ -45,6 +46,7 @@ public class WaitCivilDocUpdatedTaskHandler extends BaseExternalTaskHandler {
     private final FeatureToggleService featureToggleService;
 
     public WaitCivilDocUpdatedTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         GaCoreCaseDataService coreCaseDataService,
         CaseDetailsConverter caseDetailsConverter,
@@ -52,7 +54,7 @@ public class WaitCivilDocUpdatedTaskHandler extends BaseExternalTaskHandler {
         ObjectMapper mapper,
         FeatureToggleService featureToggleService
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.coreCaseDataService = coreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;
         this.gaForLipService = gaForLipService;
