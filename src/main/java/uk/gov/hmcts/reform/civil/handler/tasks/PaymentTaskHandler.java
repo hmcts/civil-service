@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -22,16 +21,32 @@ import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
 import static java.util.Optional.ofNullable;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Component
 @Slf4j
-@RequiredArgsConstructor
 public class PaymentTaskHandler extends BaseExternalTaskHandler {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper objectMapper;
     private final IStateFlowEngine stateFlowEngine;
+
+    public PaymentTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        CoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter,
+        ObjectMapper objectMapper,
+        IStateFlowEngine stateFlowEngine
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.objectMapper = objectMapper;
+        this.stateFlowEngine = stateFlowEngine;
+    }
 
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         try {
@@ -52,6 +67,7 @@ public class PaymentTaskHandler extends BaseExternalTaskHandler {
         }
     }
 
+    @Override
     public VariableMap getVariableMap(ExternalTaskData externalTaskData) {
         var data = externalTaskData.caseData().orElseThrow();
         VariableMap variables = Variables.createVariables();

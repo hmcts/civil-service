@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
 import java.math.BigDecimal;
 import java.time.ZoneOffset;
@@ -39,6 +40,11 @@ public abstract class ElasticSearchService {
         log.info("Found {} case(s) with ids {}", ids.size(), ids);
 
         return caseDetails;
+    }
+
+    public ElasticSearchResult getElasticSearchResult() {
+        Set<CaseDetails> caseDetails = getCases();
+        return new ElasticSearchResult(caseDetails.stream(), caseDetails.size());
     }
 
     abstract Query query(int startIndex, String timeNow);

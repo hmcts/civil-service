@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.validation.PartyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
@@ -18,15 +17,13 @@ import java.util.function.Function;
 public class ValidateRespondentDetailsTask {
 
     private final PostcodeValidator postcodeValidator;
-    private final FeatureToggleService featureToggleService;
     private final PartyValidator partyValidator;
     private final ObjectMapper objectMapper;
     private Function<CaseData, Party> getRespondent;
 
     @Autowired
-    public ValidateRespondentDetailsTask(PostcodeValidator postcodeValidator, FeatureToggleService featureToggleService, PartyValidator partyValidator, ObjectMapper objectMapper) {
+    public ValidateRespondentDetailsTask(PostcodeValidator postcodeValidator, PartyValidator partyValidator, ObjectMapper objectMapper) {
         this.postcodeValidator = postcodeValidator;
-        this.featureToggleService = featureToggleService;
         this.partyValidator = partyValidator;
         this.objectMapper = objectMapper;
     }
@@ -39,12 +36,10 @@ public class ValidateRespondentDetailsTask {
         Party respondent = getRespondent.apply(caseData);
 
         List<String> errors = postcodeValidator.validate(respondent.getPrimaryAddress().getPostCode());
-        if (featureToggleService.isJudgmentOnlineLive()) {
-            if (respondent.getPrimaryAddress() != null) {
-                partyValidator.validateAddress(respondent.getPrimaryAddress(), errors);
-            }
-            partyValidator.validateName(respondent.getPartyName(), errors);
+        if (respondent.getPrimaryAddress() != null) {
+            partyValidator.validateAddress(respondent.getPrimaryAddress(), errors);
         }
+        partyValidator.validateName(respondent.getPartyName(), errors);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.isEmpty()

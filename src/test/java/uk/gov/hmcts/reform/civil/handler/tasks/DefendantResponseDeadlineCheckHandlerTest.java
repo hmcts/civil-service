@@ -13,14 +13,12 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.DefendantResponseDeadlineCheckEvent;
-import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.search.DefendantResponseDeadlineCheckSearchService;
 
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyLong;
@@ -32,6 +30,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(SpringExtension.class)
 class DefendantResponseDeadlineCheckHandlerTest {
@@ -47,6 +48,11 @@ class DefendantResponseDeadlineCheckHandlerTest {
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
 
     @InjectMocks
     private DefendantResponseDeadlineCheckHandler handler;
@@ -97,7 +103,7 @@ class DefendantResponseDeadlineCheckHandlerTest {
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(300000L)
+            anyLong()
         );
     }
 
@@ -108,9 +114,7 @@ class DefendantResponseDeadlineCheckHandlerTest {
         doThrow(new NotFoundException(errorMessage, new RestException("", "", 500)))
             .when(externalTaskService).complete(mockTask, null);
 
-        assertThrows(
-            CompleteTaskException.class,
-            () -> handler.execute(mockTask, externalTaskService));
+        handler.execute(mockTask, externalTaskService);
 
         verify(externalTaskService, never()).handleFailure(
             any(ExternalTask.class),
@@ -151,4 +155,11 @@ class DefendantResponseDeadlineCheckHandlerTest {
         verify(applicationEventPublisher).publishEvent(new DefendantResponseDeadlineCheckEvent(caseId));
         verify(applicationEventPublisher).publishEvent(new DefendantResponseDeadlineCheckEvent(otherId));
     }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }

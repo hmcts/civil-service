@@ -272,7 +272,6 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
     @Test
     void shouldSetRespondOptionWhenImmediatePaymentPlanSelected_ApplicantConfirmsNotToProceed1v1() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
         caseLocationCivil.setBaseLocation("0123");
@@ -297,7 +296,6 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
     @Test
     void shouldSetRespondOptionWhenImmediatePartPaymentPlanSelected_ApplicantConfirmsNotToProceed1v1() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(paymentDateService.calculatePaymentDeadline()).thenReturn(LocalDate.now().plusDays(5));
 
         CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
@@ -344,7 +342,6 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
     @Test
     void shouldSetPaymentDeadlineWhenDefendantProposesImmediatePartPaymentPlanAndClaimantAcceptsIt() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(paymentDateService.calculatePaymentDeadline()).thenReturn(LocalDate.now().plusDays(5));
 
         CaseLocationCivil caseLocationCivil = new CaseLocationCivil();

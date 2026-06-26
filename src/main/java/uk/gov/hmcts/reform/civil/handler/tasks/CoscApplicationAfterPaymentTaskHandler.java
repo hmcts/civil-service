@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -21,14 +20,28 @@ import java.util.Objects;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataContentFromStartEventResponse;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
-@RequiredArgsConstructor
 @Component
 public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHandler {
 
     private final CoreCaseDataService coreCaseDataService;
     private final ObjectMapper mapper;
     private final IStateFlowEngine stateFlowEngine;
+
+    public CoscApplicationAfterPaymentTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        CoreCaseDataService coreCaseDataService,
+        ObjectMapper mapper,
+        IStateFlowEngine stateFlowEngine
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.coreCaseDataService = coreCaseDataService;
+        this.mapper = mapper;
+        this.stateFlowEngine = stateFlowEngine;
+    }
 
     @Override
     public ExternalTaskData  handleTask(ExternalTask externalTask) {
@@ -66,6 +79,11 @@ public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHand
         variables.putValue("isJudgmentMarkedPaidInFull", checkMarkPaidInFull(data));
         variables.putValue("isClaimantLR", !data.isApplicant1NotRepresented());
         return variables;
+    }
+
+    @Override
+    public int getMaxAttempts() {
+        return 1;
     }
 
     private boolean checkMarkPaidInFull(CaseData data) {

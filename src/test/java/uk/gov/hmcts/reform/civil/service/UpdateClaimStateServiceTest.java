@@ -499,9 +499,8 @@ class UpdateClaimStateServiceTest {
     }
 
     @Test
-    void shouldUpdateCaseStateToAllFinalOrderIssued_whenApplicantAcceptOrRejectedRepaymentPlanAndRequestCCJ_JudgementOnlineLiveEnabled() {
+    void shouldUpdateCaseStateToAllFinalOrderIssued_whenApplicantAcceptOrRejectedRepaymentPlanAndRequestCCJ() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         Party applicant1g = new Party();
         applicant1g.setType(Party.Type.INDIVIDUAL);
         applicant1g.setPartyName("CLAIMANT_NAME");
