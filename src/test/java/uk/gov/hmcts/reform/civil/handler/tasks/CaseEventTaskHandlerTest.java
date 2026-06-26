@@ -55,7 +55,6 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -84,6 +83,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.utils.MarkPaidInFullUtil.checkMarkPaidInFull;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import static uk.gov.hmcts.reform.civil.utils.WaTaskUtil.cancelApplicantWaDocumentUploadTask;
 
 @ExtendWith(MockitoExtension.class)
@@ -109,6 +110,9 @@ class CaseEventTaskHandlerTest {
     ArgumentCaptor<CaseDataContent> caseDataContentArgumentCaptor;
     @Spy
     private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
 
     @InjectMocks
     private CaseEventTaskHandler caseEventTaskHandler;
@@ -367,7 +371,7 @@ class CaseEventTaskHandlerTest {
                 eq(mockTask),
                 eq(String.format("[%s] during [%s] to [%s] [%s]: []", status, requestType, exampleUrl, errorMessage)),
                 anyString(),
-                anyInt(),
+                eq(0),
                 anyLong()
             );
         }
@@ -967,7 +971,6 @@ class CaseEventTaskHandlerTest {
                              Map.entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                              Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                              Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                             Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                              Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                              Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                              Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
@@ -979,7 +982,6 @@ class CaseEventTaskHandlerTest {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
@@ -993,7 +995,6 @@ class CaseEventTaskHandlerTest {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), true),
@@ -1005,7 +1006,6 @@ class CaseEventTaskHandlerTest {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
@@ -1018,7 +1018,6 @@ class CaseEventTaskHandlerTest {
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                                      Map.entry(FlowFlag.MINTI_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), true),
@@ -1030,7 +1029,6 @@ class CaseEventTaskHandlerTest {
             Map<String, Boolean> expectedFlags = new HashMap<>();
             expectedFlags.put(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false);
             expectedFlags.put(FlowFlag.BULK_CLAIM_ENABLED.name(), false);
-            expectedFlags.put(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false);
             expectedFlags.put(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false);
             expectedFlags.put(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false);
             return expectedFlags;
