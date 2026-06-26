@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
 
 import java.util.Map;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Component
 public class GaStartGeneralApplicationBusinessProcessTaskHandler extends BaseExternalTaskHandler {
@@ -32,13 +33,14 @@ public class GaStartGeneralApplicationBusinessProcessTaskHandler extends BaseExt
     private final GaStateFlowEngine stateFlowEngine;
 
     public GaStartGeneralApplicationBusinessProcessTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         GaCoreCaseDataService coreCaseDataService,
         CaseDetailsConverter caseDetailsConverter,
         ObjectMapper mapper,
         GaStateFlowEngine stateFlowEngine
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.coreCaseDataService = coreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;
         this.mapper = mapper;

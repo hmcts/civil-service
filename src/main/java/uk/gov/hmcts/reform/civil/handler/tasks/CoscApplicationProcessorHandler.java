@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.service.search.CoscApplicationSearchService;
 
 import java.util.Set;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
@@ -20,11 +21,12 @@ public class CoscApplicationProcessorHandler extends BaseExternalTaskHandler {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     public CoscApplicationProcessorHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         CoscApplicationSearchService coscApplicationSearchService,
         ApplicationEventPublisher applicationEventPublisher
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.coscApplicationSearchService = coscApplicationSearchService;
         this.applicationEventPublisher = applicationEventPublisher;
     }
