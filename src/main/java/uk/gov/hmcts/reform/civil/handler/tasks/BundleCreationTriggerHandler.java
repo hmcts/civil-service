@@ -29,6 +29,8 @@ import static uk.gov.hmcts.reform.civil.service.tasklisteners.BundleCreationTrig
 @Component
 public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
 
+    private static final String SCHEDULER_NAME = "BundleCreation";
+
     private final BundleCreationTriggerService bundleCreationTriggerService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -63,7 +65,7 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
     @SuppressWarnings("java:S2142")
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        if (!featureToggleService.isSpringSchedulerEnabled()) {
+        if (!featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
             Set<CaseDetails> cases = bundleCreationTriggerService.getCases();
             List<Long> ids = cases.stream().map(CaseDetails::getId).sorted().toList();
             log.info("Job '{}' found {} case(s) with ids {}", externalTask.getTopicName(), cases.size(), ids);

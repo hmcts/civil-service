@@ -36,6 +36,7 @@ import static org.mockito.Mockito.when;
 public class BundleCreationSchedulerITest {
 
     private static final Long CASE_ID = 123L;
+    private static final String SCHEDULER_NAME = "BundleCreation";
 
     @Autowired
     private BundleCreationScheduler scheduler;
@@ -55,7 +56,7 @@ public class BundleCreationSchedulerITest {
     @BeforeEach
     void setUp() {
         coreCaseDataApiMockHelper.setupIdamClient();
-        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(true);
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
     }
 
     @Test

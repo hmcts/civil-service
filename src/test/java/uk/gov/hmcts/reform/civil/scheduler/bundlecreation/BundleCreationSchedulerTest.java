@@ -26,6 +26,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class BundleCreationSchedulerTest {
 
+    private static final String SCHEDULER_NAME = "BundleCreation";
+
     @Mock
     private BundleCreationTriggerService searchService;
     @Mock
@@ -41,7 +43,7 @@ class BundleCreationSchedulerTest {
 
     @Test
     void shouldRunBundleCreationTask() {
-        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(true);
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         CaseDetails caseDetails = CaseDetails.builder().id(123L).build();
         ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(caseDetails), 1);
         when(searchService.getElasticSearchResult()).thenReturn(searchResult);
@@ -60,7 +62,7 @@ class BundleCreationSchedulerTest {
 
     @Test
     void shouldNotRunBundleCreationTaskWhenSpringSchedulerFeatureToggleIsDisabled() {
-        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(false);
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(false);
 
         scheduler.runScheduledTask();
 

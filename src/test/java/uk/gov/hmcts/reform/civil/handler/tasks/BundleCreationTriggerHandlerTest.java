@@ -53,6 +53,7 @@ class BundleCreationTriggerHandlerTest {
 
     private static final String ACCESS_TOKEN = "ACCESS_TOKEN";
     private static final String TEST = "test";
+    private static final String SCHEDULER_NAME = "BundleCreation";
     @Mock
     private ExternalTask mockTask;
     @Mock
@@ -84,7 +85,7 @@ class BundleCreationTriggerHandlerTest {
 
     @BeforeEach
     void init() {
-        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(false);
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(false);
         when(mockTask.getTopicName()).thenReturn(TEST);
         when(mockTask.getWorkerId()).thenReturn("worker");
         when(userConfig.getUserName()).thenReturn(TEST);
@@ -133,7 +134,7 @@ class BundleCreationTriggerHandlerTest {
 
     @Test
     void shouldNotProcessCasesWhenSpringSchedulerFeatureToggleIsEnabled() {
-        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(true);
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
 
         handler.execute(mockTask, externalTaskService);
 
