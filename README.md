@@ -13,7 +13,7 @@ Civil CCD Callback Service.
 - [Adding Git Conventions](#adding-git-conventions)
 - [Scheduler Framework](#scheduler-framework)
 
-## StateFlow diagrams
+## StateFlow diagrams.
 
 Visual snapshots of the automated journey logic are generated from the live StateFlow configuration. The diagrams below update automatically via the `Refresh StateFlow diagrams` GitHub Action after any change to the transition builders.
 
