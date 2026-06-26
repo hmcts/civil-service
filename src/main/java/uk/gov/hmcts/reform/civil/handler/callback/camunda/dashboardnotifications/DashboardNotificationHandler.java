@@ -24,7 +24,7 @@ public class DashboardNotificationHandler extends CallbackHandler implements Mul
 
     private static final List<CaseEvent> EVENTS = List.of(DASHBOARD_NOTIFICATION_EVENT);
 
-    private final DashboardNotificationDispatcher dispatcher;
+    private final DashboardNotificationRegistry registry;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -47,7 +47,14 @@ public class DashboardNotificationHandler extends CallbackHandler implements Mul
     private CallbackResponse dispatchNotifications(CallbackParams callbackParams) {
         String activityId = camundaActivityId(callbackParams);
         DashboardTaskContext context = DashboardTaskContext.from(callbackParams);
-        dispatcher.dispatch(activityId, context);
+        List<DashboardWorkflowTask> workflows = registry.workflowsFor(activityId, context.caseType());
+
+        if (workflows.isEmpty()) {
+            log.warn("No dashboard notification handlers registered for activity {}", activityId);
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
+
+        workflows.forEach(task -> task.execute(context));
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 }
