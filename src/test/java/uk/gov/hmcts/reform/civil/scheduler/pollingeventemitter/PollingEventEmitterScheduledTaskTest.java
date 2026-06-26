@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -53,17 +54,18 @@ class PollingEventEmitterScheduledTaskTest {
 
         caseDetails = CaseDetails.builder().id(CASE_ID).data(Map.of()).build();
         caseData = mock(CaseData.class);
-        when(caseData.getCcdCaseReference()).thenReturn(CASE_ID);
         when(caseData.getBusinessProcess()).thenReturn(new BusinessProcess().setCamundaEvent(CAMUNDA_EVENT));
     }
 
     @Test
     void shouldEmitBusinessProcessCamundaEventAndThrottle() {
-        when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
 
         try (MockedStatic<SchedulerThrottleUtils> throttleUtils = mockStatic(SchedulerThrottleUtils.class)) {
             task.accept(caseDetails, TOTAL_CASES, DELAY_MS);
 
+            verify(caseDetailsConverter).toCaseData(caseDetails);
+            verify(caseDetailsConverter, never()).toCaseData(caseDetails.getData());
             verify(eventEmitterService).emitBusinessProcessCamundaEvent(caseData, true);
             throttleUtils.verify(() -> SchedulerThrottleUtils.throttle(TOTAL_CASES, DELAY_MS, POLLING_WINDOW_MS));
         }
@@ -71,11 +73,13 @@ class PollingEventEmitterScheduledTaskTest {
 
     @Test
     void shouldUseConfiguredDispatchDelayWhenCalledAsScheduledTask() {
-        when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
 
         try (MockedStatic<SchedulerThrottleUtils> throttleUtils = mockStatic(SchedulerThrottleUtils.class)) {
             task.accept(caseDetails);
 
+            verify(caseDetailsConverter).toCaseData(caseDetails);
+            verify(caseDetailsConverter, never()).toCaseData(caseDetails.getData());
             verify(eventEmitterService).emitBusinessProcessCamundaEvent(caseData, true);
             throttleUtils.verify(() -> SchedulerThrottleUtils.throttle(1, DELAY_MS, POLLING_WINDOW_MS));
         }

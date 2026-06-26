@@ -32,7 +32,7 @@ public class PollingEventEmitterScheduledTask implements ScheduledTask {
     }
 
     public void accept(CaseDetails caseDetails, long totalCases, long delayMs) {
-        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails.getData());
+        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         log.info(
             "Emitting {} camunda event for case through poller: {}",
             caseData.getBusinessProcess().getCamundaEvent(),
