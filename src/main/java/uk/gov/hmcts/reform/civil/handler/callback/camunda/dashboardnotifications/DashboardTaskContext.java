@@ -11,66 +11,13 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 public class DashboardTaskContext {
 
     private final CallbackParams callbackParams;
-    private final CaseData caseData;
-    private final GeneralApplicationCaseData generalApplicationCaseData;
-    private final DashboardCaseType caseType;
-    private final String authToken;
 
-    private DashboardTaskContext(CallbackParams callbackParams,
-                                 CaseData caseData,
-                                 GeneralApplicationCaseData generalApplicationCaseData,
-                                 DashboardCaseType caseType,
-                                 String authToken) {
+    private DashboardTaskContext(CallbackParams callbackParams) {
         this.callbackParams = callbackParams;
-        this.caseData = caseData;
-        this.generalApplicationCaseData = generalApplicationCaseData;
-        this.caseType = caseType;
-        this.authToken = authToken;
     }
 
     public static DashboardTaskContext from(CallbackParams callbackParams) {
-        String authToken = Optional.ofNullable(callbackParams.getParams())
-            .map(params -> params.get(BEARER_TOKEN))
-            .map(Object::toString)
-            .orElse(null);
-
-        if (callbackParams.isGeneralApplicationCaseType()) {
-            return generalApplication(callbackParams.getGeneralApplicationCaseData(), authToken, callbackParams);
-        }
-
-        if (!callbackParams.isCivilCaseType()) {
-            try {
-                return generalApplication(callbackParams.getGeneralApplicationCaseData(), authToken, callbackParams);
-            } catch (IllegalStateException ignored) {
-                return civil(callbackParams.getCaseData(), authToken, callbackParams);
-            }
-        }
-
-        return civil(callbackParams.getCaseData(), authToken, callbackParams);
-    }
-
-    public static DashboardTaskContext civil(CaseData caseData, String authToken) {
-        return civil(caseData, authToken, null);
-    }
-
-    private static DashboardTaskContext civil(CaseData caseData, String authToken, CallbackParams callbackParams) {
-        return new DashboardTaskContext(callbackParams, caseData, null, DashboardCaseType.CIVIL, authToken);
-    }
-
-    public static DashboardTaskContext generalApplication(GeneralApplicationCaseData caseData, String authToken) {
-        return generalApplication(caseData, authToken, null);
-    }
-
-    private static DashboardTaskContext generalApplication(GeneralApplicationCaseData caseData,
-                                                           String authToken,
-                                                           CallbackParams callbackParams) {
-        return new DashboardTaskContext(
-            callbackParams,
-            null,
-            caseData,
-            DashboardCaseType.GENERAL_APPLICATION,
-            authToken
-        );
+        return new DashboardTaskContext(callbackParams);
     }
 
     public CallbackParams callbackParams() {
@@ -78,18 +25,23 @@ public class DashboardTaskContext {
     }
 
     public CaseData caseData() {
-        return caseData;
+        return callbackParams.getCaseData();
     }
 
     public GeneralApplicationCaseData generalApplicationCaseData() {
-        return generalApplicationCaseData;
+        return callbackParams.getGeneralApplicationCaseData();
     }
 
     public DashboardCaseType caseType() {
-        return caseType;
+        return callbackParams.isGeneralApplicationCaseType()
+            ? DashboardCaseType.GENERAL_APPLICATION
+            : DashboardCaseType.CIVIL;
     }
 
     public String authToken() {
-        return authToken;
+        return Optional.ofNullable(callbackParams.getParams())
+            .map(params -> params.get(BEARER_TOKEN))
+            .map(Object::toString)
+            .orElse(null);
     }
 }
