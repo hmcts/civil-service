@@ -494,8 +494,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .responseClaimTrack(FAST_CLAIM.name())
             .build();
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-
         String resultState;
         if (postTranslation) {
             resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
@@ -522,7 +520,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .responseClaimTrack(INTERMEDIATE_CLAIM.name())
             .build();
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         String resultState;
@@ -572,7 +569,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .responseClaimTrack(MULTI_CLAIM.name())
             .build();
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         String resultState;
@@ -622,8 +618,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .responseClaimTrack(FAST_CLAIM.name())
             .build();
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-
         String resultState;
         if (postTranslation) {
             resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
@@ -650,8 +644,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .responseClaimTrack(FAST_CLAIM.name())
             .build();
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-
         String resultState;
         if (postTranslation) {
             resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
@@ -677,7 +669,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .responseClaimTrack(FAST_CLAIM.name())
             .build();
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         BusinessProcess businessProcess = new BusinessProcess();
         String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
                                                                    "", businessProcess);
