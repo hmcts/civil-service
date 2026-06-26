@@ -136,9 +136,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             }
         }
 
-        if (featureToggleService.isJudgmentOnlineLive()) {
-            caseData.setPreviousCCDState(callbackParams.getCaseData().getCcdState());
-        }
+        caseData.setPreviousCCDState(callbackParams.getCaseData().getCcdState());
 
         updateDefendantQueryCollectionPartyName(caseData);
         clearLRIndividuals(replacedSolicitorCaseRole, caseData, originalMultiPartyScenario);
