@@ -40,6 +40,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 class CvpJoinLinkSchedulerHandlerTest {
 
+    private static final String SCHEDULER_NAME = "HearingCvpLink";
+
     @Mock
     private ExternalTask mockTask;
 
@@ -67,7 +69,7 @@ class CvpJoinLinkSchedulerHandlerTest {
 
     @BeforeEach
     void init() {
-        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(false);
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(false);
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
     }
@@ -97,7 +99,7 @@ class CvpJoinLinkSchedulerHandlerTest {
 
     @Test
     void shouldNotProcessCasesWhenSpringSchedulerFeatureToggleIsEnabled() {
-        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(true);
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
 
         handler.execute(mockTask, externalTaskService);
 

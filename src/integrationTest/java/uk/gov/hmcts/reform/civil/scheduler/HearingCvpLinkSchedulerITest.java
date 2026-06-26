@@ -36,6 +36,7 @@ import static org.mockito.Mockito.when;
 public class HearingCvpLinkSchedulerITest {
 
     private static final Long CASE_ID = 123L;
+    private static final String SCHEDULER_NAME = "HearingCvpLink";
 
     @Autowired
     private HearingCvpLinkScheduler scheduler;
@@ -55,7 +56,7 @@ public class HearingCvpLinkSchedulerITest {
     @BeforeEach
     void setUp() {
         coreCaseDataApiMockHelper.setupIdamClient();
-        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(true);
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
     }
 
     @Test

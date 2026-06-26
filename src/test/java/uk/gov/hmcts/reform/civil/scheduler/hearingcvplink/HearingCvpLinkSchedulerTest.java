@@ -25,6 +25,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class HearingCvpLinkSchedulerTest {
 
+    private static final String SCHEDULER_NAME = "HearingCvpLink";
+
     @Mock
     private CaseHearingDateSearchService searchService;
 
@@ -45,7 +47,7 @@ class HearingCvpLinkSchedulerTest {
 
     @Test
     void shouldRunTaskRunnerWhenScheduledTaskRuns() {
-        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(true);
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         ScheduledTaskEventConfiguration expectedConfig = new ScheduledTaskEventConfiguration(scheduler.getName());
         CaseDetails caseDetails = CaseDetails.builder().id(123L).build();
         ElasticSearchResult elasticSearchResult = new ElasticSearchResult(Stream.of(caseDetails), 1);
@@ -64,7 +66,7 @@ class HearingCvpLinkSchedulerTest {
 
     @Test
     void shouldNotRunTaskRunnerWhenSpringSchedulerFeatureToggleIsDisabled() {
-        when(featureToggleService.isSpringSchedulerEnabled()).thenReturn(false);
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(false);
 
         scheduler.runScheduledTask();
 

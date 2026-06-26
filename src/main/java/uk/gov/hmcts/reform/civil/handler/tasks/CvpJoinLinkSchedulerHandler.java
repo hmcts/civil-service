@@ -18,6 +18,8 @@ import java.util.Set;
 @Component
 public class CvpJoinLinkSchedulerHandler extends BaseExternalTaskHandler {
 
+    private static final String SCHEDULER_NAME = "HearingCvpLink";
+
     private final CaseHearingDateSearchService searchService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final FeatureToggleService featureToggleService;
@@ -37,7 +39,7 @@ public class CvpJoinLinkSchedulerHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        if (!featureToggleService.isSpringSchedulerEnabled()) {
+        if (!featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
             Set<CaseDetails> cases = searchService.getCases();
             log.info("CVP Join Link Scheduler job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 

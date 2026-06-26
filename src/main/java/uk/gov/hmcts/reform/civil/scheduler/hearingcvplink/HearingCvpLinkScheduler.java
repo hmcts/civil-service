@@ -37,7 +37,7 @@ public class HearingCvpLinkScheduler implements CivilScheduler {
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
     @Override
     public void runScheduledTask() {
-        if (featureToggleService.isSpringSchedulerEnabled()) {
+        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
             log.info("Running {} scheduler", SCHEDULER_NAME);
             ElasticSearchResult searchResult = searchService.getElasticSearchResult();
             int totalCases = searchResult == null ? 0 : searchResult.totalResults();
