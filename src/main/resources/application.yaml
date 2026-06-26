@@ -62,15 +62,15 @@ spring:
         config:
           default:
             connectTimeout: ${HTTP_CONNECT_TIMEOUT:5000}
-            readTimeout: ${HTTP_READ_TIMEOUT:30000}
+            readTimeout: ${HTTP_READ_TIMEOUT:250}
           core-case-data-api:
-            readTimeout: ${CORE_CASE_DATA_API_READ_TIMEOUT:500} # ccd-data-store-api
+            readTimeout: ${CORE_CASE_DATA_API_READ_TIMEOUT:100} # ccd-data-store-api
           ccd-access-data-store-api:
-            readTimeout: ${CASE_ACCESS_DATA_STORE_API_READ_TIMEOUT:500} # ccd-data-store-api
+            readTimeout: ${CASE_ACCESS_DATA_STORE_API_READ_TIMEOUT:100} # ccd-data-store-api
           cmc-claim-store:
-            readTimeout: ${CMC_CLAIM_STORE_API_READ_TIMEOUT:500}
+            readTimeout: ${CMC_CLAIM_STORE_API_READ_TIMEOUT:100}
           core-case-event-api:
-            readTimeout: ${CORE_CASE_EVENT_API_READ_TIMEOUT:500}
+            readTimeout: ${CORE_CASE_EVENT_API_READ_TIMEOUT:100}
 
 scheduler:
   circuitBreakerThreshold: ${CIRCUIT_BREAKER_THRESHOLD:5}
