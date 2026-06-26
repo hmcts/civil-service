@@ -61,8 +61,8 @@ spring:
       client:
         config:
           default:
-            connectTimeout: ${HTTP_CONNECT_TIMEOUT:5000}
-            readTimeout: ${HTTP_READ_TIMEOUT:250}
+            connectTimeout: ${HTTP_CONNECT_TIMEOUT:2000}
+            readTimeout: ${HTTP_READ_TIMEOUT:500}
           core-case-data-api:
             readTimeout: ${CORE_CASE_DATA_API_READ_TIMEOUT:100} # ccd-data-store-api
           ccd-access-data-store-api:
