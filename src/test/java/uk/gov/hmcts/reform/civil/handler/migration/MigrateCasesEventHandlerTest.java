@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.bulkupdate.csv.NotificationCaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.NotifyRpaFeedCaseReference;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.utils.CaseMigrationEncryptionUtil;
 
 import java.io.ByteArrayInputStream;
@@ -58,6 +59,7 @@ class MigrateCasesEventHandlerTest {
     @BeforeEach
     void setUp() {
         handler = new MigrateCasesEventHandler(
+            new ExternalTaskCompletionService(),
             new EventProperties(),
             caseReferenceCsvLoader,
             migrationTaskFactory,
