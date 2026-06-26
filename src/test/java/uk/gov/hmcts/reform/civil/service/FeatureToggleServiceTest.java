@@ -108,15 +108,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsJudgmentOnlineLive(Boolean toggleStat) {
-        var isJudgmentOnlineLiveKey = "isJudgmentOnlineLive";
-        givenToggle(isJudgmentOnlineLiveKey, toggleStat);
-
-        assertThat(featureToggleService.isJudgmentOnlineLive()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenisCjesServiceAvailableEnabled(Boolean toggleStat) {
         var key = "isCjesServiceAvailable";
         givenToggle(key, toggleStat);
@@ -211,10 +202,8 @@ class FeatureToggleServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenisJOLiveFeedActive(Boolean toggleStat) {
-        when(featureToggleService.isJudgmentOnlineLive())
-            .thenReturn(toggleStat);
-        when(featureToggleService.isJOLiveFeedActive())
-            .thenReturn(toggleStat);
+        givenToggle("isJOLiveFeedActive", toggleStat);
+
         assertThat(featureToggleService.isJOLiveFeedActive()).isEqualTo(toggleStat);
     }
 
@@ -231,15 +220,6 @@ class FeatureToggleServiceTest {
             .thenReturn(toggleStat);
 
         assertThat(featureToggleService.isDefendantNoCOnlineForCase(caseData)).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsQMForLRs(Boolean toggleStat) {
-        var caseFlagsKey = "query-management";
-        givenToggle(caseFlagsKey, toggleStat);
-
-        assertThat(featureToggleService.isQueryManagementLRsEnabled()).isEqualTo(toggleStat);
     }
 
     @Test

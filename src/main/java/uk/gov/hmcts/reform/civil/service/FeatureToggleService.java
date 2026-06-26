@@ -46,10 +46,6 @@ public class FeatureToggleService {
                 );
     }
 
-    public boolean isJudgmentOnlineLive() {
-        return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
-    }
-
     public boolean isCjesServiceAvailable() {
         return featureToggleApi.isFeatureEnabled("isCjesServiceAvailable");
     }
@@ -106,8 +102,7 @@ public class FeatureToggleService {
     }
 
     public boolean isJOLiveFeedActive() {
-        return isJudgmentOnlineLive()
-            && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
+        return featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
     }
 
     public boolean isDefendantNoCOnlineForCase(CaseData caseData)  {
@@ -119,10 +114,6 @@ public class FeatureToggleService {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
         return featureToggleApi.isFeatureEnabledForDate("is-defendant-noc-online-for-case", epoch, false);
-    }
-
-    public boolean isQueryManagementLRsEnabled() {
-        return featureToggleApi.isFeatureEnabled("query-management");
     }
 
     // if deleting this, also handle isQMPdfGeneratorEnabled() below

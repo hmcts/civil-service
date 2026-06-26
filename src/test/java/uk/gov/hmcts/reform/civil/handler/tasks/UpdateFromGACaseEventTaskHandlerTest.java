@@ -15,6 +15,7 @@ import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
@@ -35,6 +36,7 @@ import static java.util.Optional.ofNullable;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -82,7 +84,13 @@ public class UpdateFromGACaseEventTaskHandlerTest {
     @BeforeEach
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
-        handler = new UpdateFromGACaseEventTaskHandler(coreCaseDataService, caseDetailsConverter, objectMapper);
+        handler = new UpdateFromGACaseEventTaskHandler(
+            new ExternalTaskCompletionService(),
+            new EventProperties(),
+            coreCaseDataService,
+            caseDetailsConverter,
+            objectMapper
+        );
     }
 
     @Test

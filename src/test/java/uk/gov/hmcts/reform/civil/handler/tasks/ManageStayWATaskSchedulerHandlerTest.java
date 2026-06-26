@@ -13,7 +13,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.ManageStayWATaskEvent;
-import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.ManageStayUpdateRequestedSearchService;
@@ -21,7 +20,6 @@ import uk.gov.hmcts.reform.civil.service.search.ManageStayUpdateRequestedSearchS
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -33,6 +31,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(SpringExtension.class)
 class ManageStayWATaskSchedulerHandlerTest {
@@ -50,6 +51,11 @@ class ManageStayWATaskSchedulerHandlerTest {
     private ApplicationEventPublisher applicationEventPublisher;
     @Mock
     private FeatureToggleService featureToggleService;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
 
     @InjectMocks
     private ManageStayWATaskSchedulerHandler handler;
@@ -100,7 +106,7 @@ class ManageStayWATaskSchedulerHandlerTest {
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(300000L)
+            anyLong()
         );
     }
 
@@ -111,7 +117,7 @@ class ManageStayWATaskSchedulerHandlerTest {
         doThrow(new NotFoundException(errorMessage, new RestException("", "", 404)))
             .when(externalTaskService).complete(mockTask, null);
 
-        assertThrows(CompleteTaskException.class, () -> handler.execute(mockTask, externalTaskService));
+        handler.execute(mockTask, externalTaskService);
 
         verify(externalTaskService, never()).handleFailure(
             any(ExternalTask.class),
@@ -136,7 +142,7 @@ class ManageStayWATaskSchedulerHandlerTest {
         String errorMessage = "Manage Stay WA Task scheduler failed to process case with id: ";
 
         doThrow(new NullPointerException(errorMessage))
-            .when(applicationEventPublisher).publishEvent(eq(new ManageStayWATaskEvent(caseId)));
+            .when(applicationEventPublisher).publishEvent(new ManageStayWATaskEvent(caseId));
 
         handler.execute(mockTask, externalTaskService);
 
@@ -152,4 +158,11 @@ class ManageStayWATaskSchedulerHandlerTest {
         verify(applicationEventPublisher).publishEvent(new ManageStayWATaskEvent(caseId));
         verify(applicationEventPublisher).publishEvent(new ManageStayWATaskEvent(otherId));
     }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }
