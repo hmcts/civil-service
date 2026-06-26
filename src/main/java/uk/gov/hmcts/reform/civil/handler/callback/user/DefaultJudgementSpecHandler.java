@@ -572,17 +572,13 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private JudgmentDetails addActiveJudgement(CaseData caseData) {
-        JudgmentDetails activeJudgment;
-        activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
         caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
-        return activeJudgment;
+        return djOnlineMapper.addUpdateActiveJudgment(caseData);
     }
 
     private static @NonNull String allFinalOrders(CaseData caseData) {
-        String nextState;
-        nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
         caseData.setBusinessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
-        return nextState;
+        return CaseState.All_FINAL_ORDERS_ISSUED.name();
     }
 
     private static boolean wasJudgmentRequestedBeforeStay(CaseData caseData) {
