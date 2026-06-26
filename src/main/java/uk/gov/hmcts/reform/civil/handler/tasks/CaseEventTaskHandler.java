@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -41,8 +42,6 @@ import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenari
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.MarkPaidInFullUtil.checkMarkPaidInFull;
-import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
-import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import static uk.gov.hmcts.reform.civil.utils.WaTaskUtil.cancelApplicantWaDocumentUploadTask;
 
 @Component
