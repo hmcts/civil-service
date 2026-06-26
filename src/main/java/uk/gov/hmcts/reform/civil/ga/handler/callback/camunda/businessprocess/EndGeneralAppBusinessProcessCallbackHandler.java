@@ -185,8 +185,7 @@ public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler
 
     // Generate Draft Document for LRvLR Consent application
     private boolean isLRConsentApplication(GeneralApplicationCaseData caseData, List<GeneralApplicationTypes> types) {
-        return !gaForLipService.isGaForLip(caseData)
-            && types.size() == 1
+        return types.size() == 1
             && types.contains(GeneralApplicationTypes.SETTLE_BY_CONSENT);
     }
 

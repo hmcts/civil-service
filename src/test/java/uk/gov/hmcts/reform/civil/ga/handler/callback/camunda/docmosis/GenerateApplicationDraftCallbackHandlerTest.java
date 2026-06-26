@@ -351,6 +351,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         verify(generalApplicationDraftGenerator).generate(any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"));
+        verify(gaForLipService).isGaForLip(any(GeneralApplicationCaseData.class));
 
         GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 

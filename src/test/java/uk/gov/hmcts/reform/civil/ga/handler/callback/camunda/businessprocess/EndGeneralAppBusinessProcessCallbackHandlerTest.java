@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -957,8 +958,9 @@ class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralApplication
                 .isEqualTo("Awaiting Respondent Response");
         }
 
-        @Test
-        void shouldMoveLrConsentApplicationToJudicialDecision() {
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldMoveLrConsentApplicationToJudicialDecisionRegardlessOfLipStatus(boolean isGaForLip) {
             ParentCaseUpdateHelper mockHelper = mock(ParentCaseUpdateHelper.class);
             EndGeneralAppBusinessProcessCallbackHandler localHandler = new EndGeneralAppBusinessProcessCallbackHandler(
                 caseDetailsConverter,
@@ -979,7 +981,7 @@ class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralApplication
                 .build();
             CallbackParams callbackParams = getCallbackParams(caseData);
 
-            when(gaForLipService.isGaForLip(any())).thenReturn(false);
+            when(gaForLipService.isGaForLip(any())).thenReturn(isGaForLip);
             when(caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails()))
                 .thenReturn(caseData);
 

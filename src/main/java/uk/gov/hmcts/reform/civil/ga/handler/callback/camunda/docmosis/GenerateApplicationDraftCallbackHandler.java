@@ -80,8 +80,7 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
 
     // Generate Draft Document for LRvLR Consent application
     private boolean isLRConsentApplication(GeneralApplicationCaseData caseData) {
-        return !gaForLipService.isGaForLip(caseData)
-            && caseData.getGeneralAppType().getTypes().size() == 1
+        return caseData.getGeneralAppType().getTypes().size() == 1
             && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.SETTLE_BY_CONSENT);
     }
 
