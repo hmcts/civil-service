@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
-
-import java.util.function.Consumer;
 
 /**
  * Runner for scheduled tasks that coordinates between event tracking, searching and processing.
@@ -33,7 +30,7 @@ public class ScheduledTaskRunner {
      */
     public void run(ScheduledTaskEventConfiguration eventConfig,
                     ElasticSearchResult searchResult,
-                    Consumer<CaseDetails> scheduledTask) {
+                    ScheduledTask scheduledTask) {
 
         if (searchResult == null) {
             eventTracker.jobAbortedEvent(eventConfig, "SearchResult cannot be null");
@@ -63,7 +60,7 @@ public class ScheduledTaskRunner {
      * @param searchResult  the result of the elastic search containing the stream of cases
      */
     private void processCaseDetails(ScheduledTaskEventConfiguration eventConfig,
-                                    Consumer<CaseDetails> scheduledTask,
+                                    ScheduledTask scheduledTask,
                                     ElasticSearchResult searchResult) {
         int totalCases = searchResult.totalResults();
         eventTracker.jobStartedEvent(eventConfig, totalCases);
