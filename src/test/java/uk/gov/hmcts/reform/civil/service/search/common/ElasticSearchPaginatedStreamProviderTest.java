@@ -105,6 +105,7 @@ class ElasticSearchPaginatedStreamProviderTest {
 
         assertThat(result.totalResults()).isEqualTo(0);
         assertThat(result.caseDetailsStream().toList()).isEmpty();
+        verify(coreCaseDataService, times(1)).searchCasesPaginated(any());
     }
 
     @Test
@@ -127,6 +128,7 @@ class ElasticSearchPaginatedStreamProviderTest {
 
         assertThat(result.totalResults()).isEqualTo(0);
         assertThat(result.caseDetailsStream().toList()).isEmpty();
+        verify(coreCaseDataService, times(1)).searchCasesPaginated(any());
     }
 
     @Test
@@ -299,5 +301,51 @@ class ElasticSearchPaginatedStreamProviderTest {
         }
 
         assertThat(closed[0]).isTrue();
+    }
+
+    @Test
+    void shouldContinuePaginationWhenTotalCountDecreases() {
+        CaseDetails case1 = CaseDetails.builder().id(1L).build();
+        CaseDetails case2 = CaseDetails.builder().id(2L).build();
+        CaseDetails case3 = CaseDetails.builder().id(3L).build();
+
+        // This simulates the case being processed by a Camunda process and no longer being found in the search results.
+        // 3 total cases, page size 1.
+        // Search 1: 3 total, returns case 1.
+        // Search 2: 2 total, returns case 2.
+        // Search 3: 1 total, returns case 3.
+        // If bug exists: After Search 2, totalFetched (1) >= expectedTotal (2)? No.
+        // After Search 3, totalFetched (2) >= expectedTotal (1)? Yes! It stops and misses case 3.
+
+        when(coreCaseDataService.searchCasesPaginated(any(PaginatedQuery.class)))
+            .thenAnswer(invocation -> {
+                PaginatedQuery query = invocation.getArgument(0);
+                if (query.isInitialSearch()) {
+                    return SearchResult.builder().total(3).cases(List.of(case1)).build();
+                } else if ("1".equals(query.getSearchAfterValue())) {
+                    return SearchResult.builder().total(2).cases(List.of(case2)).build();
+                } else if ("2".equals(query.getSearchAfterValue())) {
+                    return SearchResult.builder().total(1).cases(List.of(case3)).build();
+                }
+                return SearchResult.builder().total(0).cases(List.of()).build();
+            });
+
+        int pageSize = 1;
+        PaginatedQueryProvider queryProvider = (pageToken, ps) -> new PaginatedQuery(
+            null,
+            null,
+            0,
+            pageToken,
+            ps
+        );
+
+        ElasticSearchResult result = provider.getPaginatedSearchResult(queryProvider, pageSize);
+
+        List<CaseDetails> cases = result.caseDetailsStream().toList();
+
+        assertThat(cases).hasSize(3);
+        assertThat(cases.get(0).getId()).isEqualTo(1L);
+        assertThat(cases.get(1).getId()).isEqualTo(2L);
+        assertThat(cases.get(2).getId()).isEqualTo(3L);
     }
 }

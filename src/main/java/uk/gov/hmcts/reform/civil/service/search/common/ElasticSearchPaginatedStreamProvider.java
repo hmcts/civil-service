@@ -100,7 +100,7 @@ public class ElasticSearchPaginatedStreamProvider {
         private PageToken pageToken;
         private List<CaseDetails> currentCases = Collections.emptyList();
         private int currentCaseIndex = 0;
-        private boolean hasMorePages = true;
+        private boolean hasMorePages = false;
 
         private int totalCasesFetched = 0;
         private int expectedTotalCases = 0;
@@ -186,12 +186,11 @@ public class ElasticSearchPaginatedStreamProvider {
                 : Collections.emptyList();
 
             if (searchResult != null) {
-                this.expectedTotalCases = searchResult.getTotal();
-                if (currentCases.size() > expectedTotalCases) {
+                if (totalCasesFetched + currentCases.size() > expectedTotalCases) {
                     log.warn(
-                        "Search result total ({}) is less than the number of cases returned ({}). "
-                            + "This may indicate an inconsistency in the search results.",
-                        expectedTotalCases, currentCases.size()
+                        "Total cases fetched ({}) exceeds expected total ({}) after adding current page ({}). "
+                            + "This may indicate that more cases now match the query than during the initial search.",
+                        totalCasesFetched, expectedTotalCases, currentCases.size()
                     );
                 }
             }
