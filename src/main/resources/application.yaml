@@ -57,6 +57,7 @@ spring:
     baseline-on-migrate: true
 
 scheduler:
+  active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:JudgementBuffer}
   circuitBreakerThreshold: ${CIRCUIT_BREAKER_THRESHOLD:5}
   lockAtLeastFor: ${LOCK_AT_LEAST_FOR:PT1M}
   lockAtMostFor: ${LOCK_AT_MOST_FOR:PT5M}
@@ -67,6 +68,10 @@ scheduler:
   defendantResponse:
     cronExpression: ${CRON_EXPRESSION_DEFENDANT_RESPONSE:0 1 16 * * ?}
     enabled: ${SCHEDULER_ENABLED_DEFENDANT_RESPONSE:false}
+  automatedHearingNotice:
+    cronExpression: ${CRON_EXPRESSION_AUTOMATED_HEARING_NOTICE:0 0 0,12 * * ?}
+    enabled: ${SCHEDULER_ENABLED_AUTOMATED_HEARING_NOTICE:true}
+    serviceIds: ${AUTOMATED_HEARING_NOTICE_SERVICE_IDS:AAA6,AAA7}
 
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}

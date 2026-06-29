@@ -40,21 +40,29 @@ public class ScheduledEventTracker {
     }
 
     public void caseProcessedEvent(ScheduledTaskEventConfiguration eventConfig, Long caseId) {
+        caseProcessedEvent(eventConfig, String.valueOf(caseId));
+    }
+
+    public void caseProcessedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId) {
         telemetryService.trackEvent(
             eventConfig.getCaseProcessedEvent(),
             Map.of(
                 SCHEDULER_NAME, eventConfig.getSchedulerName(),
-                CASE_ID, String.valueOf(caseId),
+                CASE_ID, caseId,
                 STATUS, SUCCESS
             )
         );
     }
 
     public void caseFailedEvent(ScheduledTaskEventConfiguration eventConfig, Long caseId, Exception e) {
+        caseFailedEvent(eventConfig, String.valueOf(caseId), e);
+    }
+
+    public void caseFailedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, Exception e) {
         telemetryService.trackEvent(
             eventConfig.getCaseFailedEvent(), Map.of(
                 SCHEDULER_NAME, eventConfig.getSchedulerName(),
-                CASE_ID, String.valueOf(caseId),
+                CASE_ID, caseId,
                 STATUS, FAILURE,
                 ERROR, e.getMessage(),
                 ERROR_CATEGORY, errorCategorizer.categorizeError(e)

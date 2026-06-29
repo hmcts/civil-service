@@ -407,6 +407,48 @@ The service includes a common framework for implementing scheduled tasks. This f
     - Use `ScheduledTaskRunner.run()` to execute the task.
 4. **Add Configuration**: Add settings to `application.yaml` for enabling the scheduler and defining its cron expression.
 
+### Spring Scheduler Configuration
+
+Spring-based schedulers are controlled by both a LaunchDarkly feature flag and an allowlist of active schedulers.
+
+#### Feature Flag
+The `spring-scheduler-enabled` flag in LaunchDarkly acts as a global kill-switch for all Spring-managed scheduled tasks. If this flag is disabled, no Spring schedulers will execute, regardless of their individual configuration.
+
+#### Active Schedulers List
+To enable specific Spring schedulers, they must be added to the `active-schedulers` list in `application.yaml` or via the `SCHEDULER_ACTIVE_SCHEDULERS` environment variable.
+
+**Configuration in `application.yaml`:**
+```yaml
+scheduler:
+  active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:JudgementBuffer,DefendantResponseDeadline}
+```
+
+**Using Environment Variables:**
+To enable multiple schedulers, provide a comma-separated list:
+```bash
+export SCHEDULER_ACTIVE_SCHEDULERS="JudgementBuffer,DefendantResponseDeadline"
+```
+
+To disable all Spring schedulers (even if the feature flag is on), set the list to be empty:
+```bash
+export SCHEDULER_ACTIVE_SCHEDULERS=""
+```
+
+### AutomatedHearingNoticeScheduler
+
+The `AutomatedHearingNoticeScheduler` creates automated hearing notices for unnotified Spec and Unspec hearings.
+It runs when `AutomatedHearingNotice` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.automatedHearingNotice`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_AUTOMATED_HEARING_NOTICE` |
+| `cronExpression` | When the scheduler runs. | `0 0 0,12 * * ?` (Twice daily at midnight and midday) | `CRON_EXPRESSION_AUTOMATED_HEARING_NOTICE` |
+| `serviceIds` | HMC service IDs to check for unnotified hearings. | `AAA6,AAA7` | `AUTOMATED_HEARING_NOTICE_SERVICE_IDS` |
+
 ### JudgementBufferScheduler
 
 The `JudgementBufferScheduler` is used to process cases where a default judgement has been requested and a buffer period has expired.
