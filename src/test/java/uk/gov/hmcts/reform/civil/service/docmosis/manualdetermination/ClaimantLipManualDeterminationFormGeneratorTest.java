@@ -107,7 +107,7 @@ class ClaimantLipManualDeterminationFormGeneratorTest {
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .issueDate(LocalDate.now())
                 .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
-                .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(MonetaryConversions.penniesToPounds(BigDecimal.valueOf(10000)))
+                .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.valueOf(10000))
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(PaymentFrequencyClaimantResponseLRspec.ONCE_ONE_MONTH)
                 .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate.now())
