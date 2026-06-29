@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingRespons
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,7 +82,7 @@ public class AutomatedHearingNoticeScheduler implements CivilScheduler {
             UnNotifiedHearingResponse response = hearingsService.getUnNotifiedHearingResponses(
                 userToken,
                 serviceId,
-                LocalDateTime.now().minusDays(7),
+                LocalDateTime.now(ZoneId.systemDefault()).minusDays(7),
                 null
             );
             List<String> hearingIds = response.getHearingIds() == null ? List.of() : response.getHearingIds();
