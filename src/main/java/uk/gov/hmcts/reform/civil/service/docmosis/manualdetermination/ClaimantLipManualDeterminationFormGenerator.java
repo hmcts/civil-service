@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.time.LocalDate;
 
@@ -55,7 +56,7 @@ public class ClaimantLipManualDeterminationFormGenerator implements TemplateData
             .setDefendantAdmittedAmount(caseData.getRespondToAdmittedClaimOwingAmountPounds())
             .setClaimantRequestRepaymentBy(claimantResponseUtils.getClaimantRepaymentType(caseData))
             .setClaimResponseType(caseData.getRespondent1ClaimResponseTypeForSpec())
-            .setRegularPaymentAmount(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec())
+            .setRegularPaymentAmount(MonetaryConversions.penniesToPounds(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec()))
             .setRepaymentFrequency(getRepaymentFrequency(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec()))
             .setRepaymentType(caseData.getApplicant1RepaymentOptionForDefendantSpec())
             .setFirstRepaymentDate(caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec())
