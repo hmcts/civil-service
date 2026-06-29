@@ -25,7 +25,7 @@ public class PartialAdmitPaidFullConfirmationText implements RespondToClaimConfi
             && NO.equals(caseData.getSpecDefenceAdmitted2Required())) {
             return Optional.empty();
         }
-        BigDecimal howMuchWasPaid = (caseData.getResponseToClaim() != null ? caseData.getResponseToClaim().getHowMuchWasPaid() : null);
+        BigDecimal howMuchWasPaid = caseData.getCurrentRespondentHowMuchWasPaid();
         BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
         if (Stream.of(howMuchWasPaid, totalClaimAmount)
             .anyMatch(Objects::isNull)) {

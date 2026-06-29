@@ -164,7 +164,10 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     }
 
     private void handlePayments(CaseData caseData, SealedClaimResponseFormForSpec form) {
-        RespondToClaim respondToClaim = caseData.getResponseToClaim();
+        RespondToClaim respondToClaim = caseData.resolveRespondToClaim(caseData);
+        if (respondToClaim == null) {
+            return;
+        }
         if (respondToClaim != null) {
             form.setPoundsPaid(MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()).toString())
                 .setPaymentDate(respondToClaim.getWhenWasThisAmountPaid())

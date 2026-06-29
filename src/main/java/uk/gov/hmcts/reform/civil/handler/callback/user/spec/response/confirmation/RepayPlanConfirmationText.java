@@ -11,6 +11,7 @@ import java.util.EnumSet;
 import java.util.Optional;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Component
 public class RepayPlanConfirmationText implements RespondToClaimConfirmationTextSpecGenerator {
@@ -24,17 +25,42 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
 
-        if (!RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN.equals(
-            caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
-            && !RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN.equals(
-            caseData.getDefenceAdmitPartPaymentTimeRouteRequired2())
-            || !EnumSet.of(RespondentResponseTypeSpec.FULL_ADMISSION, RespondentResponseTypeSpec.PART_ADMISSION)
-            .contains(caseData.getRespondent1ClaimResponseTypeForSpec())
-            && !EnumSet.of(RespondentResponseTypeSpec.FULL_ADMISSION, RespondentResponseTypeSpec.PART_ADMISSION)
-            .contains(caseData.getRespondent2ClaimResponseTypeForSpec())
-        ) {
+        boolean currentRespondentHasRepaymentPlan;
+        boolean currentRespondentHasAdmissionResponse;
+
+        if (YES.equals(caseData.getIsRespondent1())) {
+            currentRespondentHasRepaymentPlan =
+                RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN.equals(
+                    caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+            currentRespondentHasAdmissionResponse = EnumSet.of(
+                RespondentResponseTypeSpec.FULL_ADMISSION,
+                RespondentResponseTypeSpec.PART_ADMISSION
+            ).contains(caseData.getRespondent1ClaimResponseTypeForSpec());
+        } else if (YES.equals(caseData.getIsRespondent2())) {
+            currentRespondentHasRepaymentPlan =
+                RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN.equals(
+                    caseData.getDefenceAdmitPartPaymentTimeRouteRequired2());
+            currentRespondentHasAdmissionResponse = EnumSet.of(
+                RespondentResponseTypeSpec.FULL_ADMISSION,
+                RespondentResponseTypeSpec.PART_ADMISSION
+            ).contains(caseData.getRespondent2ClaimResponseTypeForSpec());
+        } else {
+            currentRespondentHasRepaymentPlan =
+                RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN.equals(
+                    caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
+                    || RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN.equals(
+                    caseData.getDefenceAdmitPartPaymentTimeRouteRequired2());
+            currentRespondentHasAdmissionResponse =
+                EnumSet.of(RespondentResponseTypeSpec.FULL_ADMISSION, RespondentResponseTypeSpec.PART_ADMISSION)
+                    .contains(caseData.getRespondent1ClaimResponseTypeForSpec())
+                    || EnumSet.of(RespondentResponseTypeSpec.FULL_ADMISSION, RespondentResponseTypeSpec.PART_ADMISSION)
+                    .contains(caseData.getRespondent2ClaimResponseTypeForSpec());
+        }
+
+        if (!currentRespondentHasRepaymentPlan || !currentRespondentHasAdmissionResponse) {
             return Optional.empty();
         }
+
         StringBuilder sb = new StringBuilder();
         String applicantName = caseData.getApplicant1().getPartyName();
         if (caseData.getApplicant2() != null) {

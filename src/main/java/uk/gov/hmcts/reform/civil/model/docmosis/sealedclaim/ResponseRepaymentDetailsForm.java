@@ -156,24 +156,29 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
     }
 
     private static void addPayByDatePayImmediately(ResponseRepaymentDetailsFormData data, BigDecimal totalClaimAmount, CaseData caseData) {
-        LocalDate whenWillThisAmountBePaid = null;
-        if (YES.equals(caseData.getIsRespondent1()) && caseData.getRespondToClaimAdmitPartLRspec() != null) {
-            whenWillThisAmountBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(
-                RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(null);
-        }
-        if (YES.equals(caseData.getIsRespondent2()) && caseData.getRespondToClaimAdmitPartLRspec2() != null) {
-            whenWillThisAmountBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec2()).map(
-                RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(null);
-        }
-        if ((caseData.getIsRespondent1() == null && caseData.getIsRespondent2() == null)
-            && caseData.getRespondToClaimAdmitPartLRspec() != null) {
-            whenWillThisAmountBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(
-                RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(null);
-        }
+        RespondToClaimAdmitPartLRspec respondentData = getRelevantRespondentData(caseData);
+
+        LocalDate whenWillThisAmountBePaid = Optional.ofNullable(respondentData)
+            .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
+            .orElse(null);
+
         if (whenWillThisAmountBePaid == null) {
             log.info("When will this amount be paid is not set.");
         }
         data.setPayBy(whenWillThisAmountBePaid).setAmountToPay(totalClaimAmount + "");
+    }
+
+    private static RespondToClaimAdmitPartLRspec getRelevantRespondentData(CaseData caseData) {
+        if (YES.equals(caseData.getIsRespondent2())) {
+            return caseData.getRespondToClaimAdmitPartLRspec2();
+        }
+
+        if (YES.equals(caseData.getIsRespondent1()) || (caseData.getIsRespondent1() == null
+            && caseData.getIsRespondent2() == null && caseData.getRespondToClaimAdmitPartLRspec() != null)) {
+            return caseData.getRespondToClaimAdmitPartLRspec();
+        }
+
+        return null;
     }
 
     private static void addRepaymentPlan(CaseData caseData, ResponseRepaymentDetailsFormData data, BigDecimal totalClaimAmount) {
@@ -199,11 +204,9 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
     }
 
     private static void alreadyPaid(CaseData caseData, ResponseRepaymentDetailsFormData data) {
-        //This will be set when 1v2 case
-        RespondToClaim respondToClaim = caseData.getResponseToClaim();
+        RespondToClaim respondToClaim = caseData.resolveRespondToClaim(caseData);
         if (respondToClaim == null) {
-            //This will be set when Lip vs Lip, 1v1 case
-            respondToClaim = caseData.getRespondToAdmittedClaim() != null ? caseData.getRespondToAdmittedClaim() : caseData.getRespondToClaim();
+            return;
         }
         if (respondToClaim != null) {
             String howMuchWasPaidAsString = MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()) + "";
@@ -236,10 +239,19 @@ public record ResponseRepaymentDetailsForm(String amountToPay,
 
     private static void partAdmissionData(CaseData caseData, ResponseRepaymentDetailsFormData data) {
         addDetailsOnWhyClaimIsRejected(caseData, data);
-        if (YES.equals(caseData.getIsRespondent1()) && caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES
-            || YES.equals(caseData.getIsRespondent2()) && caseData.getSpecDefenceAdmitted2Required() == YesOrNo.YES
-            || caseData.getRespondent2ResponseDate() == null
-            && (caseData.getSpecDefenceAdmittedRequired() == YES && caseData.getRespondent1ResponseDate() != null)) {
+        boolean isRespondent1AlreadyPaid =
+            YES.equals(caseData.getIsRespondent1())
+                && caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES;
+
+        boolean isRespondent2AlreadyPaid =
+            YES.equals(caseData.getIsRespondent2())
+                && caseData.getSpecDefenceAdmitted2Required() == YesOrNo.YES;
+
+        boolean is1v1RespondentAlreadyPaid =
+            caseData.getRespondent2ResponseDate() == null
+                && caseData.getRespondent1ResponseDate() != null
+                && caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES;
+        if (isRespondent1AlreadyPaid || isRespondent2AlreadyPaid || is1v1RespondentAlreadyPaid) {
             alreadyPaid(caseData, data);
         } else {
             BigDecimal amountInPennies =

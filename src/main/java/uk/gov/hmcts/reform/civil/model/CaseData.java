@@ -1263,6 +1263,30 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public BigDecimal getCurrentRespondentHowMuchWasPaid() {
+        return getResponseToClaim() != null
+            ? getResponseToClaim().getHowMuchWasPaid()
+            : Optional.ofNullable(getRespondToAdmittedClaim())
+            .map(RespondToClaim::getHowMuchWasPaid)
+            .orElseGet(() -> Optional.ofNullable(getRespondToAdmittedClaim2())
+                .map(RespondToClaim::getHowMuchWasPaid)
+                .orElse(null));
+    }
+
+    @JsonIgnore
+    public RespondToClaim resolveRespondToClaim(CaseData caseData) {
+        if (caseData.getResponseToClaim() != null) {
+            return caseData.getResponseToClaim();
+        }
+
+        if (caseData.getRespondToAdmittedClaim() != null) {
+            return caseData.getRespondToAdmittedClaim();
+        }
+
+        return caseData.getRespondToClaim();
+    }
+
+    @JsonIgnore
     public List<Element<RecurringIncomeLRspec>> getRecurringIncomeForRespondent1() {
         if (isFullAdmitClaimSpec()) {
             return ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringIncomeFA).orElse(

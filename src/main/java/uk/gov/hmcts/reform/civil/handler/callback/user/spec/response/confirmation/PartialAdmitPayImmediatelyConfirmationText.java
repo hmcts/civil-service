@@ -36,16 +36,7 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
             caseData.getDefenceAdmitPartPaymentTimeRouteRequired2())) {
             return Optional.empty();
         }
-        LocalDate whenBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
-            .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
-            .orElse(null);
-
-        if (YES.equals(caseData.getIsRespondent2())) {
-            if (caseData.getRespondToClaimAdmitPartLRspec2() != null) {
-                whenBePaid = caseData.getRespondToClaimAdmitPartLRspec2().getWhenWillThisAmountBePaid();
-            }
-        }
-
+        LocalDate whenBePaid = getCurrentRespondentPaymentDate(caseData);
         boolean isPartAdmitLRAdmissionBulk = checkLrAdmissionBulk(caseData, featureToggleService);
         BigDecimal claimOwingAmount = getClaimOwingAmount(caseData, isPartAdmitLRAdmissionBulk);
         String applicantName = caseData.getApplicant1().getPartyName();
@@ -117,6 +108,19 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
         }
 
         return Optional.of(sb.toString());
+    }
+
+    private RespondToClaimAdmitPartLRspec getCurrentRespondentAdmitPartLRspec(CaseData caseData) {
+        if (YES.equals(caseData.getIsRespondent2())) {
+            return caseData.getRespondToClaimAdmitPartLRspec2();
+        }
+        return caseData.getRespondToClaimAdmitPartLRspec();
+    }
+
+    private LocalDate getCurrentRespondentPaymentDate(CaseData caseData) {
+        return Optional.ofNullable(getCurrentRespondentAdmitPartLRspec(caseData))
+            .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
+            .orElse(null);
     }
 
     private boolean checkLrAdmissionBulk(CaseData caseData, FeatureToggleService featureToggleService) {
