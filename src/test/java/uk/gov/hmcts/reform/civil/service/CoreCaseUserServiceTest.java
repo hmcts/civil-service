@@ -300,6 +300,12 @@ class CoreCaseUserServiceTest {
             "gateway timeout response body".getBytes(UTF_8),
             Map.of());
 
+        private final FeignException notFoundException = new FeignException.NotFound(
+            "not found message",
+            Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
+            "not found response body".getBytes(UTF_8),
+            Map.of());
+
         @BeforeEach
         void setup() {
             when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(
@@ -355,6 +361,26 @@ class CoreCaseUserServiceTest {
             assertThatThrownBy(() -> service.getUserCaseRoles(CASE_ID, USER_ID))
                 .isInstanceOf(RetryableCaseUserException.class)
                 .hasCause(gatewayTimeoutException);
+        }
+
+        @Test
+        void shouldReturnEmptyList_whenUserRolesNotFound() {
+            when(caseAccessDataStoreApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenThrow(notFoundException);
+
+            var userCaseRoles = service.getUserCaseRoles(CASE_ID, USER_ID);
+
+            assertThat(userCaseRoles).isEmpty();
+        }
+
+        @Test
+        void shouldReturnEmptyList_whenUnexpectedExceptionThrown() {
+            when(caseAccessDataStoreApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenThrow(new RuntimeException("unexpected"));
+
+            var userCaseRoles = service.getUserCaseRoles(CASE_ID, USER_ID);
+
+            assertThat(userCaseRoles).isEmpty();
         }
 
         @Test
