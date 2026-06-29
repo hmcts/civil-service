@@ -74,6 +74,7 @@ class ClaimantLipManualDeterminationFormGeneratorTest {
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .issueDate(LocalDate.now())
                 .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
+                .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.valueOf(10000))
                 .build();
 
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
