@@ -40,6 +40,7 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Component
 @Slf4j
@@ -60,12 +61,13 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
     private final ObjectMapper mapper;
 
     public UpdateFromGACaseEventTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         CoreCaseDataService coreCaseDataService,
         CaseDetailsConverter caseDetailsConverter,
         ObjectMapper mapper
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.coreCaseDataService = coreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;
         this.mapper = mapper;

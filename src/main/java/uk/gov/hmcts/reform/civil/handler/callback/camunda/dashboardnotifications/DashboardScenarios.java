@@ -98,10 +98,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_CLAIMANT_REJECTS_DEF_PLAN_CLAIMANT_DISAGREES_COURT_PLAN_DEFENDANT(
         "Scenario.AAA6.ClaimantIntent.RequestCCJ.ClaimantRejectsDefPlan.ClaimantDisagreesCourtPlan.Defendant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MEDIATION_CLAIMANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.SuggestedMediation.Claimant"),
-    SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT("Scenario.AAA6.ClaimantIntent.Defendant.OrgLtdCo.Claimant"),
     SCENARIO_AAA6_CP_HEARING_SCHEDULED_CLAIMANT("Scenario.AAA6.CP.Hearing.Scheduled.Claimant"),
     SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT("Scenario.AAA6.CP.Hearing.Scheduled.Defendant"),
-    SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_DEFENDANT("Scenario.AAA6.ClaimantIntent.Defendant.OrgLtdCo.Claimant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_MULTI_INT_FAST_CLAIMANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.Multi.Int.Fast.Claimant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MULTI_INT_FAST_DEFENDANT("Scenario.AAA6.DefResponse.FullDefence.FullDispute.Multi.Int.Fast.Defendant"),
     SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT("Scenario.AAA6.CP.HearingDocuments.Upload.Claimant"),
@@ -173,6 +171,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_DEFENDANT_CHANGE_VIEW_MEDIATION_AVAILABLE_CARM("Scenario.AAA6.MediationUploadDocuments.ViewMediationAvailable.CARM.Defendant"),
     SCENARIO_AAA6_UPLOAD_MEDIATION_DOCUMENT_CLAIMANT_CHANGE_VIEW_MEDIATION_AVAILABLE_CARM("Scenario.AAA6.MediationUploadDocuments.ViewMediationAvailable.CARM.Claimant"),
     SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_CLAIMANT("Scenario.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Claimant"),
+    SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_GRANTED_CLAIMANT("Scenario.AAA6.JudgmentsOnline.DefaultJudgmentGranted.Claimant"),
     SCENARIO_AAA6_JUDGEMENTS_ONLINE_SET_ASIDE_ERROR_DEFENDANT("Scenario.AAA6.JudgmentsOnline.SetAsideError.Defendant"),
     SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT("Scenario.AAA6.CP.SDOMadebyLA.Claimant"),
     SCENARIO_AAA6_CP_SDO_MADE_BY_LA_DEFENDANT("Scenario.AAA6.CP.SDOMadebyLA.Defendant"),
@@ -205,6 +204,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_TRIAL_ARRANGEMENTS_TASK_LIST("Scenario.AAA6.DefendantNoticeOfChange.Claimant.Trial.Arrangements.TaskList"),
     SCENARIO_AAA6_DISMISS_CASE_CLAIMANT("Scenario.AAA6.CP.Case.Dismissed.Claimant"),
     SCENARIO_AAA6_DISMISS_CASE_DEFENDANT("Scenario.AAA6.CP.Case.Dismissed.Defendant"),
+    SCENARIO_AAA6_DISMISS_CASE_CCJ_CANCELLED_CLAIMANT("Scenario.AAA6.CP.Case.CCJCancelled.Claimant"),
     SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT("Scenario.AAA6.CP.Case.Stayed.Claimant"),
     SCENARIO_AAA6_CP_CASE_STAYED_DEFENDANT("Scenario.AAA6.CP.Case.Stayed.Defendant"),
     SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_APPLICANT("Scenario.AAA6.GeneralApps.ApplicationProceedsOffline.Applicant"),
@@ -303,8 +303,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_GENERAL_APPLICATION_IN_PROGRESS_DEFENDANT("Scenario.AAA6.GeneralApplication.ViewApplicationInProgress.Defendant"),
     SCENARIO_AAA6_GENERAL_APPS_TRANSLATED_DOCUMENT_UPLOADED_APPLICANT("Scenario.AAA6.GeneralApps.TranslatedDocumentUploaded.Applicant"),
     SCENARIO_AAA6_GENERAL_APPS_TRANSLATED_DOCUMENT_UPLOADED_RESPONDENT("Scenario.AAA6.GeneralApps.TranslatedDocumentUploaded.Respondent"),
-    SCENARIO_AAA6_CASE_SETTLED_JR_CANCELLED_CLAIMANT("Scenario.Notice.AAA6.JR.Cancelled.Case.Settled.Claimant"),
-    SCENARIO_AAA6_CASE_STAYED_JR_CANCELLED_CLAIMANT("Scenario.Notice.AAA6.JR.Cancelled.Case.Stayed.Claimant");
+    SCENARIO_AAA6_CASE_SETTLED_JR_CANCELLED_CLAIMANT("Scenario.AAA6.JR.Cancelled.Case.Settled.Claimant"),
+    SCENARIO_AAA6_CASE_STAYED_JR_CANCELLED_CLAIMANT("Scenario.AAA6.JR.Cancelled.Case.Stayed.Claimant");
 
     private final String scenario;
 

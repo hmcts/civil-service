@@ -16,21 +16,23 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
-import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
+import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDateTime;
@@ -67,6 +69,8 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
     @Mock
     private ExternalTask mockTask;
     private WaitCivilDocUpdatedTaskHandler waitCivilDocUpdatedTaskHandler;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     private GeneralApplicationCaseData gaCaseData;
     private GeneralApplicationCaseData civilCaseDataEmpty;
@@ -79,11 +83,13 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
         EventProperties eventProperties = new EventProperties();
         eventProperties.setRetryCount(3);
         waitCivilDocUpdatedTaskHandler = new WaitCivilDocUpdatedTaskHandler(
+            new ExternalTaskCompletionService(),
             eventProperties,
             coreCaseDataService,
             caseDetailsConverter,
             gaForLipService,
-            mapper
+            mapper,
+            featureToggleService
         );
         CaseDocument caseDocumentNow = new CaseDocument().setDocumentName("current")
                 .setDocumentLink(new Document().setDocumentUrl("url")

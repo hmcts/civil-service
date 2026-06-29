@@ -19,16 +19,25 @@ import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -37,16 +46,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Long.parseLong;
 import static java.time.LocalDateTime.now;
 import static java.util.Collections.singletonList;
-import static java.util.Objects.requireNonNull;
-import static java.util.Optional.ofNullable;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -76,6 +79,8 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     private UpdateFromGACaseEventTaskHandler handler;
 
@@ -83,10 +88,12 @@ public class UpdateFromGACaseEventTaskHandlerTest {
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         handler = new UpdateFromGACaseEventTaskHandler(
+            new ExternalTaskCompletionService(),
             new EventProperties(),
             coreCaseDataService,
             caseDetailsConverter,
-            objectMapper
+            objectMapper,
+            featureToggleService
         );
     }
 
