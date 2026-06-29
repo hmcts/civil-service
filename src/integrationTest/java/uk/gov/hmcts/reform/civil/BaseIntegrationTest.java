@@ -52,7 +52,8 @@ import static org.mockito.Mockito.when;
     properties = {
         "scheduler.bundleCreation.enabled=false",
         "scheduler.hearingCvpLink.enabled=false",
-        "scheduler.pollingEventEmitter.enabled=false"
+        "scheduler.pollingEventEmitter.enabled=false",
+        "scheduler.automatedHearingNotice.enabled=false"
     }
 )
 @AutoConfigureMockMvc

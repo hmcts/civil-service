@@ -77,6 +77,10 @@ scheduler:
   pollingEventEmitter:
     cronExpression: ${CRON_EXPRESSION_POLLING_EVENT_EMITTER:0 0 8-20 * * ?}
     enabled: ${SCHEDULER_ENABLED_POLLING_EVENT_EMITTER:true}
+  automatedHearingNotice:
+    cronExpression: ${CRON_EXPRESSION_AUTOMATED_HEARING_NOTICE:0 0 0,12 * * ?}
+    enabled: ${SCHEDULER_ENABLED_AUTOMATED_HEARING_NOTICE:true}
+    serviceIds: ${AUTOMATED_HEARING_NOTICE_SERVICE_IDS:AAA6,AAA7}
 
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}

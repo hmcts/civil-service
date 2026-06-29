@@ -447,6 +447,21 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 | `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_POLLING_EVENT_EMITTER` |
 | `cronExpression` | When the scheduler runs. | `0 0 8-20 * * ?` (Hourly between 8 AM and 8 PM) | `CRON_EXPRESSION_POLLING_EVENT_EMITTER` |
 
+### AutomatedHearingNoticeScheduler
+
+The `AutomatedHearingNoticeScheduler` creates automated hearing notices for unnotified Spec and Unspec hearings.
+It runs when `AutomatedHearingNotice` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.automatedHearingNotice`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_AUTOMATED_HEARING_NOTICE` |
+| `cronExpression` | When the scheduler runs. | `0 0 0,12 * * ?` (Twice daily at midnight and midday) | `CRON_EXPRESSION_AUTOMATED_HEARING_NOTICE` |
+| `serviceIds` | HMC service IDs to check for unnotified hearings. | `AAA6,AAA7` | `AUTOMATED_HEARING_NOTICE_SERVICE_IDS` |
+
 ### JudgementBufferScheduler
 
 The `JudgementBufferScheduler` is used to process cases where a default judgement has been requested and a buffer period has expired.
