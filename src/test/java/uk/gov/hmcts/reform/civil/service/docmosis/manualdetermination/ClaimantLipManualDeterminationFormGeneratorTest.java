@@ -89,6 +89,7 @@ class ClaimantLipManualDeterminationFormGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder()
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .issueDate(LocalDate.now())
+                .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.valueOf(10000))
                 .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
                 .applicant1RequestedPaymentDateForDefendantSpec(new PaymentBySetDate().setPaymentSetDate(LocalDate.now()))
                 .build();
