@@ -436,7 +436,8 @@ export SCHEDULER_ACTIVE_SCHEDULERS=""
 
 ### AutomatedHearingNoticeScheduler
 
-The `AutomatedHearingNoticeScheduler` emits hearing notice scheduler events for unnotified Spec and Unspec hearings.
+The `AutomatedHearingNoticeScheduler` creates automated hearing notices for unnotified Spec and Unspec hearings.
+It runs when `AutomatedHearingNotice` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
 
 #### Settings
 
@@ -445,7 +446,7 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 | Setting | Description | Default | Environment Variable |
 |---------|-------------|---------|----------------------|
 | `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_AUTOMATED_HEARING_NOTICE` |
-| `cronExpression` | When the scheduler runs. | `0 0 0,12 ? * * *` (Twice daily at midnight and midday) | `CRON_EXPRESSION_AUTOMATED_HEARING_NOTICE` |
+| `cronExpression` | When the scheduler runs. | `0 0 0,12 * * ?` (Twice daily at midnight and midday) | `CRON_EXPRESSION_AUTOMATED_HEARING_NOTICE` |
 | `serviceIds` | HMC service IDs to check for unnotified hearings. | `AAA6,AAA7` | `AUTOMATED_HEARING_NOTICE_SERVICE_IDS` |
 
 ### JudgementBufferScheduler

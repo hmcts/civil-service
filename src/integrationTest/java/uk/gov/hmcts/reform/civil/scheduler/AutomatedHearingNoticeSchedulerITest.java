@@ -54,7 +54,7 @@ public class AutomatedHearingNoticeSchedulerITest {
     @MockBean
     private TelemetryService telemetryService;
 
-    @MockBean
+    @MockBean(name = "userService")
     private UserService userService;
 
     @Test
