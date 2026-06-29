@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,7 +36,7 @@ class FeatureToggleServiceTest {
 
     @BeforeEach
     void setUp() {
-        featureToggleService = new FeatureToggleService(featureToggleApi);
+        featureToggleService = new FeatureToggleService(featureToggleApi, List.of("JudgementBuffer", "DefendantResponseDeadline"));
     }
 
     @ParameterizedTest
@@ -290,5 +291,20 @@ class FeatureToggleServiceTest {
     void shouldCallBoolVariation_whenJudgmentBufferEnabled(Boolean toggleStat) {
         givenToggle("judgment-buffer", toggleStat);
         assertThat(featureToggleService.isJudgmentBufferEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenSpringSchedulerEnabled(Boolean toggleStat) {
+        givenToggle("spring-scheduler-enabled", toggleStat);
+        assertThat(featureToggleService.isSpringSchedulerEnabled("JudgementBuffer")).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isSpringSchedulerEnabled("DefendantResponseDeadline")).isEqualTo(toggleStat);
+    }
+
+    @Test
+    void shouldReturnFalse_whenActiveSchedulersIsEmpty() {
+        FeatureToggleService emptyService = new FeatureToggleService(featureToggleApi, List.of());
+        givenToggle("spring-scheduler-enabled", true);
+        assertThat(emptyService.isSpringSchedulerEnabled("JudgementBufferScheduledTask")).isFalse();
     }
 }
