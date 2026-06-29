@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=JudgementBufferSchedulerITest",
-    "scheduler.judgementBuffer.enabled=true"
+    "scheduler.judgement-buffer.enabled=true"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class JudgementBufferSchedulerITest {
