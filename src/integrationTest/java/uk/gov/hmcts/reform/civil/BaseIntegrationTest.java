@@ -50,7 +50,8 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(
     classes = {Application.class, TestIdamConfiguration.class},
     properties = {
-        "scheduler.bundleCreation.enabled=false"
+        "scheduler.bundleCreation.enabled=false",
+        "scheduler.hearingCvpLink.enabled=false"
     })
 @AutoConfigureMockMvc
 @SuppressWarnings({"java:S112", "java:S6813", "java:S1874"})

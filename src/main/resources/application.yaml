@@ -71,6 +71,9 @@ scheduler:
   bundleCreation:
     cronExpression: ${CRON_EXPRESSION_BUNDLE_CREATION:0 0 21 * * ?}
     enabled: ${SCHEDULER_ENABLED_BUNDLE_CREATION:true}
+  hearingCvpLink:
+    cronExpression: ${CRON_EXPRESSION_HEARING_CVP_LINK:0 50 0 * * ?}
+    enabled: ${SCHEDULER_ENABLED_HEARING_CVP_LINK:true}
 
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
