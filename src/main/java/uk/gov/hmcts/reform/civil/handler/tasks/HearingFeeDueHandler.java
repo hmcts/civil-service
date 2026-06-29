@@ -51,19 +51,21 @@ public class HearingFeeDueHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        Set<CaseDetails> cases = caseSearchService.getCases();
-        log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
+        if (!featureToggleService.isSpringSchedulerEnabled()) {
+            Set<CaseDetails> cases = caseSearchService.getCases();
+            log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
-        cases.forEach(caseDetails -> {
-            try {
-                processCase(caseDetails);
-            } catch (Exception e) {
-                //Continue for other cases if there is some error in some cases, as we don't want
-                // to stop processing other valid cases because error happened in some.
-                //We log the error to leave a trace that something needs to be looked into for failed cases
-                log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
-            }
-        });
+            cases.forEach(caseDetails -> {
+                try {
+                    processCase(caseDetails);
+                } catch (Exception e) {
+                    //Continue for other cases if there is some error in some cases, as we don't want
+                    // to stop processing other valid cases because error happened in some.
+                    //We log the error to leave a trace that something needs to be looked into for failed cases
+                    log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
+                }
+            });
+        }
         return new ExternalTaskData();
     }
 

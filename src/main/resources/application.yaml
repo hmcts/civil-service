@@ -67,6 +67,9 @@ scheduler:
   defendantResponse:
     cronExpression: ${CRON_EXPRESSION_DEFENDANT_RESPONSE:0 1 16 * * ?}
     enabled: ${SCHEDULER_ENABLED_DEFENDANT_RESPONSE:false}
+  hearingFee:
+    cronExpression: ${CRON_EXPRESSION_HEARING_FEE:0 0 0 * * ?}
+    enabled: ${SCHEDULER_ENABLED_HEARING_FEE:true}
 
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
