@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.config.TestIdamConfiguration;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.scheduler.defendantresponse.DefendantResponseDeadlineScheduler;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
 import uk.gov.hmcts.test.config.CoreCaseDataApiMockHelperConfiguration;
 import uk.gov.hmcts.test.helper.CoreCaseDataApiMockHelper;
@@ -23,6 +24,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_DEADLINE_CHECK;
 
 @ActiveProfiles("integration-test")
@@ -41,12 +43,17 @@ public class DefendantResponseDeadlineSchedulerITest {
     @MockBean
     private TelemetryService telemetryService;
 
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
     @Autowired
     private CoreCaseDataApiMockHelper coreCaseDataApiMockHelper;
 
     @BeforeEach
     void setUp() {
         coreCaseDataApiMockHelper.setupIdamClient();
+        when(featureToggleService.isSpringSchedulerEnabled(DefendantResponseDeadlineScheduler.SCHEDULER_NAME))
+            .thenReturn(true);
     }
 
     @Test
