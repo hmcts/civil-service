@@ -34,7 +34,7 @@ public class UpdateClaimStateService {
             return CaseState.CASE_SETTLED.name();
         } else if (updatedData.hasApplicantNotProceededWithClaim()) {
             return CaseState.CASE_STAYED.name();
-        } else if (hasJudgmentByAdmission(updatedData, featureToggleService.isJudgmentOnlineLive())) {
+        } else if (hasJudgmentByAdmission(updatedData)) {
             return CaseState.All_FINAL_ORDERS_ISSUED.name();
         } else if (isProceedsInHeritageSystemAllowed(updatedData)) {
             return CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
@@ -88,8 +88,8 @@ public class UpdateClaimStateService {
             || caseData.hasDefendantNotAgreedToFreeMediation();
     }
 
-    private boolean hasJudgmentByAdmission(CaseData caseData, boolean judgmentOnlineLive) {
-        return judgmentOnlineLive && JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData);
+    private boolean hasJudgmentByAdmission(CaseData caseData) {
+        return JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData);
     }
 
     private boolean shouldNotChangeStateMinti(CaseData caseData) {

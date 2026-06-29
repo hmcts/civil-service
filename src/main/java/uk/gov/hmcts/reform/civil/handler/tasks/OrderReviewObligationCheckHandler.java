@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.service.search.OrderReviewObligationSearchServi
 import java.time.LocalDate;
 import java.util.Set;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
@@ -28,13 +29,14 @@ public class OrderReviewObligationCheckHandler extends BaseExternalTaskHandler {
     private final CaseDetailsConverter caseDetailsConverter;
 
     public OrderReviewObligationCheckHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         OrderReviewObligationSearchService caseSearchService,
         ApplicationEventPublisher applicationEventPublisher,
         CoreCaseDataService coreCaseDataService,
         CaseDetailsConverter caseDetailsConverter
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.caseSearchService = caseSearchService;
         this.applicationEventPublisher = applicationEventPublisher;
         this.coreCaseDataService = coreCaseDataService;
