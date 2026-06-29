@@ -51,8 +51,10 @@ import static org.mockito.Mockito.when;
     classes = {Application.class, TestIdamConfiguration.class},
     properties = {
         "scheduler.bundleCreation.enabled=false",
-        "scheduler.hearingCvpLink.enabled=false"
-    })
+        "scheduler.hearingCvpLink.enabled=false",
+        "scheduler.pollingEventEmitter.enabled=false"
+    }
+)
 @AutoConfigureMockMvc
 @SuppressWarnings({"java:S112", "java:S6813", "java:S1874"})
 public abstract class BaseIntegrationTest {

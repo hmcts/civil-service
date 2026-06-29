@@ -434,6 +434,19 @@ To disable all Spring schedulers (even if the feature flag is on), set the list 
 export SCHEDULER_ACTIVE_SCHEDULERS=""
 ```
 
+### PollingEventEmitterScheduler
+
+The `PollingEventEmitterScheduler` emits pending business process events for cases that are ready to continue processing.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.pollingEventEmitter`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_POLLING_EVENT_EMITTER` |
+| `cronExpression` | When the scheduler runs. | `0 0 8-20 * * ?` (Hourly between 8 AM and 8 PM) | `CRON_EXPRESSION_POLLING_EVENT_EMITTER` |
+
 ### JudgementBufferScheduler
 
 The `JudgementBufferScheduler` is used to process cases where a default judgement has been requested and a buffer period has expired.
