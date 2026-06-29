@@ -1,22 +1,28 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
 import uk.gov.hmcts.reform.ccd.client.CaseAssignmentApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.ccd.model.AddCaseAssignedUserRolesRequest;
+import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRoleWithOrganisation;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.exceptions.RetryableCaseUserException;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,11 +36,32 @@ public class CoreCaseUserService {
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
     private final AuthTokenGenerator authTokenGenerator;
 
+    @Retryable(retryFor = RetryableCaseUserException.class, backoff = @Backoff(delay = 500))
     public List<String> getUserCaseRoles(String caseId, String userId) {
-        return caseAccessDataStoreApi.getUserRoles(getCaaAccessToken(), authTokenGenerator.generate(), List.of(caseId))
-            .getCaseAssignedUserRoles().stream()
-            .filter(c -> c.getUserId().equals(userId)).distinct()
-            .map(c -> c.getCaseRole()).collect(Collectors.toList());
+        try {
+            return caseAccessDataStoreApi.getUserRoles(
+                    getCaaAccessToken(),
+                    authTokenGenerator.generate(),
+                    List.of(caseId)
+                )
+                .getCaseAssignedUserRoles().stream()
+                .filter(c -> c.getUserId().equals(userId)).distinct()
+                .map(CaseAssignedUserRole::getCaseRole).toList();
+        } catch (FeignException.GatewayTimeout | FeignException.BadGateway | FeignException.ServiceUnavailable e) {
+            throw new RetryableCaseUserException(e.getMessage(), e);
+        } catch (FeignException.NotFound ex) {
+            log.error("User Roles not found", ex);
+            return Collections.emptyList();
+        } catch (Exception ex) {
+            log.error("[CoreCaseUserService] Unexpected error occurred", ex);
+            return Collections.emptyList();
+        }
+    }
+
+    @Recover
+    public List<String> recover(RetryableCaseUserException ex) {
+        log.error("[CoreCaseUserService] Retryable User Case Roles lookup failed after retries", ex);
+        return Collections.emptyList();
     }
 
     public void assignCase(String caseId, String userId, String organisationId, CaseRole caseRole) {
