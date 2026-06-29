@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -106,7 +107,7 @@ class ClaimantLipManualDeterminationFormGeneratorTest {
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .issueDate(LocalDate.now())
                 .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
-                .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.valueOf(100))
+                .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(MonetaryConversions.penniesToPounds(BigDecimal.valueOf(10000)))
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(PaymentFrequencyClaimantResponseLRspec.ONCE_ONE_MONTH)
                 .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate.now())
