@@ -57,6 +57,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
 import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
+import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCasemanLR;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
@@ -76,6 +77,7 @@ import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.model.MediationAgreementDocument;
 import uk.gov.hmcts.reform.civil.model.MediationSuccessful;
+import uk.gov.hmcts.reform.civil.model.ObligationWAFlag;
 import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
@@ -358,6 +360,7 @@ public class CaseDataBuilder {
     protected String respondentSolicitor1EmailAddress;
     protected String respondentSolicitor2EmailAddress;
     protected ClaimValue claimValue;
+    protected List<ClaimAmountBreakup> claimAmountBreakup;
     protected YesOrNo uploadParticularsOfClaim;
     protected ClaimType claimType;
     protected ClaimTypeUnspec claimTypeUnSpec;
@@ -377,10 +380,12 @@ public class CaseDataBuilder {
     protected String responseClaimTrack;
     protected CaseState ccdState;
     protected List<Element<CaseDocument>> systemGeneratedCaseDocuments;
+    protected List<Element<CaseDocument>> finalOrderDocumentCollection;
     protected List<Element<CaseDocument>> gaDraftDocument;
     protected PaymentDetails claimIssuedPaymentDetails;
     protected PaymentDetails paymentDetails;
     protected PaymentDetails hearingFeePaymentDetails;
+    protected String hearingHelpFeesReferenceNumber;
     protected CorrectEmail applicantSolicitor1CheckEmail;
     protected IdamUserDetails applicantSolicitor1UserDetails;
     //Deadline extension
@@ -421,6 +426,7 @@ public class CaseDataBuilder {
     protected BigDecimal applicant1SuggestInstalmentsPaymentAmountForDefendantSpec;
     protected PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
     protected LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;
+    protected LocalDate applicant1SuggestPayImmediatelyPaymentDateForDefendantSpec;
 
     //Case proceeds in caseman
     protected ClaimProceedsInCaseman claimProceedsInCaseman;
@@ -483,6 +489,7 @@ public class CaseDataBuilder {
     protected LocalDateTime claimDismissedDate;
     protected LocalDateTime caseDismissedHearingFeeDueDate;
     protected LocalDate hearingDate;
+    protected DynamicList hearingLocation;
     private InterestClaimOptions interestClaimOptions;
     private YesOrNo claimInterest;
     private SameRateInterestSelection sameRateInterestSelection;
@@ -512,6 +519,7 @@ public class CaseDataBuilder {
     protected YesOrNo isRespondent2;
     private List<IdValue<Bundle>> caseBundles;
     private RespondToClaim respondToClaim;
+    private RespondToClaim respondToAdmittedClaim;
     private RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
     private YesOrNo defendantSingleResponseToBothClaimants;
     private RespondentResponseTypeSpec respondent2ClaimResponseTypeForSpec;
@@ -692,6 +700,7 @@ public class CaseDataBuilder {
     private YesOrNo eaCourtLocation;
 
     private Flags caseFlags;
+    private ObligationWAFlag obligationWAFlag;
 
     private MediationContactInformation app1MediationContactInfo;
     private MediationAvailability app1MediationAvailability;
@@ -6414,6 +6423,85 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder specRespondent2Represented(YesOrNo specRespondent2Represented) {
+        this.specRespondent2Represented = specRespondent2Represented;
+        return this;
+    }
+
+    public CaseDataBuilder claimAmountBreakup(List<ClaimAmountBreakup> claimAmountBreakup) {
+        this.claimAmountBreakup = claimAmountBreakup;
+        return this;
+    }
+
+    public CaseDataBuilder allocatedTrack(AllocatedTrack allocatedTrack) {
+        this.allocatedTrack = allocatedTrack;
+        return this;
+    }
+
+    public CaseDataBuilder finalOrderDocumentCollection(List<Element<CaseDocument>> finalOrderDocumentCollection) {
+        this.finalOrderDocumentCollection = finalOrderDocumentCollection;
+        return this;
+    }
+
+    public CaseDataBuilder hearingFeePaymentDetails(PaymentDetails hearingFeePaymentDetails) {
+        this.hearingFeePaymentDetails = hearingFeePaymentDetails;
+        return this;
+    }
+
+    public CaseDataBuilder hearingHelpFeesReferenceNumber(String hearingHelpFeesReferenceNumber) {
+        this.hearingHelpFeesReferenceNumber = hearingHelpFeesReferenceNumber;
+        return this;
+    }
+
+    public CaseDataBuilder hearingLocation(DynamicList hearingLocation) {
+        this.hearingLocation = hearingLocation;
+        return this;
+    }
+
+    public CaseDataBuilder respondToClaim(RespondToClaim respondToClaim) {
+        this.respondToClaim = respondToClaim;
+        return this;
+    }
+
+    public CaseDataBuilder respondToAdmittedClaim(RespondToClaim respondToAdmittedClaim) {
+        this.respondToAdmittedClaim = respondToAdmittedClaim;
+        return this;
+    }
+
+    public CaseDataBuilder respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec) {
+        this.respondToClaimAdmitPartLRspec = respondToClaimAdmitPartLRspec;
+        return this;
+    }
+
+    public CaseDataBuilder responseClaimMediationSpecRequired(YesOrNo responseClaimMediationSpecRequired) {
+        this.respondent1MediationRequired = responseClaimMediationSpecRequired;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1RepaymentPlan(RepaymentPlanLRspec respondent1RepaymentPlan) {
+        this.respondent1RepaymentPlan = respondent1RepaymentPlan;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1RespondToSettlementAgreementDeadline(LocalDateTime deadline) {
+        this.respondent1RespondToSettlementAgreementDeadline = deadline;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1SuggestPayImmediatelyPaymentDateForDefendantSpec(LocalDate paymentDate) {
+        this.applicant1SuggestPayImmediatelyPaymentDateForDefendantSpec = paymentDate;
+        return this;
+    }
+
+    public CaseDataBuilder caseDataLiP(CaseDataLiP caseDataLiP) {
+        return caseDataLip(caseDataLiP);
+    }
+
+    public CaseDataBuilder obligationWAFlag(ObligationWAFlag obligationWAFlag) {
+        this.obligationWAFlag = obligationWAFlag;
+        return this;
+    }
+
     public CaseDataBuilder claimFee(Fee fee) {
         this.claimFee = fee;
         return this;
@@ -7491,6 +7579,7 @@ public class CaseDataBuilder {
             .solicitorReferences(solicitorReferences)
             .courtLocation(courtLocation)
             .claimValue(claimValue)
+            .claimAmountBreakup(claimAmountBreakup)
             .uploadParticularsOfClaim(uploadParticularsOfClaim)
             .claimType(claimType)
             .claimTypeUnSpec(claimTypeUnSpec)
@@ -7553,6 +7642,7 @@ public class CaseDataBuilder {
             .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(applicant1SuggestInstalmentsPaymentAmountForDefendantSpec)
             .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec)
             .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec)
+            .applicant1SuggestPayImmediatelyPaymentDateForDefendantSpec(applicant1SuggestPayImmediatelyPaymentDateForDefendantSpec)
             //Case procceds in Caseman
             .claimProceedsInCaseman(claimProceedsInCaseman)
             .claimProceedsInCasemanLR(claimProceedsInCasemanLR)
@@ -7561,6 +7651,7 @@ public class CaseDataBuilder {
             .businessProcess(businessProcess)
             .ccdCaseReference(ccdCaseReference)
             .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments)
+            .finalOrderDocumentCollection(finalOrderDocumentCollection)
             .withdrawClaim(withdrawClaim)
             .discontinueClaim(discontinueClaim)
             .respondent1DQ(respondent1DQ)
@@ -7629,6 +7720,7 @@ public class CaseDataBuilder {
             .notificationSummary(notificationSummary)
             .hearingDueDate(hearingDueDate)
             .hearingDate(hearingDate)
+            .hearingLocation(hearingLocation)
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)
             .caseAccessCategory(caseAccessCategory == null ? UNSPEC_CLAIM : caseAccessCategory)
@@ -7636,10 +7728,11 @@ public class CaseDataBuilder {
             .respondToClaim(respondToClaim)
             //spec route
             .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
-            .respondToAdmittedClaim(respondToClaim)
+            .respondToAdmittedClaim(respondToAdmittedClaim == null ? respondToClaim : respondToAdmittedClaim)
             .responseClaimAdmitPartEmployer(responseClaimAdmitPartEmployer)
             //case progression
             .hearingFeePaymentDetails(hearingFeePaymentDetails)
+            .hearingHelpFeesReferenceNumber(hearingHelpFeesReferenceNumber)
             .hearingDuration(hearingDuration)
             .trialReadyApplicant(trialReadyApplicant)
             .trialReadyRespondent1(trialReadyRespondent1)
@@ -7799,6 +7892,7 @@ public class CaseDataBuilder {
             .claimIssuedHwfDetails(claimIssuedHwfDetails)
             .hearingHwfDetails(hearingHwfDetails)
             .caseFlags(caseFlags)
+            .obligationWAFlag(obligationWAFlag)
             .app1MediationContactInfo(app1MediationContactInfo)
             .app1MediationAvailability(app1MediationAvailability)
             .resp1MediationContactInfo(resp1MediationContactInfo)

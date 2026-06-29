@@ -6,11 +6,11 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialMakeAnOrder;
 import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
@@ -55,7 +56,6 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
     @Mock
     private GaCoreCaseDataService coreCaseDataService;
 
-    @InjectMocks
     private CheckUnlessOrderDeadlineEndTaskHandler gaUnlessOrderMadeTaskHandler;
 
     @Spy
@@ -82,7 +82,18 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
     private final LocalDate deadLineToday = LocalDate.now();
 
     @BeforeEach
-    void init() {
+    void setUp() {
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(3);
+        gaUnlessOrderMadeTaskHandler = new CheckUnlessOrderDeadlineEndTaskHandler(
+            new ExternalTaskCompletionService(),
+            eventProperties,
+            searchService,
+            coreCaseDataService,
+            caseDetailsConverter,
+            mapper
+        );
+
         caseDetailsWithTodayDeadlineNotProcessed = getCaseDetails(1L, UNLESS_ORDER, deadLineToday,
                                                                   YesOrNo.NO);
         caseDataWithTodayDeadlineNotProcessed = getCaseData(1L, UNLESS_ORDER, deadLineToday,

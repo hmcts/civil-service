@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.civil.service.search.JudgementBufferExpiredSearchServ
 @ConditionalOnProperty(prefix = "scheduler.judgementBuffer", name = "enabled", havingValue = "true")
 public class JudgementBufferScheduler implements CivilScheduler {
 
-    private static final String SCHEDULER_NAME = "JudgementBuffer";
+    public static final String SCHEDULER_NAME = "JudgementBuffer";
 
     private final JudgementBufferExpiredSearchService searchService;
     private final ScheduledTaskRunner scheduledTaskRunner;
@@ -36,11 +36,12 @@ public class JudgementBufferScheduler implements CivilScheduler {
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
     @Override
     public void runScheduledTask() {
-        if (featureToggleService.isJudgmentBufferEnabled()) {
+        if (featureToggleService.isJudgmentBufferEnabled()
+            && featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
             log.info("Running {} scheduler", SCHEDULER_NAME);
             scheduledTaskRunner.run(
                 new ScheduledTaskEventConfiguration(SCHEDULER_NAME),
-                searchService::getCases,
+                searchService.getElasticSearchResult(),
                 judgementBufferScheduledTask
             );
         }
