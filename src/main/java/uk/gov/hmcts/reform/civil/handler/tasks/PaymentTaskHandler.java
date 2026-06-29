@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
 import static java.util.Optional.ofNullable;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Component
 @Slf4j
@@ -33,13 +34,14 @@ public class PaymentTaskHandler extends BaseExternalTaskHandler {
     private final IStateFlowEngine stateFlowEngine;
 
     public PaymentTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         CoreCaseDataService coreCaseDataService,
         CaseDetailsConverter caseDetailsConverter,
         ObjectMapper objectMapper,
         IStateFlowEngine stateFlowEngine
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.coreCaseDataService = coreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;
         this.objectMapper = objectMapper;
