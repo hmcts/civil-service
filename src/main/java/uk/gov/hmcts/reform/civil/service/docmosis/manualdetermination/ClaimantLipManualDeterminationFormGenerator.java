@@ -57,9 +57,9 @@ public class ClaimantLipManualDeterminationFormGenerator implements TemplateData
             .setDefendantAdmittedAmount(caseData.getRespondToAdmittedClaimOwingAmountPounds())
             .setClaimantRequestRepaymentBy(claimantResponseUtils.getClaimantRepaymentType(caseData))
             .setClaimResponseType(caseData.getRespondent1ClaimResponseTypeForSpec())
-            .setRegularPaymentAmount(MonetaryConversions.penniesToPounds(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec() == null ?
-                                                                             BigDecimal.valueOf(0) :
-                                                                             caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec()))
+            .setRegularPaymentAmount(MonetaryConversions.penniesToPounds(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec() == null
+                ? BigDecimal.valueOf(0)
+                : caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec()))
             .setRepaymentFrequency(getRepaymentFrequency(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec()))
             .setRepaymentType(caseData.getApplicant1RepaymentOptionForDefendantSpec())
             .setFirstRepaymentDate(caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec())
