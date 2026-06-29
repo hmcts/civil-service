@@ -462,6 +462,20 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 | `cronExpression` | When the scheduler runs. | `0 0 0,12 * * ?` (Twice daily at midnight and midday) | `CRON_EXPRESSION_AUTOMATED_HEARING_NOTICE` |
 | `serviceIds` | HMC service IDs to check for unnotified hearings. | `AAA6,AAA7` | `AUTOMATED_HEARING_NOTICE_SERVICE_IDS` |
 
+### MediationFileTransferScheduler
+
+The `MediationFileTransferScheduler` generates CSV and JSON mediation files for eligible in-mediation cases and transfers them to MMT.
+It runs when `GenerateCsvAndSendToMmt` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.mediationFileTransfer`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_MEDIATION_FILE_TRANSFER` |
+| `cronExpression` | When the scheduler runs. | `0 0 1 * * ?` (Daily at 1 AM) | `CRON_EXPRESSION_MEDIATION_FILE_TRANSFER` |
+
 ### JudgementBufferScheduler
 
 The `JudgementBufferScheduler` is used to process cases where a default judgement has been requested and a buffer period has expired.
