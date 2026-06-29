@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.scheduler.judgementbuffer.JudgementBufferScheduler.SCHEDULER_NAME;
 
 @ExtendWith(MockitoExtension.class)
 class JudgementBufferSchedulerTest {
@@ -42,6 +43,7 @@ class JudgementBufferSchedulerTest {
         @Test
         void shouldRunTaskRunner_whenSchedulerIsEnabledAndFeatureToggleIsEnabled() {
             when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+            when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
 
             ScheduledTaskEventConfiguration expectedConfig = new ScheduledTaskEventConfiguration(scheduler.getName());
             ElasticSearchResult elasticSearchResult = new ElasticSearchResult(Stream.empty(), 0);
@@ -59,6 +61,16 @@ class JudgementBufferSchedulerTest {
         @Test
         void shouldNotRunTaskRunner_whenSchedulerIsEnabledAndFeatureToggleIsDisabled() {
             when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(false);
+
+            scheduler.runScheduledTask();
+
+            verifyNoInteractions(scheduledTaskRunner);
+        }
+
+        @Test
+        void shouldNotRunTaskRunner_whenSpringSchedulerIsDisabled() {
+            when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+            when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(false);
 
             scheduler.runScheduledTask();
 

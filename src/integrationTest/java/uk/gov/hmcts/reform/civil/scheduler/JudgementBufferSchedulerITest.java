@@ -54,6 +54,7 @@ public class JudgementBufferSchedulerITest {
     @BeforeEach
     void setUp() {
         when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+        when(featureToggleService.isSpringSchedulerEnabled("JudgementBuffer")).thenReturn(true);
         coreCaseDataApiMockHelper.setupIdamClient();
     }
 
