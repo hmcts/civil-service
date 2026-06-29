@@ -434,6 +434,20 @@ To disable all Spring schedulers (even if the feature flag is on), set the list 
 export SCHEDULER_ACTIVE_SCHEDULERS=""
 ```
 
+### AutomatedHearingNoticeScheduler
+
+The `AutomatedHearingNoticeScheduler` emits hearing notice scheduler events for unnotified Spec and Unspec hearings.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.automatedHearingNotice`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_AUTOMATED_HEARING_NOTICE` |
+| `cronExpression` | When the scheduler runs. | `0 0 0,12 ? * * *` (Twice daily at midnight and midday) | `CRON_EXPRESSION_AUTOMATED_HEARING_NOTICE` |
+| `serviceIds` | HMC service IDs to check for unnotified hearings. | `AAA6,AAA7` | `AUTOMATED_HEARING_NOTICE_SERVICE_IDS` |
+
 ### JudgementBufferScheduler
 
 The `JudgementBufferScheduler` is used to process cases where a default judgement has been requested and a buffer period has expired.
