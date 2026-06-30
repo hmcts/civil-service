@@ -117,6 +117,8 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
     public CaseDocument generate(final CaseData caseData, final String authorization) {
         log.info("generate document for case {}", caseData.getCcdCaseReference());
         SealedClaimLipResponseForm templateData = getTemplateData(caseData);
+        log.info("templateData for case ***** {}", templateData.toString());
+        log.info("caseData for case ***** {}", caseData.toString());
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData,
             DEFENDANT_RESPONSE_LIP_SPEC
