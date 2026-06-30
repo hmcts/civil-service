@@ -5,7 +5,6 @@ import feign.Client;
 import feign.Request;
 import feign.Response;
 import feign.httpclient.ApacheHttpClient;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -18,7 +17,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-@Slf4j
 @Configuration
 public class HttpClientFeignConfiguration {
 
@@ -97,11 +95,6 @@ public class HttpClientFeignConfiguration {
             } catch (Exception e) {
                 service = UNKNOWN_SERVICE;
             }
-
-            log.info("####### Feign request {} connectTimeout={}, readTimeout={}",
-                     service,
-                     options.connectTimeoutMillis(),
-                     options.readTimeoutMillis());
 
             try {
                 Response response = delegate.execute(request, options);
