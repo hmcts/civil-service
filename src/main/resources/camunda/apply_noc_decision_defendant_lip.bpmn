@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+ <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1xagno6" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.28.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
   <bpmn:collaboration id="Defendant">
     <bpmn:extensionElements>
@@ -27,7 +27,6 @@
     </bpmn:exclusiveGateway>
     <bpmn:exclusiveGateway id="Gateway_1qrnzq1" name="Claimant respresnted">
       <bpmn:incoming>Flow_0fqomdd</bpmn:incoming>
-      <bpmn:incoming>Flow_0wa89by</bpmn:incoming>
       <bpmn:outgoing>Flow_08bhmdx</bpmn:outgoing>
       <bpmn:outgoing>Flow_03l80qi</bpmn:outgoing>
     </bpmn:exclusiveGateway>
@@ -74,7 +73,7 @@
           <camunda:inputParameter name="caseEvent">UPDATE_GA_LANGUAGE_PREFERENCE</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_140ivo1</bpmn:incoming>
+      <bpmn:incoming>Flow_0gdbty8</bpmn:incoming>
       <bpmn:outgoing>Flow_0vrayka</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:startEvent id="Event_Apply_NoC_Defendant_Decision" name="Start">
@@ -101,23 +100,13 @@
     <bpmn:endEvent id="Event_0l4t4tn">
       <bpmn:incoming>Flow_1s0jw89</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:exclusiveGateway id="Gateway_1hot0k7" name="Welsh enabled?">
-      <bpmn:incoming>Flow_0gdbty8</bpmn:incoming>
-      <bpmn:outgoing>Flow_140ivo1</bpmn:outgoing>
-      <bpmn:outgoing>Flow_1p0hin5</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:exclusiveGateway id="Gateway_0eccios" name="Welsh enabled?">
-      <bpmn:incoming>Flow_0wntx79</bpmn:incoming>
-      <bpmn:outgoing>Flow_0rvh8ne</bpmn:outgoing>
-      <bpmn:outgoing>Flow_0wa89by</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
     <bpmn:serviceTask id="ResetLanguagePreferenceAfterNoC" name="Reset Language Preference" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="caseEvent">RESET_LANGUAGE_PREFERENCE</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0rvh8ne</bpmn:incoming>
+      <bpmn:incoming>Flow_0wntx79</bpmn:incoming>
       <bpmn:outgoing>Flow_0fqomdd</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:boundaryEvent id="Event_0rh0701" name="Abort" attachedToRef="Activity_0czttms">
@@ -140,9 +129,6 @@
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(!empty flowFlags.DEFENDANT_NOC_ONLINE &amp;&amp; flowFlags.DEFENDANT_NOC_ONLINE)}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0fqomdd" sourceRef="ResetLanguagePreferenceAfterNoC" targetRef="Gateway_1qrnzq1" />
-    <bpmn:sequenceFlow id="Flow_0wa89by" name="No" sourceRef="Gateway_0eccios" targetRef="Gateway_1qrnzq1">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${empty flowFlags.WELSH_ENABLED || !flowFlags.WELSH_ENABLED}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_03l80qi" name="Yes" sourceRef="Gateway_1qrnzq1" targetRef="Activity_EndBusinessProcess">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(empty flowFlags.LIP_CASE || !flowFlags.LIP_CASE)}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
@@ -160,20 +146,11 @@
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(empty flowFlags.JBA_ISSUED_BEFORE_NOC || !flowFlags.JBA_ISSUED_BEFORE_NOC)}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0vrayka" sourceRef="UpdateGenAppLanguagePreference" targetRef="DefendantLipRepresentedWithNoCNotifier" />
-    <bpmn:sequenceFlow id="Flow_1p0hin5" name="No" sourceRef="Gateway_1hot0k7" targetRef="DefendantLipRepresentedWithNoCNotifier">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${empty flowFlags.WELSH_ENABLED || !flowFlags.WELSH_ENABLED}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_0wntx79" sourceRef="DefendantLipRepresentedWithNoCNotifier" targetRef="Gateway_0eccios" />
-    <bpmn:sequenceFlow id="Flow_140ivo1" name="Yes" sourceRef="Gateway_1hot0k7" targetRef="UpdateGenAppLanguagePreference">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.WELSH_ENABLED &amp;&amp; flowFlags.WELSH_ENABLED}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0wntx79" sourceRef="DefendantLipRepresentedWithNoCNotifier" targetRef="ResetLanguagePreferenceAfterNoC" />
     <bpmn:sequenceFlow id="Flow_0dm1zjw" sourceRef="Event_Apply_NoC_Defendant_Decision" targetRef="Activity_0czttms" />
     <bpmn:sequenceFlow id="Flow_00ec3ti" sourceRef="Activity_0czttms" targetRef="UpdateCaseDetailsAfterNoC" />
-    <bpmn:sequenceFlow id="Flow_0gdbty8" sourceRef="UpdateCaseDetailsAfterNoC" targetRef="Gateway_1hot0k7" />
+    <bpmn:sequenceFlow id="Flow_0gdbty8" sourceRef="UpdateCaseDetailsAfterNoC" targetRef="UpdateGenAppLanguagePreference" />
     <bpmn:sequenceFlow id="Flow_1s0jw89" sourceRef="Event_0rh0701" targetRef="Event_0l4t4tn" />
-    <bpmn:sequenceFlow id="Flow_0rvh8ne" name="Yes" sourceRef="Gateway_0eccios" targetRef="ResetLanguagePreferenceAfterNoC">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.WELSH_ENABLED &amp;&amp; flowFlags.WELSH_ENABLED}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_13fy240" sourceRef="UpdateGeneralApplicationStatus" targetRef="UpdateClaimWithApplicationStatus" />
     <bpmn:serviceTask id="DefendantLipRepresentedWithNoCNotifier" name="Notify All Parties" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
@@ -182,7 +159,6 @@
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0vrayka</bpmn:incoming>
-      <bpmn:incoming>Flow_1p0hin5</bpmn:incoming>
       <bpmn:outgoing>Flow_0wntx79</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_0aitgnw" sourceRef="ProceedOffline" targetRef="UpdateGeneralApplicationStatus" />
@@ -287,18 +263,6 @@
       <bpmndi:BPMNShape id="Event_0l4t4tn_di" bpmnElement="Event_0l4t4tn">
         <dc:Bounds x="562" y="109" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_1hot0k7_di" bpmnElement="Gateway_1hot0k7" isMarkerVisible="true">
-        <dc:Bounds x="645" y="275" width="50" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="631" y="332" width="79" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_0eccios_di" bpmnElement="Gateway_0eccios" isMarkerVisible="true">
-        <dc:Bounds x="1325" y="275" width="50" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1311" y="332" width="79" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0kgl91m_di" bpmnElement="ResetLanguagePreferenceAfterNoC">
         <dc:Bounds x="1410" y="260" width="100" height="80" />
         <bpmndi:BPMNLabel />
@@ -365,15 +329,6 @@
         <di:waypoint x="1510" y="300" />
         <di:waypoint x="1566" y="300" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0wa89by_di" bpmnElement="Flow_0wa89by">
-        <di:waypoint x="1350" y="275" />
-        <di:waypoint x="1350" y="200" />
-        <di:waypoint x="1591" y="200" />
-        <di:waypoint x="1591" y="275" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1463" y="172" width="15" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_03l80qi_di" bpmnElement="Flow_03l80qi">
         <di:waypoint x="1591" y="275" />
         <di:waypoint x="1591" y="110" />
@@ -423,25 +378,9 @@
         <di:waypoint x="850" y="300" />
         <di:waypoint x="1010" y="300" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1p0hin5_di" bpmnElement="Flow_1p0hin5">
-        <di:waypoint x="670" y="275" />
-        <di:waypoint x="670" y="190" />
-        <di:waypoint x="1060" y="190" />
-        <di:waypoint x="1060" y="260" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="858" y="172" width="15" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0wntx79_di" bpmnElement="Flow_0wntx79">
         <di:waypoint x="1110" y="300" />
-        <di:waypoint x="1325" y="300" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_140ivo1_di" bpmnElement="Flow_140ivo1">
-        <di:waypoint x="695" y="300" />
-        <di:waypoint x="750" y="300" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="713" y="282" width="19" height="14" />
-        </bpmndi:BPMNLabel>
+        <di:waypoint x="1410" y="300" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0dm1zjw_di" bpmnElement="Flow_0dm1zjw">
         <di:waypoint x="278" y="300" />
@@ -453,19 +392,12 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0gdbty8_di" bpmnElement="Flow_0gdbty8">
         <di:waypoint x="600" y="300" />
-        <di:waypoint x="645" y="300" />
+        <di:waypoint x="750" y="300" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1s0jw89_di" bpmnElement="Flow_1s0jw89">
         <di:waypoint x="410" y="242" />
         <di:waypoint x="410" y="127" />
         <di:waypoint x="562" y="127" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0rvh8ne_di" bpmnElement="Flow_0rvh8ne">
-        <di:waypoint x="1375" y="300" />
-        <di:waypoint x="1410" y="300" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1384" y="282" width="19" height="14" />
-        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_13fy240_di" bpmnElement="Flow_13fy240">
         <di:waypoint x="1930" y="650" />

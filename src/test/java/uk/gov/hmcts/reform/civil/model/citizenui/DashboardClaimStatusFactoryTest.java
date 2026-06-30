@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -136,11 +135,9 @@ class DashboardClaimStatusFactoryTest {
         );
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectStatus_fastClaimSdo(boolean caseProgressionEnabled) {
+    @Test
+    void shouldReturnCorrectStatus_fastClaimSdo() {
         List<CaseEventDetail> eventHistory = new ArrayList<>();
-        Mockito.when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(caseProgressionEnabled);
         fastClaim(eventHistory, toggleService);
     }
 
@@ -205,11 +202,9 @@ class DashboardClaimStatusFactoryTest {
         );
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectStatus_smallClaimSdo(boolean caseProgressionEnabled) {
+    @Test
+    void shouldReturnCorrectStatus_smallClaimSdo() {
         List<CaseEventDetail> eventHistory = new ArrayList<>();
-        Mockito.when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(caseProgressionEnabled);
         smallClaim(eventHistory, toggleService);
     }
 
@@ -328,17 +323,10 @@ class DashboardClaimStatusFactoryTest {
             .drawDirectionsOrderRequired(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.FAST_TRACK)
             .build();
-        if (toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())) {
-            checkStatus(caseData, eventHistory,
-                        DashboardClaimStatus.SDO_ORDER_CREATED_CP,
-                        DashboardClaimStatus.SDO_ORDER_CREATED_CP
-            );
-        } else {
-            checkStatus(caseData, eventHistory,
-                        DashboardClaimStatus.SDO_ORDER_CREATED_PRE_CP,
-                        DashboardClaimStatus.SDO_ORDER_CREATED_PRE_CP
-            );
-        }
+        checkStatus(caseData, eventHistory,
+                    DashboardClaimStatus.SDO_ORDER_CREATED_CP,
+                    DashboardClaimStatus.SDO_ORDER_CREATED_CP
+        );
 
         return caseData;
     }
@@ -548,17 +536,10 @@ class DashboardClaimStatusFactoryTest {
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
             .systemGeneratedCaseDocuments(List.of(new Element<CaseDocument>().setValue(sdoDocument)))
             .build();
-        if (toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())) {
-            checkStatus(caseData, eventHistory,
-                        DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED,
-                        DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED
-            );
-        } else {
-            checkStatus(caseData, eventHistory,
-                        DashboardClaimStatus.SDO_ORDER_CREATED_PRE_CP,
-                        DashboardClaimStatus.SDO_ORDER_CREATED_PRE_CP
-            );
-        }
+        checkStatus(caseData, eventHistory,
+                    DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED,
+                    DashboardClaimStatus.SDO_ORDER_LEGAL_ADVISER_CREATED
+        );
 
         return caseData;
     }
@@ -839,8 +820,7 @@ class DashboardClaimStatusFactoryTest {
 
     @ParameterizedTest
     @MethodSource("provideSDOOrderCreatedPreCPScenarios")
-    void shouldTestIsSDOOrderCreatedPreCP(CaseData caseData, boolean featureToggle, boolean expectedResult) {
-        Mockito.when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(featureToggle);
+    void shouldTestIsSDOOrderCreatedPreCP(CaseData caseData, boolean expectedResult) {
         CcdDashboardClaimMatcher matcher = new CcdDashboardClaimantClaimMatcher(caseData, toggleService, Collections.emptyList()) {};
 
         boolean result = matcher.isSDOOrderCreatedPreCP();
@@ -873,8 +853,8 @@ class DashboardClaimStatusFactoryTest {
             .build();
 
         return Stream.of(
-            Arguments.arguments(caseData1, true, true),
-            Arguments.arguments(caseData2, false, true)
+            Arguments.arguments(caseData1, true),
+            Arguments.arguments(caseData2, false)
         );
     }
 

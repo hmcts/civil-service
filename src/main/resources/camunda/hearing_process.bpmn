@@ -124,10 +124,10 @@
       <bpmn:outgoing>Flow_08usjdu</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_0uo8t7q" name="No" sourceRef="Gateway_1ifeoi9" targetRef="Gateway_0as7ets">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(empty flowFlags.WELSH_ENABLED || !flowFlags.WELSH_ENABLED) || ((empty flowFlags.CLAIM_ISSUE_BILINGUAL || !flowFlags.CLAIM_ISSUE_BILINGUAL) &amp;&amp; (empty flowFlags.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL || !flowFlags.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL))}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(empty flowFlags.CLAIM_ISSUE_BILINGUAL || !flowFlags.CLAIM_ISSUE_BILINGUAL) &amp;&amp; (empty flowFlags.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL || !flowFlags.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL)}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_08usjdu" name="Yes" sourceRef="Gateway_1ifeoi9" targetRef="ServiceRequestAPI">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(!empty flowFlags.WELSH_ENABLED &amp;&amp; flowFlags.WELSH_ENABLED) &amp;&amp; ((!empty flowFlags.CLAIM_ISSUE_BILINGUAL &amp;&amp; flowFlags.CLAIM_ISSUE_BILINGUAL) || (!empty flowFlags.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL &amp;&amp; flowFlags.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL))}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(!empty flowFlags.CLAIM_ISSUE_BILINGUAL &amp;&amp; flowFlags.CLAIM_ISSUE_BILINGUAL) || (!empty flowFlags.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL &amp;&amp; flowFlags.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL)}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0hcqnfz" sourceRef="HearingNoticeGeneratorNotifier" targetRef="ServiceRequestAPI" />
     <bpmn:textAnnotation id="TextAnnotation_1ekyudw">

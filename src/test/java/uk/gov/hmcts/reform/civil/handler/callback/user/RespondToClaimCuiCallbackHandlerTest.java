@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -439,24 +440,18 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @ParameterizedTest
         @CsvSource({
-            "WELSH, ENGLISH, ENGLISH, true, false",
-            "ENGLISH, ENGLISH, ENGLISH, true, true",
-            "WELSH, ENGLISH, WELSH, true, false",
-            "WELSH, WELSH, ENGLISH, true, false",
-            "ENGLISH, WELSH, WELSH, true, false",
-            "WELSH, WELSH, WELSH, true, false",
-            "WELSH, WELSH, ENGLISH, true, false",
-            "WELSH, ENGLISH, ENGLISH, false, true",
-            "WELSH, WELSH, ENGLISH, false, false",
-            "ENGLISH, WELSH, ENGLISH, false, false",
-            "WELSH, WELSH, WELSH, false, false"
+            "WELSH, ENGLISH, ENGLISH, false",
+            "ENGLISH, ENGLISH, ENGLISH, true",
+            "WELSH, ENGLISH, WELSH, false",
+            "WELSH, WELSH, ENGLISH, false",
+            "ENGLISH, WELSH, WELSH, false",
+            "WELSH, WELSH, WELSH, false",
+            "ENGLISH, WELSH, ENGLISH, true"
         })
         void shouldMoveToAwaitingApplicantResponse_whenNoTranslations(String claimantBilingualPreference,
                                                                       String defendantBilingualPreference,
                                                                       String defendantDocumentLanguage,
-                                                                      boolean toggleEnabled,
                                                                       boolean changeState) {
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(toggleEnabled);
             RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
             respondentLiPResponse.setRespondent1ResponseLanguage(defendantBilingualPreference);
             CaseDataLiP caseDataLiP = new CaseDataLiP();
@@ -485,7 +480,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotSetDefendantResponseLanguageDisplayIfWelshNotEnabled() {
+        void shouldSetDefendantResponseLanguageDisplayToEnglishForBilingualMainCase() {
             CaseData caseData = CaseDataBuilder.builder()
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .build();
@@ -494,12 +489,11 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedCaseData = getCaseData(response);
 
-            assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isNull();
+            assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isEqualTo(PreferredLanguage.ENGLISH);
         }
 
         @Test
         void shouldSetDefendantResponseLanguageDisplayToEnglishIfNotSpecified() {
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .build();
@@ -513,7 +507,6 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetDefendantResponseLanguageDisplayToWelshIfSpecified() {
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
             respondentLiPResponse.setRespondent1ResponseLanguage("WELSH");
             CaseDataLiP caseDataLiP = new CaseDataLiP();
@@ -532,7 +525,6 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateLanguagePreferenceIfWelshDocsSpecified() {
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
             respondentLiPResponse.setRespondent1ResponseLanguage("ENGLISH");
             CaseDataLiP caseDataLiP = new CaseDataLiP();

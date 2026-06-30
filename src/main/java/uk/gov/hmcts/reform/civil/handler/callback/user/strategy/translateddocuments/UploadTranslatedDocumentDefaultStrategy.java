@@ -246,14 +246,14 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     private boolean isTranslationForLipVsLRDefendantSealedForm(Element<TranslatedDocument> document,
                                                                CaseData caseData) {
         return DEFENDANT_RESPONSE.equals(document.getValue().getDocumentType())
-            && caseData.isLipvLROneVOne() && featureToggleService.isWelshEnabledForMainCase()
+            && caseData.isLipvLROneVOne()
             && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState());
     }
 
     private boolean isTranslationForLrVsLipApplicantDq(Element<TranslatedDocument> document,
                                                         CaseData caseData) {
         return CLAIMANT_INTENTION.equals(document.getValue().getDocumentType())
-            && caseData.isLRvLipOneVOne() && featureToggleService.isWelshEnabledForMainCase()
+            && caseData.isLRvLipOneVOne()
             && CaseState.AWAITING_APPLICANT_INTENTION.equals(caseData.getCcdState());
     }
 
@@ -478,12 +478,10 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             return;
         }
 
-        if (shouldCopyOriginalDocument(originalDocument)) {
-            if (DocumentType.DEFENDANT_DEFENCE.equals(originalDocument.getValue().getDocumentType())) {
-                caseData.setRespondent1ClaimResponseDocumentSpec(originalDocument.getValue());
-            }
-            caseData.getSystemGeneratedCaseDocuments().add(originalDocument);
+        if (DocumentType.DEFENDANT_DEFENCE.equals(originalDocument.getValue().getDocumentType())) {
+            caseData.setRespondent1ClaimResponseDocumentSpec(originalDocument.getValue());
         }
+        caseData.getSystemGeneratedCaseDocuments().add(originalDocument);
     }
 
     private boolean isClaimantDocument(Element<CaseDocument> originalDocument) {
@@ -503,11 +501,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         );
     }
 
-    private boolean shouldCopyOriginalDocument(Element<CaseDocument> originalDocument) {
-        return originalDocument.getValue().getDocumentType() != DocumentType.SEALED_CLAIM
-            || featureToggleService.isWelshEnabledForMainCase();
-    }
-
     private void updateCourtOfficerOrderDocuments(CaseData caseData,
                                                   List<Element<CaseDocument>> courtOfficerOrderDocuments) {
         if (!courtOfficerOrderDocuments.isEmpty()) {
@@ -518,8 +511,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     private void updateDefendantResponseData(CaseData caseData,
                                              List<Element<TranslatedDocument>> translatedDocuments) {
         boolean isDefendantResponse = isContainsSpecifiedDocType(translatedDocuments, DEFENDANT_RESPONSE);
-        if (featureToggleService.isWelshEnabledForMainCase()
-            && caseData.getRespondent1OriginalDqDoc() != null
+        if (caseData.getRespondent1OriginalDqDoc() != null
             && isDefendantResponse) {
             caseData.getSystemGeneratedCaseDocuments().add(element(caseData.getRespondent1OriginalDqDoc()));
             caseData.setRespondent1OriginalDqDoc(null);
@@ -572,7 +564,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
 
     private CaseEvent getFallbackBusinessProcessEvent(CaseData caseData) {
         return caseData.isLRvLipOneVOne()
-            && featureToggleService.isWelshEnabledForMainCase()
             && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
             ? CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_LR_INTENTION
             : CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
@@ -581,7 +572,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     private boolean isDefendantSealedFormBusinessProcessEvent(CaseData caseData,
                                                               List<Element<TranslatedDocument>> translatedDocuments) {
         return isContainsSpecifiedDocType(translatedDocuments, DEFENDANT_RESPONSE)
-            && caseData.isLipvLROneVOne()
-            && featureToggleService.isWelshEnabledForMainCase();
+            && caseData.isLipvLROneVOne();
     }
 }

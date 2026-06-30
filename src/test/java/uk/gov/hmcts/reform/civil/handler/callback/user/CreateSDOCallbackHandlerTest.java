@@ -401,7 +401,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(LocalDate.now().plusDays(5));
             when(deadlinesCalculator.getOrderSetAsideOrVariedApplicationDeadline(ArgumentMatchers.any(LocalDateTime.class)))
                 .thenReturn(LocalDate.now().plusDays(7));
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         }
 
         @Test
@@ -500,7 +499,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
                 .claimantBilingualLanguagePreference("BOTH")
@@ -535,7 +533,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
             respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
 
@@ -578,7 +575,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
             respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
 
@@ -621,7 +617,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             RespondentLiPResponse lipResponse = new RespondentLiPResponse();
             lipResponse.setRespondent1ResponseLanguage("ENGLISH");
 
@@ -1271,7 +1266,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             given(time.now()).willReturn(submittedDate);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         }
 
         @Test

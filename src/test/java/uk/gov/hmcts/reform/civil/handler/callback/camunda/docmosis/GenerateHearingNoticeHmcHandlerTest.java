@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.hearing.HearingNoticeHmcGenerator;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
@@ -83,14 +82,12 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
     private LocationReferenceDataService locationRefDataService;
     @Mock
     private HearingFeesService hearingFeesService;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
         handler = new GenerateHearingNoticeHmcHandler(camundaService, hearingsService, hearingNoticeHmcGenerator,
-                                                      mapper, locationRefDataService, hearingFeesService, featureToggleService);
+                                                      mapper, locationRefDataService, hearingFeesService);
         mapper.registerModule(new JavaTimeModule());
 
     }
@@ -441,7 +438,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldCreateWelshDocument_whenWelshFeatureEnabledAndAppendExistingDocuments() {
+    void shouldCreateWelshDocument_whenBilingualAndAppendExistingDocuments() {
         CaseDocument existingEnglish = new CaseDocument();
         existingEnglish.setDocumentName("existing-hearing-notice");
         existingEnglish.setDocumentType(HEARING_FORM);
@@ -496,7 +493,6 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
             .thenReturn(List.of(CASE_DOCUMENT));
         when(hearingNoticeHmcGenerator.generate(any(), eq(hearing), anyString(), nullable(String.class), anyString(), eq(HEARING_NOTICE_HMC_WELSH)))
             .thenReturn(List.of(CASE_DOCUMENT_WELSH));
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_HEARING_NOTICE_HMC.name());

@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.CasemanReferenceNumberRepository;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
@@ -60,7 +59,6 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final HelpWithFeesForTabService helpWithFeesForTabService;
-    private final FeatureToggleService featureToggleService;
     private final LocationReferenceDataService locationRefDataService;
 
     @Value("${court-location.specified-claim.epimms-id}")
@@ -132,9 +130,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
             caseData.setCaseManagementLocation(caseLocationCivil);
             caseData.setLocationName(locationRefData.getSiteName());
         }
-        if (featureToggleService.isWelshEnabledForMainCase()) {
-            caseData.setClaimantLanguagePreferenceDisplay(PreferredLanguage.fromString(caseData.getClaimantBilingualLanguagePreference()));
-        }
+        caseData.setClaimantLanguagePreferenceDisplay(PreferredLanguage.fromString(caseData.getClaimantBilingualLanguagePreference()));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();

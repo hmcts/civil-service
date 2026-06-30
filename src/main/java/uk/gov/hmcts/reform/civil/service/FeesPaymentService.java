@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Arrays;
-import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
@@ -32,7 +31,6 @@ public class FeesPaymentService {
     private final PinInPostConfiguration pinInPostConfiguration;
     private final PaymentStatusService paymentStatusService;
     private final PaymentStatusRetryService paymentStatusRetryService;
-    private final FeatureToggleService featureToggleService;
 
     public CardPaymentStatusResponse createGovPaymentRequest(
             FeeType feeType, String caseReference, String authorization) {
@@ -69,8 +67,7 @@ public class FeesPaymentService {
     }
 
     private String getClaimantSelectedLanguage(CaseData caseData) {
-        return Objects.equals(caseData.getClaimantBilingualLanguagePreference(), "WELSH")
-                || (!featureToggleService.isWelshEnabledForMainCase() && Objects.equals(caseData.getClaimantBilingualLanguagePreference(), "BOTH")) ? "cy" : "en";
+        return "WELSH".equals(caseData.getClaimantBilingualLanguagePreference()) ? "cy" : "en";
     }
 
     public CardPaymentStatusResponse getGovPaymentRequestStatus(

@@ -48,16 +48,8 @@ public class DashboardNotificationHelper {
         return findMediationUnsuccessfulReason(caseData, List.of(NOT_CONTACTABLE_DEFENDANT_ONE));
     }
 
-    public boolean isSDODrawnPreCPRelease(CaseData caseData) {
-        return !(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(
-            caseData.getCaseManagementLocation().getBaseLocation())
-            || featureToggleService.isWelshEnabledForMainCase());
-    }
-
     public boolean isEligibleForReconsideration(CaseData caseData) {
-        return (featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
-            || featureToggleService.isWelshEnabledForMainCase())
-            && caseData.isSmallClaim()
+        return caseData.isSmallClaim()
             && caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(10000)) <= 0
             && (isNull(caseData.getDecisionOnRequestReconsiderationOptions())
             || !DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions()));

@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimLipResponseFormGenerator;
 import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
@@ -58,8 +57,6 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
     @Mock
     private CivilStitchService civilStitchService;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @Mock
     private AssignCategoryId assignCategoryId;
@@ -68,7 +65,7 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     void setUp() {
         mapper = new ObjectMapper();
         handler = new GenerateCUIResponseSealedFormCallBackHandler(mapper, formGenerator, systemGeneratedDocumentService,
-                                                                   assignCategoryId, civilStitchService, featureToggleService);
+                                                                   assignCategoryId, civilStitchService);
         mapper.registerModule(new JavaTimeModule());
     }
 
@@ -137,7 +134,6 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     @Test
     void shouldGenerateForm_whenLipResponseCaseStitchingEnabled() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         CaseDocument doc1 = new CaseDocument();
         doc1.setDocumentName("Stitched document");
@@ -176,7 +172,6 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     @Test
     void shouldGenerateForm_whenLipResponseCaseStitchingEnabledButRespondentHasFullAdmission() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         CaseDocument doc1 = new CaseDocument();
         doc1.setDocumentName("responseForm.pdf");
         List<Element<CaseDocument>> documents = List.of(element(doc1));
@@ -204,7 +199,6 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     @Test
     void shouldNotCreateDuplicateDocuments_whenStitchingEnabledAndStitchedDocumentCreated() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
 
         CaseDocument doc1 = new CaseDocument();
@@ -245,7 +239,6 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     @Test
     void shouldGenerateForm_whenLipResponseCaseIsBilingual() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         CaseData caseData = CaseDataBuilder.builder()

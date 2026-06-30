@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -26,16 +25,13 @@ public class CreateSDORespSolOneEmailDTOGeneratorTest {
     @Mock
     private NotificationsProperties notificationsProperties;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void shouldReturnCorrectEmailTemplateIdWhenSpecNotEANotBilingual() {
+    void shouldReturnCorrectEmailTemplateIdWhenSpecNotBilingual() {
         String baseLocation = "base location";
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
@@ -43,8 +39,7 @@ public class CreateSDORespSolOneEmailDTOGeneratorTest {
             .build();
 
         String expectedTemplateId = "template-id";
-        when(notificationsProperties.getSdoOrderedSpec()).thenReturn(expectedTemplateId);
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(baseLocation)).thenReturn(false);
+        when(notificationsProperties.getSdoOrderedSpecEa()).thenReturn(expectedTemplateId);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 
@@ -59,23 +54,6 @@ public class CreateSDORespSolOneEmailDTOGeneratorTest {
 
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getSdoOrderedSpecBilingual()).thenReturn(expectedTemplateId);
-
-        String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
-
-        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
-    }
-
-    @Test
-    void shouldReturnCorrectEmailTemplateIdWhenSpecEA() {
-        String baseLocation = "base location";
-        CaseData caseData = CaseData.builder()
-            .caseAccessCategory(SPEC_CLAIM)
-            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(baseLocation))
-            .build();
-
-        String expectedTemplateId = "template-id";
-        when(notificationsProperties.getSdoOrderedSpecEa()).thenReturn(expectedTemplateId);
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(baseLocation)).thenReturn(true);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 

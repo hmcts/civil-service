@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.CourtOfficerOrderGenerator;
@@ -61,7 +60,6 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
     private final CourtOfficerOrderGenerator courtOfficerOrderGenerator;
     private final UserService userService;
     private final AssignCategoryId assignCategoryId;
-    private final FeatureToggleService featureToggleService;
 
     public static final String HEADER = "## Your order has been issued \n ### Case number \n ### #%s";
 
@@ -82,8 +80,7 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
 
     private CallbackResponse handleAboutToSubmit(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        if (featureToggleService.isWelshEnabledForMainCase()
-            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+        if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
             List<Element<CaseDocument>> preTranslationDocuments = Optional
                 .ofNullable(caseData.getPreTranslationDocuments())
                 .orElseGet(ArrayList::new);
@@ -94,7 +91,7 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
             caseData.setPreTranslationDocuments(preTranslationDocuments);
             caseData.setUrgentFlag(YesOrNo.YES);
         } else {
-            if (featureToggleService.isWelshEnabledForMainCase() && caseData.getPreviewCourtOfficerOrder() != null) {
+            if (caseData.getPreviewCourtOfficerOrder() != null) {
                 caseData.getCourtOfficersOrders().add(element(caseData.getPreviewCourtOfficerOrder()));
                 caseData.setPreviewCourtOfficerOrder(null);
             }

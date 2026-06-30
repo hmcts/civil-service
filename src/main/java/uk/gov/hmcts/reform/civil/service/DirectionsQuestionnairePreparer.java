@@ -28,7 +28,6 @@ public class DirectionsQuestionnairePreparer {
 
     private final DirectionsQuestionnaireGenerator directionsQuestionnaireGenerator;
     private final AssignCategoryId assignCategoryId;
-    private final FeatureToggleService featureToggleService;
 
     public CaseData prepareDirectionsQuestionnaire(CaseData caseData, String userToken) {
         MultiPartyScenario scenario = MultiPartyScenario.getMultiPartyScenario(caseData);
@@ -152,8 +151,7 @@ public class DirectionsQuestionnairePreparer {
     }
 
     private boolean shouldStoreClaimantDqInPreTranslation(CaseData caseData) {
-        return featureToggleService.isWelshEnabledForMainCase()
-            && caseData.isLRvLipOneVOne()
+        return caseData.isLRvLipOneVOne()
             && caseData.isRespondentResponseBilingual()
             && CaseState.AWAITING_APPLICANT_INTENTION.equals(caseData.getCcdState());
     }
@@ -226,8 +224,7 @@ public class DirectionsQuestionnairePreparer {
     }
 
     private boolean shouldStoreRespondentOriginalDq(CaseData caseData) {
-        return featureToggleService.isWelshEnabledForMainCase()
-            && caseData.isLipvLROneVOne()
+        return caseData.isLipvLROneVOne()
             && caseData.isClaimantBilingual()
             && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState());
     }

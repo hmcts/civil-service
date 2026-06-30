@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.settlediscontinue.NoticeOfDiscontinuanceFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
@@ -53,7 +52,6 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
     private final NoticeOfDiscontinuanceFormGenerator formGenerator;
     private final RuntimeService runTimeService;
     private final OrganisationService organisationService;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -206,8 +204,7 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
     }
 
     private boolean shouldStoreForWelshTranslation(CaseData caseData) {
-        return featureToggleService.isWelshEnabledForMainCase()
-            && caseData.isRespondent1LiP()
+        return caseData.isRespondent1LiP()
             && caseData.getTypeOfDiscontinuance().equals(DiscontinuanceTypeList.PART_DISCONTINUANCE)
             && caseData.isRespondentResponseBilingual()
             && SettleDiscontinueYesOrNoList.NO.equals(caseData.getCourtPermissionNeeded());
@@ -274,8 +271,7 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
         runTimeService.setVariable(
             caseData.getBusinessProcess().getProcessInstanceId(),
             "WELSH_ENABLED",
-            featureToggleService.isWelshEnabledForMainCase()
-                && caseData.isRespondent1LiP()
+            caseData.isRespondent1LiP()
                 && caseData.getTypeOfDiscontinuance().equals(DiscontinuanceTypeList.PART_DISCONTINUANCE)
                 && caseData.isRespondentResponseBilingual()
         );

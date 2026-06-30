@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.scheduler.defendantresponse.DefendantResponseDeadlineScheduler;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
 
 import java.util.List;
@@ -41,13 +40,9 @@ public class DefendantResponseDeadlineSchedulerITest {
     @MockBean
     private TelemetryService telemetryService;
 
-    @MockBean
-    private FeatureToggleService featureToggleService;
-
     @Test
     void shouldExecuteDefendantResponseDeadlineScheduler() {
         // Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         SearchResult searchResult = SearchResult.builder()
             .total(1)

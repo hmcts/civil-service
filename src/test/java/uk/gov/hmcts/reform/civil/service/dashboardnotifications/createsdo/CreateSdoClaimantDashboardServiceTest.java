@@ -24,14 +24,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_CLAIM_REMAINS_ONLINE_CLAIMANT;
@@ -206,29 +204,6 @@ class CreateSdoClaimantDashboardServiceTest {
     }
 
     @Test
-    void shouldRecordScenarioInSdoPreCPRelease_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
-        caseData.setApplicant1Represented(YesOrNo.NO);
-
-        HashMap<String, Object> scenarioParams = new HashMap<>();
-        scenarioParams.put("orderDocument", "urlDirectionsOrder");
-
-        when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
-        when(dashboardDecisionHelper.isSDODrawnPreCPRelease(caseData)).thenReturn(true);
-
-        createSdoClaimantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
-
-        verify(dashboardScenariosService).recordScenarios(
-            AUTH_TOKEN,
-            SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario(),
-            caseData.getCcdCaseReference().toString(),
-            new ScenarioRequestParams(scenarioParams)
-        );
-        verifyNoInteractions(dashboardTasksHelper);
-    }
-
-    @Test
     void shouldRecordScenarioInSdoLegalAdviser_whenInvoked() {
         HashMap<String, Object> scenarioParams = new HashMap<>();
         scenarioParams.put("orderDocument", "urlDirectionsOrder");
@@ -288,36 +263,4 @@ class CreateSdoClaimantDashboardServiceTest {
         verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData);
     }
 
-    @Test
-    void shouldNotRecordScenarioInSdoLegalAdviser_whenInvokedWithFeatureToggleDisabled() {
-        HashMap<String, Object> scenarioParams = new HashMap<>();
-        scenarioParams.put("orderDocument", "urlDirectionsOrder");
-
-        CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
-        caseData.setResponseClaimTrack("SMALL_CLAIM");
-        caseData.setTotalClaimAmount(BigDecimal.valueOf(500));
-        caseData.setApplicant1Represented(YesOrNo.NO);
-
-        when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
-        when(dashboardDecisionHelper.isEligibleForReconsideration(caseData)).thenReturn(false);
-        when(dashboardDecisionHelper.isSDODrawnPreCPRelease(caseData)).thenReturn(true);
-
-        createSdoClaimantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
-
-        verify(dashboardScenariosService, never()).recordScenarios(
-            AUTH_TOKEN,
-            SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT.getScenario(),
-            caseData.getCcdCaseReference().toString(),
-            new ScenarioRequestParams(scenarioParams)
-        );
-
-        verify(dashboardScenariosService).recordScenarios(
-            AUTH_TOKEN,
-            SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario(),
-            caseData.getCcdCaseReference().toString(),
-            new ScenarioRequestParams(scenarioParams)
-        );
-        verifyNoInteractions(dashboardTasksHelper);
-    }
 }
