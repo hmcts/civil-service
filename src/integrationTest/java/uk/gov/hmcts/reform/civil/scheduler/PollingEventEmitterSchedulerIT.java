@@ -58,6 +58,7 @@ public class PollingEventEmitterSchedulerIT {
             .build();
         when(coreCaseDataService.searchCases(any(Query.class))).thenReturn(searchResult);
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
+        when(pollingEventEmitterScheduledTask.maxCasesPerRun()).thenReturn(Long.MAX_VALUE);
 
         scheduler.runScheduledTask();
 

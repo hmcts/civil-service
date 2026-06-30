@@ -57,6 +57,7 @@ public class HearingCvpLinkSchedulerIT {
     void setUp() {
         coreCaseDataApiMockHelper.setupIdamClient();
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
+        when(hearingCvpLinkScheduledTask.maxCasesPerRun()).thenReturn(Long.MAX_VALUE);
     }
 
     @Test
