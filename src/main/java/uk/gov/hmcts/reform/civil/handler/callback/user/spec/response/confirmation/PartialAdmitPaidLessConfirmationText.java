@@ -26,14 +26,12 @@ public class PartialAdmitPaidLessConfirmationText implements RespondToClaimConfi
                     caseData.getRespondent1ClaimResponseTypeForSpec());
             currentRespondentDefenceAdmitted =
                 YES.equals(caseData.getSpecDefenceAdmittedRequired());
-
         } else if (YES.equals(caseData.getIsRespondent2())) {
             currentRespondentPartAdmission =
                 RespondentResponseTypeSpec.PART_ADMISSION.equals(
                     caseData.getRespondent2ClaimResponseTypeForSpec());
             currentRespondentDefenceAdmitted =
                 YES.equals(caseData.getSpecDefenceAdmitted2Required());
-
         } else {
             currentRespondentPartAdmission =
                 RespondentResponseTypeSpec.PART_ADMISSION.equals(
