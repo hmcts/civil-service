@@ -12,17 +12,44 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Component
 public class PartialAdmitPaidFullConfirmationText implements RespondToClaimConfirmationTextSpecGenerator {
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
-        if (!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            && !RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-            || NO.equals(caseData.getSpecDefenceAdmittedRequired())
-            && NO.equals(caseData.getSpecDefenceAdmitted2Required())) {
+
+        boolean currentRespondentPartAdmission;
+        boolean currentRespondentDefenceAdmitted;
+
+        if (YES.equals(caseData.getIsRespondent1())) {
+            currentRespondentPartAdmission =
+                RespondentResponseTypeSpec.PART_ADMISSION.equals(
+                    caseData.getRespondent1ClaimResponseTypeForSpec());
+            currentRespondentDefenceAdmitted =
+                YES.equals(caseData.getSpecDefenceAdmittedRequired());
+
+        } else if (YES.equals(caseData.getIsRespondent2())) {
+            currentRespondentPartAdmission =
+                RespondentResponseTypeSpec.PART_ADMISSION.equals(
+                    caseData.getRespondent2ClaimResponseTypeForSpec());
+            currentRespondentDefenceAdmitted =
+                YES.equals(caseData.getSpecDefenceAdmitted2Required());
+
+        } else {
+            currentRespondentPartAdmission =
+                RespondentResponseTypeSpec.PART_ADMISSION.equals(
+                    caseData.getRespondent1ClaimResponseTypeForSpec())
+                    || RespondentResponseTypeSpec.PART_ADMISSION.equals(
+                    caseData.getRespondent2ClaimResponseTypeForSpec());
+
+            currentRespondentDefenceAdmitted =
+                YES.equals(caseData.getSpecDefenceAdmittedRequired())
+                    || YES.equals(caseData.getSpecDefenceAdmitted2Required());
+        }
+
+        if (!currentRespondentPartAdmission || !currentRespondentDefenceAdmitted) {
             return Optional.empty();
         }
         BigDecimal howMuchWasPaid = caseData.getCurrentRespondentHowMuchWasPaid();

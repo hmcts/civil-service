@@ -30,10 +30,27 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
 
-        if (!RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(
-            caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
-            && !RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(
-            caseData.getDefenceAdmitPartPaymentTimeRouteRequired2())) {
+        boolean currentRespondentImmediatePayment;
+
+        if (YES.equals(caseData.getIsRespondent1())) {
+            currentRespondentImmediatePayment =
+                RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(
+                    caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+
+        } else if (YES.equals(caseData.getIsRespondent2())) {
+            currentRespondentImmediatePayment =
+                RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(
+                    caseData.getDefenceAdmitPartPaymentTimeRouteRequired2());
+
+        } else {
+            currentRespondentImmediatePayment =
+                RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(
+                    caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
+                    || RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(
+                    caseData.getDefenceAdmitPartPaymentTimeRouteRequired2());
+        }
+
+        if (!currentRespondentImmediatePayment) {
             return Optional.empty();
         }
         LocalDate whenBePaid = getCurrentRespondentPaymentDate(caseData);

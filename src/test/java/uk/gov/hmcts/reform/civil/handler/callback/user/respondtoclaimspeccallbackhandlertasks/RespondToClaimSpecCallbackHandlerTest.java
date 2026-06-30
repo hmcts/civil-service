@@ -2563,6 +2563,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setRespondent2SameLegalRepresentative(NO);
             caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(IMMEDIATELY);
             caseData.setIsRespondent2(YES);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 

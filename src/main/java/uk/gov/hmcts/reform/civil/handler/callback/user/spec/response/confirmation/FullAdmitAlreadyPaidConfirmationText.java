@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation;
 
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -14,10 +15,36 @@ public class FullAdmitAlreadyPaidConfirmationText implements RespondToClaimConfi
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
-        if (!RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            && !RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-            || !YesOrNo.YES.equals(caseData.getSpecDefenceFullAdmittedRequired())
-            && !YesOrNo.YES.equals(caseData.getSpecDefenceFullAdmitted2Required())) {
+        boolean currentRespondentFullAdmission;
+        boolean currentRespondentDefenceFullyAdmitted;
+
+        if (YES.equals(caseData.getIsRespondent1())) {
+            currentRespondentFullAdmission =
+                RespondentResponseTypeSpec.FULL_ADMISSION.equals(
+                    caseData.getRespondent1ClaimResponseTypeForSpec());
+            currentRespondentDefenceFullyAdmitted =
+                YES.equals(caseData.getSpecDefenceFullAdmittedRequired());
+
+        } else if (YES.equals(caseData.getIsRespondent2())) {
+            currentRespondentFullAdmission =
+                RespondentResponseTypeSpec.FULL_ADMISSION.equals(
+                    caseData.getRespondent2ClaimResponseTypeForSpec());
+            currentRespondentDefenceFullyAdmitted =
+                YES.equals(caseData.getSpecDefenceFullAdmitted2Required());
+
+        } else {
+            currentRespondentFullAdmission =
+                RespondentResponseTypeSpec.FULL_ADMISSION.equals(
+                    caseData.getRespondent1ClaimResponseTypeForSpec())
+                    || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
+                    caseData.getRespondent2ClaimResponseTypeForSpec());
+
+            currentRespondentDefenceFullyAdmitted =
+                YES.equals(caseData.getSpecDefenceFullAdmittedRequired())
+                    || YES.equals(caseData.getSpecDefenceFullAdmitted2Required());
+        }
+
+        if (!currentRespondentFullAdmission || !currentRespondentDefenceFullyAdmitted) {
             return Optional.empty();
         }
 
