@@ -17,7 +17,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty(prefix = "scheduler.mediationFileTransfer", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "scheduler.mediation-file-transfer", name = "enabled", havingValue = "true")
 public class MediationFileTransferScheduler implements CivilScheduler {
 
     public static final String SCHEDULER_NAME = "GenerateCsvAndSendToMmt";
@@ -34,7 +34,7 @@ public class MediationFileTransferScheduler implements CivilScheduler {
         return SCHEDULER_NAME;
     }
 
-    @Scheduled(cron = "${scheduler.mediationFileTransfer.cronExpression}")
+    @Scheduled(cron = "${scheduler.mediation-file-transfer.cronExpression}")
     @SchedulerLock(name = "MediationFileTransferScheduler_generateAndTransfer",
         lockAtMostFor = "${scheduler.lockAtMostFor}",
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")

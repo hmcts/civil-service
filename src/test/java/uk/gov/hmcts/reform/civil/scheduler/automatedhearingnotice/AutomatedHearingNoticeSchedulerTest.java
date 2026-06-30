@@ -84,8 +84,8 @@ class AutomatedHearingNoticeSchedulerTest {
         scheduler.runScheduledTask();
 
         verify(eventTracker).jobStartedEvent(eventConfiguration, 2);
-        verify(scheduledTask).accept("spec-hearing-id", 1L);
-        verify(scheduledTask).accept("unspec-hearing-id", 1L);
+        verify(scheduledTask).accept("spec-hearing-id");
+        verify(scheduledTask).accept("unspec-hearing-id");
         verify(eventTracker).caseProcessedEvent(eventConfiguration, "spec-hearing-id");
         verify(eventTracker).caseProcessedEvent(eventConfiguration, "unspec-hearing-id");
         verify(eventTracker).jobCompletedEvent(eventConfiguration, 2, 2, 0);
@@ -129,12 +129,12 @@ class AutomatedHearingNoticeSchedulerTest {
         when(hearingsService.getUnNotifiedHearingResponses(
             eq(ACCESS_TOKEN), eq(UNSPEC_SERVICE_ID), any(LocalDateTime.class), isNull()
         )).thenReturn(new UnNotifiedHearingResponse(List.of(), 0L));
-        doThrow(exception).when(scheduledTask).accept(HEARING_ID, 2L);
+        doThrow(exception).when(scheduledTask).accept(HEARING_ID);
 
         scheduler.runScheduledTask();
 
         verify(eventTracker).caseFailedEvent(eventConfiguration, HEARING_ID, exception);
-        verify(scheduledTask).accept("hearing-id-2", 2L);
+        verify(scheduledTask).accept("hearing-id-2");
         verify(eventTracker).caseProcessedEvent(eventConfiguration, "hearing-id-2");
         verify(eventTracker).jobCompletedEvent(eventConfiguration, 2, 1, 1);
     }
@@ -151,14 +151,14 @@ class AutomatedHearingNoticeSchedulerTest {
         when(hearingsService.getUnNotifiedHearingResponses(
             eq(ACCESS_TOKEN), eq(UNSPEC_SERVICE_ID), any(LocalDateTime.class), isNull()
         )).thenReturn(new UnNotifiedHearingResponse(List.of(), 0L));
-        doThrow(firstException).when(scheduledTask).accept("hearing-id-1", 3L);
-        doThrow(secondException).when(scheduledTask).accept("hearing-id-2", 3L);
+        doThrow(firstException).when(scheduledTask).accept("hearing-id-1");
+        doThrow(secondException).when(scheduledTask).accept("hearing-id-2");
 
         scheduler.runScheduledTask();
 
         verify(eventTracker).caseFailedEvent(eventConfiguration, "hearing-id-1", firstException);
         verify(eventTracker).caseFailedEvent(eventConfiguration, "hearing-id-2", secondException);
         verify(eventTracker).jobAbortedEvent(eventConfiguration, 3, 0, 2, "second failed");
-        verify(scheduledTask, never()).accept("hearing-id-3", 3L);
+        verify(scheduledTask, never()).accept("hearing-id-3");
     }
 }

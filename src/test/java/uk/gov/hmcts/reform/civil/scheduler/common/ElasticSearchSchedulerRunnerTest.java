@@ -7,13 +7,12 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -30,56 +29,48 @@ class ElasticSearchSchedulerRunnerTest {
     @Mock
     private FeatureToggleService featureToggleService;
     @Captor
-    private ArgumentCaptor<Consumer<CaseDetails>> taskCaptor;
+    private ArgumentCaptor<ScheduledTask> taskCaptor;
     @InjectMocks
     private ElasticSearchSchedulerRunner runner;
 
     @Test
     void shouldRunScheduledTaskWhenSpringSchedulerFeatureToggleIsEnabled() {
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
-        CaseDetails caseDetails = CaseDetails.builder().id(123L).build();
-        ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(caseDetails), 1);
-        ScheduledCaseTask scheduledCaseTask = mock(ScheduledCaseTask.class);
+        ElasticSearchResult searchResult = new ElasticSearchResult(Stream.empty(), 1);
+        ScheduledTask scheduledTask = mock(ScheduledTask.class);
 
-        runner.run(SCHEDULER_NAME, () -> searchResult, scheduledCaseTask::accept);
+        runner.run(SCHEDULER_NAME, () -> searchResult, scheduledTask);
 
         verify(scheduledTaskRunner).run(
             eq(new ScheduledTaskEventConfiguration(SCHEDULER_NAME)),
             eq(searchResult),
             taskCaptor.capture()
         );
-        taskCaptor.getValue().accept(caseDetails);
-        verify(scheduledCaseTask).accept(caseDetails, 1);
+        assertThat(taskCaptor.getValue()).isSameAs(scheduledTask);
     }
 
     @Test
-    void shouldPassZeroTotalCasesWhenSearchResultIsNull() {
+    void shouldPassNullSearchResultToRunner() {
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
-        CaseDetails caseDetails = CaseDetails.builder().id(123L).build();
-        ScheduledCaseTask scheduledCaseTask = mock(ScheduledCaseTask.class);
+        ScheduledTask scheduledTask = mock(ScheduledTask.class);
 
-        runner.run(SCHEDULER_NAME, () -> null, scheduledCaseTask::accept);
+        runner.run(SCHEDULER_NAME, () -> null, scheduledTask);
 
         verify(scheduledTaskRunner).run(
             eq(new ScheduledTaskEventConfiguration(SCHEDULER_NAME)),
             eq(null),
             taskCaptor.capture()
         );
-        taskCaptor.getValue().accept(caseDetails);
-        verify(scheduledCaseTask).accept(caseDetails, 0);
+        assertThat(taskCaptor.getValue()).isSameAs(scheduledTask);
     }
 
     @Test
     void shouldNotRunScheduledTaskWhenSpringSchedulerFeatureToggleIsDisabled() {
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(false);
-        ScheduledCaseTask scheduledCaseTask = mock(ScheduledCaseTask.class);
+        ScheduledTask scheduledTask = mock(ScheduledTask.class);
 
-        runner.run(SCHEDULER_NAME, () -> new ElasticSearchResult(Stream.empty(), 0), scheduledCaseTask::accept);
+        runner.run(SCHEDULER_NAME, () -> new ElasticSearchResult(Stream.empty(), 0), scheduledTask);
 
-        verifyNoInteractions(scheduledTaskRunner, scheduledCaseTask);
-    }
-
-    private interface ScheduledCaseTask {
-        void accept(CaseDetails caseDetails, int totalCases);
+        verifyNoInteractions(scheduledTaskRunner, scheduledTask);
     }
 }

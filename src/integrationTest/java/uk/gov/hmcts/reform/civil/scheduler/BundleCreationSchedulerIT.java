@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=BundleCreationSchedulerIT",
-    "scheduler.bundleCreation.enabled=true",
+    "scheduler.bundle-creation.enabled=true",
     "stitch-bundle.wait-time-in-milliseconds=0"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
@@ -74,7 +74,7 @@ public class BundleCreationSchedulerIT {
         scheduler.runScheduledTask();
 
         // Then
-        verify(bundleCreationScheduledTask).accept(searchCase, 1);
+        verify(bundleCreationScheduledTask).accept(searchCase);
         verify(telemetryService).trackEvent(eq("BundleCreationJobStarted"), anyMap());
         verify(telemetryService).trackEvent(eq("BundleCreationCaseProcessed"), anyMap());
         verify(telemetryService).trackEvent(eq("BundleCreationJobCompleted"), anyMap());

@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.service.search.CaseHearingDateSearchService;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty(prefix = "scheduler.hearingCvpLink", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "scheduler.hearing-cvp-link", name = "enabled", havingValue = "true")
 public class HearingCvpLinkScheduler implements CivilScheduler {
 
     private static final String SCHEDULER_NAME = "HearingCvpLink";
@@ -27,7 +27,7 @@ public class HearingCvpLinkScheduler implements CivilScheduler {
         return SCHEDULER_NAME;
     }
 
-    @Scheduled(cron = "${scheduler.hearingCvpLink.cronExpression}")
+    @Scheduled(cron = "${scheduler.hearing-cvp-link.cronExpression}")
     @SchedulerLock(name = "HearingCvpLinkScheduler_sendCvpJoinLinks",
         lockAtMostFor = "${scheduler.lockAtMostFor}",
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
@@ -36,7 +36,7 @@ public class HearingCvpLinkScheduler implements CivilScheduler {
         elasticSearchSchedulerRunner.run(
             SCHEDULER_NAME,
             searchService::getElasticSearchResult,
-            hearingCvpLinkScheduledTask::accept
+            hearingCvpLinkScheduledTask
         );
     }
 }

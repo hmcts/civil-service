@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
     "test.id=PollingEventEmitterSchedulerIT",
-    "scheduler.pollingEventEmitter.enabled=true"
+    "scheduler.polling-event-emitter.enabled=true"
 })
 public class PollingEventEmitterSchedulerIT {
 
@@ -62,7 +62,7 @@ public class PollingEventEmitterSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(coreCaseDataService).searchCases(any(Query.class));
-        verify(pollingEventEmitterScheduledTask).accept(caseDetails, 1L, 30000L);
+        verify(pollingEventEmitterScheduledTask).accept(caseDetails);
         verify(telemetryService).trackEvent(eq("PollingEventEmitterJobStarted"), anyMap());
         verify(telemetryService).trackEvent(eq("PollingEventEmitterCaseProcessed"), anyMap());
         verify(telemetryService).trackEvent(eq("PollingEventEmitterJobCompleted"), anyMap());

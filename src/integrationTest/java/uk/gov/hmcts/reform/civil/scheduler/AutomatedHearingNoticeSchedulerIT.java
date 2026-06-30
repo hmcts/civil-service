@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
     "test.id=AutomatedHearingNoticeSchedulerIT",
-    "scheduler.automatedHearingNotice.enabled=true"
+    "scheduler.automated-hearing-notice.enabled=true"
 })
 public class AutomatedHearingNoticeSchedulerIT {
 
@@ -76,7 +76,7 @@ public class AutomatedHearingNoticeSchedulerIT {
         verify(hearingsService).getUnNotifiedHearingResponses(
             eq(ACCESS_TOKEN), eq(UNSPEC_SERVICE_ID), any(LocalDateTime.class), isNull()
         );
-        verify(automatedHearingNoticeScheduledTask).accept(HEARING_ID, 1L);
+        verify(automatedHearingNoticeScheduledTask).accept(HEARING_ID);
         verify(telemetryService).trackEvent(eq("AutomatedHearingNoticeJobStarted"), anyMap());
         verify(telemetryService).trackEvent(eq("AutomatedHearingNoticeCaseProcessed"), anyMap());
         verify(telemetryService).trackEvent(eq("AutomatedHearingNoticeJobCompleted"), anyMap());

@@ -50,11 +50,11 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(
     classes = {Application.class, TestIdamConfiguration.class},
     properties = {
-        "scheduler.bundleCreation.enabled=false",
-        "scheduler.hearingCvpLink.enabled=false",
-        "scheduler.pollingEventEmitter.enabled=false",
-        "scheduler.automatedHearingNotice.enabled=false",
-        "scheduler.mediationFileTransfer.enabled=false"
+        "scheduler.bundle-creation.enabled=false",
+        "scheduler.hearing-cvp-link.enabled=false",
+        "scheduler.polling-event-emitter.enabled=false",
+        "scheduler.automated-hearing-notice.enabled=false",
+        "scheduler.mediation-file-transfer.enabled=false"
     }
 )
 @AutoConfigureMockMvc

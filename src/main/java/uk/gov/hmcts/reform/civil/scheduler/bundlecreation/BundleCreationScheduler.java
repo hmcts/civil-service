@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.service.search.BundleCreationTriggerService;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty(prefix = "scheduler.bundleCreation", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "scheduler.bundle-creation", name = "enabled", havingValue = "true")
 public class BundleCreationScheduler implements CivilScheduler {
 
     private static final String SCHEDULER_NAME = "BundleCreation";
@@ -27,7 +27,7 @@ public class BundleCreationScheduler implements CivilScheduler {
         return SCHEDULER_NAME;
     }
 
-    @Scheduled(cron = "${scheduler.bundleCreation.cronExpression}")
+    @Scheduled(cron = "${scheduler.bundle-creation.cronExpression}")
     @SchedulerLock(name = "BundleCreationScheduler_createBundles",
         lockAtMostFor = "${scheduler.lockAtMostFor}",
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
@@ -36,7 +36,7 @@ public class BundleCreationScheduler implements CivilScheduler {
         elasticSearchSchedulerRunner.run(
             SCHEDULER_NAME,
             searchService::getElasticSearchResult,
-            bundleCreationScheduledTask::accept
+            bundleCreationScheduledTask
         );
     }
 }

@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.scheduler.bundlecreation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.MockedStatic;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
@@ -15,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerThrottleUtils;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.NoCacheUserService;
 
@@ -27,7 +25,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -61,8 +58,7 @@ class BundleCreationScheduledTaskTest {
             caseDetailsConverter,
             coreCaseDataService,
             new SystemUpdateUserConfiguration(USERNAME, PASSWORD),
-            noCacheUserService,
-            0
+            noCacheUserService
         );
         caseDetails = CaseDetails.builder().id(CASE_ID).data(Map.of()).build();
     }
@@ -133,15 +129,7 @@ class BundleCreationScheduledTaskTest {
     }
 
     @Test
-    void shouldThrottleUsingTotalCasesWhenBundleCreationEventIsPublished() {
-        task = new BundleCreationScheduledTask(
-            applicationEventPublisher,
-            caseDetailsConverter,
-            coreCaseDataService,
-            new SystemUpdateUserConfiguration(USERNAME, PASSWORD),
-            noCacheUserService,
-            1000
-        );
+    void shouldPublishBundleCreationEventWithoutLocalThrottle() {
         CaseData caseData = new CaseDataBuilder()
             .hearingDate(HEARING_DATE)
             .caseBundles(List.of())
@@ -149,13 +137,9 @@ class BundleCreationScheduledTaskTest {
         mockCaseData(caseData);
         when(noCacheUserService.getAccessToken(USERNAME, PASSWORD)).thenReturn(ACCESS_TOKEN);
 
-        try (MockedStatic<SchedulerThrottleUtils> schedulerThrottleUtils = mockStatic(
-            SchedulerThrottleUtils.class
-        )) {
-            task.accept(caseDetails, 5);
+        task.accept(caseDetails);
 
-            schedulerThrottleUtils.verify(() -> SchedulerThrottleUtils.throttle(5, 1000, 600000L));
-        }
+        verify(applicationEventPublisher).publishEvent(new BundleCreationTriggerEvent(CASE_ID, ACCESS_TOKEN));
     }
 
     private void mockCaseData(CaseData caseData) {

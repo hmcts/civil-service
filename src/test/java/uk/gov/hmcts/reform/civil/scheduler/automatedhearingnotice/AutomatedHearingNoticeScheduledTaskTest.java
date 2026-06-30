@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.scheduler.automatedhearingnotice;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
-import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 
 import static org.mockito.Mockito.mock;
@@ -19,15 +18,12 @@ class AutomatedHearingNoticeScheduledTaskTest {
     @BeforeEach
     void setUp() {
         applicationEventPublisher = mock(ApplicationEventPublisher.class);
-        EventProperties eventProperties = new EventProperties();
-        eventProperties.setDispatchDelay(0);
-        eventProperties.setLockDuration(1980000);
-        task = new AutomatedHearingNoticeScheduledTask(applicationEventPublisher, eventProperties);
+        task = new AutomatedHearingNoticeScheduledTask(applicationEventPublisher);
     }
 
     @Test
     void shouldPublishHearingNoticeSchedulerTaskEvent() {
-        task.accept(HEARING_ID, 1);
+        task.accept(HEARING_ID);
 
         verify(applicationEventPublisher).publishEvent(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
     }

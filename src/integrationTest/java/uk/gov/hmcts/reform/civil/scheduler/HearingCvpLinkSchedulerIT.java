@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class},
     properties = {
         "test.id=HearingCvpLinkSchedulerIT",
-        "scheduler.hearingCvpLink.enabled=true"
+        "scheduler.hearing-cvp-link.enabled=true"
     })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class HearingCvpLinkSchedulerIT {
@@ -74,7 +74,7 @@ public class HearingCvpLinkSchedulerIT {
         scheduler.runScheduledTask();
 
         // Then
-        verify(hearingCvpLinkScheduledTask).accept(searchCase, 1);
+        verify(hearingCvpLinkScheduledTask).accept(searchCase);
         verify(telemetryService).trackEvent(eq("HearingCvpLinkJobStarted"), anyMap());
         verify(telemetryService).trackEvent(eq("HearingCvpLinkCaseProcessed"), anyMap());
         verify(telemetryService).trackEvent(eq("HearingCvpLinkJobCompleted"), anyMap());

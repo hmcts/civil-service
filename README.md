@@ -440,7 +440,7 @@ The `PollingEventEmitterScheduler` emits pending business process events for cas
 
 #### Settings
 
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.pollingEventEmitter`.
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.polling-event-emitter`.
 
 | Setting | Description | Default | Environment Variable |
 |---------|-------------|---------|----------------------|
@@ -454,7 +454,7 @@ It runs when `AutomatedHearingNotice` is present in the active schedulers list a
 
 #### Settings
 
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.automatedHearingNotice`.
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.automated-hearing-notice`.
 
 | Setting | Description | Default | Environment Variable |
 |---------|-------------|---------|----------------------|
@@ -469,7 +469,7 @@ It runs when `GenerateCsvAndSendToMmt` is present in the active schedulers list 
 
 #### Settings
 
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.mediationFileTransfer`.
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.mediation-file-transfer`.
 
 | Setting | Description | Default | Environment Variable |
 |---------|-------------|---------|----------------------|
@@ -482,7 +482,7 @@ The `JudgementBufferScheduler` is used to process cases where a default judgemen
 
 #### Settings
 
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.judgementBuffer`.
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.judgement-buffer`.
 
 | Setting | Description | Default | Environment Variable |
 |---------|-------------|---------|----------------------|
@@ -495,7 +495,7 @@ The `DefendantResponseDeadlineScheduler` processes cases where the defendant res
 
 #### Settings
 
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.defendantResponse`.
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.defendant-response`.
 
 | Setting | Description | Default | Environment Variable |
 |---------|-------------|---------|----------------------|
@@ -508,7 +508,7 @@ The `BundleCreationScheduler` creates hearing bundles for eligible cases within 
 
 #### Settings
 
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.bundleCreation`.
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.bundle-creation`.
 
 | Setting | Description | Default | Environment Variable |
 |---------|-------------|---------|----------------------|
@@ -521,7 +521,7 @@ The `HearingCvpLinkScheduler` publishes CVP join link events for eligible cases 
 
 #### Settings
 
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.hearingCvpLink`.
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.hearing-cvp-link`.
 
 | Setting | Description | Default | Environment Variable |
 |---------|-------------|---------|----------------------|
@@ -534,6 +534,12 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 |---------|-------------|---------|----------------------|
 | `lockAtLeastFor` | Minimum time a task lock is held. | `PT1M` | `LOCK_AT_LEAST_FOR` |
 | `lockAtMostFor` | Maximum time a task lock is held. | `PT5M` | `LOCK_AT_MOST_FOR` |
+| `default-back-pressure.initialDelay` | Initial delay before processing a case. | `PT0S` | `DEFAULT_BACK_PRESSURE_INITIAL_DELAY` |
+| `default-back-pressure.maxDelay` | Maximum back-pressure delay between cases. | `PT10S` | `DEFAULT_BACK_PRESSURE_MAX_DELAY` |
+| `default-back-pressure.delayIncreaseOnFailure` | Delay added after a failed case. | `PT0.5S` | `DEFAULT_BACK_PRESSURE_DELAY_INCREASE_ON_FAILURE` |
+| `default-back-pressure.delayIncreaseOnSlowCase` | Delay added after a slow case. | `PT0.25S` | `DEFAULT_BACK_PRESSURE_DELAY_INCREASE_ON_SLOW_CASE` |
+| `default-back-pressure.delayReductionOnSuccess` | Delay removed after a successful case. | `PT0.1S` | `DEFAULT_BACK_PRESSURE_DELAY_REDUCTION_ON_SUCCESS` |
+| `default-back-pressure.slowCaseThreshold` | Case processing duration treated as slow. | `PT2S` | `DEFAULT_BACK_PRESSURE_SLOW_CASE_THRESHOLD` |
 
 ## License
 

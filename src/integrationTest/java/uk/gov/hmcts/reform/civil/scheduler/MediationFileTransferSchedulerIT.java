@@ -22,11 +22,11 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
     "test.id=MediationFileTransferSchedulerIT",
-    "scheduler.bundleCreation.enabled=false",
-    "scheduler.hearingCvpLink.enabled=false",
-    "scheduler.pollingEventEmitter.enabled=false",
-    "scheduler.automatedHearingNotice.enabled=false",
-    "scheduler.mediationFileTransfer.enabled=true"
+    "scheduler.bundle-creation.enabled=false",
+    "scheduler.hearing-cvp-link.enabled=false",
+    "scheduler.polling-event-emitter.enabled=false",
+    "scheduler.automated-hearing-notice.enabled=false",
+    "scheduler.mediation-file-transfer.enabled=true"
 })
 public class MediationFileTransferSchedulerIT {
 

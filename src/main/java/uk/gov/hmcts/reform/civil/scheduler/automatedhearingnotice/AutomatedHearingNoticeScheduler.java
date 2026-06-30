@@ -9,13 +9,17 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.common.DefaultBackPressureConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledEventTracker;
+import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskBackPressure;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingResponse;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -24,7 +28,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty(prefix = "scheduler.automatedHearingNotice", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "scheduler.automated-hearing-notice", name = "enabled", havingValue = "true")
 public class AutomatedHearingNoticeScheduler implements CivilScheduler {
 
     public static final String SCHEDULER_NAME = "AutomatedHearingNotice";
@@ -36,7 +40,7 @@ public class AutomatedHearingNoticeScheduler implements CivilScheduler {
     private final ScheduledEventTracker eventTracker;
     private final FeatureToggleService featureToggleService;
 
-    @Value("${scheduler.automatedHearingNotice.serviceIds}")
+    @Value("${scheduler.automated-hearing-notice.serviceIds}")
     private List<String> serviceIds;
 
     @Value("${scheduler.circuitBreakerThreshold:5}")
@@ -47,7 +51,7 @@ public class AutomatedHearingNoticeScheduler implements CivilScheduler {
         return SCHEDULER_NAME;
     }
 
-    @Scheduled(cron = "${scheduler.automatedHearingNotice.cronExpression}")
+    @Scheduled(cron = "${scheduler.automated-hearing-notice.cronExpression}")
     @SchedulerLock(name = "AutomatedHearingNoticeScheduler_sendHearingNotices",
         lockAtMostFor = "${scheduler.lockAtMostFor}",
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
@@ -108,15 +112,22 @@ public class AutomatedHearingNoticeScheduler implements CivilScheduler {
         int failedHearings = 0;
         int consecutiveFailures = 0;
         String abortReason = null;
+        ScheduledTaskBackPressure backPressure = new ScheduledTaskBackPressure(
+            DefaultBackPressureConfiguration.getDefault()
+        );
 
         for (UnnotifiedHearingsForService serviceHearings : unnotifiedHearings) {
             for (String hearingId : serviceHearings.hearingIds()) {
+                applyBackPressure(backPressure);
+                Instant startedAt = Instant.now();
                 try {
-                    scheduledTask.accept(hearingId, serviceHearings.totalFound());
+                    scheduledTask.accept(hearingId);
+                    backPressure.afterSuccess(Duration.between(startedAt, Instant.now()));
                     eventTracker.caseProcessedEvent(eventConfig, hearingId);
                     succeededHearings++;
                     consecutiveFailures = 0;
                 } catch (Exception e) {
+                    backPressure.afterFailure();
                     eventTracker.caseFailedEvent(eventConfig, hearingId, e);
                     failedHearings++;
                     consecutiveFailures++;
@@ -148,5 +159,20 @@ public class AutomatedHearingNoticeScheduler implements CivilScheduler {
     }
 
     private record UnnotifiedHearingsForService(String serviceId, List<String> hearingIds, long totalFound) {
+    }
+
+    private void applyBackPressure(ScheduledTaskBackPressure backPressure) {
+        Duration delay = backPressure.currentDelay();
+        if (delay.isZero()) {
+            return;
+        }
+
+        try {
+            log.debug("Applying scheduled task backpressure delay: {}", delay);
+            Thread.sleep(delay.toMillis());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Scheduled task interrupted while applying backpressure", e);
+        }
     }
 }
