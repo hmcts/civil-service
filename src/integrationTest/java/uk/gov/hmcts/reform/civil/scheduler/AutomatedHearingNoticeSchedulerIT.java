@@ -28,10 +28,10 @@ import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
-    "test.id=AutomatedHearingNoticeSchedulerITest",
+    "test.id=AutomatedHearingNoticeSchedulerIT",
     "scheduler.automatedHearingNotice.enabled=true"
 })
-public class AutomatedHearingNoticeSchedulerITest {
+public class AutomatedHearingNoticeSchedulerIT {
 
     private static final String SCHEDULER_NAME = "AutomatedHearingNotice";
     private static final String ACCESS_TOKEN = "access-token";

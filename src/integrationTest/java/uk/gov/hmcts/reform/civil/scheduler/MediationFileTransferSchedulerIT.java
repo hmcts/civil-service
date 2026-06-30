@@ -21,14 +21,14 @@ import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
-    "test.id=MediationFileTransferSchedulerITest",
+    "test.id=MediationFileTransferSchedulerIT",
     "scheduler.bundleCreation.enabled=false",
     "scheduler.hearingCvpLink.enabled=false",
     "scheduler.pollingEventEmitter.enabled=false",
     "scheduler.automatedHearingNotice.enabled=false",
     "scheduler.mediationFileTransfer.enabled=true"
 })
-public class MediationFileTransferSchedulerITest {
+public class MediationFileTransferSchedulerIT {
 
     private static final String SCHEDULER_NAME = "GenerateCsvAndSendToMmt";
 

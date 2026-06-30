@@ -9,11 +9,11 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
-import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.config.TestIdamConfiguration;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
-import uk.gov.hmcts.reform.civil.scheduler.judgementbuffer.JudgementBufferScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.hearingcvplink.HearingCvpLinkScheduledTask;
+import uk.gov.hmcts.reform.civil.scheduler.hearingcvplink.HearingCvpLinkScheduler;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
 import uk.gov.hmcts.test.config.CoreCaseDataApiMockHelperConfiguration;
@@ -27,17 +27,19 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
-@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
-    "test.id=JudgementBufferSchedulerITest",
-    "scheduler.judgementBuffer.enabled=true"
-})
+@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class},
+    properties = {
+        "test.id=HearingCvpLinkSchedulerIT",
+        "scheduler.hearingCvpLink.enabled=true"
+    })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-public class JudgementBufferSchedulerITest {
+public class HearingCvpLinkSchedulerIT {
 
     private static final Long CASE_ID = 123L;
+    private static final String SCHEDULER_NAME = "HearingCvpLink";
 
     @Autowired
-    private JudgementBufferScheduler scheduler;
+    private HearingCvpLinkScheduler scheduler;
 
     @MockBean
     private TelemetryService telemetryService;
@@ -45,35 +47,36 @@ public class JudgementBufferSchedulerITest {
     @MockBean
     private FeatureToggleService featureToggleService;
 
+    @MockBean
+    private HearingCvpLinkScheduledTask hearingCvpLinkScheduledTask;
+
     @Autowired
     private CoreCaseDataApiMockHelper coreCaseDataApiMockHelper;
 
     @BeforeEach
     void setUp() {
-        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
-        when(featureToggleService.isSpringSchedulerEnabled("JudgementBuffer")).thenReturn(true);
         coreCaseDataApiMockHelper.setupIdamClient();
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
     }
 
     @Test
-    void shouldExecuteJudgementBufferScheduler() {
+    void shouldExecuteHearingCvpLinkScheduler() {
         // Given
-        String caseIdString = CASE_ID.toString();
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateJudgmentRequested().id(CASE_ID).build();
-        SearchResult searchResult = SearchResult.builder().total(1).cases(List.of(caseDetails)).build();
-        StartEventResponse startEventResponse = StartEventResponse.builder().eventId(caseIdString).caseDetails(
-            caseDetails).build();
+        CaseDetails searchCase = CaseDetailsBuilder.builder().id(CASE_ID).build();
+        SearchResult searchResult = SearchResult.builder()
+            .total(1)
+            .cases(List.of(searchCase))
+            .build();
 
         coreCaseDataApiMockHelper.mockElasticSearchResult(searchResult);
-        coreCaseDataApiMockHelper.mockStartEvent(caseIdString, startEventResponse);
-        coreCaseDataApiMockHelper.mockSubmitEvent(caseIdString, caseDetails);
 
         // When
         scheduler.runScheduledTask();
 
         // Then
-        verify(telemetryService).trackEvent(eq("JudgementBufferJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("JudgementBufferJobCompleted"), anyMap());
-        coreCaseDataApiMockHelper.verifySubmitEvent();
+        verify(hearingCvpLinkScheduledTask).accept(searchCase, 1);
+        verify(telemetryService).trackEvent(eq("HearingCvpLinkJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("HearingCvpLinkCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("HearingCvpLinkJobCompleted"), anyMap());
     }
 }

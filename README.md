@@ -489,9 +489,26 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 | `enabled` | Whether the scheduler is active. | `false` | `SCHEDULER_ENABLED_JUDGEMENT_BUFFER` |
 | `cronExpression` | When the scheduler runs. | `0 0 2 * * *` (Daily at 2 AM) | `CRON_EXPRESSION_JUDGEMENT_BUFFER` |
 
+### DefendantResponseDeadlineScheduler
+
+The `DefendantResponseDeadlineScheduler` processes cases where the defendant response deadline has expired.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.defendantResponse`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `false` | `SCHEDULER_ENABLED_DEFENDANT_RESPONSE` |
+| `cronExpression` | When the scheduler runs. | `0 1 16 * * ?` (Daily at 16:01) | `CRON_EXPRESSION_DEFENDANT_RESPONSE` |
+
 ### BundleCreationScheduler
 
 The `BundleCreationScheduler` creates hearing bundles for eligible cases within the existing ten-day hearing window.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.bundleCreation`.
 
 | Setting | Description | Default | Environment Variable |
 |---------|-------------|---------|----------------------|
@@ -501,6 +518,10 @@ The `BundleCreationScheduler` creates hearing bundles for eligible cases within 
 ### HearingCvpLinkScheduler
 
 The `HearingCvpLinkScheduler` publishes CVP join link events for eligible cases with upcoming hearing dates.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.hearingCvpLink`.
 
 | Setting | Description | Default | Environment Variable |
 |---------|-------------|---------|----------------------|

@@ -28,12 +28,12 @@ import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
-    "test.id=BundleCreationSchedulerITest",
+    "test.id=BundleCreationSchedulerIT",
     "scheduler.bundleCreation.enabled=true",
     "stitch-bundle.wait-time-in-milliseconds=0"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-public class BundleCreationSchedulerITest {
+public class BundleCreationSchedulerIT {
 
     private static final Long CASE_ID = 123L;
     private static final String SCHEDULER_NAME = "BundleCreation";

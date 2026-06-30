@@ -26,10 +26,10 @@ import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
-    "test.id=PollingEventEmitterSchedulerITest",
+    "test.id=PollingEventEmitterSchedulerIT",
     "scheduler.pollingEventEmitter.enabled=true"
 })
-public class PollingEventEmitterSchedulerITest {
+public class PollingEventEmitterSchedulerIT {
 
     private static final long CASE_ID = 123L;
     private static final String SCHEDULER_NAME = "PollingEventEmitter";
