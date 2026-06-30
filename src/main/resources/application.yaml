@@ -57,6 +57,7 @@ spring:
     baseline-on-migrate: true
 
 scheduler:
+  active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:JudgementBuffer}
   circuitBreakerThreshold: ${CIRCUIT_BREAKER_THRESHOLD:5}
   lockAtLeastFor: ${LOCK_AT_LEAST_FOR:PT1M}
   lockAtMostFor: ${LOCK_AT_MOST_FOR:PT5M}
@@ -616,8 +617,8 @@ http:
     connectTimeout: ${HTTP_CONNECT_TIMEOUT:5000}
     requestTimeout: ${HTTP_REQUEST_TIMEOUT:10000}
     readTimeout: ${HTTP_READ_TIMEOUT:30000}
-    maxPerRoute: ${HTTP_MAX_PER_ROUTE:10}
-    maxTotal: ${HTTP_MAX_TOTAL:50}
+    maxPerRoute: ${HTTP_MAX_PER_ROUTE:20}
+    maxTotal: ${HTTP_MAX_TOTAL:75}
     threshold: 10000
 
 court-location:

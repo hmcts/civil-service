@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import java.time.LocalDate;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -34,7 +33,6 @@ public class JudgementByAdmissionIssuedClaimantScenarioTest extends  DashboardBa
 
         String caseId = "6532987";
         CaseData caseData = getCaseData(caseId);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         handler.handle(callbackParams(caseData));
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, CLAIMANT)
@@ -65,7 +63,6 @@ public class JudgementByAdmissionIssuedClaimantScenarioTest extends  DashboardBa
 
         String caseId = "720165773";
         CaseData caseData = getCaseData(caseId);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         handler.handle(callbackParams(caseData));
         handler.handle(callbackParams(caseData));
         //Verify task Item is created
