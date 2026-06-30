@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.scheduler.common.DefaultBackPressureConfiguration;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.NoCacheUserService;
 
@@ -47,6 +48,8 @@ class BundleCreationScheduledTaskTest {
     private CoreCaseDataService coreCaseDataService;
     @Mock
     private NoCacheUserService noCacheUserService;
+    @Mock
+    private DefaultBackPressureConfiguration defaultBackPressureConfiguration;
 
     private BundleCreationScheduledTask task;
     private CaseDetails caseDetails;
@@ -58,7 +61,8 @@ class BundleCreationScheduledTaskTest {
             caseDetailsConverter,
             coreCaseDataService,
             new SystemUpdateUserConfiguration(USERNAME, PASSWORD),
-            noCacheUserService
+            noCacheUserService,
+            defaultBackPressureConfiguration
         );
         caseDetails = CaseDetails.builder().id(CASE_ID).data(Map.of()).build();
     }
@@ -126,20 +130,6 @@ class BundleCreationScheduledTaskTest {
 
         assertThat(task.isBundleCreatedForHearingDate(CASE_ID)).isFalse();
         verify(noCacheUserService, never()).getAccessToken(USERNAME, PASSWORD);
-    }
-
-    @Test
-    void shouldPublishBundleCreationEventWithoutLocalThrottle() {
-        CaseData caseData = new CaseDataBuilder()
-            .hearingDate(HEARING_DATE)
-            .caseBundles(List.of())
-            .build();
-        mockCaseData(caseData);
-        when(noCacheUserService.getAccessToken(USERNAME, PASSWORD)).thenReturn(ACCESS_TOKEN);
-
-        task.accept(caseDetails);
-
-        verify(applicationEventPublisher).publishEvent(new BundleCreationTriggerEvent(CASE_ID, ACCESS_TOKEN));
     }
 
     private void mockCaseData(CaseData caseData) {

@@ -39,6 +39,7 @@ public class AutomatedHearingNoticeScheduler implements CivilScheduler {
     private final AutomatedHearingNoticeScheduledTask scheduledTask;
     private final ScheduledEventTracker eventTracker;
     private final FeatureToggleService featureToggleService;
+    private final DefaultBackPressureConfiguration defaultBackPressureConfiguration;
 
     @Value("${scheduler.automated-hearing-notice.serviceIds}")
     private List<String> serviceIds;
@@ -113,7 +114,7 @@ public class AutomatedHearingNoticeScheduler implements CivilScheduler {
         int consecutiveFailures = 0;
         String abortReason = null;
         ScheduledTaskBackPressure backPressure = new ScheduledTaskBackPressure(
-            DefaultBackPressureConfiguration.getDefault()
+            defaultBackPressureConfiguration.getDefaultBackPressure()
         );
 
         for (UnnotifiedHearingsForService serviceHearings : unnotifiedHearings) {

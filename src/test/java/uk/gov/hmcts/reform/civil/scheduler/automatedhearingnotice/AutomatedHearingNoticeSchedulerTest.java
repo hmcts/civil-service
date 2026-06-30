@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.scheduler.common.DefaultBackPressureConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledEventTracker;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -51,6 +52,8 @@ class AutomatedHearingNoticeSchedulerTest {
 
     @Mock
     private FeatureToggleService featureToggleService;
+    @Mock
+    private DefaultBackPressureConfiguration defaultBackPressureConfiguration;
 
     private AutomatedHearingNoticeScheduler scheduler;
     private ScheduledTaskEventConfiguration eventConfiguration;
@@ -63,7 +66,8 @@ class AutomatedHearingNoticeSchedulerTest {
             hearingsService,
             scheduledTask,
             eventTracker,
-            featureToggleService
+            featureToggleService,
+            defaultBackPressureConfiguration
         );
         ReflectionTestUtils.setField(scheduler, "serviceIds", List.of(SPEC_SERVICE_ID, UNSPEC_SERVICE_ID));
         ReflectionTestUtils.setField(scheduler, "circuitBreakerThreshold", 2);

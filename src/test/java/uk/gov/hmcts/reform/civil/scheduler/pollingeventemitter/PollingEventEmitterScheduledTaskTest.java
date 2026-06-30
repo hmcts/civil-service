@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.scheduler.common.DefaultBackPressureConfiguration;
 import uk.gov.hmcts.reform.civil.service.EventEmitterService;
 
 import java.util.Map;
@@ -31,6 +32,8 @@ class PollingEventEmitterScheduledTaskTest {
 
     @Mock
     private EventEmitterService eventEmitterService;
+    @Mock
+    private DefaultBackPressureConfiguration defaultBackPressureConfiguration;
 
     private PollingEventEmitterScheduledTask task;
     private CaseDetails caseDetails;
@@ -38,7 +41,11 @@ class PollingEventEmitterScheduledTaskTest {
 
     @BeforeEach
     void setUp() {
-        task = new PollingEventEmitterScheduledTask(caseDetailsConverter, eventEmitterService);
+        task = new PollingEventEmitterScheduledTask(
+            caseDetailsConverter,
+            eventEmitterService,
+            defaultBackPressureConfiguration
+        );
 
         caseDetails = CaseDetails.builder().id(CASE_ID).data(Map.of()).build();
         caseData = mock(CaseData.class);

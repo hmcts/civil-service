@@ -27,19 +27,22 @@ public class BundleCreationScheduledTask implements ScheduledTask {
     private final CoreCaseDataService coreCaseDataService;
     private final SystemUpdateUserConfiguration userConfig;
     private final NoCacheUserService noCacheUserService;
+    private final DefaultBackPressureConfiguration defaultBackPressureConfiguration;
 
     public BundleCreationScheduledTask(
         ApplicationEventPublisher applicationEventPublisher,
         CaseDetailsConverter caseDetailsConverter,
         CoreCaseDataService coreCaseDataService,
         SystemUpdateUserConfiguration userConfig,
-        NoCacheUserService noCacheUserService
+        NoCacheUserService noCacheUserService,
+        DefaultBackPressureConfiguration defaultBackPressureConfiguration
     ) {
         this.applicationEventPublisher = applicationEventPublisher;
         this.caseDetailsConverter = caseDetailsConverter;
         this.coreCaseDataService = coreCaseDataService;
         this.userConfig = userConfig;
         this.noCacheUserService = noCacheUserService;
+        this.defaultBackPressureConfiguration = defaultBackPressureConfiguration;
     }
 
     @Override
@@ -58,7 +61,7 @@ public class BundleCreationScheduledTask implements ScheduledTask {
 
     @Override
     public ScheduledTaskBackPressureConfiguration backPressureConfiguration() {
-        return DefaultBackPressureConfiguration.getDefault();
+        return defaultBackPressureConfiguration.getDefaultBackPressure();
     }
 
     boolean isBundleCreatedForHearingDate(Long caseId) {

@@ -19,6 +19,7 @@ public class PollingEventEmitterScheduledTask implements ScheduledTask {
 
     private final CaseDetailsConverter caseDetailsConverter;
     private final EventEmitterService eventEmitterService;
+    private final DefaultBackPressureConfiguration defaultBackPressureConfiguration;
 
     @Value("${polling.emitter.multiple.cases.delay.seconds:30}")
     private long multiCasesExecutionDelayInSeconds;
@@ -42,7 +43,7 @@ public class PollingEventEmitterScheduledTask implements ScheduledTask {
 
     @Override
     public ScheduledTaskBackPressureConfiguration backPressureConfiguration() {
-        return DefaultBackPressureConfiguration.getDefault();
+        return defaultBackPressureConfiguration.getDefaultBackPressure();
     }
 
     private long getDelaySeconds() {

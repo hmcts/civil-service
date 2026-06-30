@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 public class JudgementBufferScheduledTask implements ScheduledTask {
 
     private final CoreCaseDataService coreCaseDataService;
+    private final DefaultBackPressureConfiguration defaultBackPressureConfiguration;
 
     @Override
     public void accept(CaseDetails caseDetails) {
@@ -26,6 +27,6 @@ public class JudgementBufferScheduledTask implements ScheduledTask {
 
     @Override
     public ScheduledTaskBackPressureConfiguration backPressureConfiguration() {
-        return DefaultBackPressureConfiguration.getDefault();
+        return defaultBackPressureConfiguration.getDefaultBackPressure();
     }
 }

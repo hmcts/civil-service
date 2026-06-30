@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskBackPressureConfi
 public class HearingCvpLinkScheduledTask implements ScheduledTask {
 
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final DefaultBackPressureConfiguration defaultBackPressureConfiguration;
 
     @Override
     public void accept(CaseDetails caseDetails) {
@@ -26,6 +27,6 @@ public class HearingCvpLinkScheduledTask implements ScheduledTask {
 
     @Override
     public ScheduledTaskBackPressureConfiguration backPressureConfiguration() {
-        return DefaultBackPressureConfiguration.getDefault();
+        return defaultBackPressureConfiguration.getDefaultBackPressure();
     }
 }

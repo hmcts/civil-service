@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -61,9 +60,9 @@ class PollingEventEmitterSchedulerTest {
         scheduler.runScheduledTask();
 
         verify(scheduledTaskRunner).run(
-            eq(new ScheduledTaskEventConfiguration("PollingEventEmitter")),
-            eq(searchResult),
-            eq(pollingEventEmitterScheduledTask)
+            new ScheduledTaskEventConfiguration("PollingEventEmitter"),
+            searchResult,
+            pollingEventEmitterScheduledTask
         );
     }
 
@@ -75,9 +74,9 @@ class PollingEventEmitterSchedulerTest {
         scheduler.runScheduledTask();
 
         verify(scheduledTaskRunner).run(
-            eq(new ScheduledTaskEventConfiguration("PollingEventEmitter")),
-            eq(null),
-            eq(pollingEventEmitterScheduledTask)
+            new ScheduledTaskEventConfiguration("PollingEventEmitter"),
+            null,
+            pollingEventEmitterScheduledTask
         );
         verify(pollingEventEmitterScheduledTask, never()).accept(any());
     }
