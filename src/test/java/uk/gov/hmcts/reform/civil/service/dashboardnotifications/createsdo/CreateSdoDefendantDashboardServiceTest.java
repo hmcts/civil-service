@@ -293,7 +293,6 @@ class CreateSdoDefendantDashboardServiceTest {
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
         when(dashboardDecisionHelper.isCarmApplicableCase(any())).thenReturn(false);
-        when(dashboardDecisionHelper.isSDODrawnPreCPRelease(any())).thenReturn(true);
 
         createSdoDefendantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 
@@ -306,32 +305,7 @@ class CreateSdoDefendantDashboardServiceTest {
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
-            "Scenario.AAA6.ClaimantIntent.SDODrawn.PreCaseProgression.Defendant",
-            caseData.getCcdCaseReference().toString(),
-            new ScenarioRequestParams(scenarioParams)
-        );
-    }
-
-    @Test
-    void shouldRecordScenarioInSDOPreCPRelease_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
-        caseData.setOrderSDODocumentDJCollection(List.of(
-            ElementUtils.element(new CaseDocument().setDocumentLink(
-                new Document().setDocumentBinaryUrl("urlDirectionsOrder")))));
-        caseData.setRespondent1Represented(YesOrNo.NO);
-
-        HashMap<String, Object> scenarioParams = new HashMap<>();
-        scenarioParams.put("orderDocument", "urlDirectionsOrder");
-
-        when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
-        when(dashboardDecisionHelper.isSDODrawnPreCPRelease(any())).thenReturn(true);
-
-        createSdoDefendantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
-
-        verify(dashboardScenariosService).recordScenarios(
-            AUTH_TOKEN,
-            "Scenario.AAA6.ClaimantIntent.SDODrawn.PreCaseProgression.Defendant",
+            "Scenario.AAA6.CP.OrderMade.Defendant",
             caseData.getCcdCaseReference().toString(),
             new ScenarioRequestParams(scenarioParams)
         );

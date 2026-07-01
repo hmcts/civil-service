@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.RequestReconsiderationGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
@@ -57,9 +56,6 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
 
     @Mock
     private RequestReconsiderationGeneratorService requestReconsiderationGeneratorService;
-
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     private static final String CONFIRMATION_HEADER = "# Response has been submitted";
     private static final String CONFIRMATION_BODY_YES = "### Upholding previous order \n" +
@@ -111,7 +107,7 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         mapper.registerModule(new JavaTimeModule());
         AssignCategoryId assignCategoryId = new AssignCategoryId();
         handler = new JudgeDecisionOnReconsiderationRequestCallbackHandler(mapper, requestReconsiderationGeneratorService,
-                                                                           assignCategoryId, featureToggleService
+                                                                           assignCategoryId
         );
         sdoDocList = new ArrayList<>();
         Document docLink1 = new Document();
@@ -140,7 +136,6 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .systemGeneratedCaseDocuments(sdoDocList).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -158,7 +153,6 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
             CaseData caseData = CaseDataBuilder.builder().claimantBilingualLanguagePreference("BOTH").atStateClaimDetailsNotified()
                 .systemGeneratedCaseDocuments(sdoDocList).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -184,7 +178,6 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
             caseData.setCaseDataLiP(caseDataLiP);
             caseData.setSystemGeneratedCaseDocuments(sdoDocList);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -210,7 +203,6 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
             caseData.setCaseDataLiP(caseDataLiP);
             caseData.setSystemGeneratedCaseDocuments(sdoDocList);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -236,7 +228,6 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
             caseData.setCaseDataLiP(caseDataLiP);
             caseData.setSystemGeneratedCaseDocuments(sdoDocList);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -309,7 +300,6 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
             caseData.setDecisionOnReconsiderationDocument(document);
             caseData.setUpholdingPreviousOrderReason(upholdingPreviousOrderReason);
             caseData.setDecisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.YES);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -335,7 +325,6 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         void shouldGenerateDocAndCallBusinessProcessIfDecisionUpheldWhenWelshlanguageNotSelected(String claimantLang, String respondentLang,
             Language claimantDocLang, Language respondentDocLang) {
 
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             //Given : Casedata
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build();
@@ -376,7 +365,6 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         void shouldGenerateDocAndCallBusinessProcessIfDecisionUpheldWhenWelshlanguageSelectedClaimantLang(String claimantLang, String respondentLang,
                                                                                                  Language claimantDocLang, Language respondentDocLang) {
 
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             //Given : Casedata
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build();
@@ -416,7 +404,6 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         void shouldGenerateDocAndCallBusinessProcessIfDecisionUpheldWhenWelshlanguageSelectedRespondentLang(String claimantLang, String respondentLang,
                                                                                                           Language claimantDocLang, Language respondentDocLang) {
 
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             //Given : Casedata
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build();

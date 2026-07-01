@@ -5,8 +5,6 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.Map;
 
@@ -496,9 +494,8 @@ public class CreateClaimSpecAfterPaymentTest extends BpmnBaseTest {
         }
     }
 
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldSuccessfullyCompleteCreateClaim_whenClaimIssuedIsBilingual(boolean welshEnabled) {
+    @Test
+    void shouldSuccessfullyCompleteCreateClaim_whenClaimIssuedIsBilingual() {
 
         //assert process has started
         assertFalse(processInstance.isEnded());
@@ -512,8 +509,7 @@ public class CreateClaimSpecAfterPaymentTest extends BpmnBaseTest {
                 BULK_CLAIM_ENABLED, true,
                 LIP_CASE, true,
                 UNREPRESENTED_DEFENDANT_ONE, true,
-                CLAIM_ISSUE_BILINGUAL, true,
-                WELSH_ENABLED, welshEnabled
+                CLAIM_ISSUE_BILINGUAL, true
         ));
 
         //complete the start business process
@@ -546,16 +542,14 @@ public class CreateClaimSpecAfterPaymentTest extends BpmnBaseTest {
                 CLAIM_SUBMISSION_NOTIFY_PARTIES
         );
 
-        if (welshEnabled) {
-            //Delete payment notification
-            ExternalTask removePaymentNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-            assertCompleteExternalTask(
-                    removePaymentNotification,
-                    PROCESS_CASE_EVENT,
-                    REMOVE_PAYMENT_DASHBOARD_NOTIFICATION_EVENT,
-                    REMOVE_PAYMENT_DASHBOARD_NOTIFICATION_ACTIVITY_ID
-            );
-        }
+        //Delete payment notification
+        ExternalTask removePaymentNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+                removePaymentNotification,
+                PROCESS_CASE_EVENT,
+                REMOVE_PAYMENT_DASHBOARD_NOTIFICATION_EVENT,
+                REMOVE_PAYMENT_DASHBOARD_NOTIFICATION_ACTIVITY_ID
+        );
 
         //end business process
         ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);

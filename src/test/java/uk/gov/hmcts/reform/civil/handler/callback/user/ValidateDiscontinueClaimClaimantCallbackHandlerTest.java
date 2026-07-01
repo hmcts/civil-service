@@ -253,7 +253,6 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
         @Test
         void shouldDiscontinueCase_When2v1FullDiscontinuanceAgainstBothClaimantAndAboutToSubmitIsInvoked() {
             //Given
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
             caseData.setSelectedClaimantForDiscontinuance("Both");
@@ -271,7 +270,6 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
 
         @Test
         void shouldSetTheValuesInPreTranslationCollectionForWelshTranslation() {
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             Document document = new Document();
             document.setDocumentUrl("fake-url");
             document.setDocumentFileName("file-name");

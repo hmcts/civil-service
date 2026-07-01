@@ -1709,7 +1709,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPauseLipVsLrCaseIfClaimantLipIsWelsh() {
             // Given
-            when(toggleService.isWelshEnabledForMainCase()).thenReturn(true);
             LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(time.now()).thenReturn(dateTime);

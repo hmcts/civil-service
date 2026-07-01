@@ -25,15 +25,13 @@ public class SendSDOBulkPrintService {
 
     private final BulkPrintService bulkPrintService;
     private final SdoCoverLetterAppendService sdoCoverLetterAppendService;
-    private final FeatureToggleService featureToggleService;
     private static final String SDO_ORDER_PACK_LETTER_TYPE = "sdo-order-pack";
 
     public void sendSDOOrderToLIP(String authorisation, CaseData caseData, String taskId) {
         if (caseData.getSystemGeneratedCaseDocuments() != null && !caseData.getSystemGeneratedCaseDocuments().isEmpty()) {
             Language language = LanguageUtils.determineLanguageForBulkPrint(
                 caseData,
-                TASK_ID_CLAIMANT.equals(taskId),
-                featureToggleService.isWelshEnabledForMainCase());
+                TASK_ID_CLAIMANT.equals(taskId));
             List<CaseDocument> caseDocuments = new ArrayList<>();
             switch (language) {
                 case ENGLISH -> caseData.getSDODocument().map(Element::getValue).ifPresent(caseDocuments::add);

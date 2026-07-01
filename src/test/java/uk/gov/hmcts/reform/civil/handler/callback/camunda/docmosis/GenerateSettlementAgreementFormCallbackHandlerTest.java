@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.settlementagreement.SettlementAgreementFormGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,7 +28,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_SIGN_SETTLEMENT_AGREEMENT_FORM;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SETTLEMENT_AGREEMENT;
@@ -42,8 +40,6 @@ class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHan
     private SettlementAgreementFormGenerator formGenerator;
     @Mock
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     private ObjectMapper mapper;
 
@@ -73,8 +69,7 @@ class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHan
         handler = new GenerateSettlementAgreementFormCallbackHandler(
             formGenerator,
             systemGeneratedDocumentService,
-            mapper,
-            featureToggleService
+            mapper
         );
 
     }
@@ -102,26 +97,8 @@ class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHan
     }
 
     @Test
-    void shouldNotHideSettlementAgreementDocWhenClaimantHasWelshPreferenceAndWelshToggleDisabled() {
-        //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-        given(formGenerator.generate(
-            any(CaseData.class),
-            anyString()
-        )).willReturn(caseDocument);
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setClaimantBilingualLanguagePreference("WELSH");
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getPreTranslationDocuments()).hasSize(0);
-        verify(formGenerator).generate(caseData, BEARER_TOKEN);
-    }
-
-    @Test
     void shouldHideSettlementAgreementDocWhenClaimantHasWelshPreference() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(formGenerator.generate(
             any(CaseData.class),
             anyString()
@@ -138,7 +115,6 @@ class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldHideSettlementAgreementDocWhenDefendantHasWelshPreference() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(formGenerator.generate(
             any(CaseData.class),
             anyString()
@@ -162,5 +138,3 @@ class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHan
     }
 
 }
-
-

@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Set;
@@ -26,40 +25,26 @@ class DefendantResponseDeadlineCheckSearchServiceTest {
     private static final String MOCK_TIMESTAMP = "2025-07-08T10:00:00Z";
 
     private CoreCaseDataService coreCaseDataService;
-    private FeatureToggleService featureToggleService;
     private DefendantResponseDeadlineCheckSearchService searchService;
 
     @BeforeEach
     void setUp() {
         coreCaseDataService = mock(CoreCaseDataService.class);
-        featureToggleService = mock(FeatureToggleService.class);
-        searchService = new DefendantResponseDeadlineCheckSearchService(coreCaseDataService, featureToggleService);
+        searchService = new DefendantResponseDeadlineCheckSearchService(coreCaseDataService);
     }
 
     @Test
-    void shouldReturnQuery_whenWelshFeatureDisabled() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-
-        Query query = searchService.query(0, "now");
-
-        assertThat(query).isNotNull();
-        assertThat(query.toString()).contains("\"from\": 0");
-        assertThat(query.toString()).contains("\"_source\": [\"reference\"]");
-        assertThat(query.toString()).contains("\"sort\": [{\"reference.keyword\": \"asc\"}]");
-        assertThat(query.toString()).contains("\"query\"");
-    }
-
-    @Test
-    void shouldReturnQuery_whenWelshFeatureEnabled() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-
+    void shouldReturnQueryWithRespondentResponseDateExcluded() {
         Query query = searchService.query(0, MOCK_TIMESTAMP);
 
         assertThat(query).isNotNull();
-        assertThat(query.toString()).contains("\"from\": 0");
-        assertThat(query.toString()).contains("\"_source\": [\"reference\"]");
-        assertThat(query.toString()).contains("\"sort\": [{\"reference.keyword\": \"asc\"}]");
-        assertThat(query.toString()).contains("\"query\"");
+        assertThat(query.toString())
+            .contains("\"from\": 0")
+            .contains("\"_source\": [\"reference\"]")
+            .contains("\"sort\": [{\"reference.keyword\": \"asc\"}]")
+            .contains("\"query\"")
+            .contains("\"must_not\"")
+            .contains("data.respondent1ResponseDate");
     }
 
     @Test

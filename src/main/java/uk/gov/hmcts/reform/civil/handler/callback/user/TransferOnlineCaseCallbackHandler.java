@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -114,7 +113,7 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
                     caseData
                 ));
             }
-            caseData.setEaCourtLocation(determineEaCourtLocation(caseData, location.getEpimmsId()));
+            caseData.setEaCourtLocation(YES);
         });
 
         // Clear the list items to avoid large data payloads in the response
@@ -145,41 +144,6 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
             .confirmationHeader(CONFIRMATION_HEADER)
             .confirmationBody(body)
             .build();
-    }
-
-    /**
-     * Determines whether the EA court location should be set to YES based on business rules:
-     * 1. Welsh cases (for main case) are always set to YES.
-     * 2. Litigant in Person (LiP) cases are set based on specific progression and whitelisting rules.
-     * 3. Other cases are whitelisted by default for case progression.
-     *
-     * @param caseData the case data
-     * @param epimmsId the epimmsId of the new court location
-     * @return YES or NO based on the conditions
-     */
-    private YesOrNo determineEaCourtLocation(CaseData caseData, String epimmsId) {
-        if (featureToggleService.isWelshEnabledForMainCase()) {
-            return YES;
-        }
-        if (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP()) {
-            return isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData, epimmsId) ? YES : YesOrNo.NO;
-        }
-        log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-        return YES;
-    }
-
-    /**
-     * Checks if a LiP case meets the requirements for case progression and location whitelisting.
-     * These requirements include specific party representation combinations and feature toggle states.
-     *
-     * @param caseData the case data
-     * @param newCourtLocation the epimmsId of the target location
-     * @return true if the LiP case is eligible for case progression at the new location
-     */
-    private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData, String newCourtLocation) {
-        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne()
-            || (caseData.isLipvLROneVOne() && featureToggleService.isDefendantNoCOnlineForCase(caseData)))
-            && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(newCourtLocation);
     }
 
     /**

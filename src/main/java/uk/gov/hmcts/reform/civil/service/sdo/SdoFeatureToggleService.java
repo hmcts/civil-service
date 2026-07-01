@@ -13,8 +13,7 @@ public class SdoFeatureToggleService {
     private final FeatureToggleService featureToggleService;
 
     public boolean isWelshJourneyEnabled(CaseData caseData) {
-        return featureToggleService.isWelshEnabledForMainCase()
-            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual());
+        return caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual();
     }
 
     public boolean isCarmEnabled(CaseData caseData) {
@@ -31,10 +30,6 @@ public class SdoFeatureToggleService {
 
     public boolean isCaseProgressionEnabledAndLocationWhiteListed(String baseLocation) {
         return featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(baseLocation);
-    }
-
-    public boolean isWelshEnabledForMainCase() {
-        return featureToggleService.isWelshEnabledForMainCase();
     }
 
     public boolean isMultiOrIntermediateTrackCase(CaseData caseData) {

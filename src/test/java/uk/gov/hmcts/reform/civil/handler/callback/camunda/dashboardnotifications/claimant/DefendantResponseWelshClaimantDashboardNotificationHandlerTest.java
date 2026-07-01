@@ -54,7 +54,6 @@ class DefendantResponseWelshClaimantDashboardNotificationHandlerTest extends Bas
 
         @Test
         void shouldRecordScenarioWhenDefendantHasEnglishLanguagePreference_whenInvoked() {
-            when(toggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData.setApplicant1Represented(NO);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -77,7 +76,6 @@ class DefendantResponseWelshClaimantDashboardNotificationHandlerTest extends Bas
 
         @Test
         void shouldDeleteClaimantDJNotification_whenInvoked() {
-            when(toggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData.setApplicant1Represented(NO);
             caseData.setRespondent1ResponseDeadline(LocalDateTime.MIN);
@@ -125,15 +123,14 @@ class DefendantResponseWelshClaimantDashboardNotificationHandlerTest extends Bas
 
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
-                "Scenario.AAA6.DefResponse.BilingualFlagSet.Claimant",
+                "Scenario.AAA6.DefResponse.BilingualFlagSet.WelshEnabled.Claimant",
                 caseData.getCcdCaseReference().toString(),
                 new ScenarioRequestParams(scenarioParams)
             );
         }
 
         @Test
-        void shouldRecordScenarioWhenDefendantHasWelshLanguagePreferenceAndWelshToggleEnabled_whenInvoked() {
-            when(toggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        void shouldRecordEnabledScenarioWhenDefendantHasWelshLanguagePreference_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData.setApplicant1Represented(NO);
             RespondentLiPResponse respondentLiPResponse  = new RespondentLiPResponse();

@@ -368,7 +368,7 @@
       <bpmn:outgoing>Flow_1bxeol3</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_01fe4x6" sourceRef="Gateway_0innlw7" targetRef="Gateway_PROCEED_OR_NOT_PROCEED">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(flowFlags.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL != true or flowFlags.WELSH_ENABLED != true) or (flowFlags.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL and flowFlags.WELSH_ENABLED and  !(flowState == "MAIN.FULL_DEFENCE_PROCEED" or flowState == "MAIN.PART_ADMIT_NOT_SETTLED_NO_MEDIATION" or flowState == "MAIN.FULL_ADMIT_PROCEED" or flowState == "MAIN.PART_ADMIT_PROCEED" or flowState == "MAIN.IN_MEDIATION"))}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowFlags.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL != true or !(flowState == "MAIN.FULL_DEFENCE_PROCEED" or flowState == "MAIN.PART_ADMIT_NOT_SETTLED_NO_MEDIATION" or flowState == "MAIN.FULL_ADMIT_PROCEED" or flowState == "MAIN.PART_ADMIT_PROCEED" or flowState == "MAIN.IN_MEDIATION")}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:serviceTask id="ClaimantResponseGenerateDirectionsQuestionnaireForTranslation" name="Generate DQ" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
@@ -380,7 +380,7 @@
       <bpmn:outgoing>Flow_0gtsgjp</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_1bxeol3" sourceRef="Gateway_0innlw7" targetRef="ClaimantResponseGenerateDirectionsQuestionnaireForTranslation">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(flowFlags.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL and flowFlags.WELSH_ENABLED) and ((flowState == "MAIN.FULL_DEFENCE_PROCEED" or flowState == "MAIN.PART_ADMIT_NOT_SETTLED_NO_MEDIATION") or (flowState == "MAIN.FULL_ADMIT_PROCEED" or flowState == "MAIN.PART_ADMIT_PROCEED") or (flowState == "MAIN.IN_MEDIATION") )}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowFlags.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL and ((flowState == "MAIN.FULL_DEFENCE_PROCEED" or flowState == "MAIN.PART_ADMIT_NOT_SETTLED_NO_MEDIATION") or (flowState == "MAIN.FULL_ADMIT_PROCEED" or flowState == "MAIN.PART_ADMIT_PROCEED") or (flowState == "MAIN.IN_MEDIATION") )}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0gtsgjp" sourceRef="ClaimantResponseGenerateDirectionsQuestionnaireForTranslation" targetRef="Activity_0xp7fjj" />
     <bpmn:serviceTask id="ClaimantResponsePartAdmitPayImmediatelyNotifier" name="Notify parties" camunda:type="external" camunda:topic="processCaseEvent">
@@ -403,9 +403,7 @@
     </bpmn:textAnnotation>
     <bpmn:association id="Association_1oen8zm" sourceRef="Gateway_04v5dxt" targetRef="TextAnnotation_0qgljrk" />
     <bpmn:textAnnotation id="TextAnnotation_0tf9uhj">
-      <bpmn:text>When defendant LIP has selected WELSH as preferred language
-
-And Welsh enabled,
+<bpmn:text>When defendant LIP has selected WELSH as preferred language
 
 And the case flowstate, one of:
 
@@ -420,7 +418,7 @@ Part admission proceeding,
 In mediation.</bpmn:text>
     </bpmn:textAnnotation>
     <bpmn:textAnnotation id="TextAnnotation_0h74uvb">
-      <bpmn:text>If Welsh is not requested or not enabled, OR when welsh AND the case is in a flow state where translation is not needed, due to no DQ</bpmn:text>
+      <bpmn:text>If Welsh is not requested, OR when Welsh is requested and the case is in a flow state where translation is not needed, due to no DQ</bpmn:text>
     </bpmn:textAnnotation>
     <bpmn:association id="Association_0kzqyn4" associationDirection="None" sourceRef="TextAnnotation_0h74uvb" targetRef="Flow_01fe4x6" />
     <bpmn:association id="Association_03vngk4" associationDirection="None" sourceRef="TextAnnotation_0tf9uhj" targetRef="Flow_1bxeol3" />

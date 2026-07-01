@@ -366,7 +366,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldUpdateBusinessProcess_WhenLrVsLipAndCcdState_InAwaitingClaimantResponse() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Document doc = new Document();
         doc.setDocumentFileName(FILE_NAME_1);
         TranslatedDocument translatedDocument1 = new TranslatedDocument();
@@ -414,7 +413,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldUseDefaultBusinessProcess_WhenLrVsLipClaimantIntentionStateDoesNotMatchApplicantDqTranslation() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Document translatedFile = new Document();
         translatedFile.setDocumentFileName(FILE_NAME_1);
         TranslatedDocument translatedDocument1 = new TranslatedDocument();
@@ -445,7 +443,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     }
 
     @Test
-    void shouldUseDefaultBusinessProcess_WhenLrVsLipClaimantIntentionHasNoWelshSupport() {
+    void shouldUseClaimantLrIntentionBusinessProcess_WhenLrVsLipClaimantIntentionUploaded() {
         //Given
         Document translatedFile = new Document();
         translatedFile.setDocumentFileName(FILE_NAME_1);
@@ -473,7 +471,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         assertThat(response.getData())
             .extracting("businessProcess")
             .extracting("camundaEvent")
-            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT.name());
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_LR_INTENTION.name());
     }
 
     @Test
@@ -917,7 +915,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             expectedTranslatedDocs,
             any(CaseData.class)
         )).willReturn(documents);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Document claimIssueFileDoc = new Document();
         claimIssueFileDoc.setDocumentFileName(FILE_NAME_1);
         TranslatedDocument translatedDocument1 = new TranslatedDocument();
@@ -1230,7 +1227,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentTypeDefendantResponseOfLr() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         TranslatedDocument translatedDocument1 = new TranslatedDocument();
         translatedDocument1.setDocumentType(DEFENDANT_RESPONSE);
         Document document = new Document();
@@ -1287,7 +1283,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentTypeDefendantResponseOfLrWhenNoTranslatedDOc() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Document noticeDiscontinueFileDoc = new Document();
         noticeDiscontinueFileDoc.setDocumentFileName(FILE_NAME_2);
         TranslatedDocument translatedDocument1 = new TranslatedDocument();
@@ -1334,7 +1329,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     }
 
     @Test
-    void shouldUseDefaultBusinessProcess_WhenDefendantResponseDoesNotMeetWelshSealedFormConditions() {
+    void shouldUseDefendantSealedFormBusinessProcess_WhenDefendantResponseUploadedForLipVsLr() {
         //Given
         TranslatedDocument translatedDocument1 = new TranslatedDocument();
         translatedDocument1.setDocumentType(DEFENDANT_RESPONSE);
@@ -1364,13 +1359,12 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         assertThat(response.getData())
             .extracting("businessProcess")
             .extracting("camundaEvent")
-            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT.name());
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DEFENDANT_SEALED_FORM.name());
     }
 
     @Test
     void shouldKeepDefendantSealedFormBusinessProcess_WhenWelshTranslationDoesNotMoveAtCurrentState() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         TranslatedDocument translatedDocument1 = new TranslatedDocument();
         translatedDocument1.setDocumentType(DEFENDANT_RESPONSE);
         Document translatedFile = new Document();

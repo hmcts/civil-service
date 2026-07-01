@@ -3,11 +3,8 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -587,10 +584,8 @@ class CcdClaimStatusDashboardFactoryTest {
             .build();
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void given_SDOBeenDrawn_whenGetStatus_sdoOrderCreatedRequired(boolean caseProgressionEnabled) {
-        Mockito.when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(caseProgressionEnabled);
+    @Test
+    void given_SDOBeenDrawn_whenGetStatus_sdoOrderCreatedRequired() {
         Element<CaseDocument> document = new Element<>(
             UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
             new CaseDocument()
@@ -607,9 +602,7 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status =
             ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
                 claim, featureToggleService, Collections.emptyList()));
-        assertThat(status).isEqualTo(caseProgressionEnabled
-                                         ? DashboardClaimStatus.SDO_ORDER_CREATED_CP
-                                         : DashboardClaimStatus.SDO_ORDER_CREATED_PRE_CP);
+        assertThat(status).isEqualTo(DashboardClaimStatus.SDO_ORDER_CREATED_CP);
     }
 
     @Test
@@ -1013,7 +1006,6 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_sdoIsDrawn_anyPartyBilingual_showStatusDocumentsTranslated() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData claim = CaseData.builder().preTranslationDocuments(List.of(new Element<CaseDocument>().setValue(new CaseDocument()
                                                                                            .setDocumentType(SDO_ORDER))))
             .ccdState(CaseState.CASE_PROGRESSION)
@@ -1027,7 +1019,6 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_decisionMadeIsDrawn_anyPartyBilingual_showStatusDocumentsTranslated() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData claim = CaseData.builder().preTranslationDocuments(List.of(new Element<CaseDocument>().setValue(new CaseDocument()
                                                                                            .setDocumentType(
                                                                                                DECISION_MADE_ON_APPLICATIONS))))

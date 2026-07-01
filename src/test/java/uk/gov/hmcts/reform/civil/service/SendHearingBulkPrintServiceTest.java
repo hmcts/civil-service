@@ -27,7 +27,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DECISION_MADE_ON_APPLICATIONS;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DECISION_MADE_ON_APPLICATIONS_TRANSLATED;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
@@ -45,8 +44,6 @@ class SendHearingBulkPrintServiceTest {
 
     @InjectMocks
     private SendHearingBulkPrintService sendHearingBulkPrintService;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     private static final String SDO_HEARING_PACK_LETTER_TYPE = "hearing-document-pack";
     public static final String TASK_ID_DEFENDANT = "SendHearingToDefendantLIP";
@@ -130,7 +127,7 @@ class SendHearingBulkPrintServiceTest {
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, false);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         // then
         verifyPrintLetter(caseData, respondent1, List.of("test"));
@@ -145,7 +142,7 @@ class SendHearingBulkPrintServiceTest {
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT_HMC, false);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT_HMC);
 
         // then
         verifyPrintLetter(caseData, respondent1, List.of("test"));
@@ -160,7 +157,7 @@ class SendHearingBulkPrintServiceTest {
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT, false);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
 
         // then
         verifyPrintLetter(caseData, claimant, List.of("test"));
@@ -173,7 +170,7 @@ class SendHearingBulkPrintServiceTest {
             .systemGeneratedCaseDocuments(null).build();
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, false);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         // then
         verifyNoInteractions(bulkPrintService);
@@ -185,7 +182,7 @@ class SendHearingBulkPrintServiceTest {
         CaseData caseData = buildCaseData(null, SEALED_CLAIM, false, null, null, null, null);
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, false);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         // then
         verifyNoInteractions(bulkPrintService);
@@ -199,7 +196,7 @@ class SendHearingBulkPrintServiceTest {
             .build();
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, false);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         // then
         verifyNoInteractions(bulkPrintService);
@@ -214,7 +211,7 @@ class SendHearingBulkPrintServiceTest {
             .build();
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, false);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         // then
         verifyNoInteractions(bulkPrintService);
@@ -227,14 +224,14 @@ class SendHearingBulkPrintServiceTest {
             .systemGeneratedCaseDocuments(List.of()).build();
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, false);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         // then
         verifyNoInteractions(bulkPrintService);
     }
 
     @Test
-    void shouldDownloadDocumentAndPrintWelshHearingNoticeLetterToClaimantLiPSuccessfully() {
+    void shouldDownloadDocumentAndPrintHearingNoticeLetterToClaimantLiPWhenLanguageNotSet() {
         // given
         Party claimant = new PartyBuilder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, HEARING_FORM, true, null, null, null, null);
@@ -242,23 +239,22 @@ class SendHearingBulkPrintServiceTest {
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT, true);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
 
         // then
-        verifyPrintLetter(caseData, claimant, List.of("test", "test"));
+        verifyPrintLetter(caseData, claimant, List.of("test"));
     }
 
     @Test
     void shouldDownloadDocumentAndPrintWelshHearingNoticeLetterToClaimantLiPSuccessfullyWhenWelsh() {
         // given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = new PartyBuilder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, HEARING_FORM, true, null, "WELSH", null, null);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any(CaseDocument[].class)))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT, true);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
 
         // then
         verifyPrintLetter(caseData, claimant, List.of("test"));
@@ -267,14 +263,13 @@ class SendHearingBulkPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintWelshHearingNoticeLetterToClaimantLiPSuccessfullyWhenLangFieldNotSet() {
         // given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = new PartyBuilder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, HEARING_FORM, true, null, null, null, null);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any(CaseDocument[].class)))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT, false);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
 
         // then
         verifyPrintLetter(caseData, claimant, List.of("test"));
@@ -283,14 +278,13 @@ class SendHearingBulkPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintWelshHearingNoticeLetterToClaimantLiPSuccessfullyWhenBilingual() {
         // given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = new PartyBuilder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, HEARING_FORM, true, null, "BOTH", null, null);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any(CaseDocument[].class)))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT, true);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
 
         // then
         verifyPrintLetter(caseData, claimant, List.of("test", "test"));
@@ -299,14 +293,13 @@ class SendHearingBulkPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintWelshHearingNoticeLetterToDefendantLiPSuccessfullyWhenBilingual() {
         // given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = new PartyBuilder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, HEARING_FORM, true, "BOTH", null, null, null);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any(CaseDocument[].class)))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, true);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         // then
         verifyPrintLetter(caseData, claimant, List.of("test", "test"));
@@ -315,14 +308,13 @@ class SendHearingBulkPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintWelshHearingNoticeLetterToDefendantLiPSuccessfullyWhenEnglish() {
         // given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = new PartyBuilder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, HEARING_FORM, true, "ENGLISH", null, null, Language.WELSH);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any(CaseDocument[].class)))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, true);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         // then
         verifyPrintLetter(caseData, claimant, List.of("test"));
@@ -335,7 +327,7 @@ class SendHearingBulkPrintServiceTest {
             .systemGeneratedCaseDocuments(List.of()).build();
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, true);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         // then
         verifyNoInteractions(bulkPrintService);
@@ -348,7 +340,7 @@ class SendHearingBulkPrintServiceTest {
             .systemGeneratedCaseDocuments(null).build();
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, true);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         // then
         verifyNoInteractions(bulkPrintService);
@@ -495,7 +487,6 @@ class SendHearingBulkPrintServiceTest {
     @Test
     void shouldDownloadDecisionDocumentAndPrintWelshDecisionReconsiderationLetterToClaimantLiPSuccessfullyWhenWelsh() {
         // given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = new PartyBuilder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, DECISION_MADE_ON_APPLICATIONS_TRANSLATED, false,  null, "WELSH", null, null);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any(CaseDocument[].class)))
@@ -511,7 +502,6 @@ class SendHearingBulkPrintServiceTest {
     @Test
     void shouldDownloadDecisionDocumentAndPrintWelshDecisionReconsiderationLetterToClaimantLiPSuccessfullyWhenBilingual() {
         // given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = new PartyBuilder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, DECISION_MADE_ON_APPLICATIONS_TRANSLATED, false, null, "BOTH", null, null);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any(CaseDocument[].class)))
@@ -527,7 +517,6 @@ class SendHearingBulkPrintServiceTest {
     @Test
     void shouldDownloadDecisionDocumentAndPrintWelshDecisionReconsiderationLetterToDefendantLiPSuccessfullyWhenBilingual() {
         // given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = new PartyBuilder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, DECISION_MADE_ON_APPLICATIONS, false, "BOTH", null, null, null);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any(CaseDocument[].class)))
@@ -543,7 +532,6 @@ class SendHearingBulkPrintServiceTest {
     @Test
     void shouldDownloadDecisionDocumentAndPrintWelshDecisionReconsiderationLetterToDefendantLiPSuccessfullyWhenEnglish() {
         // given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = new PartyBuilder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, DECISION_MADE_ON_APPLICATIONS, false,  "ENGLISH", null, null, Language.ENGLISH);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any(CaseDocument[].class)))

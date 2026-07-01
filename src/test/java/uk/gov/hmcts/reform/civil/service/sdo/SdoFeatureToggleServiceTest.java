@@ -31,19 +31,15 @@ class SdoFeatureToggleServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setClaimantBilingualLanguagePreference(Language.WELSH.name());
 
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-
         assertThat(sdoFeatureToggleService.isWelshJourneyEnabled(caseData)).isTrue();
     }
 
     @Test
-    void shouldReturnFalse_whenWelshToggleDisabled() {
+    void shouldReturnTrue_whenClaimantIsBilingual() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setClaimantBilingualLanguagePreference(Language.WELSH.name());
 
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-
-        assertThat(sdoFeatureToggleService.isWelshJourneyEnabled(caseData)).isFalse();
+        assertThat(sdoFeatureToggleService.isWelshJourneyEnabled(caseData)).isTrue();
     }
 
     @Test

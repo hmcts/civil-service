@@ -30,7 +30,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
-import uk.gov.hmcts.reform.civil.exceptions.NotEarlyAdopterCourtException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -54,8 +53,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.EarlyAdoptersService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import java.time.LocalDate;
@@ -104,10 +101,6 @@ public class HearingValuesServiceTest {
     private OrganisationService organisationService;
     @Mock
     private CaseFlagsInitialiser caseFlagsInitialiser;
-    @Mock
-    private EarlyAdoptersService earlyAdoptersService;
-    @Mock
-    private FeatureToggleService featuretoggleService;
 
     @Autowired
     private ObjectMapper mapper;
@@ -125,7 +118,6 @@ public class HearingValuesServiceTest {
     @BeforeEach
     void prepare() {
         ReflectionTestUtils.setField(hearingValuesService, "mapper", mapper);
-        when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
     }
 
     @Test
@@ -529,9 +521,7 @@ public class HearingValuesServiceTest {
                 .id(caseId).build();
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
-            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(false);
-
-            assertThrows(NotEarlyAdopterCourtException.class, () -> hearingValuesService.getValues(caseId, "auth"));
+            assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
         }
 
         @Test
@@ -556,15 +546,12 @@ public class HearingValuesServiceTest {
                 .id(caseId).build();
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
-            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
-
             assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
         }
 
         @SneakyThrows
         @Test
         void shouldNotThrowErrorIfLocationIsNotWhiteListedButWelshEnabled() {
-            when(featuretoggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
@@ -586,8 +573,6 @@ public class HearingValuesServiceTest {
                 .id(caseId).build();
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
-            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(false);
-
             assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
         }
 
@@ -616,7 +601,6 @@ public class HearingValuesServiceTest {
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
 
-            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
             assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
         }
 
@@ -645,7 +629,6 @@ public class HearingValuesServiceTest {
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
 
-            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
             assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
         }
 
@@ -674,7 +657,6 @@ public class HearingValuesServiceTest {
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
 
-            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
             assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
         }
 
@@ -702,7 +684,6 @@ public class HearingValuesServiceTest {
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
 
-            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
             assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
         }
 
@@ -730,7 +711,6 @@ public class HearingValuesServiceTest {
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
 
-            when(earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(any(CaseData.class))).thenReturn(true);
             assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
         }
     }

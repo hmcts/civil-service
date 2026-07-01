@@ -150,39 +150,6 @@ class DashboardNotificationHelperTest {
     }
 
     @Nested
-    class IsSDODrawnPreCPReleaseTests {
-
-        @Test
-        void shouldReturnTrue_whenNotCaseProgressionEnabledAndLocationWhiteListedAndNotWelshEnabledForMainCase() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION))
-                .build();
-
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(false);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-
-            assertTrue(dashboardDecisionHelper.isSDODrawnPreCPRelease(caseData));
-        }
-
-        @Test
-        void shouldReturnFalse_whenEitherCaseProgressionEnabledOrLocationWhiteListedOrWelshEnabledForMainCase() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION))
-                .build();
-
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(true);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-
-            assertFalse(dashboardDecisionHelper.isSDODrawnPreCPRelease(caseData));
-
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(false);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-
-            assertFalse(dashboardDecisionHelper.isSDODrawnPreCPRelease(caseData));
-        }
-    }
-
-    @Nested
     class IsEligibleForReconsiderationTests {
 
         private static Stream<Arguments> provideCsvSourceTrueCases() {
@@ -205,44 +172,39 @@ class DashboardNotificationHelperTest {
 
         @ParameterizedTest
         @MethodSource("provideCsvSourceTrueCases")
-        void shouldReturnTrue_ForGiven_whenFeatureToggleTrue(String responseClaimTrack,
-                                                             BigDecimal totalClaimAmount,
-                                                             DecisionOnRequestReconsiderationOptions option) {
+        void shouldReturnTrue_ForGiven(String responseClaimTrack,
+                                       BigDecimal totalClaimAmount,
+                                       DecisionOnRequestReconsiderationOptions option) {
             CaseData caseData = new CaseDataBuilder()
                 .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION))
                 .build();
             caseData.setResponseClaimTrack(responseClaimTrack);
             caseData.setTotalClaimAmount(totalClaimAmount);
             caseData.setDecisionOnRequestReconsiderationOptions(option);
-
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(true);
 
             assertTrue(dashboardDecisionHelper.isEligibleForReconsideration(caseData));
         }
 
         @ParameterizedTest
         @MethodSource("provideCsvSourceTrueCases")
-        void shouldReturnTrue_ForGiven_whenWelshEnabledForMainCase(String responseClaimTrack,
-                                                                   BigDecimal totalClaimAmount,
-                                                                   DecisionOnRequestReconsiderationOptions option) {
+        void shouldReturnTrue_ForGiven_whenClaimantBilingual(String responseClaimTrack,
+                                                                BigDecimal totalClaimAmount,
+                                                                DecisionOnRequestReconsiderationOptions option) {
             CaseData caseData = new CaseDataBuilder()
                 .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION))
                 .build();
             caseData.setResponseClaimTrack(responseClaimTrack);
             caseData.setTotalClaimAmount(totalClaimAmount);
             caseData.setDecisionOnRequestReconsiderationOptions(option);
-
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(false);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
             assertTrue(dashboardDecisionHelper.isEligibleForReconsideration(caseData));
         }
 
         @ParameterizedTest
         @MethodSource("provideCsvSourceTrueCases")
-        void shouldReturnFalse_ForGiven_whenFeatureTogglesAreFalse(String responseClaimTrack,
-                                                                   BigDecimal totalClaimAmount,
-                                                                   DecisionOnRequestReconsiderationOptions option) {
+        void shouldReturnTrue_ForGiven_whenLocationIsNotWhitelisted(String responseClaimTrack,
+                                                                    BigDecimal totalClaimAmount,
+                                                                    DecisionOnRequestReconsiderationOptions option) {
             CaseData caseData = new CaseDataBuilder()
                 .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION))
                 .build();
@@ -250,25 +212,20 @@ class DashboardNotificationHelperTest {
             caseData.setTotalClaimAmount(totalClaimAmount);
             caseData.setDecisionOnRequestReconsiderationOptions(option);
 
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(false);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-
-            assertFalse(dashboardDecisionHelper.isEligibleForReconsideration(caseData));
+            assertTrue(dashboardDecisionHelper.isEligibleForReconsideration(caseData));
         }
 
         @ParameterizedTest
         @MethodSource("provideCsvSourceFalseCases")
-        void shouldReturnFalse_ForGiven_whenFeatureToggleTrue(String responseClaimTrack,
-                                                              BigDecimal totalClaimAmount,
-                                                              DecisionOnRequestReconsiderationOptions option) {
+        void shouldReturnFalse_ForGiven(String responseClaimTrack,
+                                        BigDecimal totalClaimAmount,
+                                        DecisionOnRequestReconsiderationOptions option) {
             CaseData caseData = new CaseDataBuilder()
                 .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION))
                 .build();
             caseData.setResponseClaimTrack(responseClaimTrack);
             caseData.setTotalClaimAmount(totalClaimAmount);
             caseData.setDecisionOnRequestReconsiderationOptions(option);
-
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(true);
 
             assertFalse(dashboardDecisionHelper.isEligibleForReconsideration(caseData));
         }

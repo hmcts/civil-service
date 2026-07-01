@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +20,6 @@ public class DashboardNotificationsParamsMapper {
     public static final String HIDDEN_ORDER_DOCUMENT = "hiddenOrderDocument";
 
     private final List<DashboardNotificationsParamsBuilder> dashboardNotificationsParamsBuilders;
-    private final FeatureToggleService featureToggleService;
 
     public HashMap<String, Object> mapCaseDataToParams(CaseData caseData) {
         return buildBaseParams(caseData);
@@ -54,8 +52,7 @@ public class DashboardNotificationsParamsMapper {
     private String addToMapDocumentInfo(CaseData caseData, CaseEvent caseEvent) {
         return Optional.ofNullable(caseEvent).map(event -> switch (event) {
             case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT -> {
-                if (featureToggleService.isWelshEnabledForMainCase()
-                    && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+                if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
                     yield null;
                 } else {
                     yield getFirstFinalOrderUrlIfPresent(caseData);

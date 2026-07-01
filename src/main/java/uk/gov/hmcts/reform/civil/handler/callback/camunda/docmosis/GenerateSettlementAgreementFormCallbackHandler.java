@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.settlementagreement.SettlementAgreementFormGenerator;
 
@@ -33,7 +32,6 @@ public class GenerateSettlementAgreementFormCallbackHandler extends CallbackHand
     private final SettlementAgreementFormGenerator settlementAgreementFormGenerator;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
     private final ObjectMapper objectMapper;
-    private final FeatureToggleService featureToggleService;
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_LIP_SIGN_SETTLEMENT_AGREEMENT_FORM);
     private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateResponseDocument);
     private static final String TASK_ID = "GenerateSignSettlementAgreement";
@@ -45,8 +43,7 @@ public class GenerateSettlementAgreementFormCallbackHandler extends CallbackHand
                 caseData,
                 callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        if (featureToggleService.isWelshEnabledForMainCase()
-            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+        if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
             List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
             preTranslationDocuments.add(element(claimantResponseForm));
             caseData.setBilingualHint(YesOrNo.YES);

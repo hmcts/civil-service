@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimform.ClaimFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -33,7 +32,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DRAFT_CLAIM_FORM;
@@ -53,14 +51,12 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
     private GenerateLipClaimFormCallBackHandler handler;
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
         handler = new GenerateLipClaimFormCallBackHandler(mapper, claimFormGenerator,
-                                                          assignCategoryId, systemGeneratedDocumentService, featureToggleService);
+                                                          assignCategoryId, systemGeneratedDocumentService);
         mapper.registerModule(new JavaTimeModule());
     }
 
@@ -106,7 +102,6 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldGenerateDefendantClaimForm() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         given(claimFormGenerator.generate(
             any(CaseData.class),
             anyString(),
@@ -128,7 +123,6 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldAddDefendantClaimFormInTempCollection_whenWelshFlagIsOn() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(claimFormGenerator.generate(
             any(CaseData.class),
             anyString(),

@@ -130,7 +130,6 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                     .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build()).build()).build();
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
             handler.handle(params);
 
@@ -160,7 +159,6 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                     .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build()).build()).build();
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
             handler.handle(params);
             verify(dashboardScenariosService).recordScenarios(
@@ -192,7 +190,6 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                     .build()).build();
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
             handler.handle(params);
             verify(dashboardScenariosService).recordScenarios(
@@ -227,7 +224,6 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name())
                     .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build()).build()).build();
 
-            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
 
             handler.handle(params);
@@ -247,7 +243,6 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
-            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             handler.handle(params);
 
             // Then
@@ -402,7 +397,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldRecordScenarioInSdoPreCPRelease_whenInvoked() {
+        void shouldRecordOrderMadeScenarioInSdoWhenPreCpReleasePathRemoved() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData.setApplicant1Represented(YesOrNo.NO);
 
@@ -410,16 +405,16 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name())
+                    .caseDetails(CaseDetails.builder().state(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString()).build()).build()
             ).build();
 
-            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
 
             handler.handle(params);
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
-                "Scenario.AAA6.ClaimantIntent.SDODrawn.PreCaseProgression.Claimant",
+                "Scenario.AAA6.CP.OrderMade.Claimant",
                 caseData.getCcdCaseReference().toString(),
                 new ScenarioRequestParams(scenarioParams)
             );
@@ -431,7 +426,6 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData.setResponseClaimTrack("SMALL_CLAIM");
@@ -458,7 +452,6 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData.setResponseClaimTrack("SMALL_CLAIM");
@@ -485,33 +478,6 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
             );
         }
 
-        @Test
-        void shouldNotRecordScenarioInSdoLegalAdviser_whenInvokedWithFeatureToggleDisabled() {
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-            scenarioParams.put("orderDocument", "urlDirectionsOrder");
-
-            when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
-
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
-            caseData.setResponseClaimTrack("SMALL_CLAIM");
-            caseData.setTotalClaimAmount(BigDecimal.valueOf(500));
-            caseData.setApplicant1Represented(YesOrNo.NO);
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT.name()).build()
-            ).build();
-            handler.handle(params);
-            ArgumentCaptor<String> secondParamCaptor = ArgumentCaptor.forClass(String.class);
-            verify(dashboardScenariosService).recordScenarios(
-                eq("BEARER_TOKEN"),
-                secondParamCaptor.capture(),
-                eq(caseData.getCcdCaseReference().toString()),
-                eq(new ScenarioRequestParams(scenarioParams))
-            );
-            String capturedSecondParam = secondParamCaptor.getValue();
-            Assertions.assertNotEquals("Scenario.AAA6.CP.SDOMadebyLA.Claimant", capturedSecondParam);
-        }
-
         @ParameterizedTest
         @MethodSource("provideCsvSource")
         void shouldRecordScenarioInSdoLegalAdviser(BigDecimal totalClaimAmount,
@@ -521,7 +487,6 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
             caseData.setResponseClaimTrack("SMALL_CLAIM");
@@ -571,7 +536,6 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
-            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(toggleService.isLocationWhiteListed(any())).thenReturn(true);
             handler.handle(params);
 
@@ -597,8 +561,6 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
-
-            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
             handler.handle(params);
 

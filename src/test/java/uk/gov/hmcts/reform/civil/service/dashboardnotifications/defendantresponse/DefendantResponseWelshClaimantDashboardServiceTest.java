@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
@@ -29,8 +28,6 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_WELSH_ENABLED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_ENGLISH_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT;
 
@@ -45,8 +42,6 @@ class DefendantResponseWelshClaimantDashboardServiceTest {
     private DashboardNotificationService dashboardNotificationService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private DefendantResponseWelshClaimantDashboardService service;
@@ -58,7 +53,6 @@ class DefendantResponseWelshClaimantDashboardServiceTest {
 
     @Test
     void shouldDeleteDjNotificationWhenWelshEnabledAndDeadlinePassed() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(5678L)
@@ -85,7 +79,6 @@ class DefendantResponseWelshClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordBilingualScenarioWhenClaimIssueBilingualAndToggleEnabled() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(4321L)
@@ -105,7 +98,7 @@ class DefendantResponseWelshClaimantDashboardServiceTest {
     }
 
     @Test
-    void shouldRecordBilingualScenarioWhenWelshDisabled() {
+    void shouldRecordBilingualScenarioForBilingualMainCase() {
         CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(4322L)
             .applicant1Represented(YesOrNo.NO)
@@ -116,7 +109,7 @@ class DefendantResponseWelshClaimantDashboardServiceTest {
 
         verify(dashboardScenariosService).recordScenarios(
             eq(AUTH_TOKEN),
-            eq(SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT.getScenario()),
+            eq(SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_WELSH_ENABLED_CLAIMANT.getScenario()),
             eq("4322"),
             any(ScenarioRequestParams.class)
         );

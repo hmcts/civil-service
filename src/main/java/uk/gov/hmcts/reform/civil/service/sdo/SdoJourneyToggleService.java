@@ -67,41 +67,11 @@ public class SdoJourneyToggleService {
         }
     }
 
-    /**
-     * Determines whether EA court should be enabled for a SPEC claim, aligning the logic across
-     * SDO and DJ submission/notification paths. Returns {@code null} when the case category is not SPEC.
-     */
     public YesOrNo resolveEaCourtLocation(CaseData caseData, boolean allowLipvLrWithNoC) {
         if (!CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return null;
         }
 
-        if (sdoFeatureToggleService.isWelshEnabledForMainCase()) {
-            return YesOrNo.YES;
-        }
-
-        boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
-        if (!isLipCase) {
-            return YesOrNo.YES;
-        }
-
-        return isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData, allowLipvLrWithNoC) ? YesOrNo.YES : YesOrNo.NO;
-    }
-
-    private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData, boolean allowLipvLrWithNoC) {
-        boolean eligibleLipConfiguration = caseData.isLipvLipOneVOne()
-            || caseData.isLRvLipOneVOne()
-            || (allowLipvLrWithNoC && caseData.isLipvLROneVOne() && sdoFeatureToggleService.isDefendantNoCOnlineForCase(caseData));
-
-        if (!eligibleLipConfiguration) {
-            return false;
-        }
-
-        // Mirror master behaviour: missing base location causes a failure rather than silently proceeding.
-        String baseLocation = caseData.getCaseManagementLocation().getBaseLocation();
-
-        return sdoFeatureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(
-            baseLocation
-        );
+        return YesOrNo.YES;
     }
 }
