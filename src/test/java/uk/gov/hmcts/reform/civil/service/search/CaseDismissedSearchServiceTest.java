@@ -38,7 +38,10 @@ class CaseDismissedSearchServiceTest extends ElasticSearchServiceTest {
                         .must(boolQuery().must(matchQuery("state", "CASE_ISSUED"))))
             .should(boolQuery()
                         .must(rangeQuery("data.claimDismissedDeadline").lt(timeNow))
-                        .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"))));
+                        .must(boolQuery()
+                                  .minimumShouldMatch(1)
+                                  .should(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT")))
+                                  .should(boolQuery().must(matchQuery("state", "JUDGMENT_REQUESTED")))));
 
         return new Query(query, List.of("reference"), fromValue);
     }
