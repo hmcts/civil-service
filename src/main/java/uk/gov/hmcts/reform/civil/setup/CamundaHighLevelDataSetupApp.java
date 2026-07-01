@@ -21,7 +21,7 @@ public final class CamundaHighLevelDataSetupApp {
     }
 
     public static void main(String[] args) throws Exception {
-      //  configureRelaxedSsl();
+        configureRelaxedSsl();
 
         CamundaImportConfiguration configuration = CamundaImportConfiguration.fromEnvironment(
             System.getenv(),
@@ -55,7 +55,7 @@ public final class CamundaHighLevelDataSetupApp {
             }
         };
 
-        SSLContext sslContext = SSLContext.getInstance("TLS");
+        SSLContext sslContext = SSLContext.getInstance("TLSv1.3");
         sslContext.init(null, trustAllManagers, new SecureRandom());
         HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
 
