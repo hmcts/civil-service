@@ -84,6 +84,9 @@ scheduler:
   mediation-file-transfer:
     cronExpression: ${CRON_EXPRESSION_MEDIATION_FILE_TRANSFER:0 0 1 * * ?}
     enabled: ${SCHEDULER_ENABLED_MEDIATION_FILE_TRANSFER:true}
+  take-case-offline:
+    cronExpression: ${CRON_EXPRESSION_TAKE_CASE_OFFLINE:0 1 16 * * ?}
+    enabled: ${SCHEDULER_ENABLED_TAKE_CASE_OFFLINE:true}
   default-back-pressure:
     initialDelay: ${DEFAULT_BACK_PRESSURE_INITIAL_DELAY:PT0S}
     maxDelay: ${DEFAULT_BACK_PRESSURE_MAX_DELAY:PT10S}

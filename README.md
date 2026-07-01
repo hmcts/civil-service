@@ -100,7 +100,7 @@ The project defines a set of timer-driven Camunda processes that keep cases movi
 | Retrigger cases scheduler | One-off cron to retrigger case updates as part of the 2026 migration plan. | `RETRIGGER_CASES_EVENTS` | `0 0 0 1 * ? 2026` | First day of each month until 2026 at 00:00 |
 | Settlement no response from defendant scheduler | Moves settlement agreements forward when the defendant failed to respond. | `SETTLEMENT_NO_RESPONSE_FROM_DEFENDANT_CHECK` | `0 0 1 * * ?` | Daily at 01:00 |
 | Spec automated hearing notice scheduler | Builds automated hearing notices for Spec claims twice per day. | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 ? * * *` | Twice daily at 00:00 and 12:00 |
-| Take case offline scheduler | Transitions cases that must move off digital rails. | `TAKE_CASE_OFFLINE` | `0 5 16 * * ?` | Daily at 16:05 |
+| Take case offline scheduler | Transitions cases that must move off digital rails. | `TAKE_CASE_OFFLINE` | `0 1 16 * * ?` | Daily at 16:01 |
 | Trial ready check scheduler | Verifies trial readiness status for outstanding cases. | `TRIAL_READY_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
 | Trial ready notification scheduler | Sends notifications when trial readiness has been confirmed. | `TRIAL_READY_NOTIFICATION_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
 | Unspec automated hearing notice scheduler | Builds automated hearing notices for Unspec claims twice per day. | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 ? * * *` | Twice daily at 00:00 and 12:00 |
@@ -475,6 +475,20 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 |---------|-------------|---------|----------------------|
 | `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_MEDIATION_FILE_TRANSFER` |
 | `cronExpression` | When the scheduler runs. | `0 0 1 * * ?` (Daily at 1 AM) | `CRON_EXPRESSION_MEDIATION_FILE_TRANSFER` |
+
+### TakeCaseOfflineScheduler
+
+The `TakeCaseOfflineScheduler` transitions eligible cases off digital rails once their relevant deadlines have expired.
+It runs when `TakeCaseOffline` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.take-case-offline`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_TAKE_CASE_OFFLINE` |
+| `cronExpression` | When the scheduler runs. | `0 1 16 * * ?` (Daily at 16:01) | `CRON_EXPRESSION_TAKE_CASE_OFFLINE` |
 
 ### JudgementBufferScheduler
 
