@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.dashboardnotifications.dismisscase;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
@@ -44,7 +45,9 @@ public class DismissCaseClaimantDashboardService extends DashboardScenarioServic
     protected Map<String, Boolean> getScenarios(CaseData caseData) {
         return Map.of(
             DashboardScenarios.SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_CLAIMANT.getScenario(),
-            claimantQueryAwaitingResponse(caseData)
+            claimantQueryAwaitingResponse(caseData),
+            DashboardScenarios.SCENARIO_AAA6_DISMISS_CASE_CCJ_CANCELLED_CLAIMANT.getScenario(),
+            JudgmentsOnlineHelper.isJoRequested(caseData, featureToggleService)
         );
     }
 

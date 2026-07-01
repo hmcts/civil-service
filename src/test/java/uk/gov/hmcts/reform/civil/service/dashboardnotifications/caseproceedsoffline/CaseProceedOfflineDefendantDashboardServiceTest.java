@@ -29,6 +29,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDGMENT_REQUESTED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT;
@@ -168,6 +169,27 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
             verify(dashboardScenariosService).recordScenarios(
                 eq(AUTH_TOKEN),
                 eq(SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT.getScenario()),
+                eq(caseData.getCcdCaseReference().toString()),
+                any()
+            );
+        }
+
+        @Test
+        void shouldRecordScenario_whenPreviousStateIsJudgmentRequested() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .ccdCaseReference(1234L)
+                .previousCCDState(JUDGMENT_REQUESTED)
+                .build();
+
+            when(toggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
+
+            service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
+
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
+            verify(dashboardScenariosService).recordScenarios(
+                eq(AUTH_TOKEN),
+                eq(SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES.getScenario()),
                 eq(caseData.getCcdCaseReference().toString()),
                 any()
             );
