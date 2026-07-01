@@ -50,7 +50,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT_CARM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_CLAIMANT_REJECTS_DEF_PLAN_CLAIMANT_DISAGREES_COURT_PLAN_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_ACCEPTS_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT;
@@ -178,7 +177,6 @@ class ClaimantResponseDefendantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioForLrvLipFullAdmitImmediatePaymentClaimSettled() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -563,30 +561,6 @@ class ClaimantResponseDefendantDashboardServiceTest {
     }
 
     @Test
-    void shouldRecordScenarioForLrvLipPartFullAdmitAndPayByPlan() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
-
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setCcdCaseReference(1234L);
-        caseData.setApplicant1Represented(YesOrNo.YES);
-        caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES);
-
-        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
-        ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
-        caseData.setCcjPaymentDetails(ccjPaymentDetails);
-
-        service.notifyDefendant(caseData, AUTH_TOKEN);
-
-        verify(dashboardScenariosService).recordScenarios(
-            eq(AUTH_TOKEN),
-            eq(SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario()),
-            eq("1234"),
-            any(ScenarioRequestParams.class)
-        );
-    }
-
-    @Test
     void shouldRecordScenarioForLrvLipFullDefenceNotProceed() {
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -877,8 +851,7 @@ class ClaimantResponseDefendantDashboardServiceTest {
     }
 
     @Test
-    void shouldNotRecordScenarioWhenJudgmentOnlineEnabledForLrvLipPlan() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+    void shouldNotRecordScenarioForLrvLipAcceptedPlanHandledByJba() {
 
         CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
         ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
@@ -898,7 +871,6 @@ class ClaimantResponseDefendantDashboardServiceTest {
 
     @Test
     void shouldNotRecordScenarioWhenApplicantLipForLrvLipPlan() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
         CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
         ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
@@ -918,7 +890,6 @@ class ClaimantResponseDefendantDashboardServiceTest {
 
     @Test
     void shouldNotRecordScenarioWhenCcjRequestMissingForLrvLipPlan() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -982,8 +953,7 @@ class ClaimantResponseDefendantDashboardServiceTest {
     }
 
     @Test
-    void shouldNotRecordScenarioWhenJudgmentOnlineDisabledForFullAdmitImmediate() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
+    void shouldRecordScenarioForFullAdmitImmediate() {
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -997,12 +967,16 @@ class ClaimantResponseDefendantDashboardServiceTest {
 
         service.notifyDefendant(caseData, AUTH_TOKEN);
 
-        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class)
+        );
     }
 
     @Test
     void shouldNotRecordScenarioWhenApplicantLipForFullAdmitImmediate() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -1021,7 +995,6 @@ class ClaimantResponseDefendantDashboardServiceTest {
 
     @Test
     void shouldNotRecordScenarioWhenNotImmediatePayForFullAdmitImmediate() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         Party respondent = new Party();
         respondent.setType(Party.Type.INDIVIDUAL);
