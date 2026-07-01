@@ -491,6 +491,20 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 | `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_TAKE_CASE_OFFLINE` |
 | `cronExpression` | When the scheduler runs. | `0 1 16 * * ?` (Daily at 16:01) | `CRON_EXPRESSION_TAKE_CASE_OFFLINE` |
 
+### TrialReadyNotificationScheduler
+
+The `TrialReadyNotificationScheduler` publishes trial ready notification events for eligible fast-track cases with hearings within the existing six-week notification window.
+It runs when `TrialReadyNotification` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.trial-ready-notification`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_TRIAL_READY_NOTIFICATION` |
+| `cronExpression` | When the scheduler runs. | `0 20 0 * * ?` (Daily at 00:20) | `CRON_EXPRESSION_TRIAL_READY_NOTIFICATION` |
+
 ### JudgementBufferScheduler
 
 The `JudgementBufferScheduler` is used to process cases where a default judgement has been requested and a buffer period has expired.

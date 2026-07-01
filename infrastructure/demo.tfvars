@@ -38,6 +38,10 @@ monitor_scheduler_alerts = {
     enabled      = false
     action_group = "demo-civil-service-slack-alert"
   }
+  "TrialReadyNotification" = {
+    enabled      = false
+    action_group = "demo-civil-service-slack-alert"
+  }
 }
 
 job_not_run_threshold = 26

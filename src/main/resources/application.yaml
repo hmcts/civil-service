@@ -87,6 +87,9 @@ scheduler:
   take-case-offline:
     cronExpression: ${CRON_EXPRESSION_TAKE_CASE_OFFLINE:0 1 16 * * ?}
     enabled: ${SCHEDULER_ENABLED_TAKE_CASE_OFFLINE:true}
+  trial-ready-notification:
+    cronExpression: ${CRON_EXPRESSION_TRIAL_READY_NOTIFICATION:0 20 0 * * ?}
+    enabled: ${SCHEDULER_ENABLED_TRIAL_READY_NOTIFICATION:true}
   default-back-pressure:
     initialDelay: ${DEFAULT_BACK_PRESSURE_INITIAL_DELAY:PT0S}
     maxDelay: ${DEFAULT_BACK_PRESSURE_MAX_DELAY:PT10S}
