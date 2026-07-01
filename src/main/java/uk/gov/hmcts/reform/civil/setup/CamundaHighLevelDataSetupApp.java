@@ -21,7 +21,7 @@ public final class CamundaHighLevelDataSetupApp {
     }
 
     public static void main(String[] args) throws Exception {
-        configureRelaxedSsl();
+      //  configureRelaxedSsl();
 
         CamundaImportConfiguration configuration = CamundaImportConfiguration.fromEnvironment(
             System.getenv(),
