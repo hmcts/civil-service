@@ -5,7 +5,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.scheduler.common.ElasticSearchSchedulerRunner;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.search.CaseHearingDateSearchService;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -24,7 +25,7 @@ class HearingCvpLinkSchedulerTest {
     private HearingCvpLinkScheduledTask hearingCvpLinkScheduledTask;
 
     @Mock
-    private ElasticSearchSchedulerRunner elasticSearchSchedulerRunner;
+    private ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
 
     @InjectMocks
     private HearingCvpLinkScheduler scheduler;
@@ -33,10 +34,10 @@ class HearingCvpLinkSchedulerTest {
     void shouldRunTaskRunnerWhenScheduledTaskRuns() {
         scheduler.runScheduledTask();
 
-        verify(elasticSearchSchedulerRunner).run(
+        verify(scheduledTaskRunner).run(
             eq(SCHEDULER_NAME),
             any(),
-            any()
+            eq(hearingCvpLinkScheduledTask)
         );
     }
 }

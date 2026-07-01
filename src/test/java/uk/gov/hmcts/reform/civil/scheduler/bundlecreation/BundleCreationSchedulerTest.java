@@ -5,7 +5,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.scheduler.common.ElasticSearchSchedulerRunner;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.search.BundleCreationTriggerService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,7 +24,7 @@ class BundleCreationSchedulerTest {
     @Mock
     private BundleCreationScheduledTask bundleCreationScheduledTask;
     @Mock
-    private ElasticSearchSchedulerRunner elasticSearchSchedulerRunner;
+    private ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
     @InjectMocks
     private BundleCreationScheduler scheduler;
 
@@ -32,10 +33,10 @@ class BundleCreationSchedulerTest {
         scheduler.runScheduledTask();
 
         assertThat(scheduler.getName()).isEqualTo("BundleCreation");
-        verify(elasticSearchSchedulerRunner).run(
+        verify(scheduledTaskRunner).run(
             eq(SCHEDULER_NAME),
             any(),
-            any()
+            eq(bundleCreationScheduledTask)
         );
     }
 }

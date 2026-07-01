@@ -6,12 +6,10 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
-import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.CaseReadyBusinessProcessSearchService;
-import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
 @Component
 @RequiredArgsConstructor
@@ -23,9 +21,8 @@ public class PollingEventEmitterScheduler implements CivilScheduler {
     static final int FIFTY_MINUTES_IN_SECONDS = 3000;
 
     private final CaseReadyBusinessProcessSearchService searchService;
-    private final ScheduledTaskRunner scheduledTaskRunner;
+    private final ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
     private final PollingEventEmitterScheduledTask pollingEventEmitterScheduledTask;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     public String getName() {
@@ -38,15 +35,10 @@ public class PollingEventEmitterScheduler implements CivilScheduler {
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
     @Override
     public void runScheduledTask() {
-        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
-            log.info("Running {} scheduler", SCHEDULER_NAME);
-            ElasticSearchResult searchResult = searchService.getElasticSearchResult();
-
-            scheduledTaskRunner.run(
-                new ScheduledTaskEventConfiguration(SCHEDULER_NAME),
-                searchResult,
-                pollingEventEmitterScheduledTask
-            );
-        }
+        scheduledTaskRunner.run(
+            SCHEDULER_NAME,
+            searchService::getElasticSearchResult,
+            pollingEventEmitterScheduledTask
+        );
     }
 }

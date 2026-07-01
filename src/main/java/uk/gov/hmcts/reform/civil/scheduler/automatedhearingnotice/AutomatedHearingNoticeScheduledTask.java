@@ -5,14 +5,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
+import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTask;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class AutomatedHearingNoticeScheduledTask {
+public class AutomatedHearingNoticeScheduledTask implements ScheduledTask<String, String> {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
+    @Override
+    public String getItemId(String hearingId) {
+        return hearingId;
+    }
+
+    @Override
     public void accept(String hearingId) {
         log.info("AutomatedHearingNoticeScheduledTask::accept hearing {}", hearingId);
         applicationEventPublisher.publishEvent(new HearingNoticeSchedulerTaskEvent(hearingId));

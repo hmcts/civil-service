@@ -13,10 +13,15 @@ import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskBackPressureConfi
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class HearingCvpLinkScheduledTask implements ScheduledTask {
+public class HearingCvpLinkScheduledTask implements ScheduledTask<CaseDetails, Long> {
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final DefaultBackPressureConfiguration defaultBackPressureConfiguration;
+
+    @Override
+    public Long getItemId(CaseDetails caseDetails) {
+        return caseDetails.getId();
+    }
 
     @Override
     public void accept(CaseDetails caseDetails) {

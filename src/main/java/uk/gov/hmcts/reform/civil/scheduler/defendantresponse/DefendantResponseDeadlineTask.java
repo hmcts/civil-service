@@ -11,9 +11,14 @@ import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskBackPressureConfi
 @Component
 @AllArgsConstructor
 @Slf4j
-public class DefendantResponseDeadlineTask implements ScheduledTask {
+public class DefendantResponseDeadlineTask implements ScheduledTask<CaseDetails, Long> {
 
     private final DefaultBackPressureConfiguration defaultBackPressureConfiguration;
+
+    @Override
+    public Long getItemId(CaseDetails caseDetails) {
+        return caseDetails.getId();
+    }
 
     @Override
     public void accept(CaseDetails caseDetails) {

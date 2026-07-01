@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.search.common;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.scheduler.common.TaskResult;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
@@ -10,7 +11,7 @@ import java.util.stream.Stream;
  * Contains the total number of results and a stream to consume them.
  * Note: the stream should be consumed only once.
  */
-public final class ElasticSearchResult {
+public final class ElasticSearchResult implements TaskResult<CaseDetails> {
 
     private final Stream<CaseDetails> caseDetailsStream;
     private final int totalResults;
@@ -30,6 +31,11 @@ public final class ElasticSearchResult {
             throw new IllegalStateException("Stream has already been consumed");
         }
         return caseDetailsStream;
+    }
+
+    @Override
+    public Stream<CaseDetails> itemStream() {
+        return caseDetailsStream();
     }
 
     public boolean isEmpty() {

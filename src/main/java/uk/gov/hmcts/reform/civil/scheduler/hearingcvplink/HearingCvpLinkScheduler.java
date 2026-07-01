@@ -6,8 +6,9 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
-import uk.gov.hmcts.reform.civil.scheduler.common.ElasticSearchSchedulerRunner;
+import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.search.CaseHearingDateSearchService;
 
 @Component
@@ -19,7 +20,7 @@ public class HearingCvpLinkScheduler implements CivilScheduler {
     private static final String SCHEDULER_NAME = "HearingCvpLink";
 
     private final CaseHearingDateSearchService searchService;
-    private final ElasticSearchSchedulerRunner elasticSearchSchedulerRunner;
+    private final ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
     private final HearingCvpLinkScheduledTask hearingCvpLinkScheduledTask;
 
     @Override
@@ -33,7 +34,7 @@ public class HearingCvpLinkScheduler implements CivilScheduler {
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
     @Override
     public void runScheduledTask() {
-        elasticSearchSchedulerRunner.run(
+        scheduledTaskRunner.run(
             SCHEDULER_NAME,
             searchService::getElasticSearchResult,
             hearingCvpLinkScheduledTask

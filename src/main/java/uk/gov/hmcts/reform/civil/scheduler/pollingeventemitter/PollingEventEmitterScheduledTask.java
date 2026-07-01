@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.service.EventEmitterService;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class PollingEventEmitterScheduledTask implements ScheduledTask {
+public class PollingEventEmitterScheduledTask implements ScheduledTask<CaseDetails, Long> {
 
     private final CaseDetailsConverter caseDetailsConverter;
     private final EventEmitterService eventEmitterService;
@@ -23,6 +23,11 @@ public class PollingEventEmitterScheduledTask implements ScheduledTask {
 
     @Value("${polling.emitter.multiple.cases.delay.seconds:30}")
     private long multiCasesExecutionDelayInSeconds;
+
+    @Override
+    public Long getItemId(CaseDetails caseDetails) {
+        return caseDetails.getId();
+    }
 
     @Override
     public void accept(CaseDetails caseDetails) {

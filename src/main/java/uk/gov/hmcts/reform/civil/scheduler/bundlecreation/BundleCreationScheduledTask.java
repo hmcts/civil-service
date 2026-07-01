@@ -20,7 +20,7 @@ import java.util.List;
 
 @Component
 @Slf4j
-public class BundleCreationScheduledTask implements ScheduledTask {
+public class BundleCreationScheduledTask implements ScheduledTask<CaseDetails, Long> {
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -43,6 +43,11 @@ public class BundleCreationScheduledTask implements ScheduledTask {
         this.userConfig = userConfig;
         this.noCacheUserService = noCacheUserService;
         this.defaultBackPressureConfiguration = defaultBackPressureConfiguration;
+    }
+
+    @Override
+    public Long getItemId(CaseDetails caseDetails) {
+        return caseDetails.getId();
     }
 
     @Override

@@ -7,15 +7,19 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.config.TestIdamConfiguration;
-import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledEventTracker;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
-import uk.gov.hmcts.reform.civil.scheduler.mediationfiletransfer.MediationFileTransferResult;
+import uk.gov.hmcts.reform.civil.scheduler.common.TaskResult;
 import uk.gov.hmcts.reform.civil.scheduler.mediationfiletransfer.MediationFileTransferScheduledTask;
 import uk.gov.hmcts.reform.civil.scheduler.mediationfiletransfer.MediationFileTransferScheduler;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.search.MediationSearchService;
 
-import java.util.List;
-
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,31 +40,30 @@ public class MediationFileTransferSchedulerIT {
     private MediationFileTransferScheduler scheduler;
 
     @MockBean
-    private MediationFileTransferScheduledTask scheduledTask;
+    private MediationSearchService searchService;
 
     @MockBean
-    private ScheduledEventTracker eventTracker;
+    private ScheduledTaskRunner<CaseData, Long> scheduledTaskRunner;
+
+    @MockBean
+    private MediationFileTransferScheduledTask task;
 
     @MockBean
     private FeatureToggleService featureToggleService;
 
     @Test
+    @SuppressWarnings("unchecked")
     void shouldExecuteMediationFileTransferScheduler() {
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
-        when(scheduledTask.generateCsvAndTransfer(5)).thenReturn(
-            new MediationFileTransferResult(List.of("1"), List.of("1"), List.of(), false, null)
-        );
-        when(scheduledTask.generateJsonAndTransfer(5)).thenReturn(
-            new MediationFileTransferResult(List.of(), List.of(), List.of(), false, null)
-        );
+        TaskResult<CaseData> csvResult = mock(TaskResult.class);
+        TaskResult<CaseData> jsonResult = mock(TaskResult.class);
+        when(searchService.getInMediationCsv()).thenReturn(csvResult);
+        when(searchService.getInMediationJson()).thenReturn(jsonResult);
 
         scheduler.runScheduledTask();
 
-        ScheduledTaskEventConfiguration eventConfiguration = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
-        verify(scheduledTask).generateCsvAndTransfer(5);
-        verify(scheduledTask).generateJsonAndTransfer(5);
-        verify(eventTracker).jobStartedEvent(eventConfiguration, 1);
-        verify(eventTracker).caseProcessedEvent(eventConfiguration, "1");
-        verify(eventTracker).jobCompletedEvent(eventConfiguration, 1, 1, 0);
+        verify(scheduledTaskRunner, atLeastOnce()).run(any(ScheduledTaskEventConfiguration.class), any(TaskResult.class), eq(task));
+        verify(searchService).getInMediationCsv();
+        verify(searchService).getInMediationJson();
     }
 }
