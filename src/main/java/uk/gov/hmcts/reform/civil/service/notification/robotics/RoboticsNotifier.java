@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
@@ -31,40 +30,37 @@ public class RoboticsNotifier {
     private final JsonSchemaValidationService jsonSchemaValidationService;
     private final RoboticsDataMapperForUnspec roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
-    private final FeatureToggleService toggleService;
 
     public void notifyRobotics(CaseData caseData, String authToken) {
-        if (toggleService.isRPAEmailEnabled()) {
-            RoboticsCaseData roboticsCaseData = null;
-            RoboticsCaseDataSpec roboticsCaseDataSpec = null;
-            Set<ValidationMessage> errors = null;
+        RoboticsCaseData roboticsCaseData = null;
+        RoboticsCaseDataSpec roboticsCaseDataSpec = null;
+        Set<ValidationMessage> errors = null;
 
-            String legacyCaseReference = caseData.getLegacyCaseReference();
-            boolean multiPartyScenario = isMultiPartyScenario(caseData);
-            try {
-                log.info(String.format("Start notify robotics for %s", legacyCaseReference));
-                if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-                    roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData, authToken);
-                    errors = jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString());
-                } else {
-                    log.info(String.format("Unspec robotics Data Mapping for %s", legacyCaseReference));
-                    roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(
-                        caseData,
-                        authToken
-                    );
-                    errors = jsonSchemaValidationService.validate(roboticsCaseData.toJsonString());
-                }
-
-                if (errors == null || errors.isEmpty()) {
-                    log.info(String.format("Valid RPA Json payload for %s", legacyCaseReference));
-                    sendNotifications(caseData, multiPartyScenario, authToken);
-                } else {
-                    throw new JsonSchemaValidationException(
-                        format("Invalid RPA Json payload for %s", legacyCaseReference), errors);
-                }
-            } catch (JsonProcessingException e) {
-                throw new RoboticsDataException(e.getMessage(), e);
+        String legacyCaseReference = caseData.getLegacyCaseReference();
+        boolean multiPartyScenario = isMultiPartyScenario(caseData);
+        try {
+            log.info(String.format("Start notify robotics for %s", legacyCaseReference));
+            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+                roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData, authToken);
+                errors = jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString());
+            } else {
+                log.info(String.format("Unspec robotics Data Mapping for %s", legacyCaseReference));
+                roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(
+                    caseData,
+                    authToken
+                );
+                errors = jsonSchemaValidationService.validate(roboticsCaseData.toJsonString());
             }
+
+            if (errors == null || errors.isEmpty()) {
+                log.info(String.format("Valid RPA Json payload for %s", legacyCaseReference));
+                sendNotifications(caseData, multiPartyScenario, authToken);
+            } else {
+                throw new JsonSchemaValidationException(
+                    format("Invalid RPA Json payload for %s", legacyCaseReference), errors);
+            }
+        } catch (JsonProcessingException e) {
+            throw new RoboticsDataException(e.getMessage(), e);
         }
     }
 

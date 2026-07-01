@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.notification.robotics;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
@@ -15,14 +14,11 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 @Component
 public class DefaultJudgmentRoboticsNotifier extends RoboticsNotifier {
 
-    protected final FeatureToggleService toggleService;
-
     public DefaultJudgmentRoboticsNotifier(RoboticsNotificationService roboticsNotificationService,
-                                           JsonSchemaValidationService jsonSchemaValidationService, FeatureToggleService toggleService,
+                                           JsonSchemaValidationService jsonSchemaValidationService,
                                            RoboticsDataMapperForUnspec roboticsDataMapper,
                                            RoboticsDataMapperForSpec roboticsDataMapperForSpec) {
-        super(roboticsNotificationService, jsonSchemaValidationService, roboticsDataMapper, roboticsDataMapperForSpec, toggleService);
-        this.toggleService = toggleService;
+        super(roboticsNotificationService, jsonSchemaValidationService, roboticsDataMapper, roboticsDataMapperForSpec);
     }
 
     @Override
