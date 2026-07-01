@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.scheduler.common.DefaultBackPressureConfigurati
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskBackPressureConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,6 +46,6 @@ class DefendantResponseDeadlineTaskTest {
 
     @Test
     void shouldAcceptCaseDetails() {
-        task.accept(caseDetails);
+        assertThatCode(() -> task.accept(caseDetails)).doesNotThrowAnyException();
     }
 }
