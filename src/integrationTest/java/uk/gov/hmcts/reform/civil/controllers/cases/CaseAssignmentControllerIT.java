@@ -17,11 +17,14 @@ import uk.gov.hmcts.reform.civil.service.search.exceptions.SearchServiceCaseNotF
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 
-public class CaseAssignmentControllerTest extends BaseIntegrationTest {
+public class CaseAssignmentControllerIT extends BaseIntegrationTest {
 
     private static final String CASES_URL = "/assignment";
     private static final String VALIDATE_PIN_URL = CASES_URL + "/reference/{caseReference}";
@@ -102,6 +105,21 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
         when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
         doPost("authorization", "12345", ASSIGN_CASE, "123", "DEFENDANT")
             .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    void givenFinalisedClaim_whenAssignClaim_forDefendant_shouldReturnConflict() {
+        CaseDetails caseDetails = CaseDetails.builder().id(1L).state(CASE_SETTLED.name()).build();
+        when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
+
+        doPost("authorization", "12345", ASSIGN_CASE, "123", "DEFENDANT")
+            .andExpect(status().isConflict())
+            .andExpect(content().string("CLAIM_ALREADY_FINALISED"));
+
+        verify(assignCaseService, never()).assignCase(anyString(), anyString(), any());
+        verify(lipDefendantCaseAssignmentService, never())
+            .addLipDefendantToCaseDefendantUserDetails(anyString(), anyString(), any(), any());
     }
 
     @Test

@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
@@ -21,11 +22,14 @@ import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 
+import java.util.Set;
+
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_HEARING_FEE_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 
 @Slf4j
 @Service
@@ -35,6 +39,11 @@ public class PaymentStatusRetryService {
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper objectMapper;
+    private static final Set<CaseEvent> CLAIM_ISSUE_AFTER_PAYMENT_EVENTS = Set.of(
+        CREATE_CLAIM_AFTER_PAYMENT,
+        CREATE_CLAIM_SPEC_AFTER_PAYMENT,
+        CITIZEN_CLAIM_ISSUE_PAYMENT
+    );
 
     @Retryable(retryFor = CaseDataUpdateException.class, backoff = @Backoff(delay = 500))
     public void updatePaymentStatus(FeeType feeType, String caseReference, CaseData caseData) {
@@ -132,7 +141,20 @@ public class PaymentStatusRetryService {
 
     private void submitUpdatePaymentEvent(CaseData caseData, Long caseId, FeeType feeType) {
         CaseEvent event = determineEventFromFeeType(caseData, feeType);
+        if (isClaimIssueAlreadyComplete(caseData.getCcdState(), event)) {
+            log.info(
+                "Skipping {} for case {} because claim issue has already completed in state {}",
+                event,
+                caseId,
+                caseData.getCcdState()
+            );
+            return;
+        }
         submitEvent(caseData, caseId, event);
+    }
+
+    private boolean isClaimIssueAlreadyComplete(CaseState caseState, CaseEvent event) {
+        return CASE_ISSUED == caseState && CLAIM_ISSUE_AFTER_PAYMENT_EVENTS.contains(event);
     }
 
     CaseEvent determineEventFromFeeType(CaseData caseData, FeeType feeType) {

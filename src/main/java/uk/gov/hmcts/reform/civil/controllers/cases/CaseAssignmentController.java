@@ -27,8 +27,12 @@ import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecServi
 import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CMC_CASE_TYPE;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 
 @Tag(name = "Case Assignment Controller")
 @Slf4j
@@ -46,6 +50,11 @@ public class CaseAssignmentController {
     private final LipDefendantCaseAssignmentService lipDefendantCaseAssignmentService;
     private final CoreCaseDataService coreCaseDataService;
     private static final int OCMC_PIN_LENGTH = 8;
+    private static final Set<String> FINALISED_CASE_STATES = Set.of(
+        CASE_SETTLED.name(),
+        CASE_STAYED.name(),
+        CASE_DISMISSED.name()
+    );
 
     @PostMapping(path = {
         "/reference/{caseReference}"
@@ -120,15 +129,23 @@ public class CaseAssignmentController {
 
     @PostMapping(path = "/case/{caseId}/{caseRole}")
     @Operation(summary = "Assigns case to defendant")
-    public void assignCaseToDefendant(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
-                                      @PathVariable("caseId") String caseId,
-                                      @PathVariable("caseRole") Optional<CaseRole> caseRole,
-                                      @RequestBody Optional<PinDto> pinDto) {
+    public ResponseEntity<String> assignCaseToDefendant(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
+                                                        @PathVariable("caseId") String caseId,
+                                                        @PathVariable("caseRole") Optional<CaseRole> caseRole,
+                                                        @RequestBody Optional<PinDto> pinDto) {
         log.info("assigning case with id: {}", caseId);
         Optional<CaseDetails> caseDetails = Optional.empty();
         if (caseRole.isPresent() && CaseRole.DEFENDANT == caseRole.get()) {
             caseDetails = Optional.of(coreCaseDataService.getCase(Long.valueOf(caseId)));
             defendantPinToPostLRspecService.validatePin(caseDetails.get(), pinDto.get().getPin());
+            if (isFinalised(caseDetails.get())) {
+                log.info(
+                    "Skipping defendant assignment for case {} because it is in finalised state {}",
+                    caseId,
+                    caseDetails.get().getState()
+                );
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("CLAIM_ALREADY_FINALISED");
+            }
         }
         assignCaseService.assignCase(authorisation, caseId, caseRole);
         lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(
@@ -137,5 +154,12 @@ public class CaseAssignmentController {
             caseRole,
             caseDetails
         );
+        return ResponseEntity.ok().build();
+    }
+
+    private boolean isFinalised(CaseDetails caseDetails) {
+        return Optional.ofNullable(caseDetails.getState())
+            .map(FINALISED_CASE_STATES::contains)
+            .orElse(false);
     }
 }
