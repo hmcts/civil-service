@@ -21,6 +21,7 @@ import uk.gov.hmcts.test.helper.CoreCaseDataApiMockHelper;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -58,6 +59,8 @@ public class HearingCvpLinkSchedulerIT {
         coreCaseDataApiMockHelper.setupIdamClient();
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         when(hearingCvpLinkScheduledTask.maxCasesPerRun()).thenReturn(Long.MAX_VALUE);
+        when(hearingCvpLinkScheduledTask.getItemId(any(CaseDetails.class))).thenAnswer(invocation ->
+            invocation.<CaseDetails>getArgument(0).getId());
     }
 
     @Test

@@ -68,6 +68,7 @@ public class AutomatedHearingNoticeSchedulerIT {
             eq(ACCESS_TOKEN), eq(UNSPEC_SERVICE_ID), any(LocalDateTime.class), isNull()
         )).thenReturn(new UnNotifiedHearingResponse(List.of(), 0L));
         when(automatedHearingNoticeScheduledTask.maxCasesPerRun()).thenReturn(Long.MAX_VALUE);
+        when(automatedHearingNoticeScheduledTask.getItemId(HEARING_ID)).thenReturn(HEARING_ID);
 
         scheduler.runScheduledTask();
 

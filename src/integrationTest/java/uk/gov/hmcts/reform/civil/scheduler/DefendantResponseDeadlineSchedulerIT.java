@@ -47,6 +47,7 @@ public class DefendantResponseDeadlineSchedulerIT {
     @Test
     void shouldExecuteDefendantResponseDeadlineScheduler() {
         // Given
+        when(featureToggleService.isSpringSchedulerEnabled("DefendantResponseDeadline")).thenReturn(true);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         SearchResult searchResult = SearchResult.builder()
