@@ -144,7 +144,7 @@ class CaseNameUtilsTest {
             String actual = buildCaseName(caseData);
 
             assertThat(actual).isEqualTo(
-                "John Rambo v Sole Trader represented by Litigation Friend (litigation friend)");
+                "John Rambo v Sole Trader T/A Sole Trader co represented by Litigation Friend (litigation friend)");
         }
 
         @Test

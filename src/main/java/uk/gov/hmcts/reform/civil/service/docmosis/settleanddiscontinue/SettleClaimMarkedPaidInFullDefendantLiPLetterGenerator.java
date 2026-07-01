@@ -71,7 +71,7 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator {
         byte[] letterContent = documentDownloadService.downloadDocument(settleClaimDoc, auth, caseId.toString(), errorMessage);
 
         List<String> recipients = getRecipientsList(caseData);
-        bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
+        bulkPrintService.printLetter(letterContent, String.valueOf(caseData.getCcdCaseReference()),
                                      caseData.getLegacyCaseReference(), SETTLE_CLAIM_PAID_IN_FULL_LETTER_TITLE,
                                      recipients, bulkPrintFileNames);
     }
@@ -94,6 +94,7 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator {
 
     public SettleClaimMarkedPaidInFullDefendantLiPLetter getTemplateData(CaseData caseData) {
         return new SettleClaimMarkedPaidInFullDefendantLiPLetter()
+            .setCcdCaseReference(String.valueOf(caseData.getCcdCaseReference()))
             .setClaimReferenceNumber(caseData.getLegacyCaseReference())
             .setLetterIssueDate(LocalDate.now())
             .setLetterIssueDateWelsh(formatDateInWelsh(LocalDate.now(), false))

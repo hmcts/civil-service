@@ -1089,8 +1089,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLive() {
-            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+        void shouldChangeCaseState_WhenRespondentRepaymentPlanAndJbaApplies() {
             Party party = new Party();
             party.setType(COMPANY);
             party.setCompanyName("Applicant1");
@@ -1118,8 +1117,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLiveAndLrVLr() {
-            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+        void shouldChangeCaseState_WhenRespondentRepaymentPlanAndJbaAppliesAndLrVLr() {
             CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
             ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
             ccjPaymentDetails.setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0));
@@ -1161,8 +1159,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLiveAndLrVLrAdmissionBulk() {
-            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+        void shouldChangeCaseState_WhenRespondentRepaymentPlanAndJbaAppliesAndLrVLrAdmissionBulk() {
             CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
             ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
             ccjPaymentDetails.setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0));
@@ -1204,8 +1201,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldChangeCaseState_WhenRespondentPaymentSetByDateAndFlagV2WithJudgementLive() {
-            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+        void shouldChangeCaseState_WhenRespondentPaymentSetByDateAndJbaApplies() {
             CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
             ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
             ccjPaymentDetails.setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0));
@@ -1250,8 +1246,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldChangeCaseState_WhenRespondentPaymentImmediatelyAndFlagV2WithJudgementLive() {
-            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+        void shouldChangeCaseState_WhenRespondentPaymentImmediatelyAndJbaApplies() {
             Party party = new Party();
             party.setType(COMPANY);
             party.setCompanyName("Applicant1");
@@ -1752,45 +1747,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .caseManagementLocation(caseLocation).build();
             caseData.setDefenceRouteRequired(DISPUTES_THE_CLAIM);
 
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             var params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getState()).isEqualTo(CASE_STAYED.toString());
-
-        }
-
-        @Test
-        void shouldNotMoveCaseTo_case_stayed_State_LRvLip_One_V_One() {
-            Party party2 = new Party();
-            party2.setPartyName("name");
-            party2.setType(INDIVIDUAL);
-            Applicant1DQ applicant1DQ = new Applicant1DQ();
-            applicant1DQ.setApplicant1RespondToClaimExperts(new ExpertDetails());
-            Party party1 = new Party();
-            party1.setPrimaryAddress(new Address());
-            party1.setType(Party.Type.INDIVIDUAL);
-            CaseLocationCivil caseLocation = new CaseLocationCivil();
-            caseLocation.setBaseLocation("11111");
-            caseLocation.setRegion("2");
-            CaseData caseData = CaseDataBuilder.builder()
-                .applicant1(party2)
-                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .respondent1Represented(NO)
-                .applicant1Represented(YES)
-                .responseClaimTrack(SMALL_CLAIM.name())
-                .applicant1ProceedWithClaim(NO)
-                .applicant1DQ(applicant1DQ)
-                .respondent1(party1)
-                .caseManagementLocation(caseLocation).build();
-            caseData.setDefenceRouteRequired(DISPUTES_THE_CLAIM);
-
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-            var params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getState()).isNotEqualTo(CASE_STAYED.toString());
 
         }
 
@@ -2342,7 +2302,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void summary_when_all_finals_order_issued() {
-            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
             CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
             ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
             ccjPaymentDetails.setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0));
@@ -3259,7 +3218,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnCorrectSummaryForAllFinalsOrderIssued() {
             final String expected = "The judgment request will be processed and a County"
                 + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Fee fee = new Fee();
             fee.setVersion("1");

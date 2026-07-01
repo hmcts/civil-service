@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
@@ -11,14 +10,26 @@ import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.search.TrialReadyCheckSearchService;
 
 import java.util.Set;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class TrialReadyCheckHandler extends BaseExternalTaskHandler {
 
     private final TrialReadyCheckSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    public TrialReadyCheckHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        TrialReadyCheckSearchService caseSearchService,
+        ApplicationEventPublisher applicationEventPublisher
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.caseSearchService = caseSearchService;
+        this.applicationEventPublisher = applicationEventPublisher;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -28,10 +39,12 @@ public class TrialReadyCheckHandler extends BaseExternalTaskHandler {
         cases.forEach(caseDetails -> {
             try {
                 applicationEventPublisher.publishEvent(new TrialReadyCheckEvent(caseDetails.getId()));
+                throttle(cases.size());
             } catch (Exception e) {
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
             }
         });
         return new ExternalTaskData();
     }
+
 }

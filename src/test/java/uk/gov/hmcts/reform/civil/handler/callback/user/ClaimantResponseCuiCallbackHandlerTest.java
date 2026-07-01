@@ -133,7 +133,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         CaseFlagsInitialiser caseFlagsInitialiser = new CaseFlagsInitialiser(organisationService);
-        JudgementService judgementService = new JudgementService(featureToggleService, interestCalculator);
+        JudgementService judgementService = new JudgementService(interestCalculator);
         CourtLocationUtils courtLocationUtils = new CourtLocationUtils();
         UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService = new UpdateCaseManagementDetailsService(locationHelper,
                                                                                                                                locationRefDataService,
@@ -365,7 +365,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateCCJRequestPaymentDetails() {
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails()
                 .setCcjPaymentPaidSomeOption(YES)
                 .setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
@@ -558,8 +557,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldAddActiveJudgmentWhenClaimantAcceptedRepaymentPlanAndJudgmentOnlineLiveEnabled() {
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        void shouldAddActiveJudgmentWhenClaimantAcceptedRepaymentPlan() {
             JudgmentDetails activeJudgment = new JudgmentDetails()
                 .setTotalAmount("10100.00")
                 .setClaimFeeAmount("100.00")

@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LipPredicate;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.ga.service.flowstate.GaFlowPredicate.caseContainsLiPGa;
@@ -17,10 +18,16 @@ import static uk.gov.hmcts.reform.civil.utils.JudgeReallocatedClaimTrack.judgeRe
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class FeatureToggleService {
 
+    private final List<String> activeSchedulers;
     private final FeatureToggleApi featureToggleApi;
+
+    public FeatureToggleService(FeatureToggleApi featureToggleApi,
+                                @Value("${scheduler.active-schedulers}") List<String> activeSchedulers) {
+        this.featureToggleApi = featureToggleApi;
+        this.activeSchedulers = activeSchedulers;
+    }
 
     public boolean isFeatureEnabled(String feature) {
         return this.featureToggleApi.isFeatureEnabled(feature);
@@ -34,10 +41,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("enable-rpa-emails");
     }
 
-    public boolean isLipVLipEnabled() {
-        return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
-    }
-
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
         return
             // because default value is true
@@ -48,10 +51,6 @@ public class FeatureToggleService {
                     locationEpimms,
                     true
                 );
-    }
-
-    public boolean isJudgmentOnlineLive() {
-        return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
     }
 
     public boolean isCjesServiceAvailable() {
@@ -92,8 +91,7 @@ public class FeatureToggleService {
         } else {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
-        return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled")
-            && featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
+        return featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
     }
 
     public boolean isAmendBundleEnabled() {
@@ -111,8 +109,7 @@ public class FeatureToggleService {
     }
 
     public boolean isJOLiveFeedActive() {
-        return isJudgmentOnlineLive()
-            && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
+        return featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
     }
 
     public boolean isDefendantNoCOnlineForCase(CaseData caseData)  {
@@ -124,10 +121,6 @@ public class FeatureToggleService {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
         return featureToggleApi.isFeatureEnabledForDate("is-defendant-noc-online-for-case", epoch, false);
-    }
-
-    public boolean isQueryManagementLRsEnabled() {
-        return featureToggleApi.isFeatureEnabled("query-management");
     }
 
     // if deleting this, also handle isQMPdfGeneratorEnabled() below
@@ -183,5 +176,10 @@ public class FeatureToggleService {
 
     public boolean isJudgmentBufferEnabled() {
         return featureToggleApi.isFeatureEnabled("judgment-buffer");
+    }
+
+    public boolean isSpringSchedulerEnabled(String schedulerName) {
+        return featureToggleApi.isFeatureEnabled("spring-scheduler-enabled")
+            && activeSchedulers.contains(schedulerName);
     }
 }

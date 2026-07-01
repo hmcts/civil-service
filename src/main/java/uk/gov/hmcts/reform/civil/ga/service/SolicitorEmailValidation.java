@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -96,15 +97,19 @@ public class SolicitorEmailValidation {
         if (!gaForLipService.isGaForLip(gaCaseData)) {
             caseDataBuilder.generalAppApplnSolicitor(checkIfOrgIDMatch(gaCaseData.getGeneralAppApplnSolicitor(),
                                                                    civilCaseData, gaCaseData));
-
             // GA Respondent solicitor
             List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors = newArrayList();
-            gaCaseData.getGeneralAppRespondentSolicitors().forEach(rs -> generalAppRespondentSolicitors
-                .add(element(checkIfOrgIDMatch(rs.getValue(), civilCaseData, gaCaseData))));
+            Optional.ofNullable(gaCaseData.getGeneralAppRespondentSolicitors())
+                .ifPresent(rsList -> rsList.forEach(
+                    rs -> generalAppRespondentSolicitors.add(
+                        element(checkIfOrgIDMatch(rs.getValue(), civilCaseData, gaCaseData))
+                    )
+                ));
 
-            caseDataBuilder.generalAppRespondentSolicitors(generalAppRespondentSolicitors.isEmpty()
-                                                               ? gaCaseData.getGeneralAppRespondentSolicitors()
-                                                               : generalAppRespondentSolicitors);
+            caseDataBuilder.generalAppRespondentSolicitors(
+                generalAppRespondentSolicitors.isEmpty()
+                    ? gaCaseData.getGeneralAppRespondentSolicitors()
+                    : generalAppRespondentSolicitors);
         } else {
             validateLipEmail(civilCaseData, gaCaseData, caseDataBuilder);
         }

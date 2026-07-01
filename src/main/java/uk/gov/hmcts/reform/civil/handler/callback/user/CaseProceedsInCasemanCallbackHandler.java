@@ -11,11 +11,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.groups.CasemanTransferDateGroup;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -27,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDGMENT_REQUESTED;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +38,6 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
     private final Validator validator;
     private final Time time;
     private final ObjectMapper mapper;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -67,24 +67,39 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
 
     private CallbackResponse addTakenOfflineDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        CaseState previousCaseState = getPreviousCaseSate(callbackParams);
+
         caseData.setBusinessProcess(BusinessProcess.ready(CASE_PROCEEDS_IN_CASEMAN));
         caseData.setTakenOfflineByStaffDate(time.now());
         caseData.setCoSCApplicationStatus(updateCoScApplicationStatus(callbackParams));
-        caseData.setPreviousCCDState(getPreviousCaseSate(callbackParams));
+        caseData.setPreviousCCDState(previousCaseState);
+        clearPendingJudgmentRequestIfRequired(caseData, previousCaseState);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))
             .build();
     }
 
+    private void clearPendingJudgmentRequestIfRequired(CaseData caseData, CaseState previousCaseState) {
+        if (JUDGMENT_REQUESTED.equals(previousCaseState)) {
+            JudgmentsOnlineHelper.clearJOCaseData(caseData);
+        }
+    }
+
     private CaseState getPreviousCaseSate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (featureToggleService.isLipVLipEnabled()) {
-            return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne() || caseData.isLipvLROneVOne())
-                    ? CaseState.valueOf(callbackParams.getRequest().getCaseDetailsBefore().getState())
-                    : null;
-        }
-        return null;
+        String previousState = getPreviousCaseDetailsState(callbackParams);
+        return previousState != null
+            && (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne() || caseData.isLipvLROneVOne())
+                ? CaseState.valueOf(previousState)
+                : null;
+    }
+
+    private String getPreviousCaseDetailsState(CallbackParams callbackParams) {
+        return callbackParams.getRequest() != null
+            && callbackParams.getRequest().getCaseDetailsBefore() != null
+            ? callbackParams.getRequest().getCaseDetailsBefore().getState()
+            : null;
     }
 
     private CoscApplicationStatus updateCoScApplicationStatus(CallbackParams callbackParams) {

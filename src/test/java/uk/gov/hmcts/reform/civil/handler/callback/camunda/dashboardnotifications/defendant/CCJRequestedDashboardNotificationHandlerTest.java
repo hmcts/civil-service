@@ -73,7 +73,6 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         params.put("ccdCaseReference", "123");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
@@ -98,7 +97,6 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         params.put("ccdCaseReference", "12376868");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
         claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
@@ -133,7 +131,6 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         params.put("ccdCaseReference", "123");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
         claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
@@ -166,7 +163,6 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         params.put("ccdCaseReference", "123");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
         claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);

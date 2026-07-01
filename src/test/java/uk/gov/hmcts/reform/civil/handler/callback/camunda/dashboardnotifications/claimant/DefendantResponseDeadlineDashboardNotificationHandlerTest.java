@@ -24,7 +24,6 @@ import java.util.HashMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_DEADLINE_CLAIMANT;
 
@@ -69,7 +68,6 @@ class DefendantResponseDeadlineDashboardNotificationHandlerTest extends BaseCall
 
         @BeforeEach
         void setup() {
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @Test

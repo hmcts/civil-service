@@ -31,10 +31,12 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
+import uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StateFlowDTO;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -79,6 +81,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
+import static uk.gov.hmcts.reform.civil.utils.MarkPaidInFullUtil.checkMarkPaidInFull;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(MockitoExtension.class)
 class CaseEventTaskHandlerTest {
@@ -101,8 +106,15 @@ class CaseEventTaskHandlerTest {
     private RoboticsEventTextFormatter textFormatter = new RoboticsEventTextFormatter();
     @Captor
     ArgumentCaptor<CaseDataContent> caseDataContentArgumentCaptor;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
+
     @InjectMocks
     private CaseEventTaskHandler caseEventTaskHandler;
+    private static final String IS_JUDGMENT_MARKED_PAID_IN_FULL = "isJudgmentMarkedPaidInFull";
 
     @Nested
     class NotifyRespondent {
@@ -131,6 +143,74 @@ class CaseEventTaskHandlerTest {
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, "MAIN.DRAFT");
             variables.putValue(FLOW_FLAGS, Map.of());
+            variables.putValue(IS_JUDGMENT_MARKED_PAID_IN_FULL, checkMarkPaidInFull(caseData));
+
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
+
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_EVENT))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
+
+            when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+
+            when(stateFlowEngine.getStateFlow(any(CaseData.class)))
+                .thenReturn(new StateFlowDTO().setState(State.from("MAIN.DRAFT")).setFlags(Map.of()));
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_EVENT);
+            verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
+            verify(externalTaskService).complete(mockTask, variables);
+        }
+
+        @Test
+        void shouldTriggerCCDEvent_whenHandlerIsExecutedV1() {
+            CaseData caseData1 = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(new BusinessProcess()
+                                     .setStatus(BusinessProcessStatus.READY)
+                                     .setProcessInstanceId("processInstanceId"))
+                .build();
+            CaseData.CaseDataBuilder<?, ?> caseData2 = caseData1.toBuilder();
+            caseData2.activeJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.now()));
+            caseData2.coSCApplicationStatus(CoscApplicationStatus.ACTIVE);
+            CaseData caseData  = caseData2.build();
+
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(FLOW_STATE, "MAIN.DRAFT");
+            variables.putValue(FLOW_FLAGS, Map.of());
+            variables.putValue(IS_JUDGMENT_MARKED_PAID_IN_FULL, checkMarkPaidInFull(caseData));
+
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
+
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_EVENT))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
+
+            when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+
+            when(stateFlowEngine.getStateFlow(any(CaseData.class)))
+                .thenReturn(new StateFlowDTO().setState(State.from("MAIN.DRAFT")).setFlags(Map.of()));
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_EVENT);
+            verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
+            verify(externalTaskService).complete(mockTask, variables);
+        }
+
+        @Test
+        void shouldTriggerCCDEvent_whenHandlerIsExecutedV3() {
+            CaseData caseData1 = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(new BusinessProcess()
+                                     .setStatus(BusinessProcessStatus.READY)
+                                     .setProcessInstanceId("processInstanceId"))
+                .build();
+            CaseData.CaseDataBuilder<?, ?> caseData2 = caseData1.toBuilder();
+            caseData2.activeJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.now()));
+            CaseData caseData  = caseData2.build();
+
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(FLOW_STATE, "MAIN.DRAFT");
+            variables.putValue(FLOW_FLAGS, Map.of());
+            variables.putValue(IS_JUDGMENT_MARKED_PAID_IN_FULL, checkMarkPaidInFull(caseData));
 
             CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
@@ -251,18 +331,17 @@ class CaseEventTaskHandlerTest {
                 eq(errorMessage),
                 anyString(),
                 eq(2),
-                eq(300000L)
+                anyLong()
             );
         }
 
         @Test
-        void shouldCallHandleFailureMethod_whenFeignExceptionFromBusinessLogic() {
+        void shouldCallHandleFailureMethod_whenFeignExceptionFromUnprocessableContent() {
             String errorMessage = "there was an error";
             int status = 422;
             Request.HttpMethod requestType = Request.HttpMethod.POST;
             String exampleUrl = "example url";
 
-            when(mockTask.getRetries()).thenReturn(null);
             when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_EVENT))
                 .thenAnswer(invocation -> {
                     throw FeignException.errorStatus(errorMessage, Response.builder()
@@ -286,8 +365,8 @@ class CaseEventTaskHandlerTest {
                 eq(mockTask),
                 eq(String.format("[%s] during [%s] to [%s] [%s]: []", status, requestType, exampleUrl, errorMessage)),
                 anyString(),
-                eq(2),
-                eq(300000L)
+                eq(0),
+                anyLong()
             );
         }
     }
@@ -320,7 +399,10 @@ class CaseEventTaskHandlerTest {
                 FLOW_FLAGS,
                 flags
             );
-
+            variables.putValue(
+                IS_JUDGMENT_MARKED_PAID_IN_FULL,
+                false
+            );
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
             when(mockTask.getTopicName()).thenReturn("test");
             when(mockTask.getActivityId()).thenReturn("activityId");
@@ -343,7 +425,7 @@ class CaseEventTaskHandlerTest {
 
             verify(coreCaseDataService).startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM);
             verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
-            verify(externalTaskService).complete(mockTask, Map.of(
+            verify(externalTaskService).complete(mockTask, Map.of(IS_JUDGMENT_MARKED_PAID_IN_FULL, false,
                 FLOW_FLAGS, flags,
                 FLOW_STATE, state.fullName()
             ));
@@ -378,6 +460,10 @@ class CaseEventTaskHandlerTest {
                 FLOW_FLAGS,
                 getFlowFlags(TAKEN_OFFLINE_BY_STAFF)
             );
+            variables.putValue(
+                IS_JUDGMENT_MARKED_PAID_IN_FULL,
+                false
+            );
 
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(TAKEN_OFFLINE_BY_STAFF.fullName());
             when(mockTask.getTopicName()).thenReturn("test");
@@ -403,7 +489,7 @@ class CaseEventTaskHandlerTest {
 
             verify(coreCaseDataService).startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM);
             verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
-            verify(externalTaskService).complete(mockTask, Map.of(
+            verify(externalTaskService).complete(mockTask, Map.of(IS_JUDGMENT_MARKED_PAID_IN_FULL, false,
                 FLOW_FLAGS, getFlowFlags(TAKEN_OFFLINE_BY_STAFF),
                 FLOW_STATE, TAKEN_OFFLINE_BY_STAFF.fullName()
             ));
@@ -530,7 +616,7 @@ class CaseEventTaskHandlerTest {
 
             CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
             Event event = caseDataContent.getEvent();
-            assertThat(event.getDescription()).isEqualTo("Unrepresented defendant: Mr. Sole Trader");
+            assertThat(event.getDescription()).isEqualTo("Unrepresented defendant: Mr. Sole Trader T/A Sole Trader co");
         }
 
         @Test
@@ -573,7 +659,7 @@ class CaseEventTaskHandlerTest {
 
             CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
             Event event = caseDataContent.getEvent();
-            assertThat(event.getDescription()).isEqualTo("Unregistered defendant solicitor firm: Mr. Sole Trader");
+            assertThat(event.getDescription()).isEqualTo("Unregistered defendant solicitor firm: Mr. Sole Trader T/A Sole Trader co");
         }
 
         @Test
@@ -619,7 +705,7 @@ class CaseEventTaskHandlerTest {
             assertThat(event.getDescription())
                 .isEqualTo("Unrepresented defendant and unregistered defendant solicitor firm. "
                                + "Unrepresented defendant: Mr. John Rambo. "
-                               + "Unregistered defendant solicitor firm: Mr. Sole Trader.");
+                               + "Unregistered defendant solicitor firm: Mr. Sole Trader T/A Sole Trader co.");
         }
 
         @Nested
@@ -703,7 +789,7 @@ class CaseEventTaskHandlerTest {
                     Event event = caseDataContent.getEvent();
                     assertThat(event.getSummary()).isEqualTo("RPA Reason: Claimant(s) proceeds.");
                     assertThat(event.getDescription())
-                        .isEqualTo("Claimant has provided intention: proceed against defendant: Mr. Sole Trader "
+                        .isEqualTo("Claimant has provided intention: proceed against defendant: Mr. Sole Trader T/A Sole Trader co "
                                        + "and proceed against defendant: Mr. John Rambo");
                 }
 
@@ -734,7 +820,7 @@ class CaseEventTaskHandlerTest {
                     Event event = caseDataContent.getEvent();
                     assertThat(event.getSummary()).isEqualTo("RPA Reason: Claimant(s) proceeds.");
                     assertThat(event.getDescription())
-                        .isEqualTo("Claimant has provided intention: proceed against defendant: Mr. Sole Trader "
+                        .isEqualTo("Claimant has provided intention: proceed against defendant: Mr. Sole Trader T/A Sole Trader co "
                                        + "and not proceed against defendant: Mr. John Rambo");
                 }
 
@@ -765,7 +851,7 @@ class CaseEventTaskHandlerTest {
                     Event event = caseDataContent.getEvent();
                     assertThat(event.getSummary()).isEqualTo("RPA Reason: Claimant(s) proceeds.");
                     assertThat(event.getDescription())
-                        .isEqualTo("Claimant has provided intention: not proceed against defendant: Mr. Sole Trader "
+                        .isEqualTo("Claimant has provided intention: not proceed against defendant: Mr. Sole Trader T/A Sole Trader co "
                                        + "and proceed against defendant: Mr. John Rambo");
                 }
             }
@@ -877,7 +963,6 @@ class CaseEventTaskHandlerTest {
                              Map.entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                              Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                              Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                             Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                              Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                              Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                              Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
@@ -889,7 +974,6 @@ class CaseEventTaskHandlerTest {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
@@ -903,7 +987,6 @@ class CaseEventTaskHandlerTest {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), true),
@@ -915,7 +998,6 @@ class CaseEventTaskHandlerTest {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
@@ -928,7 +1010,6 @@ class CaseEventTaskHandlerTest {
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                                      Map.entry(FlowFlag.MINTI_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), true),
@@ -940,7 +1021,6 @@ class CaseEventTaskHandlerTest {
             Map<String, Boolean> expectedFlags = new HashMap<>();
             expectedFlags.put(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false);
             expectedFlags.put(FlowFlag.BULK_CLAIM_ENABLED.name(), false);
-            expectedFlags.put(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false);
             expectedFlags.put(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false);
             expectedFlags.put(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false);
             return expectedFlags;
@@ -1102,4 +1182,11 @@ class CaseEventTaskHandlerTest {
             );
         }
     }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }

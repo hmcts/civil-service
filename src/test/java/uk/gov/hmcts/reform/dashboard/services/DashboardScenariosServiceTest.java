@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.service.TelemetryService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
 import uk.gov.hmcts.reform.dashboard.entities.ScenarioEntity;
@@ -47,6 +48,8 @@ class DashboardScenariosServiceTest {
     private TaskListService taskListService;
     @Mock
     private TaskItemTemplateRepository taskItemTemplateRepository;
+    @Mock
+    private TelemetryService telemetryService;
 
     @BeforeEach
     void setup() {
@@ -55,7 +58,8 @@ class DashboardScenariosServiceTest {
             notificationTemplateCatalog,
             dashboardNotificationService,
             taskListService,
-            taskItemTemplateRepository
+            taskItemTemplateRepository,
+            telemetryService
         );
 
         lenient().when(scenarioRepository.findByName(SCENARIO_ISSUE_CLAIM_START))

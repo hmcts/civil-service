@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.civil.service.docmosis.cosc.CertificateOfDebtGenerator;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +57,9 @@ public class GenerateCoscDocumentHandler extends CallbackHandler {
         CaseData caseDataInfo = callbackParams.getCaseData();
         buildCoscDocument(callbackParams);
         caseDataInfo.setCoSCApplicationStatus(PROCESSED);
-
+        if (caseDataInfo.getJoDefendantMarkedPaidInFullIssueDate() == null) {
+            caseDataInfo.setJoDefendantMarkedPaidInFullIssueDate(LocalDateTime.now());
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataInfo.toMap(objectMapper))
             .build();

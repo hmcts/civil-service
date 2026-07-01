@@ -13,8 +13,10 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -28,8 +30,8 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
@@ -78,9 +80,25 @@ class UpdateHmcPartiesNotifiedHandlerTest {
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
     }
 
+    private static final LocalDateTime HEARING_START = LocalDateTime.of(2024, 10, 20, 9, 30);
+
+    private void stubUserService() {
+        when(userService.getAccessToken(anyString(), anyString())).thenReturn(AUTH_TOKEN);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("test-id").build());
+        when(userConfig.getUserName()).thenReturn("USER");
+        when(userConfig.getPassword()).thenReturn("PASS");
+    }
+
+    private void stubNotPreviouslyNotified() {
+        stubUserService();
+        when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
+            .thenReturn(new PartiesNotifiedResponses());
+    }
+
     private HearingNoticeVariables sampleCamundaVars() {
         return new HearingNoticeVariables()
             .setHearingId("H123")
+            .setHearingStartDateTime(HEARING_START)
             .setHearingLocationEpims("LOC123")
             .setDays(List.of())
             .setRequestVersion(10L)
@@ -93,25 +111,44 @@ class UpdateHmcPartiesNotifiedHandlerTest {
         CallbackParams params = buildParams(caseData);
 
         when(camundaService.getProcessVariables(any())).thenReturn(sampleCamundaVars());
+        stubNotPreviouslyNotified();
 
         handler.handle(params);
 
         verify(hearingsService).updatePartiesNotifiedResponse(
             anyString(), eq("H123"), eq(10), any(), any()
         );
-
-        verifyNoMoreInteractions(userService, userConfig);
     }
 
     @Test
-    void shouldSwallowException_ifAlreadyNotifiedAfterFailure() {
+    void shouldIncludeHearingDateInPayload() {
         CaseData caseData = sampleCaseData();
+        CallbackParams params = buildParams(caseData);
 
         when(camundaService.getProcessVariables(any())).thenReturn(sampleCamundaVars());
+        stubNotPreviouslyNotified();
 
-        doThrow(new RuntimeException("Boom"))
-            .when(hearingsService).updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any());
+        handler.handle(params);
 
+        var expectedPayload = new PartiesNotified()
+            .setServiceData(new PartiesNotifiedServiceData()
+                                .setHearingNoticeGenerated(true)
+                                .setHearingDate(HEARING_START)
+                                .setHearingLocation("LOC123")
+                                .setDays(List.of()));
+
+        verify(hearingsService).updatePartiesNotifiedResponse(
+            anyString(), anyString(), anyInt(), any(), eq(expectedPayload)
+        );
+    }
+
+    @Test
+    void shouldSkipPut_ifAlreadyNotified() {
+        CaseData caseData = sampleCaseData();
+        final CallbackParams params = buildParams(caseData);
+
+        when(camundaService.getProcessVariables(any())).thenReturn(sampleCamundaVars());
+        stubUserService();
         when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
             .thenReturn(new PartiesNotifiedResponses()
                             .setResponses(List.of(
@@ -119,34 +156,64 @@ class UpdateHmcPartiesNotifiedHandlerTest {
                                     .setRequestVersion(10)
                                     .setResponseReceivedDateTime(LocalDateTime.now()))));
 
-        when(userService.getAccessToken(anyString(), anyString())).thenReturn(AUTH_TOKEN);
-        when(userService.getUserInfo(anyString()))
-            .thenReturn(UserInfo.builder().uid("test-id").build());
-        when(userConfig.getUserName()).thenReturn("USER");
-        when(userConfig.getPassword()).thenReturn("PASS");
-
-        CallbackParams params = buildParams(caseData);
         handler.handle(params);
+
+        verify(hearingsService, never()).updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any());
+    }
+
+    @Test
+    void shouldCallUpdate_ifSameVersionHasOnlyOlderNotifiedResponse() {
+        CaseData caseData = sampleCaseData();
+        final CallbackParams params = buildParams(caseData);
+        HearingNoticeVariables variables = sampleCamundaVars();
+
+        when(camundaService.getProcessVariables(any())).thenReturn(variables);
+        stubUserService();
+        when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
+            .thenReturn(new PartiesNotifiedResponses()
+                            .setResponses(List.of(
+                                new PartiesNotifiedResponse()
+                                    .setRequestVersion(10)
+                                    .setResponseReceivedDateTime(variables.getResponseDateTime().minusDays(1)))));
+
+        handler.handle(params);
+
+        verify(hearingsService).updatePartiesNotifiedResponse(
+            anyString(), eq("H123"), eq(10), eq(variables.getResponseDateTime()), any()
+        );
+    }
+
+    @Test
+    void shouldCallUpdate_ifOnlyDifferentVersionIsAlreadyNotified() {
+        CaseData caseData = sampleCaseData();
+        final CallbackParams params = buildParams(caseData);
+        HearingNoticeVariables variables = sampleCamundaVars();
+
+        when(camundaService.getProcessVariables(any())).thenReturn(variables);
+        stubUserService();
+        when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
+            .thenReturn(new PartiesNotifiedResponses()
+                            .setResponses(List.of(
+                                new PartiesNotifiedResponse()
+                                    .setRequestVersion(9)
+                                    .setResponseReceivedDateTime(variables.getResponseDateTime()))));
+
+        handler.handle(params);
+
+        verify(hearingsService).updatePartiesNotifiedResponse(
+            anyString(), eq("H123"), eq(10), eq(variables.getResponseDateTime()), any()
+        );
     }
 
     @Test
     void shouldThrowException_ifNotNotifiedAndUpdateFails() {
         CaseData caseData = sampleCaseData();
-        CallbackParams params = buildParams(caseData);
+        final CallbackParams params = buildParams(caseData);
 
         when(camundaService.getProcessVariables(any())).thenReturn(sampleCamundaVars());
-
+        stubNotPreviouslyNotified();
         doThrow(new RuntimeException("Boom"))
             .when(hearingsService).updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any());
-
-        when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
-            .thenReturn(new PartiesNotifiedResponses());
-
-        when(userService.getAccessToken(anyString(), anyString())).thenReturn(AUTH_TOKEN);
-        when(userService.getUserInfo(anyString()))
-            .thenReturn(UserInfo.builder().uid("test-id").build());
-        when(userConfig.getUserName()).thenReturn("USER");
-        when(userConfig.getPassword()).thenReturn("PASS");
 
         assertThatThrownBy(() -> handler.handle(params))
             .hasMessageContaining("Boom");

@@ -107,6 +107,9 @@ public class HttpClientFeignConfiguration {
         }
 
         private void reportMetrics(String service, long duration, boolean success, Exception e) {
+            if (telemetryClient == null) {
+                return;
+            }
             telemetryClient.trackMetric("httpclient.request.duration_ms", duration);
 
             if (duration >= slowRequestThreshold) {

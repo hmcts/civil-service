@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -87,6 +88,47 @@ public class LIPClaimSettledCallBackHandlerTest extends BaseCallbackHandlerTest 
                 .extracting("businessProcess")
                 .extracting("status")
                 .isEqualTo("READY");
+        }
+
+        @Test
+        void shouldClearJoDataWhenJudgmentBufferEnabledAndJoRequested() {
+            given(featureToggleService.isJudgmentBufferEnabled()).willReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .build();
+            caseData.setIsJoRequested(YesOrNo.YES);
+            caseData.setJoRepaymentSummaryObject("jo-summary");
+            caseData.setJoState(JudgmentState.REQUESTED);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .convertValue(response.getData(), CaseData.class);
+
+            assertThat(updatedCaseData.getPreviousCCDState()).isEqualTo(CaseState.CASE_ISSUED);
+            assertThat(updatedCaseData.getJoRepaymentSummaryObject()).isNull();
+            assertThat(updatedCaseData.getJoState()).isNull();
+        }
+
+        @Test
+        void shouldNotClearJoDataWhenJudgmentBufferEnabledAndJoNotRequested() {
+            given(featureToggleService.isJudgmentBufferEnabled()).willReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .build();
+            caseData.setIsJoRequested(YesOrNo.NO);
+            caseData.setJoRepaymentSummaryObject("jo-summary");
+            caseData.setJoState(JudgmentState.REQUESTED);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .convertValue(response.getData(), CaseData.class);
+
+            assertThat(updatedCaseData.getJoRepaymentSummaryObject()).isEqualTo("jo-summary");
+            assertThat(updatedCaseData.getJoState()).isEqualTo(JudgmentState.REQUESTED);
         }
     }
 

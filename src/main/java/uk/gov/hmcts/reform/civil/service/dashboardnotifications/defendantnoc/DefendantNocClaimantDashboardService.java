@@ -49,8 +49,7 @@ public class DefendantNocClaimantDashboardService extends DashboardScenarioServi
         if (!featureToggleService.isDefendantNoCOnlineForCase(caseData)) {
             return SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario();
         }
-        if (featureToggleService.isJudgmentOnlineLive()
-            && CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getPreviousCCDState())
+        if (CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getPreviousCCDState())
             && nonNull(caseData.getActiveJudgment())) {
             return SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_JBA_CLAIM_MOVES_OFFLINE_CLAIMANT.getScenario();
         }
@@ -59,12 +58,12 @@ public class DefendantNocClaimantDashboardService extends DashboardScenarioServi
 
     @Override
     protected boolean shouldRecordScenario(CaseData caseData) {
-        return featureToggleService.isLipVLipEnabled() && isProceedingOffline(caseData);
+        return isProceedingOffline(caseData);
     }
 
     @Override
     protected Map<String, Boolean> getScenarios(CaseData caseData) {
-        if (!featureToggleService.isLipVLipEnabled() || !isProceedingOffline(caseData)) {
+        if (!isProceedingOffline(caseData)) {
             return Map.of();
         }
 

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
@@ -11,14 +10,26 @@ import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.search.CoscApplicationSearchService;
 
 import java.util.Set;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class CoscApplicationProcessorHandler extends BaseExternalTaskHandler {
 
     private final CoscApplicationSearchService coscApplicationSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    public CoscApplicationProcessorHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        CoscApplicationSearchService coscApplicationSearchService,
+        ApplicationEventPublisher applicationEventPublisher
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.coscApplicationSearchService = coscApplicationSearchService;
+        this.applicationEventPublisher = applicationEventPublisher;
+    }
 
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         Set<CaseDetails> cases = coscApplicationSearchService.getCases();
@@ -34,4 +45,5 @@ public class CoscApplicationProcessorHandler extends BaseExternalTaskHandler {
         });
         return new ExternalTaskData();
     }
+
 }

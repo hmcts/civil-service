@@ -71,7 +71,6 @@ class DefendantNocClaimantDashboardServiceTest {
         caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
         caseData.setHearingFeePaymentDetails(paymentDetails);
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
 
         service.notifyClaimant(caseData, AUTH_TOKEN);
@@ -86,10 +85,8 @@ class DefendantNocClaimantDashboardServiceTest {
     }
 
     @Test
-    void shouldRecordJbaScenarioWhenOnlineAndJudgmentOnline() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+    void shouldRecordJbaScenarioWhenNocOnlineAndActiveJudgment() {
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         PaymentDetails paymentDetails = new PaymentDetails();
         paymentDetails.setStatus(PaymentStatus.SUCCESS);
@@ -116,9 +113,7 @@ class DefendantNocClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordMoveOfflineScenarioWhenOnlineEnabledWithoutActiveJudgment() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         PaymentDetails paymentDetails = new PaymentDetails();
         paymentDetails.setStatus(PaymentStatus.SUCCESS);
@@ -142,9 +137,7 @@ class DefendantNocClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordMoveOfflineScenarioWhenPreviousStateNotFinalOrdersIssued() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         PaymentDetails paymentDetails = new PaymentDetails();
         paymentDetails.setStatus(PaymentStatus.SUCCESS);
@@ -171,7 +164,6 @@ class DefendantNocClaimantDashboardServiceTest {
 
     @Test
     void shouldNotRecordWhenNotProceedingOffline() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -185,7 +177,6 @@ class DefendantNocClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordHwfHearingFeeScenarioWhenOutcomePending() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
 
         PaymentDetails paymentDetails = new PaymentDetails();
@@ -225,7 +216,6 @@ class DefendantNocClaimantDashboardServiceTest {
 
     @Test
     void shouldNotRecordExtraScenariosWhenFeePaidAndTrialReadySet() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
 
         PaymentDetails paymentDetails = new PaymentDetails();
@@ -267,7 +257,6 @@ class DefendantNocClaimantDashboardServiceTest {
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
         when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);
 
@@ -295,7 +284,6 @@ class DefendantNocClaimantDashboardServiceTest {
 
     @Test
     void shouldNotRecordTrialArrangementsWhenNotFastTrack() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
 
         PaymentDetails paymentDetails = new PaymentDetails();
@@ -333,7 +321,6 @@ class DefendantNocClaimantDashboardServiceTest {
 
     @Test
     void shouldNotRecordHearingFeeScenarioWhenHwfRemissionGranted() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
 
         PaymentDetails paymentDetails = new PaymentDetails();
@@ -366,16 +353,4 @@ class DefendantNocClaimantDashboardServiceTest {
         );
     }
 
-    @Test
-    void shouldNotRecordWhenLipVlipsDisabled() {
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setCcdCaseReference(1234L);
-        caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
-
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-
-        service.notifyClaimant(caseData, AUTH_TOKEN);
-
-        verifyNoInteractions(dashboardNotificationService, dashboardScenariosService);
-    }
 }

@@ -47,6 +47,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE;
@@ -66,7 +67,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT_CARM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_CLAIMANT_REJECTS_DEF_PLAN_CLAIMANT_DISAGREES_COURT_PLAN_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_ACCEPTS_DEFENDANT;
@@ -114,7 +114,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
 
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
@@ -154,7 +153,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
@@ -183,7 +181,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
@@ -213,7 +210,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
         claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
@@ -250,7 +246,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
         claimantLiPResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
@@ -284,7 +279,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
@@ -313,7 +307,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
@@ -341,7 +334,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         RespondToClaim respondToClaim = new RespondToClaim();
         respondToClaim.setHowMuchWasPaid(new BigDecimal("3000"));
@@ -376,7 +368,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         RespondToClaim respondToAdmittedClaim = new RespondToClaim();
         respondToAdmittedClaim.setHowMuchWasPaid(new BigDecimal("3000"));
@@ -410,7 +401,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
@@ -438,7 +428,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
@@ -468,7 +457,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
 
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         ClaimantMediationLip claimantMediationLip = new ClaimantMediationLip();
         claimantMediationLip.setHasAgreedFreeMediation(MediationDecision.No);
@@ -504,7 +492,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
@@ -530,7 +517,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
         claimantLiPResponse.setClaimantResponseOnCourtDecision(ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE);
@@ -562,7 +548,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         // Given
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         Party applicant1 = new Party();
         applicant1.setOrganisationName("Applicant Org");
@@ -604,7 +589,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         // Given
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -626,7 +610,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -649,13 +632,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     }
 
     @Test
-    void shouldCreateNotificationForDefendantWhenClaimantLrAcceptPaymentPlan() {
-        HashMap<String, Object> params = new HashMap<>();
-
-        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
-
+    void shouldNotCreateNotificationForDefendantWhenClaimantLrAcceptPaymentPlan() {
         CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
         ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.NO);
 
@@ -672,25 +649,13 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
             .build();
 
         handler.handle(callbackParams);
-        verify(dashboardScenariosService).recordScenarios(
-            "BEARER_TOKEN",
-            SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario(),
-            caseData.getCcdCaseReference().toString(),
-            new ScenarioRequestParams(params)
-        );
-        verify(dashboardScenariosService).recordScenarios(
-            "BEARER_TOKEN",
-            SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
-            caseData.getCcdCaseReference().toString(),
-            new ScenarioRequestParams(params)
-        );
+        verifyNoInteractions(dashboardScenariosService);
     }
 
     @Test
     void configureDashboardNotificationsForClaimantResponse_AwaitingApplicantIntention_InFavourOfClaimant_NoSettlementAgreement() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
         claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.NO);
@@ -718,7 +683,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     void configureDashboardNotificationsForClaimantResponse_ClaimantAcceptsDefendantRepaymentPlan_NoSettlementAgreement() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
         claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.NO);
@@ -745,7 +709,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     void configureDashboardNotifications_CaseStayed_ClaimantDoesNotWantToProceedFullDefence() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -773,7 +736,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     void configureDashboardNotifications_CaseSettled_ClaimantIntentionSettlePartAdmit() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -799,7 +761,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     void configureDashboardNotifications_JudicialReferral_DefendantNotPaid() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -826,7 +787,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     void configureDashboardNotifications_JudicialReferral_FullDefence_NotPaid_NoMediation() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -854,7 +814,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     void configureDashboardNotifications_JudicialReferral_FullDefence_ClaimantConfirms_DefendantNotAgreedMediation() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         RespondToClaim respondToClaim = new RespondToClaim().setHowMuchWasPaid(new BigDecimal("1000"));
 
@@ -885,7 +844,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     void configureDashboardNotifications_JudicialReferral_FullDefence_NoMediation_SpecNull() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -912,7 +870,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     void configureDashboardNotifications_JudicialReferral_RejectsMediation_LipNull() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseDataLiP caseDataLiP = new CaseDataLiP();
         caseDataLiP.setApplicant1ClaimMediationSpecRequiredLip(null);
@@ -943,7 +900,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     void configureDashboardNotifications_JudicialReferral_ClaimantRejectsAmount_NoMediation() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -970,7 +926,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     void shouldNotCreateNotificationWhenClaimantRejectRepaymentPlan_RespondentNotCompany() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         Party respondent1 = new Party().setType(Party.Type.INDIVIDUAL);
 
@@ -994,8 +949,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     void configureDashboardNotifications_LrvLip_FullAdmit_ImmediatePay_Settled() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -1024,8 +977,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
@@ -1047,8 +998,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
@@ -1067,12 +1016,10 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     }
 
     @Test
-    void shouldReturnNullWhenNothingIsMatched_JudgmentOnlineIsSet() {
+    void shouldReturnNullWhenNothingIsMatched() {
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
@@ -1094,7 +1041,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
@@ -1130,7 +1076,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -1162,7 +1107,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -1194,7 +1138,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
@@ -1219,7 +1162,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
@@ -1243,7 +1185,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     void configureDashboardNotifications_CaseSettled_And_SettlementAgreement_ShouldPrioritizeSettled() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
         claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
@@ -1275,7 +1216,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     void configureDashboardNotifications_JudicialReferral_And_SettlementAgreement_ShouldPrioritizeSettlementAgreement() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
         claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
@@ -1307,7 +1247,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     void configureDashboardNotifications_SettlementAgreement_ClaimantAcceptsDefendant() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
         claimantLiPResponse.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
@@ -1339,7 +1278,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     void configureDashboardNotifications_LrvLr_FullDefence_NotProceed_ClaimSettled() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(556677L);
@@ -1367,7 +1305,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     void configureDashboardNotifications_CaseSettled_NoPartAdmitIntention_NoScenario() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(778899L);
@@ -1388,7 +1325,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
     void configureDashboardNotifications_JudicialReferral_NoMatchingConditions_NoScenario() {
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(990011L);
@@ -1510,7 +1446,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
 
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");
@@ -1541,8 +1476,6 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setLegacyCaseReference("reference");

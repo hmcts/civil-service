@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaServi
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 import uk.gov.hmcts.reform.civil.utils.HmcDataUtils;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified;
-import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
@@ -74,31 +73,26 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
         int requestVersion = camundaVariables.getRequestVersion().intValue();
         LocalDateTime receivedDateTime = camundaVariables.getResponseDateTime();
 
+        if (hmcAlreadyHasNotification(hearingId, requestVersion, receivedDateTime)) {
+            log.info("Skipping partiesNotified PUT - already notified for caseId {}, hearingId {}, requestVersion {}",
+                     ccdCaseReference, hearingId, requestVersion);
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
+
         PartiesNotified partiesNotified = buildPartiesNotified(camundaVariables);
         logRequestPayload(partiesNotified, ccdCaseReference, hearingId);
 
-        try {
-            hearingsService.updatePartiesNotifiedResponse(
-                callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                hearingId,
-                requestVersion,
-                receivedDateTime,
-                partiesNotified
-            );
+        hearingsService.updatePartiesNotifiedResponse(
+            callbackParams.getParams().get(BEARER_TOKEN).toString(),
+            hearingId,
+            requestVersion,
+            receivedDateTime,
+            partiesNotified
+        );
 
-            log.info("Successfully updated parties notified for caseId {}, hearingId {}, requestVersion {}, receivedDateTime {}",
-                     ccdCaseReference, hearingId, requestVersion, receivedDateTime);
+        log.info("Successfully updated parties notified for caseId {}, hearingId {}, requestVersion {}, receivedDateTime {}",
+                 ccdCaseReference, hearingId, requestVersion, receivedDateTime);
 
-        } catch (Exception ex) {
-            if (isHearingResponseNotifiedForRequestVersion(hearingId, requestVersion, receivedDateTime)) {
-                log.info("Update succeeded despite exception for caseId {}, hearingId {}, requestVersion {}",
-                         ccdCaseReference, hearingId, requestVersion);
-            } else {
-                log.error("HearingsService.updatePartiesNotifiedResponse failed for caseId {}, hearingId {}, requestVersion {}",
-                          ccdCaseReference, hearingId, requestVersion, ex);
-                throw ex;
-            }
-        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
@@ -106,6 +100,7 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
         return new PartiesNotified()
             .setServiceData(new PartiesNotifiedServiceData()
                              .setHearingNoticeGenerated(true)
+                             .setHearingDate(camundaVariables.getHearingStartDateTime())
                              .setHearingLocation(camundaVariables.getHearingLocationEpims())
                              .setDays(camundaVariables.getDays()));
     }
@@ -120,21 +115,12 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
         }
     }
 
-    private boolean isHearingResponseNotifiedForRequestVersion(String hearingId, int requestVersion, LocalDateTime receivedDateTime) {
+    private boolean hmcAlreadyHasNotification(String hearingId, int requestVersion, LocalDateTime receivedDateTime) {
         try {
             var partiesNotified = hearingsService.getPartiesNotifiedResponses(
                 getSystemUpdateUser().getUserToken(), hearingId);
 
-            PartiesNotifiedResponse response =
-                HmcDataUtils.getLatestHearingResponseForRequestVersion(partiesNotified, requestVersion);
-
-            if (response != null && response.getResponseReceivedDateTime() != null) {
-                LocalDateTime partiesNotifiedDateTimeFromHMC = response.getResponseReceivedDateTime();
-                return !partiesNotifiedDateTimeFromHMC.isBefore(receivedDateTime);
-            }
-
-            return false;
-
+            return HmcDataUtils.hasAlreadyNotifiedResponse(partiesNotified, requestVersion, receivedDateTime);
         } catch (Exception ex) {
             log.error("Failed to fetch parties notified responses from HMC for hearingId {}, requestVersion {}",
                       hearingId, requestVersion, ex);

@@ -59,7 +59,6 @@ class DjTrialTemplateServiceTest {
     @BeforeEach
     void setUp() {
         DjAuthorisationFieldService authorisationFieldService = new DjAuthorisationFieldService();
-        DjBundleFieldService bundleFieldService = new DjBundleFieldService();
         DjDirectionsToggleService directionsToggleService = new DjDirectionsToggleService();
         DjPartyFieldService partyFieldService = new DjPartyFieldService();
         DjHearingMethodFieldService hearingMethodFieldService = new DjHearingMethodFieldService();
@@ -69,7 +68,6 @@ class DjTrialTemplateServiceTest {
             locationHelper,
                 featureToggleService,
                 authorisationFieldService,
-                bundleFieldService,
                 directionsToggleService,
                 partyFieldService,
                 hearingMethodFieldService,

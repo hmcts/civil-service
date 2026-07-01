@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
@@ -20,9 +19,10 @@ import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
 
 import java.time.LocalDate;
 import java.util.Set;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class HearingFeeDueHandler extends BaseExternalTaskHandler {
 
@@ -31,6 +31,23 @@ public class HearingFeeDueHandler extends BaseExternalTaskHandler {
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final FeatureToggleService featureToggleService;
+
+    public HearingFeeDueHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        HearingFeeDueSearchService caseSearchService,
+        ApplicationEventPublisher applicationEventPublisher,
+        CoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter,
+        FeatureToggleService featureToggleService
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.caseSearchService = caseSearchService;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.featureToggleService = featureToggleService;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -137,4 +154,5 @@ public class HearingFeeDueHandler extends BaseExternalTaskHandler {
         }
         applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
     }
+
 }

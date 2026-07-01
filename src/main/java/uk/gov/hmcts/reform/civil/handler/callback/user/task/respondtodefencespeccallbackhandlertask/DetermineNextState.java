@@ -203,8 +203,7 @@ public class DetermineNextState extends CallbackHandler {
     }
 
     private boolean isDefenceAdmitPayImmediately(CaseData caseData) {
-        return featureToggleService.isJudgmentOnlineLive()
-            && IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+        return IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
     }
 
     private String getNextState(CaseData caseData) {
@@ -216,25 +215,21 @@ public class DetermineNextState extends CallbackHandler {
     }
 
     private boolean isLipVLipOneVOne(CaseData caseData) {
-        return featureToggleService.isLipVLipEnabled()
-            && caseData.isLRvLipOneVOne()
+        return caseData.isLRvLipOneVOne()
             && caseData.isClaimantDontWantToProceedWithFulLDefenceFD();
     }
 
     private Pair<String, BusinessProcess> handleAcceptedRepaymentPlan(CaseData caseData,
                                                BusinessProcess businessProcess) {
         String nextState;
-        if (featureToggleService.isJudgmentOnlineLive()
-            && (caseData.isPayByInstallment() || caseData.isPayBySetDate())) {
+        if (caseData.isPayByInstallment() || caseData.isPayBySetDate()) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
         } else {
             nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
         }
-        if (featureToggleService.isJudgmentOnlineLive()) {
-            JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
-            caseData.setActiveJudgment(activeJudgment);
-        }
+        JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
+        caseData.setActiveJudgment(activeJudgment);
 
         return Pair.of(nextState, businessProcess);
     }

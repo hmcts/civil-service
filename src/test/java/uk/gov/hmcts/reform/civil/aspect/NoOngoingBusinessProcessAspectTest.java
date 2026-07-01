@@ -7,7 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,12 +23,14 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.NoOngoingBPAllowedEventService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
@@ -40,9 +44,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REMOVE_DOCUMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.START_BUSINESS_PROCESS;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 
 @ExtendWith(MockitoExtension.class)
 class NoOngoingBusinessProcessAspectTest {
@@ -55,6 +58,9 @@ class NoOngoingBusinessProcessAspectTest {
 
     @Mock
     private StateFlow stateFlow;
+
+    @Mock
+    private NoOngoingBPAllowedEventService noOngoingBPAllowedEventService;
 
     @Mock
     private ProceedingJoinPoint proceedingJoinPoint;
@@ -144,13 +150,14 @@ class NoOngoingBusinessProcessAspectTest {
 
         @ParameterizedTest
         @SneakyThrows
-        @EnumSource(value = BusinessProcessStatus.class, names = "FINISHED", mode = EnumSource.Mode.EXCLUDE)
-        void shouldNotProceedWhenOngoingBusinessProcessUpdateCaseData(BusinessProcessStatus status) {
+        @MethodSource("allowedCivilEvents")
+        void shouldProceedWhenOngoingBusinessProcessForAllowedEvent(BusinessProcessStatus status, CaseEvent event) {
             AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder().build();
             mockProceedingJoinPoint(response);
+            when(noOngoingBPAllowedEventService.isAllowed(event)).thenReturn(true);
 
             CallbackParams callbackParams = createCallbackParams(
-                UPDATE_CASE_DATA.name(),
+                event.name(),
                 CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
                     .businessProcess(new BusinessProcess().setStatus(status))
@@ -163,25 +170,26 @@ class NoOngoingBusinessProcessAspectTest {
             verify(proceedingJoinPoint).proceed();
         }
 
-        @ParameterizedTest
-        @SneakyThrows
-        @EnumSource(value = BusinessProcessStatus.class, names = "FINISHED", mode = EnumSource.Mode.EXCLUDE)
-        void shouldProceedWhenOngoingBusinessProcessUpdateCaseData(BusinessProcessStatus status) {
-            AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder().build();
-            mockProceedingJoinPoint(response);
-
-            CallbackParams callbackParams = createCallbackParams(
-                REMOVE_DOCUMENT.name(),
-                CaseDataBuilder.builder()
-                    .atStateClaimDetailsNotified()
-                    .businessProcess(new BusinessProcess().setStatus(status))
-                    .build()
-            );
-
-            Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
-
-            assertThat(result).isEqualTo(response);
-            verify(proceedingJoinPoint).proceed();
+        private static Stream<Arguments> allowedCivilEvents() {
+            return Stream.of(
+                CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS,
+                CaseEvent.CHANGE_SOLICITOR_EMAIL,
+                CaseEvent.CREATE_CASE_FLAGS,
+                CaseEvent.EVIDENCE_UPLOAD_JUDGE,
+                CaseEvent.MANAGE_CASE_FLAGS,
+                CaseEvent.MANAGE_DOCUMENTS,
+                CaseEvent.ORDER_REVIEW_OBLIGATION_CHECK,
+                CaseEvent.UPDATE_CASE_DATA,
+                CaseEvent.REMOVE_DOCUMENT,
+                CaseEvent.SERVICE_REQUEST_RECEIVED,
+                CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID,
+                CaseEvent.APPLICATION_PROCEEDS_IN_HERITAGE,
+                CaseEvent.migrateCase
+            ).filter(event -> !event.isCamundaEvent()).flatMap(event -> Stream.of(
+                BusinessProcessStatus.READY,
+                BusinessProcessStatus.DISPATCHED,
+                BusinessProcessStatus.STARTED
+            ).map(status -> Arguments.of(status, event)));
         }
 
         @ParameterizedTest
@@ -310,6 +318,38 @@ class NoOngoingBusinessProcessAspectTest {
 
             assertThat(result).isEqualTo(response);
             verify(proceedingJoinPoint, never()).proceed();
+        }
+
+        @SneakyThrows
+        @ParameterizedTest
+        @MethodSource("allowedGaEvents")
+        void shouldProceedToMethodInvocation_whenOngoingBusinessProcessForAllowedGaEvent(
+            BusinessProcessStatus status,
+            CaseEvent event
+        ) {
+            AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder().build();
+            when(proceedingJoinPoint.proceed()).thenReturn(response);
+            when(noOngoingBPAllowedEventService.isAllowed(event)).thenReturn(true);
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_START, GeneralApplicationCaseDataBuilder.builder()
+                    .businessProcess(new BusinessProcess().setStatus(status))
+                    .build())
+                .isGeneralApplicationCase(true)
+                .request(CallbackRequest.builder().eventId(event.name()).build())
+                .build();
+
+            Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
+
+            assertThat(result).isEqualTo(response);
+            verify(proceedingJoinPoint).proceed();
+        }
+
+        private static Stream<Arguments> allowedGaEvents() {
+            return Stream.of(
+                Arguments.of(BusinessProcessStatus.STARTED, INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT),
+                Arguments.of(BusinessProcessStatus.STARTED, CaseEvent.APPLICATION_PROCEEDS_IN_HERITAGE)
+            );
         }
 
         @SneakyThrows
