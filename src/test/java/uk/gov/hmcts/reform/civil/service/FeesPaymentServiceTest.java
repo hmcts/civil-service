@@ -8,11 +8,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
@@ -123,22 +126,26 @@ class FeesPaymentServiceTest {
 
     }
 
-    @Test
+    @ParameterizedTest
+    @EnumSource(value = FeeType.class, names = {"HEARING", "CLAIMISSUED"})
     @SneakyThrows
-    void shouldNotCreateGovPayPaymentUrlForMissingHearingFeePbaDetails() {
-        Fee hearingFee = new Fee();
-        hearingFee.setCalculatedAmountInPence(new BigDecimal("23200"));
+    void shouldReturnConflictWhenFeePaymentDetailsAreMissing(FeeType feeType) {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1701090368574910L)
-            .data(Map.of(
-                "hearingFee", hearingFee
-            )).build();
+            .state("AWAITING_RESPONDENT_ACKNOWLEDGEMENT")
+            .data(Map.of())
+            .build();
 
         when(coreCaseDataService.getCase(1701090368574910L)).thenReturn(expectedCaseDetails);
 
         assertThatThrownBy(
-            () -> feesPaymentService.createGovPaymentRequest(HEARING, "1701090368574910", BEARER_TOKEN)
-        ).isInstanceOf(NullPointerException.class)
-            .hasMessage("Fee Payment details cannot be null");
+            () -> feesPaymentService.createGovPaymentRequest(feeType, "1701090368574910", BEARER_TOKEN)
+        ).isInstanceOf(ResponseStatusException.class)
+            .satisfies(exception -> {
+                ResponseStatusException responseStatusException = (ResponseStatusException) exception;
+                assertThat(responseStatusException.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+                assertThat(responseStatusException.getReason())
+                    .isEqualTo("Payment is not ready yet, please retry in a moment");
+            });
 
         verify(paymentsClient, never()).createGovPayCardPaymentRequest(anyString(), anyString(), any());
     }
