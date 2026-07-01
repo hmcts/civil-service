@@ -1,0 +1,2 @@
+CREATE INDEX IF NOT EXISTS idx_dashboard_notifications_notification_action_id
+  ON dbs.dashboard_notifications(notification_action_id);
