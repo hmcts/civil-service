@@ -437,6 +437,7 @@ export SCHEDULER_ACTIVE_SCHEDULERS=""
 ### PollingEventEmitterScheduler
 
 The `PollingEventEmitterScheduler` emits pending business process events for cases that are ready to continue processing.
+It runs when `PollingEventEmitter` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
 
 #### Settings
 
@@ -519,6 +520,7 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 ### BundleCreationScheduler
 
 The `BundleCreationScheduler` creates hearing bundles for eligible cases within the existing ten-day hearing window.
+It runs when `BundleCreation` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
 
 #### Settings
 
@@ -532,6 +534,7 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 ### HearingCvpLinkScheduler
 
 The `HearingCvpLinkScheduler` publishes CVP join link events for eligible cases with upcoming hearing dates.
+It runs when `HearingCvpLink` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
 
 #### Settings
 
