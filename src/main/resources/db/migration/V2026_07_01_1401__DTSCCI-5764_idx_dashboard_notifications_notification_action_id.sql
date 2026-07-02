@@ -1,2 +1,3 @@
-CREATE INDEX IF NOT EXISTS idx_dashboard_notifications_notification_action_id
+-- flyway:executeInTransaction=false
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_dashboard_notifications_notification_action_id
   ON dbs.dashboard_notifications(notification_action_id);
