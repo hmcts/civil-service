@@ -2,23 +2,23 @@ package uk.gov.hmcts.reform.civil.scheduler.common;
 
 import java.time.Duration;
 
-public class ScheduledTaskBackPressure {
+class ScheduledTaskBackPressure {
 
     private final ScheduledTaskBackPressureConfiguration configuration;
     private Duration currentDelay;
 
-    public ScheduledTaskBackPressure(ScheduledTaskBackPressureConfiguration configuration) {
+    ScheduledTaskBackPressure(ScheduledTaskBackPressureConfiguration configuration) {
         this.configuration = configuration != null
             ? configuration
             : ScheduledTaskBackPressureConfiguration.disabled();
         this.currentDelay = this.configuration.initialDelay();
     }
 
-    public Duration currentDelay() {
+    Duration currentDelay() {
         return currentDelay;
     }
 
-    public void afterSuccess(Duration processingTime) {
+    void afterSuccess(Duration processingTime) {
         if (isSlow(processingTime)) {
             increaseDelay(configuration.delayIncreaseOnSlowCase());
         } else {
@@ -26,7 +26,7 @@ public class ScheduledTaskBackPressure {
         }
     }
 
-    public void afterFailure() {
+    void afterFailure() {
         increaseDelay(configuration.delayIncreaseOnFailure());
     }
 

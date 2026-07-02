@@ -111,7 +111,7 @@ scheduler:
     slowCaseThreshold: ${DEFAULT_BACK_PRESSURE_SLOW_CASE_THRESHOLD:PT2S}
 
 search:
-  judgementBuffer:
+  judgement-buffer:
     pageSize: ${SEARCH_PAGE_SIZE_JUDGEMENT_BUFFER:50}
 
 oidc:
