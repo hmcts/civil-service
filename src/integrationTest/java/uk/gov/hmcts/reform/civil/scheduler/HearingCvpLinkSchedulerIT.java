@@ -72,7 +72,7 @@ public class HearingCvpLinkSchedulerIT {
             .cases(List.of(searchCase))
             .build();
 
-        coreCaseDataApiMockHelper.mockElasticSearchResult(searchResult);
+        coreCaseDataApiMockHelper.mockElasticSearchResultPaginated(searchResult);
 
         // When
         scheduler.runScheduledTask();
