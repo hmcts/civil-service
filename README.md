@@ -78,7 +78,7 @@ The project defines a set of timer-driven Camunda processes that keep cases movi
 | --- | --- | --- | --- | --- |
 | Bundle creation scheduler | Builds bundles for eligible hearings each evening. | `BUNDLE_CREATION_CHECK` | `0 0 21 * * ?` | Daily at 21:00 |
 | Case dismissed scheduler | Automatically dismisses claims that have missed their deadlines. | `CASE_DISMISSED` | `0 5 16 * * ?` | Daily at 16:05 |
-| Decision outcome scheduler | Moves cases awaiting judicial decisions into the decision outcome workflow. | `MOVE_TO_DECISION_OUTCOME` | `0 0 0 * * ?` | Daily at 00:00 |
+| Decision outcome scheduler | Moves cases awaiting judicial decisions into the decision outcome workflow. | `MOVE_TO_DECISION_OUTCOME` | `0 40 0 * * ?` | Daily at 00:40 |
 | Defendant response deadline check scheduler | Sweeps for defendants whose response deadline elapsed and triggers enforcement. | `DEFENDANT_RESPONSE_DEADLINE_CHECK` | `0 1 16 * * ?` | Daily at 16:01 |
 | Evidence upload scheduler | Prompts parties to upload evidence when deadlines are approaching. | `EVIDENCE_UPLOAD_CHECK` | `0 30 17 * * ?` | Daily at 17:30 |
 | Full admit pay immediately no payment scheduler | Escalates full-admit cases where an immediate payment was promised but not received. | `FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
@@ -518,6 +518,20 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 |---------|-------------|---------|----------------------|
 | `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_ORDER_REVIEW_OBLIGATION_CHECK` |
 | `cronExpression` | When the scheduler runs. | `0 10 1 * * ?` (Daily at 01:10) | `CRON_EXPRESSION_ORDER_REVIEW_OBLIGATION_CHECK` |
+
+### DecisionOutcomeScheduler
+
+The `DecisionOutcomeScheduler` moves eligible cases awaiting judicial decisions into the decision outcome workflow.
+It runs when `DecisionOutcome` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.decision-outcome`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_DECISION_OUTCOME` |
+| `cronExpression` | When the scheduler runs. | `0 40 0 * * ?` (Daily at 00:40) | `CRON_EXPRESSION_DECISION_OUTCOME` |
 
 ### JudgementBufferScheduler
 

@@ -93,6 +93,9 @@ scheduler:
   order-review-obligation-check:
     cronExpression: ${CRON_EXPRESSION_ORDER_REVIEW_OBLIGATION_CHECK:0 10 1 * * ?}
     enabled: ${SCHEDULER_ENABLED_ORDER_REVIEW_OBLIGATION_CHECK:true}
+  decision-outcome:
+    cronExpression: ${CRON_EXPRESSION_DECISION_OUTCOME:0 40 0 * * ?}
+    enabled: ${SCHEDULER_ENABLED_DECISION_OUTCOME:true}
   default-back-pressure:
     initialDelay: ${DEFAULT_BACK_PRESSURE_INITIAL_DELAY:PT0S}
     maxDelay: ${DEFAULT_BACK_PRESSURE_MAX_DELAY:PT10S}
