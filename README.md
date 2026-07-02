@@ -77,7 +77,7 @@ The project defines a set of timer-driven Camunda processes that keep cases movi
 | Job | Purpose | Camunda topic(s) | Schedule (cron, UTC) | When it runs |
 | --- | --- | --- | --- | --- |
 | Bundle creation scheduler | Builds bundles for eligible hearings each evening. | `BUNDLE_CREATION_CHECK` | `0 0 21 * * ?` | Daily at 21:00 |
-| Case dismissed scheduler | Automatically dismisses claims that have missed their deadlines. | `CASE_DISMISSED` | `0 5 16 * * ?` | Daily at 16:05 |
+| Case dismissed scheduler | Automatically dismisses claims that have missed their deadlines. | `CASE_DISMISSED` | `0 5 0,16 * * ?` | Daily at 00:05 and 16:05 |
 | Decision outcome scheduler | Moves cases awaiting judicial decisions into the decision outcome workflow. | `MOVE_TO_DECISION_OUTCOME` | `0 40 0 * * ?` | Daily at 00:40 |
 | Defendant response deadline check scheduler | Sweeps for defendants whose response deadline elapsed and triggers enforcement. | `DEFENDANT_RESPONSE_DEADLINE_CHECK` | `0 1 16 * * ?` | Daily at 16:01 |
 | Evidence upload scheduler | Prompts parties to upload evidence when deadlines are approaching. | `EVIDENCE_UPLOAD_CHECK` | `0 30 17 * * ?` | Daily at 17:30 |
@@ -92,7 +92,7 @@ The project defines a set of timer-driven Camunda processes that keep cases movi
 | Incident retry scheduler | Retries failed external incident tasks each night. | `INCIDENT_RETRY_EVENT` | `0 1 23 * * ?` | Daily at 23:01 |
 | Manage Stay WA Task Scheduler | Maintains WA tasks for stayed cases so that no follow-up is missed. | `MANAGE_STAY_WA_TASK_SCHEDULER` | `0 0 1 ? * * *` | Daily at 01:00 |
 | Migrate cases scheduler | Reserved cron to re-run large case migration batches. | `MIGRATE_CASES_EVENTS` | `0 0 0 1 * ? 2080` | First day of each month until 2080 at 00:00 |
-| Notify claim deadline scheduler | Notifies parties about upcoming claim deadlines, prior to dismissal. | `CASE_DISMISSED` | `0 5 0 * * ?` | Daily at 00:05 |
+| Notify claim deadline scheduler | Notifies parties about upcoming claim deadlines, prior to dismissal. | `CASE_DISMISSED` | `0 5 0,16 * * ?` | Daily at 00:05 and 16:05 |
 | Order Review Obligation check scheduler | Checks order review obligations and triggers outstanding actions. | `ORDER_REVIEW_OBLIGATION_CHECK` | `0 0 1 * * ?` | Daily at 01:00 |
 | Polling event emitter scheduler | Emits polling events across the day so downstream pollers stay in sync. | `POLLING_EVENT_EMITTER` | `0 0 8-20 * * ?` | Hourly at the top of the hour from 08:00–20:00 |
 | Proof of debt scheduler | Generates proof-of-debt artefacts for COSC-linked general applications. | `CoscApplicationProcessor` | `0 0 16 * * ?` | Daily at 16:00 |
@@ -546,6 +546,20 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 |---------|-------------|---------|----------------------|
 | `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_DECISION_OUTCOME` |
 | `cronExpression` | When the scheduler runs. | `0 40 0 * * ?` (Daily at 00:40) | `CRON_EXPRESSION_DECISION_OUTCOME` |
+
+### CaseDismissedScheduler
+
+The `CaseDismissedScheduler` processes eligible cases for claim dismissal and claim deadline notification using the existing `CASE_DISMISSED` workflow.
+It runs when `CaseDismissed` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.case-dismissed`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_CASE_DISMISSED` |
+| `cronExpression` | When the scheduler runs. | `0 5 0,16 * * ?` (Daily at 00:05 and 16:05) | `CRON_EXPRESSION_CASE_DISMISSED` |
 
 ### JudgementBufferScheduler
 
