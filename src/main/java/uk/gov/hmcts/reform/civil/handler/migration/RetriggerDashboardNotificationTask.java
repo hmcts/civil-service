@@ -39,13 +39,13 @@ public class RetriggerDashboardNotificationTask extends MigrationTask<DashboardN
     }
 
     @Override
-    protected String getTaskName() {
-        return "RetriggerDashboardNotificationTask";
+    protected String getEventSummary() {
+        return "Retrigger dashboard notification task via Migration Task";
     }
 
     @Override
-    protected String getEventSummary() {
-        return "Retrigger dashboard notification task via Migration Task";
+    protected String getTaskName() {
+        return "RetriggerDashboardNotificationTask";
     }
 
     @Override
