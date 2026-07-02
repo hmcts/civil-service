@@ -16,11 +16,14 @@ import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskBackPressureConfi
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class OrderReviewObligationCheckScheduledTask implements ScheduledTask<CaseDetails, Long> {
+
+    private static final ZoneId LOCAL_ZONE = ZoneId.of("Europe/London");
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final CoreCaseDataService coreCaseDataService;
@@ -37,7 +40,7 @@ public class OrderReviewObligationCheckScheduledTask implements ScheduledTask<Ca
         Long caseId = caseDetails.getId();
         log.info("OrderReviewObligationCheckScheduledTask::accept case {}", caseId);
         CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId));
-        LocalDate currentDate = LocalDate.now();
+        LocalDate currentDate = LocalDate.now(LOCAL_ZONE);
 
         caseData.getStoredObligationData().stream()
             .map(Element::getValue)
