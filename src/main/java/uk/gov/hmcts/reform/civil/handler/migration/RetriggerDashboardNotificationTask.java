@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.handler.migration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardNotificationTaskCaseReference;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
@@ -14,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.UserService;
 
+import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Map;
 
@@ -26,16 +29,22 @@ public class RetriggerDashboardNotificationTask extends MigrationTask<DashboardN
     private final DashboardNotificationRegistry registry;
     private final UserService userService;
     private final SystemUpdateUserConfiguration userConfig;
+    private final PlatformTransactionManager transactionManager;
+    private final EntityManager entityManager;
 
     public RetriggerDashboardNotificationTask(
         DashboardNotificationRegistry registry,
         UserService userService,
-        SystemUpdateUserConfiguration userConfig
+        SystemUpdateUserConfiguration userConfig,
+        PlatformTransactionManager transactionManager,
+        EntityManager entityManager
     ) {
         super(DashboardNotificationTaskCaseReference.class);
         this.registry = registry;
         this.userService = userService;
         this.userConfig = userConfig;
+        this.transactionManager = transactionManager;
+        this.entityManager = entityManager;
     }
 
     @Override
@@ -81,7 +90,11 @@ public class RetriggerDashboardNotificationTask extends MigrationTask<DashboardN
             .params(Map.of(BEARER_TOKEN, authToken)));
 
         log.info("Retriggering dashboard task {} for case {}", dashboardTaskId, dashboardReference.getCaseReference());
-        workflows.forEach(task -> task.execute(context));
+        new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
+            entityManager.joinTransaction();
+            workflows.forEach(task -> task.execute(context));
+            entityManager.flush();
+        });
         return caseData;
     }
 

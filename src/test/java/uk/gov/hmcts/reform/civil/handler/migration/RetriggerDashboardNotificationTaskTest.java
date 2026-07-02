@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.civil.handler.migration;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.SimpleTransactionStatus;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardNotificationTaskCaseReference;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
@@ -16,9 +19,12 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import jakarta.persistence.EntityManager;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -32,16 +38,24 @@ class RetriggerDashboardNotificationTaskTest {
 
     private DashboardNotificationRegistry registry;
     private UserService userService;
+    private PlatformTransactionManager transactionManager;
+    private EntityManager entityManager;
     private RetriggerDashboardNotificationTask task;
 
     @BeforeEach
     void setUp() {
         registry = mock(DashboardNotificationRegistry.class);
         userService = mock(UserService.class);
+        transactionManager = mock(PlatformTransactionManager.class);
+        entityManager = mock(EntityManager.class);
+        TransactionStatus transactionStatus = new SimpleTransactionStatus();
+        when(transactionManager.getTransaction(any())).thenReturn(transactionStatus);
         task = new RetriggerDashboardNotificationTask(
             registry,
             userService,
-            new SystemUpdateUserConfiguration("system-user", "password")
+            new SystemUpdateUserConfiguration("system-user", "password"),
+            transactionManager,
+            entityManager
         );
     }
 
@@ -76,6 +90,9 @@ class RetriggerDashboardNotificationTaskTest {
         assertEquals(DASHBOARD_TASK_ID, contextReference.get().caseData().getBusinessProcess().getActivityId());
         assertEquals(PROCESS_INSTANCE_ID, contextReference.get().caseData().getBusinessProcess().getProcessInstanceId());
         assertEquals("existing-process", caseData.getBusinessProcess().getProcessInstanceId());
+        verify(entityManager).joinTransaction();
+        verify(entityManager).flush();
+        verify(transactionManager).commit(any());
     }
 
     @Test
