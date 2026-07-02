@@ -72,7 +72,7 @@ public class BundleCreationSchedulerIT {
             .cases(List.of(searchCase))
             .build();
 
-        coreCaseDataApiMockHelper.mockElasticSearchResultPaginated(searchResult);
+        coreCaseDataApiMockHelper.mockElasticSearchResult(searchResult);
 
         // When
         scheduler.runScheduledTask();

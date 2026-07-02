@@ -77,7 +77,7 @@ public class OrderReviewObligationCheckSchedulerIT {
             .cases(List.of(searchCase))
             .build();
 
-        coreCaseDataApiMockHelper.mockElasticSearchResultPaginated(searchResult);
+        coreCaseDataApiMockHelper.mockElasticSearchResult(searchResult);
 
         scheduler.runScheduledTask();
 

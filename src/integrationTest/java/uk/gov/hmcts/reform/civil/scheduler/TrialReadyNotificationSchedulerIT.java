@@ -70,7 +70,7 @@ public class TrialReadyNotificationSchedulerIT {
             .cases(List.of(searchCase))
             .build();
 
-        coreCaseDataApiMockHelper.mockElasticSearchResultPaginated(searchResult);
+        coreCaseDataApiMockHelper.mockElasticSearchResult(searchResult);
 
         scheduler.runScheduledTask();
 
