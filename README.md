@@ -101,7 +101,7 @@ The project defines a set of timer-driven Camunda processes that keep cases movi
 | Settlement no response from defendant scheduler | Moves settlement agreements forward when the defendant failed to respond. | `SETTLEMENT_NO_RESPONSE_FROM_DEFENDANT_CHECK` | `0 0 1 * * ?` | Daily at 01:00 |
 | Spec automated hearing notice scheduler | Builds automated hearing notices for Spec claims twice per day. | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 ? * * *` | Twice daily at 00:00 and 12:00 |
 | Take case offline scheduler | Transitions cases that must move off digital rails. | `TAKE_CASE_OFFLINE` | `0 1 16 * * ?` | Daily at 16:01 |
-| Trial ready check scheduler | Verifies trial readiness status for outstanding cases. | `TRIAL_READY_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
+| Trial ready check scheduler | Verifies trial readiness status for outstanding cases. | `TRIAL_READY_CHECK` | `0 30 0 * * ?` | Daily at 00:30 |
 | Trial ready notification scheduler | Sends notifications when trial readiness has been confirmed. | `TRIAL_READY_NOTIFICATION_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
 | Unspec automated hearing notice scheduler | Builds automated hearing notices for Unspec claims twice per day. | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 ? * * *` | Twice daily at 00:00 and 12:00 |
 | Update General application Case management Location | Future-dated cron to re-sync GA case management locations. | `RETRIGGER_GA_UPDATE_CMLOCATION_EVENTS` | `0 0 0 1 * ? 2046` | First day of each month until 2046 at 00:00 |
@@ -504,6 +504,20 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 |---------|-------------|---------|----------------------|
 | `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_TRIAL_READY_NOTIFICATION` |
 | `cronExpression` | When the scheduler runs. | `0 20 0 * * ?` (Daily at 00:20) | `CRON_EXPRESSION_TRIAL_READY_NOTIFICATION` |
+
+### TrialReadyCheckScheduler
+
+The `TrialReadyCheckScheduler` publishes trial ready check events for eligible cases approaching their hearing date.
+It runs when `TrialReadyCheck` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.trial-ready-check`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_TRIAL_READY_CHECK` |
+| `cronExpression` | When the scheduler runs. | `0 30 0 * * ?` (Daily at 00:30) | `CRON_EXPRESSION_TRIAL_READY_CHECK` |
 
 ### OrderReviewObligationCheckScheduler
 

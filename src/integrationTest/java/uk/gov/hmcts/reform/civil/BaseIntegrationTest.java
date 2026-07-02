@@ -57,6 +57,7 @@ import static org.mockito.Mockito.when;
         "scheduler.mediation-file-transfer.enabled=false",
         "scheduler.take-case-offline.enabled=false",
         "scheduler.trial-ready-notification.enabled=false",
+        "scheduler.trial-ready-check.enabled=false",
         "scheduler.order-review-obligation-check.enabled=false",
         "scheduler.decision-outcome.enabled=false"
     }
