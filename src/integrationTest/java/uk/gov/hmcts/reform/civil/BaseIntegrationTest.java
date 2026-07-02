@@ -47,7 +47,22 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
-@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class})
+@SpringBootTest(
+    classes = {Application.class, TestIdamConfiguration.class},
+    properties = {
+        "scheduler.bundle-creation.enabled=false",
+        "scheduler.hearing-cvp-link.enabled=false",
+        "scheduler.polling-event-emitter.enabled=false",
+        "scheduler.automated-hearing-notice.enabled=false",
+        "scheduler.mediation-file-transfer.enabled=false",
+        "scheduler.take-case-offline.enabled=false",
+        "scheduler.trial-ready-notification.enabled=false",
+        "scheduler.trial-ready-check.enabled=false",
+        "scheduler.order-review-obligation-check.enabled=false",
+        "scheduler.decision-outcome.enabled=false",
+        "scheduler.case-dismissed.enabled=false"
+    }
+)
 @AutoConfigureMockMvc
 @SuppressWarnings({"java:S112", "java:S6813", "java:S1874"})
 public abstract class BaseIntegrationTest {

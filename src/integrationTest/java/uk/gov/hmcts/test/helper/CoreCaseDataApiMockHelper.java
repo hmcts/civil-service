@@ -43,6 +43,11 @@ public class CoreCaseDataApiMockHelper {
         when(authTokenGenerator.generate()).thenReturn(GENERATED_TOKEN);
     }
 
+    public void mockElasticSearchResult(SearchResult searchResult) {
+        when(coreCaseDataApi.searchCases(eq(ACCESS_TOKEN), eq(GENERATED_TOKEN), eq(CASE_TYPE), any(String.class)))
+            .thenReturn(searchResult);
+    }
+
     public void mockElasticSearchResultPaginated(SearchResult searchResult, SearchResult... nextSearchResults) {
         when(coreCaseDataApi.searchCases(any(), any(), any(), any()))
             .thenReturn(searchResult, nextSearchResults);

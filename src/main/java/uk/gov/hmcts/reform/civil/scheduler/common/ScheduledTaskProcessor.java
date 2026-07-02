@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -17,7 +15,7 @@ import java.util.stream.Stream;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ScheduledTaskProcessor {
+public class ScheduledTaskProcessor<T, I> {
 
     private final ScheduledEventTracker eventTracker;
 
@@ -25,73 +23,73 @@ public class ScheduledTaskProcessor {
     private int circuitBreakerThreshold;
 
     /**
-     * Performs processing of scheduled tasks for a stream of cases.
+     * Performs processing of scheduled tasks for a stream of items.
      * Use allMatch to short-circuit the stream if the circuit breaker is triggered.
      * Once the predicate returns false, allMatch stops processing further elements.
      *
      * @param eventConfig   the event configuration
-     * @param scheduledTask the task to be performed on each case
-     * @param searchResult  the result of the elastic search containing the stream of cases
+     * @param scheduledTask the task to be performed on each item
+     * @param searchResult  the result of the search containing the stream of items
      * @return the outcome of the scheduled task processing
      */
-    public ScheduledTaskOutcome performProcessing(ScheduledTaskEventConfiguration eventConfig,
-                                                  ScheduledTask scheduledTask,
-                                                  ElasticSearchResult searchResult) {
-        List<Long> succeededCases = new ArrayList<>();
-        List<Long> failedCases = new ArrayList<>();
+    public ScheduledTaskOutcome<I> performProcessing(ScheduledTaskEventConfiguration eventConfig,
+                                                     ScheduledTask<T, I> scheduledTask,
+                                                     TaskResult<T> searchResult) {
+        List<I> succeededItems = new ArrayList<>();
+        List<I> failedItems = new ArrayList<>();
         int[] consecutiveFailures = new int[1];
         String[] abortReason = new String[1];
         ScheduledTaskBackPressure backPressure = new ScheduledTaskBackPressure(
             scheduledTask.backPressureConfiguration()
         );
 
-        Stream<CaseDetails> sequentialStream = searchResult.caseDetailsStream()
+        Stream<T> sequentialStream = searchResult.itemStream()
             .sequential()
             .limit(maxCasesPerRun(scheduledTask));
 
         try {
-            boolean completed = sequentialStream.allMatch(caseDetails -> processCaseDetails(
+            boolean completed = sequentialStream.allMatch(item -> processItem(
                 eventConfig,
                 scheduledTask,
-                caseDetails,
+                item,
                 backPressure,
-                succeededCases,
-                failedCases,
+                succeededItems,
+                failedItems,
                 consecutiveFailures,
                 abortReason
             ));
 
-            return new ScheduledTaskOutcome(succeededCases, failedCases, !completed, abortReason[0]);
+            return new ScheduledTaskOutcome<>(succeededItems, failedItems, !completed, abortReason[0]);
         } catch (ScheduledTaskInterruptedException e) {
             abortReason[0] = e.getMessage();
-            return new ScheduledTaskOutcome(succeededCases, failedCases, true, abortReason[0]);
+            return new ScheduledTaskOutcome<>(succeededItems, failedItems, true, abortReason[0]);
         }
     }
 
-    private boolean processCaseDetails(ScheduledTaskEventConfiguration eventConfig,
-                                       ScheduledTask scheduledTask,
-                                       CaseDetails caseDetails,
+    private boolean processItem(ScheduledTaskEventConfiguration eventConfig,
+                                       ScheduledTask<T, I> scheduledTask,
+                                       T item,
                                        ScheduledTaskBackPressure backPressure,
-                                       List<Long> succeededCases,
-                                       List<Long> failedCases,
+                                       List<I> succeededItems,
+                                       List<I> failedItems,
                                        int[] consecutiveFailures,
                                        String[] abortReason) {
         applyBackPressure(backPressure);
 
-        Long caseId = caseDetails.getId();
+        I itemId = scheduledTask.getItemId(item);
         Instant startedAt = Instant.now();
 
         try {
-            scheduledTask.accept(caseDetails);
+            scheduledTask.accept(item);
             backPressure.afterSuccess(Duration.between(startedAt, Instant.now()));
-            eventTracker.caseProcessedEvent(eventConfig, caseId);
-            succeededCases.add(caseId);
+            eventTracker.caseProcessedEvent(eventConfig, itemId.toString());
+            succeededItems.add(itemId);
             consecutiveFailures[0] = 0;
         } catch (Exception e) {
             backPressure.afterFailure();
-            failedCases.add(caseId);
-            eventTracker.caseFailedEvent(eventConfig, caseId, e);
-            log.error("Error processing case {}: {}", caseId, e.getMessage(), e);
+            failedItems.add(itemId);
+            eventTracker.caseFailedEvent(eventConfig, itemId.toString(), e);
+            log.error("Error processing item {}: {}", itemId, e.getMessage(), e);
             int failures = ++consecutiveFailures[0];
 
             if (failures >= circuitBreakerThreshold) {
@@ -102,7 +100,7 @@ public class ScheduledTaskProcessor {
         return true;
     }
 
-    private long maxCasesPerRun(ScheduledTask scheduledTask) {
+    private long maxCasesPerRun(ScheduledTask<T, I> scheduledTask) {
         long maxCasesPerRun = scheduledTask.maxCasesPerRun();
         if (maxCasesPerRun < 0) {
             throw new IllegalArgumentException("maxCasesPerRun cannot be negative");
