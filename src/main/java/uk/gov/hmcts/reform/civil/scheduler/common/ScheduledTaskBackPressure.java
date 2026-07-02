@@ -36,18 +36,16 @@ class ScheduledTaskBackPressure {
     }
 
     private void increaseDelay(Duration increase) {
-        currentDelay = min(configuration.maxDelay(), currentDelay.plus(increase));
+        currentDelay = currentDelay.plus(increase);
+        if (currentDelay.compareTo(configuration.maxDelay()) > 0) {
+            currentDelay = configuration.maxDelay();
+        }
     }
 
     private void reduceDelay(Duration reduction) {
-        currentDelay = max(Duration.ZERO, currentDelay.minus(reduction));
-    }
-
-    private Duration min(Duration left, Duration right) {
-        return left.compareTo(right) <= 0 ? left : right;
-    }
-
-    private Duration max(Duration left, Duration right) {
-        return left.compareTo(right) >= 0 ? left : right;
+        currentDelay = currentDelay.minus(reduction);
+        if (currentDelay.compareTo(configuration.initialDelay()) < 0) {
+            currentDelay = configuration.initialDelay();
+        }
     }
 }
