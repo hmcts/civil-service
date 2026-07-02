@@ -2,35 +2,52 @@ package uk.gov.hmcts.reform.civil.scheduler.common;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+
+import java.util.function.Supplier;
 
 /**
  * Runner for scheduled tasks that coordinates between event tracking, searching and processing.
- * This component is prototype-scoped to ensure isolated state per scheduler instance.
  */
 @Component
-@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @RequiredArgsConstructor
 @Slf4j
-public class ScheduledTaskRunner {
+public class ScheduledTaskRunner<T, I> {
 
     private final ScheduledEventTracker eventTracker;
-    private final ScheduledTaskProcessor scheduledTaskProcessor;
+    private final ScheduledTaskProcessor<T, I> scheduledTaskProcessor;
+    private final FeatureToggleService featureToggleService;
 
     /**
-     * Executes the scheduled task for cases found in the search result.
+     * Executes the scheduled task if the feature toggle is enabled.
+     * Handles searching, logging and processing of items.
+     *
+     * @param schedulerName         the name of the scheduler
+     * @param searchResultSupplier  the supplier for search results
+     * @param scheduledTask         the task to be performed on each item
+     */
+    public void run(String schedulerName,
+                    Supplier<? extends TaskResult<T>> searchResultSupplier,
+                    ScheduledTask<T, I> scheduledTask) {
+        if (featureToggleService.isSpringSchedulerEnabled(schedulerName)) {
+            log.info("Running {} scheduler", schedulerName);
+            TaskResult<T> searchResult = searchResultSupplier.get();
+            run(new ScheduledTaskEventConfiguration(schedulerName), searchResult, scheduledTask);
+        }
+    }
+
+    /**
+     * Executes the scheduled task for items found in the search result.
      * Handles null search results and empty search results by logging and tracking events appropriately.
      *
      * @param eventConfig   the event configuration
-     * @param searchResult  the result of the elastic search
-     * @param scheduledTask the task to be performed on each case
+     * @param searchResult  the result of the search
+     * @param scheduledTask the task to be performed on each item
      */
     public void run(ScheduledTaskEventConfiguration eventConfig,
-                    ElasticSearchResult searchResult,
-                    ScheduledTask scheduledTask) {
+                    TaskResult<T> searchResult,
+                    ScheduledTask<T, I> scheduledTask) {
 
         if (searchResult == null) {
             eventTracker.jobAbortedEvent(eventConfig, "SearchResult cannot be null");
@@ -48,25 +65,25 @@ public class ScheduledTaskRunner {
             return;
         }
 
-        processCaseDetails(eventConfig, scheduledTask, searchResult);
+        processItems(eventConfig, scheduledTask, searchResult);
     }
 
     /**
-     * Orchestrates the processing of case details by delegating to {@link ScheduledTaskProcessor}.
+     * Orchestrates the processing of items by delegating to {@link ScheduledTaskProcessor}.
      * Tracks the start, completion, or early abortion of the job.
      *
      * @param eventConfig   the event configuration
-     * @param scheduledTask the task to be performed on each case
-     * @param searchResult  the result of the elastic search containing the stream of cases
+     * @param scheduledTask the task to be performed on each item
+     * @param searchResult  the result of the search containing the stream of items
      */
-    private void processCaseDetails(ScheduledTaskEventConfiguration eventConfig,
-                                    ScheduledTask scheduledTask,
-                                    ElasticSearchResult searchResult) {
+    private void processItems(ScheduledTaskEventConfiguration eventConfig,
+                                    ScheduledTask<T, I> scheduledTask,
+                                    TaskResult<T> searchResult) {
         int totalCases = searchResult.totalResults();
         eventTracker.jobStartedEvent(eventConfig, totalCases);
         log.info("Running scheduled task: {}, totalCases: {}", eventConfig.getSchedulerName(), totalCases);
 
-        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(
+        ScheduledTaskOutcome<I> outcome = scheduledTaskProcessor.performProcessing(
             eventConfig,
             scheduledTask,
             searchResult
@@ -78,29 +95,33 @@ public class ScheduledTaskRunner {
                 totalCases,
                 outcome.succeededCases().size(),
                 outcome.failedCases().size(),
-                outcome.abortReason()
+                outcome.abortReason(),
+                outcome.cumulativeDelay()
             );
             log.info(
-                "Scheduled task aborted: {}, totalCases: {}, succeededCases: {}, failedCases: {}, abortReason: {}",
+                "Scheduled task aborted: {}, totalCases: {}, succeededCases: {}, failedCases: {}, abortReason: {}, cumulativeDelay: {}",
                 eventConfig.getSchedulerName(),
                 totalCases,
                 outcome.succeededCases().size(),
                 outcome.failedCases().size(),
-                outcome.abortReason()
+                outcome.abortReason(),
+                outcome.cumulativeDelay()
             );
         } else {
             eventTracker.jobCompletedEvent(
                 eventConfig,
                 totalCases,
                 outcome.succeededCases().size(),
-                outcome.failedCases().size()
+                outcome.failedCases().size(),
+                outcome.cumulativeDelay()
             );
             log.info(
-                "Scheduled task completed: {}, totalCases: {}, succeededCases: {}, failedCases: {}",
+                "Scheduled task completed: {}, totalCases: {}, succeededCases: {}, failedCases: {}, cumulativeDelay: {}",
                 eventConfig.getSchedulerName(),
                 totalCases,
                 outcome.succeededCases().size(),
-                outcome.failedCases().size()
+                outcome.failedCases().size(),
+                outcome.cumulativeDelay()
             );
         }
     }
