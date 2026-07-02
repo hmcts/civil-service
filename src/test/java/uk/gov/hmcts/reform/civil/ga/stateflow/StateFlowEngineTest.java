@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
@@ -25,7 +24,6 @@ import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption.LIST_FOR_A_HEARING;
@@ -47,8 +45,6 @@ public class StateFlowEngineTest {
     @InjectMocks
     private GaStateFlowEngine stateFlowEngine;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
 
@@ -288,7 +284,6 @@ public class StateFlowEngineTest {
 
     @Test
     void shouldReturnApplicationSubmittedWhenPBAPaymentIsSuccess_SetWelshFlowFlag() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData =
             GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData().copy()
                 .isGaApplicantLip(YES)
@@ -308,7 +303,6 @@ public class StateFlowEngineTest {
 
     @Test
     void shouldReturnApplicationSubmittedWhenPBAPaymentIsSuccess_SetWelshFlowFlagForRespondentLip() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData =
             GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData().copy()
                 .isGaApplicantLip(NO)
@@ -331,7 +325,6 @@ public class StateFlowEngineTest {
 
     @Test
     void shouldReturn_Judge_Written_Rep_WhenJudgeMadeDecisionForWelshApplicant() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .writtenRepresentationSequentialApplication()
             .generalAppPBADetails(
@@ -363,7 +356,6 @@ public class StateFlowEngineTest {
 
     @Test
     void shouldReturnApplicationSubmittedWhenPBAPaymentIsSuccess_DontSetWelshFlowFlagForRespondentLip() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData =
             GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData().copy()
                 .isGaApplicantLip(NO)
@@ -386,7 +378,6 @@ public class StateFlowEngineTest {
 
     @Test
     void shouldSetWelshFlag_Judge_Directions_WhenJudgeMadeDecision() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().copy()
             .judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER))
             .isGaApplicantLip(YES)
@@ -415,7 +406,6 @@ public class StateFlowEngineTest {
 
     @Test
     void shouldSetWelshFlagRespondentBilingual_Judge_Directions_WhenJudgeMadeDecision() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().copy()
             .judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER))
             .isGaApplicantLip(YES)
@@ -444,7 +434,6 @@ public class StateFlowEngineTest {
 
     @Test
     void shouldReturn_Judge_Order_Made_WhenJudgeMadeDecisionForWelshLip() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .approveApplication()
             .isGaApplicantLip(YES)
@@ -476,7 +465,6 @@ public class StateFlowEngineTest {
 
     @Test
     void shouldReturn_Judge_Order_Made_WhenJudgeMadeDecisionForRespondentWelshLip() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .approveApplication()
             .isGaApplicantLip(YES)
@@ -509,7 +497,6 @@ public class StateFlowEngineTest {
 
     @Test
     void shouldReturn_Judge_Order_Made_WhenJudgeMadeDecisionForNonWelshLip() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .approveApplication()
             .isGaApplicantLip(YES)
@@ -540,7 +527,6 @@ public class StateFlowEngineTest {
 
     @Test
     void shouldReturn_Additional_Info_WhenJudgeMadeDecisionForApplicantWelsh() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().copy()
             .judicialDecision(new GAJudicialDecision().setDecision(REQUEST_MORE_INFO))
             .generalAppInformOtherParty(new GAInformOtherParty()
@@ -568,7 +554,6 @@ public class StateFlowEngineTest {
 
     @Test
     void shouldReturn_Additional_Info_WhenJudgeMadeDecisionForRespondentWelsh() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().copy()
             .judicialDecision(new GAJudicialDecision().setDecision(REQUEST_MORE_INFO))
             .generalAppInformOtherParty(new GAInformOtherParty()
@@ -596,7 +581,6 @@ public class StateFlowEngineTest {
 
     @Test
     void shouldReturnApplicationSubmittedWhenPBAPaymentIsSuccess_DontSetWelshFlowFlagForApplicantLip() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData =
             GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData().copy()
                 .isGaApplicantLip(YES)

@@ -37,7 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -79,8 +78,6 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     private UpdateFromGACaseEventTaskHandler handler;
 
@@ -92,8 +89,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             new EventProperties(),
             coreCaseDataService,
             caseDetailsConverter,
-            objectMapper,
-            featureToggleService
+            objectMapper
         );
     }
 

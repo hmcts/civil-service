@@ -87,6 +87,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.InitiateGeneralApplicationHandler.NOT_ALLOWED_SETTLE_DISCONTINUE;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.InitiateGeneralApplicationHandler.NOT_IN_EA_REGION;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CUSTOMER_REFERENCE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.INVALID_SETTLE_BY_CONSENT;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.INVALID_UNAVAILABILITY_RANGE;
@@ -290,7 +291,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldThrowError_whenLipVsLrAndClaimantLiPIsBilingual() {
+    void shouldThrowLocationError_whenLipVsLrClaimantIsBilingualAndCourtIsNotWhitelisted() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v1LiP()
@@ -307,13 +308,14 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
-        given(featureToggleService.isDefendantNoCOnlineForCase(any())).willReturn(true);
+        given(featureToggleService.isLocationWhiteListed(any())).willReturn(false);
+        given(featureToggleService.isCuiGaNroEnabled()).willReturn(false);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        assertThat(response.getErrors()).isNotNull();
+        assertThat(response.getErrors()).containsOnly(NOT_IN_EA_REGION);
     }
 
     @Test
-    void shouldNotThrowError_whenLipVsLrAndClaimantLiPIsBilingualAndWelshGaToggleEnabled() {
+    void shouldNotThrowError_whenLipVsLrAndClaimantLiPIsBilingualAndLocationWhitelisted() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v1LiP()
@@ -329,10 +331,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-        given(featureToggleService.isGaForWelshEnabled()).willReturn(true);
         given(featureToggleService.isLocationWhiteListed(any())).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
-        given(featureToggleService.isDefendantNoCOnlineForCase(any())).willReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isEmpty();
     }
@@ -355,11 +355,11 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        assertThat(response.getErrors()).isNotNull();
+        assertThat(response.getErrors()).containsOnly(NOT_IN_EA_REGION);
     }
 
     @Test
-    void shouldThrowError_whenLRVsLiPAndLiPIsBilingual() {
+    void shouldThrowLocationError_whenLRVsLiPRespondentIsBilingualAndCourtIsNotWhitelisted() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v1LiP()
@@ -371,13 +371,16 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+        given(featureToggleService.isLocationWhiteListed(any())).willReturn(false);
+        given(featureToggleService.isCuiGaNroEnabled()).willReturn(false);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        assertThat(response.getErrors()).isNotNull();
+        assertThat(response.getErrors()).containsOnly(NOT_IN_EA_REGION);
     }
 
     @Test
-    void shouldNotThrowError_whenLRVsLiPAndLiPIsBilingualGaForWelshEnabled() {
+    void shouldNotThrowError_whenLRVsLiPAndLiPIsBilingualAndLocationWhitelisted() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v1LiP()
@@ -390,7 +393,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-        given(featureToggleService.isGaForWelshEnabled()).willReturn(true);
         given(featureToggleService.isLocationWhiteListed(any())).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
 
@@ -399,7 +401,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldNotThrowError_whenLRVsLiPAndLiPIsBilingualGaForWelshEnabledForNro() {
+    void shouldNotThrowError_whenLRVsLiPAndLiPIsBilingualAndNroEnabled() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v1LiP()
@@ -412,7 +414,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-        given(featureToggleService.isGaForWelshEnabled()).willReturn(true);
         given(featureToggleService.isLocationWhiteListed(any())).willReturn(false);
         given(featureToggleService.isCuiGaNroEnabled()).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
