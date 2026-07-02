@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_MEDIATION_WHEN_CLAIMANT_NOT_CONTACTABLE;
 import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
@@ -18,6 +19,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class MediationUnsuccessfulDefendantDashboardService extends DashboardScenarioService {
 
@@ -37,11 +39,14 @@ public class MediationUnsuccessfulDefendantDashboardService extends DashboardSce
 
     @Override
     public String getScenario(CaseData caseData) {
+        log.info("Evaluating mediation dashboard scenarios for case {}", caseData);
+        log.info("Evaluating getMediation scenarios for case {}", caseData.getMediation());
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
-            if (isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(caseData)) {
-                return SCENARIO_AAA6_DEFENDANT_MEDIATION_WHEN_CLAIMANT_NOT_CONTACTABLE.getScenario();
-            } else if (isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(caseData)) {
+            log.info("Evaluating inside scenarios for case {}", caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect());
+            if (isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(caseData)) {
                 return SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_DEFENDANT_NONATTENDANCE.getScenario();
+            } else if (isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(caseData)) {
+                return SCENARIO_AAA6_DEFENDANT_MEDIATION_WHEN_CLAIMANT_NOT_CONTACTABLE.getScenario();
             } else {
                 return SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_GENERIC.getScenario();
             }
