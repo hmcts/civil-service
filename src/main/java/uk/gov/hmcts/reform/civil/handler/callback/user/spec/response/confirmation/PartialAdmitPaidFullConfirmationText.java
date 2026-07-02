@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -13,19 +12,45 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Component
 public class PartialAdmitPaidFullConfirmationText implements RespondToClaimConfirmationTextSpecGenerator {
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
-        if (!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || NO.equals(caseData.getSpecDefenceAdmittedRequired())) {
+
+        boolean currentRespondentPartAdmission;
+        boolean currentRespondentDefenceAdmitted;
+
+        if (YES.equals(caseData.getIsRespondent2())) {
+            currentRespondentPartAdmission =
+                RespondentResponseTypeSpec.PART_ADMISSION.equals(
+                    caseData.getRespondent2ClaimResponseTypeForSpec());
+            currentRespondentDefenceAdmitted =
+                YES.equals(caseData.getSpecDefenceAdmitted2Required());
+        } else if (YES.equals(caseData.getIsRespondent1())) {
+            currentRespondentPartAdmission =
+                RespondentResponseTypeSpec.PART_ADMISSION.equals(
+                    caseData.getRespondent1ClaimResponseTypeForSpec());
+            currentRespondentDefenceAdmitted =
+                YES.equals(caseData.getSpecDefenceAdmittedRequired());
+        } else {
+            currentRespondentPartAdmission =
+                RespondentResponseTypeSpec.PART_ADMISSION.equals(
+                    caseData.getRespondent1ClaimResponseTypeForSpec())
+                    || RespondentResponseTypeSpec.PART_ADMISSION.equals(
+                    caseData.getRespondent2ClaimResponseTypeForSpec());
+
+            currentRespondentDefenceAdmitted =
+                YES.equals(caseData.getSpecDefenceAdmittedRequired())
+                    || YES.equals(caseData.getSpecDefenceAdmitted2Required());
+        }
+
+        if (!currentRespondentPartAdmission || !currentRespondentDefenceAdmitted) {
             return Optional.empty();
         }
-        BigDecimal howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
-            .map(RespondToClaim::getHowMuchWasPaid).orElse(null);
+        BigDecimal howMuchWasPaid = caseData.getCurrentRespondentHowMuchWasPaid();
         BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
         if (Stream.of(howMuchWasPaid, totalClaimAmount)
             .anyMatch(Objects::isNull)) {
