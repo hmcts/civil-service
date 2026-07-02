@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardNotificationRegistry;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardWorkflowTask;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -77,7 +78,8 @@ public class RetriggerDashboardNotificationTask extends MigrationTask<DashboardN
         dashboardCaseData.setBusinessProcess(businessProcessForDashboardTask(caseData, dashboardReference));
 
         String dashboardTaskId = dashboardReference.getDashboardTaskId();
-        List<DashboardWorkflowTask> workflows = registry.workflowsFor(dashboardTaskId, DashboardCaseType.CIVIL);
+        DashboardCaseType dashboardCaseType = dashboardCaseType(dashboardReference);
+        List<DashboardWorkflowTask> workflows = registry.workflowsFor(dashboardTaskId, dashboardCaseType);
 
         if (workflows.isEmpty()) {
             throw new IllegalArgumentException("No dashboard notification handlers registered for: " + dashboardTaskId);
@@ -86,7 +88,8 @@ public class RetriggerDashboardNotificationTask extends MigrationTask<DashboardN
         String authToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         DashboardTaskContext context = DashboardTaskContext.from(new CallbackParams()
             .caseData(dashboardCaseData)
-            .isCivilCaseType(true)
+            .isCivilCaseType(dashboardCaseType == DashboardCaseType.CIVIL)
+            .isGeneralApplicationCaseType(dashboardCaseType == DashboardCaseType.GENERAL_APPLICATION)
             .params(Map.of(BEARER_TOKEN, authToken)));
 
         log.info("Retriggering dashboard task {} for case {}", dashboardTaskId, dashboardReference.getCaseReference());
@@ -98,12 +101,61 @@ public class RetriggerDashboardNotificationTask extends MigrationTask<DashboardN
         return caseData;
     }
 
+    @Override
+    protected CaseData migrateGeneralApplicationCaseData(
+        CaseData caseData,
+        GeneralApplicationCaseData gaCaseData,
+        DashboardNotificationTaskCaseReference dashboardReference
+    ) {
+        validateDashboardReference(dashboardReference);
+
+        GeneralApplicationCaseData dashboardCaseData = gaCaseData.copy();
+        dashboardCaseData.businessProcess(businessProcessForDashboardTask(gaCaseData.getBusinessProcess(), dashboardReference));
+
+        String dashboardTaskId = dashboardReference.getDashboardTaskId();
+        List<DashboardWorkflowTask> workflows = registry.workflowsFor(dashboardTaskId, DashboardCaseType.GENERAL_APPLICATION);
+
+        if (workflows.isEmpty()) {
+            throw new IllegalArgumentException("No dashboard notification handlers registered for: " + dashboardTaskId);
+        }
+
+        String authToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        DashboardTaskContext context = DashboardTaskContext.from(new CallbackParams()
+            .caseData(dashboardCaseData)
+            .isCivilCaseType(false)
+            .isGeneralApplicationCaseType(true)
+            .params(Map.of(BEARER_TOKEN, authToken)));
+
+        log.info("Retriggering GA dashboard task {} for case {}", dashboardTaskId, dashboardReference.getCaseReference());
+        new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
+            entityManager.joinTransaction();
+            workflows.forEach(task -> task.execute(context));
+            entityManager.flush();
+        });
+        return caseData;
+    }
+
+    private void validateDashboardReference(DashboardNotificationTaskCaseReference dashboardReference) {
+        if (dashboardReference == null
+            || StringUtils.isBlank(dashboardReference.getCaseReference())
+            || StringUtils.isBlank(dashboardReference.getDashboardTaskId())) {
+            throw new IllegalArgumentException("Case reference and dashboardTaskId must not be blank");
+        }
+    }
+
     private BusinessProcess businessProcessForDashboardTask(
         CaseData caseData,
         DashboardNotificationTaskCaseReference caseReference
     ) {
-        BusinessProcess businessProcess = caseData.getBusinessProcess() != null
-            ? caseData.getBusinessProcess().copy()
+        return businessProcessForDashboardTask(caseData.getBusinessProcess(), caseReference);
+    }
+
+    private BusinessProcess businessProcessForDashboardTask(
+        BusinessProcess existingBusinessProcess,
+        DashboardNotificationTaskCaseReference caseReference
+    ) {
+        BusinessProcess businessProcess = existingBusinessProcess != null
+            ? existingBusinessProcess.copy()
             : new BusinessProcess();
 
         businessProcess.updateActivityId(caseReference.getDashboardTaskId());
@@ -112,5 +164,12 @@ public class RetriggerDashboardNotificationTask extends MigrationTask<DashboardN
         }
 
         return businessProcess;
+    }
+
+    private DashboardCaseType dashboardCaseType(DashboardNotificationTaskCaseReference dashboardReference) {
+        if (StringUtils.isBlank(dashboardReference.getDashboardCaseType())) {
+            return DashboardCaseType.CIVIL;
+        }
+        return DashboardCaseType.valueOf(dashboardReference.getDashboardCaseType().trim());
     }
 }

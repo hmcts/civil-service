@@ -138,6 +138,7 @@ class MigrateCasesEventHandlerTest {
         when(externalTask.getVariable("dashboardTaskId")).thenReturn("GenerateDashboardNotificationsHearingScheduledHmc");
         when(externalTask.getVariable("dashboardProcessInstanceId")).thenReturn("process-123");
         when(externalTask.getVariable("dashboardProcessInstanceIds")).thenReturn(null);
+        when(externalTask.getVariable("dashboardCaseType")).thenReturn("GENERAL_APPLICATION");
         when(externalTask.getVariable("notificationCamundaProcessIdentifier")).thenReturn(null);
         when(externalTask.getVariable("caseNoteElementId")).thenReturn(null);
         when(externalTask.getVariable("notifyEventId")).thenReturn(null);
@@ -164,6 +165,7 @@ class MigrateCasesEventHandlerTest {
         assertEquals("456", references.get(1).getCaseReference());
         assertEquals("GenerateDashboardNotificationsHearingScheduledHmc", references.get(0).getDashboardTaskId());
         assertEquals("process-123", references.get(0).getDashboardProcessInstanceId());
+        assertEquals("GENERAL_APPLICATION", references.get(0).getDashboardCaseType());
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
