@@ -17,7 +17,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_GRANTED_SPEC;
 
 public class CoreCaseDataApiMockHelper {
 
@@ -48,7 +47,7 @@ public class CoreCaseDataApiMockHelper {
             .thenReturn(searchResult);
     }
 
-    public void mockStartEvent(String caseIdString, StartEventResponse startEventResponse) {
+    public void mockStartEvent(String caseIdString, StartEventResponse startEventResponse, String eventId) {
         when(coreCaseDataApi.startEventForCaseWorker(
             ACCESS_TOKEN,
             GENERATED_TOKEN,
@@ -56,7 +55,7 @@ public class CoreCaseDataApiMockHelper {
             JURISDICTION,
             CASE_TYPE,
             caseIdString,
-            DEFAULT_JUDGEMENT_GRANTED_SPEC.name()
+            eventId
         )).thenReturn(startEventResponse);
     }
 

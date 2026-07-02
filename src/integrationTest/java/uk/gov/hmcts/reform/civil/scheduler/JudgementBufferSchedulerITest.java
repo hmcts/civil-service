@@ -25,11 +25,12 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_GRANTED_SPEC;
 
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=JudgementBufferSchedulerITest",
-    "scheduler.judgementBuffer.enabled=true"
+    "scheduler.judgement-buffer.enabled=true"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class JudgementBufferSchedulerITest {
@@ -65,7 +66,11 @@ public class JudgementBufferSchedulerITest {
             caseDetails).build();
 
         coreCaseDataApiMockHelper.mockElasticSearchResult(searchResult);
-        coreCaseDataApiMockHelper.mockStartEvent(caseIdString, startEventResponse);
+        coreCaseDataApiMockHelper.mockStartEvent(
+            caseIdString,
+            startEventResponse,
+            DEFAULT_JUDGEMENT_GRANTED_SPEC.name()
+        );
         coreCaseDataApiMockHelper.mockSubmitEvent(caseIdString, caseDetails);
 
         // When

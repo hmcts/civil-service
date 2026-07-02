@@ -9,36 +9,40 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.DefendantResponseDeadlineCheckSearchService;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty(prefix = "scheduler.defendantResponse", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "scheduler.defendant-response", name = "enabled", havingValue = "true")
 public class DefendantResponseDeadlineScheduler implements CivilScheduler {
 
-    private static final String SCHEDULER_NAME = "DefendantResponseDeadline";
+    public static final String SCHEDULER_NAME = "DefendantResponseDeadline";
 
     private final DefendantResponseDeadlineCheckSearchService searchService;
     private final ScheduledTaskRunner scheduledTaskRunner;
     private final DefendantResponseDeadlineTask defendantResponseDeadlineTask;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public String getName() {
         return SCHEDULER_NAME;
     }
 
-    @Scheduled(cron = "${scheduler.defendantResponse.cronExpression}")
+    @Scheduled(cron = "${scheduler.defendant-response.cronExpression}")
     @SchedulerLock(name = "DefendantResponseDeadlineScheduler_deadlineCheck",
         lockAtMostFor = "${scheduler.lockAtMostFor}",
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
     @Override
     public void runScheduledTask() {
-        log.info("Running {} scheduler", SCHEDULER_NAME);
-        scheduledTaskRunner.run(
-            new ScheduledTaskEventConfiguration(SCHEDULER_NAME),
-            searchService.getElasticSearchResult(),
-            defendantResponseDeadlineTask
-        );
+        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
+            log.info("Running {} scheduler", SCHEDULER_NAME);
+            scheduledTaskRunner.run(
+                new ScheduledTaskEventConfiguration(SCHEDULER_NAME),
+                searchService.getElasticSearchResult(),
+                defendantResponseDeadlineTask
+            );
+        }
     }
 }

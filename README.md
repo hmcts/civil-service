@@ -440,12 +440,25 @@ The `JudgementBufferScheduler` is used to process cases where a default judgemen
 
 #### Settings
 
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.judgementBuffer`.
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.judgement-buffer`.
 
 | Setting | Description | Default | Environment Variable |
 |---------|-------------|---------|----------------------|
 | `enabled` | Whether the scheduler is active. | `false` | `SCHEDULER_ENABLED_JUDGEMENT_BUFFER` |
 | `cronExpression` | When the scheduler runs. | `0 0 2 * * *` (Daily at 2 AM) | `CRON_EXPRESSION_JUDGEMENT_BUFFER` |
+
+### DefendantResponseDeadlineScheduler
+
+The `DefendantResponseDeadlineScheduler` is used to process cases where a defendant response deadline has been reached.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.defendantResponse`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|--------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `CRON_EXPRESSION_DEFENDANT_RESPONSE` |
+| `cronExpression` | When the scheduler runs. | `0 1 16 * * ?` (Daily at 4:01 PM) | `CRON_EXPRESSION_DEFENDANT_RESPONSE` |
 
 #### Global Scheduler Settings
 
