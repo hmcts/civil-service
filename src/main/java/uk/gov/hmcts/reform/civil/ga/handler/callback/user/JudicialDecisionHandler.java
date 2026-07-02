@@ -100,6 +100,7 @@ import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeWrittenRepresentation
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS;
 import static uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil.isGeneralAppConsentOrder;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.nowInLocalZone;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
@@ -172,13 +173,13 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
             As this order was made on the court's own initiative, any \
             party affected by the order may apply to set aside, vary, or stay the order. \
             Any such application must be made by 4pm on\s
-            
+
             """;
     private static final String ORDER_WITHOUT_NOTICE = """
             If you were not notified of the application before this \
             order was made, you may apply to set aside, vary, or stay the order. \
             Any such application must be made by 4pm on\s
-            
+
             """;
     private static final String DISMISSAL_ORDER_TEXT = """
         This application is dismissed.
@@ -683,23 +684,23 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
         caseDataBuilder.caseNameHmctsInternal(getAllPartyNames(caseData));
         caseDataBuilder.judicialDecisionRequestMoreInfo(
             new GAJudicialRequestMoreInfo().setJudgeRequestMoreInfoByDate(deadlinesCalculator
-                .getJudicialOrderDeadlineDate(LocalDateTime.now(), PLUS_7DAYS))
+                .getJudicialOrderDeadlineDate(nowInLocalZone(), PLUS_7DAYS))
         );
         caseDataBuilder.orderOnCourtInitiative(new FreeFormOrderValues()
                                                    .setOnInitiativeSelectionTextArea(ON_INITIATIVE_SELECTION_TEST)
                                                    .setOnInitiativeSelectionDate(deadlinesCalculator
                                                                                   .getJudicialOrderDeadlineDate(
-                                                                                      LocalDateTime.now(), PLUS_7DAYS)));
+                                                                                      nowInLocalZone(), PLUS_7DAYS)));
         caseDataBuilder.orderWithoutNotice(new FreeFormOrderValues()
                                                .setWithoutNoticeSelectionTextArea(WITHOUT_NOTICE_SELECTION_TEXT)
                                                .setWithoutNoticeSelectionDate(deadlinesCalculator
                                                                                .getJudicialOrderDeadlineDate(
-                                                                                   LocalDateTime.now(), PLUS_7DAYS)));
+                                                                                   nowInLocalZone(), PLUS_7DAYS)));
         caseDataBuilder.judicialDecisionMakeAnOrderForWrittenRepresentations(
             new GAJudicialWrittenRepresentations()
-                .setWrittenConcurrentRepresentationsBy(deadlinesCalculator.getJudicialOrderDeadlineDate(LocalDateTime.now(), 14))
-                .setWrittenSequentailRepresentationsBy(deadlinesCalculator.getJudicialOrderDeadlineDate(LocalDateTime.now(), 14))
-                .setSequentialApplicantMustRespondWithin(deadlinesCalculator.getJudicialOrderDeadlineDate(LocalDateTime.now(), 21))
+                .setWrittenConcurrentRepresentationsBy(deadlinesCalculator.getJudicialOrderDeadlineDate(nowInLocalZone(), 14))
+                .setWrittenSequentailRepresentationsBy(deadlinesCalculator.getJudicialOrderDeadlineDate(nowInLocalZone(), 14))
+                .setSequentialApplicantMustRespondWithin(deadlinesCalculator.getJudicialOrderDeadlineDate(nowInLocalZone(), 21))
         );
     }
 
@@ -991,13 +992,13 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
                                                                  .setOrderCourtOwnInitiative(ORDER_COURT_OWN_INITIATIVE)
                                                                  .setOrderCourtOwnInitiativeDate(deadlinesCalculator
                                                                                                      .getJudicialOrderDeadlineDate(
-                                                                                                         LocalDateTime.now(),
+                                                                                                         nowInLocalZone(),
                                                                                                          PLUS_7DAYS
                                                                                                      )))
             .orderWithoutNoticeForWrittenRep(new GAOrderWithoutNoticeGAspec()
                                                  .setOrderWithoutNoticeDate(deadlinesCalculator
                                                                                 .getJudicialOrderDeadlineDate(
-                                                                                    LocalDateTime.now(),
+                                                                                    nowInLocalZone(),
                                                                                     PLUS_7DAYS
                                                                                 ))
                                                  .setOrderWithoutNotice(ORDER_WITHOUT_NOTICE))
@@ -1098,15 +1099,15 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
                                                        .setOrderCourtOwnInitiative(ORDER_COURT_OWN_INITIATIVE)
                                                        .setOrderCourtOwnInitiativeDate(deadlinesCalculator
                                                                                            .getJudicialOrderDeadlineDate(
-                                                                                               LocalDateTime.now(),
+                                                                                               nowInLocalZone(),
                                                                                                PLUS_7DAYS
                                                                                            )))
             .orderWithoutNoticeListForHearing(new GAOrderWithoutNoticeGAspec()
                                                   .setOrderWithoutNoticeDate(deadlinesCalculator
-                                                                                  .getJudicialOrderDeadlineDate(
-                                                                                      LocalDateTime.now(),
-                                                                                      PLUS_7DAYS
-                                                                                  ))
+                                                                                 .getJudicialOrderDeadlineDate(
+                                                                                     nowInLocalZone(),
+                                                                                     PLUS_7DAYS
+                                                                                 ))
                                                   .setOrderWithoutNotice(ORDER_WITHOUT_NOTICE))
             .build();
 
