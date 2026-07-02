@@ -82,10 +82,11 @@ class RetriggerDashboardNotificationTaskTest {
     void migrateCaseDataShouldThrowWhenDashboardTaskIdIsMissing() {
         DashboardNotificationTaskCaseReference caseReference = new DashboardNotificationTaskCaseReference();
         caseReference.setCaseReference(CASE_REFERENCE);
+        CaseData caseData = CaseData.builder().build();
 
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> task.migrateCaseData(CaseData.builder().build(), caseReference)
+            () -> task.migrateCaseData(caseData, caseReference)
         );
 
         assertEquals("Case reference and dashboardTaskId must not be blank", exception.getMessage());
@@ -93,11 +94,13 @@ class RetriggerDashboardNotificationTaskTest {
 
     @Test
     void migrateCaseDataShouldThrowWhenNoWorkflowIsRegistered() {
+        CaseData caseData = CaseData.builder().build();
+        DashboardNotificationTaskCaseReference caseReference = caseReference();
         when(registry.workflowsFor(DASHBOARD_TASK_ID, DashboardCaseType.CIVIL)).thenReturn(List.of());
 
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> task.migrateCaseData(CaseData.builder().build(), caseReference())
+            () -> task.migrateCaseData(caseData, caseReference)
         );
 
         assertEquals("No dashboard notification handlers registered for: " + DASHBOARD_TASK_ID, exception.getMessage());

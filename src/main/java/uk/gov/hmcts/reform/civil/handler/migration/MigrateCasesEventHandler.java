@@ -96,35 +96,31 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
     }
 
     private <T extends CaseReference> List<T> resolveCaseReferences(ExternalTask externalTask, MigrationTask<T> task) {
-        String caseIds = externalTask.getVariable(CASE_IDS);
-        String scenario = externalTask.getVariable(SCENARIO);
-        String dashboardTaskId = externalTask.getVariable(DASHBOARD_TASK_ID);
-        String dashboardProcessInstanceId = externalTask.getVariable(DASHBOARD_PROCESS_INSTANCE_ID);
-        String dashboardProcessInstanceIds = externalTask.getVariable(DASHBOARD_PROCESS_INSTANCE_IDS);
-        String camundaProcessIdentifier = externalTask.getVariable(NOTIFICATION_CAMUNDA_PROCESS_IDENTIFIER);
-        String caseNoteElementId = externalTask.getVariable(CASE_NOTE_ELEMENT_ID);
-        String notifyEventId = externalTask.getVariable(NOTIFY_EVENT_ID);
+        MigrationVariables variables = migrationVariables(externalTask);
 
         FileValue excelFileValue = externalTask.getVariableTyped(EXCEL_FILE, false);
         if (excelFileValue != null) {
             return getCaseReferencesFromExcel(task, excelFileValue);
         }
 
-        if (caseIds != null && !caseIds.isEmpty()) {
-            return getCaseReferencesFromVariables(
-                task,
-                caseIds,
-                scenario,
-                dashboardTaskId,
-                dashboardProcessInstanceId,
-                dashboardProcessInstanceIds,
-                camundaProcessIdentifier,
-                caseNoteElementId,
-                notifyEventId
-            );
+        if (variables.hasCaseIds()) {
+            return getCaseReferencesFromVariables(task, variables);
         }
 
         return getCaseReferencesFromCsv(externalTask, task.getType());
+    }
+
+    private MigrationVariables migrationVariables(ExternalTask externalTask) {
+        return new MigrationVariables(
+            externalTask.getVariable(CASE_IDS),
+            externalTask.getVariable(SCENARIO),
+            externalTask.getVariable(DASHBOARD_TASK_ID),
+            externalTask.getVariable(DASHBOARD_PROCESS_INSTANCE_ID),
+            externalTask.getVariable(DASHBOARD_PROCESS_INSTANCE_IDS),
+            externalTask.getVariable(NOTIFICATION_CAMUNDA_PROCESS_IDENTIFIER),
+            externalTask.getVariable(CASE_NOTE_ELEMENT_ID),
+            externalTask.getVariable(NOTIFY_EVENT_ID)
+        );
     }
 
     private <T extends CaseReference> List<T> getCaseReferencesFromExcel(MigrationTask<T> task, FileValue excelFileValue) {
@@ -151,31 +147,21 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
 
     private <T extends CaseReference> List<T> getCaseReferencesFromVariables(
         MigrationTask<T> task,
-        String caseIds,
-        String scenario,
-        String dashboardTaskId,
-        String dashboardProcessInstanceId,
-        String dashboardProcessInstanceIds,
-        String camundaProcessIdentifier,
-        String caseNoteElementId,
-        String notifyEventId
+        MigrationVariables variables
     ) {
-        List<String> caseReferenceIds = Arrays.stream(caseIds.split(","))
+        List<String> caseReferenceIds = Arrays.stream(variables.caseIds().split(","))
             .map(String::trim)
             .filter(s -> !s.isEmpty())
             .toList();
-        List<String> dashboardProcessInstanceIdList = toList(dashboardProcessInstanceIds);
+        List<String> dashboardProcessInstanceIdList = toList(variables.dashboardProcessInstanceIds());
 
         List<T> caseReferences = IntStream.range(0, caseReferenceIds.size())
             .mapToObj(index -> buildCaseReference(
                 task.getType(),
                 caseReferenceIds.get(index),
-                scenario,
-                dashboardTaskId,
-                resolveDashboardProcessInstanceId(index, dashboardProcessInstanceId, dashboardProcessInstanceIdList),
-                camundaProcessIdentifier,
-                caseNoteElementId,
-                notifyEventId
+                variables.withDashboardProcessInstanceId(
+                    resolveDashboardProcessInstanceId(index, variables.dashboardProcessInstanceId(), dashboardProcessInstanceIdList)
+                )
             ))
             .toList();
         log.info("Created {} case references from Camunda variables", caseReferences.size());
@@ -207,31 +193,26 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
     private <T extends CaseReference> T buildCaseReference(
         Class<T> type,
         String caseId,
-        String scenario,
-        String dashboardTaskId,
-        String dashboardProcessInstanceId,
-        String camundaProcessIdentifier,
-        String caseNoteElementId,
-        String notifyEventId
+        MigrationVariables variables
     ) {
-        if (scenario != null) {
-            return type.cast(buildScenarioCaseReference(caseId, scenario));
+        if (variables.scenario() != null) {
+            return type.cast(buildScenarioCaseReference(caseId, variables.scenario()));
         }
-        if (dashboardTaskId != null) {
+        if (variables.dashboardTaskId() != null) {
             return type.cast(buildDashboardNotificationTaskCaseReference(
                 caseId,
-                dashboardTaskId,
-                dashboardProcessInstanceId
+                variables.dashboardTaskId(),
+                variables.dashboardProcessInstanceId()
             ));
         }
-        if (camundaProcessIdentifier != null) {
-            return type.cast(buildNotificationCaseReference(caseId, camundaProcessIdentifier));
+        if (variables.camundaProcessIdentifier() != null) {
+            return type.cast(buildNotificationCaseReference(caseId, variables.camundaProcessIdentifier()));
         }
-        if (caseNoteElementId != null) {
-            return type.cast(buildCaseNoteReference(caseId, caseNoteElementId));
+        if (variables.caseNoteElementId() != null) {
+            return type.cast(buildCaseNoteReference(caseId, variables.caseNoteElementId()));
         }
-        if (notifyEventId != null) {
-            return type.cast(buildNotifyRpaFeedCaseReference(caseId, notifyEventId));
+        if (variables.notifyEventId() != null) {
+            return type.cast(buildNotifyRpaFeedCaseReference(caseId, variables.notifyEventId()));
         }
         return type.cast(buildBaseCaseReference(caseId));
     }
@@ -297,6 +278,35 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
             return caseReferenceCsvLoader.loadCaseReferenceList(type, csvFileName, encryptionSecret);
         } else {
             return caseReferenceCsvLoader.loadCaseReferenceList(type, csvFileName);
+        }
+    }
+
+    private record MigrationVariables(
+        String caseIds,
+        String scenario,
+        String dashboardTaskId,
+        String dashboardProcessInstanceId,
+        String dashboardProcessInstanceIds,
+        String camundaProcessIdentifier,
+        String caseNoteElementId,
+        String notifyEventId
+    ) {
+
+        boolean hasCaseIds() {
+            return caseIds != null && !caseIds.isEmpty();
+        }
+
+        MigrationVariables withDashboardProcessInstanceId(String processInstanceId) {
+            return new MigrationVariables(
+                caseIds,
+                scenario,
+                dashboardTaskId,
+                processInstanceId,
+                dashboardProcessInstanceIds,
+                camundaProcessIdentifier,
+                caseNoteElementId,
+                notifyEventId
+            );
         }
     }
 }
