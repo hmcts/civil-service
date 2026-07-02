@@ -383,19 +383,21 @@ class JudgmentByAdmissionMapperTest {
         assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
         assertEquals(1, activeJudgment.getJudgmentId());
         assertEquals(PaymentPlanSelection.PAY_IN_INSTALMENTS, activeJudgment.getPaymentPlan().getType());
-        assertEquals("1.20", activeJudgment.getInstalmentDetails().getAmount());
+        assertEquals("120", activeJudgment.getInstalmentDetails().getAmount());
         assertEquals(paymentFrequency, activeJudgment.getInstalmentDetails().getPaymentFrequency());
         assertEquals(LocalDate.now().plusDays(10), activeJudgment.getInstalmentDetails().getStartDate());
+        assertEquals("120", caseData.getJoRepaymentAmount());
         assertEquals(paymentFrequency, caseData.getJoRepaymentFrequency());
     }
 
     @ParameterizedTest
     @CsvSource({
-        "120,1.20",
-        "12050,120.50",
-        "12049,120.49"
+        "120,120",
+        "120.00,120",
+        "12050,12050",
+        "12049,12049"
     })
-    void testIfJudgmentByAdmission_scenario6_convertsPenceToPounds(BigDecimal inputAmount, String expectedAmount) {
+    void testIfJudgmentByAdmission_scenario6_keepsPenceForCcdMoneyFields(BigDecimal inputAmount, String expectedAmount) {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
             .specRespondent1Represented(YesOrNo.NO)
@@ -416,6 +418,7 @@ class JudgmentByAdmissionMapperTest {
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
         assertNotNull(activeJudgment);
         assertEquals(expectedAmount, activeJudgment.getInstalmentDetails().getAmount());
+        assertEquals(expectedAmount, caseData.getJoRepaymentAmount());
     }
 
     @Test
@@ -492,7 +495,7 @@ class JudgmentByAdmissionMapperTest {
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
 
         assertNotNull(activeJudgment.getInstalmentDetails());
-        assertEquals("1.00", activeJudgment.getInstalmentDetails().getAmount());
+        assertEquals("100", activeJudgment.getInstalmentDetails().getAmount());
         assertEquals(expectedFreq, activeJudgment.getInstalmentDetails().getPaymentFrequency());
     }
 
