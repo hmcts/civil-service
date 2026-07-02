@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.BaseCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,6 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
+import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
 
 class CaseDetailsConverterTest {
 
@@ -59,5 +62,26 @@ class CaseDetailsConverterTest {
         assertEquals("Details of Claim", civilCaseData.getDetailsOfClaim());
         assertEquals(CASE_REFERENCE, civilCaseData.getCcdCaseReference());
         assertEquals(CASE_ISSUED, civilCaseData.getCcdState());
+    }
+
+    @Test
+    public void shouldConvertUnwrappedMediationUnsuccessfulReasonsFromCivilCaseData() {
+        final CaseDetails caseDetails = CaseDetails.builder()
+            .caseTypeId(CASE_TYPE)
+            .id(CASE_REFERENCE)
+            .data(Map.of(
+                "mediationUnsuccessfulReasonsMultiSelect",
+                List.of("NOT_CONTACTABLE_CLAIMANT_ONE", "NOT_CONTACTABLE_DEFENDANT_ONE")
+            ))
+            .build();
+
+        final BaseCaseData baseCaseData = caseDetailsConverter.toBaseCaseData(caseDetails);
+        assertInstanceOf(CaseData.class, baseCaseData);
+
+        final CaseData civilCaseData = (CaseData) baseCaseData;
+        assertEquals(
+            List.of(NOT_CONTACTABLE_CLAIMANT_ONE, NOT_CONTACTABLE_DEFENDANT_ONE),
+            civilCaseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect()
+        );
     }
 }

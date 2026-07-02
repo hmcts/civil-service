@@ -31,6 +31,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_MEDIATION_UNSUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.APPOINTMENT_NO_AGREEMENT;
+import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_UNSUCCESSFUL_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_DEFENDANT_NONATTENDANCE;
@@ -137,6 +138,38 @@ class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest extends Bas
 
             Mediation mediation = new Mediation();
             mediation.setMediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_DEFENDANT_ONE));
+
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setLegacyCaseReference("reference");
+            caseData.setRespondent1Represented(YesOrNo.NO);
+            caseData.setCcdCaseReference(1234L);
+            caseData.setRespondent1ResponseDeadline(LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay());
+            caseData.setMediation(mediation);
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
+
+            handler.handle(callbackParams);
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_DEFENDANT_NONATTENDANCE.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                new ScenarioRequestParams(params)
+            );
+        }
+
+        @Test
+        void createDashboardNotificationsWhenCarmIsEnabledAndBothPartiesNotContactable() {
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            params.put("ccdCaseReference", "123");
+            when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+
+            Mediation mediation = new Mediation();
+            mediation.setMediationUnsuccessfulReasonsMultiSelect(List.of(
+                NOT_CONTACTABLE_CLAIMANT_ONE,
+                NOT_CONTACTABLE_DEFENDANT_ONE
+            ));
 
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setLegacyCaseReference("reference");
