@@ -62,15 +62,22 @@ scheduler:
   lockAtLeastFor: ${LOCK_AT_LEAST_FOR:PT1M}
   lockAtMostFor: ${LOCK_AT_MOST_FOR:PT30M}
   defaultLockAtMostFor: ${DEFAULT_LOCK_AT_MOST_FOR:PT30M}
-  judgementBuffer:
+  judgement-buffer:
     cronExpression: ${CRON_EXPRESSION_JUDGEMENT_BUFFER:0 0 2 * * *}
     enabled: ${SCHEDULER_ENABLED_JUDGEMENT_BUFFER:false}
-  defendantResponse:
+  defendant-response:
     cronExpression: ${CRON_EXPRESSION_DEFENDANT_RESPONSE:0 1 16 * * ?}
     enabled: ${SCHEDULER_ENABLED_DEFENDANT_RESPONSE:false}
+  default-back-pressure:
+    initialDelay: ${DEFAULT_BACK_PRESSURE_INITIAL_DELAY:PT0S}
+    maxDelay: ${DEFAULT_BACK_PRESSURE_MAX_DELAY:PT10S}
+    delayIncreaseOnFailure: ${DEFAULT_BACK_PRESSURE_DELAY_INCREASE_ON_FAILURE:PT0.5S}
+    delayIncreaseOnSlowCase: ${DEFAULT_BACK_PRESSURE_DELAY_INCREASE_ON_SLOW_CASE:PT0.25S}
+    delayReductionOnSuccess: ${DEFAULT_BACK_PRESSURE_DELAY_REDUCTION_ON_SUCCESS:PT0.1S}
+    slowCaseThreshold: ${DEFAULT_BACK_PRESSURE_SLOW_CASE_THRESHOLD:PT2S}
 
 search:
-  judgementBuffer:
+  judgement-buffer:
     pageSize: ${SEARCH_PAGE_SIZE_JUDGEMENT_BUFFER:50}
 
 oidc:
