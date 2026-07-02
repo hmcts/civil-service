@@ -10,12 +10,12 @@ import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.search.JudgementBufferExpiredSearchService;
+import uk.gov.hmcts.reform.civil.service.search.judgementbuffer.JudgementBufferExpiredSearchService;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty(prefix = "scheduler.judgementBuffer", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "scheduler.judgement-buffer", name = "enabled", havingValue = "true")
 public class JudgementBufferScheduler implements CivilScheduler {
 
     public static final String SCHEDULER_NAME = "JudgementBuffer";
@@ -30,7 +30,7 @@ public class JudgementBufferScheduler implements CivilScheduler {
         return SCHEDULER_NAME;
     }
 
-    @Scheduled(cron = "${scheduler.judgementBuffer.cronExpression}")
+    @Scheduled(cron = "${scheduler.judgement-buffer.cronExpression}")
     @SchedulerLock(name = "JudgementBufferScheduler_issueJudgement",
         lockAtMostFor = "${scheduler.lockAtMostFor}",
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
