@@ -37,10 +37,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("bulk_claim_enabled");
     }
 
-    public boolean isRPAEmailEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("enable-rpa-emails");
-    }
-
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
         return
             // because default value is true
