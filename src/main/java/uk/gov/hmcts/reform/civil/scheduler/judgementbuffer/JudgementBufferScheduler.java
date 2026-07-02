@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.search.JudgementBufferExpiredSearchService;
+import uk.gov.hmcts.reform.civil.service.search.judgementbuffer.JudgementBufferExpiredSearchService;
 
 @Component
 @RequiredArgsConstructor

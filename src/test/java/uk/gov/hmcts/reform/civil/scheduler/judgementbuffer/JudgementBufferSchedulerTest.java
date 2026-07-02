@@ -9,18 +9,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.search.JudgementBufferExpiredSearchService;
+import uk.gov.hmcts.reform.civil.service.search.judgementbuffer.JudgementBufferExpiredSearchService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.scheduler.judgementbuffer.JudgementBufferScheduler.SCHEDULER_NAME;
 
 @ExtendWith(MockitoExtension.class)
 class JudgementBufferSchedulerTest {
-
-    private static final String SCHEDULER_NAME = "JudgementBuffer";
 
     @Mock
     private JudgementBufferExpiredSearchService searchService;
