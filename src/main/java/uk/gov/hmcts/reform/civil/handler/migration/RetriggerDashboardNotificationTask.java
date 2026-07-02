@@ -39,32 +39,35 @@ public class RetriggerDashboardNotificationTask extends MigrationTask<DashboardN
     }
 
     @Override
+    @SuppressWarnings("java:S4144")
     protected String getEventSummary() {
         return "Retrigger dashboard notification task via Migration Task";
     }
 
     @Override
+    @SuppressWarnings("java:S4144")
     protected String getTaskName() {
         return "RetriggerDashboardNotificationTask";
     }
 
     @Override
+    @SuppressWarnings("java:S4144")
     protected String getEventDescription() {
         return "This task runs the dashboard notification workflow for a Camunda dashboard task id";
     }
 
     @Override
-    protected CaseData migrateCaseData(CaseData caseData, DashboardNotificationTaskCaseReference caseReference) {
-        if (caseReference == null
-            || StringUtils.isBlank(caseReference.getCaseReference())
-            || StringUtils.isBlank(caseReference.getDashboardTaskId())) {
+    protected CaseData migrateCaseData(CaseData caseData, DashboardNotificationTaskCaseReference dashboardReference) {
+        if (dashboardReference == null
+            || StringUtils.isBlank(dashboardReference.getCaseReference())
+            || StringUtils.isBlank(dashboardReference.getDashboardTaskId())) {
             throw new IllegalArgumentException("Case reference and dashboardTaskId must not be blank");
         }
 
         CaseData dashboardCaseData = caseData.toBuilder().build();
-        dashboardCaseData.setBusinessProcess(businessProcessForDashboardTask(caseData, caseReference));
+        dashboardCaseData.setBusinessProcess(businessProcessForDashboardTask(caseData, dashboardReference));
 
-        String dashboardTaskId = caseReference.getDashboardTaskId();
+        String dashboardTaskId = dashboardReference.getDashboardTaskId();
         List<DashboardWorkflowTask> workflows = registry.workflowsFor(dashboardTaskId, DashboardCaseType.CIVIL);
 
         if (workflows.isEmpty()) {
@@ -77,7 +80,7 @@ public class RetriggerDashboardNotificationTask extends MigrationTask<DashboardN
             .isCivilCaseType(true)
             .params(Map.of(BEARER_TOKEN, authToken)));
 
-        log.info("Retriggering dashboard task {} for case {}", dashboardTaskId, caseReference.getCaseReference());
+        log.info("Retriggering dashboard task {} for case {}", dashboardTaskId, dashboardReference.getCaseReference());
         workflows.forEach(task -> task.execute(context));
         return caseData;
     }
