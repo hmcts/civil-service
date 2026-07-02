@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
     "search.judgement-buffer.pageSize=50"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class JudgementBufferSchedulerITest {
+public class JudgementBufferSchedulerIT {
 
     private static final Long CASE_ID = 123L;
 
