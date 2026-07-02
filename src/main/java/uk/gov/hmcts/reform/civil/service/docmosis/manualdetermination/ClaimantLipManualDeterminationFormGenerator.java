@@ -16,7 +16,9 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static java.util.Objects.nonNull;
@@ -55,7 +57,7 @@ public class ClaimantLipManualDeterminationFormGenerator implements TemplateData
             .setDefendantAdmittedAmount(caseData.getRespondToAdmittedClaimOwingAmountPounds())
             .setClaimantRequestRepaymentBy(claimantResponseUtils.getClaimantRepaymentType(caseData))
             .setClaimResponseType(caseData.getRespondent1ClaimResponseTypeForSpec())
-            .setRegularPaymentAmount(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec())
+            .setRegularPaymentAmount(getApplicant1SuggestedInstallmentPaymentAmount(caseData))
             .setRepaymentFrequency(getRepaymentFrequency(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec()))
             .setRepaymentType(caseData.getApplicant1RepaymentOptionForDefendantSpec())
             .setFirstRepaymentDate(caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec())
@@ -65,6 +67,11 @@ public class ClaimantLipManualDeterminationFormGenerator implements TemplateData
 
     private DocmosisTemplates getDocmosisTemplate() {
         return CLAIMANT_LIP_MANUAL_DETERMINATION_PDF;
+    }
+
+    private BigDecimal getApplicant1SuggestedInstallmentPaymentAmount(CaseData caseData) {
+        BigDecimal paymentAmountInPennies = caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
+        return nonNull(paymentAmountInPennies) ? MonetaryConversions.penniesToPounds(paymentAmountInPennies) : null;
     }
 
     private String getRepaymentFrequency(PaymentFrequencyClaimantResponseLRspec claimantSuggestedRepaymentFrequency) {
