@@ -90,6 +90,9 @@ scheduler:
   trial-ready-notification:
     cronExpression: ${CRON_EXPRESSION_TRIAL_READY_NOTIFICATION:0 20 0 * * ?}
     enabled: ${SCHEDULER_ENABLED_TRIAL_READY_NOTIFICATION:true}
+  order-review-obligation-check:
+    cronExpression: ${CRON_EXPRESSION_ORDER_REVIEW_OBLIGATION_CHECK:0 10 1 * * ?}
+    enabled: ${SCHEDULER_ENABLED_ORDER_REVIEW_OBLIGATION_CHECK:true}
   default-back-pressure:
     initialDelay: ${DEFAULT_BACK_PRESSURE_INITIAL_DELAY:PT0S}
     maxDelay: ${DEFAULT_BACK_PRESSURE_MAX_DELAY:PT10S}

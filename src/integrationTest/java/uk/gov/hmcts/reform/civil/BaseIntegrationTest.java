@@ -56,7 +56,8 @@ import static org.mockito.Mockito.when;
         "scheduler.automated-hearing-notice.enabled=false",
         "scheduler.mediation-file-transfer.enabled=false",
         "scheduler.take-case-offline.enabled=false",
-        "scheduler.trial-ready-notification.enabled=false"
+        "scheduler.trial-ready-notification.enabled=false",
+        "scheduler.order-review-obligation-check.enabled=false"
     }
 )
 @AutoConfigureMockMvc

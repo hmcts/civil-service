@@ -505,6 +505,20 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 | `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_TRIAL_READY_NOTIFICATION` |
 | `cronExpression` | When the scheduler runs. | `0 20 0 * * ?` (Daily at 00:20) | `CRON_EXPRESSION_TRIAL_READY_NOTIFICATION` |
 
+### OrderReviewObligationCheckScheduler
+
+The `OrderReviewObligationCheckScheduler` checks eligible cases for due order review obligations and raises outstanding work-allocation tasks.
+It runs when `OrderReviewObligationCheck` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.order-review-obligation-check`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_ORDER_REVIEW_OBLIGATION_CHECK` |
+| `cronExpression` | When the scheduler runs. | `0 10 1 * * ?` (Daily at 01:10) | `CRON_EXPRESSION_ORDER_REVIEW_OBLIGATION_CHECK` |
+
 ### JudgementBufferScheduler
 
 The `JudgementBufferScheduler` is used to process cases where a default judgement has been requested and a buffer period has expired.
