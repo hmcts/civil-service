@@ -53,31 +53,33 @@ public class PollingEventEmitterHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        if (!featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
-            Set<CaseDetails> cases = Set.copyOf(caseSearchService.getCases());
-            if (log.isInfoEnabled()) {
-                log.info("Job '{}' found {} case(s) with IDs {}", externalTask.getTopicName(), cases.size(),
-                         cases.stream()
-                             .map(caseDetails -> caseDetails.getId().toString()).collect(Collectors.joining(","))
-                );
-            }
-            // 50 min is the max allowed time to avoid conflicting with next poller execution
-            long delaySeconds = Math.max(1L, multiCasesExecutionDelayInSeconds);
-            long limit = Math.min(cases.size(), (FIFTY_MINUTES / delaySeconds));
-            long delayMs = TimeUnit.SECONDS.toMillis(delaySeconds);
-            cases.stream()
-                .map(caseDetailsConverter::toCaseData)
-                .limit(limit)
-                .forEach(mappedCase -> {
-                    log.info(format(
-                        "Emitting %s camunda event for case through poller: %d",
-                        mappedCase.getBusinessProcess().getCamundaEvent(),
-                        mappedCase.getCcdCaseReference()
-                    ));
-                    eventEmitterService.emitBusinessProcessCamundaEvent(mappedCase, true);
-                    throttle(limit, delayMs);
-                });
+        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
+            return new ExternalTaskData();
         }
+
+        Set<CaseDetails> cases = Set.copyOf(caseSearchService.getCases());
+        if (log.isInfoEnabled()) {
+            log.info("Job '{}' found {} case(s) with IDs {}", externalTask.getTopicName(), cases.size(),
+                     cases.stream()
+                         .map(caseDetails -> caseDetails.getId().toString()).collect(Collectors.joining(","))
+            );
+        }
+        // 50 min is the max allowed time to avoid conflicting with next poller execution
+        long delaySeconds = Math.max(1L, multiCasesExecutionDelayInSeconds);
+        long limit = Math.min(cases.size(), (FIFTY_MINUTES / delaySeconds));
+        long delayMs = TimeUnit.SECONDS.toMillis(delaySeconds);
+        cases.stream()
+            .map(caseDetailsConverter::toCaseData)
+            .limit(limit)
+            .forEach(mappedCase -> {
+                log.info(format(
+                    "Emitting %s camunda event for case through poller: %d",
+                    mappedCase.getBusinessProcess().getCamundaEvent(),
+                    mappedCase.getCcdCaseReference()
+                ));
+                eventEmitterService.emitBusinessProcessCamundaEvent(mappedCase, true);
+                throttle(limit, delayMs);
+            });
         return new ExternalTaskData();
     }
 

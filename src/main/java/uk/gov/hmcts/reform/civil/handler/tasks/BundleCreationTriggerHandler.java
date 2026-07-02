@@ -65,28 +65,30 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
     @SuppressWarnings("java:S2142")
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        if (!featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
-            Set<CaseDetails> cases = bundleCreationTriggerService.getCases();
-            List<Long> ids = cases.stream().map(CaseDetails::getId).sorted().toList();
-            log.info("Job '{}' found {} case(s) with ids {}", externalTask.getTopicName(), cases.size(), ids);
-            log.info("Initial  waitTime in milliseconds is {}", waitTime);
-            String accessToken = noCacheUserService.getAccessToken(userConfig.getUserName(),
-                                                                   userConfig.getPassword());
-            cases.forEach(caseDetails -> {
-                try {
-                    boolean isBundleCreated = getIsBundleCreatedForHearingDate(caseDetails.getId());
-                    if (!isBundleCreated) {
-                        applicationEventPublisher.publishEvent(
-                            new BundleCreationTriggerEvent(caseDetails.getId(), accessToken));
-                        throttle(cases.size(), waitTime, LOCK_DURATION);
-                    } else {
-                        log.info("Bundle is already created for {}", caseDetails.getId());
-                    }
-                } catch (Exception e) {
-                    log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
-                }
-            });
+        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
+            return new ExternalTaskData();
         }
+
+        Set<CaseDetails> cases = bundleCreationTriggerService.getCases();
+        List<Long> ids = cases.stream().map(CaseDetails::getId).sorted().toList();
+        log.info("Job '{}' found {} case(s) with ids {}", externalTask.getTopicName(), cases.size(), ids);
+        log.info("Initial  waitTime in milliseconds is {}", waitTime);
+        String accessToken = noCacheUserService.getAccessToken(userConfig.getUserName(),
+                                                               userConfig.getPassword());
+        cases.forEach(caseDetails -> {
+            try {
+                boolean isBundleCreated = getIsBundleCreatedForHearingDate(caseDetails.getId());
+                if (!isBundleCreated) {
+                    applicationEventPublisher.publishEvent(
+                        new BundleCreationTriggerEvent(caseDetails.getId(), accessToken));
+                    throttle(cases.size(), waitTime, LOCK_DURATION);
+                } else {
+                    log.info("Bundle is already created for {}", caseDetails.getId());
+                }
+            } catch (Exception e) {
+                log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
+            }
+        });
         return new ExternalTaskData();
     }
 

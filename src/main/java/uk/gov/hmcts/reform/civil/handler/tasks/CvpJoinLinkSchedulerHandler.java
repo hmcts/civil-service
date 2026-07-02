@@ -39,20 +39,22 @@ public class CvpJoinLinkSchedulerHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        if (!featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
-            Set<CaseDetails> cases = searchService.getCases();
-            log.info("CVP Join Link Scheduler job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
-
-            cases.forEach(caseDetails -> {
-                try {
-                    log.info("Publishing event for case id: '{}'", caseDetails.getId());
-                    applicationEventPublisher.publishEvent(new CvpJoinLinkEvent(caseDetails.getId()));
-                    throttle(cases.size());
-                } catch (Exception e) {
-                    log.error("Publishing 'CvpJoinLinkEvent' event for case id: '{}' failed", caseDetails.getId(), e);
-                }
-            });
+        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
+            return new ExternalTaskData();
         }
+
+        Set<CaseDetails> cases = searchService.getCases();
+        log.info("CVP Join Link Scheduler job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
+
+        cases.forEach(caseDetails -> {
+            try {
+                log.info("Publishing event for case id: '{}'", caseDetails.getId());
+                applicationEventPublisher.publishEvent(new CvpJoinLinkEvent(caseDetails.getId()));
+                throttle(cases.size());
+            } catch (Exception e) {
+                log.error("Publishing 'CvpJoinLinkEvent' event for case id: '{}' failed", caseDetails.getId(), e);
+            }
+        });
         return new ExternalTaskData();
     }
 
