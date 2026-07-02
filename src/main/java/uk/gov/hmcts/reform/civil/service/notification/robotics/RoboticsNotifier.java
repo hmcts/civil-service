@@ -36,15 +36,15 @@ public class RoboticsNotifier {
         RoboticsCaseDataSpec roboticsCaseDataSpec = null;
         Set<ValidationMessage> errors = null;
 
-        String legacyCaseReference = caseData.getLegacyCaseReference();
+        Long caseId = caseData.getCcdCaseReference();
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
         try {
-            log.info(String.format("Start notify robotics for %s", legacyCaseReference));
+            log.info("Start notify robotics for {}", caseId);
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
                 roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData, authToken);
                 errors = jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString());
             } else {
-                log.info(String.format("Unspec robotics Data Mapping for %s", legacyCaseReference));
+                log.info("Unspec robotics Data Mapping for {}", caseId);
                 roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(
                     caseData,
                     authToken
@@ -53,11 +53,11 @@ public class RoboticsNotifier {
             }
 
             if (errors == null || errors.isEmpty()) {
-                log.info(String.format("Valid RPA Json payload for %s", legacyCaseReference));
+                log.info("Valid RPA Json payload for {}", caseId);
                 sendNotifications(caseData, multiPartyScenario, authToken);
             } else {
                 throw new JsonSchemaValidationException(
-                    format("Invalid RPA Json payload for %s", legacyCaseReference), errors);
+                    format("Invalid RPA Json payload for %s", caseId), errors);
             }
         } catch (JsonProcessingException e) {
             throw new RoboticsDataException(e.getMessage(), e);
