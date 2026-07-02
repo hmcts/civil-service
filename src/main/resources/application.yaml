@@ -60,8 +60,8 @@ scheduler:
   active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:JudgementBuffer}
   circuitBreakerThreshold: ${CIRCUIT_BREAKER_THRESHOLD:5}
   lockAtLeastFor: ${LOCK_AT_LEAST_FOR:PT1M}
-  lockAtMostFor: ${LOCK_AT_MOST_FOR:PT5M}
-  defaultLockAtMostFor: ${DEFAULT_LOCK_AT_MOST_FOR:PT10M}
+  lockAtMostFor: ${LOCK_AT_MOST_FOR:PT30M}
+  defaultLockAtMostFor: ${DEFAULT_LOCK_AT_MOST_FOR:PT30M}
   judgement-buffer:
     cronExpression: ${CRON_EXPRESSION_JUDGEMENT_BUFFER:0 0 2 * * *}
     enabled: ${SCHEDULER_ENABLED_JUDGEMENT_BUFFER:false}
@@ -75,6 +75,10 @@ scheduler:
     delayIncreaseOnSlowCase: ${DEFAULT_BACK_PRESSURE_DELAY_INCREASE_ON_SLOW_CASE:PT0.25S}
     delayReductionOnSuccess: ${DEFAULT_BACK_PRESSURE_DELAY_REDUCTION_ON_SUCCESS:PT0.1S}
     slowCaseThreshold: ${DEFAULT_BACK_PRESSURE_SLOW_CASE_THRESHOLD:PT2S}
+
+search:
+  judgement-buffer:
+    pageSize: ${SEARCH_PAGE_SIZE_JUDGEMENT_BUFFER:50}
 
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
