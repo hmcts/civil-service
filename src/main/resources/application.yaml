@@ -111,6 +111,9 @@ scheduler:
   ga-order-made:
     cronExpression: ${CRON_EXPRESSION_GA_ORDER_MADE:0 15 16 * * ?}
     enabled: ${SCHEDULER_ENABLED_GA_ORDER_MADE:true}
+  ga-unless-order:
+    cronExpression: ${CRON_EXPRESSION_GA_UNLESS_ORDER:0 0 16 * * ?}
+    enabled: ${SCHEDULER_ENABLED_GA_UNLESS_ORDER:true}
   default-back-pressure:
     initialDelay: ${DEFAULT_BACK_PRESSURE_INITIAL_DELAY:PT0S}
     maxDelay: ${DEFAULT_BACK_PRESSURE_MAX_DELAY:PT10S}

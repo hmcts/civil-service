@@ -85,7 +85,7 @@ The project defines a set of timer-driven Camunda processes that keep cases movi
 | GA doc upload notify scheduler | Sends notifications when GA supporting documents are uploaded. | `GADocUploadNotifyScheduler` | `0 0 23 * * ?` | Daily at 23:00 |
 | GA order made scheduler | Processes stay-order general applications once their order deadline has expired. | `GAOrderMadeScheduler` | `0 15 16 * * ?` | Daily at 16:15 |
 | GA response deadline processor | Processes GA response deadlines, judge revisits and respondent checks. | `GAResponseDeadlineProcessor`<br>`GAJudgeRevisitProcessor`<br>`GARespondentResponseCheckScheduler` | `0 15 17 * * ?` | Daily at 17:15 |
-| GA unless order scheduler | Enforces GA Unless Orders once the compliance deadline passes. | `GAUnlessOrderScheduler` | `0 0 16 ? * * *` | Daily at 16:00 |
+| GA unless order scheduler | Enforces GA Unless Orders once the compliance deadline passes. | `GAUnlessOrderScheduler` | `0 0 16 * * ?` | Daily at 16:00 |
 | Generate CSV and send to MMT scheduler | Produces nightly CSV/JSON exports for the mediation service (MMT). | `GenerateCsvAndSendToMmt`<br>`GenerateJsonAndSendToMmt` | `0 0 1 ? * * *` | Daily at 01:00 |
 | Hearing cvp link scheduler | Issues CVP/remote hearing links on a daily cadence. | `HEARING_CVP_LINK` | `0 50 0 * * ?` | Daily at 00:50 |
 | Hearing fee check scheduler | Checks for unpaid hearing fees and raises the necessary follow-up tasks. | `HEARING_FEE_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
@@ -602,6 +602,20 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 |---------|-------------|---------|----------------------|
 | `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_GA_ORDER_MADE` |
 | `cronExpression` | When the scheduler runs. | `0 15 16 * * ?` (Daily at 16:15) | `CRON_EXPRESSION_GA_ORDER_MADE` |
+
+### GAUnlessOrderScheduler
+
+The `GAUnlessOrderScheduler` processes General Application unless orders when their compliance deadline is today or has passed.
+It runs when `GAUnlessOrderScheduler` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.ga-unless-order`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_GA_UNLESS_ORDER` |
+| `cronExpression` | When the scheduler runs. | `0 0 16 * * ?` (Daily at 16:00) | `CRON_EXPRESSION_GA_UNLESS_ORDER` |
 
 ### JudgementBufferScheduler
 

@@ -63,7 +63,8 @@ import static org.mockito.Mockito.when;
         "scheduler.case-dismissed.enabled=false",
         "scheduler.ga-document-upload-notify.enabled=false",
         "scheduler.ga-proof-of-debt.enabled=false",
-        "scheduler.ga-order-made.enabled=false"
+        "scheduler.ga-order-made.enabled=false",
+        "scheduler.ga-unless-order.enabled=false"
     }
 )
 @AutoConfigureMockMvc
