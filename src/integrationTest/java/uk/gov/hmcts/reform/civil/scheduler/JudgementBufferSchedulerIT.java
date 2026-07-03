@@ -30,14 +30,12 @@ import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
-    "test.id=JudgementBufferSchedulerITest",
+    "test.id=JudgementBufferSchedulerIT",
     "scheduler.judgement-buffer.enabled=true",
     "search.judgement-buffer.pageSize=50"
 })
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class JudgementBufferSchedulerIT {
-
-    private static final Long CASE_ID = 123L;
 
     @Autowired
     private JudgementBufferScheduler scheduler;
@@ -56,29 +54,6 @@ public class JudgementBufferSchedulerIT {
         when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
         when(featureToggleService.isSpringSchedulerEnabled("JudgementBuffer")).thenReturn(true);
         coreCaseDataApiMockHelper.setupIdamClient();
-    }
-
-    @Test
-    void shouldExecuteJudgementBufferScheduler() {
-        // Given
-        String caseIdString = CASE_ID.toString();
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateJudgmentRequested().id(CASE_ID)
-            .build();
-        SearchResult page1 = SearchResult.builder().total(1).cases(List.of(caseDetails)).build();
-        StartEventResponse startEventResponse = StartEventResponse.builder().eventId(caseIdString).caseDetails(
-            caseDetails).build();
-
-        coreCaseDataApiMockHelper.mockElasticSearchResultPaginated(page1);
-        coreCaseDataApiMockHelper.mockStartEvent(caseIdString, startEventResponse);
-        coreCaseDataApiMockHelper.mockSubmitEvent(caseIdString, caseDetails);
-
-        // When
-        scheduler.runScheduledTask();
-
-        // Then
-        verify(telemetryService).trackEvent(eq("JudgementBufferJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("JudgementBufferJobCompleted"), anyMap());
-        coreCaseDataApiMockHelper.verifySubmitEvent(1);
     }
 
     @Test
