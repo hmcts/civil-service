@@ -22,4 +22,7 @@ public class DashboardNotificationTaskCaseReference extends CaseReference {
 
     @JsonProperty
     private String dashboardProcessInstanceId;
+
+    @JsonProperty
+    private String dashboardCaseType;
 }

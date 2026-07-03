@@ -15,12 +15,15 @@ import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class JudgementBufferScheduledTaskTest {
 
     @Mock
     private CoreCaseDataService coreCaseDataService;
+    @Mock
+    private DefaultBackPressureConfiguration defaultBackPressureConfiguration;
 
     @InjectMocks
     private JudgementBufferScheduledTask task;
@@ -46,8 +49,7 @@ class JudgementBufferScheduledTaskTest {
             Duration.ofSeconds(5)
         );
 
-        DefaultBackPressureConfiguration configuration = new DefaultBackPressureConfiguration();
-        configuration.setDefaultBackPressure(backPressure);
+        when(defaultBackPressureConfiguration.getDefaultBackPressure()).thenReturn(backPressure);
 
         ScheduledTaskBackPressureConfiguration result = task.backPressureConfiguration();
 

@@ -8,6 +8,7 @@ import org.springframework.transaction.support.SimpleTransactionStatus;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardNotificationTaskCaseReference;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardCaseType;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardNotificationRegistry;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
@@ -93,6 +94,33 @@ class RetriggerDashboardNotificationTaskTest {
         verify(entityManager).joinTransaction();
         verify(entityManager).flush();
         verify(transactionManager).commit(any());
+    }
+
+    @Test
+    void migrateGeneralApplicationCaseDataShouldRunGeneralApplicationDashboardWorkflow() {
+        AtomicReference<DashboardTaskContext> contextReference = new AtomicReference<>();
+        DashboardWorkflowTask workflow = new DashboardWorkflowTask() {
+            @Override
+            public void execute(DashboardTaskContext context) {
+                contextReference.set(context);
+            }
+        };
+
+        when(registry.workflowsFor(DASHBOARD_TASK_ID, DashboardCaseType.GENERAL_APPLICATION)).thenReturn(List.of(workflow));
+        when(userService.getAccessToken("system-user", "password")).thenReturn(AUTH_TOKEN);
+
+        CaseData caseData = CaseData.builder().build();
+        GeneralApplicationCaseData gaCaseData = new GeneralApplicationCaseData();
+        gaCaseData.setCcdCaseReference(Long.valueOf(CASE_REFERENCE));
+        DashboardNotificationTaskCaseReference caseReference = caseReference();
+        caseReference.setDashboardCaseType(DashboardCaseType.GENERAL_APPLICATION.name());
+
+        task.migrateGeneralApplicationCaseData(caseData, gaCaseData, caseReference);
+
+        verify(registry).workflowsFor(DASHBOARD_TASK_ID, DashboardCaseType.GENERAL_APPLICATION);
+        assertEquals(DashboardCaseType.GENERAL_APPLICATION, contextReference.get().caseType());
+        assertEquals(Long.valueOf(CASE_REFERENCE), contextReference.get().generalApplicationCaseData().getCcdCaseReference());
+        assertEquals(DASHBOARD_TASK_ID, contextReference.get().generalApplicationCaseData().getBusinessProcess().getActivityId());
     }
 
     @Test
