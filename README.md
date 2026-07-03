@@ -394,7 +394,7 @@ The service includes a common framework for implementing scheduled tasks. This f
 
 - **`CivilScheduler`**: The main interface for scheduler components. Implementations should be annotated with `@Component` and `@Scheduled`.
 - **`ScheduledTask`**: An interface extending `Consumer<CaseDetails>`, representing the logic to be executed for each case found.
-- **`ScheduledTaskRunner`**: A prototype-scoped component that coordinates the task execution, including case retrieval via a `Supplier<Set<CaseDetails>>`.
+- **`ScheduledTaskRunner`**: A component that coordinates the task execution, including case retrieval via a `Supplier<? extends TaskResult<T>>`.
 - **`ElasticSearchService`**: A base class for services that search for cases to be processed by a scheduler.
 
 ### Creating a New Scheduler

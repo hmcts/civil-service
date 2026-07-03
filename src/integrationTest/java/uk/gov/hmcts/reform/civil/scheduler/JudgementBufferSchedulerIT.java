@@ -20,7 +20,9 @@ import uk.gov.hmcts.test.config.CoreCaseDataApiMockHelperConfiguration;
 import uk.gov.hmcts.test.helper.CoreCaseDataApiMockHelper;
 
 import java.util.List;
+import java.util.Map;
 
+import static java.util.stream.IntStream.rangeClosed;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -29,13 +31,12 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_GRA
 
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
-    "test.id=JudgementBufferSchedulerITest",
-    "scheduler.judgement-buffer.enabled=true"
+    "test.id=JudgementBufferSchedulerIT",
+    "scheduler.judgement-buffer.enabled=true",
+    "search.judgement-buffer.pageSize=50"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-public class JudgementBufferSchedulerITest {
-
-    private static final Long CASE_ID = 123L;
+public class JudgementBufferSchedulerIT {
 
     @Autowired
     private JudgementBufferScheduler scheduler;
@@ -57,21 +58,24 @@ public class JudgementBufferSchedulerITest {
     }
 
     @Test
-    void shouldExecuteJudgementBufferScheduler() {
+    void shouldExecuteJudgementBufferSchedulerWithPagination() {
         // Given
-        String caseIdString = CASE_ID.toString();
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateJudgmentRequested().id(CASE_ID).build();
-        SearchResult searchResult = SearchResult.builder().total(1).cases(List.of(caseDetails)).build();
-        StartEventResponse startEventResponse = StartEventResponse.builder().eventId(caseIdString).caseDetails(
-            caseDetails).build();
+        // Create 50 cases for the first page to test pagination
+        List<CaseDetails> page1Cases = createCaseDetailsBatch(50);
+        CaseDetails case51 = CaseDetailsBuilder.builder().id(51L).data(Map.of()).build();
 
-        coreCaseDataApiMockHelper.mockElasticSearchResult(searchResult);
-        coreCaseDataApiMockHelper.mockStartEvent(
-            caseIdString,
-            startEventResponse,
-            DEFAULT_JUDGEMENT_GRANTED_SPEC.name()
-        );
-        coreCaseDataApiMockHelper.mockSubmitEvent(caseIdString, caseDetails);
+        SearchResult page1 = SearchResult.builder().total(51).cases(page1Cases).build();
+        SearchResult page2 = SearchResult.builder().total(51).cases(List.of(case51)).build();
+
+        coreCaseDataApiMockHelper.mockElasticSearchResultPaginated(page1, page2);
+
+        StartEventResponse startEventResponse = StartEventResponse.builder()
+            .eventId("eventId")
+            .caseDetails(CaseDetails.builder().id(1L).data(Map.of()).build())
+            .build();
+        // Mock start and submit events for all 51 cases
+        coreCaseDataApiMockHelper.mockStartEventAnyCase(startEventResponse, DEFAULT_JUDGEMENT_GRANTED_SPEC.name());
+        coreCaseDataApiMockHelper.mockSubmitEventAnyCase(CaseDetailsBuilder.builder().id(1L).data(Map.of()).build());
 
         // When
         scheduler.runScheduledTask();
@@ -79,6 +83,12 @@ public class JudgementBufferSchedulerITest {
         // Then
         verify(telemetryService).trackEvent(eq("JudgementBufferJobStarted"), anyMap());
         verify(telemetryService).trackEvent(eq("JudgementBufferJobCompleted"), anyMap());
-        coreCaseDataApiMockHelper.verifySubmitEvent();
+        coreCaseDataApiMockHelper.verifySubmitEvent(51);
+    }
+
+    private List<CaseDetails> createCaseDetailsBatch(int size) {
+        return rangeClosed(1, size)
+            .mapToObj(i -> CaseDetailsBuilder.builder().id((long) i).data(Map.of()).build())
+            .toList();
     }
 }

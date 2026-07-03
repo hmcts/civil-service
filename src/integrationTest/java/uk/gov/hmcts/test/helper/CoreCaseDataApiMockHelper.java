@@ -47,6 +47,11 @@ public class CoreCaseDataApiMockHelper {
             .thenReturn(searchResult);
     }
 
+    public void mockElasticSearchResultPaginated(SearchResult searchResult, SearchResult... nextSearchResults) {
+        when(coreCaseDataApi.searchCases(any(), any(), any(), any()))
+            .thenReturn(searchResult, nextSearchResults);
+    }
+
     public void mockStartEvent(String caseIdString, StartEventResponse startEventResponse, String eventId) {
         when(coreCaseDataApi.startEventForCaseWorker(
             ACCESS_TOKEN,
@@ -56,6 +61,18 @@ public class CoreCaseDataApiMockHelper {
             CASE_TYPE,
             caseIdString,
             eventId
+        )).thenReturn(startEventResponse);
+    }
+
+    public void mockStartEventAnyCase(StartEventResponse startEventResponse, String eventId) {
+        when(coreCaseDataApi.startEventForCaseWorker(
+            eq(ACCESS_TOKEN),
+            eq(GENERATED_TOKEN),
+            eq(USER_ID),
+            eq(JURISDICTION),
+            eq(CASE_TYPE),
+            any(String.class),
+            eq(eventId)
         )).thenReturn(startEventResponse);
     }
 
@@ -72,8 +89,8 @@ public class CoreCaseDataApiMockHelper {
         )).thenReturn(caseDetails);
     }
 
-    public void verifySubmitEvent() {
-        verify(coreCaseDataApi).submitEventForCaseWorker(
+    public void mockSubmitEventAnyCase(CaseDetails caseDetails) {
+        when(coreCaseDataApi.submitEventForCaseWorker(
             eq(ACCESS_TOKEN),
             eq(GENERATED_TOKEN),
             eq(USER_ID),
@@ -82,6 +99,19 @@ public class CoreCaseDataApiMockHelper {
             any(String.class),
             eq(true),
             any(CaseDataContent.class)
+        )).thenReturn(caseDetails);
+    }
+
+    public void verifySubmitEvent(int expectedCount) {
+        verify(coreCaseDataApi, org.mockito.Mockito.times(expectedCount)).submitEventForCaseWorker(
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            org.mockito.ArgumentMatchers.anyBoolean(),
+            any()
         );
     }
 }

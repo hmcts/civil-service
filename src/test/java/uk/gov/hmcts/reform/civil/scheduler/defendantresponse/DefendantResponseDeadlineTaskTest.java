@@ -9,15 +9,23 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.scheduler.common.DefaultBackPressureConfiguration;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskBackPressureConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DefendantResponseDeadlineTaskTest {
 
     @Mock
     private CoreCaseDataService coreCaseDataService;
+
+    @Mock
+    private DefaultBackPressureConfiguration defaultBackPressureConfiguration;
+
+    @Mock
+    private ScheduledTaskBackPressureConfiguration backPressureConfiguration;
 
     @InjectMocks
     private DefendantResponseDeadlineTask task;
@@ -33,8 +41,9 @@ class DefendantResponseDeadlineTaskTest {
     }
 
     @Test
-    void shouldReturnDefaultBackPressureConfiguration_whenBackPressureConfigurationIsCalled() {
-        assertThat(task.backPressureConfiguration())
-            .isEqualTo(DefaultBackPressureConfiguration.getDefault());
+    void shouldUseDefaultBackPressureConfiguration() {
+        when(defaultBackPressureConfiguration.getDefaultBackPressure()).thenReturn(backPressureConfiguration);
+
+        assertThat(task.backPressureConfiguration()).isSameAs(backPressureConfiguration);
     }
 }

@@ -14,9 +14,15 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_DE
 @Component
 @AllArgsConstructor
 @Slf4j
-public class DefendantResponseDeadlineTask implements ScheduledTask {
+public class DefendantResponseDeadlineTask implements ScheduledTask<CaseDetails, Long> {
 
     private final CoreCaseDataService coreCaseDataService;
+    private final DefaultBackPressureConfiguration defaultBackPressureConfiguration;
+
+    @Override
+    public Long getItemId(CaseDetails caseDetails) {
+        return caseDetails.getId();
+    }
 
     @Override
     public void accept(CaseDetails caseDetails) {
@@ -27,6 +33,6 @@ public class DefendantResponseDeadlineTask implements ScheduledTask {
 
     @Override
     public ScheduledTaskBackPressureConfiguration backPressureConfiguration() {
-        return DefaultBackPressureConfiguration.getDefault();
+        return defaultBackPressureConfiguration.getDefaultBackPressure();
     }
 }
