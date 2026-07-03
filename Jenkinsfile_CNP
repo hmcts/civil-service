@@ -66,10 +66,7 @@ def secrets = [
     secret('idam-noc-approver-password', 'IDAM_NOC_APPROVER_PASSWORD'),
     secret('aac-manage-case-s2s-secret', 'MANAGE_CASE_S2S_KEY'),
     secret('notify-mca-api-key-secret', 'NOTIFY_MCA_API_KEY')
-  ],
-  'civil-prod': [
-    secret('microservicekey-civil-service', 'S2S_SECRET_PROD')
-  ],
+  ]
 ]
 
 def secretsOtherenv = [
