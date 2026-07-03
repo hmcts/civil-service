@@ -5,33 +5,43 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.event.CoscApplicationProcessorEvent;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.CoscApplicationSearchService;
 
 import java.util.Set;
-import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
-import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
 public class CoscApplicationProcessorHandler extends BaseExternalTaskHandler {
 
+    private static final String SCHEDULER_NAME = "CoscApplicationProcessor";
+
     private final CoscApplicationSearchService coscApplicationSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final FeatureToggleService featureToggleService;
 
     public CoscApplicationProcessorHandler(
         ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         CoscApplicationSearchService coscApplicationSearchService,
-        ApplicationEventPublisher applicationEventPublisher
+        ApplicationEventPublisher applicationEventPublisher,
+        FeatureToggleService featureToggleService
     ) {
         super(externalTaskCompletionService, eventProperties);
         this.coscApplicationSearchService = coscApplicationSearchService;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.featureToggleService = featureToggleService;
     }
 
     public ExternalTaskData handleTask(ExternalTask externalTask) {
+        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
+            return new ExternalTaskData();
+        }
+
         Set<CaseDetails> cases = coscApplicationSearchService.getCases();
         log.info("COSC Application Processor Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 

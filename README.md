@@ -575,6 +575,20 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 | `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_GA_DOCUMENT_UPLOAD_NOTIFY` |
 | `cronExpression` | When the scheduler runs. | `0 0 23 * * ?` (Daily at 23:00) | `CRON_EXPRESSION_GA_DOCUMENT_UPLOAD_NOTIFY` |
 
+### GAProofOfDebtScheduler
+
+The `GAProofOfDebtScheduler` processes active Certificate of Satisfaction or Cancellation General Applications once their scheduler deadline has passed.
+It runs when `CoscApplicationProcessor` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.ga-proof-of-debt`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_GA_PROOF_OF_DEBT` |
+| `cronExpression` | When the scheduler runs. | `0 0 16 * * ?` (Daily at 16:00) | `CRON_EXPRESSION_GA_PROOF_OF_DEBT` |
+
 ### JudgementBufferScheduler
 
 The `JudgementBufferScheduler` is used to process cases where a default judgement has been requested and a buffer period has expired.

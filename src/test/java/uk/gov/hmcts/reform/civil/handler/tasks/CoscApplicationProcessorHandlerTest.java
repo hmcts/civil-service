@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.CoscApplicationProcessorEvent;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.CoscApplicationSearchService;
 
 import java.util.Map;
@@ -47,6 +48,8 @@ class CoscApplicationProcessorHandlerTest {
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
+    @Mock
+    private FeatureToggleService featureToggleService;
     @Spy
     private EventProperties eventProperties = configuredEventProperties();
 
@@ -68,6 +71,7 @@ class CoscApplicationProcessorHandlerTest {
         Map<String, Object> data = Map.of("data", "some data");
         Set<CaseDetails> caseDetails = Set.of(new CaseDetailsBuilder().id(caseId).data(data).build());
 
+        when(featureToggleService.isSpringSchedulerEnabled("CoscApplicationProcessor")).thenReturn(false);
         when(searchService.getCases()).thenReturn(caseDetails);
 
         handler.execute(mockTask, externalTaskService);
@@ -78,6 +82,7 @@ class CoscApplicationProcessorHandlerTest {
 
     @Test
     void shouldNotEmitEvent_WhenNoCasesFound() {
+        when(featureToggleService.isSpringSchedulerEnabled("CoscApplicationProcessor")).thenReturn(false);
         when(searchService.getCases()).thenReturn(Set.of());
 
         handler.execute(mockTask, externalTaskService);
@@ -86,9 +91,21 @@ class CoscApplicationProcessorHandlerTest {
     }
 
     @Test
+    void shouldNotProcessLegacyTaskWhenSpringSchedulerIsEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled("CoscApplicationProcessor")).thenReturn(true);
+
+        handler.execute(mockTask, externalTaskService);
+
+        verifyNoInteractions(searchService);
+        verifyNoInteractions(applicationEventPublisher);
+        verify(externalTaskService).complete(mockTask, null);
+    }
+
+    @Test
     void shouldCallHandleFailureMethod_whenExceptionFromBusinessLogic() {
         String errorMessage = "there was an error";
 
+        when(featureToggleService.isSpringSchedulerEnabled("CoscApplicationProcessor")).thenReturn(false);
         when(mockTask.getRetries()).thenReturn(null);
         when(searchService.getCases()).thenAnswer(invocation -> {
             throw new Exception(errorMessage);
