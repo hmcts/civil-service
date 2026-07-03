@@ -21,10 +21,22 @@ public final class ElasticSearchResult {
         this.caseDetailsStream = caseDetailsStream;
     }
 
+    /**
+     * Gets the total results count.
+     *
+     * @return the total number of results found in ElasticSearch
+     */
     public int totalResults() {
         return totalResults;
     }
 
+    /**
+     * Gets the stream of CaseDetails.
+     * Note: the stream can only be consumed once.
+     *
+     * @return the stream of cases
+     * @throws IllegalStateException if the stream has already been consumed
+     */
     public Stream<CaseDetails> caseDetailsStream() {
         if (consumed.getAndSet(true)) {
             throw new IllegalStateException("Stream has already been consumed");
