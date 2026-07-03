@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
 
+import java.time.Duration;
 import java.util.Map;
 
 @Component
@@ -15,6 +16,7 @@ public class ScheduledEventTracker {
     private static final String SUCCEEDED_CASES = "succeededCases";
     private static final String FAILED_CASES = "failedCases";
     private static final String ABORT_REASON = "abortReason";
+    private static final String CUMULATIVE_DELAY = "cumulativeDelay";
     private static final String UNKNOWN = "Unknown";
     private static final String ZERO = String.valueOf(0);
     private static final String FAILURE = "FAILURE";
@@ -23,6 +25,8 @@ public class ScheduledEventTracker {
     private static final String STATUS = "status";
     private static final String ERROR = "error";
     private static final String ERROR_CATEGORY = "errorCategory";
+    private static final String PREVIOUS_DELAY = "previousDelay";
+    private static final String CURRENT_DELAY = "currentDelay";
 
     private final ErrorCategorizer errorCategorizer;
     private final TelemetryService telemetryService;
@@ -73,14 +77,16 @@ public class ScheduledEventTracker {
     public void jobCompletedEvent(ScheduledTaskEventConfiguration eventConfig,
                                   int totalCases,
                                   int succeededCases,
-                                  int failedCases) {
+                                  int failedCases,
+                                  Duration cumulativeDelay) {
         telemetryService.trackEvent(
             eventConfig.getJobCompletedEvent(),
             Map.of(
                 SCHEDULER_NAME, eventConfig.getSchedulerName(),
                 TOTAL_CASES, String.valueOf(totalCases),
                 SUCCEEDED_CASES, String.valueOf(succeededCases),
-                FAILED_CASES, String.valueOf(failedCases)
+                FAILED_CASES, String.valueOf(failedCases),
+                CUMULATIVE_DELAY, String.valueOf(cumulativeDelay.toMillis())
             )
         );
     }
@@ -92,7 +98,8 @@ public class ScheduledEventTracker {
                 SCHEDULER_NAME, eventConfig.getSchedulerName(),
                 TOTAL_CASES, ZERO,
                 SUCCEEDED_CASES, ZERO,
-                FAILED_CASES, ZERO
+                FAILED_CASES, ZERO,
+                CUMULATIVE_DELAY, ZERO
             )
         );
     }
@@ -101,7 +108,8 @@ public class ScheduledEventTracker {
                                 int totalCases,
                                 int succeededCases,
                                 int failedCases,
-                                String reason) {
+                                String reason,
+                                Duration cumulativeDelay) {
         telemetryService.trackEvent(
             eventConfig.getJobAbortedEvent(),
             Map.of(
@@ -109,7 +117,8 @@ public class ScheduledEventTracker {
                 TOTAL_CASES, String.valueOf(totalCases),
                 SUCCEEDED_CASES, String.valueOf(succeededCases),
                 FAILED_CASES, String.valueOf(failedCases),
-                ABORT_REASON, reason != null ? reason : UNKNOWN
+                ABORT_REASON, reason != null ? reason : UNKNOWN,
+                CUMULATIVE_DELAY, String.valueOf(cumulativeDelay.toMillis())
             )
         );
     }
@@ -122,7 +131,19 @@ public class ScheduledEventTracker {
                 TOTAL_CASES, ZERO,
                 SUCCEEDED_CASES, ZERO,
                 FAILED_CASES, ZERO,
-                ABORT_REASON, reason != null ? reason : UNKNOWN
+                ABORT_REASON, reason != null ? reason : UNKNOWN,
+                CUMULATIVE_DELAY, ZERO
+            )
+        );
+    }
+
+    public void backPressureUpdatedEvent(ScheduledTaskEventConfiguration eventConfig, Duration oldDelay, Duration newDelay) {
+        telemetryService.trackEvent(
+            eventConfig.getBackPressureUpdatedEvent(),
+            Map.of(
+                SCHEDULER_NAME, eventConfig.getSchedulerName(),
+                PREVIOUS_DELAY, String.valueOf(oldDelay.toMillis()),
+                CURRENT_DELAY, String.valueOf(newDelay.toMillis())
             )
         );
     }

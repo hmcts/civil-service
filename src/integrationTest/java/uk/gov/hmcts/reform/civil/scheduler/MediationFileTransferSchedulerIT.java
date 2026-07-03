@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.config.TestIdamConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
-import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.TaskResult;
 import uk.gov.hmcts.reform.civil.scheduler.mediationfiletransfer.MediationFileTransferScheduledTask;
 import uk.gov.hmcts.reform.civil.scheduler.mediationfiletransfer.MediationFileTransferScheduler;
@@ -64,7 +63,8 @@ public class MediationFileTransferSchedulerIT {
 
         scheduler.runScheduledTask();
 
-        verify(scheduledTaskRunner, atLeastOnce()).run(any(ScheduledTaskEventConfiguration.class), any(TaskResult.class), eq(task));
+        verify(scheduledTaskRunner, atLeastOnce()).run(eq(SCHEDULER_NAME + "_CSV"), any(), eq(task));
+        verify(scheduledTaskRunner, atLeastOnce()).run(eq(SCHEDULER_NAME + "_JSON"), any(), eq(task));
         verify(searchService).getInMediationCsv();
         verify(searchService).getInMediationJson();
     }

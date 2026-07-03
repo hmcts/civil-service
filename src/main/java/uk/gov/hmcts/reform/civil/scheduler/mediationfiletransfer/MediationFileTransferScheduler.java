@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
-import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.MediationSearchService;
@@ -42,7 +41,7 @@ public class MediationFileTransferScheduler implements CivilScheduler {
         }
 
         log.info("Running {} scheduler", SCHEDULER_NAME);
-        scheduledTaskRunner.run(new ScheduledTaskEventConfiguration(SCHEDULER_NAME + "_CSV"), searchService.getInMediationCsv(), task);
-        scheduledTaskRunner.run(new ScheduledTaskEventConfiguration(SCHEDULER_NAME + "_JSON"), searchService.getInMediationJson(), task);
+        scheduledTaskRunner.run(SCHEDULER_NAME + "_CSV", searchService::getInMediationCsv, task);
+        scheduledTaskRunner.run(SCHEDULER_NAME + "_JSON", searchService::getInMediationJson, task);
     }
 }

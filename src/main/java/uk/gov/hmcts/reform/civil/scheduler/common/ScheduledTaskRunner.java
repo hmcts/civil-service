@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.civil.scheduler.common;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -11,10 +9,8 @@ import java.util.function.Supplier;
 
 /**
  * Runner for scheduled tasks that coordinates between event tracking, searching and processing.
- * This component is prototype-scoped to ensure isolated state per scheduler instance.
  */
 @Component
-@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @RequiredArgsConstructor
 @Slf4j
 public class ScheduledTaskRunner<T, I> {
@@ -37,7 +33,7 @@ public class ScheduledTaskRunner<T, I> {
         if (featureToggleService.isSpringSchedulerEnabled(schedulerName)) {
             log.info("Running {} scheduler", schedulerName);
             TaskResult<T> searchResult = searchResultSupplier.get();
-            run(new ScheduledTaskEventConfiguration(schedulerName), searchResult, scheduledTask);
+            execute(new ScheduledTaskEventConfiguration(schedulerName), searchResult, scheduledTask);
         }
     }
 
@@ -49,9 +45,9 @@ public class ScheduledTaskRunner<T, I> {
      * @param searchResult  the result of the search
      * @param scheduledTask the task to be performed on each item
      */
-    public void run(ScheduledTaskEventConfiguration eventConfig,
-                    TaskResult<T> searchResult,
-                    ScheduledTask<T, I> scheduledTask) {
+    private void execute(ScheduledTaskEventConfiguration eventConfig,
+                         TaskResult<T> searchResult,
+                         ScheduledTask<T, I> scheduledTask) {
 
         if (searchResult == null) {
             eventTracker.jobAbortedEvent(eventConfig, "SearchResult cannot be null");
@@ -99,29 +95,33 @@ public class ScheduledTaskRunner<T, I> {
                 totalCases,
                 outcome.succeededCases().size(),
                 outcome.failedCases().size(),
-                outcome.abortReason()
+                outcome.abortReason(),
+                outcome.cumulativeDelay()
             );
             log.info(
-                "Scheduled task aborted: {}, totalCases: {}, succeededCases: {}, failedCases: {}, abortReason: {}",
+                "Scheduled task aborted: {}, totalCases: {}, succeededCases: {}, failedCases: {}, abortReason: {}, cumulativeDelay: {}",
                 eventConfig.getSchedulerName(),
                 totalCases,
                 outcome.succeededCases().size(),
                 outcome.failedCases().size(),
-                outcome.abortReason()
+                outcome.abortReason(),
+                outcome.cumulativeDelay()
             );
         } else {
             eventTracker.jobCompletedEvent(
                 eventConfig,
                 totalCases,
                 outcome.succeededCases().size(),
-                outcome.failedCases().size()
+                outcome.failedCases().size(),
+                outcome.cumulativeDelay()
             );
             log.info(
-                "Scheduled task completed: {}, totalCases: {}, succeededCases: {}, failedCases: {}",
+                "Scheduled task completed: {}, totalCases: {}, succeededCases: {}, failedCases: {}, cumulativeDelay: {}",
                 eventConfig.getSchedulerName(),
                 totalCases,
                 outcome.succeededCases().size(),
-                outcome.failedCases().size()
+                outcome.failedCases().size(),
+                outcome.cumulativeDelay()
             );
         }
     }

@@ -10,6 +10,9 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 @Component
@@ -37,10 +40,14 @@ public class ScheduledTaskProcessor<T, I> {
                                                      TaskResult<T> searchResult) {
         List<I> succeededItems = new ArrayList<>();
         List<I> failedItems = new ArrayList<>();
-        int[] consecutiveFailures = new int[1];
-        String[] abortReason = new String[1];
+        AtomicInteger consecutiveFailures = new AtomicInteger();
+        AtomicReference<String> abortReason = new AtomicReference<>();
+        AtomicLong cumulativeDelayMillis = new AtomicLong();
         ScheduledTaskBackPressure backPressure = new ScheduledTaskBackPressure(
-            scheduledTask.backPressureConfiguration()
+            eventConfig.getSchedulerName(),
+            scheduledTask.backPressureConfiguration(),
+            eventTracker,
+            eventConfig
         );
 
         Stream<T> sequentialStream = searchResult.itemStream()
@@ -56,13 +63,26 @@ public class ScheduledTaskProcessor<T, I> {
                 succeededItems,
                 failedItems,
                 consecutiveFailures,
-                abortReason
+                abortReason,
+                cumulativeDelayMillis
             ));
 
-            return new ScheduledTaskOutcome<>(succeededItems, failedItems, !completed, abortReason[0]);
+            return new ScheduledTaskOutcome<>(
+                succeededItems,
+                failedItems,
+                !completed,
+                abortReason.get(),
+                Duration.ofMillis(cumulativeDelayMillis.get())
+            );
         } catch (ScheduledTaskInterruptedException e) {
-            abortReason[0] = e.getMessage();
-            return new ScheduledTaskOutcome<>(succeededItems, failedItems, true, abortReason[0]);
+            abortReason.set(e.getMessage());
+            return new ScheduledTaskOutcome<>(
+                succeededItems,
+                failedItems,
+                true,
+                abortReason.get(),
+                Duration.ofMillis(cumulativeDelayMillis.get())
+            );
         }
     }
 
@@ -72,9 +92,10 @@ public class ScheduledTaskProcessor<T, I> {
                                        ScheduledTaskBackPressure backPressure,
                                        List<I> succeededItems,
                                        List<I> failedItems,
-                                       int[] consecutiveFailures,
-                                       String[] abortReason) {
-        applyBackPressure(backPressure);
+                                       AtomicInteger consecutiveFailures,
+                                       AtomicReference<String> abortReason,
+                                       AtomicLong cumulativeDelayMillis) {
+        applyBackPressure(backPressure, cumulativeDelayMillis);
 
         I itemId = scheduledTask.getItemId(item);
         Instant startedAt = Instant.now();
@@ -84,16 +105,16 @@ public class ScheduledTaskProcessor<T, I> {
             backPressure.afterSuccess(Duration.between(startedAt, Instant.now()));
             eventTracker.caseProcessedEvent(eventConfig, itemId.toString());
             succeededItems.add(itemId);
-            consecutiveFailures[0] = 0;
+            consecutiveFailures.set(0);
         } catch (Exception e) {
             backPressure.afterFailure();
             failedItems.add(itemId);
             eventTracker.caseFailedEvent(eventConfig, itemId.toString(), e);
             log.error("Error processing item {}: {}", itemId, e.getMessage(), e);
-            int failures = ++consecutiveFailures[0];
+            int failures = consecutiveFailures.incrementAndGet();
 
             if (failures >= circuitBreakerThreshold) {
-                abortReason[0] = Objects.toString(e.getMessage(), e.getClass().getSimpleName());
+                abortReason.set(Objects.toString(e.getMessage(), e.getClass().getSimpleName()));
                 return false;
             }
         }
@@ -108,7 +129,7 @@ public class ScheduledTaskProcessor<T, I> {
         return maxCasesPerRun;
     }
 
-    private void applyBackPressure(ScheduledTaskBackPressure backPressure) {
+    private void applyBackPressure(ScheduledTaskBackPressure backPressure, AtomicLong cumulativeDelayMillis) {
         Duration delay = backPressure.currentDelay();
         if (delay.isZero()) {
             return;
@@ -116,6 +137,7 @@ public class ScheduledTaskProcessor<T, I> {
 
         try {
             log.debug("Applying scheduled task backpressure delay: {}", delay);
+            cumulativeDelayMillis.addAndGet(delay.toMillis());
             sleep(delay);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

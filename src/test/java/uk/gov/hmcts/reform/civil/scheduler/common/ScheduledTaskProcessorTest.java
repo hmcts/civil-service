@@ -151,10 +151,14 @@ class ScheduledTaskProcessorTest {
         assertThat(outcome.failedCases()).containsExactly(1L);
         assertThat(outcome.succeededCases()).containsExactly(2L, 3L);
         assertThat(processor.delays()).containsExactly(Duration.ofMillis(10), Duration.ofMillis(5));
+        assertThat(outcome.cumulativeDelay()).isEqualTo(Duration.ofMillis(15));
 
         verify(scheduledEventTracker).caseFailedEvent(eventConfig, "1", error);
         verify(scheduledEventTracker).caseProcessedEvent(eventConfig, "2");
         verify(scheduledEventTracker).caseProcessedEvent(eventConfig, "3");
+        verify(scheduledEventTracker).backPressureUpdatedEvent(eventConfig, Duration.ZERO, Duration.ofMillis(10));
+        verify(scheduledEventTracker).backPressureUpdatedEvent(eventConfig, Duration.ofMillis(10), Duration.ofMillis(5));
+        verify(scheduledEventTracker).backPressureUpdatedEvent(eventConfig, Duration.ofMillis(5), Duration.ZERO);
     }
 
     @Test
