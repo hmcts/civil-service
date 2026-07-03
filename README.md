@@ -83,7 +83,7 @@ The project defines a set of timer-driven Camunda processes that keep cases movi
 | Evidence upload scheduler | Prompts parties to upload evidence when deadlines are approaching. | `EVIDENCE_UPLOAD_CHECK` | `0 30 17 * * ?` | Daily at 17:30 |
 | Full admit pay immediately no payment scheduler | Escalates full-admit cases where an immediate payment was promised but not received. | `FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
 | GA doc upload notify scheduler | Sends notifications when GA supporting documents are uploaded. | `GADocUploadNotifyScheduler` | `0 0 23 * * ?` | Daily at 23:00 |
-| GA order made scheduler | Publishes GA order-made events to downstream services each afternoon. | `GAOrderMadeScheduler` | `0 15 16 ? * * *` | Daily at 16:15 |
+| GA order made scheduler | Processes stay-order general applications once their order deadline has expired. | `GAOrderMadeScheduler` | `0 15 16 * * ?` | Daily at 16:15 |
 | GA response deadline processor | Processes GA response deadlines, judge revisits and respondent checks. | `GAResponseDeadlineProcessor`<br>`GAJudgeRevisitProcessor`<br>`GARespondentResponseCheckScheduler` | `0 15 17 * * ?` | Daily at 17:15 |
 | GA unless order scheduler | Enforces GA Unless Orders once the compliance deadline passes. | `GAUnlessOrderScheduler` | `0 0 16 ? * * *` | Daily at 16:00 |
 | Generate CSV and send to MMT scheduler | Produces nightly CSV/JSON exports for the mediation service (MMT). | `GenerateCsvAndSendToMmt`<br>`GenerateJsonAndSendToMmt` | `0 0 1 ? * * *` | Daily at 01:00 |
@@ -588,6 +588,20 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 |---------|-------------|---------|----------------------|
 | `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_GA_PROOF_OF_DEBT` |
 | `cronExpression` | When the scheduler runs. | `0 0 16 * * ?` (Daily at 16:00) | `CRON_EXPRESSION_GA_PROOF_OF_DEBT` |
+
+### GAOrderMadeScheduler
+
+The `GAOrderMadeScheduler` processes General Application stay orders when their order deadline is today or has passed.
+It runs when `GAOrderMadeScheduler` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.ga-order-made`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_GA_ORDER_MADE` |
+| `cronExpression` | When the scheduler runs. | `0 15 16 * * ?` (Daily at 16:15) | `CRON_EXPRESSION_GA_ORDER_MADE` |
 
 ### JudgementBufferScheduler
 
