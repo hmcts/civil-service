@@ -102,6 +102,9 @@ scheduler:
   case-dismissed:
     cronExpression: ${CRON_EXPRESSION_CASE_DISMISSED:0 5 0,16 * * ?}
     enabled: ${SCHEDULER_ENABLED_CASE_DISMISSED:true}
+  ga-document-upload-notify:
+    cronExpression: ${CRON_EXPRESSION_GA_DOCUMENT_UPLOAD_NOTIFY:0 0 23 * * ?}
+    enabled: ${SCHEDULER_ENABLED_GA_DOCUMENT_UPLOAD_NOTIFY:true}
   default-back-pressure:
     initialDelay: ${DEFAULT_BACK_PRESSURE_INITIAL_DELAY:PT0S}
     maxDelay: ${DEFAULT_BACK_PRESSURE_MAX_DELAY:PT10S}

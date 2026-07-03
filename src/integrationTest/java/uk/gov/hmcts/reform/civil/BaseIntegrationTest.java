@@ -60,7 +60,8 @@ import static org.mockito.Mockito.when;
         "scheduler.trial-ready-check.enabled=false",
         "scheduler.order-review-obligation-check.enabled=false",
         "scheduler.decision-outcome.enabled=false",
-        "scheduler.case-dismissed.enabled=false"
+        "scheduler.case-dismissed.enabled=false",
+        "scheduler.ga-document-upload-notify.enabled=false"
     }
 )
 @AutoConfigureMockMvc

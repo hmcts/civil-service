@@ -561,6 +561,20 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 | `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_CASE_DISMISSED` |
 | `cronExpression` | When the scheduler runs. | `0 5 0,16 * * ?` (Daily at 00:05 and 16:05) | `CRON_EXPRESSION_CASE_DISMISSED` |
 
+### GADocumentUploadNotifyScheduler
+
+The `GADocumentUploadNotifyScheduler` notifies General Application cases when supporting documents have been uploaded.
+It runs when `GADocUploadNotifyScheduler` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.ga-document-upload-notify`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_GA_DOCUMENT_UPLOAD_NOTIFY` |
+| `cronExpression` | When the scheduler runs. | `0 0 23 * * ?` (Daily at 23:00) | `CRON_EXPRESSION_GA_DOCUMENT_UPLOAD_NOTIFY` |
+
 ### JudgementBufferScheduler
 
 The `JudgementBufferScheduler` is used to process cases where a default judgement has been requested and a buffer period has expired.
