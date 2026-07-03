@@ -13,9 +13,15 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 @Component
 @Slf4j
 @AllArgsConstructor
-public class JudgementBufferScheduledTask implements ScheduledTask {
+public class JudgementBufferScheduledTask implements ScheduledTask<CaseDetails, Long> {
 
     private final CoreCaseDataService coreCaseDataService;
+    private final DefaultBackPressureConfiguration defaultBackPressureConfiguration;
+
+    @Override
+    public Long getItemId(CaseDetails caseDetails) {
+        return caseDetails.getId();
+    }
 
     @Override
     public void accept(CaseDetails caseDetails) {
@@ -26,6 +32,6 @@ public class JudgementBufferScheduledTask implements ScheduledTask {
 
     @Override
     public ScheduledTaskBackPressureConfiguration backPressureConfiguration() {
-        return DefaultBackPressureConfiguration.getDefault();
+        return defaultBackPressureConfiguration.getDefaultBackPressure();
     }
 }
