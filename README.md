@@ -440,7 +440,7 @@ The `JudgementBufferScheduler` is used to process cases where a default judgemen
 
 #### Settings
 
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.judgementBuffer`.
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.judgement-buffer`.
 
 | Setting | Description | Default | Environment Variable |
 |---------|-------------|---------|----------------------|

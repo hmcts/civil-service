@@ -31,11 +31,11 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=JudgementBufferSchedulerITest",
-    "scheduler.judgementBuffer.enabled=true",
-    "search.judgementbuffer.pageSize=50"
+    "scheduler.judgement-buffer.enabled=true",
+    "search.judgement-buffer.pageSize=50"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class JudgementBufferSchedulerITest {
+public class JudgementBufferSchedulerIT {
 
     private static final Long CASE_ID = 123L;
 
