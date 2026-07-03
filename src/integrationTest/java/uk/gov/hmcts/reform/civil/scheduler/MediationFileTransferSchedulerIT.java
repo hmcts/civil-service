@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.civil.scheduler;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
-import uk.gov.hmcts.reform.civil.Application;
-import uk.gov.hmcts.reform.civil.config.TestIdamConfiguration;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.scheduler.common.TaskResult;
@@ -15,37 +13,29 @@ import uk.gov.hmcts.reform.civil.scheduler.mediationfiletransfer.MediationFileTr
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.MediationSearchService;
 
-import static org.mockito.ArgumentMatchers.any;
+import java.util.function.Supplier;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ActiveProfiles("integration-test")
-@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
-    "test.id=MediationFileTransferSchedulerIT",
-    "scheduler.bundle-creation.enabled=false",
-    "scheduler.hearing-cvp-link.enabled=false",
-    "scheduler.polling-event-emitter.enabled=false",
-    "scheduler.automated-hearing-notice.enabled=false",
-    "scheduler.mediation-file-transfer.enabled=true"
-})
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+@ExtendWith(MockitoExtension.class)
 public class MediationFileTransferSchedulerIT {
 
     private static final String SCHEDULER_NAME = "GenerateCsvAndSendToMmt";
 
-    @MockBean
+    @Mock
     private MediationSearchService searchService;
 
-    @MockBean
+    @Mock
     private ScheduledTaskRunner<CaseData, Long> scheduledTaskRunner;
 
-    @MockBean
+    @Mock
     private MediationFileTransferScheduledTask task;
 
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
 
     @Test
@@ -64,8 +54,16 @@ public class MediationFileTransferSchedulerIT {
             featureToggleService
         ).runScheduledTask();
 
-        verify(scheduledTaskRunner, atLeastOnce()).run(eq(SCHEDULER_NAME + "_CSV"), any(), eq(task));
-        verify(scheduledTaskRunner, atLeastOnce()).run(eq(SCHEDULER_NAME + "_JSON"), any(), eq(task));
+        ArgumentCaptor<Supplier<? extends TaskResult<CaseData>>> csvSupplierCaptor =
+            ArgumentCaptor.forClass(Supplier.class);
+        ArgumentCaptor<Supplier<? extends TaskResult<CaseData>>> jsonSupplierCaptor =
+            ArgumentCaptor.forClass(Supplier.class);
+
+        verify(scheduledTaskRunner).run(eq(SCHEDULER_NAME + "_CSV"), csvSupplierCaptor.capture(), eq(task));
+        verify(scheduledTaskRunner).run(eq(SCHEDULER_NAME + "_JSON"), jsonSupplierCaptor.capture(), eq(task));
+
+        assertThat(csvSupplierCaptor.getValue().get()).isSameAs(csvResult);
+        assertThat(jsonSupplierCaptor.getValue().get()).isSameAs(jsonResult);
         verify(searchService).getInMediationCsv();
         verify(searchService).getInMediationJson();
     }
