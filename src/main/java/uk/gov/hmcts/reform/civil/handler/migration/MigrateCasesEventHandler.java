@@ -38,6 +38,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
     private static final String DASHBOARD_TASK_ID = "dashboardTaskId";
     private static final String DASHBOARD_PROCESS_INSTANCE_ID = "dashboardProcessInstanceId";
     private static final String DASHBOARD_PROCESS_INSTANCE_IDS = "dashboardProcessInstanceIds";
+    private static final String DASHBOARD_CASE_TYPE = "dashboardCaseType";
     private static final String NOTIFICATION_CAMUNDA_PROCESS_IDENTIFIER = "notificationCamundaProcessIdentifier";
     private static final String CASE_NOTE_ELEMENT_ID = "caseNoteElementId";
     private static final String NOTIFY_EVENT_ID = "notifyEventId";
@@ -117,6 +118,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
             externalTask.getVariable(DASHBOARD_TASK_ID),
             externalTask.getVariable(DASHBOARD_PROCESS_INSTANCE_ID),
             externalTask.getVariable(DASHBOARD_PROCESS_INSTANCE_IDS),
+            externalTask.getVariable(DASHBOARD_CASE_TYPE),
             externalTask.getVariable(NOTIFICATION_CAMUNDA_PROCESS_IDENTIFIER),
             externalTask.getVariable(CASE_NOTE_ELEMENT_ID),
             externalTask.getVariable(NOTIFY_EVENT_ID)
@@ -202,7 +204,8 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
             return type.cast(buildDashboardNotificationTaskCaseReference(
                 caseId,
                 variables.dashboardTaskId(),
-                variables.dashboardProcessInstanceId()
+                variables.dashboardProcessInstanceId(),
+                variables.dashboardCaseType()
             ));
         }
         if (variables.camundaProcessIdentifier() != null) {
@@ -220,12 +223,14 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
     private DashboardNotificationTaskCaseReference buildDashboardNotificationTaskCaseReference(
         String caseId,
         String dashboardTaskId,
-        String dashboardProcessInstanceId
+        String dashboardProcessInstanceId,
+        String dashboardCaseType
     ) {
         DashboardNotificationTaskCaseReference caseReference = new DashboardNotificationTaskCaseReference();
         caseReference.setCaseReference(caseId);
         caseReference.setDashboardTaskId(dashboardTaskId);
         caseReference.setDashboardProcessInstanceId(dashboardProcessInstanceId);
+        caseReference.setDashboardCaseType(dashboardCaseType);
         return caseReference;
     }
 
@@ -287,6 +292,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
         String dashboardTaskId,
         String dashboardProcessInstanceId,
         String dashboardProcessInstanceIds,
+        String dashboardCaseType,
         String camundaProcessIdentifier,
         String caseNoteElementId,
         String notifyEventId
@@ -303,6 +309,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
                 dashboardTaskId,
                 processInstanceId,
                 dashboardProcessInstanceIds,
+                dashboardCaseType,
                 camundaProcessIdentifier,
                 caseNoteElementId,
                 notifyEventId
