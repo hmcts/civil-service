@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.civil.scheduler;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.util.AopTestUtils;
 import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.config.TestIdamConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -38,9 +36,6 @@ public class MediationFileTransferSchedulerIT {
 
     private static final String SCHEDULER_NAME = "GenerateCsvAndSendToMmt";
 
-    @Autowired
-    private MediationFileTransferScheduler scheduler;
-
     @MockBean
     private MediationSearchService searchService;
 
@@ -55,14 +50,19 @@ public class MediationFileTransferSchedulerIT {
 
     @Test
     @SuppressWarnings("unchecked")
-    void shouldExecuteMediationFileTransferScheduler() throws Exception {
+    void shouldExecuteMediationFileTransferScheduler() {
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         TaskResult<CaseData> csvResult = mock(TaskResult.class);
         TaskResult<CaseData> jsonResult = mock(TaskResult.class);
         when(searchService.getInMediationCsv()).thenReturn(csvResult);
         when(searchService.getInMediationJson()).thenReturn(jsonResult);
 
-        AopTestUtils.<MediationFileTransferScheduler>getTargetObject(scheduler).runScheduledTask();
+        new MediationFileTransferScheduler(
+            searchService,
+            scheduledTaskRunner,
+            task,
+            featureToggleService
+        ).runScheduledTask();
 
         verify(scheduledTaskRunner, atLeastOnce()).run(eq(SCHEDULER_NAME + "_CSV"), any(), eq(task));
         verify(scheduledTaskRunner, atLeastOnce()).run(eq(SCHEDULER_NAME + "_JSON"), any(), eq(task));
