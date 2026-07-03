@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.util.AopTestUtils;
 import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.config.TestIdamConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -54,14 +55,14 @@ public class MediationFileTransferSchedulerIT {
 
     @Test
     @SuppressWarnings("unchecked")
-    void shouldExecuteMediationFileTransferScheduler() {
+    void shouldExecuteMediationFileTransferScheduler() throws Exception {
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         TaskResult<CaseData> csvResult = mock(TaskResult.class);
         TaskResult<CaseData> jsonResult = mock(TaskResult.class);
         when(searchService.getInMediationCsv()).thenReturn(csvResult);
         when(searchService.getInMediationJson()).thenReturn(jsonResult);
 
-        scheduler.runScheduledTask();
+        AopTestUtils.<MediationFileTransferScheduler>getTargetObject(scheduler).runScheduledTask();
 
         verify(scheduledTaskRunner, atLeastOnce()).run(eq(SCHEDULER_NAME + "_CSV"), any(), eq(task));
         verify(scheduledTaskRunner, atLeastOnce()).run(eq(SCHEDULER_NAME + "_JSON"), any(), eq(task));
