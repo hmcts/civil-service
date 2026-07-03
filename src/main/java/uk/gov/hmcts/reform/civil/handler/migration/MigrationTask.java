@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.migration;
 
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.Collections;
@@ -23,6 +24,14 @@ public abstract class MigrationTask<T extends CaseReference> {
     protected abstract String getEventDescription();
 
     protected abstract CaseData migrateCaseData(CaseData caseData, T caseReference);
+
+    protected CaseData migrateGeneralApplicationCaseData(
+        CaseData caseData,
+        GeneralApplicationCaseData gaCaseData,
+        T caseReference
+    ) {
+        return migrateCaseData(caseData, caseReference);
+    }
 
     protected List<String> getFieldsToNullify() {
         return Collections.emptyList();
