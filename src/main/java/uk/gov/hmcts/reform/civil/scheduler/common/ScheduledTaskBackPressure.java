@@ -1,16 +1,28 @@
 package uk.gov.hmcts.reform.civil.scheduler.common;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.time.Duration;
 
+@Slf4j
 class ScheduledTaskBackPressure {
 
+    private final String schedulerName;
     private final ScheduledTaskBackPressureConfiguration configuration;
+    private final ScheduledEventTracker eventTracker;
+    private final ScheduledTaskEventConfiguration eventConfig;
     private Duration currentDelay;
 
-    ScheduledTaskBackPressure(ScheduledTaskBackPressureConfiguration configuration) {
+    ScheduledTaskBackPressure(String schedulerName,
+                              ScheduledTaskBackPressureConfiguration configuration,
+                              ScheduledEventTracker eventTracker,
+                              ScheduledTaskEventConfiguration eventConfig) {
+        this.schedulerName = schedulerName;
         this.configuration = configuration != null
             ? configuration
             : ScheduledTaskBackPressureConfiguration.disabled();
+        this.eventTracker = eventTracker;
+        this.eventConfig = eventConfig;
         this.currentDelay = this.configuration.initialDelay();
     }
 
@@ -36,18 +48,32 @@ class ScheduledTaskBackPressure {
     }
 
     private void increaseDelay(Duration increase) {
-        currentDelay = min(configuration.maxDelay(), currentDelay.plus(increase));
+        Duration previousDelay = currentDelay;
+        currentDelay = currentDelay.plus(increase);
+        if (currentDelay.compareTo(configuration.maxDelay()) > 0) {
+            currentDelay = configuration.maxDelay();
+        }
+
+        notifyIfChanged(previousDelay);
     }
 
     private void reduceDelay(Duration reduction) {
-        currentDelay = max(Duration.ZERO, currentDelay.minus(reduction));
+        Duration previousDelay = currentDelay;
+        currentDelay = currentDelay.minus(reduction);
+        if (currentDelay.compareTo(configuration.initialDelay()) < 0) {
+            currentDelay = configuration.initialDelay();
+        }
+
+        notifyIfChanged(previousDelay);
     }
 
-    private Duration min(Duration left, Duration right) {
-        return left.compareTo(right) <= 0 ? left : right;
-    }
-
-    private Duration max(Duration left, Duration right) {
-        return left.compareTo(right) >= 0 ? left : right;
+    private void notifyIfChanged(Duration previousDelay) {
+        if (!currentDelay.equals(previousDelay)) {
+            log.info("{} backpressure: delay changed from {}ms to {}ms",
+                     schedulerName, previousDelay.toMillis(), currentDelay.toMillis());
+            if (eventTracker != null && eventConfig != null) {
+                eventTracker.backPressureUpdatedEvent(eventConfig, previousDelay, currentDelay);
+            }
+        }
     }
 }

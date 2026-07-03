@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.civil.scheduler.common;
 
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-
 import java.util.function.Consumer;
 
-public interface ScheduledTask extends Consumer<CaseDetails> {
+public interface ScheduledTask<T, I> extends Consumer<T> {
+
+    I getItemId(T item);
 
     default long maxCasesPerRun() {
         return Long.MAX_VALUE;

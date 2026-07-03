@@ -40,9 +40,9 @@ public class JudgementBufferExpiredQueryProvider implements PaginatedQueryProvid
      */
     @Override
     public PaginatedQuery getPaginatedQuery(PageToken pageToken, int pageSize) {
-        String timeNow = ZonedDateTime.now(ZoneOffset.UTC).toString();
+        ZonedDateTime timeNow = ZonedDateTime.now(ZoneOffset.UTC);
         log.info("Call to JudgementBufferExpiredSearchService query with timeNow {}", timeNow);
-        ZonedDateTime timeMinus48Hours = ZonedDateTime.parse(timeNow).minusHours(48);
+        ZonedDateTime timeMinus48Hours = timeNow.minusHours(48);
         return new PaginatedQuery(
             generateSearchForExpiredJudgments(timeMinus48Hours),
             List.of("reference"),

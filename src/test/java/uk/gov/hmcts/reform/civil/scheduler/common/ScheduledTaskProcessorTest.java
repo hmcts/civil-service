@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.scheduler.common;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
@@ -23,7 +24,9 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -35,10 +38,18 @@ class ScheduledTaskProcessorTest {
     private ScheduledEventTracker scheduledEventTracker;
 
     @Mock(answer = Answers.CALLS_REAL_METHODS)
-    private ScheduledTask scheduledTask;
+    private ScheduledTask<CaseDetails, Long> scheduledTask;
 
     @InjectMocks
-    private ScheduledTaskProcessor scheduledTaskProcessor;
+    private ScheduledTaskProcessor<CaseDetails, Long> scheduledTaskProcessor;
+
+    @BeforeEach
+    void setUp() {
+        lenient().when(scheduledTask.getItemId(any())).thenAnswer(invocation -> {
+            CaseDetails caseDetails = invocation.getArgument(0);
+            return caseDetails != null ? caseDetails.getId() : null;
+        });
+    }
 
     @Test
     void shouldProcessAllCases_whenNoFailures() {
@@ -50,7 +61,7 @@ class ScheduledTaskProcessorTest {
         List<CaseDetails> cases = List.of(case1, case2, case3);
         ElasticSearchResult searchResult = new ElasticSearchResult(cases.stream(), 3);
 
-        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
+        ScheduledTaskOutcome<Long> outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
 
         assertThat(outcome).isNotNull();
         assertThat(outcome.succeededCases().size()).isEqualTo(3);
@@ -61,11 +72,12 @@ class ScheduledTaskProcessorTest {
         verify(scheduledTask).accept(case3);
         verify(scheduledTask).backPressureConfiguration();
         verify(scheduledTask).maxCasesPerRun();
+        verify(scheduledTask, times(3)).getItemId(any());
         verifyNoMoreInteractions(scheduledTask);
 
-        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, case1.getId());
-        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, case2.getId());
-        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, case3.getId());
+        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, String.valueOf(case1.getId()));
+        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, String.valueOf(case2.getId()));
+        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, String.valueOf(case3.getId()));
         verifyNoMoreInteractions(scheduledEventTracker);
     }
 
@@ -73,7 +85,7 @@ class ScheduledTaskProcessorTest {
     void shouldNotProcess_whenNoCases() {
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
 
-        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, new ElasticSearchResult(Stream.empty(), 0));
+        ScheduledTaskOutcome<Long> outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, new ElasticSearchResult(Stream.empty(), 0));
 
         assertThat(outcome).isNotNull();
         assertThat(outcome.succeededCases()).isEmpty();
@@ -81,6 +93,7 @@ class ScheduledTaskProcessorTest {
 
         verify(scheduledTask).backPressureConfiguration();
         verify(scheduledTask).maxCasesPerRun();
+        verify(scheduledTask, never()).getItemId(any());
         verifyNoMoreInteractions(scheduledTask);
         verifyNoInteractions(scheduledEventTracker);
     }
@@ -95,16 +108,16 @@ class ScheduledTaskProcessorTest {
 
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
 
-        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, task, searchResult);
+        ScheduledTaskOutcome<Long> outcome = scheduledTaskProcessor.performProcessing(eventConfig, task, searchResult);
 
         assertThat(outcome.abortedEarly()).isFalse();
         assertThat(outcome.succeededCases()).containsExactly(1L, 2L);
         assertThat(outcome.failedCases()).isEmpty();
         assertThat(task.processedCases()).containsExactly(1L, 2L);
 
-        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, 1L);
-        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, 2L);
-        verify(scheduledEventTracker, never()).caseProcessedEvent(eventConfig, 3L);
+        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, "1");
+        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, "2");
+        verify(scheduledEventTracker, never()).caseProcessedEvent(eventConfig, "3");
         verifyNoMoreInteractions(scheduledEventTracker);
     }
 
@@ -132,16 +145,20 @@ class ScheduledTaskProcessorTest {
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
         ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1, case2, case3), 3);
 
-        ScheduledTaskOutcome outcome = processor.performProcessing(eventConfig, task, searchResult);
+        ScheduledTaskOutcome<Long> outcome = processor.performProcessing(eventConfig, task, searchResult);
 
         assertThat(outcome.abortedEarly()).isFalse();
         assertThat(outcome.failedCases()).containsExactly(1L);
         assertThat(outcome.succeededCases()).containsExactly(2L, 3L);
         assertThat(processor.delays()).containsExactly(Duration.ofMillis(10), Duration.ofMillis(5));
+        assertThat(outcome.cumulativeDelay()).isEqualTo(Duration.ofMillis(15));
 
-        verify(scheduledEventTracker).caseFailedEvent(eventConfig, 1L, error);
-        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, 2L);
-        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, 3L);
+        verify(scheduledEventTracker).caseFailedEvent(eventConfig, "1", error);
+        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, "2");
+        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, "3");
+        verify(scheduledEventTracker).backPressureUpdatedEvent(eventConfig, Duration.ZERO, Duration.ofMillis(10));
+        verify(scheduledEventTracker).backPressureUpdatedEvent(eventConfig, Duration.ofMillis(10), Duration.ofMillis(5));
+        verify(scheduledEventTracker).backPressureUpdatedEvent(eventConfig, Duration.ofMillis(5), Duration.ZERO);
     }
 
     @Test
@@ -162,7 +179,7 @@ class ScheduledTaskProcessorTest {
         );
 
         try {
-            ScheduledTaskOutcome outcome = processor.performProcessing(
+            ScheduledTaskOutcome<Long> outcome = processor.performProcessing(
                 new ScheduledTaskEventConfiguration("JudgmentBuffer"),
                 task,
                 new ElasticSearchResult(Stream.of(case1), 1)
@@ -201,7 +218,7 @@ class ScheduledTaskProcessorTest {
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
         ElasticSearchResult searchResult = new ElasticSearchResult(cases.stream(), 4);
 
-        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
+        ScheduledTaskOutcome<Long> outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
 
         assertThat(outcome.abortedEarly()).isTrue();
         assertThat(outcome.abortReason()).isEqualTo("Error 2");
@@ -211,8 +228,8 @@ class ScheduledTaskProcessorTest {
         verify(scheduledTask).accept(case1);
         verify(scheduledTask).accept(case2);
 
-        verify(scheduledEventTracker).caseFailedEvent(eventConfig, 1L, error1);
-        verify(scheduledEventTracker).caseFailedEvent(eventConfig, 2L, error2);
+        verify(scheduledEventTracker).caseFailedEvent(eventConfig, "1", error1);
+        verify(scheduledEventTracker).caseFailedEvent(eventConfig, "2", error2);
         verifyNoMoreInteractions(scheduledEventTracker);
     }
 
@@ -227,23 +244,23 @@ class ScheduledTaskProcessorTest {
 
         // Fail case 1, succeed case 2, fail case 3
         RuntimeException error1 = new RuntimeException("Error 1");
-        doThrow(error1).when(scheduledTask).accept(argThat(c -> c != null && c.getId().equals(101L)));
-        doNothing().when(scheduledTask).accept(argThat(c -> c != null && c.getId().equals(102L)));
+        doThrow(error1).when(scheduledTask).accept(argThat((CaseDetails c) -> c != null && c.getId().equals(101L)));
+        doNothing().when(scheduledTask).accept(argThat((CaseDetails c) -> c != null && c.getId().equals(102L)));
         RuntimeException error3 = new RuntimeException("Error 3");
-        doThrow(error3).when(scheduledTask).accept(argThat(c -> c != null && c.getId().equals(103L)));
+        doThrow(error3).when(scheduledTask).accept(argThat((CaseDetails c) -> c != null && c.getId().equals(103L)));
 
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
         ElasticSearchResult searchResult = new ElasticSearchResult(cases.stream(), 3);
 
-        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
+        ScheduledTaskOutcome<Long> outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
 
         assertThat(outcome.abortedEarly()).isFalse();
         assertThat(outcome.succeededCases()).containsExactly(102L);
         assertThat(outcome.failedCases()).containsExactly(101L, 103L);
 
-        verify(scheduledEventTracker).caseFailedEvent(eventConfig, 101L, error1);
-        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, 102L);
-        verify(scheduledEventTracker).caseFailedEvent(eventConfig, 103L, error3);
+        verify(scheduledEventTracker).caseFailedEvent(eventConfig, "101", error1);
+        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, "102");
+        verify(scheduledEventTracker).caseFailedEvent(eventConfig, "103", error3);
     }
 
     @Test
@@ -257,7 +274,7 @@ class ScheduledTaskProcessorTest {
         doThrow(errorWithoutMessage).when(scheduledTask).accept(case1);
 
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
-        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
+        ScheduledTaskOutcome<Long> outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
 
         assertThat(outcome.abortedEarly()).isTrue();
         assertThat(outcome.abortReason()).isEqualTo("RuntimeException");
@@ -282,7 +299,7 @@ class ScheduledTaskProcessorTest {
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
         ElasticSearchResult searchResult = new ElasticSearchResult(cases.stream(), 3);
 
-        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
+        ScheduledTaskOutcome<Long> outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
 
         assertThat(outcome.abortedEarly()).isFalse();
         assertThat(outcome.succeededCases()).containsExactly(3L);
@@ -302,7 +319,7 @@ class ScheduledTaskProcessorTest {
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
         ElasticSearchResult searchResult = new ElasticSearchResult(cases.stream(), 2);
 
-        ScheduledTaskOutcome outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
+        ScheduledTaskOutcome<Long> outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
 
         assertThat(outcome.abortedEarly()).isTrue();
         assertThat(outcome.failedCases()).containsExactly(1L);
@@ -314,7 +331,7 @@ class ScheduledTaskProcessorTest {
         verify(scheduledEventTracker, never()).caseFailedEvent(any(), eq(2L), any());
     }
 
-    private static class RecordingScheduledTask implements ScheduledTask {
+    private static class RecordingScheduledTask implements ScheduledTask<CaseDetails, Long> {
 
         private final long maxCasesPerRun;
         private final ScheduledTaskBackPressureConfiguration backPressureConfiguration;
@@ -335,6 +352,11 @@ class ScheduledTaskProcessorTest {
             this.maxCasesPerRun = maxCasesPerRun;
             this.backPressureConfiguration = backPressureConfiguration;
             this.failures = failures;
+        }
+
+        @Override
+        public Long getItemId(CaseDetails caseDetails) {
+            return caseDetails.getId();
         }
 
         @Override
@@ -361,7 +383,7 @@ class ScheduledTaskProcessorTest {
         }
     }
 
-    private static class CapturingScheduledTaskProcessor extends ScheduledTaskProcessor {
+    private static class CapturingScheduledTaskProcessor extends ScheduledTaskProcessor<CaseDetails, Long> {
 
         private final List<Duration> delays = new ArrayList<>();
 
@@ -379,7 +401,7 @@ class ScheduledTaskProcessorTest {
         }
     }
 
-    private static class InterruptingScheduledTaskProcessor extends ScheduledTaskProcessor {
+    private static class InterruptingScheduledTaskProcessor extends ScheduledTaskProcessor<CaseDetails, Long> {
 
         InterruptingScheduledTaskProcessor(ScheduledEventTracker eventTracker) {
             super(eventTracker);
