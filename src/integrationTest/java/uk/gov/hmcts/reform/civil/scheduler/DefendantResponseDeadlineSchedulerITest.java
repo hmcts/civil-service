@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
     "test.id=DefendantResponseDeadlineSchedulerITest",
-    "scheduler.defendantResponse.enabled=true"
+    "scheduler.defendant-response.enabled=true"
 })
 public class DefendantResponseDeadlineSchedulerITest {
 
