@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.scheduler.defendantresponse.DefendantResponseDeadlineScheduler;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
+import uk.gov.hmcts.test.config.CoreCaseDataApiMockHelperConfiguration;
 import uk.gov.hmcts.test.helper.CoreCaseDataApiMockHelper;
 
 import java.util.List;
@@ -27,7 +28,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_DEADLINE_CHECK;
 
 @ActiveProfiles("integration-test")
-@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
+@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=DefendantResponseDeadlineSchedulerIT",
     "scheduler.defendant-response.enabled=true"
 })
