@@ -44,7 +44,10 @@ public class ScheduledTaskProcessor<T, I> {
         AtomicReference<String> abortReason = new AtomicReference<>();
         AtomicLong cumulativeDelayMillis = new AtomicLong();
         ScheduledTaskBackPressure backPressure = new ScheduledTaskBackPressure(
-            scheduledTask.backPressureConfiguration()
+            eventConfig.getSchedulerName(),
+            scheduledTask.backPressureConfiguration(),
+            eventTracker,
+            eventConfig
         );
 
         Stream<T> sequentialStream = searchResult.itemStream()

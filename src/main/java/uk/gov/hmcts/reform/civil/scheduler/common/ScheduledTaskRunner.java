@@ -33,7 +33,7 @@ public class ScheduledTaskRunner<T, I> {
         if (featureToggleService.isSpringSchedulerEnabled(schedulerName)) {
             log.info("Running {} scheduler", schedulerName);
             TaskResult<T> searchResult = searchResultSupplier.get();
-            run(new ScheduledTaskEventConfiguration(schedulerName), searchResult, scheduledTask);
+            execute(new ScheduledTaskEventConfiguration(schedulerName), searchResult, scheduledTask);
         }
     }
 
@@ -45,9 +45,9 @@ public class ScheduledTaskRunner<T, I> {
      * @param searchResult  the result of the search
      * @param scheduledTask the task to be performed on each item
      */
-    public void run(ScheduledTaskEventConfiguration eventConfig,
-                    TaskResult<T> searchResult,
-                    ScheduledTask<T, I> scheduledTask) {
+    private void execute(ScheduledTaskEventConfiguration eventConfig,
+                         TaskResult<T> searchResult,
+                         ScheduledTask<T, I> scheduledTask) {
 
         if (searchResult == null) {
             eventTracker.jobAbortedEvent(eventConfig, "SearchResult cannot be null");

@@ -156,6 +156,9 @@ class ScheduledTaskProcessorTest {
         verify(scheduledEventTracker).caseFailedEvent(eventConfig, "1", error);
         verify(scheduledEventTracker).caseProcessedEvent(eventConfig, "2");
         verify(scheduledEventTracker).caseProcessedEvent(eventConfig, "3");
+        verify(scheduledEventTracker).backPressureUpdatedEvent(eventConfig, Duration.ZERO, Duration.ofMillis(10));
+        verify(scheduledEventTracker).backPressureUpdatedEvent(eventConfig, Duration.ofMillis(10), Duration.ofMillis(5));
+        verify(scheduledEventTracker).backPressureUpdatedEvent(eventConfig, Duration.ofMillis(5), Duration.ZERO);
     }
 
     @Test

@@ -25,6 +25,8 @@ public class ScheduledEventTracker {
     private static final String STATUS = "status";
     private static final String ERROR = "error";
     private static final String ERROR_CATEGORY = "errorCategory";
+    private static final String PREVIOUS_DELAY = "previousDelay";
+    private static final String CURRENT_DELAY = "currentDelay";
 
     private final ErrorCategorizer errorCategorizer;
     private final TelemetryService telemetryService;
@@ -131,6 +133,17 @@ public class ScheduledEventTracker {
                 FAILED_CASES, ZERO,
                 ABORT_REASON, reason != null ? reason : UNKNOWN,
                 CUMULATIVE_DELAY, ZERO
+            )
+        );
+    }
+
+    public void backPressureUpdatedEvent(ScheduledTaskEventConfiguration eventConfig, Duration oldDelay, Duration newDelay) {
+        telemetryService.trackEvent(
+            eventConfig.getBackPressureUpdatedEvent(),
+            Map.of(
+                SCHEDULER_NAME, eventConfig.getSchedulerName(),
+                PREVIOUS_DELAY, String.valueOf(oldDelay.toMillis()),
+                CURRENT_DELAY, String.valueOf(newDelay.toMillis())
             )
         );
     }
