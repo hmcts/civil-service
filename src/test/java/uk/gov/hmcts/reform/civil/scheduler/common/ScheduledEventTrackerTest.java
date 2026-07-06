@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
 
+import java.time.Duration;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.eq;
@@ -40,7 +41,9 @@ class ScheduledEventTrackerTest {
             eq("TestSchedulerJobStarted"),
             eq(Map.of(
                 "schedulerName", "TestScheduler",
-                "totalCases", "10"
+                "totalCases", "10",
+                "succeededCases", "0",
+                "failedCases", "0"
             ))
         );
     }
@@ -80,7 +83,7 @@ class ScheduledEventTrackerTest {
 
     @Test
     void shouldTrackJobCompletedEvent() {
-        scheduledEventTracker.jobCompletedEvent(eventConfig, 3, 2, 1);
+        scheduledEventTracker.jobCompletedEvent(eventConfig, 3, 2, 1, Duration.ofMillis(500));
 
         verify(telemetryService).trackEvent(
             eq("TestSchedulerJobCompleted"),
@@ -88,14 +91,15 @@ class ScheduledEventTrackerTest {
                 "schedulerName", "TestScheduler",
                 "totalCases", "3",
                 "succeededCases", "2",
-                "failedCases", "1"
+                "failedCases", "1",
+                "cumulativeDelay", "500"
             ))
         );
     }
 
     @Test
     void shouldTrackJobAbortedEvent() {
-        scheduledEventTracker.jobAbortedEvent(eventConfig, 2, 0, 2, "Aborted due to too many errors");
+        scheduledEventTracker.jobAbortedEvent(eventConfig, 2, 0, 2, "Aborted due to too many errors", Duration.ofMillis(100));
 
         verify(telemetryService).trackEvent(
             eq("TestSchedulerJobAborted"),
@@ -104,14 +108,15 @@ class ScheduledEventTrackerTest {
                 "totalCases", "2",
                 "succeededCases", "0",
                 "failedCases", "2",
-                "abortReason", "Aborted due to too many errors"
+                "abortReason", "Aborted due to too many errors",
+                "cumulativeDelay", "100"
             ))
         );
     }
 
     @Test
     void shouldTrackJobAbortedEventWithUnknownReason_whenReasonIsNull() {
-        scheduledEventTracker.jobAbortedEvent(eventConfig, 0, 0, 0, null);
+        scheduledEventTracker.jobAbortedEvent(eventConfig, 0, 0, 0, null, Duration.ZERO);
 
         verify(telemetryService).trackEvent(
             eq("TestSchedulerJobAborted"),
@@ -120,7 +125,8 @@ class ScheduledEventTrackerTest {
                 "totalCases", "0",
                 "succeededCases", "0",
                 "failedCases", "0",
-                "abortReason", "Unknown"
+                "abortReason", "Unknown",
+                "cumulativeDelay", "0"
             ))
         );
     }
@@ -133,7 +139,10 @@ class ScheduledEventTrackerTest {
             eq("TestSchedulerJobCompleted"),
             eq(Map.of(
                 "schedulerName", "TestScheduler",
-                "totalCases", "0"
+                "totalCases", "0",
+                "succeededCases", "0",
+                "failedCases", "0",
+                "cumulativeDelay", "0"
             ))
         );
     }
@@ -146,7 +155,11 @@ class ScheduledEventTrackerTest {
             eq("TestSchedulerJobAborted"),
             eq(Map.of(
                 "schedulerName", "TestScheduler",
-                "abortReason", "Error reason"
+                "totalCases", "0",
+                "succeededCases", "0",
+                "failedCases", "0",
+                "abortReason", "Error reason",
+                "cumulativeDelay", "0"
             ))
         );
     }
@@ -159,7 +172,11 @@ class ScheduledEventTrackerTest {
             eq("TestSchedulerJobAborted"),
             eq(Map.of(
                 "schedulerName", "TestScheduler",
-                "abortReason", "Unknown"
+                "totalCases", "0",
+                "succeededCases", "0",
+                "failedCases", "0",
+                "abortReason", "Unknown",
+                "cumulativeDelay", "0"
             ))
         );
     }

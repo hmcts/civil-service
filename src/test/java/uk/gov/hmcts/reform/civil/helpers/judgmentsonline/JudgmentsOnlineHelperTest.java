@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
@@ -36,7 +38,12 @@ import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineH
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getMoneyValue;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getPartialPayment;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.isDefaultJudgmentRequested;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.isNonDivergentForDJ;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 public class JudgmentsOnlineHelperTest {
 
@@ -87,6 +94,25 @@ public class JudgmentsOnlineHelperTest {
             .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("John Smith")))
             .build();
         assertThat(isNonDivergentForDJ(caseData)).isFalse();
+    }
+
+    @Test
+    void shouldIdentifyDefaultJudgmentRequestedState() {
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.JUDGMENT_REQUESTED)
+            .build();
+
+        assertThat(isDefaultJudgmentRequested(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalseWhenDefaultJudgmentNotRequested() {
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .build();
+
+        assertThat(isDefaultJudgmentRequested(caseData)).isFalse();
+        assertThat(isDefaultJudgmentRequested(null)).isFalse();
     }
 
     @Test
@@ -179,8 +205,38 @@ public class JudgmentsOnlineHelperTest {
         assertThat(calculateRepaymentBreakdownSummaryWithoutClaimInterest(activeJudgment, false)).isNotNull();
     }
 
+    @Nested
+    class IsJoRequested {
+        @Test
+        void shouldReturnTrueWhenJoRequestedAndFeatureEnabled() {
+            FeatureToggleService featureToggleService = mock(FeatureToggleService.class);
+            when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+            CaseData caseData = CaseData.builder().isJoRequested(YES).build();
+
+            assertThat(JudgmentsOnlineHelper.isJoRequested(caseData, featureToggleService)).isTrue();
+        }
+
+        @Test
+        void shouldReturnFalseWhenJoRequestedAndFeatureDisabled() {
+            FeatureToggleService featureToggleService = mock(FeatureToggleService.class);
+            when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(false);
+            CaseData caseData = CaseData.builder().isJoRequested(YES).build();
+
+            assertThat(JudgmentsOnlineHelper.isJoRequested(caseData, featureToggleService)).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalseWhenJoNotRequestedAndFeatureEnabled() {
+            FeatureToggleService featureToggleService = mock(FeatureToggleService.class);
+            when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+            CaseData caseData = CaseData.builder().isJoRequested(YesOrNo.NO).build();
+
+            assertThat(JudgmentsOnlineHelper.isJoRequested(caseData, featureToggleService)).isFalse();
+        }
+    }
+
     @Test
-    void shouldClearJoCaseData() {
+    void shouldClearJoCaseDataExceptIsJoRequested() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued().build();
         caseData.setActiveJudgment(new JudgmentDetails());
@@ -204,10 +260,12 @@ public class JudgmentsOnlineHelperTest {
         caseData.setRepaymentSuggestion("repayment suggestion");
         caseData.setRepaymentSummaryObject("repayment summary");
         caseData.setShowOldDJFixedCostsScreen(YES);
+        caseData.setIsJoRequested(YES);
 
         CaseData clearedCaseData = clearJOCaseData(caseData);
 
         assertThat(clearedCaseData).isSameAs(caseData);
+        assertThat(clearedCaseData.getIsJoRequested()).isEqualTo(YES);
         assertThat(clearedCaseData.getActiveJudgment()).isNull();
         assertThat(clearedCaseData.getDefaultJudgementOverallTotal()).isNull();
         assertThat(clearedCaseData.getJoDefendantName1()).isNull();

@@ -14,14 +14,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.properties.AsyncHandlerProperties;
 import uk.gov.hmcts.reform.civil.event.CvpJoinLinkEvent;
-import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.search.CaseHearingDateSearchService;
 
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -33,6 +32,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(SpringExtension.class)
 class CvpJoinLinkSchedulerHandlerTest {
@@ -51,6 +53,11 @@ class CvpJoinLinkSchedulerHandlerTest {
 
     @Mock
     private AsyncHandlerProperties asyncHandlerProperties;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
 
     @InjectMocks
     private CvpJoinLinkSchedulerHandler handler;
@@ -100,8 +107,8 @@ class CvpJoinLinkSchedulerHandlerTest {
             eq(mockTask),
             eq(errorMessage),
             anyString(),
-            eq(2),
-            eq(300000L)
+            eq(0),
+            anyLong()
         );
     }
 
@@ -112,9 +119,7 @@ class CvpJoinLinkSchedulerHandlerTest {
         doThrow(new NotFoundException(errorMessage, new RestException("", "", 404)))
             .when(externalTaskService).complete(mockTask, null);
 
-        assertThrows(
-            CompleteTaskException.class,
-            () -> handler.execute(mockTask, externalTaskService));
+        handler.execute(mockTask, externalTaskService);
 
         verify(externalTaskService, never()).handleFailure(
             any(ExternalTask.class),
@@ -139,7 +144,7 @@ class CvpJoinLinkSchedulerHandlerTest {
         String errorMessage = "there was an error";
 
         doThrow(new NullPointerException(errorMessage))
-            .when(applicationEventPublisher).publishEvent(eq(new CvpJoinLinkEvent(caseId)));
+            .when(applicationEventPublisher).publishEvent(new CvpJoinLinkEvent(caseId));
 
         handler.execute(mockTask, externalTaskService);
 
@@ -155,4 +160,16 @@ class CvpJoinLinkSchedulerHandlerTest {
         verify(applicationEventPublisher).publishEvent(new CvpJoinLinkEvent(caseId));
         verify(applicationEventPublisher).publishEvent(new CvpJoinLinkEvent(otherId));
     }
+
+    @Test
+    void shouldOnlyAttemptOnce() {
+        assertEquals(1, handler.getMaxAttempts());
+    }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }

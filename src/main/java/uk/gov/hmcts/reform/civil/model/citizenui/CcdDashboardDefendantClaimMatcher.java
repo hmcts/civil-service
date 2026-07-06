@@ -114,6 +114,11 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     @Override
+    public boolean isJudgmentBufferEligible() {
+        return featureToggleService.isJudgmentBufferEnabled() && isEligibleForCCJ();
+    }
+
+    @Override
     public boolean claimantConfirmedDefendantPaid() {
         return caseData.getRespondent1CourtOrderPayment() != null && caseData.respondent1PaidInFull();
     }
@@ -332,6 +337,11 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
             || caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() != null;
+    }
+
+    @Override
+    public boolean isDefaultJudgementGranted() {
+        return false;
     }
 
     @Override

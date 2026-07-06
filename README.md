@@ -11,6 +11,7 @@ Civil CCD Callback Service.
 - [Building and deploying application](#building-and-deploying-the-application)
 - [Pact or contract testing](#pact-or-contract-testing)
 - [Adding Git Conventions](#adding-git-conventions)
+- [Scheduler Framework](#scheduler-framework)
 
 ## StateFlow diagrams
 
@@ -384,6 +385,75 @@ where ???? is the branch name you want to point to. e.g civilDefinitionBranch:DT
 By default, preview environments use WireMock for external services (fees-api, send-letter,
 role-assignment, etc.). Add this label when you need to test against live AAT services.
 ```
+
+## Scheduler Framework
+
+The service includes a common framework for implementing scheduled tasks. This framework provides standard logging, error handling, and case processing logic.
+
+### Core Components
+
+- **`CivilScheduler`**: The main interface for scheduler components. Implementations should be annotated with `@Component` and `@Scheduled`.
+- **`ScheduledTask`**: An interface extending `Consumer<CaseDetails>`, representing the logic to be executed for each case found.
+- **`ScheduledTaskRunner`**: A component that coordinates the task execution, including case retrieval via a `Supplier<? extends TaskResult<T>>`.
+- **`ElasticSearchService`**: A base class for services that search for cases to be processed by a scheduler.
+
+### Creating a New Scheduler
+
+1. **Implement a Search Service**: Extend `ElasticSearchService` to define the query for finding cases.
+2. **Implement a Scheduled Task**: Implement `ScheduledTask` (or `Consumer<CaseDetails>`) to define what happens to each case.
+3. **Create the Scheduler Class**:
+    - Implement `CivilScheduler`.
+    - Use `@Scheduled` on the `runScheduledTask` method.
+    - Use `ScheduledTaskRunner.run()` to execute the task.
+4. **Add Configuration**: Add settings to `application.yaml` for enabling the scheduler and defining its cron expression.
+
+### Spring Scheduler Configuration
+
+Spring-based schedulers are controlled by both a LaunchDarkly feature flag and an allowlist of active schedulers.
+
+#### Feature Flag
+The `spring-scheduler-enabled` flag in LaunchDarkly acts as a global kill-switch for all Spring-managed scheduled tasks. If this flag is disabled, no Spring schedulers will execute, regardless of their individual configuration.
+
+#### Active Schedulers List
+To enable specific Spring schedulers, they must be added to the `active-schedulers` list in `application.yaml` or via the `SCHEDULER_ACTIVE_SCHEDULERS` environment variable.
+
+**Configuration in `application.yaml`:**
+```yaml
+scheduler:
+  active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:JudgementBuffer,DefendantResponseDeadline}
+```
+
+**Using Environment Variables:**
+To enable multiple schedulers, provide a comma-separated list:
+```bash
+export SCHEDULER_ACTIVE_SCHEDULERS="JudgementBuffer,DefendantResponseDeadline"
+```
+
+To disable all Spring schedulers (even if the feature flag is on), set the list to be empty:
+```bash
+export SCHEDULER_ACTIVE_SCHEDULERS=""
+```
+
+### JudgementBufferScheduler
+
+The `JudgementBufferScheduler` is used to process cases where a default judgement has been requested and a buffer period has expired.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.judgement-buffer`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `false` | `SCHEDULER_ENABLED_JUDGEMENT_BUFFER` |
+| `cronExpression` | When the scheduler runs. | `0 0 2 * * *` (Daily at 2 AM) | `CRON_EXPRESSION_JUDGEMENT_BUFFER` |
+
+#### Global Scheduler Settings
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `lockAtLeastFor` | Minimum time a task lock is held. | `PT1M` | `LOCK_AT_LEAST_FOR` |
+| `lockAtMostFor` | Maximum time a task lock is held. | `PT5M` | `LOCK_AT_MOST_FOR` |
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
