@@ -29,7 +29,7 @@ public class RepaymentPlanLRspec {
     @JsonIgnore
     public LocalDate finalPaymentBy(BigDecimal totalAmount) {
         if (firstRepaymentDate != null && paymentAmount != null && repaymentFrequency != null) {
-            if (paymentAmount.compareTo(BigDecimal.ZERO) <= 0) {
+            if (BigDecimal.ZERO.compareTo(paymentAmount) >= 0) {
                 log.error("Payment amount is zero or less, cannot calculate final payment date");
                 return null;
             }
