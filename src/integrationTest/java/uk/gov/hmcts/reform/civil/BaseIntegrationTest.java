@@ -49,7 +49,7 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class},
     properties = {
-        "scheduler.evidenceUpload.enabled=false"
+        "scheduler.evidence-upload.enabled=false"
     })
 @AutoConfigureMockMvc
 @SuppressWarnings({"java:S112", "java:S6813", "java:S1874"})
