@@ -114,6 +114,9 @@ scheduler:
   ga-unless-order:
     cronExpression: ${CRON_EXPRESSION_GA_UNLESS_ORDER:0 0 16 * * ?}
     enabled: ${SCHEDULER_ENABLED_GA_UNLESS_ORDER:true}
+  request-for-reconsideration-notification:
+    cronExpression: ${CRON_EXPRESSION_REQUEST_FOR_RECONSIDERATION_NOTIFICATION:0 10 0 * * ?}
+    enabled: ${SCHEDULER_ENABLED_REQUEST_FOR_RECONSIDERATION_NOTIFICATION:true}
   default-back-pressure:
     initialDelay: ${DEFAULT_BACK_PRESSURE_INITIAL_DELAY:PT0S}
     maxDelay: ${DEFAULT_BACK_PRESSURE_MAX_DELAY:PT10S}
