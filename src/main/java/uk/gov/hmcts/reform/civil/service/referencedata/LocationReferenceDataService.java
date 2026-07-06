@@ -85,7 +85,7 @@ public class LocationReferenceDataService {
 
     public List<LocationRefData> getCourtLocationsForGeneralApplication(String authToken) {
         try {
-            List<LocationRefData> responseEntity = courtVenueService.getCMLAndHLCourts(authTokenGenerator.generate(), authToken);
+            List<LocationRefData> responseEntity = courtVenueService.getCMLAndHLCourtsGAspec(authTokenGenerator.generate(), authToken);
             return onlyEnglandAndWalesLocations(responseEntity)
                 .stream().sorted(Comparator.comparing(LocationRefData::getSiteName)).toList();
         } catch (Exception e) {

@@ -25,7 +25,7 @@ public class GeneralAppLocationRefDataService {
     public List<LocationRefData> getCourtLocations(String authToken) {
         try {
             List<LocationRefData> responseEntity =
-                courtVenueService.getCMLAndHLCourts(
+                courtVenueService.getCMLAndHLCourtsGAspec(
                     authTokenGenerator.generate(),
                     authToken);
             return onlyEnglandAndWalesLocations(responseEntity)

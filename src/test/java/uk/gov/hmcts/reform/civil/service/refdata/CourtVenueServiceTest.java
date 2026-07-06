@@ -131,4 +131,10 @@ class CourtVenueServiceTest {
         List<LocationRefData> result = courtVenueService.getCMLAndHLCourts(serviceAuth, auth);
         assertThat(result).containsExactly(court1);
     }
+
+    @Test
+    void shouldReturnCMLAndHLCourtsGAspec() {
+        List<LocationRefData> result = courtVenueService.getCMLAndHLCourtsGAspec(serviceAuth, auth);
+        assertThat(result).containsExactlyInAnyOrder(court1, court2);
+    }
 }
