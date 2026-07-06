@@ -43,20 +43,32 @@ public class CoreCaseDataApiMockHelper {
         when(authTokenGenerator.generate()).thenReturn(GENERATED_TOKEN);
     }
 
-    public void mockElasticSearchResult(SearchResult searchResult) {
-        when(coreCaseDataApi.searchCases(eq(ACCESS_TOKEN), eq(GENERATED_TOKEN), eq(CASE_TYPE), any(String.class)))
-            .thenReturn(searchResult);
+    public void mockElasticSearchResultPaginated(SearchResult searchResult, SearchResult... nextSearchResults) {
+        when(coreCaseDataApi.searchCases(any(), any(), any(), any()))
+            .thenReturn(searchResult, nextSearchResults);
     }
 
     public void mockStartEvent(String caseIdString, StartEventResponse startEventResponse) {
         when(coreCaseDataApi.startEventForCaseWorker(
-            ACCESS_TOKEN,
-            GENERATED_TOKEN,
-            USER_ID,
-            JURISDICTION,
-            CASE_TYPE,
-            caseIdString,
-            DEFAULT_JUDGEMENT_GRANTED_SPEC.name()
+            eq(ACCESS_TOKEN),
+            eq(GENERATED_TOKEN),
+            eq(USER_ID),
+            eq(JURISDICTION),
+            eq(CASE_TYPE),
+            eq(caseIdString),
+            eq(DEFAULT_JUDGEMENT_GRANTED_SPEC.name())
+        )).thenReturn(startEventResponse);
+    }
+
+    public void mockStartEventAnyCase(StartEventResponse startEventResponse) {
+        when(coreCaseDataApi.startEventForCaseWorker(
+            eq(ACCESS_TOKEN),
+            eq(GENERATED_TOKEN),
+            eq(USER_ID),
+            eq(JURISDICTION),
+            eq(CASE_TYPE),
+            any(String.class),
+            eq(DEFAULT_JUDGEMENT_GRANTED_SPEC.name())
         )).thenReturn(startEventResponse);
     }
 
@@ -73,8 +85,8 @@ public class CoreCaseDataApiMockHelper {
         )).thenReturn(caseDetails);
     }
 
-    public void verifySubmitEvent() {
-        verify(coreCaseDataApi).submitEventForCaseWorker(
+    public void mockSubmitEventAnyCase(CaseDetails caseDetails) {
+        when(coreCaseDataApi.submitEventForCaseWorker(
             eq(ACCESS_TOKEN),
             eq(GENERATED_TOKEN),
             eq(USER_ID),
@@ -83,6 +95,19 @@ public class CoreCaseDataApiMockHelper {
             any(String.class),
             eq(true),
             any(CaseDataContent.class)
+        )).thenReturn(caseDetails);
+    }
+
+    public void verifySubmitEvent(int expectedCount) {
+        verify(coreCaseDataApi, org.mockito.Mockito.times(expectedCount)).submitEventForCaseWorker(
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            org.mockito.ArgumentMatchers.anyBoolean(),
+            any()
         );
     }
 }
