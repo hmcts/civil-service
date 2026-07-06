@@ -78,7 +78,7 @@ public class EvidenceUploadSchedulerIT {
             caseDetails).build();
 
         coreCaseDataApiMockHelper.mockElasticSearchResult(searchResult);
-        coreCaseDataApiMockHelper.mockGetCase(caseDetails);
+        coreCaseDataApiMockHelper.mockGetCase(caseIdString, caseDetails);
         coreCaseDataApiMockHelper.mockStartEvent(
             caseIdString,
             startEventResponse,
