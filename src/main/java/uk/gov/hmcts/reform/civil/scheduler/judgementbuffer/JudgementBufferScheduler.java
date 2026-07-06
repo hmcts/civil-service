@@ -6,8 +6,8 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
-import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.judgementbuffer.JudgementBufferExpiredSearchService;
@@ -15,13 +15,13 @@ import uk.gov.hmcts.reform.civil.service.search.judgementbuffer.JudgementBufferE
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty(prefix = "scheduler.judgementBuffer", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "scheduler.judgement-buffer", name = "enabled", havingValue = "true")
 public class JudgementBufferScheduler implements CivilScheduler {
 
     public static final String SCHEDULER_NAME = "JudgementBuffer";
 
     private final JudgementBufferExpiredSearchService searchService;
-    private final ScheduledTaskRunner scheduledTaskRunner;
+    private final ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
     private final JudgementBufferScheduledTask judgementBufferScheduledTask;
     private final FeatureToggleService featureToggleService;
 
@@ -30,18 +30,16 @@ public class JudgementBufferScheduler implements CivilScheduler {
         return SCHEDULER_NAME;
     }
 
-    @Scheduled(cron = "${scheduler.judgementBuffer.cronExpression}")
+    @Scheduled(cron = "${scheduler.judgement-buffer.cronExpression}")
     @SchedulerLock(name = "JudgementBufferScheduler_issueJudgement",
         lockAtMostFor = "${scheduler.lockAtMostFor}",
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
     @Override
     public void runScheduledTask() {
-        if (featureToggleService.isJudgmentBufferEnabled()
-            && featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
-            log.info("Running {} scheduler", SCHEDULER_NAME);
+        if (featureToggleService.isJudgmentBufferEnabled()) {
             scheduledTaskRunner.run(
-                new ScheduledTaskEventConfiguration(SCHEDULER_NAME),
-                searchService.getElasticSearchResult(),
+                SCHEDULER_NAME,
+                searchService::getElasticSearchResult,
                 judgementBufferScheduledTask
             );
         }
