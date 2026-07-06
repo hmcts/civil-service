@@ -64,14 +64,14 @@ class RequestForReconsiderationNotificationDeadlineHandlerTest {
     void init() {
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
-        lenient().when(featureToggleService.isSpringSchedulerEnabled("REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK"))
+        lenient().when(featureToggleService.isSpringSchedulerEnabled("RequestForReconsiderationNotification"))
             .thenReturn(false);
 
     }
 
     @Test
     void shouldNotProcessLegacyTaskWhenSpringSchedulerIsEnabled() {
-        when(featureToggleService.isSpringSchedulerEnabled("REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK"))
+        when(featureToggleService.isSpringSchedulerEnabled("RequestForReconsiderationNotification"))
             .thenReturn(true);
 
         handler.execute(mockTask, externalTaskService);

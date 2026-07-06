@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 @Component
 public class RequestForReconsiderationNotificationDeadlineHandler extends BaseExternalTaskHandler {
 
-    private static final String SCHEDULER_NAME = "REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK";
+    private static final String SCHEDULER_NAME = "RequestForReconsiderationNotification";
 
     private final RequestForReconsiderationNotificationDeadlineSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;

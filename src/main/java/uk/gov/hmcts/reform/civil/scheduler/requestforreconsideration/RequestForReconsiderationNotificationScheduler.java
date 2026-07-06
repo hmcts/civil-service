@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.civil.service.search.RequestForReconsiderationNotific
 @ConditionalOnProperty(prefix = "scheduler.request-for-reconsideration-notification", name = "enabled", havingValue = "true")
 public class RequestForReconsiderationNotificationScheduler implements CivilScheduler {
 
-    public static final String SCHEDULER_NAME = "REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK";
+    public static final String SCHEDULER_NAME = "RequestForReconsiderationNotification";
 
     private final RequestForReconsiderationNotificationDeadlineSearchService searchService;
     private final ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;

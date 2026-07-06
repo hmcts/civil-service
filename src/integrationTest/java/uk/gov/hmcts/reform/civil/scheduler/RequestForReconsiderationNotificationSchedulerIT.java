@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 public class RequestForReconsiderationNotificationSchedulerIT {
 
     private static final Long CASE_ID = 123L;
-    private static final String SCHEDULER_NAME = "REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK";
+    private static final String SCHEDULER_NAME = "RequestForReconsiderationNotification";
 
     @Autowired
     private RequestForReconsiderationNotificationScheduler scheduler;
@@ -75,8 +75,8 @@ public class RequestForReconsiderationNotificationSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(requestForReconsiderationNotificationScheduledTask).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECKJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECKCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECKJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("RequestForReconsiderationNotificationJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("RequestForReconsiderationNotificationCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("RequestForReconsiderationNotificationJobCompleted"), anyMap());
     }
 }

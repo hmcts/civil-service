@@ -74,7 +74,7 @@ monitor_scheduler_alerts = {
     enabled      = false
     action_group = "demo-civil-service-slack-alert"
   }
-  "REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK" = {
+  "RequestForReconsiderationNotification" = {
     enabled      = false
     action_group = "demo-civil-service-slack-alert"
   }
