@@ -90,7 +90,7 @@ The project defines a set of timer-driven Camunda processes that keep cases movi
 | Hearing cvp link scheduler | Issues CVP/remote hearing links on a daily cadence. | `HEARING_CVP_LINK` | `0 50 0 * * ?` | Daily at 00:50 |
 | Hearing fee check scheduler | Checks for unpaid hearing fees and raises the necessary follow-up tasks. | `HEARING_FEE_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
 | Incident retry scheduler | Retries failed external incident tasks each night. | `INCIDENT_RETRY_EVENT` | `0 1 23 * * ?` | Daily at 23:01 |
-| Manage Stay WA Task Scheduler | Maintains WA tasks for stayed cases so that no follow-up is missed. | `MANAGE_STAY_WA_TASK_SCHEDULER` | `0 0 1 ? * * *` | Daily at 01:00 |
+| Manage Stay WA Task Scheduler | Maintains WA tasks for stayed cases so that no follow-up is missed. | `ManageStayWATask` | `0 20 1 * * ?` | Daily at 01:20 |
 | Migrate cases scheduler | Reserved cron to re-run large case migration batches. | `MIGRATE_CASES_EVENTS` | `0 0 0 1 * ? 2080` | First day of each month until 2080 at 00:00 |
 | Notify claim deadline scheduler | Notifies parties about upcoming claim deadlines, prior to dismissal. | `CASE_DISMISSED` | `0 5 0,16 * * ?` | Daily at 00:05 and 16:05 |
 | Order Review Obligation check scheduler | Checks order review obligations and triggers outstanding actions. | `ORDER_REVIEW_OBLIGATION_CHECK` | `0 0 1 * * ?` | Daily at 01:00 |
@@ -630,6 +630,20 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 |---------|-------------|---------|----------------------|
 | `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_REQUEST_FOR_RECONSIDERATION_NOTIFICATION` |
 | `cronExpression` | When the scheduler runs. | `0 10 0 * * ?` (Daily at 00:10) | `CRON_EXPRESSION_REQUEST_FOR_RECONSIDERATION_NOTIFICATION` |
+
+### ManageStayWATaskScheduler
+
+The `ManageStayWATaskScheduler` processes stayed cases where a manage-stay update has been requested and the follow-up window has expired.
+It runs when `ManageStayWATask` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.manage-stay-wa-task`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_MANAGE_STAY_WA_TASK` |
+| `cronExpression` | When the scheduler runs. | `0 20 1 * * ?` (Daily at 01:20) | `CRON_EXPRESSION_MANAGE_STAY_WA_TASK` |
 
 ### JudgementBufferScheduler
 

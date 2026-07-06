@@ -65,7 +65,8 @@ import static org.mockito.Mockito.when;
         "scheduler.ga-proof-of-debt.enabled=false",
         "scheduler.ga-order-made.enabled=false",
         "scheduler.ga-unless-order.enabled=false",
-        "scheduler.request-for-reconsideration-notification.enabled=false"
+        "scheduler.request-for-reconsideration-notification.enabled=false",
+        "scheduler.manage-stay-wa-task.enabled=false"
     }
 )
 @AutoConfigureMockMvc

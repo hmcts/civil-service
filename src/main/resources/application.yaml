@@ -117,6 +117,9 @@ scheduler:
   request-for-reconsideration-notification:
     cronExpression: ${CRON_EXPRESSION_REQUEST_FOR_RECONSIDERATION_NOTIFICATION:0 10 0 * * ?}
     enabled: ${SCHEDULER_ENABLED_REQUEST_FOR_RECONSIDERATION_NOTIFICATION:true}
+  manage-stay-wa-task:
+    cronExpression: ${CRON_EXPRESSION_MANAGE_STAY_WA_TASK:0 20 1 * * ?}
+    enabled: ${SCHEDULER_ENABLED_MANAGE_STAY_WA_TASK:true}
   default-back-pressure:
     initialDelay: ${DEFAULT_BACK_PRESSURE_INITIAL_DELAY:PT0S}
     maxDelay: ${DEFAULT_BACK_PRESSURE_MAX_DELAY:PT10S}
