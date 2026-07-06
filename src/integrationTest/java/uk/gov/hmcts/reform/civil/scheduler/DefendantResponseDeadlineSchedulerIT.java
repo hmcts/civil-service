@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
@@ -27,10 +28,11 @@ import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
-    "test.id=DefendantResponseDeadlineSchedulerITest",
-    "scheduler.defendantResponse.enabled=true"
+    "test.id=DefendantResponseDeadlineSchedulerIT",
+    "scheduler.defendant-response.enabled=true"
 })
-public class DefendantResponseDeadlineSchedulerITest {
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+public class DefendantResponseDeadlineSchedulerIT {
 
     @Autowired
     private DefendantResponseDeadlineScheduler scheduler;
@@ -47,6 +49,7 @@ public class DefendantResponseDeadlineSchedulerITest {
     @Test
     void shouldExecuteDefendantResponseDeadlineScheduler() {
         // Given
+        when(featureToggleService.isSpringSchedulerEnabled("DefendantResponseDeadline")).thenReturn(true);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         SearchResult searchResult = SearchResult.builder()
