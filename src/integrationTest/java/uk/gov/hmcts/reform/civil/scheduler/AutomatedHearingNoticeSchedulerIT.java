@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.scheduler;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,13 +25,15 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
     "test.id=AutomatedHearingNoticeSchedulerIT",
-    "scheduler.automated-hearing-notice.enabled=true"
+    "scheduler.automated-hearing-notice.enabled=true",
+    "scheduler.lockAtLeastFor=PT0S"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class AutomatedHearingNoticeSchedulerIT {
@@ -59,8 +62,9 @@ public class AutomatedHearingNoticeSchedulerIT {
     @MockBean(name = "userService")
     private UserService userService;
 
-    @Test
-    void shouldExecuteAutomatedHearingNoticeScheduler() {
+    @BeforeEach
+    void setUp() {
+        reset(hearingsService, automatedHearingNoticeScheduledTask, featureToggleService, telemetryService, userService);
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         when(userService.getAccessToken(anyString(), anyString())).thenReturn(ACCESS_TOKEN);
         when(hearingsService.getUnNotifiedHearingResponses(
@@ -71,7 +75,10 @@ public class AutomatedHearingNoticeSchedulerIT {
         )).thenReturn(new UnNotifiedHearingResponse(List.of(), 0L));
         when(automatedHearingNoticeScheduledTask.maxCasesPerRun()).thenReturn(Long.MAX_VALUE);
         when(automatedHearingNoticeScheduledTask.getItemId(HEARING_ID)).thenReturn(HEARING_ID);
+    }
 
+    @Test
+    void shouldExecuteAutomatedHearingNoticeScheduler() {
         scheduler.runScheduledTask();
 
         verify(hearingsService).getUnNotifiedHearingResponses(

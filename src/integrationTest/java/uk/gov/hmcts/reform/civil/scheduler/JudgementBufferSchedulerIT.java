@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
@@ -25,16 +24,18 @@ import java.util.Map;
 import static java.util.stream.IntStream.rangeClosed;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_GRANTED_SPEC;
 
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=JudgementBufferSchedulerIT",
     "scheduler.judgement-buffer.enabled=true",
-    "search.judgementbuffer.pageSize=50"
+    "search.judgement-buffer.pageSize=50",
+    "scheduler.lockAtLeastFor=PT0S"
 })
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class JudgementBufferSchedulerIT {
 
     @Autowired
@@ -51,8 +52,10 @@ public class JudgementBufferSchedulerIT {
 
     @BeforeEach
     void setUp() {
+        reset(telemetryService, featureToggleService);
+        coreCaseDataApiMockHelper.resetMocks();
         when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
-        when(featureToggleService.isSpringSchedulerEnabled("JudgementBuffer")).thenReturn(true);
+        when(featureToggleService.isSpringSchedulerEnabled(JudgementBufferScheduler.SCHEDULER_NAME)).thenReturn(true);
         coreCaseDataApiMockHelper.setupIdamClient();
     }
 
@@ -73,7 +76,7 @@ public class JudgementBufferSchedulerIT {
             .caseDetails(CaseDetails.builder().id(1L).data(Map.of()).build())
             .build();
         // Mock start and submit events for all 51 cases
-        coreCaseDataApiMockHelper.mockStartEventAnyCase(startEventResponse);
+        coreCaseDataApiMockHelper.mockStartEventAnyCase(startEventResponse, DEFAULT_JUDGEMENT_GRANTED_SPEC.name());
         coreCaseDataApiMockHelper.mockSubmitEventAnyCase(CaseDetailsBuilder.builder().id(1L).data(Map.of()).build());
 
         // When

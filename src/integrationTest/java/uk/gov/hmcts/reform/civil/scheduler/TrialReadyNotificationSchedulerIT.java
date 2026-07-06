@@ -24,13 +24,15 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=TrialReadyNotificationSchedulerIT",
-    "scheduler.trial-ready-notification.enabled=true"
+    "scheduler.trial-ready-notification.enabled=true",
+    "scheduler.lockAtLeastFor=PT0S"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class TrialReadyNotificationSchedulerIT {
@@ -55,6 +57,8 @@ public class TrialReadyNotificationSchedulerIT {
 
     @BeforeEach
     void setUp() {
+        reset(telemetryService, featureToggleService, trialReadyNotificationScheduledTask);
+        coreCaseDataApiMockHelper.resetMocks();
         coreCaseDataApiMockHelper.setupIdamClient();
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         when(trialReadyNotificationScheduledTask.maxCasesPerRun()).thenReturn(Long.MAX_VALUE);

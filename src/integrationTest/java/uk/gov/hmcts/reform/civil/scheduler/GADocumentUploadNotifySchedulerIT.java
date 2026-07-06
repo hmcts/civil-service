@@ -22,13 +22,15 @@ import java.util.Set;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
     "test.id=GADocumentUploadNotifySchedulerIT",
-    "scheduler.ga-document-upload-notify.enabled=true"
+    "scheduler.ga-document-upload-notify.enabled=true",
+    "scheduler.lockAtLeastFor=PT0S"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class GADocumentUploadNotifySchedulerIT {
@@ -53,6 +55,7 @@ public class GADocumentUploadNotifySchedulerIT {
 
     @BeforeEach
     void setUp() {
+        reset(telemetryService, featureToggleService, searchService, gaDocumentUploadNotifyScheduledTask);
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         when(gaDocumentUploadNotifyScheduledTask.maxCasesPerRun()).thenReturn(Long.MAX_VALUE);
         when(gaDocumentUploadNotifyScheduledTask.getItemId(any(CaseDetails.class))).thenAnswer(invocation ->

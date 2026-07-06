@@ -24,6 +24,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,7 +38,8 @@ import static org.mockito.Mockito.when;
     "scheduler.mediation-file-transfer.enabled=false",
     "scheduler.take-case-offline.enabled=false",
     "scheduler.trial-ready-notification.enabled=false",
-    "scheduler.order-review-obligation-check.enabled=true"
+    "scheduler.order-review-obligation-check.enabled=true",
+    "scheduler.lockAtLeastFor=PT0S"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class OrderReviewObligationCheckSchedulerIT {
@@ -62,6 +64,8 @@ public class OrderReviewObligationCheckSchedulerIT {
 
     @BeforeEach
     void setUp() {
+        reset(telemetryService, featureToggleService, orderReviewObligationCheckScheduledTask);
+        coreCaseDataApiMockHelper.resetMocks();
         coreCaseDataApiMockHelper.setupIdamClient();
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         when(orderReviewObligationCheckScheduledTask.maxCasesPerRun()).thenReturn(Long.MAX_VALUE);

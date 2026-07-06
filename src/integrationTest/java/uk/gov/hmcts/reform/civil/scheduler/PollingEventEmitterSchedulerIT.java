@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.scheduler;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,13 +23,15 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
     "test.id=PollingEventEmitterSchedulerIT",
-    "scheduler.polling-event-emitter.enabled=true"
+    "scheduler.polling-event-emitter.enabled=true",
+    "scheduler.lockAtLeastFor=PT0S"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class PollingEventEmitterSchedulerIT {
@@ -50,6 +53,11 @@ public class PollingEventEmitterSchedulerIT {
 
     @MockBean
     private TelemetryService telemetryService;
+
+    @BeforeEach
+    void setUp() {
+        reset(coreCaseDataService, pollingEventEmitterScheduledTask, featureToggleService, telemetryService);
+    }
 
     @Test
     void shouldExecutePollingEventEmitterScheduler() {

@@ -27,6 +27,7 @@ import java.util.Set;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.ORDER_MADE;
@@ -35,7 +36,8 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.UNLESS_
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
     "test.id=GAUnlessOrderSchedulerIT",
-    "scheduler.ga-unless-order.enabled=true"
+    "scheduler.ga-unless-order.enabled=true",
+    "scheduler.lockAtLeastFor=PT0S"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class GAUnlessOrderSchedulerIT {
@@ -63,6 +65,7 @@ public class GAUnlessOrderSchedulerIT {
 
     @BeforeEach
     void setUp() {
+        reset(telemetryService, featureToggleService, searchService, caseDetailsConverter, gaUnlessOrderScheduledTask);
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         when(gaUnlessOrderScheduledTask.maxCasesPerRun()).thenReturn(Long.MAX_VALUE);
         when(gaUnlessOrderScheduledTask.getItemId(any(GeneralApplicationCaseData.class))).thenAnswer(invocation ->
