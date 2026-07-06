@@ -42,6 +42,10 @@ public class CoreCaseDataApiMockHelper {
         when(authTokenGenerator.generate()).thenReturn(GENERATED_TOKEN);
     }
 
+    public void resetMocks() {
+        org.mockito.Mockito.reset(coreCaseDataApi, idamClient, authTokenGenerator);
+    }
+
     public void mockElasticSearchResult(SearchResult searchResult) {
         when(coreCaseDataApi.searchCases(eq(ACCESS_TOKEN), eq(GENERATED_TOKEN), eq(CASE_TYPE), any(String.class)))
             .thenReturn(searchResult);
