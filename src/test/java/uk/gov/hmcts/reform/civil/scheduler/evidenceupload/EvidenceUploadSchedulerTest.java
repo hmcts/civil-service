@@ -5,15 +5,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.search.EvidenceUploadNotificationSearchService;
-import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
-import java.util.stream.Stream;
-
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.scheduler.evidenceupload.EvidenceUploadScheduler.SCHEDULER_NAME;
 
 @ExtendWith(MockitoExtension.class)
 class EvidenceUploadSchedulerTest {
@@ -22,7 +21,7 @@ class EvidenceUploadSchedulerTest {
     private EvidenceUploadNotificationSearchService searchService;
 
     @Mock
-    private ScheduledTaskRunner scheduledTaskRunner;
+    private ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
 
     @Mock
     private EvidenceUploadSchedulerTask evidenceUploadSchedulerTask;
@@ -32,16 +31,12 @@ class EvidenceUploadSchedulerTest {
 
     @Test
     void shouldRunTaskRunner_whenSchedulerIsEnabled() {
-        ScheduledTaskEventConfiguration expectedConfig = new ScheduledTaskEventConfiguration(scheduler.getName());
-        ElasticSearchResult elasticSearchResult = new ElasticSearchResult(Stream.empty(), 0);
-        when(searchService.getElasticSearchResult()).thenReturn(elasticSearchResult);
-
         scheduler.runScheduledTask();
 
         verify(scheduledTaskRunner).run(
-            expectedConfig,
-            elasticSearchResult,
-            evidenceUploadSchedulerTask
+            eq(SCHEDULER_NAME),
+            any(),
+            eq(evidenceUploadSchedulerTask)
         );
     }
 }
