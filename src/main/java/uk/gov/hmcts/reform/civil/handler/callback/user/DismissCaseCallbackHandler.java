@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -58,6 +59,10 @@ public class DismissCaseCallbackHandler extends CallbackHandler {
         caseData.setInformation(null);
         caseData.setHearingNoticeListOther(null);
 
+        if (JudgmentsOnlineHelper.isJoRequested(caseData, featureToggleService)) {
+            JudgmentsOnlineHelper.clearJOCaseData(caseData);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
@@ -69,5 +74,4 @@ public class DismissCaseCallbackHandler extends CallbackHandler {
             .confirmationBody("&nbsp;")
             .build();
     }
-
 }

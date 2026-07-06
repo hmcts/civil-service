@@ -32,6 +32,9 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(MockitoExtension.class)
 class FullAdmitPayImmediatelyNoPaymentFromDefendantHandlerTest {
@@ -53,6 +56,11 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantHandlerTest {
 
     @Mock
     private ExternalTask externalTask;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
 
     @InjectMocks
     private FullAdmitPayImmediatelyNoPaymentFromDefendantHandler handler;
@@ -124,4 +132,11 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantHandlerTest {
         verifyNoInteractions(coreCaseDataService);
         verifyNoInteractions(applicationEventPublisher);
     }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }

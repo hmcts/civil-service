@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -41,9 +40,6 @@ public class DefaultJudgementIssuedClaimantNotificationHandlerTest extends BaseC
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     public static final String TASK_ID = "GenerateDashboardNotificationDJNonDivergentClaimant";
 
     HashMap<String, Object> params = new HashMap<>();
@@ -68,7 +64,6 @@ public class DefaultJudgementIssuedClaimantNotificationHandlerTest extends BaseC
     @Test
     void shouldCreateDashboardNotifications_whenDashboardIsEnabled() {
         params.put("ccdCaseReference", "123");
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseDataBuilder.builder().build();
