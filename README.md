@@ -96,7 +96,7 @@ The project defines a set of timer-driven Camunda processes that keep cases movi
 | Order Review Obligation check scheduler | Checks order review obligations and triggers outstanding actions. | `ORDER_REVIEW_OBLIGATION_CHECK` | `0 0 1 * * ?` | Daily at 01:00 |
 | Polling event emitter scheduler | Emits polling events across the day so downstream pollers stay in sync. | `POLLING_EVENT_EMITTER` | `0 0 8-20 * * ?` | Hourly at the top of the hour from 08:00–20:00 |
 | Proof of debt scheduler | Generates proof-of-debt artefacts for COSC-linked general applications. | `CoscApplicationProcessor` | `0 0 16 * * ?` | Daily at 16:00 |
-| Request for reconsideration notification check scheduler | Ensures reconsideration notifications are sent when conditions are met. | `REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
+| Request for reconsideration notification check scheduler | Ensures reconsideration notifications are sent when conditions are met. | `REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK` | `0 10 0 * * ?` | Daily at 00:10 |
 | Retrigger cases scheduler | One-off cron to retrigger case updates as part of the 2026 migration plan. | `RETRIGGER_CASES_EVENTS` | `0 0 0 1 * ? 2026` | First day of each month until 2026 at 00:00 |
 | Settlement no response from defendant scheduler | Moves settlement agreements forward when the defendant failed to respond. | `SETTLEMENT_NO_RESPONSE_FROM_DEFENDANT_CHECK` | `0 0 1 * * ?` | Daily at 01:00 |
 | Spec automated hearing notice scheduler | Builds automated hearing notices for Spec claims twice per day. | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 ? * * *` | Twice daily at 00:00 and 12:00 |
@@ -616,6 +616,20 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 |---------|-------------|---------|----------------------|
 | `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_GA_UNLESS_ORDER` |
 | `cronExpression` | When the scheduler runs. | `0 0 16 * * ?` (Daily at 16:00) | `CRON_EXPRESSION_GA_UNLESS_ORDER` |
+
+### RequestForReconsiderationNotificationScheduler
+
+The `RequestForReconsiderationNotificationScheduler` processes cases where the request-for-reconsideration notification deadline has expired.
+It runs when `REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.request-for-reconsideration-notification`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_REQUEST_FOR_RECONSIDERATION_NOTIFICATION` |
+| `cronExpression` | When the scheduler runs. | `0 10 0 * * ?` (Daily at 00:10) | `CRON_EXPRESSION_REQUEST_FOR_RECONSIDERATION_NOTIFICATION` |
 
 ### JudgementBufferScheduler
 
