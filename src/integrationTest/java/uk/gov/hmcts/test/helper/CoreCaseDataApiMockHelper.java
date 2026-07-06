@@ -17,7 +17,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_GRANTED_SPEC;
 
 public class CoreCaseDataApiMockHelper {
 
@@ -43,12 +42,21 @@ public class CoreCaseDataApiMockHelper {
         when(authTokenGenerator.generate()).thenReturn(GENERATED_TOKEN);
     }
 
+    public void mockElasticSearchResult(SearchResult searchResult) {
+        when(coreCaseDataApi.searchCases(eq(ACCESS_TOKEN), eq(GENERATED_TOKEN), eq(CASE_TYPE), any(String.class)))
+            .thenReturn(searchResult);
+    }
+
     public void mockElasticSearchResultPaginated(SearchResult searchResult, SearchResult... nextSearchResults) {
-        when(coreCaseDataApi.searchCases(any(), any(), any(), any()))
+        when(coreCaseDataApi.searchCases(eq(ACCESS_TOKEN), eq(GENERATED_TOKEN), eq(CASE_TYPE), any()))
             .thenReturn(searchResult, nextSearchResults);
     }
 
-    public void mockStartEvent(String caseIdString, StartEventResponse startEventResponse) {
+    public void mockGetCase(String caseIdString, CaseDetails caseDetails) {
+        when(coreCaseDataApi.getCase(eq(ACCESS_TOKEN), eq(GENERATED_TOKEN), eq(caseIdString))).thenReturn(caseDetails);
+    }
+
+    public void mockStartEvent(String caseIdString, StartEventResponse startEventResponse, String eventId) {
         when(coreCaseDataApi.startEventForCaseWorker(
             eq(ACCESS_TOKEN),
             eq(GENERATED_TOKEN),
@@ -56,11 +64,11 @@ public class CoreCaseDataApiMockHelper {
             eq(JURISDICTION),
             eq(CASE_TYPE),
             eq(caseIdString),
-            eq(DEFAULT_JUDGEMENT_GRANTED_SPEC.name())
+            eq(eventId)
         )).thenReturn(startEventResponse);
     }
 
-    public void mockStartEventAnyCase(StartEventResponse startEventResponse) {
+    public void mockStartEventAnyCase(StartEventResponse startEventResponse, String eventId) {
         when(coreCaseDataApi.startEventForCaseWorker(
             eq(ACCESS_TOKEN),
             eq(GENERATED_TOKEN),
@@ -68,7 +76,7 @@ public class CoreCaseDataApiMockHelper {
             eq(JURISDICTION),
             eq(CASE_TYPE),
             any(String.class),
-            eq(DEFAULT_JUDGEMENT_GRANTED_SPEC.name())
+            eq(eventId)
         )).thenReturn(startEventResponse);
     }
 
