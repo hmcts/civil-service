@@ -57,16 +57,28 @@ spring:
     baseline-on-migrate: true
 
 scheduler:
+  active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:JudgementBuffer}
   circuitBreakerThreshold: ${CIRCUIT_BREAKER_THRESHOLD:5}
   lockAtLeastFor: ${LOCK_AT_LEAST_FOR:PT1M}
-  lockAtMostFor: ${LOCK_AT_MOST_FOR:PT5M}
-  defaultLockAtMostFor: ${DEFAULT_LOCK_AT_MOST_FOR:PT10M}
-  judgementBuffer:
+  lockAtMostFor: ${LOCK_AT_MOST_FOR:PT30M}
+  defaultLockAtMostFor: ${DEFAULT_LOCK_AT_MOST_FOR:PT30M}
+  judgement-buffer:
     cronExpression: ${CRON_EXPRESSION_JUDGEMENT_BUFFER:0 0 2 * * *}
     enabled: ${SCHEDULER_ENABLED_JUDGEMENT_BUFFER:false}
-  defendantResponse:
+  defendant-response:
     cronExpression: ${CRON_EXPRESSION_DEFENDANT_RESPONSE:0 1 16 * * ?}
     enabled: ${SCHEDULER_ENABLED_DEFENDANT_RESPONSE:false}
+  default-back-pressure:
+    initialDelay: ${DEFAULT_BACK_PRESSURE_INITIAL_DELAY:PT0S}
+    maxDelay: ${DEFAULT_BACK_PRESSURE_MAX_DELAY:PT10S}
+    delayIncreaseOnFailure: ${DEFAULT_BACK_PRESSURE_DELAY_INCREASE_ON_FAILURE:PT0.5S}
+    delayIncreaseOnSlowCase: ${DEFAULT_BACK_PRESSURE_DELAY_INCREASE_ON_SLOW_CASE:PT0.25S}
+    delayReductionOnSuccess: ${DEFAULT_BACK_PRESSURE_DELAY_REDUCTION_ON_SUCCESS:PT0.1S}
+    slowCaseThreshold: ${DEFAULT_BACK_PRESSURE_SLOW_CASE_THRESHOLD:PT2S}
+
+search:
+  judgement-buffer:
+    pageSize: ${SEARCH_PAGE_SIZE_JUDGEMENT_BUFFER:50}
 
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
@@ -425,6 +437,7 @@ notifications:
   notifyRespondentLiPMediationSuccessfulTemplate: "9acfd1df-cccc-4490-9983-41bd04e53f13"
   notifyRespondentLiPMediationSuccessfulTemplateWelsh: "90541017-49c9-4e05-9195-d146aeea1f99"
   notifyDefendantLIPClaimantSettleTheClaimTemplate: "38cc4b02-90f4-4fae-adf3-6f7d9b80ee51"
+  notifyDefendantLIPClaimantSettleTheClaimTemplateWelsh: "ca8a8101-94fa-4586-82d3-0e172f234260"
   notifyDefendantLRClaimantSettleTheClaimTemplate: "034573ca-fece-4ed5-bdb6-4f39065bf60a"
 
   notifyLipUpdateTemplate: "edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf"
@@ -616,8 +629,8 @@ http:
     connectTimeout: ${HTTP_CONNECT_TIMEOUT:5000}
     requestTimeout: ${HTTP_REQUEST_TIMEOUT:10000}
     readTimeout: ${HTTP_READ_TIMEOUT:30000}
-    maxPerRoute: ${HTTP_MAX_PER_ROUTE:10}
-    maxTotal: ${HTTP_MAX_TOTAL:50}
+    maxPerRoute: ${HTTP_MAX_PER_ROUTE:20}
+    maxTotal: ${HTTP_MAX_TOTAL:75}
     threshold: 10000
 
 court-location:

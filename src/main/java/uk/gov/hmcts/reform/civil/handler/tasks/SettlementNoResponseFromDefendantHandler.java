@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.service.search.SettlementNoResponseFromDefendan
 
 import java.util.Set;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
@@ -20,11 +21,12 @@ public class SettlementNoResponseFromDefendantHandler extends BaseExternalTaskHa
     private final ApplicationEventPublisher applicationEventPublisher;
 
     public SettlementNoResponseFromDefendantHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         SettlementNoResponseFromDefendantSearchService caseSearchService,
         ApplicationEventPublisher applicationEventPublisher
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.caseSearchService = caseSearchService;
         this.applicationEventPublisher = applicationEventPublisher;
     }
