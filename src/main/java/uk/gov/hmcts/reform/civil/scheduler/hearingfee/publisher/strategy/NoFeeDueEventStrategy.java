@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.scheduler.hearingfee.publisher;
+package uk.gov.hmcts.reform.civil.scheduler.hearingfee.publisher.strategy;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;

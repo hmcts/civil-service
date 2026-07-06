@@ -6,43 +6,38 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
-import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty(prefix = "scheduler.hearingFee", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "scheduler.hearing-fee", name = "enabled", havingValue = "true")
 public class HearingFeeScheduler implements CivilScheduler {
 
-    private static final String SCHEDULER_NAME = "HearingFee";
+    public static final String SCHEDULER_NAME = "HearingFee";
 
     private final HearingFeeDueSearchService searchService;
-    private final ScheduledTaskRunner scheduledTaskRunner;
+    private final ScheduledTaskRunner<CaseDetails, Long>  scheduledTaskRunner;
     private final HearingFeeSchedulerTask hearingFeeSchedulerTask;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     public String getName() {
         return SCHEDULER_NAME;
     }
 
-    @Scheduled(cron = "${scheduler.hearingFee.cronExpression}")
+    @Scheduled(cron = "${scheduler.hearing-fee.cronExpression}")
     @SchedulerLock(name = "HearingFeeScheduler_check",
         lockAtMostFor = "${scheduler.lockAtMostFor}",
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
     @Override
     public void runScheduledTask() {
-        if (featureToggleService.isSpringSchedulerEnabled()) {
-            log.info("Running {} scheduler", SCHEDULER_NAME);
-            scheduledTaskRunner.run(
-                new ScheduledTaskEventConfiguration(SCHEDULER_NAME),
-                searchService.getElasticSearchResult(),
-                hearingFeeSchedulerTask
-            );
-        }
+        scheduledTaskRunner.run(
+            SCHEDULER_NAME,
+            searchService::getElasticSearchResult,
+            hearingFeeSchedulerTask
+        );
     }
 }

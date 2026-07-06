@@ -6,6 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.scheduler.hearingfee.publisher.strategy.PaidEventStrategy;
+import uk.gov.hmcts.reform.civil.scheduler.hearingfee.publisher.strategy.UnpaidEventStrategy;
 
 import java.util.function.Consumer;
 import java.util.function.Function;

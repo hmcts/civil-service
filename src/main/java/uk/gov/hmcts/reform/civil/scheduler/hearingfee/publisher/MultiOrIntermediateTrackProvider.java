@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.scheduler.hearingfee.publisher;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.scheduler.hearingfee.publisher.strategy.HearingFeeEventStrategy;
 
 import java.util.List;
 import java.util.function.Consumer;

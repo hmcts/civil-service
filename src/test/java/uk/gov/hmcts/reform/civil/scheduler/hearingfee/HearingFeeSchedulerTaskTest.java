@@ -9,16 +9,27 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.scheduler.common.DefaultBackPressureConfiguration;
+import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskBackPressureConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.hearingfee.publisher.HearingFeePublisherProvider;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.util.function.Consumer;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class HearingFeeSchedulerTaskTest {
+
+    private static final long CASE_ID = 123L;
+
+    @Mock
+    private DefaultBackPressureConfiguration defaultBackPressureConfiguration;
+
+    @Mock
+    private ScheduledTaskBackPressureConfiguration backPressureConfiguration;
 
     @Mock
     private CoreCaseDataService coreCaseDataService;
@@ -33,20 +44,33 @@ class HearingFeeSchedulerTaskTest {
     private Consumer<Long> publisher;
 
     @InjectMocks
-    private HearingFeeSchedulerTask handler;
+    private HearingFeeSchedulerTask task;
+
+    @Test
+    void shouldReturnCaseId() {
+        CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(CASE_ID).build();
+        CaseDetails caseDetails = CaseDetails.builder().id(CASE_ID).build();
+        assertThat(task.getItemId(caseDetails)).isEqualTo(CASE_ID);
+    }
+
+    @Test
+    void shouldUseDefaultBackPressureConfiguration() {
+        when(defaultBackPressureConfiguration.getDefaultBackPressure()).thenReturn(backPressureConfiguration);
+
+        assertThat(task.backPressureConfiguration()).isSameAs(backPressureConfiguration);
+    }
 
     @Test
     void shouldInvokePublisher_whenCaseFound() {
-        long caseId = 1L;
-        CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(caseId).build();
-        CaseDetails caseDetails = CaseDetails.builder().id(caseId).build();
+        CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(CASE_ID).build();
+        CaseDetails caseDetails = CaseDetails.builder().id(CASE_ID).build();
 
-        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails);
+        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         when(hearingFeePublisherProvider.provide(caseData)).thenReturn(publisher);
 
-        handler.accept(caseDetails);
+        task.accept(caseDetails);
 
-        verify(publisher).accept(caseId);
+        verify(publisher).accept(CASE_ID);
     }
 }
