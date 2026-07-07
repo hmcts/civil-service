@@ -297,7 +297,7 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Test
-        void shouldNotUpdateCaseState_WhenNotFullDiscontinue() {
+        void shouldUpdateCaseState_WhenNoCourtPermissionAndPartDiscontinue() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
             caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
@@ -305,7 +305,7 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getState()).isEqualTo(caseData.getCcdState().name());
+            assertThat(response.getState()).isEqualTo(CaseState.CASE_DISCONTINUED.name());
         }
 
         @Test
