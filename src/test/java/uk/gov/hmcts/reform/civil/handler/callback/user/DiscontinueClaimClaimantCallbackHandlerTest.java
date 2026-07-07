@@ -327,6 +327,37 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getJoRepaymentSummaryObject()).isNull();
             assertThat(updatedCaseData.getJoState()).isNull();
         }
+
+        @Test
+        void shouldClearJoDataWhenJudgmentBufferEnabledAndPartDiscontinueDiscontinuesCase() {
+            given(featureToggleService.isJudgmentBufferEnabled()).willReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setCcdState(CaseState.JUDGMENT_REQUESTED);
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
+            caseData.setJoRepaymentSummaryObject("jo-summary");
+            caseData.setJoState(JudgmentState.REQUESTED);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(response.getState()).isEqualTo(CaseState.CASE_DISCONTINUED.name());
+            assertThat(updatedCaseData.getJoRepaymentSummaryObject()).isNull();
+            assertThat(updatedCaseData.getJoState()).isNull();
+        }
+
+        @Test
+        void shouldNotUpdateCaseState_WhenCourtPermissionNeededForPartDiscontinue() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.YES);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getState()).isEqualTo(caseData.getCcdState().name());
+        }
     }
 
     @Nested
