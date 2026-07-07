@@ -29,7 +29,7 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScheduler implements C
     }
 
     @Scheduled(cron = "${scheduler.full-admit-pay-immediately-no-payment-from-def.cronExpression}")
-    @SchedulerLock(name = "FullAdmitPayImmediatelyNoPaymentFromDefendantScheduler_fullAdmitPay",
+    @SchedulerLock(name = "FullAdmitPayImmediatelyNoPaymentFromDefScheduler_fullAdmitPay",
         lockAtMostFor = "${scheduler.lockAtMostFor}",
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
     @Override
