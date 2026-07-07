@@ -75,12 +75,6 @@ def secretsOtherenv = [
   ]
 ]
 
-def secretsProd = [
-  'civil-prod': [
-    secret('microservicekey-civil-service', 'S2S_SECRET_PROD')
-  ]
-]
-
 def uploadBpmnDiagrams(String env) {
   dir("${WORKSPACE}/bin/camunda") {
     sh """
@@ -205,10 +199,7 @@ withPipeline(type, product, component) {
   afterSuccess('functionalTest:aat') {
     createBpmnGithubRelease()
     uploadBpmnDiagrams('aat')
-    withSubscription('prod') {
-      loadVaultSecrets(secretsProd)
-      uploadBpmnDiagrams('prod')
-    }
+    uploadBpmnDiagrams('prod')
   }
 
   afterAlways('functionalTest:aat') {
