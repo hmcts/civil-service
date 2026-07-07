@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -40,8 +39,9 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.ga.utils.OrgPolicyUtils.getRespondent1SolicitorOrgId;
 import static uk.gov.hmcts.reform.civil.ga.utils.OrgPolicyUtils.getRespondent2SolicitorOrgId;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
-@RequiredArgsConstructor
 @Component
 public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
 
@@ -51,6 +51,21 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
     private final GaStateFlowEngine stateFlowEngine;
+
+    public CreateApplicationTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        GaCoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter,
+        ObjectMapper mapper,
+        GaStateFlowEngine stateFlowEngine
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.mapper = mapper;
+        this.stateFlowEngine = stateFlowEngine;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -95,6 +110,11 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
         return new ExternalTaskData()
             .setParentCaseData(parentCaseData)
             .setUpdateGeneralApplicationCaseData(generalAppCaseData);
+    }
+
+    @Override
+    public int getMaxAttempts() {
+        return 1;
     }
 
     private GeneralApplicationCaseData withoutNoticeNoConsent(GeneralApplication generalApplication,
