@@ -68,21 +68,6 @@ class GAUnlessOrderScheduledTaskTest {
     }
 
     @Test
-    void shouldIdentifyExpiredUnlessOrderDeadline() {
-        assertThat(task.hasExpiredUnlessOrderDeadline(getCaseData(LocalDate.now(), YesOrNo.NO))).isTrue();
-        assertThat(task.hasExpiredUnlessOrderDeadline(getCaseData(LocalDate.now().minusDays(1), YesOrNo.NO)))
-            .isTrue();
-        assertThat(task.hasExpiredUnlessOrderDeadline(getCaseData(LocalDate.now().plusDays(1), YesOrNo.NO)))
-            .isFalse();
-        assertThat(task.hasExpiredUnlessOrderDeadline(getCaseData(null, YesOrNo.NO))).isFalse();
-        assertThat(task.hasExpiredUnlessOrderDeadline(getCaseData(LocalDate.now(), YesOrNo.YES))).isFalse();
-        assertThat(task.hasExpiredUnlessOrderDeadline(getCaseData(LocalDate.now(), null))).isFalse();
-        assertThat(task.hasExpiredUnlessOrderDeadline(GeneralApplicationCaseDataBuilder.builder()
-                                                        .ccdCaseReference(CASE_ID)
-                                                        .build())).isFalse();
-    }
-
-    @Test
     void shouldUseDefaultBackPressureConfiguration() {
         when(defaultBackPressureConfiguration.getDefaultBackPressure()).thenReturn(backPressureConfiguration);
 

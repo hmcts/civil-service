@@ -7,15 +7,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialMakeAnOrder;
 import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.scheduler.common.TaskResult;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -51,8 +55,6 @@ class GAUnlessOrderSchedulerTest {
             .thenReturn(Set.of(expiredCaseDetails, futureCaseDetails));
         when(caseDetailsConverter.toGeneralApplicationCaseData(expiredCaseDetails)).thenReturn(expiredCaseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(futureCaseDetails)).thenReturn(futureCaseData);
-        when(gaUnlessOrderScheduledTask.hasExpiredUnlessOrderDeadline(expiredCaseData)).thenReturn(true);
-        when(gaUnlessOrderScheduledTask.hasExpiredUnlessOrderDeadline(futureCaseData)).thenReturn(false);
 
         scheduler.runScheduledTask();
 
@@ -67,11 +69,38 @@ class GAUnlessOrderSchedulerTest {
         assertThat(supplierCaptor.getValue().get().itemStream()).containsExactly(expiredCaseData);
     }
 
+    @Test
+    void shouldIdentifyExpiredUnlessOrderDeadline() {
+        assertThat(scheduler.hasExpiredUnlessOrderDeadline(getCaseData(LocalDate.now(), YesOrNo.NO))).isTrue();
+        assertThat(scheduler.hasExpiredUnlessOrderDeadline(getCaseData(LocalDate.now().minusDays(1), YesOrNo.NO)))
+            .isTrue();
+        assertThat(scheduler.hasExpiredUnlessOrderDeadline(getCaseData(LocalDate.now().plusDays(1), YesOrNo.NO)))
+            .isFalse();
+        assertThat(scheduler.hasExpiredUnlessOrderDeadline(getCaseData(null, YesOrNo.NO))).isFalse();
+        assertThat(scheduler.hasExpiredUnlessOrderDeadline(getCaseData(LocalDate.now(), YesOrNo.YES))).isFalse();
+        assertThat(scheduler.hasExpiredUnlessOrderDeadline(getCaseData(LocalDate.now(), null))).isFalse();
+        assertThat(scheduler.hasExpiredUnlessOrderDeadline(GeneralApplicationCaseDataBuilder.builder()
+                                                          .ccdCaseReference(1L)
+                                                          .build())).isFalse();
+    }
+
     private GeneralApplicationCaseData getCaseData(Long caseId, LocalDate deadline) {
         return GeneralApplicationCaseDataBuilder.builder()
             .ccdCaseReference(caseId)
             .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
-                                           .setJudgeApproveEditOptionDateForUnlessOrder(deadline))
+                                           .setJudgeApproveEditOptionDateForUnlessOrder(deadline)
+                                           .setIsOrderProcessedByUnlessScheduler(YesOrNo.NO))
+            .build();
+    }
+
+    private GeneralApplicationCaseData getCaseData(LocalDate deadline, YesOrNo isProcessed) {
+        return GeneralApplicationCaseDataBuilder.builder()
+            .ccdCaseReference(1L)
+            .ccdState(ORDER_MADE)
+            .generalAppType(new GAApplicationType().setTypes(List.of(GeneralApplicationTypes.UNLESS_ORDER)))
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setJudgeApproveEditOptionDateForUnlessOrder(deadline)
+                                           .setIsOrderProcessedByUnlessScheduler(isProcessed))
             .build();
     }
 }

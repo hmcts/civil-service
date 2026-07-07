@@ -7,15 +7,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAApproveConsentOrder;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialMakeAnOrder;
 import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.scheduler.common.TaskResult;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -51,8 +56,6 @@ class GAOrderMadeSchedulerTest {
             .thenReturn(Set.of(expiredCaseDetails, futureCaseDetails));
         when(caseDetailsConverter.toGeneralApplicationCaseData(expiredCaseDetails)).thenReturn(expiredCaseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(futureCaseDetails)).thenReturn(futureCaseData);
-        when(gaOrderMadeScheduledTask.hasExpiredStayDeadline(expiredCaseData)).thenReturn(true);
-        when(gaOrderMadeScheduledTask.hasExpiredStayDeadline(futureCaseData)).thenReturn(false);
 
         scheduler.runScheduledTask();
 
@@ -67,11 +70,45 @@ class GAOrderMadeSchedulerTest {
         assertThat(supplierCaptor.getValue().get().itemStream()).containsExactly(expiredCaseData);
     }
 
+    @Test
+    void shouldIdentifyExpiredStayDeadline() {
+        assertThat(scheduler.hasExpiredStayDeadline(getJudicialOrderCaseData(LocalDate.now(), YesOrNo.NO))).isTrue();
+        assertThat(scheduler.hasExpiredStayDeadline(getJudicialOrderCaseData(LocalDate.now().minusDays(1), YesOrNo.NO)))
+            .isTrue();
+        assertThat(scheduler.hasExpiredStayDeadline(getConsentOrderCaseData(LocalDate.now(), YesOrNo.NO))).isTrue();
+        assertThat(scheduler.hasExpiredStayDeadline(getJudicialOrderCaseData(LocalDate.now().plusDays(1), YesOrNo.NO)))
+            .isFalse();
+        assertThat(scheduler.hasExpiredStayDeadline(getJudicialOrderCaseData(null, YesOrNo.NO))).isFalse();
+    }
+
     private GeneralApplicationCaseData getCaseData(Long caseId, LocalDate deadline) {
         return GeneralApplicationCaseDataBuilder.builder()
             .ccdCaseReference(caseId)
             .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                            .setJudgeApproveEditOptionDate(deadline))
+            .build();
+    }
+
+    private GeneralApplicationCaseData getJudicialOrderCaseData(LocalDate deadline, YesOrNo isProcessed) {
+        return GeneralApplicationCaseDataBuilder.builder()
+            .ccdCaseReference(1L)
+            .ccdState(ORDER_MADE)
+            .generalAppType(new GAApplicationType().setTypes(List.of(GeneralApplicationTypes.STAY_THE_CLAIM)))
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setJudgeApproveEditOptionDate(deadline)
+                                           .setIsOrderProcessedByStayScheduler(isProcessed))
+            .build();
+    }
+
+    private GeneralApplicationCaseData getConsentOrderCaseData(LocalDate deadline, YesOrNo isProcessed) {
+        return GeneralApplicationCaseDataBuilder.builder()
+            .ccdCaseReference(1L)
+            .ccdState(ORDER_MADE)
+            .generalAppType(new GAApplicationType().setTypes(List.of(GeneralApplicationTypes.STAY_THE_CLAIM)))
+            .approveConsentOrder(new GAApproveConsentOrder()
+                                     .setConsentOrderDescription("Testing prepopulated text")
+                                     .setConsentOrderDateToEnd(deadline)
+                                     .setIsOrderProcessedByStayScheduler(isProcessed))
             .build();
     }
 }

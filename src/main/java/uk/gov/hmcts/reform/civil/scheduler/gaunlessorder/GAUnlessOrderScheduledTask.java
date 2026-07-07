@@ -12,8 +12,6 @@ import uk.gov.hmcts.reform.civil.scheduler.common.DefaultBackPressureConfigurati
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTask;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskBackPressureConfiguration;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_SCHEDULER_CHECK_UNLESS_ORDER_DEADLINE;
@@ -22,8 +20,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_SCHEDULER_CHECK_U
 @RequiredArgsConstructor
 @Slf4j
 public class GAUnlessOrderScheduledTask implements ScheduledTask<GeneralApplicationCaseData, Long> {
-
-    private static final ZoneId LOCAL_ZONE = ZoneId.of("Europe/London");
 
     private final GaCoreCaseDataService coreCaseDataService;
     private final ObjectMapper mapper;
@@ -44,14 +40,6 @@ public class GAUnlessOrderScheduledTask implements ScheduledTask<GeneralApplicat
             END_SCHEDULER_CHECK_UNLESS_ORDER_DEADLINE,
             getUpdatedCaseDataMapper(updateCaseData(caseData))
         );
-    }
-
-    public boolean hasExpiredUnlessOrderDeadline(GeneralApplicationCaseData caseData) {
-        GAJudicialMakeAnOrder judicialDecisionMakeOrder = caseData.getJudicialDecisionMakeOrder();
-        return judicialDecisionMakeOrder != null
-            && judicialDecisionMakeOrder.getJudgeApproveEditOptionDateForUnlessOrder() != null
-            && YesOrNo.NO.equals(judicialDecisionMakeOrder.getIsOrderProcessedByUnlessScheduler())
-            && !LocalDate.now(LOCAL_ZONE).isBefore(judicialDecisionMakeOrder.getJudgeApproveEditOptionDateForUnlessOrder());
     }
 
     private GeneralApplicationCaseData updateCaseData(GeneralApplicationCaseData caseData) {

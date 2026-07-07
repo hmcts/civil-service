@@ -9,6 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.config.TestIdamConfiguration;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialMakeAnOrder;
 import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
@@ -76,11 +77,11 @@ public class GAUnlessOrderSchedulerIT {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .ccdCaseReference(CASE_ID)
             .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
-                                           .setJudgeApproveEditOptionDateForUnlessOrder(LocalDate.now()))
+                                           .setJudgeApproveEditOptionDateForUnlessOrder(LocalDate.now())
+                                           .setIsOrderProcessedByUnlessScheduler(YesOrNo.NO))
             .build();
         when(searchService.getOrderMadeGeneralApplications(ORDER_MADE, UNLESS_ORDER)).thenReturn(Set.of(searchCase));
         when(caseDetailsConverter.toGeneralApplicationCaseData(searchCase)).thenReturn(caseData);
-        when(gaUnlessOrderScheduledTask.hasExpiredUnlessOrderDeadline(caseData)).thenReturn(true);
 
         scheduler.runScheduledTask();
 

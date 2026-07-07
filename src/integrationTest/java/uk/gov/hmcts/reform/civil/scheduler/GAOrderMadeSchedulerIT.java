@@ -80,7 +80,6 @@ public class GAOrderMadeSchedulerIT {
             .build();
         when(searchService.getOrderMadeGeneralApplications(ORDER_MADE, STAY_THE_CLAIM)).thenReturn(Set.of(searchCase));
         when(caseDetailsConverter.toGeneralApplicationCaseData(searchCase)).thenReturn(caseData);
-        when(gaOrderMadeScheduledTask.hasExpiredStayDeadline(caseData)).thenReturn(true);
 
         scheduler.runScheduledTask();
 

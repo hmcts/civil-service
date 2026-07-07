@@ -83,17 +83,6 @@ class GAOrderMadeScheduledTaskTest {
     }
 
     @Test
-    void shouldIdentifyExpiredStayDeadline() {
-        assertThat(task.hasExpiredStayDeadline(getJudicialOrderCaseData(LocalDate.now(), YesOrNo.NO))).isTrue();
-        assertThat(task.hasExpiredStayDeadline(getJudicialOrderCaseData(LocalDate.now().minusDays(1), YesOrNo.NO)))
-            .isTrue();
-        assertThat(task.hasExpiredStayDeadline(getConsentOrderCaseData(LocalDate.now(), YesOrNo.NO))).isTrue();
-        assertThat(task.hasExpiredStayDeadline(getJudicialOrderCaseData(LocalDate.now().plusDays(1), YesOrNo.NO)))
-            .isFalse();
-        assertThat(task.hasExpiredStayDeadline(getJudicialOrderCaseData(null, YesOrNo.NO))).isFalse();
-    }
-
-    @Test
     void shouldUseDefaultBackPressureConfiguration() {
         when(defaultBackPressureConfiguration.getDefaultBackPressure()).thenReturn(backPressureConfiguration);
 
