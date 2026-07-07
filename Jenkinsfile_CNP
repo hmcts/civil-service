@@ -46,6 +46,7 @@ def secrets = [
   'civil-${env}': [
     secret('case-document-am-api-s2s-secret', 'CASE_DOCUMENT_AM_API_S2S_SECRET'),
     secret('microservicekey-civil-service', 'S2S_SECRET'),
+    secret('microservicekey-civil-service', env == 'prod' ? 'S2S_SECRET_PROD' : 'S2S_SECRET'),
     secret('ccd-importer-username', 'CCD_CONFIGURER_IMPORTER_USERNAME'),
     secret('ccd-importer-password', 'CCD_CONFIGURER_IMPORTER_PASSWORD'),
     secret('postgres-user', 'POSTGRES_USER'),
