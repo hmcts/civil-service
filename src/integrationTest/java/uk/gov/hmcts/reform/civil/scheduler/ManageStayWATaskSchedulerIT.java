@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
@@ -34,7 +33,6 @@ import static org.mockito.Mockito.when;
     "scheduler.manage-stay-wa-task.enabled=true",
     "scheduler.lockAtLeastFor=PT0S"
 })
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class ManageStayWATaskSchedulerIT {
 
     private static final Long CASE_ID = 123L;
