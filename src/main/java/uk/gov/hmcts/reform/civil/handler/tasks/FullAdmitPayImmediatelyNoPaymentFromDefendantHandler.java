@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.event.FullAdmitPayImmediatelyNoPaymentFromDefendantEvent;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService;
 
 import java.util.HashMap;
@@ -28,21 +29,31 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantHandler extends BaseEx
 
     private final CoreCaseDataService coreCaseDataService;
 
+    private static final String SCHEDULER_NAME = "FullAdmitPayImmediatelyNoPaymentFromDefendant";
+    private final FeatureToggleService featureToggleService;
+
     public FullAdmitPayImmediatelyNoPaymentFromDefendantHandler(
         ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService caseSearchService,
         ApplicationEventPublisher applicationEventPublisher,
-        CoreCaseDataService coreCaseDataService
+        CoreCaseDataService coreCaseDataService,
+        FeatureToggleService featureToggleService
     ) {
         super(externalTaskCompletionService, eventProperties);
         this.caseSearchService = caseSearchService;
         this.applicationEventPublisher = applicationEventPublisher;
         this.coreCaseDataService = coreCaseDataService;
+        this.featureToggleService = featureToggleService;
     }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
+
+        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
+            return new ExternalTaskData();
+        }
+
         Set<CaseDetails> cases = caseSearchService.getCases();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
