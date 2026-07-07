@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReferenceCsvLoader;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -79,11 +80,18 @@ class AsyncCaseMigrationServiceTest {
         when(startEventResponse.getCaseDetails()).thenReturn(caseDetails);
 
         CaseData caseData = mock(CaseData.class);
+        GeneralApplicationCaseData gaCaseData = mock(GeneralApplicationCaseData.class);
+        when(caseData.toMap(ArgumentMatchers.any())).thenReturn(Map.of());
 
-        List<CaseReference> mockReferences = List.of(new CaseReference("12345"), new CaseReference("67890"));
+        final List<CaseReference> mockReferences = List.of(new CaseReference("12345"), new CaseReference("67890"));
 
         when(caseDetailsConverter.toGACaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
-        when(migrationTask.migrateCaseData(ArgumentMatchers.any(CaseData.class), ArgumentMatchers.any(CaseReference.class))).thenReturn(caseData);
+        when(caseDetailsConverter.toGeneralApplicationCaseData(startEventResponse.getCaseDetails())).thenReturn(gaCaseData);
+        when(migrationTask.migrateGeneralApplicationCaseData(
+            ArgumentMatchers.any(CaseData.class),
+            ArgumentMatchers.any(GeneralApplicationCaseData.class),
+            ArgumentMatchers.any(CaseReference.class)
+        )).thenReturn(caseData);
 
         asyncCaseMigrationService.migrateCasesAsync(migrationTask, mockReferences, null, true);
 

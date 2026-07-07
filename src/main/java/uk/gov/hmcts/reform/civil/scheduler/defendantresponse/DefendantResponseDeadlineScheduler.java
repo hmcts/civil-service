@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.service.search.DefendantResponseDeadlineCheckSe
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty(prefix = "scheduler.defendantResponse", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "scheduler.defendant-response", name = "enabled", havingValue = "true")
 public class DefendantResponseDeadlineScheduler implements CivilScheduler {
 
     private static final String SCHEDULER_NAME = "DefendantResponseDeadline";
@@ -28,7 +28,7 @@ public class DefendantResponseDeadlineScheduler implements CivilScheduler {
         return SCHEDULER_NAME;
     }
 
-    @Scheduled(cron = "${scheduler.defendantResponse.cronExpression}")
+    @Scheduled(cron = "${scheduler.defendant-response.cronExpression}")
     @SchedulerLock(name = "DefendantResponseDeadlineScheduler_deadlineCheck",
         lockAtMostFor = "${scheduler.lockAtMostFor}",
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
