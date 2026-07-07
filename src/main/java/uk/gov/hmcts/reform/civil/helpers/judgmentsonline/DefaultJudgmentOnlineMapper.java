@@ -41,11 +41,13 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
         isNonDivergent =  JudgmentsOnlineHelper.isNonDivergentForDJ(caseData);
         JudgmentDetails activeJudgment = addDefaultActiveJudgment(caseData);
+
         activeJudgment
             .setState(getJudgmentState(caseData))
             .setIsRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
             .setRtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
             .setIssueDate(LocalDate.now());
+
         super.updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData);
 
         return activeJudgment;
@@ -63,9 +65,6 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
     }
 
     private JudgmentDetails addDefaultActiveJudgment(CaseData caseData) {
-        BigInteger orderAmount = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator));
-        BigInteger costs = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ(caseData));
-        BigInteger claimFee = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ(caseData));
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
         activeJudgment = super.updateDefendantDetails(activeJudgment, caseData, addressMapper);
         activeJudgment
@@ -73,13 +72,22 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .setType(JudgmentType.DEFAULT_JUDGMENT)
             .setInstalmentDetails(DJPaymentTypeSelection.REPAYMENT_PLAN.equals(caseData.getPaymentTypeSelection())
                                       ? getInstalmentDetails(caseData) : null)
-            .setPaymentPlan(getPaymentPlan(caseData))
+            .setPaymentPlan(getPaymentPlan(caseData));
+        setJudgmentAmounts(activeJudgment, caseData);
+
+        return activeJudgment;
+    }
+
+    private void setJudgmentAmounts(JudgmentDetails activeJudgment, CaseData caseData) {
+        BigInteger orderAmount = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator));
+        BigInteger costs = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ(caseData));
+        BigInteger claimFee = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ(caseData));
+
+        activeJudgment
             .setOrderedAmount(orderAmount.toString())
             .setClaimFeeAmount(claimFee.toString())
             .setCosts(costs.toString())
             .setTotalAmount(orderAmount.add(costs).add(claimFee).toString());
-
-        return activeJudgment;
     }
 
     @Override

@@ -68,6 +68,7 @@ class DefaultJudgmentOnlineMapperPendingIssueTest {
         assertEquals(YesOrNo.NO, activeJudgment.getIsRegisterWithRTL());
         assertEquals("100990", activeJudgment.getOrderedAmount());
         assertEquals("0", activeJudgment.getCosts());
+        assertEquals("0", activeJudgment.getClaimFeeAmount());
         assertEquals("100990", activeJudgment.getTotalAmount());
         assertEquals(PaymentPlanSelection.PAY_IN_INSTALMENTS, activeJudgment.getPaymentPlan().getType());
         assertEquals(PaymentFrequency.WEEKLY, activeJudgment.getInstalmentDetails().getPaymentFrequency());
