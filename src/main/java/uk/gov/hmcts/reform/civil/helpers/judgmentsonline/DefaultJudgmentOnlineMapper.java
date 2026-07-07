@@ -42,11 +42,19 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
         isNonDivergent =  JudgmentsOnlineHelper.isNonDivergentForDJ(caseData);
         JudgmentDetails activeJudgment = addDefaultActiveJudgment(caseData);
 
+        BigInteger orderAmount = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator));
+        BigInteger costs = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ(caseData));
+        BigInteger claimFee = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ(caseData));
+
         activeJudgment
             .setState(getJudgmentState(caseData))
             .setIsRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
             .setRtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
-            .setIssueDate(LocalDate.now());
+            .setIssueDate(LocalDate.now())
+            .setOrderedAmount(orderAmount.toString())
+            .setClaimFeeAmount(claimFee.toString())
+            .setCosts(costs.toString())
+            .setTotalAmount(orderAmount.add(costs).add(claimFee).toString());
 
         super.updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData);
 
@@ -73,21 +81,8 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .setInstalmentDetails(DJPaymentTypeSelection.REPAYMENT_PLAN.equals(caseData.getPaymentTypeSelection())
                                       ? getInstalmentDetails(caseData) : null)
             .setPaymentPlan(getPaymentPlan(caseData));
-        setJudgmentAmounts(activeJudgment, caseData);
 
         return activeJudgment;
-    }
-
-    private void setJudgmentAmounts(JudgmentDetails activeJudgment, CaseData caseData) {
-        BigInteger orderAmount = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator));
-        BigInteger costs = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ(caseData));
-        BigInteger claimFee = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ(caseData));
-
-        activeJudgment
-            .setOrderedAmount(orderAmount.toString())
-            .setClaimFeeAmount(claimFee.toString())
-            .setCosts(costs.toString())
-            .setTotalAmount(orderAmount.add(costs).add(claimFee).toString());
     }
 
     @Override
