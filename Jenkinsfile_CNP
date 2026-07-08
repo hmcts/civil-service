@@ -75,6 +75,12 @@ def secretsOtherenv = [
   ]
 ]
 
+def secretsProd = [
+  'civil-prod': [
+    secret('microservicekey-civil-service', 'S2S_SECRET_PROD')
+  ]
+]
+
 def uploadBpmnDiagrams(String env) {
   dir("${WORKSPACE}/bin/camunda") {
     sh """
@@ -134,6 +140,8 @@ withPipeline(type, product, component) {
     env.ENVIRONMENT = "aat"
     env.CCD_DEFINITION_BRANCH = "master"
     env.SKIP_COMMON_AAT_CCD_SETUP = "true"
+
+    loadVaultSecrets(secretsProd)
 
     afterSuccess('akschartsinstall') {
       runStagingHighLevelDataSetup()
