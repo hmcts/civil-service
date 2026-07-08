@@ -205,9 +205,9 @@ withPipeline(type, product, component) {
   afterSuccess('functionalTest:aat') {
     createBpmnGithubRelease()
     uploadBpmnDiagrams('aat')
-    withSubscription('prod') {
-      loadVaultSecrets(secretsProd)
-      uploadBpmnDiagrams('prod')
+    withSubscription('prod', product, 'prod') {
+    loadVaultSecrets(secretsProd)
+    uploadBpmnDiagrams('prod')
     }
   }
 
