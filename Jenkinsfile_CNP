@@ -141,8 +141,6 @@ withPipeline(type, product, component) {
     env.CCD_DEFINITION_BRANCH = "master"
     env.SKIP_COMMON_AAT_CCD_SETUP = "true"
 
-    loadVaultSecrets(secretsProd)
-
     afterSuccess('akschartsinstall') {
       runStagingHighLevelDataSetup()
     }
@@ -207,11 +205,28 @@ withPipeline(type, product, component) {
   afterSuccess('functionalTest:aat') {
     createBpmnGithubRelease()
     uploadBpmnDiagrams('aat')
-    uploadBpmnDiagrams('prod')
   }
 
   afterAlways('functionalTest:aat') {
     publishFunctionalTestResults()
+  }
+
+  // Dedicated stage for prod BPMN deployment after AAT tests complete
+  // Runs only on master branch with complete subscription isolation
+  stage('Deploy Prod BPMN') {
+    when { branch 'master' }
+    node('civil-prod') {
+      checkout scm
+      dir("${WORKSPACE}") {
+        withSubscription('prod') {
+          loadVaultSecrets(secretsProd)
+          sh """
+            eval \$(./bin/camunda/variables/load-prod-environment-variables.sh)
+            ./bin/camunda/import-bpmn-diagram.sh ${WORKSPACE} prod
+          """
+        }
+      }
+    }
   }
 
   before('functionalTest:preview') {
