@@ -110,7 +110,7 @@ class ClaimantResponseSpecTest extends BpmnBaseTest {
     }
 
     @Test
-    void shouldSuccessfullyCompleteWhenPayImmediately() {
+    void shouldSuccessfullyCompleteWhenPayImmediatelyDashboardDisabled() {
         //assert process has started
         assertFalse(processInstance.isEnded());
 
@@ -121,8 +121,7 @@ class ClaimantResponseSpecTest extends BpmnBaseTest {
         VariableMap variables = Variables.createVariables();
         variables.putValue("flowState", "MAIN.FULL_ADMIT_PAY_IMMEDIATELY");
         variables.putValue("flowFlags", Map.of(
-            DASHBOARD_SERVICE_ENABLED, true,
-            JO_ONLINE_LIVE_ENABLED, false
+            DASHBOARD_SERVICE_ENABLED, false
         ));
 
         //complete the start business process
@@ -135,27 +134,6 @@ class ClaimantResponseSpecTest extends BpmnBaseTest {
             variables
         );
 
-        //complete the Robotics notification
-        ExternalTask proccedOffline = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            proccedOffline,
-            PROCESS_CASE_EVENT,
-            PROCEED_OFFLINE_EVENT,
-            PROCEED_OFFLINE_EVENT_ACTIVITY_ID,
-            variables
-        );
-
-        //complete the Robotics notification
-        ExternalTask forRobotics = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            forRobotics,
-            PROCESS_CASE_EVENT,
-            NOTIFY_RPA_ON_CASE_HANDED_OFFLINE,
-            NOTIFY_RPA_ON_CASE_HANDED_OFFLINE_ACTIVITY_ID,
-            variables
-        );
-        generateDashboardNotifications();
-
         //end business process
         ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);
         completeBusinessProcess(endBusinessProcess);
@@ -164,7 +142,7 @@ class ClaimantResponseSpecTest extends BpmnBaseTest {
     }
 
     @Test
-    void shouldSuccessfullyCompleteWhenPayImmediately_JoFlagEnabled() {
+    void shouldSuccessfullyCompleteWhenPayImmediatelyDashboardEnabled() {
         //assert process has started
         assertFalse(processInstance.isEnded());
 
@@ -175,8 +153,7 @@ class ClaimantResponseSpecTest extends BpmnBaseTest {
         VariableMap variables = Variables.createVariables();
         variables.putValue("flowState", "MAIN.FULL_ADMIT_PAY_IMMEDIATELY");
         variables.putValue("flowFlags", Map.of(
-            DASHBOARD_SERVICE_ENABLED, true,
-            JO_ONLINE_LIVE_ENABLED, true
+            DASHBOARD_SERVICE_ENABLED, true
         ));
 
         //complete the start business process
@@ -525,7 +502,7 @@ class ClaimantResponseSpecTest extends BpmnBaseTest {
     }
 
     @Test
-    void shouldCompletePartAdmitPayImmediately_WhenApplicantConfirmsNotToProceed_JoFlagDisabled() {
+    void shouldCompletePartAdmitPayImmediately_WhenApplicantConfirmsNotToProceedDashboardDisabled() {
         //assert process has started
         assertFalse(processInstance.isEnded());
 
@@ -537,8 +514,7 @@ class ClaimantResponseSpecTest extends BpmnBaseTest {
         variables.putValue("flowState", "MAIN.PART_ADMIT_PAY_IMMEDIATELY");
         variables.putValue("flowFlags", Map.of(
             ONE_RESPONDENT_REPRESENTATIVE, true,
-            DASHBOARD_SERVICE_ENABLED, false,
-            JO_ONLINE_LIVE_ENABLED, false
+            DASHBOARD_SERVICE_ENABLED, false
         ));
 
         //complete the start business process
@@ -551,52 +527,12 @@ class ClaimantResponseSpecTest extends BpmnBaseTest {
             variables
         );
 
-        //complete the Robotics notification
-        ExternalTask proccedOffline = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            proccedOffline,
-            PROCESS_CASE_EVENT,
-            PROCEED_OFFLINE_EVENT,
-            PROCEED_OFFLINE_FOR_RESPONSE_TO_DEFENCE_ACTIVITY_ID,
-            variables
-        );
-
-        //complete the GA events
-        ExternalTask updateGaStatus = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            updateGaStatus,
-            PROCESS_CASE_EVENT,
-            "TRIGGER_APPLICATION_PROCEEDS_IN_HERITAGE",
-            "UpdateGeneralApplicationStatus",
-            variables
-        );
-        //complete the GA events
-        ExternalTask updateClaimGaStatus = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            updateClaimGaStatus,
-            PROCESS_CASE_EVENT,
-            "APPLICATION_OFFLINE_UPDATE_CLAIM",
-            "UpdateClaimWithApplicationStatus",
-            variables
-        );
-
-        //complete the notification to all parties
         ExternalTask notifyParties = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(
             notifyParties,
             PROCESS_CASE_EVENT,
             NOTIFY_EVENT,
-            NOTIFY_RESPONDENT_SOLICITOR1_CONFIRMS_NOT_TO_PROCEED_EVENT_ID,
-            variables
-        );
-
-        //complete the Robotics notification
-        ExternalTask moveCaseToOffline = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            moveCaseToOffline,
-            PROCESS_CASE_EVENT,
-            NOTIFY_RPA_ON_CASE_HANDED_OFFLINE,
-            NOTIFY_RPA_ON_CASE_HANDED_OFFLINE_ACTIVITY_ID,
+            NOTIFY_PARTIES_PART_ADMIT_PAY_IMMEDIATELY_AGREED_ACTIVITY_ID,
             variables
         );
 
@@ -608,7 +544,7 @@ class ClaimantResponseSpecTest extends BpmnBaseTest {
     }
 
     @Test
-    void shouldSuccessfullyCompleteWhenPartPayImmediately_JoFlagEnabled() {
+    void shouldSuccessfullyCompleteWhenPartPayImmediatelyDashboardEnabled() {
         //assert process has started
         assertFalse(processInstance.isEnded());
 
@@ -619,8 +555,7 @@ class ClaimantResponseSpecTest extends BpmnBaseTest {
         VariableMap variables = Variables.createVariables();
         variables.putValue("flowState", "MAIN.PART_ADMIT_PAY_IMMEDIATELY");
         variables.putValue("flowFlags", Map.of(
-            DASHBOARD_SERVICE_ENABLED, true,
-            JO_ONLINE_LIVE_ENABLED, true
+            DASHBOARD_SERVICE_ENABLED, true
         ));
 
         //complete the start business process

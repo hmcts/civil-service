@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -42,9 +41,6 @@ class NotifySetAsideJudgementDashboardNotificationHandlerTest {
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     public static final String TASK_ID = "GenerateDashboardNotificationSetAsideJudgmentClaimant";
 
     HashMap<String, Object> params = new HashMap<>();
@@ -67,10 +63,9 @@ class NotifySetAsideJudgementDashboardNotificationHandlerTest {
     }
 
     @Test
-    void shouldCreateDashboardNotifications_whenJudgmentOnlineLiveAndClaimantIsLiPAndSetAsideError() {
+    void shouldCreateDashboardNotifications_whenClaimantIsLiPAndSetAsideError() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -95,10 +90,9 @@ class NotifySetAsideJudgementDashboardNotificationHandlerTest {
     }
 
     @Test
-    void shouldNotCreateDashboardNotifications_whenJudgmentOnlineLiveAndClaimantIsLiP() {
+    void shouldNotCreateDashboardNotifications_whenClaimantIsLiP() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseDataBuilder.builder().build();
