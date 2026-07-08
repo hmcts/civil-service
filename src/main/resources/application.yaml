@@ -7,6 +7,9 @@ management:
       show-details: "always"
       probes:
         enabled: true
+      group:
+        readiness:
+          include: readinessState, s2sSecretReadiness
   endpoints:
     web:
       base-path: /
