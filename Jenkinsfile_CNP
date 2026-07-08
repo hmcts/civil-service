@@ -141,8 +141,6 @@ withPipeline(type, product, component) {
     env.CCD_DEFINITION_BRANCH = "master"
     env.SKIP_COMMON_AAT_CCD_SETUP = "true"
 
-    loadVaultSecrets(secretsProd)
-
     afterSuccess('akschartsinstall') {
       runStagingHighLevelDataSetup()
     }
@@ -207,7 +205,10 @@ withPipeline(type, product, component) {
   afterSuccess('functionalTest:aat') {
     createBpmnGithubRelease()
     uploadBpmnDiagrams('aat')
-    uploadBpmnDiagrams('prod')
+    withSubscription('prod') {
+      loadVaultSecrets(secretsProd)
+      uploadBpmnDiagrams('prod')
+    }
   }
 
   afterAlways('functionalTest:aat') {
