@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.exceptions.InvalidGeneralApplicationTypeException;
 import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.events.GaCaseEventService;
@@ -43,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.any;
@@ -232,6 +234,24 @@ public class CasesControllerTest extends BaseIntegrationTest {
             "123"
         ).andExpect(content().json(toJson(expectedCaseDetails)))
             .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldReturnBadRequestWhenGeneralApplicationTypePayloadIsInvalid() {
+        when(caseEventService.submitEvent(any()))
+            .thenThrow(new InvalidGeneralApplicationTypeException(1, Set.of("UI_ONLY_OTHER_OPTION")));
+
+        doPost(
+            BEARER_TOKEN,
+            new EventDto()
+                .setEvent(CaseEvent.INITIATE_GENERAL_APPLICATION)
+                .setCaseDataUpdate(Map.of("generalAppType", Map.of("types", List.of("OTHER_OPTION")))),
+            SUBMIT_EVENT_URL,
+            "123",
+            "123"
+        ).andExpect(content().string("Invalid general application type"))
+            .andExpect(status().isBadRequest());
     }
 
     @Test

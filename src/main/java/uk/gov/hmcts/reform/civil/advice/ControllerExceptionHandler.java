@@ -17,6 +17,7 @@ import org.springframework.web.context.request.WebRequest;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.exceptions.InvalidGeneralApplicationTypeException;
 import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
 import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
@@ -116,6 +117,22 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
             new HttpHeaders(),
             HttpStatus.UNPROCESSABLE_ENTITY
         );
+    }
+
+    @ExceptionHandler(InvalidGeneralApplicationTypeException.class)
+    public ResponseEntity<Object> invalidGeneralApplicationTypeException(
+        InvalidGeneralApplicationTypeException exception,
+        ContentCachingRequestWrapper contentCachingRequestWrapper) {
+        String errorMessage = "Invalid general application type payload for field %s with invalid count %s "
+            + "and reasons %s for case %s run by user %s";
+        log.error(errorMessage.formatted(
+            InvalidGeneralApplicationTypeException.FIELD_PATH,
+            exception.getInvalidValueCount(),
+            exception.getReasonCategories(),
+            getCaseId(contentCachingRequestWrapper),
+            getUserId(contentCachingRequestWrapper)
+        ));
+        return new ResponseEntity<>("Invalid general application type", new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(UserNotFoundOnCaseException.class)

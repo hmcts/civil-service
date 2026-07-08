@@ -10,13 +10,16 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.exceptions.InvalidGeneralApplicationTypeException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
@@ -27,6 +30,11 @@ import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataC
 @Slf4j
 @SuppressWarnings("unchecked")
 public class CaseEventService {
+
+    private static final Set<CaseEvent> GENERAL_APPLICATION_CREATION_EVENTS = EnumSet.of(
+        CaseEvent.INITIATE_GENERAL_APPLICATION,
+        CaseEvent.INITIATE_GENERAL_APPLICATION_COSC
+    );
 
     private final CoreCaseDataApi coreCaseDataApi;
     private final AuthTokenGenerator authTokenGenerator;
@@ -58,6 +66,7 @@ public class CaseEventService {
     }
 
     public CaseDetails submitEventForClaim(EventSubmissionParams params, boolean includeEventSummary) {
+        validateGeneralApplicationSubmit(params);
         StartEventResponse eventResponse = startEvent(
             params.getAuthorisation(),
             params.getUserId(),
@@ -116,5 +125,25 @@ public class CaseEventService {
             return submitEventForNewClaim(params);
         }
         return submitEventForClaim(params, false);
+    }
+
+    private void validateGeneralApplicationSubmit(EventSubmissionParams params) {
+        if (!GENERAL_APPLICATION_CREATION_EVENTS.contains(params.getEvent())) {
+            return;
+        }
+
+        try {
+            GeneralApplicationTypeValidator.validate(params.getUpdates());
+        } catch (InvalidGeneralApplicationTypeException exception) {
+            log.warn(
+                "Rejected GA submit payload for case {}, event {}, field {}, invalidCount={}, reasons={}",
+                params.getCaseId(),
+                params.getEvent(),
+                InvalidGeneralApplicationTypeException.FIELD_PATH,
+                exception.getInvalidValueCount(),
+                exception.getReasonCategories()
+            );
+            throw exception;
+        }
     }
 }
