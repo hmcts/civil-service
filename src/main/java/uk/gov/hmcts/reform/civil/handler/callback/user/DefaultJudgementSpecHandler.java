@@ -505,15 +505,15 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         } else {
             activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
             caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
+            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
+                activeJudgment,
+                true
+            ));
+            caseData.setTotalInterest(interestCalculator.calculateInterest(caseData));
         }
         caseData.setActiveJudgment(activeJudgment);
-        caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
-            activeJudgment,
-            true
-        ));
 
         caseData.setJoDJCreatedDate(time.now());
-        caseData.setTotalInterest(interestCalculator.calculateInterest(caseData));
         caseData.setClaimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
             DEFAULT_JUDGEMENT_SPEC_DEADLINE_EXTENSION_MONTHS,
             LocalDate.now()

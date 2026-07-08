@@ -113,7 +113,13 @@ public class DefaultJudgementGrantedSpecCallbackHandler extends CallbackHandler 
             .setClaimFeeAmount(claimFee.toString())
             .setCosts(costs.toString())
             .setTotalAmount(orderAmount.add(costs).add(claimFee).toString());
+
         caseData.setJoIsLiveJudgmentExists(YES);
+        caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
+            activeJudgment,
+            true
+        ));
+        caseData.setTotalInterest(interestCalculator.calculateInterest(caseData));
         caseData.setBusinessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
 
         return caseData;

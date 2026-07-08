@@ -77,6 +77,16 @@ class DefaultJudgementGrantedSpecCallbackHandlerTest extends BaseCallbackHandler
             assertThat(updatedData.getActiveJudgment().getCosts()).isEqualTo("10200");
             assertThat(updatedData.getActiveJudgment().getTotalAmount()).isEqualTo("117200");
             assertThat(updatedData.getJoIsLiveJudgmentExists()).isEqualTo(YES);
+            assertThat(updatedData.getJoRepaymentSummaryObject())
+                .contains("The judgment will order the defendant to pay £1172.00")
+                .contains("### Claim amount")
+                .contains("£1000.00")
+                .contains("### Fixed cost amount")
+                .contains("£102.00")
+                .contains("### Claim fee amount")
+                .contains("£70.00")
+                .contains("## Total still owed");
+            assertThat(updatedData.getTotalInterest()).isEqualByComparingTo(BigDecimal.ZERO);
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
         }
 
