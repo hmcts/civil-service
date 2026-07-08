@@ -141,6 +141,8 @@ withPipeline(type, product, component) {
     env.CCD_DEFINITION_BRANCH = "master"
     env.SKIP_COMMON_AAT_CCD_SETUP = "true"
 
+    loadVaultSecrets(secretsProd)
+
     afterSuccess('akschartsinstall') {
       runStagingHighLevelDataSetup()
     }
