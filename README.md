@@ -447,6 +447,19 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 | `enabled` | Whether the scheduler is active. | `false` | `SCHEDULER_ENABLED_JUDGEMENT_BUFFER` |
 | `cronExpression` | When the scheduler runs. | `0 0 2 * * *` (Daily at 2 AM) | `CRON_EXPRESSION_JUDGEMENT_BUFFER` |
 
+### SettlementNoResponseFromDefendantCheckScheduler
+
+The `SettlementNoResponseFromDefendantCheckScheduler` Moves settlement agreements forward when the defendant failed to respond.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.settlement-no-response-from-defendant-check`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_SETTLEMENT_NO_RESPONSE_FROM_DEFENDANT_CHECK` |
+| `cronExpression` | When the scheduler runs. | `0 0 1 * * ?` (Daily at 01:00) | `CRON_EXPRESSION_SETTLEMENT_NO_RESPONSE_FROM_DEFENDANT_CHECK` |
+
 #### Global Scheduler Settings
 
 | Setting | Description | Default | Environment Variable |
