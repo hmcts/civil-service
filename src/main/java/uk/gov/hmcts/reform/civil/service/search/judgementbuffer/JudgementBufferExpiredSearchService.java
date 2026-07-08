@@ -19,7 +19,7 @@ public class JudgementBufferExpiredSearchService {
     private final ElasticSearchPaginatedStreamProvider elasticSearchPaginatedStreamProvider;
     private final JudgementBufferExpiredQueryProvider judgementBufferExpiredQueryProvider;
 
-    @Value("${search.judgementBuffer.pageSize:50}")
+    @Value("${search.judgement-buffer.pageSize:50}")
     private int pageSize;
 
     /**
