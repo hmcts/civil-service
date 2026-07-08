@@ -44,7 +44,7 @@ public class PartyUtils {
 
     private static final String SPACE = " ";
     private static final String TRADING_AS = " T/A %s";
-    private static final String BY_HIS_LITIGATION_FRIEND = "%s (by his litigation friend %s %s) ";
+    private static final String BY_HIS_LITIGATION_FRIEND = "%s represented by %s %s (litigation friend)";
 
     private PartyUtils() {
         //NO-OP
@@ -134,6 +134,13 @@ public class PartyUtils {
         };
     }
 
+    public static boolean isMinor(Party party) {
+        return Optional.ofNullable(party)
+            .flatMap(PartyUtils::getDateOfBirth)
+            .map(dob -> dob.isAfter(LocalDate.now().minusYears(18)))
+            .orElse(false);
+    }
+
     public static String getPartyNameWithLitigiousFriend(Party party, LitigationFriend litigationFriend) {
         return getPartyNameWithLitigiousFriend(party, litigationFriend, false);
     }
@@ -145,12 +152,14 @@ public class PartyUtils {
                 .map(friend -> buildPartyNameWithLitigationFriend(partyName, friend))
                 .orElse(partyName);
         }
-        log.error("Party name is null for party {}", party);
-        return null;
+        return partyName;
     }
 
     private static String buildPartyNameWithLitigationFriend(String partyName, LitigationFriend litigationFriend) {
-        return String.format(BY_HIS_LITIGATION_FRIEND, partyName, litigationFriend.getFirstName(), litigationFriend.getLastName());
+        if (litigationFriend != null && litigationFriend.getFirstName() != null && litigationFriend.getLastName() != null) {
+            return String.format(BY_HIS_LITIGATION_FRIEND, partyName, litigationFriend.getFirstName(), litigationFriend.getLastName());
+        }
+        return partyName;
     }
 
     private static String getSoleTraderName(Party party, boolean omitTitle) {
