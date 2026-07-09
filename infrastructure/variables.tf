@@ -69,6 +69,19 @@ variable "monitor_scheduler_alerts" {
   description = "Map of scheduler alerts to create, with action_group mapping"
 }
 
+variable "monitor_service_health_alerts" {
+  type = map(object({
+    frequency_in_minutes    = optional(number)
+    time_window_in_minutes  = optional(number)
+    failure_count_threshold = optional(number)
+    severity_level          = optional(string)
+    enabled                 = optional(bool)
+    action_group            = string
+  }))
+  default     = {}
+  description = "Map of service-health alerts (e.g. CCD callback 502 rate) to create, with action_group mapping"
+}
+
 variable "civil_service_alert_slack_email_secret_name" {
   type        = string
   description = "The name of the Key Vault secret containing the slack email group"
