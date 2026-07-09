@@ -10,12 +10,12 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocuments.UploadTranslatedDocumentStrategyFactory;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
-import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.UserType;
@@ -110,14 +110,12 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
         } else {
             setRespondentResponseBilingualLanguagePreference(caseData, preferredLanguage, revisedBilingualPreference);
         }
-        List<Element<GeneralApplication>> generalApplications = caseData.getGeneralApplications();
-        if (generalApplications != null && !generalApplications.isEmpty()) {
-            triggerGaEvent(callbackParams);
-        }
 
-        if (ENGLISH.equals(preferredLanguage)) {
+        if (ENGLISH.equals(preferredLanguage) && CaseState.PENDING_CASE_ISSUED.equals(caseData.getCcdState())) {
             return uploadTranslatedDocumentStrategyFactory.getUploadTranslatedDocumentStrategy(callbackParams.getVersion())
                 .uploadDocument(callbackParams);
+        } else {
+            caseData.setBusinessProcess(BusinessProcess.ready(CHANGE_LANGUAGE_PREFERENCE));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))

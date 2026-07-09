@@ -19,19 +19,15 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
-import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.UserType;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -39,7 +35,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_LANGUAGE_PREFERENCE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_GA_LANGUAGE_UPDATE;
+import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.ENGLISH;
@@ -84,10 +80,10 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
             });
     }
 
-    private ChangeLanguagePreference changeLanguagePreference(UserType userType, PreferredLanguage preferredLanguage) {
+    private ChangeLanguagePreference changeLanguagePreference(UserType userType) {
         ChangeLanguagePreference changeLanguagePreference = new ChangeLanguagePreference();
         changeLanguagePreference.setUserType(userType);
-        changeLanguagePreference.setPreferredLanguage(preferredLanguage);
+        changeLanguagePreference.setPreferredLanguage(WELSH);
         return changeLanguagePreference;
     }
 
@@ -214,7 +210,7 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnError_WhenDefendantLipResponseIsMissing() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-            caseData.setChangeLanguagePreference(changeLanguagePreference(DEFENDANT, WELSH));
+            caseData.setChangeLanguagePreference(changeLanguagePreference(DEFENDANT));
             caseData.setRespondent1Represented(NO);
             caseData.setCaseDataLiP(new CaseDataLiP());
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-lang-pref");
@@ -228,7 +224,7 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnNoErrors_WhenClaimantIsLip() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-            caseData.setChangeLanguagePreference(changeLanguagePreference(CLAIMANT, WELSH));
+            caseData.setChangeLanguagePreference(changeLanguagePreference(CLAIMANT));
             caseData.setApplicant1Represented(NO);
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-lang-pref");
 
@@ -241,7 +237,7 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnNoErrors_WhenDefendantIsLipAndHasResponded() {
             CaseData caseData = respondentCaseData();
-            caseData.setChangeLanguagePreference(changeLanguagePreference(DEFENDANT, WELSH));
+            caseData.setChangeLanguagePreference(changeLanguagePreference(DEFENDANT));
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-lang-pref");
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -328,29 +324,32 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Test
-        void shouldNotTriggerGaLanguageUpdate_WhenGeneralApplicationsAreEmpty() {
+        void shouldSetBusinessProcess_WhenLanguagePreferenceChanged() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-            caseData.setChangeLanguagePreference(changeLanguagePreference(CLAIMANT, WELSH));
+            caseData.setChangeLanguagePreference(changeLanguagePreference(CLAIMANT));
             caseData.setApplicant1Represented(NO);
-            caseData.setGeneralApplications(List.of());
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            handler.handle(params);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
 
+            assertThat(response.getData().get("businessProcess"))
+                .extracting("camundaEvent", "status")
+                .contains(CHANGE_LANGUAGE_PREFERENCE.name(), READY.name());
             verifyNoInteractions(helperService);
         }
 
         @Test
-        void shouldTriggerGaLanguageUpdate_WhenGeneralApplicationsExist() {
+        void shouldNotTriggerGaLanguageUpdate_WhenGeneralApplicationsExist() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-            caseData.setChangeLanguagePreference(changeLanguagePreference(CLAIMANT, WELSH));
+            caseData.setChangeLanguagePreference(changeLanguagePreference(CLAIMANT));
             caseData.setApplicant1Represented(NO);
             caseData.setGeneralApplications(wrapElements(new GeneralApplication()));
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             handler.handle(params);
 
-            verify(helperService).triggerEvent(caseData, TRIGGER_GA_LANGUAGE_UPDATE);
+            verifyNoInteractions(helperService);
         }
 
         @Test
