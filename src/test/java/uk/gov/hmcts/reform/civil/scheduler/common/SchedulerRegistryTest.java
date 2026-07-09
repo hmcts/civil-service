@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class TestingSupportSchedulerRegistryTest {
+class SchedulerRegistryTest {
 
     @Mock
     private CivilScheduler scheduler1;
@@ -31,13 +31,13 @@ class TestingSupportSchedulerRegistryTest {
     @Captor
     private ArgumentCaptor<Runnable> runnableCaptor;
 
-    private TestingSupportSchedulerRegistry repository;
+    private SchedulerRegistry repository;
 
     @BeforeEach
     void setUp() {
         when(scheduler1.getName()).thenReturn("scheduler1");
         when(scheduler2.getName()).thenReturn("scheduler2");
-        repository = new TestingSupportSchedulerRegistry(List.of(scheduler1, scheduler2), taskExecutor);
+        repository = new SchedulerRegistry(List.of(scheduler1, scheduler2), taskExecutor);
     }
 
     @Test
