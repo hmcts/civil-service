@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.scheduler.hearingfee.publisher;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -32,16 +32,11 @@ class PreMultiIntermediateClaimProviderTest {
     @Mock
     private Consumer<Long> publisher;
 
+    @InjectMocks
     private PreMultiIntermediateClaimProvider provider;
-
-    @BeforeEach
-    void setUp() {
-        provider = new PreMultiIntermediateClaimProvider(hearingFeeEventPublisher, paidEventStrategy, unpaidEventStrategy);
-    }
 
     @Test
     void shouldReturnPaidPublisher_whenPaidStrategySupportsCaseData() {
-        // Given
         when(paidEventStrategy.supports(caseData)).thenReturn(true);
         when(paidEventStrategy.getEventName()).thenReturn("PaidEvent");
         Function<Long, Object> factory = id -> new Object();
@@ -50,17 +45,14 @@ class PreMultiIntermediateClaimProviderTest {
         when(caseData.getCcdCaseReference()).thenReturn(123456789L);
         when(caseData.getCcdState()).thenReturn(uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS);
 
-        // When
         Consumer<Long> result = provider.getPublisher(caseData);
 
-        // Then
         assertThat(result).isEqualTo(publisher);
         verify(hearingFeeEventPublisher).createPublisher(any(), eq(factory));
     }
 
     @Test
     void shouldReturnUnpaidPublisher_whenPaidStrategyDoesNotSupportCaseData() {
-        // Given
         when(paidEventStrategy.supports(caseData)).thenReturn(false);
         when(unpaidEventStrategy.getEventName()).thenReturn("UnpaidEvent");
         Function<Long, Object> factory = id -> new Object();
@@ -69,10 +61,8 @@ class PreMultiIntermediateClaimProviderTest {
         when(caseData.getCcdCaseReference()).thenReturn(123456789L);
         when(caseData.getCcdState()).thenReturn(uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS);
 
-        // When
         Consumer<Long> result = provider.getPublisher(caseData);
 
-        // Then
         assertThat(result).isEqualTo(publisher);
         verify(hearingFeeEventPublisher).createPublisher(any(), eq(factory));
     }

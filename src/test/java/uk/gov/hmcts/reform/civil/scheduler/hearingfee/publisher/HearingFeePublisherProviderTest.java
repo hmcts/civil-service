@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.scheduler.hearingfee.publisher;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -28,41 +28,27 @@ class HearingFeePublisherProviderTest {
     @Mock
     private Consumer<Long> publisher;
 
+    @InjectMocks
     private HearingFeePublisherProvider hearingFeePublisherProvider;
 
-    @BeforeEach
-    void setUp() {
-        hearingFeePublisherProvider = new HearingFeePublisherProvider(
-            multiOrIntermediateTrackProvider,
-            preMultiIntermediateClaimProvider,
-            featureToggleService
-        );
-    }
-
     @Test
-    void shouldReturnMultiOrIntermediatePublisher_whenFeatureIsEnabled() {
-        // Given
+    void shouldReturnMultiOrIntermediatePublisher_whenMultiOrIntermediateTrackEnabled() {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
         when(multiOrIntermediateTrackProvider.getPublisher(caseData)).thenReturn(publisher);
 
-        // When
         Consumer<Long> result = hearingFeePublisherProvider.provide(caseData);
 
-        // Then
         assertThat(result).isEqualTo(publisher);
         verify(multiOrIntermediateTrackProvider).getPublisher(caseData);
     }
 
     @Test
-    void shouldReturnPreMultiIntermediatePublisher_whenFeatureIsDisabled() {
-        // Given
+    void shouldReturnPreMultiIntermediatePublisher_whenMultiOrIntermediateTrackDisabled() {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
         when(preMultiIntermediateClaimProvider.getPublisher(caseData)).thenReturn(publisher);
 
-        // When
         Consumer<Long> result = hearingFeePublisherProvider.provide(caseData);
 
-        // Then
         assertThat(result).isEqualTo(publisher);
         verify(preMultiIntermediateClaimProvider).getPublisher(caseData);
     }

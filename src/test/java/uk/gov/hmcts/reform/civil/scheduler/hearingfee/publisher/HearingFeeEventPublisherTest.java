@@ -27,17 +27,14 @@ class HearingFeeEventPublisherTest {
 
     @Test
     void shouldPublishEvent_whenConsumerIsInvoked() {
-        // Given
         Long caseId = 123L;
         String logMessage = "Test log message";
         Object event = new Object();
         Function<Long, Object> eventFactory = id -> event;
 
-        // When
         Consumer<Long> publisher = hearingFeeEventPublisher.createPublisher(logMessage, eventFactory);
         publisher.accept(caseId);
 
-        // Then
         verify(applicationEventPublisher).publishEvent(event);
     }
 }

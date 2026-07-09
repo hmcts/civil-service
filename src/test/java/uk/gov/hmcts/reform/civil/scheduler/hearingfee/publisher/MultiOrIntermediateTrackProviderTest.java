@@ -42,7 +42,6 @@ class MultiOrIntermediateTrackProviderTest {
 
     @Test
     void shouldReturnPublisher_whenStrategySupportsCaseData() {
-        // Given
         when(strategy1.supports(caseData)).thenReturn(false);
         when(strategy2.supports(caseData)).thenReturn(true);
         when(strategy2.getEventName()).thenReturn("TestEvent");
@@ -52,22 +51,18 @@ class MultiOrIntermediateTrackProviderTest {
         when(caseData.getCcdCaseReference()).thenReturn(123456789L);
         when(caseData.getCcdState()).thenReturn(uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS);
 
-        // When
         Consumer<Long> result = provider.getPublisher(caseData);
 
-        // Then
         assertThat(result).isEqualTo(publisher);
         verify(hearingFeeEventPublisher).createPublisher(any(), eq(factory));
     }
 
     @Test
     void shouldThrowException_whenNoStrategySupportsCaseData() {
-        // Given
         when(strategy1.supports(caseData)).thenReturn(false);
         when(strategy2.supports(caseData)).thenReturn(false);
         when(caseData.getCcdCaseReference()).thenReturn(123456789L);
 
-        // When & Then
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> provider.getPublisher(caseData));
         assertThat(exception.getMessage()).contains("Hearing fee payment details are not set for case: 123456789");
     }

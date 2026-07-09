@@ -253,7 +253,7 @@ class HearingFeeDueHandlerTest {
     }
 
     @Test
-    void shouldNotEmitNoHearingFeeDueEvent_whenFeatureToggleIsEnabled() {
+    void shouldNotEmitNoHearingFeeDueEvent_whenSpringSchedulerEnabled() {
         when(featureToggleService.isSpringSchedulerEnabled(HearingFeeScheduler.SCHEDULER_NAME)).thenReturn(true);
 
         long caseId = 1L;
