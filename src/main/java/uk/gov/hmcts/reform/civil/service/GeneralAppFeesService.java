@@ -135,12 +135,6 @@ public class GeneralAppFeesService {
         return applyDefaultListFee(calculationState, types, respondentAgreed, informOtherParty, hearingScheduledDate);
     }
 
-    private void validateApplicationTypes(List<GeneralApplicationTypes> types) {
-        if (CollectionUtils.isEmpty(types)) {
-            throw new IllegalArgumentException(MISSING_APPLICATION_TYPE);
-        }
-    }
-
     public Fee getFeeForGA(String keyword, String event, String service) {
         if (Objects.isNull(event)) {
             event = feesConfiguration.getEvent();
@@ -171,6 +165,12 @@ public class GeneralAppFeesService {
             throw new RuntimeException("No Fees returned by fee-service while creating General Application");
         }
         return buildFeeDto(feeLookupResponseDto);
+    }
+
+    private void validateApplicationTypes(List<GeneralApplicationTypes> types) {
+        if (CollectionUtils.isEmpty(types)) {
+            throw new IllegalArgumentException(MISSING_APPLICATION_TYPE);
+        }
     }
 
     private Fee getDefaultFee(List<GeneralApplicationTypes> types, Boolean respondentAgreed, Boolean informOtherParty, LocalDate hearingScheduledDate) {
