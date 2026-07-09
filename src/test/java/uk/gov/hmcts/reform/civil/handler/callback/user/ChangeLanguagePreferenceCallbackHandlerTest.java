@@ -17,12 +17,10 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocume
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
-import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.UserType;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -43,7 +41,6 @@ import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguag
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.WELSH;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.UserType.CLAIMANT;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.UserType.DEFENDANT;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
 class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -55,16 +52,13 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
     private UploadTranslatedDocumentStrategyFactory uploadTranslatedDocumentStrategyFactory;
     @Mock
     private UploadTranslatedDocumentStrategy uploadTranslatedDocumentStrategy;
-    @Mock
-    private GenAppStateHelperService helperService;
 
     @BeforeEach
     void setup() {
         mapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         handler = new ChangeLanguagePreferenceCallbackHandler(
             uploadTranslatedDocumentStrategyFactory,
-            mapper,
-            helperService
+            mapper
         );
     }
 
@@ -336,20 +330,6 @@ class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHandlerTes
             assertThat(response.getData().get("businessProcess"))
                 .extracting("camundaEvent", "status")
                 .contains(CHANGE_LANGUAGE_PREFERENCE.name(), READY.name());
-            verifyNoInteractions(helperService);
-        }
-
-        @Test
-        void shouldNotTriggerGaLanguageUpdate_WhenGeneralApplicationsExist() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-            caseData.setChangeLanguagePreference(changeLanguagePreference(CLAIMANT));
-            caseData.setApplicant1Represented(NO);
-            caseData.setGeneralApplications(wrapElements(new GeneralApplication()));
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            handler.handle(params);
-
-            verifyNoInteractions(helperService);
         }
 
         @Test

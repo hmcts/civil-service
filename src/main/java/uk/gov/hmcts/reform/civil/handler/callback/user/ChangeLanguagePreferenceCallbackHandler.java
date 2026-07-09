@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.UserType;
-import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +30,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_LANGUAGE_PREFERENCE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_GA_LANGUAGE_UPDATE;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.ENGLISH;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.UserType.CLAIMANT;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.UserType.DEFENDANT;
@@ -49,7 +47,6 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(CHANGE_LANGUAGE_PREFERENCE);
 
     private final ObjectMapper objectMapper;
-    private final GenAppStateHelperService helperService;
 
     private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_START), this::nullFieldsForNewSubmission,
                                                              callbackKey(MID, VALIDATE_LANGUAGE_PREFERENCE), this::validateChangeLanguagePreference,
@@ -144,10 +141,5 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
 
         caseData.setCaseDataLiP(caseDataLiP);
         caseData.setDefendantLanguagePreferenceDisplay(preferredLanguage);
-    }
-
-    private void triggerGaEvent(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        helperService.triggerEvent(caseData, TRIGGER_GA_LANGUAGE_UPDATE);
     }
 }
