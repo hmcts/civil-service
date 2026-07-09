@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_GRANTED_SPEC;
 
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
@@ -73,7 +74,7 @@ public class JudgementBufferSchedulerIT {
             .caseDetails(CaseDetails.builder().id(1L).data(Map.of()).build())
             .build();
         // Mock start and submit events for all 51 cases
-        coreCaseDataApiMockHelper.mockStartEventAnyCase(startEventResponse);
+        coreCaseDataApiMockHelper.mockStartEventAnyCase(startEventResponse, DEFAULT_JUDGEMENT_GRANTED_SPEC.name());
         coreCaseDataApiMockHelper.mockSubmitEventAnyCase(CaseDetailsBuilder.builder().id(1L).data(Map.of()).build());
 
         // When

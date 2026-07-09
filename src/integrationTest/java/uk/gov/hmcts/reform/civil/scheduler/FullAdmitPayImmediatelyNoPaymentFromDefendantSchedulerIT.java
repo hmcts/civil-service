@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.scheduler;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
@@ -35,7 +36,8 @@ import org.springframework.test.context.ActiveProfiles;
     CoreCaseDataApiMockHelperConfiguration.class
 }, properties = {
     "test.id=FullAdmitPayImmediatelyNoPaymentFromDefendantSchedulerIT",
-    "scheduler.full-admit-pay-immediately-no-payment-from-def.enabled=true"
+    "scheduler.full-admit-pay-immediately-no-payment-from-def.enabled=true",
+    "scheduler.lockAtLeastFor=PT0S"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 class FullAdmitPayImmediatelyNoPaymentFromDefendantSchedulerIT {
@@ -60,6 +62,8 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantSchedulerIT {
 
     @BeforeEach
     void setUp() {
+        reset(telemetryService, featureToggleService);
+        coreCaseDataApiMockHelper.resetMocks();
         coreCaseDataApiMockHelper.setupIdamClient();
 
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
@@ -79,7 +83,7 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantSchedulerIT {
             .cases(List.of(searchCase))
             .build();
 
-        coreCaseDataApiMockHelper.mockElasticSearchResultPaginated(searchResult);
+        coreCaseDataApiMockHelper.mockElasticSearchResult(searchResult);
 
         scheduler.runScheduledTask();
 
