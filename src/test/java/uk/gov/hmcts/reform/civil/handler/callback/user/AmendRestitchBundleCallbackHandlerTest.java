@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.civil.model.bundle.BundleDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.bundle.BundleCreationService;
 
 import java.time.LocalDate;
@@ -54,8 +53,6 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
     private BundleCreationService bundleCreationService;
     @Mock
     private BundleCreationTriggerEventHandler bundleCreationTriggerEventHandler;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -68,8 +65,7 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
         handler = new AmendRestitchBundleCallbackHandler(
             mapper,
             bundleCreationService,
-            bundleCreationTriggerEventHandler,
-            featureToggleService
+            bundleCreationTriggerEventHandler
         );
 
     }
@@ -122,21 +118,7 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmit {
 
         @Test
-        void shouldReturnNoError_WhenMidIsInvoked() {
-            when(featureToggleService.isAmendBundleEnabled()).thenReturn(false);
-            CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getErrors()).isNull();
-        }
-
-        @Test
         void shouldReturnBundle_AndOverwriteExistingBundleForHearingDate() {
-            when(featureToggleService.isAmendBundleEnabled()).thenReturn(true);
-
             Document stitchedDocument = new Document();
             stitchedDocument.setDocumentUrl(TEST_URL);
             stitchedDocument.setDocumentFileName(TEST_FILE_NAME);
@@ -181,20 +163,7 @@ class AmendRestitchBundleCallbackHandlerTest extends BaseCallbackHandlerTest {
     class Submitted {
 
         @Test
-        void shouldReturnNoError_WhenSubmittedIsInvoked() {
-            when(featureToggleService.isAmendBundleEnabled()).thenReturn(false);
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateDecisionOutcome().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseDetails).build();
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getErrors()).isNull();
-        }
-
-        @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
-            when(featureToggleService.isAmendBundleEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);

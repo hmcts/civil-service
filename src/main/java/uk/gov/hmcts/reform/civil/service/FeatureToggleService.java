@@ -94,10 +94,6 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
     }
 
-    public boolean isAmendBundleEnabled() {
-        return featureToggleApi.isFeatureEnabled("amend-bundle-enabled");
-    }
-
     public boolean isCaseProgressionEnabledAndLocationWhiteListed(String location) {
         return location != null
             && featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", location, true);
