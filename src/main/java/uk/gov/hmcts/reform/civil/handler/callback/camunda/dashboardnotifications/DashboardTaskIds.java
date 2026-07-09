@@ -72,4 +72,5 @@ public final class DashboardTaskIds {
     public static final String GA_TRANSLATED_DOCUMENT = "GenerateDashboardNotificationsGaTranslatedDocument";
     public static final String INITIATE_COSC = "GenerateDashboardNotificationsInitiateCOSC";
     public static final String PROCESS_COSC = "GenerateDashboardNotificationsProcessCOSC";
+    public static final String CLAIM_DISMISSED = "GenerateDashboardNotificationsClaimDismissed";
 }

@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.search.PaginatedQuery;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
@@ -195,6 +196,13 @@ public class CoreCaseDataService {
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         String searchString = query.toString();
         log.info("Searching Elasticsearch with query: " + searchString);
+        return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, searchString);
+    }
+
+    public SearchResult searchCasesPaginated(PaginatedQuery paginatedQuery) {
+        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        String searchString = paginatedQuery.getJsonString(mapper);
+        log.info("Searching Elasticsearch with paginated query: " + searchString);
         return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, searchString);
     }
 

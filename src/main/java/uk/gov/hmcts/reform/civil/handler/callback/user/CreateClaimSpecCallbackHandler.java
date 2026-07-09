@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidat
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -431,13 +432,19 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     //calculate interest for specified claim
     private CallbackResponse calculateInterest(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
+        if (totalClaimAmount == null) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseData.toMap(objectMapper))
+                .build();
+        }
 
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest);
+        BigDecimal totalAmountWithInterest = totalClaimAmount.add(interest);
 
         String calculatedInterest = " | Description | Amount | \n |---|---| \n | Claim amount | £ "
-            + caseData.getTotalClaimAmount().setScale(2)
-            + " | \n | Interest amount | £ " + interest.setScale(2) + " | \n | Total amount | £ " + totalAmountWithInterest.setScale(2) + " |";
+            + totalClaimAmount.setScale(2, RoundingMode.HALF_UP)
+            + " | \n | Interest amount | £ " + interest.setScale(2, RoundingMode.HALF_UP) + " | \n | Total amount | £ " + totalAmountWithInterest.setScale(2) + " |";
         caseData.setCalculatedInterest(calculatedInterest);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
@@ -446,11 +453,16 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private CallbackResponse specCalculateInterest(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount();
+        BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
+        if (totalClaimAmount == null) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseData.toMap(objectMapper))
+                .build();
+        }
 
         String calculateInterest = " | Description | Amount | \n |---|---| \n | Claim amount | £ "
-            + caseData.getTotalClaimAmount().setScale(2)
-            + " | \n | Interest amount | £ " + "0" + " | \n | Total amount | £ " + totalAmountWithInterest.setScale(2) + " |";
+            + totalClaimAmount.setScale(2, RoundingMode.HALF_UP)
+            + " | \n | Interest amount | £ " + "0" + " | \n | Total amount | £ " + totalClaimAmount.setScale(2, RoundingMode.HALF_UP) + " |";
         caseData.setCalculatedInterest(calculateInterest);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
