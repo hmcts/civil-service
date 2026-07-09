@@ -37,13 +37,8 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScheduledTask implemen
         Long caseId = caseDetails.getId();
         log.info("FullAdmitPayImmediatelyNoPaymentFromDefendantScheduledTask::accept case {}", caseId);
 
-        try {
-            setFullAdmitNoPaymentSchedulerProcessed(caseId);
-            applicationEventPublisher.publishEvent(new FullAdmitPayImmediatelyNoPaymentFromDefendantEvent(
-                caseId));
-        } catch (Exception e) {
-            log.error("Updating case with id: '{}' failed", caseId, e);
-        }
+        setFullAdmitNoPaymentSchedulerProcessed(caseId);
+        applicationEventPublisher.publishEvent(new FullAdmitPayImmediatelyNoPaymentFromDefendantEvent(caseId));
     }
 
     protected void setFullAdmitNoPaymentSchedulerProcessed(Long caseId) {

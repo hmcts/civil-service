@@ -1,11 +1,8 @@
 package uk.gov.hmcts.reform.civil.scheduler.fulladmitpayimmediatelynopayfromdef;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
@@ -72,17 +69,6 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantScheduledTaskTest {
         verify(applicationEventPublisher).publishEvent(captor.capture());
 
         assertThat(captor.getValue().caseId()).isEqualTo(123L);
-    }
-
-    @Test
-    void shouldCatchExceptionAndNotPublishEvent() {
-        doThrow(new RuntimeException("Failure"))
-            .when(scheduledTask)
-            .setFullAdmitNoPaymentSchedulerProcessed(123L);
-
-        scheduledTask.accept(caseDetails);
-
-        verify(applicationEventPublisher, never()).publishEvent(any());
     }
 
     @Test
