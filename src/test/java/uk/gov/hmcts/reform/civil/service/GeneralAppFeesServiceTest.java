@@ -317,6 +317,21 @@ class GeneralAppFeesServiceTest {
     @Nested
     class FeeForGA {
 
+        @Test
+        void shouldThrowClearException_whenApplicationTypeIsMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .generalAppType(null)
+                .build();
+
+            IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> generalAppFeesService.getFeeForGA(caseData)
+            );
+
+            assertThat(exception).hasMessage("General application type is required to calculate the fee");
+            verifyNoInteractions(feesApiClient);
+        }
+
         @ParameterizedTest
         @CsvSource({
             "GAOnNotice, NO, YES",

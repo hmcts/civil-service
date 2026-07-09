@@ -65,6 +65,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -1327,6 +1329,21 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             GeneralApplication application = unwrapElements(responseCaseData.getGeneralApplications()).get(0);
             assertThat(application.getGeneralAppPBADetails()).isNotNull();
             assertThat(application.getGeneralAppPBADetails().getFee()).isNotNull();
+        }
+
+        @Test
+        void shouldReturnError_whenApplicationTypeIsMissingAndFeesAreUnsetByCCD() {
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseData(CaseDataBuilder.builder().generalAppType(null).build());
+            caseData.setGeneralAppType(null);
+            caseData.setGeneralAppPBADetails(null);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsOnly("Select an application type");
+            verify(feesService, never()).getFeeForGA(any(CaseData.class));
         }
 
         @Test

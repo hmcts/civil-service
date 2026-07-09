@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
@@ -49,6 +50,7 @@ public class GeneralAppFeesService {
 
     private static final String MISCELLANEOUS = "miscellaneous";
     private static final String OTHER = "other";
+    private static final String MISSING_APPLICATION_TYPE = "General application type is required to calculate the fee";
 
     protected static final List<GeneralApplicationTypes> VARY_TYPES
         = List.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT);
@@ -90,8 +92,11 @@ public class GeneralAppFeesService {
     }
 
     public Fee getFeeForGA(CaseData caseData) {
+        List<GeneralApplicationTypes> types = Optional.ofNullable(caseData.getGeneralAppType())
+            .map(GAApplicationType::getTypes)
+            .orElse(null);
         return getFeeForGA(
-            caseData.getGeneralAppType().getTypes(),
+            types,
             getRespondentAgreed(caseData),
             getInformOtherParty(caseData),
             getHearingDate(caseData)
@@ -99,7 +104,10 @@ public class GeneralAppFeesService {
     }
 
     public Fee getFeeForGA(GeneralApplicationCaseData caseData) {
-        List<GeneralApplicationTypes> types = caseData.getGeneralAppType().getTypes();
+        List<GeneralApplicationTypes> types = Optional.ofNullable(caseData.getGeneralAppType())
+            .map(GAApplicationType::getTypes)
+            .orElse(null);
+        validateApplicationTypes(types);
         FeeCalculationState calculationState = initialCalculationState(types);
         calculationState = applyVaryFee(calculationState, types);
         calculationState = applySettlementByConsentFee(calculationState, types);
@@ -118,12 +126,19 @@ public class GeneralAppFeesService {
     }
 
     private Fee getFeeForGA(List<GeneralApplicationTypes> types, Boolean respondentAgreed, Boolean informOtherParty, LocalDate hearingScheduledDate) {
+        validateApplicationTypes(types);
         FeeCalculationState calculationState = initialCalculationState(types);
         calculationState = applyVaryFee(calculationState, types);
         calculationState = applySettlementByConsentFee(calculationState, types);
         calculationState = applyListSetAsideFee(calculationState, types, respondentAgreed, informOtherParty);
         calculationState = applyCertificateOfSatisfactionFee(calculationState, types);
         return applyDefaultListFee(calculationState, types, respondentAgreed, informOtherParty, hearingScheduledDate);
+    }
+
+    private void validateApplicationTypes(List<GeneralApplicationTypes> types) {
+        if (CollectionUtils.isEmpty(types)) {
+            throw new IllegalArgumentException(MISSING_APPLICATION_TYPE);
+        }
     }
 
     public Fee getFeeForGA(String keyword, String event, String service) {
