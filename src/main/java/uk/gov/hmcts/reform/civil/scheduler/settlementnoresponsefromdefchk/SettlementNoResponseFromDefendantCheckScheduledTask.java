@@ -29,12 +29,7 @@ public class SettlementNoResponseFromDefendantCheckScheduledTask implements Sche
         Long caseId = caseDetails.getId();
         log.info("SettlementNoResponseFromDefendantCheckScheduledTask::accept case {}", caseId);
 
-        try {
-            applicationEventPublisher.publishEvent(new SettlementNoResponseFromDefendantEvent(caseId));
-        } catch (Exception e) {
-            log.error("Updating case with id: '{}' failed", caseId, e);
-        }
-
+        applicationEventPublisher.publishEvent(new SettlementNoResponseFromDefendantEvent(caseId));
     }
 
     @Override

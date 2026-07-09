@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.civil.scheduler.settlementnoresponsefromdefchk;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,18 +64,6 @@ class SettlementNoResponseFromDefendantCheckScheduledTaskTest {
 
         SettlementNoResponseFromDefendantEvent event = captor.getValue();
         assertThat(event.getCaseId()).isEqualTo(123L);
-    }
-
-    @Test
-    void shouldNotThrowWhenPublishEventFails() {
-        CaseDetails caseDetails = mock(CaseDetails.class);
-        when(caseDetails.getId()).thenReturn(123L);
-
-        doThrow(new RuntimeException("Failure"))
-            .when(applicationEventPublisher)
-            .publishEvent(any(Object.class));
-
-        assertDoesNotThrow(() -> task.accept(caseDetails));
     }
 
     @Test
