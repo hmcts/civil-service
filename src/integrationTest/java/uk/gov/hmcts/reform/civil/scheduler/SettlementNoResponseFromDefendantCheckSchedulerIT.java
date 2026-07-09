@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.scheduler;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,7 +38,8 @@ import org.springframework.test.context.ActiveProfiles;
     },
     properties = {
         "test.id=SettlementNoResponseFromDefendantCheckSchedulerIT",
-        "scheduler.settlement-no-response-from-defendant-check.enabled=true"
+        "scheduler.settlement-no-response-from-defendant-check.enabled=true",
+        "scheduler.lockAtLeastFor=PT0S"
     }
 )
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
@@ -63,8 +65,9 @@ class SettlementNoResponseFromDefendantCheckSchedulerIT {
 
     @BeforeEach
     void setUp() {
+        reset(telemetryService, featureToggleService);
+        coreCaseDataApiMockHelper.resetMocks();
         coreCaseDataApiMockHelper.setupIdamClient();
-
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         when(scheduledTask.maxCasesPerRun()).thenReturn(Long.MAX_VALUE);
         when(scheduledTask.getItemId(any(CaseDetails.class)))
@@ -82,7 +85,7 @@ class SettlementNoResponseFromDefendantCheckSchedulerIT {
             .cases(List.of(searchCase))
             .build();
 
-        coreCaseDataApiMockHelper.mockElasticSearchResultPaginated(searchResult);
+        coreCaseDataApiMockHelper.mockElasticSearchResult(searchResult);
 
         scheduler.runScheduledTask();
 
