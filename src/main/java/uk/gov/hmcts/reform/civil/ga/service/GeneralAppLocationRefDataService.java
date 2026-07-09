@@ -23,11 +23,13 @@ public class GeneralAppLocationRefDataService {
     private static final String DATA_LOOKUP_FAILED = "Location Reference Data Lookup Failed - ";
 
     public List<LocationRefData> getCourtLocations(String authToken) {
+        log.info("Fetching GA court locations");
         try {
             List<LocationRefData> responseEntity =
-                courtVenueService.getCMLAndHLCourtsGAspec(
+                courtVenueService.getHearingLocationCourtsOnly(
                     authTokenGenerator.generate(),
                     authToken);
+            log.info("GA court locations fetched: {}", responseEntity.size());
             return onlyEnglandAndWalesLocations(responseEntity)
                 .stream().sorted(Comparator.comparing(LocationRefData::getSiteName)).toList();
         } catch (Exception e) {

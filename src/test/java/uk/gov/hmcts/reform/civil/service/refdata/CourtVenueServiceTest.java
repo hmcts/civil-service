@@ -133,8 +133,8 @@ class CourtVenueServiceTest {
     }
 
     @Test
-    void shouldReturnCMLAndHLCourtsGAspec() {
-        List<LocationRefData> result = courtVenueService.getCMLAndHLCourtsGAspec(serviceAuth, auth);
+    void shouldReturnHearingLocationCourtsOnly() {
+        List<LocationRefData> result = courtVenueService.getHearingLocationCourtsOnly(serviceAuth, auth);
         assertThat(result).containsExactlyInAnyOrder(court1, court2);
     }
 }

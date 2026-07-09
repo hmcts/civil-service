@@ -204,7 +204,7 @@ class GeneralAppLocationRefDataServiceTest {
     @Test
     void shouldReturnLocations_whenLRDReturnsAllLocations() {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(courtVenueService.getCMLAndHLCourtsGAspec(
+        when(courtVenueService.getHearingLocationCourtsOnly(
             anyString(),
             anyString()
         )).thenReturn(getAllLocationsRefDataResponse());
@@ -234,7 +234,7 @@ class GeneralAppLocationRefDataServiceTest {
     @Test
     void shouldReturnLocations_whenLRDReturnsNullBody() {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(courtVenueService.getCMLAndHLCourtsGAspec(
+        when(courtVenueService.getHearingLocationCourtsOnly(
             anyString(),
             anyString()
         )).thenReturn(new ArrayList<>());
@@ -248,7 +248,7 @@ class GeneralAppLocationRefDataServiceTest {
     @Test
     void shouldReturnLocations_whenLRDReturnsOnlyScotlandLocations() {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(courtVenueService.getCMLAndHLCourtsGAspec(
+        when(courtVenueService.getHearingLocationCourtsOnly(
             anyString(),
             anyString()
         )).thenReturn(getOnlyScotlandLocationsRefDataResponse());
@@ -261,7 +261,7 @@ class GeneralAppLocationRefDataServiceTest {
     @Test
     void shouldReturnLocations_whenLRDReturnsNonScotlandLocations() {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(courtVenueService.getCMLAndHLCourtsGAspec(
+        when(courtVenueService.getHearingLocationCourtsOnly(
             anyString(),
             anyString()
         )).thenReturn(getNonScotlandLocationsRefDataResponse());
@@ -290,7 +290,7 @@ class GeneralAppLocationRefDataServiceTest {
     @Test
     void shouldReturnEmptyList_whenLRDThrowsException() {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(courtVenueService.getCMLAndHLCourtsGAspec(
+        when(courtVenueService.getHearingLocationCourtsOnly(
             anyString(),
             anyString()
         )).thenThrow(new RestClientException("403"));

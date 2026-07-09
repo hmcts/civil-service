@@ -86,7 +86,8 @@ public class CourtVenueService {
         return filterCachedCourts(serviceAuth, auth, this::isCMLAndHL);
     }
 
-    public List<LocationRefData> getCMLAndHLCourtsGAspec(String serviceAuth, String auth) {
+    public List<LocationRefData> getHearingLocationCourtsOnly(String serviceAuth, String auth) {
+        log.info("Fetching hearing location courts only");
         return filterCachedCourts(serviceAuth, auth, c -> IS_HEARING_LOCATION.equalsIgnoreCase(c.getIsHearingLocation()));
     }
 

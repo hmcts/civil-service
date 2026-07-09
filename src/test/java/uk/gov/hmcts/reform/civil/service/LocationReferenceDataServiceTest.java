@@ -125,7 +125,7 @@ class LocationReferenceDataServiceTest {
 
     @Test
     void shouldReturnSortedEnglandAndWalesCourtsForGA() {
-        when(courtVenueService.getCMLAndHLCourtsGAspec(generatedAuth, auth))
+        when(courtVenueService.getHearingLocationCourtsOnly(generatedAuth, auth))
             .thenReturn(List.of(loc1, loc2, loc3));
 
         List<LocationRefData> result = service.getCourtLocationsForGeneralApplication(auth);
