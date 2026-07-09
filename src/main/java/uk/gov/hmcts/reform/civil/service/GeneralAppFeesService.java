@@ -92,9 +92,7 @@ public class GeneralAppFeesService {
     }
 
     public Fee getFeeForGA(CaseData caseData) {
-        List<GeneralApplicationTypes> types = Optional.ofNullable(caseData.getGeneralAppType())
-            .map(GAApplicationType::getTypes)
-            .orElse(null);
+        List<GeneralApplicationTypes> types = getApplicationTypes(caseData.getGeneralAppType());
         return getFeeForGA(
             types,
             getRespondentAgreed(caseData),
@@ -104,10 +102,7 @@ public class GeneralAppFeesService {
     }
 
     public Fee getFeeForGA(GeneralApplicationCaseData caseData) {
-        List<GeneralApplicationTypes> types = Optional.ofNullable(caseData.getGeneralAppType())
-            .map(GAApplicationType::getTypes)
-            .orElse(null);
-        validateApplicationTypes(types);
+        List<GeneralApplicationTypes> types = getApplicationTypes(caseData.getGeneralAppType());
         FeeCalculationState calculationState = initialCalculationState(types);
         calculationState = applyVaryFee(calculationState, types);
         calculationState = applySettlementByConsentFee(calculationState, types);
@@ -165,6 +160,13 @@ public class GeneralAppFeesService {
             throw new RuntimeException("No Fees returned by fee-service while creating General Application");
         }
         return buildFeeDto(feeLookupResponseDto);
+    }
+
+    private List<GeneralApplicationTypes> getApplicationTypes(GAApplicationType applicationType) {
+        if (applicationType == null || CollectionUtils.isEmpty(applicationType.getTypes())) {
+            throw new IllegalArgumentException(MISSING_APPLICATION_TYPE);
+        }
+        return applicationType.getTypes();
     }
 
     private void validateApplicationTypes(List<GeneralApplicationTypes> types) {
