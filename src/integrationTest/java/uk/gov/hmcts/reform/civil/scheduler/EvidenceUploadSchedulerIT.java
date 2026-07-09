@@ -26,6 +26,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_CHECK;
@@ -33,9 +34,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_CHECK
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=EvidenceUploadSchedulerIT",
-    "scheduler.defendant-response.enabled=true"
+    "scheduler.defendant-response.enabled=true",
+    "scheduler.lockAtLeastFor=PT0S"
 })
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class EvidenceUploadSchedulerIT {
 
     private static final Long CASE_ID = 123L;
@@ -63,6 +64,8 @@ public class EvidenceUploadSchedulerIT {
 
     @BeforeEach
     void setUp() {
+        reset(telemetryService, featureToggleService);
+        coreCaseDataApiMockHelper.resetMocks();
         coreCaseDataApiMockHelper.setupIdamClient();
         when(featureToggleService.isSpringSchedulerEnabled(EvidenceUploadScheduler.SCHEDULER_NAME))
             .thenReturn(true);
