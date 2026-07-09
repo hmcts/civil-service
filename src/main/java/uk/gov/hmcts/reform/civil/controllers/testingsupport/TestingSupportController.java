@@ -51,7 +51,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
-import uk.gov.hmcts.reform.civil.scheduler.common.TestingSupportSchedulerRegistry;
+import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerRegistry;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -101,7 +101,7 @@ public class TestingSupportController {
     private final OrganisationService organisationService;
     private final CoreCaseUserService coreCaseUserService;
     private final GAJudgeRevisitTaskHandler gaJudgeRevisitTaskHandler;
-    private final TestingSupportSchedulerRegistry civilSchedulerRepository;
+    private final SchedulerRegistry civilSchedulerRepository;
 
     private static final String SUCCESS = "success";
     private static final String FAILED = "failed";
