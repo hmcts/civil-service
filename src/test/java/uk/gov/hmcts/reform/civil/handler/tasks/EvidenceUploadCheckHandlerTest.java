@@ -181,7 +181,7 @@ class EvidenceUploadCheckHandlerTest {
     }
 
     @Test
-    void shouldNotEmitEvidenceUploadCheckEvent_WhenFeatureFlagIsTrue() {
+    void shouldNotEmitEvidenceUploadCheckEvent_WhenSpringSchedulerEnabled() {
         when(featureToggleService.isSpringSchedulerEnabled(EvidenceUploadScheduler.SCHEDULER_NAME)).thenReturn(true);
         // Given: one case found from search service
         long caseId = 1L;
