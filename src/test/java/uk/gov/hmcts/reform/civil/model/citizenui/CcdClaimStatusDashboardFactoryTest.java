@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -635,6 +636,23 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService, Collections.emptyList()));
         assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_COURT_REVIEW);
+    }
+
+    @Test
+    void givenClaimantRejectedRepaymentPlanAndFinalOrderIssued_whenGetStatus_thenReturnOrderMade() {
+        CaseData claim = CaseData.builder()
+            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+            .ccdState(All_FINAL_ORDERS_ISSUED)
+            .build();
+        List<CaseEventDetail> eventHistory = new ArrayList<>(List.of(CaseEventDetail.builder()
+                                                                         .createdDate(LocalDateTime.now())
+                                                                         .id(CaseEvent.COURT_OFFICER_ORDER.name())
+                                                                         .build()));
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(
+            new CcdDashboardClaimantClaimMatcher(claim, featureToggleService, eventHistory));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.ORDER_MADE);
     }
 
     @Test
