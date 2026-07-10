@@ -639,9 +639,13 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
-    void givenClaimantRejectedRepaymentPlanAndFinalOrderIssued_whenGetStatus_thenReturnOrderMade() {
+    void givenClaimantRejectedPartAdmitRepaymentPlanAndFinalOrderIssued_whenGetStatus_thenReturnOrderMade() {
         CaseData claim = CaseData.builder()
-            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+            .respondent1(new Party().setType(Party.Type.INDIVIDUAL))
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(
+                RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
             .ccdState(All_FINAL_ORDERS_ISSUED)
             .build();
         List<CaseEventDetail> eventHistory = new ArrayList<>(List.of(CaseEventDetail.builder()
@@ -653,6 +657,11 @@ class CcdClaimStatusDashboardFactoryTest {
             new CcdDashboardClaimantClaimMatcher(claim, featureToggleService, eventHistory));
 
         assertThat(status).isEqualTo(DashboardClaimStatus.ORDER_MADE);
+
+        DashboardClaimStatus defendantStatus = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(
+            new CcdDashboardDefendantClaimMatcher(claim, featureToggleService, eventHistory));
+
+        assertThat(defendantStatus).isEqualTo(DashboardClaimStatus.ORDER_MADE);
     }
 
     @Test
