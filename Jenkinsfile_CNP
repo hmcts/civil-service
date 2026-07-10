@@ -205,9 +205,14 @@ withPipeline(type, product, component) {
   afterSuccess('functionalTest:aat') {
     createBpmnGithubRelease()
     uploadBpmnDiagrams('aat')
-    withSubscription('prod', product, 'prod') {
-    loadVaultSecrets(secretsProd)
-    uploadBpmnDiagrams('prod')
+  }
+
+  afterSuccess('buildinfra:prod') {
+    withAzureKeyvault(
+      azureKeyVaultSecrets: secretsProd['civil-prod'],
+      keyVaultURLOverride: 'https://civil-prod.vault.azure.net/'
+    ) {
+      uploadBpmnDiagrams('prod')
     }
   }
 
