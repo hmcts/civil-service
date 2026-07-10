@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerRegistry;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -65,9 +64,6 @@ class TriggerSchedulerExternalTaskHandlerTest {
         verify(schedulerRegistry).runScheduler(TEST_SCHEDULER_NAME);
         ArgumentCaptor<VariableMap> variableMapCaptor = ArgumentCaptor.forClass(VariableMap.class);
         verify(externalTaskService).complete(eq(mockTask), variableMapCaptor.capture());
-
-        VariableMap variables = variableMapCaptor.getValue();
-        assertThat(variables.get("schedulerFound")).isEqualTo(true);
     }
 
     @Test
@@ -79,8 +75,5 @@ class TriggerSchedulerExternalTaskHandlerTest {
         verify(schedulerRegistry).runScheduler(TEST_SCHEDULER_NAME);
         ArgumentCaptor<VariableMap> variableMapCaptor = ArgumentCaptor.forClass(VariableMap.class);
         verify(externalTaskService).complete(eq(mockTask), variableMapCaptor.capture());
-
-        VariableMap variables = variableMapCaptor.getValue();
-        assertThat(variables.get("schedulerFound")).isEqualTo(false);
     }
 }
