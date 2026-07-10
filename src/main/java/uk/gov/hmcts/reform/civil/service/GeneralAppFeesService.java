@@ -280,6 +280,9 @@ public class GeneralAppFeesService {
     }
 
     private FeeCalculationState initialCalculationState(List<GeneralApplicationTypes> types) {
+        if (CollectionUtils.isEmpty(types)) {
+            throw new IllegalArgumentException("General application type is required to calculate a fee");
+        }
         return new FeeCalculationState(createMaxFee(), types.size());
     }
 

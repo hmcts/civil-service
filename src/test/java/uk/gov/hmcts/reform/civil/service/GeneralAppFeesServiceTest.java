@@ -314,6 +314,26 @@ class GeneralAppFeesServiceTest {
         assertThat(exception.getCause()).hasMessage("fee lookup failed");
     }
 
+    @Test
+    void shouldRejectEmptyApplicationTypesWhenCalculatingFee() {
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> generalAppFeesService.getFeeForGALiP(Collections.emptyList(), false, false, null)
+        );
+
+        assertThat(exception).hasMessage("General application type is required to calculate a fee");
+    }
+
+    @Test
+    void shouldRejectNullApplicationTypesWhenCalculatingFee() {
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> generalAppFeesService.getFeeForGALiP(null, false, false, null)
+        );
+
+        assertThat(exception).hasMessage("General application type is required to calculate a fee");
+    }
+
     @Nested
     class FeeForGA {
 
