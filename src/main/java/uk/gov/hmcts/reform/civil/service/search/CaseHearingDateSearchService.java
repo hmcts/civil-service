@@ -31,7 +31,7 @@ public class CaseHearingDateSearchService extends ElasticSearchService {
 
     @Override
     public Query query(int startIndex, String timeNow) {
-        log.info("Call to CaseDismissedSearchService query with index {} and timeNow {}", startIndex, timeNow);
+        log.info("Call to CaseHearingDateSearchService query with index {} and timeNow {}", startIndex, timeNow);
         LocalDate baseDate = ZonedDateTime.parse(timeNow).toLocalDate();
         String targetMaxDateString = DateUtils.addDaysSkippingWeekends(
             baseDate, BUSINESS_DAYS_FROM_NOW_MAX).format(DateTimeFormatter.ISO_DATE);
