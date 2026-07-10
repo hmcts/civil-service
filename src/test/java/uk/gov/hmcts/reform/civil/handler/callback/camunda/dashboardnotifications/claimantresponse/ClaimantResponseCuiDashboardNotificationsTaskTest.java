@@ -6,8 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.caseproceedsoffline.ApplicationsProceedOfflineClaimantDashboardTask;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.caseproceedsoffline.ApplicationsProceedOfflineDefendantDashboardTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StateFlowDTO;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -31,14 +29,6 @@ class ClaimantResponseCuiDashboardNotificationsTaskTest {
     @Mock
     private ClaimantResponseDefendantDashboardTask defendantTask;
     @Mock
-    private ClaimantCcjResponseClaimantDashboardTask claimantCcjTask;
-    @Mock
-    private ClaimantCcjResponseDefendantDashboardTask defendantCcjTask;
-    @Mock
-    private ApplicationsProceedOfflineClaimantDashboardTask claimantOfflineTask;
-    @Mock
-    private ApplicationsProceedOfflineDefendantDashboardTask defendantOfflineTask;
-    @Mock
     private JudgmentByAdmissionIssuedClaimantDashboardTask judgmentByAdmissionClaimantTask;
     @Mock
     private JudgmentByAdmissionIssuedDefendantDashboardTask judgmentByAdmissionDefendantTask;
@@ -54,10 +44,6 @@ class ClaimantResponseCuiDashboardNotificationsTaskTest {
             stateFlowEngine,
             claimantTask,
             defendantTask,
-            claimantCcjTask,
-            defendantCcjTask,
-            claimantOfflineTask,
-            defendantOfflineTask,
             judgmentByAdmissionClaimantTask,
             judgmentByAdmissionDefendantTask
         );
@@ -76,10 +62,6 @@ class ClaimantResponseCuiDashboardNotificationsTaskTest {
             stateFlowEngine,
             claimantTask,
             defendantTask,
-            claimantCcjTask,
-            defendantCcjTask,
-            claimantOfflineTask,
-            defendantOfflineTask,
             judgmentByAdmissionClaimantTask,
             judgmentByAdmissionDefendantTask
         );
@@ -87,43 +69,21 @@ class ClaimantResponseCuiDashboardNotificationsTaskTest {
 
     @Test
     void shouldRunClaimantResponseNotificationsWhenNoJudgmentAdmission() {
-        when(stateFlowEngine.getStateFlow(caseData)).thenReturn(stateFlow(false, false));
+        when(stateFlowEngine.getStateFlow(caseData)).thenReturn(stateFlow(false));
 
         task.execute(context);
 
         verify(claimantTask).execute(context);
         verify(defendantTask).execute(context);
         verifyNoInteractions(
-            claimantCcjTask,
-            defendantCcjTask,
-            claimantOfflineTask,
-            defendantOfflineTask,
             judgmentByAdmissionClaimantTask,
             judgmentByAdmissionDefendantTask
         );
     }
 
     @Test
-    void shouldRunOfflineAndCcjNotificationsWhenJudgmentAdmissionWithJoDisabled() {
-        when(stateFlowEngine.getStateFlow(caseData)).thenReturn(stateFlow(true, false));
-
-        task.execute(context);
-
-        verify(claimantOfflineTask).execute(context);
-        verify(defendantOfflineTask).execute(context);
-        verify(claimantCcjTask).execute(context);
-        verify(defendantCcjTask).execute(context);
-        verifyNoInteractions(
-            claimantTask,
-            defendantTask,
-            judgmentByAdmissionClaimantTask,
-            judgmentByAdmissionDefendantTask
-        );
-    }
-
-    @Test
-    void shouldRunJudgmentByAdmissionNotificationsWhenJudgmentAdmissionWithJoEnabled() {
-        when(stateFlowEngine.getStateFlow(caseData)).thenReturn(stateFlow(true, true));
+    void shouldRunJudgmentByAdmissionNotificationsWhenJudgmentAdmission() {
+        when(stateFlowEngine.getStateFlow(caseData)).thenReturn(stateFlow(true));
 
         task.execute(context);
 
@@ -131,18 +91,13 @@ class ClaimantResponseCuiDashboardNotificationsTaskTest {
         verify(judgmentByAdmissionDefendantTask).execute(context);
         verifyNoInteractions(
             claimantTask,
-            defendantTask,
-            claimantCcjTask,
-            defendantCcjTask,
-            claimantOfflineTask,
-            defendantOfflineTask
+            defendantTask
         );
     }
 
-    private StateFlowDTO stateFlow(boolean lipJudgmentAdmission, boolean joOnlineLiveEnabled) {
+    private StateFlowDTO stateFlow(boolean lipJudgmentAdmission) {
         Map<String, Boolean> flags = new HashMap<>();
         flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), lipJudgmentAdmission);
-        flags.put(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), joOnlineLiveEnabled);
 
         return new StateFlowDTO()
             .setFlags(flags);
