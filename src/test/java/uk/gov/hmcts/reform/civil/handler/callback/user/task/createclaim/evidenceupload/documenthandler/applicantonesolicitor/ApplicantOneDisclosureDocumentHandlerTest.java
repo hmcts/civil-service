@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,7 +41,7 @@ class ApplicantOneDisclosureDocumentHandlerTest extends BaseDocumentHandlerTest 
     @Test
     void shouldNotRenameDocuments() {
         UploadEvidenceDocumentType uploadEvidenceDocumentType = new UploadEvidenceDocumentType();
-        uploadEvidenceDocumentType.setDocumentIssuedDate(LocalDate.of(2022, 2, 10));
+        uploadEvidenceDocumentType.setDocumentIssuedDate(LocalDate.of(2022, Month.FEBRUARY, 10));
         uploadEvidenceDocumentType.setTypeOfDocument("typeOfDocument");
         uploadEvidenceDocumentType.setDocumentUpload(document);
         Element<UploadEvidenceDocumentType> element = new Element<>();
