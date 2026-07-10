@@ -17,7 +17,7 @@ public class CollectorUtils {
             Collectors.toList(),
             list -> {
                 if (list.size() != 1) {
-                    throw new IllegalStateException();
+                    throw new IllegalStateException("Expected exactly one element but found " + list.size());
                 }
                 return list.get(0);
             }
