@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -27,9 +26,10 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_SCHEDULER_CHECK_STAY_ORDER_DEADLINE;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.ORDER_MADE;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STAY_THE_CLAIM;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 @ConditionalOnExpression("${judge.revisit.stayOrder.event.emitter.enabled:true}")
 public class CheckStayOrderDeadlineEndTaskHandler extends BaseExternalTaskHandler {
@@ -40,6 +40,21 @@ public class CheckStayOrderDeadlineEndTaskHandler extends BaseExternalTaskHandle
 
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
+
+    public CheckStayOrderDeadlineEndTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        CaseStateSearchService caseSearchService,
+        GaCoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter,
+        ObjectMapper mapper
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.caseSearchService = caseSearchService;
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.mapper = mapper;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -105,4 +120,5 @@ public class CheckStayOrderDeadlineEndTaskHandler extends BaseExternalTaskHandle
     private Map<String, Object> getUpdatedCaseDataMapper(GeneralApplicationCaseData caseData) {
         return caseData.toMap(mapper);
     }
+
 }

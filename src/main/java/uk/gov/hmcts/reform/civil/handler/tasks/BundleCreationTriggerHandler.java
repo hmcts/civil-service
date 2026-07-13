@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,10 +19,12 @@ import uk.gov.hmcts.reform.civil.service.search.BundleCreationTriggerService;
 
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+
+import static uk.gov.hmcts.reform.civil.service.tasklisteners.BundleCreationTriggerHandlerExternalTaskListener.LOCK_DURATION;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
 
@@ -35,6 +36,25 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
     @Value("${stitch-bundle.wait-time-in-milliseconds}")
     private Integer waitTime;
     private final NoCacheUserService noCacheUserService;
+
+    public BundleCreationTriggerHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        BundleCreationTriggerService bundleCreationTriggerService,
+        ApplicationEventPublisher applicationEventPublisher,
+        CaseDetailsConverter caseDetailsConverter,
+        CoreCaseDataService coreCaseDataService,
+        SystemUpdateUserConfiguration userConfig,
+        NoCacheUserService noCacheUserService
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.bundleCreationTriggerService = bundleCreationTriggerService;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.coreCaseDataService = coreCaseDataService;
+        this.userConfig = userConfig;
+        this.noCacheUserService = noCacheUserService;
+    }
 
     @SuppressWarnings("java:S2142")
     @Override
@@ -50,12 +70,10 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
                 boolean isBundleCreated = getIsBundleCreatedForHearingDate(caseDetails.getId());
                 if (!isBundleCreated) {
                     applicationEventPublisher.publishEvent(new BundleCreationTriggerEvent(caseDetails.getId(), accessToken));
-                    TimeUnit.MILLISECONDS.sleep(waitTime);
+                    throttle(cases.size(), waitTime, LOCK_DURATION);
                 } else {
                     log.info("Bundle is already created for {}", caseDetails.getId());
                 }
-            } catch (InterruptedException e) {
-                log.error("Error processing caseRef {} and error is {}", caseDetails.getId(), e.getMessage(), e);
             } catch (Exception e) {
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
             }
