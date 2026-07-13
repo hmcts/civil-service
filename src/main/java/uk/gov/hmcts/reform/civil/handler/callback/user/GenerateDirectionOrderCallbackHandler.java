@@ -99,6 +99,7 @@ import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDateType.DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDateType.SINGLE_DATE;
 import static uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDownloadGenerator.BLANK_TEMPLATE_TO_BE_USED_AFTER_A_HEARING;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -333,7 +334,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         if (ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())) {
             String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
             List<LocationRefData> locations = (locationRefDataService
-                .getHearingCourtLocations(authToken));
+                .getHearingCourtLocations(authToken, getCaseServiceId(caseData.getCaseAccessCategory())));
             populateFields(caseData, locations, authToken);
         } else  {
             populateFreeFormFields(caseData);

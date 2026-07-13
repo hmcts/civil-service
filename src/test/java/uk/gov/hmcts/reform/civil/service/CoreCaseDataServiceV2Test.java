@@ -98,7 +98,8 @@ class CoreCaseDataServiceV2Test {
                 .setSiteName("London SX12 2345")
                 ;
             mockLocation.add(locationRefData);
-            when(locationReferenceDataService.getCourtLocationsByEpimmsId(anyString(), anyString())).thenReturn(mockLocation);
+            when(locationReferenceDataService.getCourtLocationsByEpimmsId(anyString(), anyString(), anyString()))
+                .thenReturn(mockLocation);
             when(userService.getUserInfo(USER_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
             when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTH_TOKEN);
             when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(USER_AUTH_TOKEN);

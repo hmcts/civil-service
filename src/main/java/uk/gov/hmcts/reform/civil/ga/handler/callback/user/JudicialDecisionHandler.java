@@ -54,6 +54,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.utils.CaseServiceUtil;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -298,7 +299,8 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
     }
 
     private DynamicList getDynamicLocationList(GeneralApplicationCaseData caseData, String authToken) {
-        DynamicList dynamicLocationList = getLocationsFromList(locationRefDataService.getCourtLocations(authToken));
+        final String serviceId = CaseServiceUtil.getCaseServiceId(caseData);
+        DynamicList dynamicLocationList = getLocationsFromList(locationRefDataService.getCourtLocations(authToken, serviceId));
         selectSharedApplicantLocation(caseData, dynamicLocationList);
         return dynamicLocationList;
     }
