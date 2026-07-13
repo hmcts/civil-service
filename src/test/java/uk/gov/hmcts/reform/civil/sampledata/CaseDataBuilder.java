@@ -968,6 +968,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder hearingDueDate(LocalDate hearingDueDate) {
+        this.hearingDueDate = hearingDueDate;
+        return this;
+    }
+
     public CaseDataBuilder respondent1DQWithFixedRecoverableCosts() {
         respondent1DQ = respondent1DQ.copy()
             .setRespondent1DQFixedRecoverableCosts(new FixedRecoverableCosts()

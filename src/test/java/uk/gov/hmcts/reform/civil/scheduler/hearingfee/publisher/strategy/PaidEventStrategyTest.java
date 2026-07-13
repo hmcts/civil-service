@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.scheduler.hearingfee.publisher.HearingFeeHelper;
 
 import java.util.function.Function;
@@ -30,7 +31,7 @@ class PaidEventStrategyTest {
 
     @Test
     void shouldSupport_whenHearingFeeIsPaid() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .hearingFeePaymentDetails(new PaymentDetails())
             .build();
         when(hearingFeeHelper.isHearingFeePaid(caseData.getHearingFeePaymentDetails(), caseData)).thenReturn(true);
@@ -40,7 +41,7 @@ class PaidEventStrategyTest {
 
     @Test
     void shouldNotSupport_whenHearingFeeIsNotPaid() {
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .hearingFeePaymentDetails(new PaymentDetails())
             .build();
         when(hearingFeeHelper.isHearingFeePaid(caseData.getHearingFeePaymentDetails(), caseData)).thenReturn(false);

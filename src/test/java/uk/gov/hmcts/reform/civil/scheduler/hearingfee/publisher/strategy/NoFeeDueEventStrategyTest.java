@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.event.NoHearingFeeDueEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 import java.util.function.Function;
@@ -21,13 +22,13 @@ class NoFeeDueEventStrategyTest {
 
     @Test
     void shouldSupport_whenHearingDueDateIsNull() {
-        CaseData caseData = CaseData.builder().hearingDueDate(null).build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test
     void shouldNotSupport_whenHearingDueDateIsNotNull() {
-        CaseData caseData = CaseData.builder().hearingDueDate(LocalDate.now()).build();
+        CaseData caseData = CaseDataBuilder.builder().hearingDueDate(LocalDate.now()).build();
         assertThat(strategy.supports(caseData)).isFalse();
     }
 

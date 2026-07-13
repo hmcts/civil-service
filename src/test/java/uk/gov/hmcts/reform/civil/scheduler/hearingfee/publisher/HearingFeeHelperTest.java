@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 
@@ -27,7 +28,7 @@ class HearingFeeHelperTest {
         @Test
         void shouldReturnTrue_whenSuccessfulPaymentBeforeDueDate() {
             PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS);
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .hearingDueDate(LocalDate.now().minusDays(1))
                 .build();
 
@@ -36,7 +37,7 @@ class HearingFeeHelperTest {
 
         @Test
         void shouldReturnTrue_whenPaymentDoneWithHWF() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .hearingHelpFeesReferenceNumber("REF123")
                 .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
                                               .setHwfFullRemissionGrantedForHearingFee(uk.gov.hmcts.reform.civil.enums.YesOrNo.YES))
@@ -48,7 +49,7 @@ class HearingFeeHelperTest {
         @Test
         void shouldReturnFalse_whenSuccessfulPaymentOnDueDate() {
             PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS);
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .hearingDueDate(LocalDate.now())
                 .build();
 
@@ -58,7 +59,7 @@ class HearingFeeHelperTest {
         @Test
         void shouldReturnFalse_whenSuccessfulPaymentAfterDueDate() {
             PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS);
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .hearingDueDate(LocalDate.now().plusDays(1))
                 .build();
 
@@ -68,7 +69,7 @@ class HearingFeeHelperTest {
         @Test
         void shouldReturnFalse_whenFailedPaymentAndNoHWF() {
             PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.FAILED);
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .hearingDueDate(LocalDate.now().minusDays(1))
                 .build();
 
@@ -77,7 +78,7 @@ class HearingFeeHelperTest {
 
         @Test
         void shouldReturnFalse_whenNullPaymentDetailsAndNoHWF() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .hearingDueDate(LocalDate.now().minusDays(1))
                 .build();
 
@@ -90,7 +91,7 @@ class HearingFeeHelperTest {
 
         @Test
         void shouldReturnTrue_whenNullPaymentDetailsAndAfterDueDate() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .hearingDueDate(LocalDate.now().minusDays(1))
                 .build();
 
@@ -100,7 +101,7 @@ class HearingFeeHelperTest {
         @Test
         void shouldReturnTrue_whenFailedPaymentAndAfterDueDate() {
             PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.FAILED);
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .hearingDueDate(LocalDate.now().minusDays(1))
                 .build();
 
@@ -110,7 +111,7 @@ class HearingFeeHelperTest {
         @Test
         void shouldReturnFalse_whenSuccessfulPaymentAndAfterDueDate() {
             PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS);
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .hearingDueDate(LocalDate.now().minusDays(1))
                 .build();
 
@@ -119,7 +120,7 @@ class HearingFeeHelperTest {
 
         @Test
         void shouldReturnFalse_whenNullPaymentDetailsButBeforeDueDate() {
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .hearingDueDate(LocalDate.now().plusDays(1))
                 .build();
 
@@ -129,7 +130,7 @@ class HearingFeeHelperTest {
         @Test
         void shouldReturnFalse_whenFailedPaymentButBeforeDueDate() {
             PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.FAILED);
-            CaseData caseData = CaseData.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .hearingDueDate(LocalDate.now().plusDays(1))
                 .build();
 
