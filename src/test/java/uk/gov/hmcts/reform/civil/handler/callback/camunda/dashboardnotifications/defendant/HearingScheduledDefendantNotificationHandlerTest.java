@@ -15,8 +15,8 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -79,7 +79,7 @@ class HearingScheduledDefendantNotificationHandlerTest extends BaseCallbackHandl
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(any(), any())).thenReturn(locations);
 
         DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
         DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
@@ -108,7 +108,7 @@ class HearingScheduledDefendantNotificationHandlerTest extends BaseCallbackHandl
     void doNotCreateDashboardNotifications() {
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(any(), any())).thenReturn(locations);
 
         DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
         DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
