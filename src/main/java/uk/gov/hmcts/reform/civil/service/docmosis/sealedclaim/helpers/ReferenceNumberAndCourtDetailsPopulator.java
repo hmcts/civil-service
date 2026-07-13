@@ -5,6 +5,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseFormForSpec;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
@@ -52,13 +54,13 @@ public class ReferenceNumberAndCourtDetailsPopulator {
     private Optional<String> getRequestedCourt(CaseData caseData) {
         if (!isRespondent2(caseData)) {
             return Optional.ofNullable(caseData.getRespondent1DQ())
-                .map(respondent1DQ -> respondent1DQ.getRespondent1DQRequestedCourt())
+                .map(Respondent1DQ::getRespondent1DQRequestedCourt)
                 .map(RequestedCourt::getCaseLocation)
                 .map(CaseLocationCivil::getBaseLocation);
         }
 
         return Optional.ofNullable(caseData.getRespondent2DQ())
-            .map(respondent2DQ -> respondent2DQ.getRespondent2DQRequestedCourt())
+            .map(Respondent2DQ::getRespondent2DQRequestedCourt)
             .map(RequestedCourt::getCaseLocation)
             .map(CaseLocationCivil::getBaseLocation);
     }
