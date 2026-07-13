@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
@@ -15,23 +16,25 @@ import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDateTime;
 
+import static java.time.Month.JANUARY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class HearingFeeHelperTest {
 
-    private HearingFeeHelper helper;
+    private static final int ONE_DAY = 1;
+    private static final LocalDateTime NOW = LocalDateTime.of(2026, JANUARY, 1, 12, 0);
 
     @Mock
     private Time time;
 
-    private static final LocalDateTime NOW = LocalDateTime.of(2023, 1, 1, 12, 0);
+    @InjectMocks
+    private HearingFeeHelper helper;
 
     @BeforeEach
     void setUp() {
         lenient().when(time.now()).thenReturn(NOW);
-        helper = new HearingFeeHelper(time);
     }
 
     @Nested
@@ -41,7 +44,7 @@ class HearingFeeHelperTest {
         void shouldReturnTrue_whenSuccessfulPaymentBeforeDueDate() {
             PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS);
             CaseData caseData = CaseDataBuilder.builder()
-                .hearingDueDate(NOW.toLocalDate().minusDays(1))
+                .hearingDueDate(NOW.toLocalDate().minusDays(ONE_DAY))
                 .build();
 
             assertThat(helper.isHearingFeePaid(paymentDetails, caseData)).isTrue();
@@ -72,7 +75,7 @@ class HearingFeeHelperTest {
         void shouldReturnFalse_whenSuccessfulPaymentAfterDueDate() {
             PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS);
             CaseData caseData = CaseDataBuilder.builder()
-                .hearingDueDate(NOW.toLocalDate().plusDays(1))
+                .hearingDueDate(NOW.toLocalDate().plusDays(ONE_DAY))
                 .build();
 
             assertThat(helper.isHearingFeePaid(paymentDetails, caseData)).isFalse();
@@ -82,7 +85,7 @@ class HearingFeeHelperTest {
         void shouldReturnFalse_whenFailedPaymentAndNoHWF() {
             PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.FAILED);
             CaseData caseData = CaseDataBuilder.builder()
-                .hearingDueDate(NOW.toLocalDate().minusDays(1))
+                .hearingDueDate(NOW.toLocalDate().minusDays(ONE_DAY))
                 .build();
 
             assertThat(helper.isHearingFeePaid(paymentDetails, caseData)).isFalse();
@@ -91,7 +94,7 @@ class HearingFeeHelperTest {
         @Test
         void shouldReturnFalse_whenNullPaymentDetailsAndNoHWF() {
             CaseData caseData = CaseDataBuilder.builder()
-                .hearingDueDate(NOW.toLocalDate().minusDays(1))
+                .hearingDueDate(NOW.toLocalDate().minusDays(ONE_DAY))
                 .build();
 
             assertThat(helper.isHearingFeePaid(null, caseData)).isFalse();
@@ -104,7 +107,7 @@ class HearingFeeHelperTest {
         @Test
         void shouldReturnTrue_whenNullPaymentDetailsAndAfterDueDate() {
             CaseData caseData = CaseDataBuilder.builder()
-                .hearingDueDate(NOW.toLocalDate().minusDays(1))
+                .hearingDueDate(NOW.toLocalDate().minusDays(ONE_DAY))
                 .build();
 
             assertThat(helper.isHearingFeeUnpaid(null, caseData)).isTrue();
@@ -114,7 +117,7 @@ class HearingFeeHelperTest {
         void shouldReturnTrue_whenFailedPaymentAndAfterDueDate() {
             PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.FAILED);
             CaseData caseData = CaseDataBuilder.builder()
-                .hearingDueDate(NOW.toLocalDate().minusDays(1))
+                .hearingDueDate(NOW.toLocalDate().minusDays(ONE_DAY))
                 .build();
 
             assertThat(helper.isHearingFeeUnpaid(paymentDetails, caseData)).isTrue();
@@ -124,7 +127,7 @@ class HearingFeeHelperTest {
         void shouldReturnFalse_whenSuccessfulPaymentAndAfterDueDate() {
             PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS);
             CaseData caseData = CaseDataBuilder.builder()
-                .hearingDueDate(NOW.toLocalDate().minusDays(1))
+                .hearingDueDate(NOW.toLocalDate().minusDays(ONE_DAY))
                 .build();
 
             assertThat(helper.isHearingFeeUnpaid(paymentDetails, caseData)).isFalse();
@@ -133,7 +136,7 @@ class HearingFeeHelperTest {
         @Test
         void shouldReturnFalse_whenNullPaymentDetailsButBeforeDueDate() {
             CaseData caseData = CaseDataBuilder.builder()
-                .hearingDueDate(NOW.toLocalDate().plusDays(1))
+                .hearingDueDate(NOW.toLocalDate().plusDays(ONE_DAY))
                 .build();
 
             assertThat(helper.isHearingFeeUnpaid(null, caseData)).isFalse();
@@ -143,7 +146,7 @@ class HearingFeeHelperTest {
         void shouldReturnFalse_whenFailedPaymentButBeforeDueDate() {
             PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.FAILED);
             CaseData caseData = CaseDataBuilder.builder()
-                .hearingDueDate(NOW.toLocalDate().plusDays(1))
+                .hearingDueDate(NOW.toLocalDate().plusDays(ONE_DAY))
                 .build();
 
             assertThat(helper.isHearingFeeUnpaid(paymentDetails, caseData)).isFalse();
