@@ -2054,7 +2054,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             List<LocationRefData> locations = List.of(new LocationRefData());
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString(), anyString()))
                     .thenReturn(locations);
             LocationRefData completePreferredLocation = new LocationRefData()
                     .setRegionId("regionId")
@@ -2132,7 +2132,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     ));
 
             List<LocationRefData> locations = List.of(new LocationRefData());
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString(), anyString()))
                     .thenReturn(locations);
             LocationRefData completePreferredLocation = new LocationRefData()
                     .setRegionId("regionId")
@@ -2208,7 +2208,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             List<LocationRefData> locations = List.of(new LocationRefData());
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString(), anyString()))
                     .thenReturn(locations);
             LocationRefData completePreferredLocation = new LocationRefData()
                     .setRegionId("regionId")
@@ -3040,7 +3040,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             List<LocationRefData> locations = List.of(new LocationRefData());
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString(), anyString()))
                     .thenReturn(locations);
             DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
             when(courtLocationUtils.getLocationsFromList(locations))
@@ -3079,7 +3079,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             List<LocationRefData> locations = List.of(new LocationRefData());
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString(), anyString()))
                     .thenReturn(locations);
             DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
             when(courtLocationUtils.getLocationsFromList(locations))

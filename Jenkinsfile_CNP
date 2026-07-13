@@ -141,8 +141,6 @@ withPipeline(type, product, component) {
     env.CCD_DEFINITION_BRANCH = "master"
     env.SKIP_COMMON_AAT_CCD_SETUP = "true"
 
-    loadVaultSecrets(secretsProd)
-
     afterSuccess('akschartsinstall') {
       runStagingHighLevelDataSetup()
     }
@@ -207,7 +205,15 @@ withPipeline(type, product, component) {
   afterSuccess('functionalTest:aat') {
     createBpmnGithubRelease()
     uploadBpmnDiagrams('aat')
-    uploadBpmnDiagrams('prod')
+  }
+
+  afterSuccess('buildinfra:prod') {
+    withAzureKeyvault(
+      azureKeyVaultSecrets: secretsProd['civil-prod'],
+      keyVaultURLOverride: 'https://civil-prod.vault.azure.net/'
+    ) {
+      uploadBpmnDiagrams('prod')
+    }
   }
 
   afterAlways('functionalTest:aat') {

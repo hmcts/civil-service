@@ -15,56 +15,53 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.GAHearingType;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.enums.GADebtorPaymentPlanGAspec;
 import uk.gov.hmcts.reform.civil.ga.enums.GAJudicialHearingType;
 import uk.gov.hmcts.reform.civil.ga.enums.GARespondentDebtorOfferOptionsGAspec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.dq.GAHearingType;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption;
-import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.ga.model.GARespondentRepresentative;
-import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudgesHearingListGAspec;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialDecision;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GARespondentDebtorOfferGAspec;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GARespondentResponse;
-import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.DocUploadDashboardNotificationService;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.GeneralAppLocationRefDataService;
-import uk.gov.hmcts.reform.civil.ga.service.ParentCaseUpdateHelper;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -87,7 +84,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
-public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
+class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     @Spy
     private ObjectMapper objectMapper = ObjectMapperFactory.instance();
@@ -106,8 +103,6 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     IdamClient idamClient;
     @Mock
     GaForLipService gaForLipService;
-    @Mock
-    ParentCaseUpdateHelper parentCaseUpdateHelper;
 
     @Mock
     private CoreCaseDataService coreCaseDataService;
@@ -118,7 +113,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     List<Element<Document>> documents = new ArrayList<>();
 
     @BeforeEach
-    public void setUp() throws IOException {
+    void setUp() {
         Document document = new Document().setDocumentUrl("url").setDocumentFileName("file");
         documents.add(ElementUtils.element(document));
     }
@@ -182,7 +177,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(true);
-        CallbackParams params = callbackParamsOf(getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
+        CallbackParams params = callbackParamsOf(getVaryCase(),
                                                  CallbackType.SUBMITTED);
         var response = (SubmittedCallbackResponse) handler.handle(params);
 
@@ -194,7 +189,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenGaHasLipAndVaryJudgeApppLRvLR() {
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
-        CallbackParams params = callbackParamsOf(getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
+        CallbackParams params = callbackParamsOf(getVaryCase(),
                                                  CallbackType.SUBMITTED);
         var response = (SubmittedCallbackResponse) handler.handle(params);
         verifyNoInteractions(dashboardNotificationService);
@@ -206,7 +201,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     void buildResponseConfirmationReturnsCorrectMessageWhenWelshFlagEnabledAndApplicantBilingual() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
-        GeneralApplicationCaseData casedata = getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).copy()
+        GeneralApplicationCaseData casedata = getVaryCase().copy()
             .isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES).build();
 
         CallbackParams params = callbackParamsOf(casedata, CallbackType.SUBMITTED);
@@ -221,7 +216,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     void buildResponseConfirmationReturnsCorrectMessageWhenWelshFlagEnabledAndApplicantNotBilingual() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
-        GeneralApplicationCaseData casedata = getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).copy()
+        GeneralApplicationCaseData casedata = getVaryCase().copy()
             .isGaApplicantLip(YES).applicantBilingualLanguagePreference(NO).build();
 
         CallbackParams params = callbackParamsOf(casedata, CallbackType.SUBMITTED);
@@ -238,7 +233,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(true);
-        GeneralApplicationCaseData casedata = getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).copy()
+        GeneralApplicationCaseData casedata = getVaryCase().copy()
             .isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES).build();
 
         CallbackParams params = callbackParamsOf(casedata, CallbackType.SUBMITTED);
@@ -254,19 +249,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(false);
-        CallbackParams params = callbackParamsOf(getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
-                                                 CallbackType.SUBMITTED);
-        var response = (SubmittedCallbackResponse) handler.handle(params);
-        verify(dashboardNotificationService).createOfflineResponseDashboardNotification(any(), any(), anyString());
-        assertThat(response).isNotNull();
-    }
-
-    @Test
-    void buildResponseConfirmationReturnsCorrectMessageWhenGaHasLipAndVaryJudgeApppLRVLip() {
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
-        when(gaForLipService.isLipApp(any())).thenReturn(true);
-        when(gaForLipService.isLipResp(any())).thenReturn(false);
-        CallbackParams params = callbackParamsOf(getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
+        CallbackParams params = callbackParamsOf(getVaryCase(),
                                                  CallbackType.SUBMITTED);
         var response = (SubmittedCallbackResponse) handler.handle(params);
         verify(dashboardNotificationService).createOfflineResponseDashboardNotification(any(), any(), anyString());
@@ -297,7 +280,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address").setPostcode("post code")
                           .setCourtName("Court Name").setRegion("Region"));
-        when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
+        when(locationRefDataService.getCourtLocations(any(), any())).thenReturn(locations);
 
         CallbackParams params = callbackParamsOf(getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
                                                  CallbackType.ABOUT_TO_START);
@@ -314,7 +297,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address").setPostcode("post code")
                           .setCourtName("Court Name").setRegion("Region"));
-        when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
+        when(locationRefDataService.getCourtLocations(any(), any())).thenReturn(locations);
         when(gaForLipService.isLipResp(any())).thenReturn(true);
         GeneralApplicationCaseData caseData =
             new GeneralApplicationCaseData().ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).generalAppUrgencyRequirement(
@@ -341,7 +324,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address").setPostcode("post code")
                           .setCourtName("Court Name").setRegion("Region"));
-        when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
+        when(locationRefDataService.getCourtLocations(any(), any())).thenReturn(locations);
 
         GeneralApplicationCaseData caseData = getCaseWithRespondentResponse();
         GeneralApplicationCaseData updateCaseData = caseData.copy();
@@ -368,7 +351,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address").setPostcode("post code")
                           .setCourtName("Court Name").setRegion("Region"));
-        when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
+        when(locationRefDataService.getCourtLocations(any(), any())).thenReturn(locations);
 
         GeneralApplicationCaseData caseData = getCaseWithRespondentResponse();
         GeneralApplicationCaseData updateCaseData = caseData.copy();
@@ -393,7 +376,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address").setPostcode("post code")
                           .setCourtName("Court Name").setRegion("Region"));
-        when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
+        when(locationRefDataService.getCourtLocations(any(), any())).thenReturn(locations);
 
         CallbackParams params = callbackParamsOf(getCase(AWAITING_RESPONDENT_RESPONSE),
                                                  CallbackType.ABOUT_TO_START);
@@ -973,9 +956,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         assertThat(responseCaseData.getGeneralAppRespondDocument()).isNull();
         assertThat(responseCaseData.getGeneralAppRespondReason()).isNull();
         assertThat(responseCaseData.getGeneralAppRespondent1Representative().getGeneralAppRespondent1Representative()).isNull();
-        assertThat(responseCaseData.getGaAddlDoc().size()).isEqualTo(1);
-        assertThat(responseCaseData.getGaAddlDocStaff().size()).isEqualTo(1);
-        assertThat(responseCaseData.getGaAddlDocRespondentSol().size()).isEqualTo(1);
+        assertThat(responseCaseData.getGaAddlDoc()).hasSize(1);
+        assertThat(responseCaseData.getGaAddlDocStaff()).hasSize(1);
+        assertThat(responseCaseData.getGaAddlDocRespondentSol()).hasSize(1);
         assertThat(responseCaseData.getGaAddlDoc().getFirst().getValue().getDocumentName()).isEqualTo("Respond evidence");
         assertThat(responseCaseData.getGaAddlDoc().getFirst().getValue().getCreatedBy()).isEqualTo("Respondent One");
         assertThat(responseCaseData.getGaAddlDoc().getFirst().getValue().getDocumentLink().getCategoryID()).isEqualTo("applications");
@@ -1023,9 +1006,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         assertThat(responseCaseData.getGeneralAppRespondDocument()).isNull();
         assertThat(responseCaseData.getGeneralAppRespondReason()).isNull();
         assertThat(responseCaseData.getGeneralAppRespondent1Representative().getGeneralAppRespondent1Representative()).isNull();
-        assertThat(responseCaseData.getGaAddlDoc().size()).isEqualTo(1);
-        assertThat(responseCaseData.getGaAddlDocStaff().size()).isEqualTo(1);
-        assertThat(responseCaseData.getGaAddlDocRespondentSolTwo().size()).isEqualTo(1);
+        assertThat(responseCaseData.getGaAddlDoc()).hasSize(1);
+        assertThat(responseCaseData.getGaAddlDocStaff()).hasSize(1);
+        assertThat(responseCaseData.getGaAddlDocRespondentSolTwo()).hasSize(1);
         assertThat(responseCaseData.getGaAddlDoc().getFirst().getValue().getDocumentName()).isEqualTo("Respond evidence");
         assertThat(responseCaseData.getGaAddlDoc().getFirst().getValue().getCreatedBy()).isEqualTo("Respondent Two");
         assertThat(responseCaseData.getGaAddlDoc().getFirst().getValue().getDocumentLink().getCategoryID()).isEqualTo("applications");
@@ -1069,9 +1052,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         assertThat(responseCaseData.getGeneralAppRespondConsentDocument()).isNull();
         assertThat(responseCaseData.getGeneralAppRespondConsentReason()).isNull();
         assertThat(responseCaseData.getGaRespondentConsent()).isNull();
-        assertThat(responseCaseData.getGaAddlDoc().size()).isEqualTo(1);
-        assertThat(responseCaseData.getGaAddlDocStaff().size()).isEqualTo(1);
-        assertThat(responseCaseData.getGaAddlDocRespondentSol().size()).isEqualTo(1);
+        assertThat(responseCaseData.getGaAddlDoc()).hasSize(1);
+        assertThat(responseCaseData.getGaAddlDocStaff()).hasSize(1);
+        assertThat(responseCaseData.getGaAddlDocRespondentSol()).hasSize(1);
     }
 
     @Test
@@ -1117,9 +1100,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         assertThat(responseCaseData.getRespondentsResponses().getFirst().getValue()
                 .getGaRespondentResponseReason()).isEqualTo(expectedReason);
         assertThat(responseCaseData.getGeneralAppRespondDebtorDocument()).isNull();
-        assertThat(responseCaseData.getGaAddlDoc().size()).isEqualTo(1);
-        assertThat(responseCaseData.getGaAddlDocStaff().size()).isEqualTo(1);
-        assertThat(responseCaseData.getGaAddlDocRespondentSol().size()).isEqualTo(1);
+        assertThat(responseCaseData.getGaAddlDoc()).hasSize(1);
+        assertThat(responseCaseData.getGaAddlDocStaff()).hasSize(1);
+        assertThat(responseCaseData.getGaAddlDocRespondentSol()).hasSize(1);
     }
 
     @Test
@@ -1397,7 +1380,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         return respondentSols;
     }
 
-    private GeneralApplicationCaseData getVaryCase(CaseState state) {
+    private GeneralApplicationCaseData getVaryCase() {
         List<GeneralApplicationTypes> types = List.of(
             (VARY_PAYMENT_TERMS_OF_JUDGMENT));
         DynamicList dynamicListTest = fromList(getSampleCourLocations());
@@ -1430,7 +1413,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                                  .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
                                  .setStatus(BusinessProcessStatus.STARTED)
                                  .setActivityId(ACTIVITY_ID))
-            .ccdState(state)
+            .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .build();
     }
 
@@ -1556,7 +1539,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     private List<String> locationsFromDynamicList(DynamicList dynamicList) {
         return dynamicList.getListItems().stream()
             .map(DynamicListElement::getLabel)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     protected List<String> getSampleCourLocations() {
