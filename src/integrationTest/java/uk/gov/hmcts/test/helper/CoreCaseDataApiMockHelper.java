@@ -12,7 +12,9 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
@@ -43,7 +45,7 @@ public class CoreCaseDataApiMockHelper {
     }
 
     public void resetMocks() {
-        org.mockito.Mockito.reset(coreCaseDataApi, idamClient, authTokenGenerator);
+        reset(coreCaseDataApi, idamClient, authTokenGenerator);
     }
 
     public void mockElasticSearchResult(SearchResult searchResult) {
@@ -118,7 +120,7 @@ public class CoreCaseDataApiMockHelper {
             any(),
             any(),
             any(),
-            org.mockito.ArgumentMatchers.anyBoolean(),
+            anyBoolean(),
             any()
         );
     }
