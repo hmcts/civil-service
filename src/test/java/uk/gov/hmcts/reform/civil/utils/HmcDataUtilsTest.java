@@ -1351,12 +1351,13 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnLocation_whenInvoked() {
             List<LocationRefData> locations = List.of(new LocationRefData().setEpimmsId("venue"));
-            when(locationRefDataService.getHearingCourtLocations("authToken"))
+            when(locationRefDataService.getHearingCourtLocations("authToken", "AAA6"))
                 .thenReturn(locations);
             LocationRefData locationRefData = HmcDataUtils.getLocationRefData(
                 "HER123",
                 "venue",
                 "authToken",
+                "AAA6",
                 locationRefDataService
             );
 
@@ -1365,14 +1366,15 @@ class HmcDataUtilsTest {
 
         @Test
         void shouldThrowException_whenLocationIsNull() {
-            when(locationRefDataService.getHearingCourtLocations("abc"))
-                .thenReturn(null);
+            when(locationRefDataService.getHearingCourtLocations("authToken", "AAA6"))
+                .thenReturn(List.of());
             assertThrows(
                 IllegalArgumentException.class,
                 () -> HmcDataUtils.getLocationRefData(
                     "HER123",
                     "abc",
                     "authToken",
+                    "AAA6",
                     locationRefDataService));
         }
     }
