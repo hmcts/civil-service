@@ -48,8 +48,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -139,7 +139,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
 
         List<LocationRefData> locations = List.of(new LocationRefData()
                                                       .setEpimmsId(EPIMS));
-        when(locationRefDataService.getHearingCourtLocations(anyString()))
+        when(locationRefDataService.getHearingCourtLocations(anyString(), anyString()))
             .thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
         HearingDay hearingDay = new HearingDay()
@@ -209,7 +209,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
 
         List<LocationRefData> locations = List.of(new LocationRefData()
                                                       .setEpimmsId(EPIMS));
-        when(locationRefDataService.getHearingCourtLocations(anyString()))
+        when(locationRefDataService.getHearingCourtLocations(anyString(), anyString()))
             .thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
         HearingDay hearingDay = new HearingDay()
@@ -284,7 +284,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
 
         List<LocationRefData> locations = List.of(new LocationRefData()
                                                       .setEpimmsId(EPIMS));
-        when(locationRefDataService.getHearingCourtLocations(anyString()))
+        when(locationRefDataService.getHearingCourtLocations(anyString(), anyString()))
             .thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
         HearingDay hearingDay = new HearingDay()
@@ -342,7 +342,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
 
         List<LocationRefData> locations = List.of(new LocationRefData()
                                                       .setEpimmsId(EPIMS));
-        when(locationRefDataService.getHearingCourtLocations(anyString()))
+        when(locationRefDataService.getHearingCourtLocations(anyString(), anyString()))
             .thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
         HearingDay hearingDay = new HearingDay()
@@ -404,7 +404,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
 
         List<LocationRefData> locations = List.of(new LocationRefData()
                                                       .setEpimmsId(EPIMS));
-        when(locationRefDataService.getHearingCourtLocations(anyString()))
+        when(locationRefDataService.getHearingCourtLocations(anyString(), anyString()))
             .thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
         HearingDay hearingDay = new HearingDay()
@@ -474,7 +474,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         inputVariables.setCaseId(CASE_ID);
 
         List<LocationRefData> locations = List.of(new LocationRefData().setEpimmsId(EPIMS));
-        when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(anyString(), anyString())).thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
         HearingDay hearingDay = new HearingDay()
             .setHearingStartDateTime(LocalDateTime.of(2023, 7, 1, 9, 0, 0))
@@ -559,7 +559,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         params.getRequest().setEventId(GENERATE_HEARING_NOTICE_HMC.name());
 
         try (MockedStatic<HmcDataUtils> utils = Mockito.mockStatic(HmcDataUtils.class, Answers.CALLS_REAL_METHODS)) {
-            utils.when(() -> HmcDataUtils.getLocationRefData(HEARING_ID, EPIMS, "BEARER_TOKEN", locationRefDataService))
+            utils.when(() -> HmcDataUtils.getLocationRefData(HEARING_ID, EPIMS, "BEARER_TOKEN", "AAA6", locationRefDataService))
                 .thenReturn(null);
 
             AboutToStartOrSubmitCallbackResponse actual = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

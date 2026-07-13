@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_AD
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.PaymentDateService.DATE_FORMATTER;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 
 @Component
 @RequiredArgsConstructor
@@ -125,14 +126,17 @@ public class PopulateCaseDataTask implements CaseTask {
 
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(
+            authToken,
+            getCaseServiceId(callbackParams.getCaseData().getCaseAccessCategory())
+        );
     }
 
     private void populatePreviewDocuments(CaseData caseData) {
         if (caseData.getSystemGeneratedCaseDocuments() == null) {
             caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         }
-        
+
         if (caseData.getRespondent2DocumentURL() == null) {
             caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
                 if (document.getValue().getDocumentName().contains("defendant_directions_questionnaire_form")) {
