@@ -18,12 +18,14 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
+import uk.gov.hmcts.reform.civil.exceptions.UpstreamUnavailableException;
 import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 import uk.gov.hmcts.reform.civil.service.search.exceptions.SearchServiceCaseNotFoundException;
 
 import static uk.gov.hmcts.reform.civil.utils.ContentCachingRequestWrapperUtil.getCaseId;
 import static uk.gov.hmcts.reform.civil.utils.ContentCachingRequestWrapperUtil.getUserId;
+import static uk.gov.hmcts.reform.civil.utils.FeignRetryUtils.RETRY_AFTER;
 
 @Slf4j
 @ControllerAdvice
@@ -41,6 +43,20 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
                       )
         );
         return new ResponseEntity<>("Case was not found", new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UpstreamUnavailableException.class)
+    public ResponseEntity<Object> upstreamUnavailable(UpstreamUnavailableException upstreamUnavailableException) {
+        String errorMessage = "Upstream service %s unavailable with message: %s for case %s run by user %s";
+        log.error(errorMessage.formatted(
+            upstreamUnavailableException.getUpstreamService(),
+            upstreamUnavailableException.getMessage(),
+            upstreamUnavailableException.getCaseId(),
+            upstreamUnavailableException.getUserId()
+        ));
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(RETRY_AFTER, "10");
+        return new ResponseEntity<>(upstreamUnavailableException.getMessage(), headers, HttpStatus.SERVICE_UNAVAILABLE);
     }
 
     @ExceptionHandler(SearchServiceCaseNotFoundException.class)
