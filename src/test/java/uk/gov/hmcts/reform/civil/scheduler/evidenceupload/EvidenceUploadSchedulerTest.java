@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.service.search.EvidenceUploadNotificationSearch
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.reform.civil.scheduler.evidenceupload.EvidenceUploadScheduler.SCHEDULER_NAME;
 
 @ExtendWith(MockitoExtension.class)
 class EvidenceUploadSchedulerTest {
@@ -34,7 +33,7 @@ class EvidenceUploadSchedulerTest {
         scheduler.runScheduledTask();
 
         verify(scheduledTaskRunner).run(
-            eq(SCHEDULER_NAME),
+            eq(scheduler.getName()),
             any(),
             eq(evidenceUploadSchedulerTask)
         );
