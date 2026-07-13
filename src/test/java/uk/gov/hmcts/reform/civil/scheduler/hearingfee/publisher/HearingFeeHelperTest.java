@@ -3,23 +3,35 @@ package uk.gov.hmcts.reform.civil.scheduler.hearingfee.publisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.Time;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.lenient;
 
+@ExtendWith(MockitoExtension.class)
 class HearingFeeHelperTest {
 
     private HearingFeeHelper helper;
 
+    @Mock
+    private Time time;
+
+    private static final LocalDateTime NOW = LocalDateTime.of(2023, 1, 1, 12, 0);
+
     @BeforeEach
     void setUp() {
-        helper = new HearingFeeHelper();
+        lenient().when(time.now()).thenReturn(NOW);
+        helper = new HearingFeeHelper(time);
     }
 
     @Nested
@@ -29,7 +41,7 @@ class HearingFeeHelperTest {
         void shouldReturnTrue_whenSuccessfulPaymentBeforeDueDate() {
             PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS);
             CaseData caseData = CaseDataBuilder.builder()
-                .hearingDueDate(LocalDate.now().minusDays(1))
+                .hearingDueDate(NOW.toLocalDate().minusDays(1))
                 .build();
 
             assertThat(helper.isHearingFeePaid(paymentDetails, caseData)).isTrue();
@@ -50,7 +62,7 @@ class HearingFeeHelperTest {
         void shouldReturnFalse_whenSuccessfulPaymentOnDueDate() {
             PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS);
             CaseData caseData = CaseDataBuilder.builder()
-                .hearingDueDate(LocalDate.now())
+                .hearingDueDate(NOW.toLocalDate())
                 .build();
 
             assertThat(helper.isHearingFeePaid(paymentDetails, caseData)).isFalse();
@@ -60,7 +72,7 @@ class HearingFeeHelperTest {
         void shouldReturnFalse_whenSuccessfulPaymentAfterDueDate() {
             PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS);
             CaseData caseData = CaseDataBuilder.builder()
-                .hearingDueDate(LocalDate.now().plusDays(1))
+                .hearingDueDate(NOW.toLocalDate().plusDays(1))
                 .build();
 
             assertThat(helper.isHearingFeePaid(paymentDetails, caseData)).isFalse();
@@ -70,7 +82,7 @@ class HearingFeeHelperTest {
         void shouldReturnFalse_whenFailedPaymentAndNoHWF() {
             PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.FAILED);
             CaseData caseData = CaseDataBuilder.builder()
-                .hearingDueDate(LocalDate.now().minusDays(1))
+                .hearingDueDate(NOW.toLocalDate().minusDays(1))
                 .build();
 
             assertThat(helper.isHearingFeePaid(paymentDetails, caseData)).isFalse();
@@ -79,7 +91,7 @@ class HearingFeeHelperTest {
         @Test
         void shouldReturnFalse_whenNullPaymentDetailsAndNoHWF() {
             CaseData caseData = CaseDataBuilder.builder()
-                .hearingDueDate(LocalDate.now().minusDays(1))
+                .hearingDueDate(NOW.toLocalDate().minusDays(1))
                 .build();
 
             assertThat(helper.isHearingFeePaid(null, caseData)).isFalse();
@@ -92,7 +104,7 @@ class HearingFeeHelperTest {
         @Test
         void shouldReturnTrue_whenNullPaymentDetailsAndAfterDueDate() {
             CaseData caseData = CaseDataBuilder.builder()
-                .hearingDueDate(LocalDate.now().minusDays(1))
+                .hearingDueDate(NOW.toLocalDate().minusDays(1))
                 .build();
 
             assertThat(helper.isHearingFeeUnpaid(null, caseData)).isTrue();
@@ -102,7 +114,7 @@ class HearingFeeHelperTest {
         void shouldReturnTrue_whenFailedPaymentAndAfterDueDate() {
             PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.FAILED);
             CaseData caseData = CaseDataBuilder.builder()
-                .hearingDueDate(LocalDate.now().minusDays(1))
+                .hearingDueDate(NOW.toLocalDate().minusDays(1))
                 .build();
 
             assertThat(helper.isHearingFeeUnpaid(paymentDetails, caseData)).isTrue();
@@ -112,7 +124,7 @@ class HearingFeeHelperTest {
         void shouldReturnFalse_whenSuccessfulPaymentAndAfterDueDate() {
             PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS);
             CaseData caseData = CaseDataBuilder.builder()
-                .hearingDueDate(LocalDate.now().minusDays(1))
+                .hearingDueDate(NOW.toLocalDate().minusDays(1))
                 .build();
 
             assertThat(helper.isHearingFeeUnpaid(paymentDetails, caseData)).isFalse();
@@ -121,7 +133,7 @@ class HearingFeeHelperTest {
         @Test
         void shouldReturnFalse_whenNullPaymentDetailsButBeforeDueDate() {
             CaseData caseData = CaseDataBuilder.builder()
-                .hearingDueDate(LocalDate.now().plusDays(1))
+                .hearingDueDate(NOW.toLocalDate().plusDays(1))
                 .build();
 
             assertThat(helper.isHearingFeeUnpaid(null, caseData)).isFalse();
@@ -131,7 +143,7 @@ class HearingFeeHelperTest {
         void shouldReturnFalse_whenFailedPaymentButBeforeDueDate() {
             PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.FAILED);
             CaseData caseData = CaseDataBuilder.builder()
-                .hearingDueDate(LocalDate.now().plusDays(1))
+                .hearingDueDate(NOW.toLocalDate().plusDays(1))
                 .build();
 
             assertThat(helper.isHearingFeeUnpaid(paymentDetails, caseData)).isFalse();

@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.scheduler.hearingfee.publisher.strategy.PaidEve
 import uk.gov.hmcts.reform.civil.scheduler.hearingfee.publisher.strategy.UnpaidEventStrategy;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.LongFunction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,7 +39,7 @@ class PreMultiIntermediateClaimProviderTest {
     void shouldReturnPaidPublisher_whenPaidStrategySupportsCaseData() {
         when(paidEventStrategy.supports(caseData)).thenReturn(true);
         when(paidEventStrategy.getEventName()).thenReturn("PaidEvent");
-        Function<Long, Object> factory = id -> new Object();
+        LongFunction<Object> factory = id -> new Object();
         when(paidEventStrategy.getEventFactory()).thenReturn(factory);
         when(hearingFeeEventPublisher.createPublisher(any(), eq(factory))).thenReturn(publisher);
         when(caseData.getCcdCaseReference()).thenReturn(123456789L);
@@ -55,7 +55,7 @@ class PreMultiIntermediateClaimProviderTest {
     void shouldReturnUnpaidPublisher_whenPaidStrategyDoesNotSupportCaseData() {
         when(paidEventStrategy.supports(caseData)).thenReturn(false);
         when(unpaidEventStrategy.getEventName()).thenReturn("UnpaidEvent");
-        Function<Long, Object> factory = id -> new Object();
+        LongFunction<Object> factory = id -> new Object();
         when(unpaidEventStrategy.getEventFactory()).thenReturn(factory);
         when(hearingFeeEventPublisher.createPublisher(any(), eq(factory))).thenReturn(publisher);
         when(caseData.getCcdCaseReference()).thenReturn(123456789L);

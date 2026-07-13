@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.scheduler.hearingfee.publisher.HearingFeeHelper;
 
-import java.util.function.Function;
+import java.util.function.LongFunction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -51,7 +51,7 @@ class PaidEventStrategyTest {
 
     @Test
     void shouldReturnCorrectEventFactory() {
-        Function<Long, Object> eventFactory = strategy.getEventFactory();
+        LongFunction<Object> eventFactory = strategy.getEventFactory();
         Object event = eventFactory.apply(123L);
         assertThat(event).isInstanceOf(HearingFeePaidEvent.class);
         assertThat(((HearingFeePaidEvent) event).getCaseId()).isEqualTo(123L);

@@ -6,7 +6,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.LongFunction;
 
 @Component
 @AllArgsConstructor
@@ -15,8 +15,8 @@ public class HearingFeeEventPublisher {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public Consumer<Long> createPublisher(String logMessage, Function<Long, Object> eventFactory) {
-        return (caseId) -> {
+    public Consumer<Long> createPublisher(String logMessage, LongFunction<Object> eventFactory) {
+        return caseId -> {
             log.info(logMessage);
             applicationEventPublisher.publishEvent(eventFactory.apply(caseId));
         };

@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
-import java.util.function.Function;
+import java.util.function.LongFunction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,7 +34,7 @@ class NoFeeDueEventStrategyTest {
 
     @Test
     void shouldReturnCorrectEventFactory() {
-        Function<Long, Object> eventFactory = strategy.getEventFactory();
+        LongFunction<Object> eventFactory = strategy.getEventFactory();
         Object event = eventFactory.apply(123L);
         assertThat(event).isInstanceOf(NoHearingFeeDueEvent.class);
         assertThat(((NoHearingFeeDueEvent) event).getCaseId()).isEqualTo(123L);

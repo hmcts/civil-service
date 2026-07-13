@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.scheduler.hearingfee.publisher.strategy.Hearing
 
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.LongFunction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,7 +45,7 @@ class MultiOrIntermediateTrackProviderTest {
         when(strategy1.supports(caseData)).thenReturn(false);
         when(strategy2.supports(caseData)).thenReturn(true);
         when(strategy2.getEventName()).thenReturn("TestEvent");
-        Function<Long, Object> factory = id -> new Object();
+        LongFunction<Object> factory = id -> new Object();
         when(strategy2.getEventFactory()).thenReturn(factory);
         when(hearingFeeEventPublisher.createPublisher(any(), eq(factory))).thenReturn(publisher);
         when(caseData.getCcdCaseReference()).thenReturn(123456789L);
@@ -63,7 +63,10 @@ class MultiOrIntermediateTrackProviderTest {
         when(strategy2.supports(caseData)).thenReturn(false);
         when(caseData.getCcdCaseReference()).thenReturn(123456789L);
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> provider.getPublisher(caseData));
+        IllegalStateException exception = assertThrows(
+            IllegalStateException.class,
+            () -> provider.getPublisher(caseData)
+        );
         assertThat(exception.getMessage()).contains("Hearing fee payment details are not set for case: 123456789");
     }
 }

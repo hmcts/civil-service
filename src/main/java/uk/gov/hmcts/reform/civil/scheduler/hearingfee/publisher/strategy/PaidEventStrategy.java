@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.scheduler.hearingfee.publisher.HearingFeeHelper;
 
-import java.util.function.Function;
+import java.util.function.LongFunction;
 
 @Component
 @AllArgsConstructor
@@ -22,7 +22,7 @@ public class PaidEventStrategy implements HearingFeeEventStrategy {
     }
 
     @Override
-    public Function<Long, Object> getEventFactory() {
+    public LongFunction<Object> getEventFactory() {
         return HearingFeePaidEvent::new;
     }
 

@@ -4,11 +4,16 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-
-import java.time.LocalDate;
+import uk.gov.hmcts.reform.civil.service.Time;
 
 @Component
 public class HearingFeeHelper {
+
+    private final Time time;
+
+    public HearingFeeHelper(Time time) {
+        this.time = time;
+    }
 
     public boolean isHearingFeePaid(PaymentDetails hearingFeePaymentDetails, CaseData caseData) {
         return isSuccessfulPaymentBeforeDueDate(hearingFeePaymentDetails, caseData)
@@ -17,12 +22,12 @@ public class HearingFeeHelper {
 
     public boolean isHearingFeeUnpaid(PaymentDetails hearingFeePaymentDetails, CaseData caseData) {
         return (isFailedPayment(hearingFeePaymentDetails) || hearingFeePaymentDetails == null)
-            && caseData.getHearingDueDate().isBefore(LocalDate.now());
+            && caseData.getHearingDueDate().isBefore(time.now().toLocalDate());
     }
 
     private boolean isSuccessfulPaymentBeforeDueDate(PaymentDetails hearingFeePaymentDetails, CaseData caseData) {
         return isSuccessfulPayment(hearingFeePaymentDetails)
-            && caseData.getHearingDueDate().isBefore(LocalDate.now());
+            && caseData.getHearingDueDate().isBefore(time.now().toLocalDate());
     }
 
     private boolean isSuccessfulPayment(PaymentDetails paymentDetails) {

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.event.NoHearingFeeDueEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
-import java.util.function.Function;
+import java.util.function.LongFunction;
 
 @Component
 @Order(1)
@@ -17,7 +17,7 @@ public class NoFeeDueEventStrategy implements HearingFeeEventStrategy {
     }
 
     @Override
-    public Function<Long, Object> getEventFactory() {
+    public LongFunction<Object> getEventFactory() {
         return NoHearingFeeDueEvent::new;
     }
 

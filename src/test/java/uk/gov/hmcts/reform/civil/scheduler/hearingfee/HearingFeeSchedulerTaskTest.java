@@ -48,7 +48,6 @@ class HearingFeeSchedulerTaskTest {
 
     @Test
     void shouldReturnCaseId() {
-        CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(CASE_ID).build();
         CaseDetails caseDetails = CaseDetails.builder().id(CASE_ID).build();
         assertThat(task.getItemId(caseDetails)).isEqualTo(CASE_ID);
     }
