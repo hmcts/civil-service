@@ -27,8 +27,9 @@ import static org.mockito.Mockito.when;
 /**
  * Verifies the actuator WIRING that the unit test cannot: that {@code s2sSecretReadiness}
  * (the contributor name Spring derives from {@link S2sSecretReadinessHealthIndicator}) matches the
- * {@code management.endpoint.health.group.readiness.include} entry in application.yaml, and that the
- * indicator can actually drag the readiness GROUP to DOWN (which is what pulls the pod from traffic).
+ * {@code management.endpoint.health.group.s2s.include} entry in application.yaml, that the indicator
+ * can drag its OWN {@code /health/s2s} group to DOWN, and crucially that it does NOT sit in the
+ * Kubernetes {@code readiness} group (so an S2S blip cannot pull the pod out of rotation).
  *
  * <p>Only the actuator health infrastructure and this indicator are loaded, with a mocked
  * {@link AuthTokenGenerator}, so the full civil-service context is not required.</p>
@@ -51,7 +52,9 @@ import static org.mockito.Mockito.when;
         "management.health.readinessstate.enabled=true",
         "management.health.livenessstate.enabled=true",
         // mirror application.yaml exactly so a rename/typo of the contributor is caught here
-        "management.endpoint.health.group.readiness.include=readinessState, s2sSecretReadiness",
+        "management.endpoint.health.group.s2s.include=s2sSecretReadiness",
+        // the default k8s readiness membership: readinessState only, WITHOUT the S2S check
+        "management.endpoint.health.group.readiness.include=readinessState",
         // keep the scheduler out of the test; we drive refresh() explicitly
         "civil.health.s2s.initial-delay-ms=600000",
         "civil.health.s2s.check-interval-ms=600000",
@@ -82,26 +85,38 @@ class S2sSecretReadinessHealthGroupIntegrationTest {
     private S2sSecretReadinessHealthIndicator indicator;
 
     private void markContextAcceptingTraffic() {
-        // make readinessState UP so the group status reflects our indicator, not the availability default
         AvailabilityChangeEvent.publish(context, ReadinessState.ACCEPTING_TRAFFIC);
     }
 
     @Test
-    void readinessGroupIncludesTheIndicatorAndIsUpWhenS2sTokenGenerates() {
-        markContextAcceptingTraffic();
+    void s2sGroupIncludesTheIndicatorAndIsUpWhenS2sTokenGenerates() {
         when(serviceAuthTokenGenerator.generate()).thenReturn("Bearer valid");
         indicator.refresh();
 
-        HealthComponent readiness = healthEndpoint.healthForPath("readiness");
+        HealthComponent s2s = healthEndpoint.healthForPath("s2s");
 
-        assertThat(readiness.getStatus()).isEqualTo(Status.UP);
-        assertThat(((CompositeHealth) readiness).getComponents())
-            .as("readiness group must reference the contributor named in application.yaml")
+        assertThat(s2s.getStatus()).isEqualTo(Status.UP);
+        assertThat(((CompositeHealth) s2s).getComponents())
+            .as("s2s group must reference the contributor named in application.yaml")
             .containsKey("s2sSecretReadiness");
     }
 
     @Test
-    void readinessGroupGoesDownWhenS2sTokenGenerationFails() {
+    void s2sGroupGoesDownWhenS2sTokenGenerationFails() {
+        when(serviceAuthTokenGenerator.generate())
+            .thenThrow(new IllegalStateException("microservice key is null"));
+        indicator.refresh();
+
+        HealthComponent s2s = healthEndpoint.healthForPath("s2s");
+
+        assertThat(s2s.getStatus())
+            .as("a DOWN S2S indicator must drag its own s2s group DOWN for alerting")
+            .isEqualTo(Status.DOWN);
+        assertThat(((CompositeHealth) s2s).getComponents()).containsKey("s2sSecretReadiness");
+    }
+
+    @Test
+    void readinessGroupDoesNotIncludeTheIndicator() {
         markContextAcceptingTraffic();
         when(serviceAuthTokenGenerator.generate())
             .thenThrow(new IllegalStateException("microservice key is null"));
@@ -109,9 +124,11 @@ class S2sSecretReadinessHealthGroupIntegrationTest {
 
         HealthComponent readiness = healthEndpoint.healthForPath("readiness");
 
+        assertThat(((CompositeHealth) readiness).getComponents())
+            .as("the S2S check must NOT gate the Kubernetes readiness probe")
+            .doesNotContainKey("s2sSecretReadiness");
         assertThat(readiness.getStatus())
-            .as("a DOWN S2S indicator must drag the readiness group DOWN so the pod leaves the Service")
-            .isEqualTo(Status.DOWN);
-        assertThat(((CompositeHealth) readiness).getComponents()).containsKey("s2sSecretReadiness");
+            .as("a DOWN S2S check must not drag readiness DOWN and pull the pod from traffic")
+            .isEqualTo(Status.UP);
     }
 }
