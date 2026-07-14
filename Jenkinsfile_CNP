@@ -258,7 +258,7 @@ def checkForCcdDefinitionBranchLabel() {
   for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "civilDefinitionBranch:")) {
     return label.minus("civilDefinitionBranch:").trim()
   }
-  return "DTSCCI-0000-fix-functional-test-failures-civil-service"
+  return "master"
 }
 
 def getFunctionalTestsGroups() {
