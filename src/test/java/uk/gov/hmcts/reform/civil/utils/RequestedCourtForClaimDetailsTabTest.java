@@ -56,7 +56,7 @@ class RequestedCourtForClaimDetailsTabTest {
             new LocationRefData().setEpimmsId("00003").setCourtLocationCode("00003")
                 .setSiteName("court 3").setCourtAddress("3 address").setPostcode("Y03 7RB")
         );
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(any(), any())).thenReturn(locations);
     }
 
     @Test
