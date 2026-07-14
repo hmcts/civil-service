@@ -30,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.service.dj.StandardDirectionOrderDjConst
 import static uk.gov.hmcts.reform.civil.service.dj.StandardDirectionOrderDjConstants.HEARING_CHANNEL;
 import static uk.gov.hmcts.reform.civil.service.dj.StandardDirectionOrderDjConstants.SPEC_SERVICE_ID;
 import static uk.gov.hmcts.reform.civil.service.dj.StandardDirectionOrderDjConstants.UNSPEC_SERVICE_ID;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 
 @Service
 @Slf4j
@@ -141,7 +142,8 @@ public class DjLocationAndToggleService {
 
     private DynamicList buildLocationList(CallbackParams callbackParams, CaseData caseData) {
         List<LocationRefData> locations = locationReferenceDataService.getCourtLocationsForDefaultJudgments(
-            callbackParams.getParams().get(BEARER_TOKEN).toString()
+            callbackParams.getParams().get(BEARER_TOKEN).toString(),
+            getCaseServiceId(caseData.getCaseAccessCategory())
         );
 
         Optional<RequestedCourt> preferredCourt;

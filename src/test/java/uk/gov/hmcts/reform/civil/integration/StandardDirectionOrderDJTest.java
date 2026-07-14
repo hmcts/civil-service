@@ -29,12 +29,12 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.StandardDirectionOrderDJ;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.DirectionsOrderStageExecutor;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.pipeline.DirectionsOrderCallbackPipeline;
-import uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl.DjPrePopulateTask;
-import uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl.DjOrderDetailsTask;
-import uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl.DjValidationTask;
-import uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl.DjDocumentTask;
-import uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl.DjSubmissionTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl.DjConfirmationTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl.DjDocumentTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl.DjOrderDetailsTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl.DjPrePopulateTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl.DjSubmissionTask;
+import uk.gov.hmcts.reform.civil.handler.callback.user.dj.tasks.impl.DjValidationTask;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -48,32 +48,32 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjAuthorisationFieldService;
-import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjDirectionsToggleService;
-import uk.gov.hmcts.reform.civil.service.dj.DjCreditHireDirectionsService;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
+import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderCaseProgressionService;
+import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderParticipantService;
 import uk.gov.hmcts.reform.civil.service.dj.DjBuildingDisputeDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjClinicalDirectionsService;
-import uk.gov.hmcts.reform.civil.service.dj.DjHousingDisrepairDirectionsService;
-import uk.gov.hmcts.reform.civil.service.dj.DjPpiDirectionsService;
-import uk.gov.hmcts.reform.civil.service.dj.DjRoadTrafficAccidentDirectionsService;
-import uk.gov.hmcts.reform.civil.service.dj.DjOrderDetailsService;
-import uk.gov.hmcts.reform.civil.service.dj.DjValidationService;
-import uk.gov.hmcts.reform.civil.service.dj.DjDocumentService;
-import uk.gov.hmcts.reform.civil.service.dj.DjNarrativeService;
-import uk.gov.hmcts.reform.civil.service.dj.DjSubmissionService;
-import uk.gov.hmcts.reform.civil.service.dj.DjLocationAndToggleService;
+import uk.gov.hmcts.reform.civil.service.dj.DjCreditHireDirectionsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjDeadlineService;
 import uk.gov.hmcts.reform.civil.service.dj.DjDisposalDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjDisposalNarrativeService;
-import uk.gov.hmcts.reform.civil.service.dj.DjDeadlineService;
+import uk.gov.hmcts.reform.civil.service.dj.DjDocumentService;
+import uk.gov.hmcts.reform.civil.service.dj.DjHousingDisrepairDirectionsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjLocationAndToggleService;
+import uk.gov.hmcts.reform.civil.service.dj.DjNarrativeService;
+import uk.gov.hmcts.reform.civil.service.dj.DjOrderDetailsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjPpiDirectionsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjRoadTrafficAccidentDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjSpecialistDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjSpecialistNarrativeService;
-import uk.gov.hmcts.reform.civil.service.dj.DjWelshLanguageService;
+import uk.gov.hmcts.reform.civil.service.dj.DjSubmissionService;
 import uk.gov.hmcts.reform.civil.service.dj.DjTrialDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjTrialNarrativeService;
-import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderParticipantService;
-import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderCaseProgressionService;
-import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
+import uk.gov.hmcts.reform.civil.service.dj.DjValidationService;
+import uk.gov.hmcts.reform.civil.service.dj.DjWelshLanguageService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjAuthorisationFieldService;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjDirectionsToggleService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoJourneyToggleService;
@@ -110,7 +110,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_BASIC_RATE_EVIDENCE_WITH_LIABILITY_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_CLAIMANT_EVIDENCE_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DEFENDANT_UPLOAD_DJ;
@@ -120,11 +119,8 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_DEADLINE_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_PROMPT_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_WITNESS_LIMIT_DJ;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_COUNT_LIMIT_NOTE_DJ;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_PAGE_LIMIT_PREFIX;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_PAGE_LIMIT_SUFFIX_DJ;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_FINAL_HEARING_LISTING_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_FINAL_HEARING_LISTING_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_CLAIMANT_SEND_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_COUNTER_SEND;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_SCHEDULE_COUNTER_UPLOAD_DJ;
@@ -133,16 +129,20 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_WITNESS_CPR32_7_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_WITNESS_TRIAL_NOTE_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_WITNESS_UPLOAD;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_TRIAL_BUNDLE_NOTICE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_TRIAL_MANUAL_BUNDLE_GUIDANCE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_LOWERCASE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_WITH_ARTICLE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ORDER_WITHOUT_HEARING_UPLOAD_TO_PORTAL_DJ;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_TRIAL_BUNDLE_NOTICE;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_TRIAL_MANUAL_BUNDLE_GUIDANCE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_ANSWERS;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_PERMISSION_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_QUESTIONS;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ROAD_TRAFFIC_ACCIDENT_UPLOAD_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_COUNT_LIMIT_NOTE_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_PAGE_LIMIT_PREFIX;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_PAGE_LIMIT_SUFFIX_DJ;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -296,7 +296,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             List<LocationRefData> locations = new ArrayList<>();
             locations.add(locationRefData);
             locations.add(locationRefData1);
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString(), anyString())).thenReturn(locations);
             Category category = new Category();
             category.setCategoryKey("HearingChannel");
             category.setKey("INTER");
@@ -665,7 +665,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 locationRefData2
             );
 
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString())).thenReturn(locations);
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString(), anyString())).thenReturn(locations);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
@@ -758,7 +758,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             List<LocationRefData> locations = new ArrayList<>();
             locations.add(locationRefData);
             locations.add(locationRefData1);
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString(), anyString())).thenReturn(locations);
             Category category = new Category();
             category.setCategoryKey("HearingChannel");
             category.setKey("INTER");
