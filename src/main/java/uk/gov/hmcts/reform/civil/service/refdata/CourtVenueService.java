@@ -84,16 +84,12 @@ public class CourtVenueService {
     }
 
     public List<LocationRefData> getHearingLocationCourts(String serviceAuth, String auth, String serviceId) {
-        return filterCachedCourtsByServiceId(serviceAuth, auth, c -> IS_HEARING_LOCATION.equals(c.getIsHearingLocation()), serviceId);
+        log.info("Fetching hearing location courts only for serviceId: {}", serviceId);
+        return filterCachedCourtsByServiceId(serviceAuth, auth, c -> IS_HEARING_LOCATION.equalsIgnoreCase(c.getIsHearingLocation()), serviceId);
     }
 
     public List<LocationRefData> getCMLAndHLCourts(String serviceAuth, String auth, String serviceId) {
         return filterCachedCourtsByServiceId(serviceAuth, auth, this::isCMLAndHL, serviceId);
-    }
-
-    public List<LocationRefData> getHearingLocationCourtsOnly(String serviceAuth, String auth, String serviceId) {
-        log.info("Fetching hearing location courts only for serviceId: {}", serviceId);
-        return filterCachedCourtsByServiceId(serviceAuth, auth, c -> IS_HEARING_LOCATION.equalsIgnoreCase(c.getIsHearingLocation()), serviceId);
     }
 
     private boolean isCMLAndHL(LocationRefData court) {

@@ -26,7 +26,7 @@ public class GeneralAppLocationRefDataService {
         log.info("Fetching GA court locations for serviceId: {}", serviceId);
         try {
             List<LocationRefData> responseEntity =
-                courtVenueService.getHearingLocationCourtsOnly(
+                courtVenueService.getHearingLocationCourts(
                     authTokenGenerator.generate(),
                     authToken,
                     serviceId);

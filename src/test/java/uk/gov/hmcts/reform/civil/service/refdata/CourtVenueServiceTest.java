@@ -152,7 +152,7 @@ class CourtVenueServiceTest {
     @ParameterizedTest()
     @ValueSource(strings = {"AAA6", "AAA7"})
     void shouldReturnHearingLocationCourtsOnly(String serviceId) {
-        List<LocationRefData> result = courtVenueService.getHearingLocationCourtsOnly(serviceAuth, auth, serviceId);
+        List<LocationRefData> result = courtVenueService.getHearingLocationCourts(serviceAuth, auth, serviceId);
         assertThat(result).containsExactlyInAnyOrder(court1, court2);
     }
 }

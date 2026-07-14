@@ -194,7 +194,7 @@ class GeneralAppLocationRefDataServiceTest {
     @CsvSource({"AAA6", "AAA7"})
     void shouldReturnLocations_whenLRDReturnsAllLocations(String serviceId) {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(courtVenueService.getHearingLocationCourtsOnly(
+        when(courtVenueService.getHearingLocationCourts(
             anyString(),
             anyString(),
             anyString()
@@ -225,7 +225,7 @@ class GeneralAppLocationRefDataServiceTest {
     @CsvSource({"AAA6", "AAA7"})
     void shouldReturnLocations_whenLRDReturnsNullBody(String serviceId) {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(courtVenueService.getHearingLocationCourtsOnly(
+        when(courtVenueService.getHearingLocationCourts(
             anyString(),
             anyString(),
             anyString()
@@ -241,7 +241,7 @@ class GeneralAppLocationRefDataServiceTest {
     @CsvSource({"AAA6", "AAA7"})
     void shouldReturnLocations_whenLRDReturnsOnlyScotlandLocations(String serviceId) {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(courtVenueService.getHearingLocationCourtsOnly(
+        when(courtVenueService.getHearingLocationCourts(
             anyString(),
             anyString(),
             anyString()
@@ -256,7 +256,7 @@ class GeneralAppLocationRefDataServiceTest {
     @CsvSource({"AAA6", "AAA7"})
     void shouldReturnLocations_whenLRDReturnsNonScotlandLocations(String serviceId) {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(courtVenueService.getHearingLocationCourtsOnly(
+        when(courtVenueService.getHearingLocationCourts(
             anyString(),
             anyString(),
             anyString()
@@ -287,7 +287,7 @@ class GeneralAppLocationRefDataServiceTest {
     @CsvSource({"AAA6", "AAA7"})
     void shouldReturnEmptyList_whenLRDThrowsException(String serviceId) {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(courtVenueService.getHearingLocationCourtsOnly(
+        when(courtVenueService.getHearingLocationCourts(
             anyString(),
             anyString(),
             anyString()

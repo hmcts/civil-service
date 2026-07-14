@@ -88,7 +88,7 @@ public class LocationReferenceDataService {
     public List<LocationRefData> getCourtLocationsForGeneralApplication(String authToken, String serviceId) {
         log.info("Fetching court locations for General Application for serviceId: {}", serviceId);
         try {
-            List<LocationRefData> responseEntity = courtVenueService.getHearingLocationCourtsOnly(
+            List<LocationRefData> responseEntity = courtVenueService.getHearingLocationCourts(
                 authTokenGenerator.generate(),
                 authToken,
                 serviceId);

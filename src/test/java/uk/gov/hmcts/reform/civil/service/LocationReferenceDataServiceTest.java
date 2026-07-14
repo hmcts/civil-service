@@ -122,7 +122,7 @@ class LocationReferenceDataServiceTest {
     @ParameterizedTest
     @CsvSource({"AAA6", "AAA7"})
     void shouldReturnSortedEnglandAndWalesCourtsForGA(String serviceId) {
-        when(courtVenueService.getHearingLocationCourtsOnly(generatedAuth, auth, serviceId))
+        when(courtVenueService.getHearingLocationCourts(generatedAuth, auth, serviceId))
             .thenReturn(getMockLocationList(serviceId));
 
         List<LocationRefData> result = service.getCourtLocationsForGeneralApplication(auth, serviceId);
