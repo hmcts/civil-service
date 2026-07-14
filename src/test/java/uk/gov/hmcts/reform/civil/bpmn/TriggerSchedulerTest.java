@@ -36,13 +36,13 @@ public class TriggerSchedulerTest extends BpmnBaseTest {
         // fetch and complete task
         List<LockedExternalTask> lockedExternalTasks = fetchAndLockTask(TOPIC_NAME);
         assertThat(lockedExternalTasks).hasSize(1);
-        assertThat(lockedExternalTasks.get(0).getVariables()).containsEntry("schedulerName", "TestScheduler");
+        assertThat(lockedExternalTasks.getFirst().getVariables()).containsEntry("schedulerName", "TestScheduler");
 
-        completeTask(lockedExternalTasks.get(0).getId());
+        completeTask(lockedExternalTasks.getFirst().getId());
 
         // Then
         // Assert no external tasks left and process is ended
         assertNoExternalTasksLeft();
-        assertThat(engine.getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+        assertThat(engine.getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 }

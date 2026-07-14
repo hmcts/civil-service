@@ -26,6 +26,9 @@ class SchedulerRegistryTest {
     private CivilScheduler scheduler2;
 
     @Mock
+    private CivilScheduler scheduler1Duplicate;
+
+    @Mock
     private TaskExecutor taskExecutor;
 
     @Captor
@@ -65,8 +68,25 @@ class SchedulerRegistryTest {
 
     @Test
     void shouldReturnSchedulerNames() {
-        List<String> names = repository.getSchedulerNames();
+        assertThat(repository.getSchedulerNames()).containsExactlyInAnyOrder("scheduler1", "scheduler2");
+    }
 
-        assertThat(names).containsExactlyInAnyOrder("scheduler1", "scheduler2");
+    @Test
+    void shouldIgnoreDuplicateNamedSchedulers() {
+        when(scheduler1Duplicate.getName()).thenReturn("scheduler1");
+        repository = new SchedulerRegistry(List.of(scheduler1, scheduler2, scheduler1Duplicate), taskExecutor);
+        assertThat(repository.getSchedulerNames()).containsExactlyInAnyOrder("scheduler1", "scheduler2");
+
+        boolean result = repository.runScheduler("scheduler1");
+
+        assertThat(result).isTrue();
+        verify(taskExecutor).execute(runnableCaptor.capture());
+
+        // Execute the runnable to verify it triggers the task
+        runnableCaptor.getValue().run();
+
+        verify(scheduler1).runScheduledTask();
+        verify(scheduler2, never()).runScheduledTask();
+        verify(scheduler1Duplicate, never()).runScheduledTask();
     }
 }
