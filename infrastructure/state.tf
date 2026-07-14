@@ -17,14 +17,8 @@ terraform {
 }
 
 provider "azurerm" {
-  alias                           = "send-grid"
-  subscription_id                 = var.send_grid_subscription
-  resource_provider_registrations = "none"
-
-  enhanced_validation {
-    resource_providers = false
-  }
-
+  alias           = "send-grid"
+  subscription_id = var.send_grid_subscription
   features {}
 }
 
