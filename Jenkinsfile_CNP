@@ -164,9 +164,14 @@ withPipeline(type, product, component) {
   }
 
   afterSuccess('checkout') {
-    def subscription = 'nonprod'
     if (env.ENVIRONMENT in ['ithc', 'demo', 'perftest']) {
-      withSubscription(subscription) {
+      def subscriptions = [
+        demo    : env.DEMO_SUBSCRIPTION_NAME ?: 'nonprod',
+        perftest: env.PERFTEST_SUBSCRIPTION_NAME ?: 'qa',
+        ithc    : env.ITHC_SUBSCRIPTION_NAME ?: 'qa'
+      ]
+
+      withSubscription(subscriptions[env.ENVIRONMENT], product, env.ENVIRONMENT) {
         withTeamSecrets(pipelineConf, env.ENVIRONMENT) {
           uploadBpmnDiagrams(env.ENVIRONMENT)
         }
