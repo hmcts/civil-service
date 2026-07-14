@@ -12,7 +12,7 @@ public class TriggerSchedulerExternalTaskListener {
     private static final String TOPIC = "TRIGGER_SCHEDULER";
 
     @Autowired
-    private TriggerSchedulerExternalTaskListener(TriggerSchedulerExternalTaskHandler handler, ExternalTaskClient client) {
+    TriggerSchedulerExternalTaskListener(TriggerSchedulerExternalTaskHandler handler, ExternalTaskClient client) {
         TopicSubscriptionBuilder subscriptionBuilder = client.subscribe(TOPIC);
         subscriptionBuilder.handler(handler).open();
     }
