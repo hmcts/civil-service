@@ -7,8 +7,9 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAByCourtsInitiativeGAspec;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.ga.service.GeneralAppLocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.utils.CaseServiceUtil;
 
 import java.util.List;
 import java.util.Objects;
@@ -27,10 +28,11 @@ public class DocmosisService {
     public LocationRefData getCaseManagementLocationVenueName(GeneralApplicationCaseData caseData, String authorisation) {
         List<LocationRefData> courtLocations = null;
         Boolean cnbcCourt = checkIfCnbc(caseData);
-        if (cnbcCourt) {
-            courtLocations = generalAppLocationRefDataService.getCnbcLocation(authorisation);
+        String serviceId = CaseServiceUtil.getCaseServiceId(caseData);
+        if (Boolean.TRUE.equals(cnbcCourt)) {
+            courtLocations = generalAppLocationRefDataService.getCnbcLocation(authorisation, serviceId);
         } else {
-            courtLocations = generalAppLocationRefDataService.getCourtLocations(authorisation);
+            courtLocations = generalAppLocationRefDataService.getCourtLocations(authorisation, serviceId);
         }
         assert courtLocations != null;
         var caseLocation = caseData.getCaseManagementLocation();
@@ -42,7 +44,7 @@ public class DocmosisService {
                 .toList();
 
         if (!matchingLocations.isEmpty()) {
-            return matchingLocations.get(0);
+            return matchingLocations.getFirst();
         } else {
             throw new IllegalArgumentException("Court Name is not found in location data");
         }
