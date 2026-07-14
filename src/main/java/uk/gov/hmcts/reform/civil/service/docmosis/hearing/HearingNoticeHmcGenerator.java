@@ -31,6 +31,7 @@ import java.util.List;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC_WELSH;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.hearingFeeRequired;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingDaysText;
@@ -162,6 +163,7 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
             hearingId,
             caseData.getCaseManagementLocation().getBaseLocation(),
             bearerToken,
+            getCaseServiceId(caseData.getCaseAccessCategory()),
             locationRefDataService
         );
     }
