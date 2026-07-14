@@ -8,14 +8,15 @@ import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
+import uk.gov.hmcts.reform.civil.utils.CaseServiceUtil;
+import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -25,6 +26,7 @@ import java.util.function.Predicate;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 
 @Service
 @RequiredArgsConstructor
@@ -49,10 +51,11 @@ public class SdoHearingPreparationService {
             preferredCourt = locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData);
             preferredCourt.map(RequestedCourt::getCaseLocation)
                 .ifPresent(caseData::setCaseManagementLocation);
+            final String serviceId = CaseServiceUtil.getCaseServiceId(caseData.getCaseAccessCategory());
             preferredCourt
                 .map(RequestedCourt::getCaseLocation)
                 .map(CaseLocationCivil::getBaseLocation)
-                .map(epimmsId -> sdoLocationService.fetchCourtLocationsByEpimmsId(authToken, epimmsId))
+                .map(epimmsId -> sdoLocationService.fetchCourtLocationsByEpimmsId(authToken, epimmsId, serviceId))
                 .map(list -> Optional.of(list).orElse(Collections.emptyList()))
                 .flatMap(locations -> locations.stream().findFirst())
                 .ifPresent(locationRefData -> caseData.setLocationName(locationRefData.getSiteName()));
@@ -99,7 +102,10 @@ public class SdoHearingPreparationService {
         String authToken,
         CaseData caseData
     ) {
-        List<LocationRefData> locationRefDataList = sdoLocationService.fetchHearingLocations(authToken);
+        List<LocationRefData> locationRefDataList = sdoLocationService.fetchHearingLocations(
+            authToken,
+            getCaseServiceId(caseData.getCaseAccessCategory())
+        );
         DynamicList locationsList;
         if (caseData.getReasonForTransfer() != null && caseData.getTransferCourtLocationList() != null) {
             RequestedCourt requestedCourt = new RequestedCourt();

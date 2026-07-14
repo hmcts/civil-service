@@ -54,6 +54,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.utils.CaseServiceUtil;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -172,13 +173,13 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
             As this order was made on the court's own initiative, any \
             party affected by the order may apply to set aside, vary, or stay the order. \
             Any such application must be made by 4pm on\s
-            
+
             """;
     private static final String ORDER_WITHOUT_NOTICE = """
             If you were not notified of the application before this \
             order was made, you may apply to set aside, vary, or stay the order. \
             Any such application must be made by 4pm on\s
-            
+
             """;
     private static final String DISMISSAL_ORDER_TEXT = """
         This application is dismissed.
@@ -297,7 +298,8 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
     }
 
     private DynamicList getDynamicLocationList(GeneralApplicationCaseData caseData, String authToken) {
-        DynamicList dynamicLocationList = getLocationsFromList(locationRefDataService.getCourtLocations(authToken));
+        final String serviceId = CaseServiceUtil.getCaseServiceId(caseData);
+        DynamicList dynamicLocationList = getLocationsFromList(locationRefDataService.getCourtLocations(authToken, serviceId));
         selectSharedApplicantLocation(caseData, dynamicLocationList);
         return dynamicLocationList;
     }
