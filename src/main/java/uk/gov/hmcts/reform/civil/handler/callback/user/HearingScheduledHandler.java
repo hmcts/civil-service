@@ -50,6 +50,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateHearingDueDate;
 
@@ -121,7 +122,7 @@ public class HearingScheduledHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
         List<LocationRefData> locations = (locationRefDataService
-            .getHearingCourtLocations(authToken));
+            .getHearingCourtLocations(authToken, getCaseServiceId(caseData.getCaseAccessCategory())));
         caseData.setHearingLocation(getLocationsFromList(locations));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
