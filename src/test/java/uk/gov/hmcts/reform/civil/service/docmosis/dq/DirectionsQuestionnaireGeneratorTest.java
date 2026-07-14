@@ -1042,7 +1042,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 DisclosureReport extracted = templateData.getDisclosureReport();
-                assertThat(extracted).isEqualTo(null);
+                assertThat(extracted).isNull();
             }
 
             @Test
@@ -1062,7 +1062,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 DisclosureReport extracted = templateData.getDisclosureReport();
-                assertThat(extracted).isEqualTo(null);
+                assertThat(extracted).isNull();
             }
 
             @Test
@@ -1113,7 +1113,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 assertThat(templateData.getWitnessesIncludingDefendants())
-                    .isEqualTo(0);
+                    .isZero();
             }
 
             @Test
@@ -1435,7 +1435,7 @@ class DirectionsQuestionnaireGeneratorTest {
                         .setWhyRequired(expert.getWhyRequired())
                         .setFormattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
                             .format(MonetaryConversions.penniesToPounds(expert.getEstimatedCost()))))
-                    .collect(toList());
+                    .toList();
             }
 
             private Witnesses getWitnesses(DQ dq) {
@@ -2156,7 +2156,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     "ONE"
                 );
 
-                assertThat(caseDocument.isPresent()).isEqualTo(false);
+                assertThat(caseDocument.isPresent()).isFalse();
             }
 
             @Test
@@ -2834,7 +2834,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 .setCourtName("Court Name").setRegion("Region").setRegionId("4").setCourtVenueId("000")
                 .setCourtTypeId("10").setCourtLocationCode("121")
                 .setEpimmsId("000000"));
-            when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
+            when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any(), any())).thenReturn(locations);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceWithHearingSupport()
                 .build()

@@ -79,8 +79,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OTHER_SUPPORT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
@@ -89,8 +89,8 @@ import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServic
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.INTERMEDIATE_CLAIM_TRACK;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.MULTI_CLAIM_TRACK;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.SMALL_CLAIM_TRACK;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @SpringBootTest(classes = {
     InitiateGeneralApplicationService.class,
@@ -874,6 +874,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     void shouldPopulateLocationDetailsForBaseLocationWhereListIsEmptyForGaLips() {
         when(locationService.getWorkAllocationLocationDetails(
             any(),
+            any(),
             any()
         )).thenReturn(getEmptyCourLocationsRefObject().get(0));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
@@ -894,6 +895,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     @Test
     void shouldPopulateLocationDetailsForFAForLipsEnabled() {
         when(locationService.getWorkAllocationLocationDetails(
+            any(),
             any(),
             any()
         )).thenReturn(getSampleCourLocationsRefObject().get(0));
