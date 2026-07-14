@@ -196,20 +196,10 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
             caseData.getCcdCaseReference().toString(),
             CLAIMANT
         );
-        if (getFeatureToggleService().isLocationWhiteListed(caseData
-                                                                                   .getCaseManagementLocation()
-                                                                                   .getBaseLocation())
-            || getFeatureToggleService().isCuiGaNroEnabled()) {
-            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
-                caseData.getCcdCaseReference().toString(),
-                CLAIMANT,
-                GA
-            );
-        } else {
-            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
-                CLAIMANT
-            );
-        }
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
+            caseData.getCcdCaseReference().toString(),
+            CLAIMANT,
+            GA
+        );
     }
 }

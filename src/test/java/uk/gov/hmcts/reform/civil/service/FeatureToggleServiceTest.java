@@ -263,15 +263,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldCallBoolVariation_whenGaForLipNro(Boolean toggleStat) {
-        var gaCuiNroKey = "cui-ga-nro";
-        givenToggle(gaCuiNroKey, toggleStat);
-
-        assertThat(featureToggleService.isCuiGaNroEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsOtherRemedyEnabled(Boolean toggleStat) {
         var otherRemedyKey = "other-remedy-enabled";
         givenToggle(otherRemedyKey, toggleStat);

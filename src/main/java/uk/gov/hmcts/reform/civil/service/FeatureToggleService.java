@@ -162,10 +162,6 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabledForDate("cui-query-management", epoch, false);
     }
 
-    public boolean isCuiGaNroEnabled() {
-        return featureToggleApi.isFeatureEnabled("cui-ga-nro");
-    }
-
     public boolean isOtherRemedyEnabled() {
         return featureToggleApi.isFeatureEnabled("other-remedy-enabled");
     }
