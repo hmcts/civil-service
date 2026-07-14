@@ -10,8 +10,8 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.DebtPaymentOptions;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -56,9 +56,10 @@ import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServic
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.SMALL_CLAIM_TRACK;
 import static uk.gov.hmcts.reform.civil.service.LocationService.settleDiscontinueStates;
 import static uk.gov.hmcts.reform.civil.service.LocationService.statesBeforeSDO;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
@@ -364,7 +365,11 @@ public class InitiateGeneralApplicationService {
     }
 
     private void setLocationDetails(CaseData caseData, String authToken, GeneralApplication applicationBuilder) {
-        LocationRefData locationDetails = locationService.getWorkAllocationLocationDetails(caseData.getCaseManagementLocation().getBaseLocation(), authToken);
+        LocationRefData locationDetails = locationService.getWorkAllocationLocationDetails(
+            caseData.getCaseManagementLocation().getBaseLocation(),
+            authToken,
+            getCaseServiceId(caseData.getCaseAccessCategory())
+        );
         CaseLocationCivil caseManagementLocation = new CaseLocationCivil();
         caseManagementLocation.setRegion(caseData.getCaseManagementLocation().getRegion());
         caseManagementLocation.setBaseLocation(caseData.getCaseManagementLocation().getBaseLocation());
@@ -384,14 +389,18 @@ public class InitiateGeneralApplicationService {
         }
         if (Objects.isNull(caseLocation.getLeft().getSiteName())
                 && Objects.nonNull(caseLocation.getLeft().getBaseLocation())) {
-            LocationRefData locationDetails = locationService.getWorkAllocationLocationDetails(caseLocation.getLeft().getBaseLocation(), authToken);
+            LocationRefData locationDetails = locationService.getWorkAllocationLocationDetails(
+                caseLocation.getLeft().getBaseLocation(),
+                authToken,
+                getCaseServiceId(caseData.getCaseAccessCategory())
+            );
             caseLocation.getLeft().setSiteName(locationDetails.getSiteName());
             caseLocation.getLeft().setAddress(locationDetails.getCourtAddress());
             caseLocation.getLeft().setPostcode(locationDetails.getPostcode());
         }
         applicationBuilder.setCaseManagementLocation(caseLocation.getLeft());
         applicationBuilder.setLocationName(hasSDOBeenMade(caseData) ? caseData.getLocationName() : caseLocation.getLeft().getSiteName());
-        applicationBuilder.setIsCcmccLocation(caseLocation.getRight() ? YES : NO);
+        applicationBuilder.setIsCcmccLocation(Boolean.TRUE.equals(caseLocation.getRight()) ? YES : NO);
     }
 
     private void setGeneralAppN245FormUpload(CaseData caseData, GeneralApplication applicationBuilder) {
