@@ -11,7 +11,7 @@ management:
     web:
       base-path: /
       exposure:
-        include: health, info, prometheus
+        include: health, info, prometheus, circuitbreakers, circuitbreakerevents
   health:
     case-document-am-api:
       enabled: true
@@ -71,6 +71,21 @@ spring:
             readTimeout: ${CMC_CLAIM_STORE_API_READ_TIMEOUT:25000}
           core-case-event-api:
             readTimeout: ${CORE_CASE_EVENT_API_READ_TIMEOUT:25000}
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      caseAccessDataStoreApi:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        slowCallRateThreshold: 50
+        slowCallDurationThreshold: ${CASE_ACCESS_DATA_STORE_SLOW_CALL_THRESHOLD:30s}
+        waitDurationInOpenState: ${CASE_ACCESS_DATA_STORE_OPEN_STATE_WAIT:30s}
+        permittedNumberOfCallsInHalfOpenState: 2
+        automaticTransitionFromOpenToHalfOpenEnabled: true
 
 scheduler:
   active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:JudgementBuffer}
