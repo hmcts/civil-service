@@ -14,8 +14,10 @@ import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.service.cache.CaseUserRolesCacheService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,12 +31,22 @@ public class CoreCaseUserService {
     private final UserService userService;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
     private final AuthTokenGenerator authTokenGenerator;
+    private final CaseUserRolesCacheService caseUserRolesCacheService;
 
     public List<String> getUserCaseRoles(String caseId, String userId) {
-        return caseAccessDataStoreApi.getUserRoles(getCaaAccessToken(), authTokenGenerator.generate(), List.of(caseId))
+        Optional<List<String>> cached = caseUserRolesCacheService.get(caseId, userId);
+        if (cached.isPresent()) {
+            return cached.get();
+        }
+
+        List<String> roles = caseAccessDataStoreApi.getUserRoles(
+            getCaaAccessToken(), authTokenGenerator.generate(), List.of(caseId))
             .getCaseAssignedUserRoles().stream()
             .filter(c -> c.getUserId().equals(userId)).distinct()
             .map(c -> c.getCaseRole()).collect(Collectors.toList());
+
+        caseUserRolesCacheService.put(caseId, userId, roles);
+        return roles;
     }
 
     public void assignCase(String caseId, String userId, String organisationId, CaseRole caseRole) {
@@ -42,6 +54,8 @@ public class CoreCaseUserService {
 
         if (!userWithCaseRoleExistsOnCase(caseId, caaAccessToken, caseRole, userId)) {
             assignUserToCaseForRole(caseId, userId, organisationId, caseRole, caaAccessToken);
+            caseUserRolesCacheService.evict(caseId, userId);
+            caseUserRolesCacheService.evictAllForCase(caseId);
         } else {
             log.info("Case already have the user with {} role", caseRole.getFormattedName());
         }
@@ -56,6 +70,8 @@ public class CoreCaseUserService {
                 .setCaseRole(caseRole.getFormattedName())
                 .setOrganisationId(organisationId);
             removeAccessFromRole(caseAssignedUserRoleWithOrganisation, caaAccessToken);
+            caseUserRolesCacheService.evict(caseId, userId);
+            caseUserRolesCacheService.evictAllForCase(caseId);
         }
     }
 
@@ -65,6 +81,8 @@ public class CoreCaseUserService {
 
         if (userWithCaseRoleExistsOnCase(caseId, caaAccessToken, CaseRole.CREATOR, userId)) {
             removeCreatorAccess(caseId, userId, organisationId, caaAccessToken);
+            caseUserRolesCacheService.evict(caseId, userId);
+            caseUserRolesCacheService.evictAllForCase(caseId);
         } else {
             log.info("User doesn't have {} role", CaseRole.CREATOR.getFormattedName());
         }

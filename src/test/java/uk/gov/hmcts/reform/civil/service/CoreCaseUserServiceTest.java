@@ -20,9 +20,11 @@ import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.service.cache.CaseUserRolesCacheService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -64,6 +66,9 @@ class CoreCaseUserServiceTest {
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
 
+    @MockBean
+    private CaseUserRolesCacheService caseUserRolesCacheService;
+
     @Autowired
     private CoreCaseUserService service;
 
@@ -74,6 +79,7 @@ class CoreCaseUserServiceTest {
         when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTH_TOKEN);
         when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(
             CAA_USER_AUTH_TOKEN);
+        when(caseUserRolesCacheService.get(anyString(), anyString())).thenReturn(Optional.empty());
     }
 
     @Nested
