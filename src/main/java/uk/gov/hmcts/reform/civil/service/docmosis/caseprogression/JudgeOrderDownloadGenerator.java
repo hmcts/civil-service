@@ -135,6 +135,7 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
 
         return new JudgeFinalOrderForm()
             .setJudgeNameTitle(userDetails.getFullName())
+            .setLegacyNumber(caseData.getLegacyCaseReference())
             .setCourtName(caseManagementLocationDetails.getExternalShortName())
             .setCaseNumber(nonNull(caseData.getCcdCaseReference()) ? caseData.getCcdCaseReference().toString() : null)
             .setClaimant1Name(getPartyNameWithLitigiousFriend(caseData.getApplicant1(), caseData.getApplicant1LitigationFriend()))

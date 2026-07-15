@@ -238,6 +238,35 @@ class GenAppStateHelperServiceTest {
         }
 
         @Test
+        public void updateApplicationDetailsListsToReflectLatestApplicationStatusChange_IgnoreNullStatus() {
+            setupForApplicationOffline();
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),
+                                            true,
+                                            true,
+                                            true, true,
+                                            getOriginalStatusOfGeneralApplication_applicationOffline_withNotStatus()
+                );
+
+            CaseData updatedData = service.updateApplicationDetailsInClaim(
+                caseData,
+                APPLICATION_OFFLINE_TEXT,
+                APPLICATION_PROCEEDS_OFFLINE
+            );
+
+            assertStatusChangeApplicationOffline(updatedData, "1234", true);
+            assertStatusChangeApplicationOffline(updatedData, "2345", false);
+            assertStatusChangeApplicationOffline(updatedData, "3456", true);
+            assertStatusChangeApplicationOffline(updatedData, "4567", true);
+            assertStatusChangeApplicationOffline(updatedData, "5678", true);
+            assertStatusChangeApplicationOffline(updatedData, "6789", true);
+            assertStatusChangeApplicationOffline(updatedData, "7890", false);
+            assertStatusChangeApplicationOffline(updatedData, "8910", true);
+            assertStatusChangeApplicationOffline(updatedData, "1011", true);
+            assertStatusChangeApplicationOffline(updatedData, "1112", false);
+        }
+
+        @Test
         public void noUpdatesToCaseDataIfThereAreNoGeneralApplications_AO() {
             setupForApplicationOffline();
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
@@ -374,6 +403,13 @@ class GenAppStateHelperServiceTest {
             return latestStatus;
         }
 
+        private Map<String, String> getOriginalStatusOfGeneralApplication_applicationOffline_withNotStatus() {
+            Map<String, String> latestStatus = getOriginalStatusOfGeneralApplication_applicationClosed();
+            latestStatus.put("1112", null);
+
+            return latestStatus;
+        }
+
         private CaseDetails getCaseDetails(
             long ccdRef,
             String caseState,
@@ -396,9 +432,9 @@ class GenAppStateHelperServiceTest {
 
         @Test
          void updateApplicationLocationDetailsLists() {
-            when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any()))
+            when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any(), any()))
                 .thenReturn(getSampleCourLocationsRefObject());
-            when(locationService.getWorkAllocationLocationDetails(any(), any()))
+            when(locationService.getWorkAllocationLocationDetails(any(), any(), any()))
                 .thenReturn(getSampleCourLocationsRefObject1());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),

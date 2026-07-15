@@ -189,8 +189,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @Test
     void shouldSetStateAllFinalOrdersIssuedWhenApplicantAcceptedRepaymentPlan() {
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-
         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
 
         JudgmentDetails activeJudgment = new JudgmentDetails();
@@ -377,9 +375,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
         caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
         caseData.setApplicant1ProceedWithClaim(NO);
         caseData.setDefenceRouteRequired(SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM);
-
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
         String resultState;
         if (postTranslation) {
             resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
@@ -394,8 +389,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldSetProceedsInHeritageSystemWhenApplicantAcceptedRepaymentPlanAndNotLrVLip() {
-
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
 
@@ -455,8 +448,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
             .build();
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-
         String resultState;
         if (postTranslation) {
             resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
@@ -481,7 +472,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
             .build();
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         BusinessProcess businessProcess = new BusinessProcess();
         String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
                                                                    "", businessProcess);

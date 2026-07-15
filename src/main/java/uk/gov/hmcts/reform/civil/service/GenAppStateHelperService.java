@@ -25,6 +25,7 @@ import java.util.function.BiConsumer;
 
 import static java.lang.Long.parseLong;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Slf4j
@@ -84,7 +85,8 @@ public class GenAppStateHelperService {
 
         LocationRefData locationDetails = locationService.getWorkAllocationLocationDetails(
             caseData.getCaseManagementLocation().getBaseLocation(),
-            authToken
+            authToken,
+            getCaseServiceId(caseData.getCaseAccessCategory())
         );
         caseData.setGeneralApplications(wrapElements(buildUpdatedGeneralApplications(caseData, locationDetails)));
         return caseData;
@@ -174,6 +176,7 @@ public class GenAppStateHelperService {
                                               RequiredState gaFlow) {
         if (gaDetails != null
                 && gaDetails.getCaseLink() != null
+                && gaDetails.getCaseState() != null
                 && isLive(gaDetails.getCaseState())) {
             long caseId = parseLong(gaDetails.getCaseLink().getCaseReference());
             return isGeneralApplicationCaseStatusUpdated(caseId, generalApplicationMap, gaFlow);
@@ -186,6 +189,7 @@ public class GenAppStateHelperService {
                                               RequiredState gaFlow) {
         if (gaDetailsRespondentSol != null
                 && gaDetailsRespondentSol.getCaseLink() != null
+                && gaDetailsRespondentSol.getCaseState() != null
                 && isLive(gaDetailsRespondentSol.getCaseState())) {
             long caseId = parseLong(gaDetailsRespondentSol.getCaseLink().getCaseReference());
             return isGeneralApplicationCaseStatusUpdated(caseId, generalApplicationMap, gaFlow);

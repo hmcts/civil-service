@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.LitigationFriend;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
@@ -54,6 +56,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -117,7 +120,7 @@ class HearingNoticeHmcGeneratorTest {
             .thenReturn(CASE_DOCUMENT);
 
         when(locationRefDataService
-                 .getHearingCourtLocations(BEARER_TOKEN)).thenReturn(List.of(new LocationRefData()
+                 .getHearingCourtLocations(eq(BEARER_TOKEN), anyString())).thenReturn(List.of(new LocationRefData()
                                                                                              .setEpimmsId(EPIMS)
                                                                                              .setExternalShortName("VenueName")
                                                                                              .setWelshExternalShortName("WelshVenueValue")
@@ -186,6 +189,7 @@ class HearingNoticeHmcGeneratorTest {
         var expected = new HearingNoticeHmc()
             .setTitle("trial")
             .setCaseNumber(caseData.getCcdCaseReference())
+            .setLegacyNumber(caseData.getLegacyCaseReference())
             .setCreationDate(LocalDate.now())
             .setClaimant(caseData.getApplicant1().getPartyName())
             .setDefendant(caseData.getRespondent1().getPartyName())
@@ -205,6 +209,187 @@ class HearingNoticeHmcGeneratorTest {
             .setPartiesAttendingByTelephone("Jenny Harper");
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldGenerateHearingNoticeHmc_1v1_withLitigationFriend_asMinor() {
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails().setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(EPIMS)
+            )
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+            )
+            .applicant1(new PartyBuilder().individual().build()
+                            .setIndividualDateOfBirth(LocalDate.now().minusYears(10)))
+            .applicant1LitigationFriend(new LitigationFriend().setFirstName("John").setLastName("Smith"))
+            .respondent1(new PartyBuilder().soleTrader().build()
+                             .setSoleTraderDateOfBirth(LocalDate.now().minusYears(10)))
+            .respondent1LitigationFriend(new LitigationFriend().setFirstName("Jane").setLastName("Doe"))
+            .build();
+
+        when(hearingFeesService
+                 .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
+
+        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC);
+
+        assertEquals("Mr. John Rambo represented by John Smith (litigation friend)", actual.getClaimant());
+        assertEquals("Mr. Sole Trader T/A Sole Trader co", actual.getDefendant());
+    }
+
+    @Test
+    void shouldGenerateHearingNoticeHmc_1v1_withLitigationFriend_notMinor() {
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails().setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(EPIMS)
+            )
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+            )
+            .applicant1(new PartyBuilder().individual().build()
+                            .setIndividualDateOfBirth(LocalDate.now().minusYears(30)))
+            .applicant1LitigationFriend(new LitigationFriend().setFirstName("John").setLastName("Smith"))
+            .build();
+
+        when(hearingFeesService
+                 .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
+
+        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC);
+
+        assertEquals("Mr. John Rambo", actual.getClaimant());
+    }
+
+    @Test
+    void shouldGenerateHearingNoticeHmc_1v1_applicant1_notMinor_withLitigationFriend() {
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails().setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(EPIMS)
+            )
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .applicant1(new PartyBuilder().individual().build()
+                            .setIndividualDateOfBirth(LocalDate.now().minusYears(30)))
+            .applicant1LitigationFriend(new LitigationFriend().setFirstName("John").setLastName("Smith"))
+            .build();
+
+        when(hearingFeesService
+                 .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
+
+        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC);
+
+        assertEquals("Mr. John Rambo", actual.getClaimant());
+    }
+
+    @Test
+    void shouldGenerateHearingNoticeHmc_1v2_withApplicant2_asMinor() {
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails().setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(EPIMS)
+            )
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .applicant1(new PartyBuilder().individual().build()
+                            .setIndividualDateOfBirth(LocalDate.now().minusYears(30)))
+            .applicant2(new PartyBuilder().individual().build()
+                            .setIndividualDateOfBirth(LocalDate.now().minusYears(10)))
+            .applicant2LitigationFriend(new LitigationFriend().setFirstName("Bob").setLastName("Friend"))
+            .build();
+
+        when(hearingFeesService
+                 .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
+
+        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC);
+
+        assertEquals("Mr. John Rambo", actual.getClaimant());
+        assertEquals("Mr. John Rambo represented by Bob Friend (litigation friend)", actual.getClaimant2());
+    }
+
+    @Test
+    void shouldGenerateHearingNoticeHmc_1v2_withApplicant2_notMinor() {
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails().setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation(EPIMS)
+            )
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .applicant1(new PartyBuilder().individual().build()
+                            .setIndividualDateOfBirth(LocalDate.now().minusYears(30)))
+            .applicant2(new PartyBuilder().individual().build()
+                            .setIndividualDateOfBirth(LocalDate.now().minusYears(30)))
+            .applicant2LitigationFriend(new LitigationFriend().setFirstName("Bob").setLastName("Friend"))
+            .build();
+
+        when(hearingFeesService
+                 .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
+
+        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC);
+
+        assertEquals("Mr. John Rambo", actual.getClaimant());
+        assertEquals("Mr. John Rambo", actual.getClaimant2());
     }
 
     @ParameterizedTest
@@ -244,6 +429,7 @@ class HearingNoticeHmcGeneratorTest {
         var expected = new HearingNoticeHmc()
             .setTitle("trial")
             .setCaseNumber(caseData.getCcdCaseReference())
+            .setLegacyNumber(caseData.getLegacyCaseReference())
             .setCreationDate(LocalDate.now())
             .setClaimant(caseData.getApplicant1().getPartyName())
             .setDefendant(caseData.getRespondent1().getPartyName())
@@ -299,6 +485,7 @@ class HearingNoticeHmcGeneratorTest {
         var expected = new HearingNoticeHmc()
             .setTitle(isWelsh ? "dreial" : "trial")
             .setCaseNumber(caseData.getCcdCaseReference())
+            .setLegacyNumber(caseData.getLegacyCaseReference())
             .setCreationDate(creationDate)
             .setCreationDateWelshText(isWelsh ? DateUtils.formatDateInWelsh(creationDate, true) : null)
             .setClaimant(caseData.getApplicant1().getPartyName())
@@ -358,6 +545,7 @@ class HearingNoticeHmcGeneratorTest {
         var expected = new HearingNoticeHmc()
             .setTitle(isWelsh ? "wrandawiad gwaredu" : "disposal hearing")
             .setCaseNumber(caseData.getCcdCaseReference())
+            .setLegacyNumber(caseData.getLegacyCaseReference())
             .setCreationDate(LocalDate.now())
             .setCreationDateWelshText(isWelsh ? DateUtils.formatDateInWelsh(LocalDate.now(), true) : null)
             .setClaimant(caseData.getApplicant1().getPartyName())
@@ -418,6 +606,7 @@ class HearingNoticeHmcGeneratorTest {
         var expected = new HearingNoticeHmc()
             .setTitle(isWelsh ? "wrandawiad datrys anghydfod" : "dispute resolution hearing")
             .setCaseNumber(caseData.getCcdCaseReference())
+            .setLegacyNumber(caseData.getLegacyCaseReference())
             .setCreationDate(LocalDate.now())
             .setCreationDateWelshText(isWelsh ? DateUtils.formatDateInWelsh(LocalDate.now(), true) : null)
             .setClaimant(caseData.getApplicant1().getPartyName())
@@ -484,6 +673,7 @@ class HearingNoticeHmcGeneratorTest {
         var expected = new HearingNoticeHmc()
             .setTitle(expectedTitle)
             .setCaseNumber(caseData.getCcdCaseReference())
+            .setLegacyNumber(caseData.getLegacyCaseReference())
             .setCreationDate(LocalDate.now())
             .setClaimant(caseData.getApplicant1().getPartyName())
             .setClaimant2(caseData.getApplicant2().getPartyName())
@@ -544,6 +734,7 @@ class HearingNoticeHmcGeneratorTest {
         var expected = new HearingNoticeHmc()
                 .setTitle("dispute resolution hearing")
             .setCaseNumber(caseData.getCcdCaseReference())
+            .setLegacyNumber(caseData.getLegacyCaseReference())
             .setCreationDate(LocalDate.now())
             .setClaimant(caseData.getApplicant1().getPartyName())
             .setClaimant2(caseData.getApplicant2().getPartyName())
@@ -566,7 +757,7 @@ class HearingNoticeHmcGeneratorTest {
 
     @Test
     void shouldReturnEnglishExternalShortName_whenWelshShortNameIsMissing() {
-        when(locationRefDataService.getHearingCourtLocations(BEARER_TOKEN)).thenReturn(List.of(new LocationRefData()
+        when(locationRefDataService.getHearingCourtLocations(eq(BEARER_TOKEN), anyString())).thenReturn(List.of(new LocationRefData()
                                                                                                    .setEpimmsId(EPIMS)
                                                                                                    .setExternalShortName("VenueName")
                                                                                                    .setWelshExternalShortName("")

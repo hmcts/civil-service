@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
@@ -11,23 +10,36 @@ import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.search.RequestForReconsiderationNotificationDeadlineSearchService;
 
 import java.util.Set;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class RequestForReconsiderationNotificationDeadlineHandler extends BaseExternalTaskHandler {
 
     private final RequestForReconsiderationNotificationDeadlineSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
+    public RequestForReconsiderationNotificationDeadlineHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        RequestForReconsiderationNotificationDeadlineSearchService caseSearchService,
+        ApplicationEventPublisher applicationEventPublisher
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.caseSearchService = caseSearchService;
+        this.applicationEventPublisher = applicationEventPublisher;
+    }
+
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         Set<CaseDetails> cases = caseSearchService.getCases();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
-        cases.forEach(caseDetails -> {
-            applicationEventPublisher.publishEvent(new RequestForReconsiderationNotificationDeadlineEvent(caseDetails.getId()));
-        });
+        cases.forEach(caseDetails ->
+            applicationEventPublisher.publishEvent(new RequestForReconsiderationNotificationDeadlineEvent(caseDetails.getId()))
+        );
         return new ExternalTaskData();
     }
+
 }

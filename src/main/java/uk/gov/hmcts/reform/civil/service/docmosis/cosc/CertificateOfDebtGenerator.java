@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 
 @Slf4j
@@ -63,7 +64,8 @@ public class CertificateOfDebtGenerator implements TemplateDataGenerator<Certifi
     }
 
     private CertificateOfDebtForm getCertificateOfDebtTemplateData(CaseData caseData, String authorisation) {
-        var certificateOfDebtForm = new CertificateOfDebtForm()
+        return new CertificateOfDebtForm()
+            .setCcdCaseReference(String.valueOf(caseData.getCcdCaseReference()))
             .setClaimNumber(caseData.getLegacyCaseReference())
             .setDefendantFullName(caseData.getRespondent1().getPartyName())
             .setDefendantAddress(AddressUtils.formatAddress(caseData.getRespondent1().getPrimaryAddress()))
@@ -86,8 +88,6 @@ public class CertificateOfDebtGenerator implements TemplateDataGenerator<Certifi
             .setJudgmentOrderDateWelsh(getDateInWelsh(caseData.getActiveJudgment().getIssueDate()))
             .setDateFinalPaymentMadeWelsh(getDateInWelsh(caseData.getActiveJudgment().getFullyPaymentMadeDate()))
             .setApplicationIssuedDateWelsh(getDateInWelsh(LocalDate.now()));
-
-        return certificateOfDebtForm;
     }
 
     private String getJudgmentText(JudgmentDetails activeJudgment, boolean isBilingual) {
@@ -107,9 +107,13 @@ public class CertificateOfDebtGenerator implements TemplateDataGenerator<Certifi
         if (caseData.getLocationName() != null) {
             return caseData.getLocationName();
         } else {
-            List<LocationRefData> locationDetails = locationRefDataService.getCourtLocationsByEpimmsId(authorisation, caseData.getCaseManagementLocation().getBaseLocation());
+            List<LocationRefData> locationDetails = locationRefDataService.getCourtLocationsByEpimmsId(
+                authorisation,
+                caseData.getCaseManagementLocation().getBaseLocation(),
+                getCaseServiceId(caseData.getCaseAccessCategory())
+            );
             if (locationDetails != null && !locationDetails.isEmpty()) {
-                return locationDetails.get(0).getCourtName();
+                return locationDetails.getFirst().getCourtName();
             }
         }
         return null;

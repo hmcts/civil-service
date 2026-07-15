@@ -4,7 +4,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.70.0"
+      version = "4.74.0"
     }
     random = {
       source = "hashicorp/random"
@@ -17,8 +17,14 @@ terraform {
 }
 
 provider "azurerm" {
-  alias           = "send-grid"
-  subscription_id = var.send_grid_subscription
+  alias                           = "send-grid"
+  subscription_id                 = var.send_grid_subscription
+  resource_provider_registrations = "none"
+
+  enhanced_validation {
+    resource_providers = false
+  }
+
   features {}
 }
 

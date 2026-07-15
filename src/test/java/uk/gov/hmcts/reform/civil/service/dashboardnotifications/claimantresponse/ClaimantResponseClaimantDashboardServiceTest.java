@@ -36,7 +36,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_CLAIMANT_CARM;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_JO_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_JUDGE_PLAN_REQUESTED_CCJ_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT;
@@ -71,7 +70,6 @@ class ClaimantResponseClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioAndCleanupWhenEligible() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -92,7 +90,6 @@ class ClaimantResponseClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordGeneralApplicationScenarioWhenProceedInHeritage() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -114,22 +111,7 @@ class ClaimantResponseClaimantDashboardServiceTest {
     }
 
     @Test
-    void shouldNotRecordWhenToggleDisabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setCcdCaseReference(1234L);
-        caseData.setApplicant1Represented(YesOrNo.NO);
-        caseData.setCcdState(CaseState.CASE_SETTLED);
-
-        service.notifyClaimant(caseData, AUTH_TOKEN);
-
-        verifyNoInteractions(dashboardScenariosService, dashboardNotificationService, taskListService);
-    }
-
-    @Test
     void shouldNotRecordWhenApplicantIsRepresented() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -143,7 +125,6 @@ class ClaimantResponseClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioForMultiTrackAwaitingIntention() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -164,7 +145,6 @@ class ClaimantResponseClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioForMultiClaimAwaitingIntention() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -213,7 +193,6 @@ class ClaimantResponseClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioForJudicialReferral() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -232,7 +211,6 @@ class ClaimantResponseClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioForMediationCarmEnabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -252,7 +230,6 @@ class ClaimantResponseClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioForMediationCarmDisabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -272,7 +249,6 @@ class ClaimantResponseClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioForSettlementAgreement() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         ClaimantLiPResponse response = new ClaimantLiPResponse();
         response.setApplicant1SignedSettlementAgreement(YesOrNo.YES);
@@ -296,7 +272,6 @@ class ClaimantResponseClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioForRejectedCourtDecision() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         ClaimantLiPResponse response = new ClaimantLiPResponse();
         response.setClaimantResponseOnCourtDecision(ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_PLAN);
@@ -320,7 +295,6 @@ class ClaimantResponseClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioWhenClaimantEndsClaim() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);
@@ -354,9 +328,7 @@ class ClaimantResponseClaimantDashboardServiceTest {
     }
 
     @Test
-    void shouldRecordScenarioForRejectRepaymentCompanyWhenJoEnabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+    void shouldRecordScenarioForRejectRepaymentCompanyOnJbaPath() {
 
         Party respondent = new Party();
         respondent.setType(Party.Type.COMPANY);
@@ -418,9 +390,7 @@ class ClaimantResponseClaimantDashboardServiceTest {
     }
 
     @Test
-    void shouldRecordScenarioForRejectRepaymentCompanyWhenJoDisabled() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
+    void shouldRecordJoScenarioForRejectRepaymentCompany() {
 
         Party respondent = new Party();
         respondent.setType(Party.Type.COMPANY);
@@ -437,7 +407,7 @@ class ClaimantResponseClaimantDashboardServiceTest {
 
         verify(dashboardScenariosService).recordScenarios(
             eq(AUTH_TOKEN),
-            eq(SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT.getScenario()),
+            eq(SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_JO_CLAIMANT.getScenario()),
             eq("1234"),
             any(ScenarioRequestParams.class)
         );
@@ -445,7 +415,6 @@ class ClaimantResponseClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioForPartAdmitImmediatePayment() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCcdCaseReference(1234L);

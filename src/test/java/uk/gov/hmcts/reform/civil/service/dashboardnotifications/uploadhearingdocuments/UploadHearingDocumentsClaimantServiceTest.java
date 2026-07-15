@@ -58,7 +58,6 @@ class UploadHearingDocumentsClaimantServiceTest {
     void shouldCreateDashboardNotifications_ifApplicant1NotRepresented() {
 
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(any())).thenReturn(true);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -114,7 +113,6 @@ class UploadHearingDocumentsClaimantServiceTest {
     void shouldCreateDashboardNotificationsAfterNroChangesAndWelshEnabledForMainCase() {
 
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(any())).thenReturn(true);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
@@ -138,7 +136,6 @@ class UploadHearingDocumentsClaimantServiceTest {
     void shouldNotCreateDashboardNotifications_ifNotCaseProgressionEnabledAndLocationWhiteListed() {
 
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(any())).thenReturn(true);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
@@ -158,25 +155,8 @@ class UploadHearingDocumentsClaimantServiceTest {
     }
 
     @Test
-    void shouldNotCreateDashboardNotifications_ifNotLipVLipEnabled() {
-
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setApplicant1Represented(YesOrNo.NO);
-        caseData.setCcdCaseReference(CASE_ID);
-        caseData.setCcdState(CaseState.CASE_PROGRESSION);
-        caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION));
-
-        uploadHearingDocumentsClaimantService.notifyUploadHearingDocuments(caseData, AUTH_TOKEN);
-
-        verifyNoInteractions(dashboardScenariosService);
-    }
-
-    @Test
     void shouldNotCreateDashboardNotifications_ifDashBoardDisabled() {
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(any())).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().build();

@@ -1,0 +1,889 @@
+{
+  "claimFee": {
+    "code": "FEE0209",
+    "version": "3",
+    "calculatedAmountInPence": "250000"
+  },
+  "caseNotes": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "note": "Debug case note",
+        "createdBy": "Debug User",
+        "createdOn": "2025-12-30T12:34:27"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "note": "Debug case note",
+        "createdBy": "Debug User",
+        "createdOn": "2025-12-17T08:33:59"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "note": "Debug case note",
+        "createdBy": "Debug User",
+        "createdOn": "2025-12-02T12:50:50"
+      }
+    }
+  ],
+  "claimType": "PERSONAL_INJURY",
+  "issueDate": "2025-11-24",
+  "applicant1": {
+    "type": "INDIVIDUAL",
+    "flags": {
+      "partyName": "Debug Claimant v Debug Defendant One Ltd",
+      "roleOnCase": "Claimant 1"
+    },
+    "partyID": "debug-party-id",
+    "partyName": "Debug Claimant v Debug Defendant One Ltd",
+    "primaryAddress": {
+      "PostCode": "ZZ1 1ZZ",
+      "PostTown": "Debugtown",
+      "AddressLine1": "1 Debug Street",
+      "AddressLine2": "Debug Area"
+    },
+    "individualTitle": "Ms",
+    "individualLastName": "Claimant",
+    "individualFirstName": "Debug",
+    "individualDateOfBirth": "1990-01-01",
+    "partyTypeDisplayValue": "Individual"
+  },
+  "claimValue": {
+    "statementOfValueInPennies": "5000000"
+  },
+  "respondent1": {
+    "type": "COMPANY",
+    "flags": {
+      "partyName": "Debug Claimant v Debug Defendant One Ltd",
+      "roleOnCase": "Defendant 1"
+    },
+    "partyID": "debug-party-id",
+    "partyName": "Debug Claimant v Debug Defendant One Ltd",
+    "companyName": "Debug Claimant v Debug Defendant One Ltd",
+    "primaryAddress": {
+      "PostCode": "ZZ1 1ZZ",
+      "PostTown": "Debugtown",
+      "AddressLine1": "1 Debug Street"
+    },
+    "partyTypeDisplayValue": "Company"
+  },
+  "respondent2": {
+    "type": "COMPANY",
+    "flags": {
+      "partyName": "Debug Claimant v Debug Defendant One Ltd",
+      "roleOnCase": "Defendant 2"
+    },
+    "partyID": "debug-party-id",
+    "partyName": "Debug Claimant v Debug Defendant One Ltd",
+    "companyName": "Debug Claimant v Debug Defendant One Ltd",
+    "primaryAddress": {
+      "PostCode": "ZZ1 1ZZ",
+      "PostTown": "Debugtown",
+      "AddressLine1": "1 Debug Street",
+      "AddressLine2": "Debug Area"
+    },
+    "partyTypeDisplayValue": "Company"
+  },
+  "nextDeadline": "2026-05-14",
+  "addApplicant2": "No",
+  "allPartyNames": "Debug Claimant v Debug Defendant One Ltd",
+  "courtLocation": {
+    "caseLocation": {
+      "region": "2",
+      "baseLocation": "000000"
+    },
+    "applicantPreferredCourt": "000",
+    "reasonForHearingAtSpecificCourt": "Debug text"
+  },
+  "submittedDate": "2025-11-24T17:26:27",
+  "SearchCriteria": {
+    "SearchParties": [
+      {
+        "id": "00000000-0000-4000-8000-000000000001",
+        "value": {
+          "Name": "Debug Claimant v Debug Defendant One Ltd",
+          "PostCode": "ZZ1 1ZZ",
+          "AddressLine1": "1 Debug Street",
+          "EmailAddress": "debug.user@example.test"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000001",
+        "value": {
+          "Name": "Debug Claimant v Debug Defendant One Ltd",
+          "PostCode": "ZZ1 1ZZ",
+          "AddressLine1": "1 Debug Street",
+          "EmailAddress": "debug.user@example.test"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000001",
+        "value": {
+          "Name": "Debug Claimant v Debug Defendant One Ltd",
+          "PostCode": "ZZ1 1ZZ",
+          "DateOfBirth": "1990-01-01",
+          "AddressLine1": "1 Debug Street",
+          "EmailAddress": "debug.user@example.test"
+        }
+      }
+    ],
+    "OtherCaseReferences": [
+      {
+        "id": "00000000-0000-4000-8000-000000000001",
+        "value": "DEBUG-CASE-001"
+      }
+    ]
+  },
+  "addRespondent2": "Yes",
+  "allocatedTrack": "INTERMEDIATE_CLAIM",
+  "anyRepresented": "Yes",
+  "caseNamePublic": "Debug Claimant v Debug Defendant One Ltd",
+  "detailsOfClaim": "Debug text",
+  "gaAddlDocStaff": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "createdBy": "Debug User",
+        "documentLink": {
+          "category_id": "applications",
+          "document_url": "http://example.test/documents/debug-document",
+          "upload_timestamp": "2026-05-19T13:46:40.364490331",
+          "document_filename": "debug-document.pdf",
+          "document_binary_url": "http://example.test/documents/debug-document/binary"
+        },
+        "documentName": "debug-document.pdf",
+        "documentSize": 0,
+        "createdDatetime": "2026-05-19T14:46:41"
+      }
+    }
+  ],
+  "businessProcess": {
+    "status": "STARTED",
+    "camundaEvent": "CASE_PROCEEDS_IN_CASEMAN",
+    "processInstanceId": "debug-process-instance"
+  },
+  "claimTypeUnSpec": "PERSONAL_INJURY",
+  "featureToggleWA": "Prod",
+  "gaDraftDocStaff": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "createdBy": "Debug User",
+        "documentLink": {
+          "category_id": "applications",
+          "document_url": "http://example.test/documents/debug-document",
+          "upload_timestamp": "2026-05-20T15:23:07.770900351",
+          "document_filename": "debug-document.pdf",
+          "document_binary_url": "http://example.test/documents/debug-document/binary"
+        },
+        "documentName": "debug-document.pdf",
+        "documentSize": 47165,
+        "documentType": "GENERAL_APPLICATION_DRAFT",
+        "createdDatetime": "2026-05-20T16:23:07"
+      }
+    }
+  ],
+  "generalAppTypeLR": {
+    "types": [
+      "EXTEND_TIME"
+    ]
+  },
+  "gaAddlDocClaimant": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "createdBy": "Debug User",
+        "documentLink": {
+          "category_id": "applications",
+          "document_url": "http://example.test/documents/debug-document",
+          "upload_timestamp": "2026-05-19T13:46:40.364490331",
+          "document_filename": "debug-document.pdf",
+          "document_binary_url": "http://example.test/documents/debug-document/binary"
+        },
+        "documentName": "debug-document.pdf",
+        "documentSize": 0,
+        "createdDatetime": "2026-05-19T14:46:41"
+      }
+    }
+  ],
+  "CaseAccessCategory": "UNSPEC_CLAIM",
+  "gaDraftDocClaimant": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "createdBy": "Debug User",
+        "documentLink": {
+          "category_id": "applications",
+          "document_url": "http://example.test/documents/debug-document",
+          "upload_timestamp": "2026-05-20T15:23:07.770900351",
+          "document_filename": "debug-document.pdf",
+          "document_binary_url": "http://example.test/documents/debug-document/binary"
+        },
+        "documentName": "debug-document.pdf",
+        "documentSize": 47165,
+        "documentType": "GENERAL_APPLICATION_DRAFT",
+        "createdDatetime": "2026-05-20T16:23:07"
+      }
+    }
+  ],
+  "personalInjuryType": "WORK_ACCIDENT",
+  "generalApplications": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "caseLink": {
+          "CaseReference": "1111222233334444"
+        },
+        "gaWaTrackLabel": " - Intermediate Track",
+        "generalAppType": {
+          "types": [
+            "EXTEND_TIME"
+          ]
+        },
+        "businessProcess": {
+          "status": "FINISHED",
+          "camundaEvent": "CREATE_GENERAL_APPLICATION_CASE",
+          "processInstanceId": "debug-process-instance"
+        },
+        "isGaApplicantLip": "No",
+        "litigiousPartyID": "debug-party-id",
+        "caseNameGaInternal": "Debug Claimant v Debug Defendant One Ltd",
+        "emailPartyReference": "debug.user@example.test",
+        "isGaRespondentOneLip": "No",
+        "isGaRespondentTwoLip": "No",
+        "mainCaseSubmittedDate": "2025-11-24T17:26:27",
+        "caseManagementLocation": {
+          "region": "2",
+          "address": "Debug Court, 1 Debug Street",
+          "postcode": "ZZ1 1ZZ",
+          "siteName": "Debug Hearing Centre",
+          "baseLocation": "000000"
+        },
+        "generalAppConsentOrder": "No",
+        "generalAppDateDeadline": "2026-05-26T16:00:00",
+        "parentClaimantIsApplicant": "No",
+        "generalAppSubmittedDateGAspec": "2026-05-19T13:46:40",
+        "generalAppApplicantAddlSolicitors": [
+          {
+            "id": "00000000-0000-4000-8000-000000000001",
+            "value": {
+              "id": "00000000-0000-4000-8000-000000000001",
+              "email": "debug.user@example.test",
+              "organisationIdentifier": "DEBUGORG"
+            }
+          },
+          {
+            "id": "00000000-0000-4000-8000-000000000001",
+            "value": {
+              "id": "00000000-0000-4000-8000-000000000001",
+              "email": "debug.user@example.test",
+              "organisationIdentifier": "DEBUGORG"
+            }
+          },
+          {
+            "id": "00000000-0000-4000-8000-000000000001",
+            "value": {
+              "id": "00000000-0000-4000-8000-000000000001",
+              "email": "debug.user@example.test",
+              "organisationIdentifier": "DEBUGORG"
+            }
+          },
+          {
+            "id": "00000000-0000-4000-8000-000000000001",
+            "value": {
+              "id": "00000000-0000-4000-8000-000000000001",
+              "email": "debug.user@example.test",
+              "organisationIdentifier": "DEBUGORG"
+            }
+          },
+          {
+            "id": "00000000-0000-4000-8000-000000000001",
+            "value": {
+              "id": "00000000-0000-4000-8000-000000000001",
+              "email": "debug.user@example.test",
+              "organisationIdentifier": "DEBUGORG"
+            }
+          },
+          {
+            "id": "00000000-0000-4000-8000-000000000001",
+            "value": {
+              "id": "00000000-0000-4000-8000-000000000001",
+              "email": "debug.user@example.test",
+              "organisationIdentifier": "DEBUGORG"
+            }
+          },
+          {
+            "id": "00000000-0000-4000-8000-000000000001",
+            "value": {
+              "id": "00000000-0000-4000-8000-000000000001",
+              "email": "debug.user@example.test",
+              "organisationIdentifier": "DEBUGORG"
+            }
+          },
+          {
+            "id": "00000000-0000-4000-8000-000000000001",
+            "value": {
+              "id": "00000000-0000-4000-8000-000000000001",
+              "email": "debug.user@example.test",
+              "organisationIdentifier": "DEBUGORG"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "legacyCaseReference": "DEBUG-CASE-REFERENCE",
+  "notificationSummary": "Debug notification summary",
+  "servedDocumentFiles": {
+    "other": [
+      {
+        "id": "00000000-0000-4000-8000-000000000001",
+        "value": {
+          "document": {
+            "category_id": "particularsOfClaim",
+            "document_url": "http://example.test/documents/debug-document",
+            "upload_timestamp": "2026-03-19T09:30:38.034499135",
+            "document_filename": "debug-document.pdf",
+            "document_binary_url": "http://example.test/documents/debug-document/binary"
+          }
+        }
+      }
+    ],
+    "medicalReport": [
+      {
+        "id": "00000000-0000-4000-8000-000000000001",
+        "value": {
+          "document": {
+            "category_id": "particularsOfClaim",
+            "document_url": "http://example.test/documents/debug-document",
+            "upload_timestamp": "2026-03-19T08:27:53.830875427",
+            "document_filename": "debug-document.pdf",
+            "document_binary_url": "http://example.test/documents/debug-document/binary"
+          }
+        }
+      }
+    ],
+    "scheduleOfLoss": [
+      {
+        "id": "00000000-0000-4000-8000-000000000001",
+        "value": {
+          "document": {
+            "category_id": "particularsOfClaim",
+            "document_url": "http://example.test/documents/debug-document",
+            "upload_timestamp": "2026-03-19T08:27:53.830875427",
+            "document_filename": "debug-document.pdf",
+            "document_binary_url": "http://example.test/documents/debug-document/binary"
+          }
+        }
+      }
+    ],
+    "particularsOfClaimDocument": [
+      {
+        "id": "00000000-0000-4000-8000-000000000001",
+        "value": {
+          "category_id": "particularsOfClaim",
+          "document_url": "http://example.test/documents/debug-document",
+          "upload_timestamp": "2026-03-19T08:27:53.830875427",
+          "document_filename": "debug-document.pdf",
+          "document_binary_url": "http://example.test/documents/debug-document/binary"
+        }
+      }
+    ]
+  },
+  "solicitorReferences": {
+    "applicantSolicitor1Reference": "DEBUG-REFERENCE",
+    "respondentSolicitor1Reference": "DEBUG-REFERENCE"
+  },
+  "claimantGaAppDetails": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "caseLink": {
+          "CaseReference": "1111222233334444"
+        },
+        "caseState": "Order Made",
+        "generalApplicationType": "Extend time",
+        "parentClaimantIsApplicant": "No",
+        "generalAppSubmittedDateGAspec": "2026-05-19T13:46:40"
+      }
+    }
+  ],
+  "generalOrderDocStaff": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "createdBy": "Debug User",
+        "documentLink": {
+          "category_id": "ordersMadeOnApplications",
+          "document_url": "http://example.test/documents/debug-document",
+          "upload_timestamp": "2026-05-25T07:45:32.773818381",
+          "document_filename": "debug-document.pdf",
+          "document_binary_url": "http://example.test/documents/debug-document/binary"
+        },
+        "documentName": "debug-document.pdf",
+        "documentSize": 39292,
+        "documentType": "GENERAL_ORDER",
+        "createdDatetime": "2026-05-25T08:45:32"
+      }
+    }
+  ],
+  "caseNameHmctsInternal": "Debug Claimant v Debug Defendant One Ltd",
+  "claimIssuedPBADetails": {
+    "fee": {
+      "code": "FEE0209",
+      "version": "3",
+      "calculatedAmountInPence": "250000"
+    },
+    "serviceRequestReference": "DEBUG-CASE-REFERENCE"
+  },
+  "claimNotificationDate": "2026-03-19T09:27:13",
+  "caseManagementCategory": {
+    "value": {
+      "code": "Civil",
+      "label": "Civil"
+    },
+    "list_items": [
+      {
+        "id": "00000000-0000-4000-8000-000000000001",
+        "value": {
+          "code": "Civil",
+          "label": "Civil"
+        }
+      }
+    ]
+  },
+  "caseManagementLocation": {
+    "region": "2",
+    "baseLocation": "000000"
+  },
+  "changeOfRepresentation": {
+    "caseRole": "[RESPONDENTSOLICITORTWO]",
+    "timestamp": "2026-03-24T15:11:34",
+    "organisationToAddID": "DEBUGORG"
+  },
+  "claimDismissedDeadline": "2029-05-21T23:59:59",
+  "claimProceedsInCaseman": {
+    "date": "2026-06-15",
+    "other": "Debug text",
+    "reason": "OTHER"
+  },
+  "cosNotifyClaimDetails2": {
+    "cosSender": "Debug Party",
+    "cosDocSaved": "Yes",
+    "cosRecipient": "Debug Party",
+    "cosSenderFirm": "Debug Party",
+    "cosEvidenceDocument": [
+      {
+        "id": "00000000-0000-4000-8000-000000000001",
+        "value": {
+          "category_id": "particularsOfClaim",
+          "document_url": "http://example.test/documents/debug-document",
+          "upload_timestamp": "2026-03-19T09:30:38.034499135",
+          "document_filename": "debug-document.pdf",
+          "document_binary_url": "http://example.test/documents/debug-document/binary"
+        }
+      }
+    ],
+    "cosRecipientServeType": "POSTED",
+    "cosServedDocumentFiles": "sealed claim form, particulars of claim, medical report, provisional schedule of loss, response pack",
+    "cosRecipientServeLocation": "1 Debug Street, Debugtown ZZ1 1ZZ",
+    "cosDateOfServiceForDefendant": "2026-03-19",
+    "cosRecipientServeLocationType": "PLACE_OF_BUSINESS",
+    "cosSenderStatementOfTruthLabel": [
+      "CERTIFIED"
+    ],
+    "cosDateDeemedServedForDefendant": "2026-03-23",
+    "cosRecipientServeLocationOwnerType": "SOLICITOR"
+  },
+  "gaAddlDocRespondentSol": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "createdBy": "Debug User",
+        "documentLink": {
+          "category_id": "applications",
+          "document_url": "http://example.test/documents/debug-document",
+          "upload_timestamp": "2026-05-19T13:46:40.364490331",
+          "document_filename": "debug-document.pdf",
+          "document_binary_url": "http://example.test/documents/debug-document/binary"
+        },
+        "documentName": "debug-document.pdf",
+        "documentSize": 0,
+        "createdDatetime": "2026-05-19T14:46:41"
+      }
+    }
+  ],
+  "respondent1Represented": "Yes",
+  "respondent2Represented": "Yes",
+  "gaDraftDocRespondentSol": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "createdBy": "Debug User",
+        "documentLink": {
+          "category_id": "applications",
+          "document_url": "http://example.test/documents/debug-document",
+          "upload_timestamp": "2026-05-20T15:23:07.770900351",
+          "document_filename": "debug-document.pdf",
+          "document_binary_url": "http://example.test/documents/debug-document/binary"
+        },
+        "documentName": "debug-document.pdf",
+        "documentSize": 47165,
+        "documentType": "GENERAL_APPLICATION_DRAFT",
+        "createdDatetime": "2026-05-20T16:23:07"
+      }
+    }
+  ],
+  "generalOrderDocClaimant": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "createdBy": "Debug User",
+        "documentLink": {
+          "category_id": "ordersMadeOnApplications",
+          "document_url": "http://example.test/documents/debug-document",
+          "upload_timestamp": "2026-05-25T07:45:32.773818381",
+          "document_filename": "debug-document.pdf",
+          "document_binary_url": "http://example.test/documents/debug-document/binary"
+        },
+        "documentName": "debug-document.pdf",
+        "documentSize": 39292,
+        "documentType": "GENERAL_ORDER",
+        "createdDatetime": "2026-05-25T08:45:32"
+      }
+    }
+  ],
+  "respondent1ResponseDate": "2026-05-13T15:06:50",
+  "takenOfflineByStaffDate": "2026-06-15T09:26:31",
+  "cosNotifyClaimDefendant2": {
+    "cosSender": "Debug Party",
+    "cosRecipient": "Debug Party",
+    "cosSenderFirm": "Debug Party",
+    "cosRecipientServeType": "POSTED",
+    "cosServedDocumentFiles": "sealed claim form, particulars of claim, medical report, provisional schedule of loss, response pack",
+    "cosRecipientServeLocation": "1 Debug Street, Debugtown ZZ1 1ZZ",
+    "cosDateOfServiceForDefendant": "2026-03-19",
+    "cosRecipientServeLocationType": "PLACE_OF_BUSINESS",
+    "cosSenderStatementOfTruthLabel": [
+      "CERTIFIED"
+    ],
+    "cosDateDeemedServedForDefendant": "2026-03-23",
+    "cosRecipientServeLocationOwnerType": "SOLICITOR"
+  },
+  "respondent1OrgRegistered": "Yes",
+  "respondent2OrgRegistered": "Yes",
+  "uploadParticularsOfClaim": "No",
+  "applicant1DQRemoteHearing": {
+    "reasonForRemoteHearing": "Debug text",
+    "remoteHearingRequested": "Yes"
+  },
+  "claimIssuedPaymentDetails": {
+    "status": "SUCCESS",
+    "reference": "DEBUG-REFERENCE"
+  },
+  "claimNotificationDeadline": "2026-03-24T23:59:59",
+  "gaAddlDocRespondentSolTwo": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "createdBy": "Debug User",
+        "documentLink": {
+          "category_id": "applications",
+          "document_url": "http://example.test/documents/debug-document",
+          "upload_timestamp": "2026-05-19T13:46:40.364490331",
+          "document_filename": "debug-document.pdf",
+          "document_binary_url": "http://example.test/documents/debug-document/binary"
+        },
+        "documentName": "debug-document.pdf",
+        "documentSize": 0,
+        "createdDatetime": "2026-05-19T14:46:41"
+      }
+    }
+  ],
+  "gaDetailsMasterCollection": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "caseLink": {
+          "CaseReference": "1111222233334444"
+        },
+        "caseState": "Order Made",
+        "generalApplicationType": "Extend time",
+        "parentClaimantIsApplicant": "No",
+        "generalAppSubmittedDateGAspec": "2026-05-19T13:46:40"
+      }
+    }
+  ],
+  "respondentSolGaAppDetails": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "caseLink": {
+          "CaseReference": "1111222233334444"
+        },
+        "caseState": "Order Made",
+        "generalApplicationType": "Extend time",
+        "parentClaimantIsApplicant": "No",
+        "generalAppSubmittedDateGAspec": "2026-05-19T13:46:40"
+      }
+    }
+  ],
+  "defendant1LIPAtClaimIssued": "No",
+  "defendant2LIPAtClaimIssued": "No",
+  "defendantResponseDocuments": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "createdBy": "Debug User",
+        "documentLink": {
+          "category_id": "defendant1DefenseDirectionsQuestionnaire",
+          "document_url": "http://example.test/documents/debug-document",
+          "upload_timestamp": "2026-05-13T14:06:50.262413918",
+          "document_filename": "debug-document.pdf",
+          "document_binary_url": "http://example.test/documents/debug-document/binary"
+        },
+        "documentName": "debug-document.pdf",
+        "documentSize": 0,
+        "documentType": "DEFENDANT_DEFENCE",
+        "createdDatetime": "2026-05-13T15:06:50"
+      }
+    }
+  ],
+  "gaDraftDocRespondentSolTwo": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "createdBy": "Debug User",
+        "documentLink": {
+          "category_id": "applications",
+          "document_url": "http://example.test/documents/debug-document",
+          "upload_timestamp": "2026-05-20T15:23:07.770900351",
+          "document_filename": "debug-document.pdf",
+          "document_binary_url": "http://example.test/documents/debug-document/binary"
+        },
+        "documentName": "debug-document.pdf",
+        "documentSize": 47165,
+        "documentType": "GENERAL_APPLICATION_DRAFT",
+        "createdDatetime": "2026-05-20T16:23:07"
+      }
+    }
+  ],
+  "multiPartyResponseTypeFlags": "PART_ADMISSION",
+  "respondent1ResponseDeadline": "2026-05-14T16:00:00",
+  "respondent2ResponseDeadline": "2026-05-19T16:00:00",
+  "applicant1OrganisationPolicy": {
+    "Organisation": {
+      "OrganisationID": "DEBUGORG"
+    },
+    "OrgPolicyReference": "DEBUG-REFERENCE",
+    "OrgPolicyCaseAssignedRole": "[APPLICANTSOLICITORONE]"
+  },
+  "claimDetailsNotificationDate": "2026-03-19T09:30:37",
+  "generalOrderDocRespondentSol": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "createdBy": "Debug User",
+        "documentLink": {
+          "category_id": "ordersMadeOnApplications",
+          "document_url": "http://example.test/documents/debug-document",
+          "upload_timestamp": "2026-05-25T07:45:32.773818381",
+          "document_filename": "debug-document.pdf",
+          "document_binary_url": "http://example.test/documents/debug-document/binary"
+        },
+        "documentName": "debug-document.pdf",
+        "documentSize": 39292,
+        "documentType": "GENERAL_ORDER",
+        "createdDatetime": "2026-05-25T08:45:32"
+      }
+    }
+  ],
+  "respondent1ClaimResponseType": "PART_ADMISSION",
+  "respondent1TimeExtensionDate": "2026-04-14T14:41:18",
+  "respondent2TimeExtensionDate": "2026-04-20T12:35:19",
+  "respondentSolTwoGaAppDetails": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "caseLink": {
+          "CaseReference": "1111222233334444"
+        },
+        "caseState": "Order Made",
+        "generalApplicationType": "Extend time",
+        "parentClaimantIsApplicant": "No",
+        "generalAppSubmittedDateGAspec": "2026-05-19T13:46:40"
+      }
+    }
+  ],
+  "systemGeneratedCaseDocuments": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "createdBy": "Debug User",
+        "documentLink": {
+          "category_id": "detailsOfClaim",
+          "document_url": "http://example.test/documents/debug-document",
+          "upload_timestamp": "2025-11-24T17:27:24.742485322",
+          "document_filename": "debug-document.pdf",
+          "document_binary_url": "http://example.test/documents/debug-document/binary"
+        },
+        "documentName": "debug-document.pdf",
+        "documentSize": 132692,
+        "documentType": "SEALED_CLAIM",
+        "createdDatetime": "2025-11-24T17:27:24"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "createdBy": "Debug User",
+        "documentLink": {
+          "category_id": "defendant1DefenseDirectionsQuestionnaire",
+          "document_url": "http://example.test/documents/debug-document",
+          "upload_timestamp": "2026-03-26T15:47:29.169935766",
+          "document_filename": "debug-document.pdf",
+          "document_binary_url": "http://example.test/documents/debug-document/binary"
+        },
+        "documentName": "debug-document.pdf",
+        "documentSize": 89599,
+        "documentType": "ACKNOWLEDGEMENT_OF_CLAIM",
+        "createdDatetime": "2026-03-26T15:47:28"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "createdBy": "Debug User",
+        "documentLink": {
+          "category_id": "defendant2DefenseDirectionsQuestionnaire",
+          "document_url": "http://example.test/documents/debug-document",
+          "upload_timestamp": "2026-04-02T14:52:40.689781671",
+          "document_filename": "debug-document.pdf",
+          "document_binary_url": "http://example.test/documents/debug-document/binary"
+        },
+        "documentName": "debug-document.pdf",
+        "documentSize": 88963,
+        "documentType": "ACKNOWLEDGEMENT_OF_CLAIM",
+        "createdDatetime": "2026-04-02T15:52:40"
+      }
+    }
+  ],
+  "respondent1DQStatementOfTruth": {
+    "name": "Debug Claimant v Debug Defendant One Ltd",
+    "role": "Debug Role"
+  },
+  "respondent1OrganisationIDCopy": "DEBUGORG",
+  "respondent1OrganisationPolicy": {
+    "Organisation": {
+      "OrganisationID": "DEBUGORG"
+    },
+    "OrgPolicyReference": "DEBUG-REFERENCE",
+    "OrgPolicyCaseAssignedRole": "[RESPONDENTSOLICITORONE]"
+  },
+  "respondent2OrganisationIDCopy": "DEBUGORG",
+  "respondent2OrganisationPolicy": {
+    "Organisation": {
+      "OrganisationID": "DEBUGORG"
+    },
+    "PreviousOrganisations": [
+      {
+        "id": "00000000-0000-4000-8000-000000000001",
+        "value": {
+          "ToTimestamp": "2026-03-24T15:11:36",
+          "FromTimestamp": "2025-11-24T17:26:27"
+        }
+      }
+    ],
+    "OrgPolicyCaseAssignedRole": "[RESPONDENTSOLICITORTWO]"
+  },
+  "applicantSolicitor1UserDetails": {
+    "email": "debug.user@example.test"
+  },
+  "generalOrderDocRespondentSolTwo": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "value": {
+        "createdBy": "Debug User",
+        "documentLink": {
+          "category_id": "ordersMadeOnApplications",
+          "document_url": "http://example.test/documents/debug-document",
+          "upload_timestamp": "2026-05-25T07:45:32.773818381",
+          "document_filename": "debug-document.pdf",
+          "document_binary_url": "http://example.test/documents/debug-document/binary"
+        },
+        "documentName": "debug-document.pdf",
+        "documentSize": 39292,
+        "documentType": "GENERAL_ORDER",
+        "createdDatetime": "2026-05-25T08:45:32"
+      }
+    }
+  ],
+  "claimDetailsNotificationDeadline": "2026-03-24T23:59:59",
+  "respondent1ClaimResponseDocument": {
+    "file": {
+      "category_id": "defendant1DefenseDirectionsQuestionnaire",
+      "document_url": "http://example.test/documents/debug-document",
+      "upload_timestamp": "2026-05-13T14:06:50.262413918",
+      "document_filename": "debug-document.pdf",
+      "document_binary_url": "http://example.test/documents/debug-document/binary"
+    }
+  },
+  "respondentSolicitor1EmailAddress": "debug.user@example.test",
+  "respondentSolicitor2EmailAddress": "debug.user@example.test",
+  "applicant1LitigationFriendRequired": "No",
+  "respondent2SameLegalRepresentative": "No",
+  "respondentSolicitor1ServiceAddress": {
+    "Country": "United Kingdom",
+    "PostCode": "ZZ1 1ZZ",
+    "PostTown": "Debugtown",
+    "AddressLine1": "1 Debug Street",
+    "AddressLine2": "Debug Area"
+  },
+  "respondent1DetailsForClaimDetailsTab": {
+    "type": "COMPANY",
+    "partyID": "debug-party-id",
+    "partyName": "Debug Claimant v Debug Defendant One Ltd",
+    "companyName": "Debug Claimant v Debug Defendant One Ltd",
+    "primaryAddress": {
+      "PostCode": "ZZ1 1ZZ",
+      "PostTown": "Debugtown",
+      "AddressLine1": "1 Debug Street"
+    },
+    "partyTypeDisplayValue": "Company"
+  },
+  "respondent2DetailsForClaimDetailsTab": {
+    "type": "COMPANY",
+    "partyID": "debug-party-id",
+    "partyName": "Debug Claimant v Debug Defendant One Ltd",
+    "companyName": "Debug Claimant v Debug Defendant One Ltd",
+    "primaryAddress": {
+      "PostCode": "ZZ1 1ZZ",
+      "PostTown": "Debugtown",
+      "AddressLine1": "1 Debug Street",
+      "AddressLine2": "Debug Area"
+    },
+    "partyTypeDisplayValue": "Company"
+  },
+  "respondent1ClaimResponseIntentionType": "FULL_DEFENCE",
+  "respondent2ClaimResponseIntentionType": "FULL_DEFENCE",
+  "respondent1AcknowledgeNotificationDate": "2026-03-26T15:47:27",
+  "respondent2AcknowledgeNotificationDate": "2026-04-02T15:52:39",
+  "applicantSolicitor1ClaimStatementOfTruth": {
+    "name": "Debug Claimant v Debug Defendant One Ltd",
+    "role": "Debug Role"
+  },
+  "applicantSolicitor1ServiceAddressRequired": "No",
+  "respondentSolicitor1ServiceAddressRequired": "Yes",
+  "respondentSolicitor2ServiceAddressRequired": "No",
+  "specApplicantCorrespondenceAddressRequired": "No",
+  "caseListDisplayDefendantSolicitorReferences": "DEBUG-REFERENCE",
+  "respondentSolicitor1AgreedDeadlineExtension": "2026-05-14",
+  "respondentSolicitor2AgreedDeadlineExtension": "2026-05-19",
+  "specRespondentCorrespondenceAddressRequired": "No",
+  "specRespondent2CorrespondenceAddressRequired": "No",
+  "unassignedCaseListDisplayOrganisationReferences": "DEBUG-REFERENCE"
+}

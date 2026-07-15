@@ -4,11 +4,29 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
 
+import java.time.Duration;
 import java.util.Map;
 
 @Component
 @AllArgsConstructor
 public class ScheduledEventTracker {
+
+    private static final String SCHEDULER_NAME = "schedulerName";
+    private static final String TOTAL_CASES = "totalCases";
+    private static final String SUCCEEDED_CASES = "succeededCases";
+    private static final String FAILED_CASES = "failedCases";
+    private static final String ABORT_REASON = "abortReason";
+    private static final String CUMULATIVE_DELAY = "cumulativeDelay";
+    private static final String UNKNOWN = "Unknown";
+    private static final String ZERO = String.valueOf(0);
+    private static final String FAILURE = "FAILURE";
+    private static final String SUCCESS = "SUCCESS";
+    private static final String CASE_ID = "caseId";
+    private static final String STATUS = "status";
+    private static final String ERROR = "error";
+    private static final String ERROR_CATEGORY = "errorCategory";
+    private static final String PREVIOUS_DELAY = "previousDelay";
+    private static final String CURRENT_DELAY = "currentDelay";
 
     private final ErrorCategorizer errorCategorizer;
     private final TelemetryService telemetryService;
@@ -17,31 +35,41 @@ public class ScheduledEventTracker {
         telemetryService.trackEvent(
             eventConfig.getJobStartedEvent(),
             Map.of(
-                "schedulerName", eventConfig.getSchedulerName(),
-                "totalCases", String.valueOf(casesSize)
+                SCHEDULER_NAME, eventConfig.getSchedulerName(),
+                TOTAL_CASES, String.valueOf(casesSize),
+                SUCCEEDED_CASES, ZERO,
+                FAILED_CASES, ZERO
             )
         );
     }
 
     public void caseProcessedEvent(ScheduledTaskEventConfiguration eventConfig, Long caseId) {
+        caseProcessedEvent(eventConfig, String.valueOf(caseId));
+    }
+
+    public void caseProcessedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId) {
         telemetryService.trackEvent(
             eventConfig.getCaseProcessedEvent(),
             Map.of(
-                "schedulerName", eventConfig.getSchedulerName(),
-                "caseId", String.valueOf(caseId),
-                "status", "SUCCESS"
+                SCHEDULER_NAME, eventConfig.getSchedulerName(),
+                CASE_ID, caseId,
+                STATUS, SUCCESS
             )
         );
     }
 
     public void caseFailedEvent(ScheduledTaskEventConfiguration eventConfig, Long caseId, Exception e) {
+        caseFailedEvent(eventConfig, String.valueOf(caseId), e);
+    }
+
+    public void caseFailedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, Exception e) {
         telemetryService.trackEvent(
             eventConfig.getCaseFailedEvent(), Map.of(
-                "schedulerName", eventConfig.getSchedulerName(),
-                "caseId", String.valueOf(caseId),
-                "status", "FAILURE",
-                "error", e.getMessage(),
-                "errorCategory", errorCategorizer.categorizeError(e)
+                SCHEDULER_NAME, eventConfig.getSchedulerName(),
+                CASE_ID, caseId,
+                STATUS, FAILURE,
+                ERROR, e.getMessage(),
+                ERROR_CATEGORY, errorCategorizer.categorizeError(e)
             )
         );
     }
@@ -49,14 +77,16 @@ public class ScheduledEventTracker {
     public void jobCompletedEvent(ScheduledTaskEventConfiguration eventConfig,
                                   int totalCases,
                                   int succeededCases,
-                                  int failedCases) {
+                                  int failedCases,
+                                  Duration cumulativeDelay) {
         telemetryService.trackEvent(
             eventConfig.getJobCompletedEvent(),
             Map.of(
-                "schedulerName", eventConfig.getSchedulerName(),
-                "totalCases", String.valueOf(totalCases),
-                "succeededCases", String.valueOf(succeededCases),
-                "failedCases", String.valueOf(failedCases)
+                SCHEDULER_NAME, eventConfig.getSchedulerName(),
+                TOTAL_CASES, String.valueOf(totalCases),
+                SUCCEEDED_CASES, String.valueOf(succeededCases),
+                FAILED_CASES, String.valueOf(failedCases),
+                CUMULATIVE_DELAY, String.valueOf(cumulativeDelay.toMillis())
             )
         );
     }
@@ -65,8 +95,11 @@ public class ScheduledEventTracker {
         telemetryService.trackEvent(
             eventConfig.getJobCompletedEvent(),
             Map.of(
-                "schedulerName", eventConfig.getSchedulerName(),
-                "totalCases", String.valueOf(0)
+                SCHEDULER_NAME, eventConfig.getSchedulerName(),
+                TOTAL_CASES, ZERO,
+                SUCCEEDED_CASES, ZERO,
+                FAILED_CASES, ZERO,
+                CUMULATIVE_DELAY, ZERO
             )
         );
     }
@@ -75,15 +108,17 @@ public class ScheduledEventTracker {
                                 int totalCases,
                                 int succeededCases,
                                 int failedCases,
-                                String reason) {
+                                String reason,
+                                Duration cumulativeDelay) {
         telemetryService.trackEvent(
             eventConfig.getJobAbortedEvent(),
             Map.of(
-                "schedulerName", eventConfig.getSchedulerName(),
-                "totalCases", String.valueOf(totalCases),
-                "succeededCases", String.valueOf(succeededCases),
-                "failedCases", String.valueOf(failedCases),
-                "abortReason", reason != null ? reason : "Unknown"
+                SCHEDULER_NAME, eventConfig.getSchedulerName(),
+                TOTAL_CASES, String.valueOf(totalCases),
+                SUCCEEDED_CASES, String.valueOf(succeededCases),
+                FAILED_CASES, String.valueOf(failedCases),
+                ABORT_REASON, reason != null ? reason : UNKNOWN,
+                CUMULATIVE_DELAY, String.valueOf(cumulativeDelay.toMillis())
             )
         );
     }
@@ -92,8 +127,23 @@ public class ScheduledEventTracker {
         telemetryService.trackEvent(
             eventConfig.getJobAbortedEvent(),
             Map.of(
-                "schedulerName", eventConfig.getSchedulerName(),
-                "abortReason", reason != null ? reason : "Unknown"
+                SCHEDULER_NAME, eventConfig.getSchedulerName(),
+                TOTAL_CASES, ZERO,
+                SUCCEEDED_CASES, ZERO,
+                FAILED_CASES, ZERO,
+                ABORT_REASON, reason != null ? reason : UNKNOWN,
+                CUMULATIVE_DELAY, ZERO
+            )
+        );
+    }
+
+    public void backPressureUpdatedEvent(ScheduledTaskEventConfiguration eventConfig, Duration oldDelay, Duration newDelay) {
+        telemetryService.trackEvent(
+            eventConfig.getBackPressureUpdatedEvent(),
+            Map.of(
+                SCHEDULER_NAME, eventConfig.getSchedulerName(),
+                PREVIOUS_DELAY, String.valueOf(oldDelay.toMillis()),
+                CURRENT_DELAY, String.valueOf(newDelay.toMillis())
             )
         );
     }

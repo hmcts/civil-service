@@ -37,7 +37,6 @@ class SdoDisposalTemplateServiceTest {
         when(disposalDirectionsService.getFinalHearingTimeLabel(caseData)).thenReturn("4 hours");
         when(disposalDirectionsService.getTelephoneHearingLabel(caseData)).thenReturn("claimant");
         when(disposalDirectionsService.getVideoConferenceHearingLabel(caseData)).thenReturn("defendant");
-        when(disposalDirectionsService.getBundleTypeText(caseData)).thenReturn("bundle type");
         when(disposalDirectionsService.hasDisposalVariable(eq(caseData), any())).thenReturn(true);
 
         LocationRefData location = new LocationRefData();
@@ -61,5 +60,6 @@ class SdoDisposalTemplateServiceTest {
         assertThat(result.getDisposalHearingTimeEstimate()).isEqualTo("2 hours 30 minutes");
         assertThat(result.getHearingLocation()).isEqualTo(location);
         assertThat(result.isHasDisposalWelshToggle()).isFalse();
+        assertThat(result.getCcdCaseReference()).isEqualTo("1594901956117591");
     }
 }

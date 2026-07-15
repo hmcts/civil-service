@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -23,8 +22,9 @@ import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
 import java.util.Map;
 
 import static java.util.Optional.ofNullable;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
-@RequiredArgsConstructor
 @Component
 public class GaSpecExternalCaseEventTaskHandler extends BaseExternalTaskHandler {
 
@@ -32,6 +32,21 @@ public class GaSpecExternalCaseEventTaskHandler extends BaseExternalTaskHandler 
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
     private final GaStateFlowEngine stateFlowEngine;
+
+    public GaSpecExternalCaseEventTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        GaCoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter,
+        ObjectMapper mapper,
+        GaStateFlowEngine stateFlowEngine
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.mapper = mapper;
+        this.stateFlowEngine = stateFlowEngine;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {

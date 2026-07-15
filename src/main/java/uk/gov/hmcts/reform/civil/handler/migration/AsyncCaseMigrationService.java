@@ -12,10 +12,12 @@ import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -71,6 +73,8 @@ public class AsyncCaseMigrationService {
                     startEventResponse = coreCaseDataService.startGeneralApplicationUpdate(caseReference.getCaseReference(), CaseEvent.UPDATE_CASE_DATA);
                     CaseDetails caseDetails = startEventResponse.getCaseDetails();
                     caseData = caseDetailsConverter.toGACaseData(caseDetails);
+                    GeneralApplicationCaseData gaCaseData = caseDetailsConverter.toGeneralApplicationCaseData(caseDetails);
+                    caseData = task.migrateGeneralApplicationCaseData(caseData, gaCaseData, caseReference);
                 } else {
                     startEventResponse = coreCaseDataService.startUpdate(
                         caseReference.getCaseReference(),
@@ -78,8 +82,8 @@ public class AsyncCaseMigrationService {
                     );
                     CaseDetails caseDetails = startEventResponse.getCaseDetails();
                     caseData = caseDetailsConverter.toCaseData(caseDetails);
+                    caseData = task.migrateCaseData(caseData, caseReference);
                 }
-                caseData = task.migrateCaseData(caseData, caseReference);
                 Optional<String> updatedState = task.getUpdatedState(state);
                 if (updatedState.isPresent()) {
                     String newState = updatedState.get();
@@ -107,9 +111,10 @@ public class AsyncCaseMigrationService {
         }
     }
 
-    protected CaseDataContent buildCaseDataContent(StartEventResponse startEventResponse, CaseData caseData, MigrationTask task) {
+    protected CaseDataContent buildCaseDataContent(StartEventResponse startEventResponse, CaseData caseData, MigrationTask<?> task) {
 
-        Map<String, Object> updatedData = caseData.toMap(objectMapper);
+        Map<String, Object> updatedData = new HashMap<>(caseData.toMap(objectMapper));
+        task.getFieldsToNullify().forEach(field -> updatedData.put(field, null));
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
             .event(Event.builder().id(startEventResponse.getEventId())

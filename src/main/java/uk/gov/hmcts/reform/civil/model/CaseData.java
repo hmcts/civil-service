@@ -415,6 +415,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  MediationAvailability resp2MediationAvailability;
 
     private final String additionalInformationForJudge;
+    @JsonProperty("applicant1AdditionalInformationForJudge")
     private final String applicantAdditionalInformationForJudge;
     @JsonUnwrapped
     private  ExpertRequirements respondToClaimExperts;
@@ -1500,8 +1501,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean hearingFeePaymentDoneWithHWF() {
-        return isLipvLipOneVOne()
-            && Objects.nonNull(getHearingHelpFeesReferenceNumber())
+        return Objects.nonNull(getHearingHelpFeesReferenceNumber())
             && Objects.nonNull(getFeePaymentOutcomeDetails())
             && Objects.nonNull(getFeePaymentOutcomeDetails().getHwfFullRemissionGrantedForHearingFee());
     }

@@ -1,12 +1,22 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
+import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RegistrationInformation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentAddress;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
@@ -14,20 +24,26 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
-import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.checkIfDateDifferenceIsGreaterThan31Days;
-import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ;
-import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ;
-import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getMoneyValue;
-import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getPartialPayment;
-import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.isNonDivergentForDJ;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.checkIfDateDifferenceIsGreaterThanDaysInMonth;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.clearJOCaseData;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getMoneyValue;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getPartialPayment;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.isDefaultJudgmentRequested;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.isNonDivergentForDJ;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 public class JudgmentsOnlineHelperTest {
 
@@ -48,8 +64,8 @@ public class JudgmentsOnlineHelperTest {
 
     @Test
     void shouldCheckIfDateDifferenceIsGreaterThan31Days() {
-        assertThat(checkIfDateDifferenceIsGreaterThan31Days(LocalDate.now(), LocalDate.now().plusDays(31))).isFalse();
-        assertThat(checkIfDateDifferenceIsGreaterThan31Days(LocalDate.now(), LocalDate.now().plusDays(32))).isTrue();
+        assertThat(checkIfDateDifferenceIsGreaterThanDaysInMonth(LocalDate.of(2026, 4,  5), LocalDate.of(2026, 4,  7))).isFalse();
+        assertThat(checkIfDateDifferenceIsGreaterThanDaysInMonth(LocalDate.of(2026, 3,  5), LocalDate.of(2026, 4,  7))).isTrue();
     }
 
     @Test
@@ -78,6 +94,25 @@ public class JudgmentsOnlineHelperTest {
             .defendantDetailsSpec(new DynamicList().setValue(new DynamicListElement().setLabel("John Smith")))
             .build();
         assertThat(isNonDivergentForDJ(caseData)).isFalse();
+    }
+
+    @Test
+    void shouldIdentifyDefaultJudgmentRequestedState() {
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.JUDGMENT_REQUESTED)
+            .build();
+
+        assertThat(isDefaultJudgmentRequested(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalseWhenDefaultJudgmentNotRequested() {
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .build();
+
+        assertThat(isDefaultJudgmentRequested(caseData)).isFalse();
+        assertThat(isDefaultJudgmentRequested(null)).isFalse();
     }
 
     @Test
@@ -168,5 +203,89 @@ public class JudgmentsOnlineHelperTest {
             .setAmountAlreadyPaid("10");
 
         assertThat(calculateRepaymentBreakdownSummaryWithoutClaimInterest(activeJudgment, false)).isNotNull();
+    }
+
+    @Nested
+    class IsJoRequested {
+        @Test
+        void shouldReturnTrueWhenJoRequestedAndFeatureEnabled() {
+            FeatureToggleService featureToggleService = mock(FeatureToggleService.class);
+            when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+            CaseData caseData = CaseData.builder().isJoRequested(YES).build();
+
+            assertThat(JudgmentsOnlineHelper.isJoRequested(caseData, featureToggleService)).isTrue();
+        }
+
+        @Test
+        void shouldReturnFalseWhenJoRequestedAndFeatureDisabled() {
+            FeatureToggleService featureToggleService = mock(FeatureToggleService.class);
+            when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(false);
+            CaseData caseData = CaseData.builder().isJoRequested(YES).build();
+
+            assertThat(JudgmentsOnlineHelper.isJoRequested(caseData, featureToggleService)).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalseWhenJoNotRequestedAndFeatureEnabled() {
+            FeatureToggleService featureToggleService = mock(FeatureToggleService.class);
+            when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+            CaseData caseData = CaseData.builder().isJoRequested(YesOrNo.NO).build();
+
+            assertThat(JudgmentsOnlineHelper.isJoRequested(caseData, featureToggleService)).isFalse();
+        }
+    }
+
+    @Test
+    void shouldClearJoCaseDataExceptIsJoRequested() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued().build();
+        caseData.setActiveJudgment(new JudgmentDetails());
+        caseData.setDefaultJudgementOverallTotal(BigDecimal.TEN);
+        caseData.setJoDefendantName1("Defendant 1");
+        caseData.setJoDJCreatedDate(LocalDateTime.now());
+        caseData.setJoIsDisplayInJudgmentTab(YES);
+        caseData.setJoIsLiveJudgmentExists(YES);
+        caseData.setJoPaymentPlanSelected(PaymentPlanSelection.PAY_IMMEDIATELY);
+        caseData.setJoRepaymentAmount("100");
+        caseData.setJoRepaymentFrequency(PaymentFrequency.MONTHLY);
+        caseData.setJoRepaymentStartDate(LocalDate.now());
+        caseData.setJoRepaymentSummaryObject("jo repayment summary");
+        caseData.setPartialPayment(YES);
+        caseData.setPaymentConfirmationDecisionSpec(YES);
+        caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
+        caseData.setRegistrationTypeRespondentOne(List.of(new Element<>(UUID.randomUUID(), new RegistrationInformation())));
+        caseData.setRepaymentDate(LocalDate.now());
+        caseData.setRepaymentDue("repayment due");
+        caseData.setRepaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH);
+        caseData.setRepaymentSuggestion("repayment suggestion");
+        caseData.setRepaymentSummaryObject("repayment summary");
+        caseData.setShowOldDJFixedCostsScreen(YES);
+        caseData.setIsJoRequested(YES);
+
+        CaseData clearedCaseData = clearJOCaseData(caseData);
+
+        assertThat(clearedCaseData).isSameAs(caseData);
+        assertThat(clearedCaseData.getIsJoRequested()).isEqualTo(YES);
+        assertThat(clearedCaseData.getActiveJudgment()).isNull();
+        assertThat(clearedCaseData.getDefaultJudgementOverallTotal()).isNull();
+        assertThat(clearedCaseData.getJoDefendantName1()).isNull();
+        assertThat(clearedCaseData.getJoDJCreatedDate()).isNull();
+        assertThat(clearedCaseData.getJoIsDisplayInJudgmentTab()).isNull();
+        assertThat(clearedCaseData.getJoIsLiveJudgmentExists()).isNull();
+        assertThat(clearedCaseData.getJoPaymentPlanSelected()).isNull();
+        assertThat(clearedCaseData.getJoRepaymentAmount()).isNull();
+        assertThat(clearedCaseData.getJoRepaymentFrequency()).isNull();
+        assertThat(clearedCaseData.getJoRepaymentStartDate()).isNull();
+        assertThat(clearedCaseData.getJoRepaymentSummaryObject()).isNull();
+        assertThat(clearedCaseData.getPartialPayment()).isNull();
+        assertThat(clearedCaseData.getPaymentConfirmationDecisionSpec()).isNull();
+        assertThat(clearedCaseData.getPaymentTypeSelection()).isNull();
+        assertThat(clearedCaseData.getRegistrationTypeRespondentOne()).isNull();
+        assertThat(clearedCaseData.getRepaymentDate()).isNull();
+        assertThat(clearedCaseData.getRepaymentDue()).isNull();
+        assertThat(clearedCaseData.getRepaymentFrequency()).isNull();
+        assertThat(clearedCaseData.getRepaymentSuggestion()).isNull();
+        assertThat(clearedCaseData.getRepaymentSummaryObject()).isNull();
+        assertThat(clearedCaseData.getShowOldDJFixedCostsScreen()).isNull();
     }
 }

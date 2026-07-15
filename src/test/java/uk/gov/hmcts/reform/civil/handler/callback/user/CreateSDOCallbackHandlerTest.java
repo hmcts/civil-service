@@ -216,6 +216,9 @@ import static uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions.OPEN_DATE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MINTI_DISPOSAL_NOT_ALLOWED;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_DOCUMENTS_EXCHANGE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_WITNESS_UPLOAD;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_PERMISSION_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIM_WITNESS_STATEMENT_TEXT;
 
 @SpringBootTest(classes = {
@@ -389,7 +392,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToStartCallback extends LocationRefSampleDataBuilder {
         @BeforeEach
         void setup() {
-            given(locationRefDataService.getHearingCourtLocations(any()))
+            given(locationRefDataService.getHearingCourtLocations(any(), any()))
                 .willReturn(getSampleCourLocationsRefObject());
             when(workingDayIndicator.getNextWorkingDay(LocalDate.now())).thenReturn(LocalDate.now().plusDays(1));
             when(deadlinesCalculator.calculateFirstWorkingDay(any(LocalDate.class)))
@@ -411,7 +414,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
                 locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
             );
-            when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+            when(locationRefDataService.getHearingCourtLocations(anyString(), anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
 
@@ -450,7 +453,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
                 locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
             );
-            when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+            when(locationRefDataService.getHearingCourtLocations(anyString(), anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
 
@@ -494,7 +497,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
                 locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
             );
-            when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+            when(locationRefDataService.getHearingCourtLocations(anyString(), anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
@@ -529,7 +532,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
                 locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
             );
-            when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+            when(locationRefDataService.getHearingCourtLocations(anyString(), anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
@@ -572,7 +575,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
                 locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
             );
-            when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+            when(locationRefDataService.getHearingCourtLocations(anyString(), anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
@@ -615,7 +618,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
                 locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
             );
-            when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+            when(locationRefDataService.getHearingCourtLocations(anyString(), anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
@@ -761,7 +764,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
                 locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
             );
-            when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+            when(locationRefDataService.getHearingCourtLocations(anyString(), anyString())).thenReturn(locations);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
             caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
@@ -796,7 +799,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
                 locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
             );
-            when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+            when(locationRefDataService.getHearingCourtLocations(anyString(), anyString())).thenReturn(locations);
 
             Category category = hearingChannelCategory(HearingSubChannel.INTER.name(), HearingMethod.IN_PERSON.getLabel());
             CategorySearchResult categorySearchResult = categorySearchResult(category);
@@ -1329,7 +1332,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(featureToggleService.isLocationWhiteListedForCaseProgression(optionTwo.getCode()))
             .thenReturn(isLocationWhiteListed);
         when(locationRefDataService.getLocationMatchingLabel(optionTwo.getCode(), params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString()))
+            CallbackParams.Params.BEARER_TOKEN).toString(), "AAA6"))
             .thenReturn(Optional.of(locationRefDataWithRegion()));
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1392,7 +1395,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPrePopulateDisposalHearingPage() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            given(locationRefDataService.getHearingCourtLocations(any()))
+            given(locationRefDataService.getHearingCourtLocations(any(), any()))
                 .willReturn(getSampleCourLocationsRefObject());
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
                 .thenReturn(LocalDate.now().plusDays(5));
@@ -1425,7 +1428,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setCaseAccessCategory(SPEC_CLAIM);
             caseData.setTotalClaimAmount(BigDecimal.valueOf(10000));
 
-            given(locationRefDataService.getHearingCourtLocations(any()))
+            given(locationRefDataService.getHearingCourtLocations(any(), any()))
                 .willReturn(getSampleCourLocationsRefObject());
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
                 .thenReturn(LocalDate.now().plusDays(5));
@@ -1460,7 +1463,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setCaseAccessCategory(SPEC_CLAIM);
             caseData.setTotalClaimAmount(BigDecimal.valueOf(10000));
             caseData.setApplicant1DQ(applicant1DQ);
-            given(locationRefDataService.getHearingCourtLocations(any()))
+            given(locationRefDataService.getHearingCourtLocations(any(), any()))
                 .willReturn(getSampleCourLocationsRefObject());
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
                 .thenReturn(LocalDate.now().plusDays(5));
@@ -1501,7 +1504,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             applicant1DQ.setApplicant1DQRequestedCourt(requestedCourt);
             caseData.setApplicant1DQ(applicant1DQ);
 
-            given(locationRefDataService.getHearingCourtLocations(any()))
+            given(locationRefDataService.getHearingCourtLocations(any(), any()))
                 .willReturn(getSampleCourLocationsRefObject());
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
                 .thenReturn(LocalDate.now().plusDays(5));
@@ -1752,7 +1755,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1DQWithLocation()
                 .build();
             caseData.setCaseManagementLocation(createCaseLocation("00000", null));
-            given(locationRefDataService.getHearingCourtLocations(any()))
+            given(locationRefDataService.getHearingCourtLocations(any(), any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
             Category category = hearingChannelCategory("INTER", "In Person");
             CategorySearchResult categorySearchResult = categorySearchResult(category);
@@ -1793,6 +1796,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackSchedulesOfLossToggle").isNotNull();
             assertThat(response.getData()).extracting("fastTrackCostsToggle").isNotNull();
             assertThat(response.getData()).extracting("fastTrackTrialToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackTrialBundleToggle").isNotNull();
             assertThat(response.getData()).extracting("fastTrackMethodToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocumentsToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactToggle").isNotNull();
@@ -1801,7 +1805,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingMethodToggle").isNotNull();
-            assertThat(response.getData()).extracting("disposalHearingBundleToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingClaimSettlingToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingCostsToggle").isNotNull();
             assertThat(response.getData()).extracting("smallClaimsHearingToggle").isNotNull();
@@ -1816,16 +1819,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + " and Directions questionnaires");
 
             assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocuments").extracting("input1")
-                .isEqualTo("The parties shall serve on each other copies of the documents upon which reliance is "
-                               + "to be placed at the disposal hearing by 4pm on");
-            assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocuments").extracting("input2")
-                .isEqualTo(
-                    "The parties must upload to the Digital Portal copies of those documents which they wish the "
-                        + "court to consider when deciding the amount of damages, by 4pm on");
+                .isEqualTo(DISPOSAL_DOCUMENTS_EXCHANGE);
 
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("input3")
-                .isEqualTo("The claimant must upload to the Digital Portal copies of the witness statements"
-                               + " of all witnesses of fact on whose evidence reliance is to be placed by 4pm on");
+                .isEqualTo(DISPOSAL_WITNESS_UPLOAD);
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("date2")
                 .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("input4")
@@ -1840,10 +1837,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "the 30-minute maximum time estimate for a disposal hearing.");
 
             assertThat(response.getData()).extracting("disposalHearingMedicalEvidence").extracting("input")
-                .isEqualTo("The claimant has permission to rely upon the written expert evidence already uploaded "
-                               + "to the Digital Portal with the particulars of claim and in addition has permission to"
-                               + " rely upon any associated correspondence or updating report which is uploaded"
-                               + " to the Digital Portal by 4pm on");
+                .isEqualTo(PERSONAL_INJURY_PERMISSION_SDO);
             assertThat(response.getData()).extracting("disposalHearingMedicalEvidence").extracting("date")
                 .isEqualTo(nextWorkingDayDate.toString());
 
@@ -1873,11 +1867,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("This claim will be listed for final disposal "
                                + "before a judge on the first available date after");
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearing").extracting("date")
-                .isEqualTo(LocalDate.now().plusWeeks(16).toString());
-
-            assertThat(response.getData()).extracting("disposalHearingBundle").extracting("input")
-                .isEqualTo("At least 7 days before the disposal hearing, "
-                               + "the claimant must file and serve");
+                .isEqualTo(LocalDate.now().plusWeeks(12).toString());
 
             assertThat(response.getData()).extracting("disposalHearingNotes").extracting("input")
                 .isEqualTo("This Order has been made without a hearing. Each party has the right to apply to have"
@@ -2209,7 +2199,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDraft()
                 .totalClaimAmount(BigDecimal.valueOf(15000))
                 .applicant1DQWithLocation().build();
-            given(locationRefDataService.getHearingCourtLocations(any()))
+            given(locationRefDataService.getHearingCourtLocations(any(), any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
             Category category = hearingChannelCategory("INTER", "In Person");
             CategorySearchResult categorySearchResult = categorySearchResult(category);
@@ -2235,7 +2225,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDraft()
                 .totalClaimAmount(BigDecimal.valueOf(15000))
                 .applicant1DQWithLocation().build();
-            given(locationRefDataService.getHearingCourtLocations(any()))
+            given(locationRefDataService.getHearingCourtLocations(any(), any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
             Category category = hearingChannelCategory("INTER", "In Person");
             CategorySearchResult categorySearchResult = categorySearchResult(category);
@@ -2271,7 +2261,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDraft()
                 .totalClaimAmount(BigDecimal.valueOf(15000))
                 .applicant1DQWithLocation().build();
-            given(locationRefDataService.getHearingCourtLocations(any()))
+            given(locationRefDataService.getHearingCourtLocations(any(), any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
             Category category = hearingChannelCategory("INTER", "In Person");
             CategorySearchResult categorySearchResult = categorySearchResult(category);
@@ -2313,7 +2303,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
                 locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
             );
-            when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+            when(locationRefDataService.getHearingCourtLocations(anyString(), anyString())).thenReturn(locations);
 
             Category category = hearingChannelCategory("INTER", "In Person");
             CategorySearchResult categorySearchResult = categorySearchResult(category);
@@ -2403,7 +2393,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDraft()
                 .totalClaimAmount(BigDecimal.valueOf(15000))
                 .applicant1DQWithLocation().build();
-            given(locationRefDataService.getHearingCourtLocations(any()))
+            given(locationRefDataService.getHearingCourtLocations(any(), any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
             Category category = hearingChannelCategory("INTER", "In Person");
             CategorySearchResult categorySearchResult = categorySearchResult(category);
@@ -2439,7 +2429,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
                 locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
             );
-            when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+            when(locationRefDataService.getHearingCourtLocations(anyString(), anyString())).thenReturn(locations);
 
             Category category = hearingChannelCategory("INTER", "In Person");
             CategorySearchResult categorySearchResult = categorySearchResult(category);
@@ -2475,7 +2465,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1DQWithLocation()
                 .build();
             caseData.setApplicant1(applicant1);
-            given(locationRefDataService.getHearingCourtLocations(any()))
+            given(locationRefDataService.getHearingCourtLocations(any(), any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -2497,7 +2487,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void testSDOSortsLocationListThroughDecideDamagesOrderType() {
-            given(locationRefDataService.getHearingCourtLocations(any()))
+            given(locationRefDataService.getHearingCourtLocations(any(), any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQWithLocation()

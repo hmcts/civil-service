@@ -1,7 +1,8 @@
 #!groovy
 
-@Library("Infrastructure")
+@Library("Infrastructure@2.4.2")
 
+import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
 
@@ -12,9 +13,11 @@ properties([
 def type = "java"
 def product = "civil"
 def component = "service"
-def camundaBranch = "master"
 def dmnBranch = "master"
 def wiremockMappingsBranch = "master"
+def branchesToSync = ['demo', 'perftest', 'ithc']
+
+AppPipelineConfig pipelineConf
 
 static Map<String, Object> secret(String secretName, String envVariable) {
   [$class     : 'AzureKeyVaultSecret',
@@ -63,10 +66,42 @@ def secrets = [
     secret('idam-noc-approver-password', 'IDAM_NOC_APPROVER_PASSWORD'),
     secret('aac-manage-case-s2s-secret', 'MANAGE_CASE_S2S_KEY'),
     secret('notify-mca-api-key-secret', 'NOTIFY_MCA_API_KEY')
-  ],
+  ]
 ]
 
+def secretsOtherenv = [
+  'civil-${env}': [
+    secret('microservicekey-civil-service', 'S2S_SECRET'),
+  ]
+]
+
+def secretsProd = [
+  'civil-prod': [
+    secret('microservicekey-civil-service', 'S2S_SECRET_PROD')
+  ]
+]
+
+def uploadBpmnDiagrams(String env) {
+  dir("${WORKSPACE}/bin/camunda") {
+    sh """
+      eval \$(./variables/load-${env}-environment-variables.sh)
+      ./import-bpmn-diagram.sh ${WORKSPACE} ${env}
+    """
+  }
+}
+
+def createBpmnGithubRelease() {
+  sh """
+    ./bin/camunda/create-github-release.sh
+  """
+}
+
 withPipeline(type, product, component) {
+  pipelineConf = config
+  disableLegacyDeployment()
+  enableAksStagingDeployment()
+  syncBranchesWithMaster(branchesToSync)
+
   env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
   env.EM_CCD_ORCHESTRATOR_URL = 'http://em-ccd-orchestrator-aat.service.core-compute-aat.internal'
   env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
@@ -76,7 +111,6 @@ withPipeline(type, product, component) {
   env.GRADLE_OPTS = "-Dorg.gradle.workers.max=3"
   env.CHECKSTYLE_SKIP = (env.CHANGE_ID != null) ? "false" : "true"
   env.BEFTA_S2S_CLIENT_ID = "ccd_data"
-  env.CAMUNDA_DEFINITION_BRANCH = camundaBranch
   env.DMN_DEFINITION_BRANCH = dmnBranch
   env.WIREMOCK_MAPPINGS_BRANCH = wiremockMappingsBranch
   env.UNASSIGN_CASES = true
@@ -114,6 +148,37 @@ withPipeline(type, product, component) {
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
   }
 
+  onDemo {
+    env.ENVIRONMENT = "demo"
+    loadVaultSecrets(secretsOtherenv)
+  }
+
+  onPerftest {
+    env.ENVIRONMENT = "perftest"
+    loadVaultSecrets(secretsOtherenv)
+  }
+
+  onIthc {
+    env.ENVIRONMENT = "ithc"
+    loadVaultSecrets(secretsOtherenv)
+  }
+
+  afterSuccess('checkout') {
+    if (env.ENVIRONMENT in ['ithc', 'demo', 'perftest']) {
+      def subscriptions = [
+        demo    : env.DEMO_SUBSCRIPTION_NAME ?: 'nonprod',
+        perftest: env.PERFTEST_SUBSCRIPTION_NAME ?: 'qa',
+        ithc    : env.ITHC_SUBSCRIPTION_NAME ?: 'qa'
+      ]
+
+      withSubscription(subscriptions[env.ENVIRONMENT], product, env.ENVIRONMENT) {
+        withTeamSecrets(pipelineConf, env.ENVIRONMENT) {
+          uploadBpmnDiagrams(env.ENVIRONMENT)
+        }
+      }
+    }
+  }
+
   afterAlways('test') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/build/reports/jacoco/**'
   }
@@ -127,6 +192,10 @@ withPipeline(type, product, component) {
   }
 
   afterAlways('functionalTest:preview') {
+    if(checkForSkipFunctionalTests(env.BRANCH_NAME)) {
+      echo "Skipping publish functional test results due to label: pr-values:skip-functional-tests"
+      return
+    }
     publishFunctionalTestResults()
   }
 
@@ -138,11 +207,29 @@ withPipeline(type, product, component) {
     archiveSmokeTestResults()
   }
 
+  afterSuccess('functionalTest:aat') {
+    createBpmnGithubRelease()
+    uploadBpmnDiagrams('aat')
+  }
+
+  afterSuccess('buildinfra:prod') {
+    withAzureKeyvault(
+      azureKeyVaultSecrets: secretsProd['civil-prod'],
+      keyVaultURLOverride: 'https://civil-prod.vault.azure.net/'
+    ) {
+      uploadBpmnDiagrams('prod')
+    }
+  }
+
   afterAlways('functionalTest:aat') {
     publishFunctionalTestResults()
   }
 
   before('functionalTest:preview') {
+    if(checkForSkipFunctionalTests(env.BRANCH_NAME)) {
+      env.SKIP_FUNCTIONAL_TESTS = true
+      return
+    }
     prepareFunctionalTests(checkForRunAllFunctionalTests(env.BRANCH_NAME))
   }
 
@@ -150,6 +237,12 @@ withPipeline(type, product, component) {
     prepareFunctionalTests(false)
     setStagingUrls()
   }
+}
+
+def checkForSkipFunctionalTests(branch_name) {
+  return new GithubAPI(this)
+    .getLabelsbyPattern(branch_name, "pr-values:skip-functional-tests")
+    .contains("pr-values:skip-functional-tests")
 }
 
 def checkForRunAllFunctionalTests(branch_name) {

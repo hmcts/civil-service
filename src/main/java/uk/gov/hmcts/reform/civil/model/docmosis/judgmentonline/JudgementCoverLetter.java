@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 @Accessors(chain = true)
 public class JudgementCoverLetter implements MappableObject {
 
+    private String ccdCaseReference;
     private String claimNumber;
     private String partyName;
     private Address address;

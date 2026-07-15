@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -22,7 +23,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.cas.model.DecisionRequest;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -45,7 +45,6 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     private final AuthTokenGenerator authTokenGenerator;
     private final CaseAssignmentApi caseAssignmentApi;
     private final ObjectMapper objectMapper;
-    private final FeatureToggleService featureToggleService;
 
     private static final String CHANGE_ORGANISATION_REQUEST = "changeOrganisationRequestField";
     private static final String ORG_ID_FOR_AUTO_APPROVAL =
@@ -66,10 +65,19 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
 
     private CallbackResponse applyNoticeOfChangeDecision(CallbackParams callbackParams) {
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
+        ChangeOrganisationRequest changeOrganisationRequest = callbackParams.getCaseData().getChangeOrganisationRequestField();
+        if (changeOrganisationRequest == null
+            || changeOrganisationRequest.getCaseRoleId() == null
+            || changeOrganisationRequest.getCaseRoleId().getValue() == null) {
+            throw new CallbackException(
+                "ChangeOrganisationRequest is missing or invalid - NoC decision cannot be applied (case "
+                    + callbackParams.getCaseData().getCcdCaseReference() + ")"
+            );
+        }
         // Keep the original CoR payload before NoC decision mutates/nullifies parts of the request.
         CaseData preDecisionData = objectMapper.convertValue(caseDetails.getData(), CaseData.class);
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        String selectedCaseRole = callbackParams.getCaseData().getChangeOrganisationRequestField().getCaseRoleId().getValue().getCode();
+        String selectedCaseRole = changeOrganisationRequest.getCaseRoleId().getValue().getCode();
 
         updateOrgPoliciesForLiP(callbackParams.getRequest().getCaseDetails());
 
@@ -89,8 +97,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         );
 
         postDecisionData.setBusinessProcess(BusinessProcess.ready(getBusinessProcessEvent(postDecisionData, selectedCaseRole)));
-        postDecisionData.setChangeOfRepresentation(getChangeOfRepresentation(
-            callbackParams.getCaseData().getChangeOrganisationRequestField(), postDecisionData));
+        postDecisionData.setChangeOfRepresentation(getChangeOfRepresentation(changeOrganisationRequest, postDecisionData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(postDecisionData.toMap(objectMapper)).build();
@@ -187,6 +194,9 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     }
 
     private void clearAddLegalRepDeadlineForRole(CaseData caseData, String caseRole) {
+        if (caseData == null) {
+            throw new CallbackException("No case data returned when applying the NoC decision");
+        }
         if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)) {
             caseData.setAddLegalRepDeadlineRes1(null);
         } else if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(caseRole)) {
@@ -218,8 +228,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
             && postDecisionCaseData.isApplicantLiP()) {
             return APPLY_NOC_DECISION_LIP;
         } else if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)
-            && postDecisionCaseData.isRespondent1LiP()
-            && featureToggleService.isLipVLipEnabled()) {
+            && postDecisionCaseData.isRespondent1LiP()) {
             return APPLY_NOC_DECISION_DEFENDANT_LIP;
         }
         return APPLY_NOC_DECISION;

@@ -52,7 +52,7 @@ class CourtOfficerOrderGeneratorTest {
         .documentName(COURT_ORDER_FILE_NAME)
         .documentType(COURT_OFFICER_ORDER)
         .build();
-    private static LocationRefData locationRefData = new LocationRefData().setSiteName("SiteName")
+    private static final LocationRefData locationRefData = new LocationRefData().setSiteName("SiteName")
         .setCourtAddress("12").setPostcode("34")
         .setCourtName("Court Name").setRegion("Region").setRegionId("4").setCourtVenueId("000")
         .setExternalShortName("Court Name Short")
@@ -72,13 +72,13 @@ class CourtOfficerOrderGeneratorTest {
     private CourtOfficerOrderGenerator generator;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         when(locationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
-        when(locationRefDataService.getCcmccLocation(any())).thenReturn(locationRefData);
-        when(locationRefDataService.getCourtLocationsByEpimmsId(anyString(), anyString())).thenReturn(List.of(
+        when(locationRefDataService.getCcmccLocation(any(), any())).thenReturn(locationRefData);
+        when(locationRefDataService.getCourtLocationsByEpimmsId(anyString(), anyString(), anyString())).thenReturn(List.of(
             locationRefData
         ));
-        when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(List.of(locationRefData));
+        when(locationRefDataService.getHearingCourtLocations(anyString(), anyString())).thenReturn(List.of(locationRefData));
     }
 
     @Test

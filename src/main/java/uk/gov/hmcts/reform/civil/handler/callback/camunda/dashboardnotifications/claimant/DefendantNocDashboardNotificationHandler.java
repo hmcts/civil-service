@@ -55,11 +55,7 @@ public class DefendantNocDashboardNotificationHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-                callbackKey(ABOUT_TO_SUBMIT),
-                callbackParams -> featureToggleService.isLipVLipEnabled()
-                        ? configureScenarioForDefendantNoc(callbackParams)
-                        : emptyCallbackResponse(callbackParams));
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForDefendantNoc);
     }
 
     private CallbackResponse configureScenarioForDefendantNoc(CallbackParams callbackParams) {
@@ -115,8 +111,7 @@ public class DefendantNocDashboardNotificationHandler extends CallbackHandler {
     }
 
     private String getScenario(CaseData caseData) {
-        if (featureToggleService.isJudgmentOnlineLive()
-                && CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getPreviousCCDState())
+        if (CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getPreviousCCDState())
                 && nonNull(caseData.getActiveJudgment())) {
             return SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_JBA_CLAIM_MOVES_OFFLINE_CLAIMANT.getScenario();
         }

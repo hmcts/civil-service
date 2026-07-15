@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -19,17 +20,19 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_BUSINESS_PROCESS;
-import static uk.gov.hmcts.reform.civil.handler.tasks.EndBusinessProcessTaskHandler.NOT_RETRYABLE_MESSAGE;
 
 @ExtendWith(MockitoExtension.class)
 class EndBusinessProcessTaskHandlerTest {
@@ -52,8 +55,13 @@ class EndBusinessProcessTaskHandlerTest {
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
-        handler = new EndBusinessProcessTaskHandler(coreCaseDataService, caseDetailsConverter,
-                                                    objectMapper);
+        handler = new EndBusinessProcessTaskHandler(
+            new ExternalTaskCompletionService(),
+            new EventProperties(),
+            coreCaseDataService,
+            caseDetailsConverter,
+            objectMapper
+        );
     }
 
     @BeforeEach
@@ -86,13 +94,14 @@ class EndBusinessProcessTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CASE_ID, END_BUSINESS_PROCESS);
         verify(coreCaseDataService, never()).submitUpdate(CASE_ID, caseDataContentWithFinishedStatus);
-        verify(externalTaskService).handleFailure(
-            eq(mockExternalTask),
-            eq(NOT_RETRYABLE_MESSAGE),
+        verify(externalTaskService, never()).handleFailure(
+            any(ExternalTask.class),
             anyString(),
-            eq(0),
-            eq(1000L)
+            anyString(),
+            anyInt(),
+            anyLong()
         );
+        verify(externalTaskService).complete(mockExternalTask, null);
     }
 
     @Test

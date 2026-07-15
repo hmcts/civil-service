@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.search.PaginatedQuery;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
@@ -37,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CMC_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 
 @Service
 @Slf4j
@@ -50,7 +52,6 @@ public class CoreCaseDataService {
     private final AuthTokenGenerator authTokenGenerator;
     private final CaseDetailsConverter caseDetailsConverter;
     private final UserService userService;
-    private final FeatureToggleService featureToggleService;
     private final LocationReferenceDataService referenceDataService;
 
     public void triggerEvent(Long caseId, CaseEvent eventName) {
@@ -80,11 +81,14 @@ public class CoreCaseDataService {
                                               String eventSummary,
                                               String eventDescription) {
 
+        StartEventResponse startEventResponse = startUpdate(caseId.toString(), eventName);
+        CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
         List<LocationRefData> locationRefDataList = referenceDataService.getCourtLocationsByEpimmsId(
             getSystemUpdateUser().getUserToken(),
-            epimdsId
+            epimdsId,
+            getCaseServiceId(caseData.getCaseAccessCategory())
         );
-        LocationRefData locationRefData = locationRefDataList.get(0);
+        LocationRefData locationRefData = locationRefDataList.getFirst();
 
         DynamicListElement dynamicListElement = new DynamicListElement();
         dynamicListElement.setCode(UUID.randomUUID().toString());
@@ -92,9 +96,6 @@ public class CoreCaseDataService {
 
         DynamicList transferCourtLocationList = new DynamicList();
         transferCourtLocationList.setValue(dynamicListElement);
-
-        StartEventResponse startEventResponse = startUpdate(caseId.toString(), eventName);
-        CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
 
         caseData.setTransferCourtLocationList(transferCourtLocationList);
         caseData.setReasonForTransfer(transferReason);
@@ -198,6 +199,13 @@ public class CoreCaseDataService {
         return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, searchString);
     }
 
+    public SearchResult searchCasesPaginated(PaginatedQuery paginatedQuery) {
+        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        String searchString = paginatedQuery.getJsonString(mapper);
+        log.info("Searching Elasticsearch with paginated query: " + searchString);
+        return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, searchString);
+    }
+
     public SearchResult searchMediationCases(Query query) {
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         String searchString = query.toMediationQueryString();
@@ -278,17 +286,10 @@ public class CoreCaseDataService {
     }
 
     private String createQuery(String authorization, int startIndex, String userEmailField) {
-        if (featureToggleService.isLipVLipEnabled()) {
-            UserDetails defendantInfo = userService.getUserDetails(authorization);
-            return new SearchSourceBuilder()
-                .query(QueryBuilders.boolQuery()
-                           .must(QueryBuilders.termQuery(userEmailField, defendantInfo.getEmail())))
-                .sort("data.submittedDate", SortOrder.DESC)
-                .from(startIndex)
-                .size(RETURNED_NUMBER_OF_CASES).toString();
-        }
+        UserDetails defendantInfo = userService.getUserDetails(authorization);
         return new SearchSourceBuilder()
-            .query(QueryBuilders.matchAllQuery())
+            .query(QueryBuilders.boolQuery()
+                       .must(QueryBuilders.termQuery(userEmailField, defendantInfo.getEmail())))
             .sort("data.submittedDate", SortOrder.DESC)
             .from(startIndex)
             .size(RETURNED_NUMBER_OF_CASES).toString();

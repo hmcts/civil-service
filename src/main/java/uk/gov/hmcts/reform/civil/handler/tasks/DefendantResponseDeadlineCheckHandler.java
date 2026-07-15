@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
@@ -11,14 +10,26 @@ import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.search.DefendantResponseDeadlineCheckSearchService;
 
 import java.util.Set;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class DefendantResponseDeadlineCheckHandler extends BaseExternalTaskHandler {
 
     private final DefendantResponseDeadlineCheckSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    public DefendantResponseDeadlineCheckHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        DefendantResponseDeadlineCheckSearchService caseSearchService,
+        ApplicationEventPublisher applicationEventPublisher
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.caseSearchService = caseSearchService;
+        this.applicationEventPublisher = applicationEventPublisher;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -34,4 +45,5 @@ public class DefendantResponseDeadlineCheckHandler extends BaseExternalTaskHandl
         });
         return new ExternalTaskData();
     }
+
 }

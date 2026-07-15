@@ -6,8 +6,10 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
@@ -20,6 +22,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType.DEFAULT_JUDGMENT;
 
 public abstract class CcdDashboardClaimMatcher implements Claim {
 
@@ -72,6 +76,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     public boolean isClaimProceedInCaseMan() {
         List<CaseState> caseMovedInCaseManStates = List.of(CaseState.AWAITING_APPLICANT_INTENTION,
                                                            CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
+                                                           CaseState.JUDGMENT_REQUESTED,
                                                            CaseState.IN_MEDIATION, CaseState.JUDICIAL_REFERRAL
         );
 
@@ -94,6 +99,16 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     public boolean hasResponseDeadlineBeenExtended() {
         return caseData.getRespondent1TimeExtensionDate() != null
             && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+    }
+
+    protected boolean isDefaultJudgmentGrantedForDashboard() {
+        return featureToggleService.isJudgmentBufferEnabled()
+            && caseData != null
+            && CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getCcdState())
+            && Optional.ofNullable(caseData.getActiveJudgment())
+            .map(activeJudgment -> DEFAULT_JUDGMENT.equals(activeJudgment.getType())
+                && JudgmentState.ISSUED.equals(activeJudgment.getState()))
+            .orElse(false);
     }
 
     @Override
@@ -317,5 +332,10 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             && caseData.getPreTranslationDocuments().stream().anyMatch(
                 element -> element.getValue().getDocumentType() == DocumentType.HEARING_FORM
         );
+    }
+
+    public boolean isDefaultJudgementRequested() {
+        return featureToggleService.isJudgmentBufferEnabled()
+            && JudgmentsOnlineHelper.isDefaultJudgmentRequested(caseData);
     }
 }

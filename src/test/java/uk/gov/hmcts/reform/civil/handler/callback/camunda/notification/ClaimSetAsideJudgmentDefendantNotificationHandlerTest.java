@@ -204,7 +204,7 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandlerTest extends BaseC
         expectedProperties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         expectedProperties.put(LEGAL_ORG_NAME, "Test Org Name");
         expectedProperties.put(REASON_FROM_CASEWORKER, "test error");
-        expectedProperties.put(DEFENDANT_NAME_INTERIM, "Mr. Sole Trader and Mr. John Rambo");
+        expectedProperties.put(DEFENDANT_NAME_INTERIM, "Mr. Sole Trader T/A Sole Trader co and Mr. John Rambo");
         expectedProperties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
         expectedProperties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
         return expectedProperties;

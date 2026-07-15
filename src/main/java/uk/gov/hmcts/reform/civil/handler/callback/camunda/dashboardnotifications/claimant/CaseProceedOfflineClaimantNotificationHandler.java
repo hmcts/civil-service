@@ -88,14 +88,14 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
     public boolean shouldRecordScenario(CaseData caseData) {
         return (caseData.getPreviousCCDState() != null
             && caseMovedInCaseManStates.contains(caseData.getPreviousCCDState())
-            && (caseData.isLipvLipOneVOne() || caseData.isLipvLROneVOne()))
+            && (caseData.isLipvLipOneVOne() || caseData.isLipvLROneVOne() || caseData.isLRvLipOneVOne()))
             || shouldRecordScenarioInCaseProgression(caseData);
     }
 
     public boolean shouldRecordScenarioInCaseProgression(CaseData caseData) {
         return caseData.getPreviousCCDState() != null
                 && caseMovedInCaseManStatesCaseProgression.contains(caseData.getPreviousCCDState())
-                && caseData.isLipvLipOneVOne();
+                && (caseData.isLipvLipOneVOne() || caseData.isLipvLROneVOne() || caseData.isLRvLipOneVOne());
     }
 
     @Override

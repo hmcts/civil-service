@@ -34,31 +34,50 @@ public class CaseCategoriesService {
 
     public CaseCategoryModel getCaseCategoriesFor(CategoryType categoryType, CaseData caseData, String authToken) {
         String hmctsServiceID = HmctsServiceIDUtils.getHmctsServiceID(caseData, paymentsConfiguration);
+        String allocatedTrack = getClaimTrack(caseData);
+        if (allocatedTrack == null) {
+            log.info(
+                "No claim track found for category search caseNumber={}, hmctsServiceID={}, categoryType={}",
+                caseData.getCcdCaseReference(), hmctsServiceID, categoryType
+            );
+            return null;
+        }
+
+        String categoryKey = String.format(CATEGORY_KEY, hmctsServiceID, allocatedTrack);
+        log.info("Searching for category allocatedTrack={}, categoryKey={}", allocatedTrack, categoryKey);
+
         Optional<CategorySearchResult> caseTypeResult = categoryService.findCategoryByCategoryIdAndServiceId(
             authToken,
             categoryType.getStringValueForQuery(),
             hmctsServiceID
         );
-
-        String allocatedTrack = getClaimTrack(caseData);
-        String categoryKey = String.format(CATEGORY_KEY, hmctsServiceID, allocatedTrack);
-        log.info("Searching for category caseNumber={}, hmctsServiceID={}, allocatedTrack={}, categoryKey={}, categoryType={}",
-                 caseData.getCcdCaseReference(), hmctsServiceID, allocatedTrack, categoryKey, categoryType);
-
         if (caseTypeResult.isPresent()) {
             CategorySearchResult categorySearchResult = caseTypeResult.get();
-            log.info("CategorySearchResult found with {} categories", categorySearchResult.getCategories() == null ? null : categorySearchResult.getCategories().size());
+            log.info(
+                "CategorySearchResult found with {} categories: {}",
+                categorySearchResult.getCategories() == null ? null : categorySearchResult.getCategories().size(),
+                categorySearchResult.getCategories()
+            );
 
-            Category categoryResult = categorySearchResult.getCategories().stream().filter(c -> c.getKey().equals(
-                categoryKey)).collect(toSingleton());
-            log.info("Category found: parentKey={}, key={}", categoryResult.getParentKey(), categoryResult.getKey());
+            try {
+                Category categoryResult = categorySearchResult.getCategories()
+                    .stream()
+                    .filter(c -> c.getKey().equals(categoryKey))
+                    .collect(toSingleton());
+                log.info("Category found: parentKey={}, key={}", categoryResult.getParentKey(), categoryResult.getKey());
 
-            CaseCategoryModel caseCategoryModel = new CaseCategoryModel();
-            caseCategoryModel.setCategoryParent(categoryResult.getParentKey());
-            caseCategoryModel.setCategoryType(getCategoryTypeFromResult(categoryResult));
-            caseCategoryModel.setCategoryValue(categoryResult.getKey());
-            return caseCategoryModel;
+                CaseCategoryModel caseCategoryModel = new CaseCategoryModel();
+                caseCategoryModel.setCategoryParent(categoryResult.getParentKey());
+                caseCategoryModel.setCategoryType(getCategoryTypeFromResult(categoryResult));
+                caseCategoryModel.setCategoryValue(categoryResult.getKey());
+                return caseCategoryModel;
+            } catch (IllegalStateException ex) {
+                log.warn("Category not found allocatedTrack={}, categoryKey={}, categoryType={}",
+                         allocatedTrack, categoryKey, categoryType);
+            }
         }
+
+        log.info("No Search Result found for category allocatedTrack={}, categoryKey={}", allocatedTrack, categoryKey);
         return null;
     }
 

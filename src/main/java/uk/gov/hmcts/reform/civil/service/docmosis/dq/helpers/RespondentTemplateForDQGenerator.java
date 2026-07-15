@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.utils.CaseServiceUtil;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -45,7 +47,6 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Component
@@ -64,6 +65,7 @@ public class RespondentTemplateForDQGenerator {
 
         return new DirectionsQuestionnaireForm()
             .setCaseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
+            .setCcdCaseReference(caseData.getCcdCaseReference().toString())
             .setReferenceNumber(caseData.getLegacyCaseReference())
             .setSolicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData))
             .setSubmittedOn(caseData.getRespondent2SameLegalRepresentative().equals(YES)
@@ -97,7 +99,7 @@ public class RespondentTemplateForDQGenerator {
             .setVulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .setAllocatedTrack(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                 ? caseData.getAllocatedTrack().name() : caseData.getResponseClaimTrack())
-            .setRequestedCourt(getRequestedCourt(dq, authorisation));
+            .setRequestedCourt(getRequestedCourt(dq, authorisation, caseData.getCaseAccessCategory()));
     }
 
     public DirectionsQuestionnaireForm getRespondent1TemplateData(CaseData caseData, String defendantIdentifier, String authorisation) {
@@ -136,7 +138,7 @@ public class RespondentTemplateForDQGenerator {
             .setStatementOfTruthText(getStatementOfTruthText())
             .setVulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .setAllocatedTrack(getClaimTrack(caseData))
-            .setRequestedCourt(getRequestedCourt(dq, authorisation));
+            .setRequestedCourt(getRequestedCourt(dq, authorisation, caseData.getCaseAccessCategory()));
     }
 
     private String getStatementOfTruthText() {
@@ -154,7 +156,7 @@ public class RespondentTemplateForDQGenerator {
     private String getOrgNameFromParties(List<Party> parties) {
         return Optional.ofNullable(parties)
             .filter(p -> !p.isEmpty())
-            .map(p -> p.get(0))
+            .map(p -> p.getFirst())
             .map(Party::getRepresentative)
             .map(Representative::getOrganisationName)
             .filter(StringUtils::isNotBlank)
@@ -239,18 +241,19 @@ public class RespondentTemplateForDQGenerator {
         return true;
     }
 
-    public RequestedCourt getRequestedCourt(DQ dq, String authorisation) {
+    public RequestedCourt getRequestedCourt(DQ dq, String authorisation, CaseCategory caseCategory) {
         RequestedCourt rc = dq.getRequestedCourt();
+        String caseServiceId = CaseServiceUtil.getCaseServiceId(caseCategory);
         if (rc != null && null !=  rc.getCaseLocation()) {
             List<LocationRefData> courtLocations = (locationRefDataService
                 .getCourtLocationsByEpimmsIdAndCourtType(authorisation,
-                                                         rc.getCaseLocation().getBaseLocation()
+                                                         rc.getCaseLocation().getBaseLocation(),
+                                                         caseServiceId
                 ));
             RequestedCourt requestedCourt = new RequestedCourt();
             requestedCourt.setRequestHearingAtSpecificCourt(YES);
             requestedCourt.setReasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt());
             courtLocations.stream()
-                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
                 .findFirst().ifPresent(court -> {
                     requestedCourt.setResponseCourtCode(court.getCourtLocationCode());
                     requestedCourt.setResponseCourtName(court.getCourtName());
@@ -268,14 +271,11 @@ public class RespondentTemplateForDQGenerator {
         if (hearing == null || hearing.getHearingLength() == null) {
             return null;
         }
-        switch (hearing.getHearingLength()) {
-            case LESS_THAN_DAY:
-                return hearing.getHearingLengthHours() + " hours";
-            case ONE_DAY:
-                return "One day";
-            default:
-                return hearing.getHearingLengthDays() + " days";
-        }
+        return switch (hearing.getHearingLength()) {
+            case LESS_THAN_DAY -> hearing.getHearingLengthHours() + " hours";
+            case ONE_DAY -> "One day";
+            default -> hearing.getHearingLengthDays() + " days";
+        };
     }
 
     private Hearing getHearing(DQ dq) {

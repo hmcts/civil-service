@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
 import org.jetbrains.annotations.NotNull;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentAddress;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -29,7 +31,7 @@ public class JudgmentsOnlineHelper {
     private static final String ERROR_MESSAGE_DATE_FIRST_INSTALMENT_MUST_BE_IN_FUTURE = "Date of first instalment must be in the future";
     private static final String ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST = "Date judge made the order must be in the past";
 
-    private static final String regex = "[ˆ`´¨]";
+    private static final String REGEX = "[ˆ`´¨]";
 
     private JudgmentsOnlineHelper() {
     }
@@ -39,8 +41,8 @@ public class JudgmentsOnlineHelper {
         return date.isAfter(today);
     }
 
-    public static boolean checkIfDateDifferenceIsGreaterThan31Days(LocalDate firstDate, LocalDate secondDate) {
-        return ChronoUnit.DAYS.between(firstDate, secondDate) > 31;
+    public static boolean checkIfDateDifferenceIsGreaterThanDaysInMonth(LocalDate firstDate, LocalDate secondDate) {
+        return ChronoUnit.DAYS.between(firstDate, secondDate) > firstDate.lengthOfMonth();
     }
 
     public static List<String> validateMidCallbackData(CaseData caseData) {
@@ -80,6 +82,11 @@ public class JudgmentsOnlineHelper {
         return  MultiPartyScenario.isOneVOne(caseData)
             || MultiPartyScenario.isTwoVOne(caseData)
             || caseData.isLRvLipOneVOne();
+    }
+
+    public static boolean isDefaultJudgmentRequested(CaseData caseData) {
+        return caseData != null
+            && CaseState.JUDGMENT_REQUESTED.equals(caseData.getCcdState());
     }
 
     public static BigDecimal getClaimFeeOfJudgmentForDJ(CaseData data) {
@@ -295,7 +302,7 @@ public class JudgmentsOnlineHelper {
     }
 
     public static String removeWelshCharacters(String input) {
-        return input != null ? input.replaceAll(regex, "") : input;
+        return input != null ? input.replaceAll(REGEX, "") : input;
     }
 
     private static String trimDownTo35(String input) {
@@ -311,6 +318,36 @@ public class JudgmentsOnlineHelper {
             .append(formatAddressLine(address.getDefendantAddressLine5()))
             .toString().trim();
         return formattedLine.length() > 0 ? formattedLine.substring(0, formattedLine.length() - 1) : "";
+    }
+
+    public static boolean isJoRequested(CaseData caseData, FeatureToggleService featureToggleService) {
+        return featureToggleService.isJudgmentBufferEnabled() && YesOrNo.YES.equals(caseData.getIsJoRequested());
+    }
+
+    public static CaseData clearJOCaseData(CaseData caseData) {
+        caseData.setActiveJudgment(null);
+        caseData.setDefaultJudgementOverallTotal(null);
+        caseData.setJoDefendantName1(null);
+        caseData.setJoDJCreatedDate(null);
+        caseData.setJoIsDisplayInJudgmentTab(null);
+        caseData.setJoIsLiveJudgmentExists(null);
+        caseData.setJoPaymentPlanSelected(null);
+        caseData.setJoRepaymentAmount(null);
+        caseData.setJoRepaymentFrequency(null);
+        caseData.setJoRepaymentStartDate(null);
+        caseData.setJoRepaymentSummaryObject(null);
+        caseData.setPartialPayment(null);
+        caseData.setPaymentConfirmationDecisionSpec(null);
+        caseData.setPaymentTypeSelection(null);
+        caseData.setRegistrationTypeRespondentOne(null);
+        caseData.setRepaymentDate(null);
+        caseData.setRepaymentDue(null);
+        caseData.setRepaymentFrequency(null);
+        caseData.setRepaymentSuggestion(null);
+        caseData.setRepaymentSummaryObject(null);
+        caseData.setShowOldDJFixedCostsScreen(null);
+        caseData.setJoState(null);
+        return caseData;
     }
 
     private static String formatAddressLine(String line) {

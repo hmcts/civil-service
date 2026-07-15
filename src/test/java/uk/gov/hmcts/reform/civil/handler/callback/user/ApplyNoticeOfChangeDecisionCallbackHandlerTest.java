@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.cas.client.CaseAssignmentApi;
 import uk.gov.hmcts.reform.civil.cas.model.DecisionRequest;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
@@ -36,6 +37,8 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -102,7 +105,7 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
                     .changeOrganisationRequestField(false, false, "1234", null, REQUESTER_EMAIL)
                     .build().toBuilder().respondent1OrganisationIDCopy(null).build();
 
-                executeTest(caseData, RESPONDENT_ONE_ORG_POLICY);
+                executeTest(caseData, RESPONDENT_ONE_ORG_POLICY, "APPLY_NOC_DECISION_DEFENDANT_LIP");
             }
 
             @Test
@@ -212,10 +215,66 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
                 .applicant1Represented(YesOrNo.NO)
                 .respondent1Represented(YesOrNo.NO)
                 .build();
-
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
             executeTest(caseData, RESPONDENT_ONE_ORG_POLICY, "APPLY_NOC_DECISION_DEFENDANT_LIP");
+        }
+
+        @Test
+        void shouldThrowCallbackException_whenChangeOrganisationRequestFieldAlreadyRemoved() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .changeOfRepresentation(false, false, "1234", null, REQUESTER_EMAIL)
+                .build();
+
+            CallbackParams params = callbackParamsOf(
+                caseData,
+                CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                ABOUT_TO_SUBMIT
+            );
+
+            assertThatThrownBy(() -> handler.handle(params))
+                .isInstanceOf(CallbackException.class)
+                .hasMessageContaining("ChangeOrganisationRequest is missing or invalid")
+                .hasMessageContaining(String.valueOf(caseData.getCcdCaseReference()));
+            verifyNoInteractions(caseAssignmentApi, authTokenGenerator);
+        }
+
+        @Test
+        void shouldThrowCallbackException_whenChangeOrganisationRequestCaseRoleIsMissing() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .changeOrganisationRequestField(false, false, "1234", "QWERTY R", REQUESTER_EMAIL)
+                .build();
+            caseData.getChangeOrganisationRequestField().setCaseRoleId(null);
+
+            CallbackParams params = callbackParamsOf(
+                caseData,
+                CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                ABOUT_TO_SUBMIT
+            );
+
+            assertThatThrownBy(() -> handler.handle(params))
+                .isInstanceOf(CallbackException.class)
+                .hasMessageContaining("ChangeOrganisationRequest is missing or invalid");
+            verifyNoInteractions(caseAssignmentApi, authTokenGenerator);
+        }
+
+        @Test
+        void shouldThrowCallbackException_whenApplyDecisionReturnsNoCaseData() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .changeOrganisationRequestField(false, false, "1234", "QWERTY R", REQUESTER_EMAIL)
+                .build();
+            CallbackParams params = callbackParamsOf(
+                caseData,
+                CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                ABOUT_TO_SUBMIT
+            );
+            when(caseAssignmentApi.applyDecision(
+                params.getParams().get(BEARER_TOKEN).toString(),
+                authTokenGenerator.generate(),
+                DecisionRequest.decisionRequest(params.getRequest().getCaseDetails())
+            )).thenReturn(AboutToStartOrSubmitCallbackResponse.builder().build());
+
+            assertThatThrownBy(() -> handler.handle(params))
+                .isInstanceOf(CallbackException.class)
+                .hasMessage("No case data returned when applying the NoC decision");
         }
 
         @NotNull
