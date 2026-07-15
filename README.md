@@ -434,7 +434,7 @@ To disable all Spring schedulers (even if the feature flag is on), set the list 
 export SCHEDULER_ACTIVE_SCHEDULERS=""
 ```
 
-### JudgementBufferScheduler
+### JudgementBufferScheduler civil-2.0
 
 The `JudgementBufferScheduler` is used to process cases where a default judgement has been requested and a buffer period has expired.
 
