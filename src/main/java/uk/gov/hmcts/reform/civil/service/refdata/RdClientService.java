@@ -21,9 +21,9 @@ public class RdClientService {
         this.locationRefDataApiClient = locationRefDataApiClient;
     }
 
-    @Cacheable(value = "courtVenueCache", key = "'allLocations'")
-    public List<LocationRefData> fetchAllCivilCourts(String serviceAuth, String auth) {
-        log.info("[CourtVenueService] Cache MISS → calling Location Reference Data API to fetch all courts");
-        return locationRefDataApiClient.getAllCivilCourtVenues(serviceAuth, auth, CIVIL_COURT_TYPE_ID, LOCATION_TYPE);
+    @Cacheable(value = "courtVenueCache", key = "T(String).format('allLocations-%s', #serviceId)")
+    public List<LocationRefData> fetchAllCivilCourtsByServiceId(String serviceAuth, String auth, String serviceId) {
+        log.info("RdClientService Cache MISS → calling Location Reference Data API to fetch all courts for service id {}", serviceId);
+        return locationRefDataApiClient.getAllCivilCourtVenuesByServiceId(serviceAuth, auth, CIVIL_COURT_TYPE_ID, LOCATION_TYPE, serviceId);
     }
 }

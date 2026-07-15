@@ -34,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.PopulateRespondentTabDetails.updateDataForClaimDetailsTab;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 
 @Component
 @Slf4j
@@ -206,6 +207,9 @@ public class PopulateRespondentCopyObjects implements CaseTask {
 
     private List<LocationRefData> getLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(
+            authToken,
+            getCaseServiceId(callbackParams.getCaseData().getCaseAccessCategory())
+        );
     }
 }
