@@ -68,7 +68,7 @@ allprojects {
     analyzers.assemblyEnabled = false
     analyzers.retirejs.enabled = false
     analyzers.ossIndex.enabled = false
-    analyzers.nodeEnabled = false
+    analyzers.nodeAuditEnabled = false
   }
 
   dependencyManagement {
