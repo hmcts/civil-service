@@ -277,7 +277,7 @@ public abstract class BpmnBaseTest {
         String activityId,
         VariableMap variables
     ) {
-        String expectedTopicName = expectedTopicName(topicName, caseEvent);
+        String expectedTopicName = externalTask.getTopicName();
         List<LockedExternalTask> lockedProcessTask = fetchAndLockTask(expectedTopicName);
 
         assertExternalTask(externalTask, expectedTopicName, caseEvent, activityId, lockedProcessTask);
@@ -291,7 +291,7 @@ public abstract class BpmnBaseTest {
         String caseEvent,
         String activityId
     ) {
-        String expectedTopicName = expectedTopicName(topicName, caseEvent);
+        String expectedTopicName = externalTask.getTopicName();
         List<LockedExternalTask> lockedProcessTask = fetchAndLockTask(expectedTopicName);
 
         assertExternalTask(externalTask, expectedTopicName, caseEvent, activityId, lockedProcessTask);
@@ -303,19 +303,6 @@ public abstract class BpmnBaseTest {
         List<String> topics = getTopics();
         if (topics.size() == 1 && dashboardNotificationTopic(topicName, topics.get(0))) {
             return topics.get(0);
-        }
-        return topicName;
-    }
-
-    private String expectedTopicName(String topicName, String caseEvent) {
-        if (DASHBOARD_NOTIFICATION_EVENT.equals(caseEvent)) {
-            if (PROCESS_CASE_EVENT.equals(topicName)) {
-                return DASHBOARD_NOTIFICATION_TOPIC;
-            }
-            if ("applicationProcessCaseEventGASpec".equals(topicName)
-                || "processExternalCaseEventGASpec".equals(topicName)) {
-                return GA_DASHBOARD_NOTIFICATION_TOPIC;
-            }
         }
         return topicName;
     }
