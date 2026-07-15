@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentAccessException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentNotFoundException;
 import uk.gov.hmcts.reform.civil.documentmanagement.InvalidDocumentLinkException;
 import uk.gov.hmcts.reform.civil.model.CallbackErrorResponse;
+import uk.gov.hmcts.reform.civil.exceptions.CaseAccessDataStoreUnavailableException;
 import uk.gov.hmcts.reform.civil.exceptions.UpstreamIdamException;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
@@ -218,6 +219,21 @@ public class ResourceExceptionHandlerTest {
                 contentCachingRequestWrapper
             ),
             HttpStatus.FAILED_DEPENDENCY
+        );
+    }
+
+    @Test
+    void shouldReturnServiceUnavailable_whenCaseAccessDataStoreUnavailableExceptionThrown() {
+        testTemplate(
+            "CaseAccessDataStoreApi is unavailable for operation: getUserRoles",
+            handler.handleCaseAccessDataStoreUnavailableException(
+                new CaseAccessDataStoreUnavailableException(
+                    "CaseAccessDataStoreApi is unavailable for operation: getUserRoles",
+                    new RuntimeException("CCD /case-users unavailable")
+                ),
+                contentCachingRequestWrapper
+            ),
+            HttpStatus.SERVICE_UNAVAILABLE
         );
     }
 
