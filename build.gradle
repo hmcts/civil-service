@@ -538,6 +538,9 @@ dependencies {
   implementation "org.apache.httpcomponents.client5:httpclient5:5.6.1"
   implementation "net.javacrumbs.shedlock:shedlock-spring:7.7.0"
   implementation "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.7.0"
+  implementation "io.github.resilience4j:resilience4j-spring-boot3"
+  implementation "io.github.resilience4j:resilience4j-circuitbreaker"
+  implementation "io.github.resilience4j:resilience4j-micrometer"
 
   implementation('com.github.hmcts:fees-java-client:0.1.0') {
     exclude group: 'uk.gov.hmcts.reform', module: 'java-logging'

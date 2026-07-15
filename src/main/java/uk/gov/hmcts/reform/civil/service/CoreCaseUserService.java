@@ -9,7 +9,6 @@ import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
 import uk.gov.hmcts.reform.ccd.client.CaseAssignmentApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.ccd.model.AddCaseAssignedUserRolesRequest;
@@ -30,7 +29,7 @@ public class CoreCaseUserService {
 
     Logger log = LoggerFactory.getLogger(CoreCaseUserService.class);
 
-    private final CaseAccessDataStoreApi caseAccessDataStoreApi;
+    private final CaseAccessDataStoreService caseAccessDataStoreService;
     private final CaseAssignmentApi caseAssignmentApi;
     private final UserService userService;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
@@ -39,7 +38,7 @@ public class CoreCaseUserService {
     @Retryable(retryFor = RetryableCaseUserException.class, backoff = @Backoff(delay = 500))
     public List<String> getUserCaseRoles(String caseId, String userId) {
         try {
-            return caseAccessDataStoreApi.getUserRoles(
+            return caseAccessDataStoreService.getUserRoles(
                     getCaaAccessToken(),
                     authTokenGenerator.generate(),
                     List.of(caseId)
@@ -126,7 +125,7 @@ public class CoreCaseUserService {
             .setCaseRole(caseRole.getFormattedName())
             .setOrganisationId(organisationId);
 
-        caseAccessDataStoreApi.addCaseUserRoles(
+        caseAccessDataStoreService.addCaseUserRoles(
             caaAccessToken,
             authTokenGenerator.generate(),
             new AddCaseAssignedUserRolesRequest()
@@ -146,7 +145,7 @@ public class CoreCaseUserService {
     }
 
     private void removeAccessFromRole(CaseAssignedUserRoleWithOrganisation caseAssignedUserRoleWithOrganisation, String caaAccessToken) {
-        caseAccessDataStoreApi.removeCaseUserRoles(
+        caseAccessDataStoreService.removeCaseUserRoles(
             caaAccessToken,
             authTokenGenerator.generate(),
             new CaseAssignedUserRolesRequest()
@@ -155,7 +154,7 @@ public class CoreCaseUserService {
     }
 
     private boolean userWithCaseRoleExistsOnCase(String caseId, String accessToken, CaseRole caseRole, String userId) {
-        CaseAssignedUserRolesResource userRoles = caseAccessDataStoreApi.getUserRoles(
+        CaseAssignedUserRolesResource userRoles = caseAccessDataStoreService.getUserRoles(
             accessToken,
             authTokenGenerator.generate(),
             List.of(caseId)
