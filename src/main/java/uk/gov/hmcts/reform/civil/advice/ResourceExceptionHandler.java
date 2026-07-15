@@ -5,6 +5,7 @@ import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.ClientAbortException;
+import org.slf4j.MDC;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -89,6 +90,7 @@ public class ResourceExceptionHandler {
         CallbackErrorResponse errorResponse = new CallbackErrorResponse();
         try {
             errorResponse = objectMapper.readValue(exception.contentUTF8(), CallbackErrorResponse.class);
+            MDC.put("callbackErrors", errorResponse.toString());
         } catch (Exception parseException) {
             log.info(parseException.getMessage(), parseException);
             errorResponse.setCallbackErrors(List.of("Unable to parse error response"));
@@ -97,6 +99,8 @@ public class ResourceExceptionHandler {
                 .internalServerError()
                 .headers(new HttpHeaders())
                 .body(errorResponse);
+        } finally {
+            MDC.remove("callbackErrors");
         }
 
         String errorMessage = "Unprocessable Entity error with message: %s for case %s run by user %s";
