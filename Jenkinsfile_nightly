@@ -223,6 +223,7 @@ withNightlyPipeline(type, product, component) {
   env.IDAM_API_URL=params.IDAM_API_URL
   env.IDAM_TEST_SUPPORT_API_URL=params.IDAM_TEST_SUPPORT_API_URL
   env.SERVICE_AUTH_PROVIDER_API_BASE_URL = params.SERVICE_AUTH_PROVIDER_API_BASE_URL
+  env.WA_TASK_MGMT_URL = params.WA_TASK_MGMT_URL
   env.CCD_DATA_STORE_URL = ccdDataStoreUrl
   env.CIVIL_SERVICE_URL = civilServiceUrl
   env.WAIT_FOR_TIMEOUT_MS = params.WAIT_FOR_TIMEOUT_MS
