@@ -58,6 +58,8 @@ properties([
                                             'https://manage-case-assignment-civil-citizen-ui-pr-{PR_NUMBER}.preview.platform.hmcts.net',
                                           ],
       description: 'The URL of case assignment service'),
+    choice(name: 'WA_TASK_MGMT_URL', choices: ['http://wa-task-management-api-aat.service.core-compute-aat.internal', 'http://wa-task-management-api-demo.service.core-compute-demo.internal'],
+       description: 'The URL of wa task management'),
     string(name: 'PLAYWRIGHT_WORKERS', defaultValue: '8',
       description: 'Number of workers for playwright'),
     string(name: 'PLAYWRIGHT_RETRIES', defaultValue: '1',
