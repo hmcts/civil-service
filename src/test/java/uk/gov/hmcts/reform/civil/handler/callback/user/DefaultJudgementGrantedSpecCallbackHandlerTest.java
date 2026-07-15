@@ -28,6 +28,8 @@ import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_GRANTED_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,6 +47,11 @@ class DefaultJudgementGrantedSpecCallbackHandlerTest extends BaseCallbackHandler
     @BeforeEach
     void setUp() {
         handler = new DefaultJudgementGrantedSpecCallbackHandler(objectMapper, new InterestCalculator());
+    }
+
+    @Test
+    void shouldReturnHandledEvents() {
+        assertThat(handler.handledEvents()).containsExactly(DEFAULT_JUDGEMENT_GRANTED_SPEC);
     }
 
     @Nested
@@ -86,7 +93,10 @@ class DefaultJudgementGrantedSpecCallbackHandlerTest extends BaseCallbackHandler
                 .contains("### Claim fee amount")
                 .contains("£70.00")
                 .contains("## Total still owed");
+            assertThat(updatedData.getRepaymentSummaryObject()).isEqualTo(updatedData.getJoRepaymentSummaryObject());
             assertThat(updatedData.getTotalInterest()).isEqualByComparingTo(BigDecimal.ZERO);
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent())
+                .isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
         }
 

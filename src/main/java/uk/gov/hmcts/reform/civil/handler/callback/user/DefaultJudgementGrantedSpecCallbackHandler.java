@@ -115,10 +115,13 @@ public class DefaultJudgementGrantedSpecCallbackHandler extends CallbackHandler 
             .setTotalAmount(orderAmount.add(costs).add(claimFee).toString());
 
         caseData.setJoIsLiveJudgmentExists(YES);
-        caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
+        caseData.setJoState(JudgmentState.ISSUED);
+        String repaymentSummaryObject = JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
             activeJudgment,
             true
-        ));
+        );
+        caseData.setJoRepaymentSummaryObject(repaymentSummaryObject);
+        caseData.setRepaymentSummaryObject(repaymentSummaryObject);
         caseData.setTotalInterest(interestCalculator.calculateInterest(caseData));
         caseData.setBusinessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
 
