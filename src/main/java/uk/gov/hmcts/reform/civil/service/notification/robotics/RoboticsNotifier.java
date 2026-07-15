@@ -37,7 +37,7 @@ public class RoboticsNotifier {
         String legacyCaseReference = caseData.getLegacyCaseReference();
 
         if (!toggleService.isRPAEmailEnabled()) {
-            log.info("RPA email disabled, skipping notification for case: {}", legacyCaseReference);
+            log.info("RPA email disabled, skipping notification for case reference: {}", caseData.getCcdCaseReference());
             return;
         }
 
