@@ -62,15 +62,8 @@ allprojects {
   }
 
   dependencyCheck {
-    analyzers {
-      nodeAuditEnabled = false
-    }
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
     suppressionFile = 'config/owasp/suppressions.xml'
-
-    analyzers.assemblyEnabled = false
-    analyzers.retirejs.enabled = false
-    analyzers.ossIndex.enabled = false
   }
 
   dependencyManagement {
@@ -166,8 +159,22 @@ tasks.register("npmInstall", Exec) {
 
 tasks.register("npmAudit", Exec) {
   dependsOn "npmInstall"
+  description = "Runs npm audit for package-lock.json vulnerabilities"
+  group = "Verification"
   workingDir = projectDir
   commandLine "npm", "audit", "--audit-level=high"
+}
+
+tasks.named("check") {
+  dependsOn "npmAudit"
+}
+
+tasks.named("dependencyCheckAnalyze") {
+  dependsOn "npmAudit"
+}
+
+tasks.named("dependencyCheckAggregate") {
+  dependsOn "npmAudit"
 }
 
 tasks.register('fortifyScan', JavaExec) {
