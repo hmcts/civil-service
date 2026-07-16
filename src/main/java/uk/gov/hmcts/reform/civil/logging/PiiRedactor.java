@@ -5,12 +5,28 @@ import java.util.regex.Pattern;
 public final class PiiRedactor {
 
     private static final String REDACTED = "[REDACTED]";
+    private static final String PII_FIELD_NAMES = String.join("|",
+        "firstName",
+        "lastName",
+        "fullName",
+        "partyName",
+        "individualFirstName",
+        "individualLastName",
+        "email",
+        "emailAddress",
+        "dateOfBirth",
+        "dob",
+        "addressLine[1-3]?",
+        "postCode",
+        "postTown",
+        "county",
+        "country"
+    );
     private static final Pattern EMAIL = Pattern.compile(
         "(?i)(?<![\\w.+-])[\\w.+-]+@[\\w.-]+\\.[a-z]{2,}(?![\\w.-])"
     );
     private static final Pattern PII_FIELD = Pattern.compile(
-        "(?i)(\\\"?(?:firstName|lastName|fullName|partyName|individualFirstName|individualLastName|"
-            + "email|emailAddress|dateOfBirth|dob|addressLine[1-3]?|postCode|postcode|postTown|county|country)"
+        "(?i)(\\\"?(?:" + PII_FIELD_NAMES + ")"
             + "\\\"?\\s*[:=]\\s*)(\\\"[^\\\"]*\\\"|[^,})]+)"
     );
 
