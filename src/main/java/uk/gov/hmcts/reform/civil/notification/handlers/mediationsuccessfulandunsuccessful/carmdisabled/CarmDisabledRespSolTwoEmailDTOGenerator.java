@@ -2,24 +2,23 @@ package uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandun
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.RespSolTwoEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isTwoVOne;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.MediationSuccessfulNotifyParties;
 
 @Component
-public class CarmDisabledRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
+public class CarmDisabledRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
 
-    private static final String REFERENCE_TEMPLATE = "mediation-update-defendant-notification-%s";
+    private static final String REFERENCE_TEMPLATE = "mediation-update-defendant-two-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
 
-    public CarmDisabledRespSolOneEmailDTOGenerator(OrganisationService organisationService,
-                                           NotificationsProperties notificationsProperties) {
+    public CarmDisabledRespSolTwoEmailDTOGenerator(OrganisationService organisationService,
+                                                   NotificationsProperties notificationsProperties) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
     }
@@ -27,17 +26,7 @@ public class CarmDisabledRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOG
     @Override
     protected String getEmailTemplateId(CaseData caseData, String taskId) {
         if (MediationSuccessfulNotifyParties.toString().equals(taskId)) {
-            if (caseData.isLipvLROneVOne()) {
-                return notificationsProperties.getNotifyLrDefendantSuccessfulMediationForLipVLrClaim();
-            }
-            if (isTwoVOne(caseData)) {
-                return notificationsProperties.getNotifyTwoVOneDefendantSuccessfulMediation();
-            }
             return notificationsProperties.getNotifyLrDefendantSuccessfulMediation();
-        }
-
-        if (caseData.isLipvLROneVOne()) {
-            return notificationsProperties.getMediationUnsuccessfulLRTemplateForLipVLr();
         }
         return notificationsProperties.getMediationUnsuccessfulLRTemplate();
     }
@@ -49,6 +38,6 @@ public class CarmDisabledRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOG
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        return buildDefendantNotificationProperties(properties, caseData);
+        return buildDefendantTwoNotificationProperties(properties, caseData);
     }
 }
