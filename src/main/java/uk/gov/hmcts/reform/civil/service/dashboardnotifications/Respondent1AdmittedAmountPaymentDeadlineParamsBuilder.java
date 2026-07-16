@@ -64,10 +64,7 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
     @Override
     public void addParams(CaseData caseData, HashMap<String, Object> params) {
         final String defendantAdmittedAmount = getDefendantAdmittedAmount(caseData);
-
         final String applicant1PartyName = getStringParam(params, PARAM_APPLICANT1_PARTY_NAME);
-        log.debug("defendantAdmittedAmount: {}, applicant1PartyName: {}",
-                  defendantAdmittedAmount, applicant1PartyName);
 
         final LocalDate paymentDate = getPaymentDate(caseData);
         final String paymentDateEn = formatDateEn(paymentDate);
