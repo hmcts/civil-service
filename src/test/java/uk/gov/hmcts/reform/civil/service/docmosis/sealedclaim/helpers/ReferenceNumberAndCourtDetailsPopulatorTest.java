@@ -202,7 +202,7 @@ class ReferenceNumberAndCourtDetailsPopulatorTest {
 
         assertEquals("12345", form.getReferenceNumber());
         assertNull(form.getHearingCourtLocation());
-        verify(locationRefDataService, never()).getCourtLocationsByEpimmsId(any(), any());
+        verify(locationRefDataService, never()).getCourtLocationsByEpimmsId(any(), any(), any());
     }
 
     @Test
@@ -230,6 +230,6 @@ class ReferenceNumberAndCourtDetailsPopulatorTest {
 
         assertEquals("12345", form.getReferenceNumber());
         assertNull(form.getHearingCourtLocation());
-        verify(locationRefDataService, never()).getCourtLocationsByEpimmsId(any(), any());
+        verify(locationRefDataService, never()).getCourtLocationsByEpimmsId(any(), any(), any());
     }
 }
