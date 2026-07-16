@@ -92,5 +92,30 @@ class DocumentGeneratorServiceTest {
 
         assertThat(httpClientErrorException).hasMessageContaining("404 not found");
     }
-}
 
+    @Test
+    void shouldThrowWhenTornadoReturnsNullBody() {
+        when(docmosisApiClient.createDocument(argumentCaptor.capture())).thenReturn(null);
+
+        DocumentGenerationFailedException exception = assertThrows(
+            DocumentGenerationFailedException.class,
+            () -> documentGeneratorService.generateDocmosisDocument(Map.of(), N1, "pdf")
+        );
+
+        assertThat(exception).hasMessageContaining("Docmosis document generation returned an empty response");
+        assertThat(exception).hasMessageContaining(N1.getTemplate());
+    }
+
+    @Test
+    void shouldThrowWhenTornadoReturnsEmptyBody() {
+        when(docmosisApiClient.createDocument(argumentCaptor.capture())).thenReturn(new byte[0]);
+
+        DocumentGenerationFailedException exception = assertThrows(
+            DocumentGenerationFailedException.class,
+            () -> documentGeneratorService.generateDocmosisDocument(Map.of(), N1, "pdf")
+        );
+
+        assertThat(exception).hasMessageContaining("Docmosis document generation returned an empty response");
+        assertThat(exception).hasMessageContaining(N1.getTemplate());
+    }
+}

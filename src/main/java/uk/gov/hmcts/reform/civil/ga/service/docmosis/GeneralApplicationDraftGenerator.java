@@ -221,7 +221,9 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
             return YesOrNo.YES;
         }
 
-        return caseData.getGeneralAppInformOtherParty().getIsWithNotice();
+        return Optional.ofNullable(caseData.getGeneralAppInformOtherParty())
+            .map(informOtherParty -> informOtherParty.getIsWithNotice())
+            .orElse(null);
     }
 
     private Boolean validateCasePastDueDate(GeneralApplicationCaseData caseData) {

@@ -16,7 +16,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.RESPONDENT2_DOCUMENT_GENERATION_USER;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.fetchApplicantName;
+import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.fetchResponseIntentionsDocmosisTemplate;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.fetchSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCcdCaseReference;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.toCaseName;
@@ -35,6 +39,25 @@ class DocmosisTemplateDataUtilsTest {
             .ccdCaseReference(1L)
             .build();
         assertThatThrownBy(() -> fetchApplicantName(caseData)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void shouldReturnRespondent2ResponseIntentionForRespondent2AcknowledgementWhenRespondent1IntentionIsMissing() {
+        CaseData caseData = CaseData.builder()
+            .respondent2(new Party())
+            .respondent2SameLegalRepresentative(NO)
+            .respondent2DocumentGeneration(RESPONDENT2_DOCUMENT_GENERATION_USER)
+            .respondent2ClaimResponseIntentionType(FULL_DEFENCE)
+            .build();
+
+        assertThat(fetchResponseIntentionsDocmosisTemplate(caseData)).containsExactly("Defend all of the claim");
+    }
+
+    @Test
+    void shouldReturnEmptyResponseIntentionWhenValueIsMissing() {
+        CaseData caseData = CaseData.builder().build();
+
+        assertThat(fetchResponseIntentionsDocmosisTemplate(caseData)).containsExactly("");
     }
 
     @Test

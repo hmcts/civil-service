@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -158,27 +159,33 @@ public class DocmosisTemplateDataUtils {
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
                 responseIntentions.add(isRespondent2Acknowledgement(caseData)
-                                           ? ofNullable(caseData.getRespondent2ClaimResponseIntentionType())
-                                           .orElse(caseData.getRespondent1ClaimResponseIntentionType()).getLabel()
-                                           : caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+                                           ? labelOrEmpty(ofNullable(caseData.getRespondent2ClaimResponseIntentionType())
+                                                              .orElse(caseData.getRespondent1ClaimResponseIntentionType()))
+                                           : labelOrEmpty(caseData.getRespondent1ClaimResponseIntentionType()));
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
                 responseIntentions.add("Defendant 1 :"
-                                           + caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+                                           + labelOrEmpty(caseData.getRespondent1ClaimResponseIntentionType()));
                 responseIntentions.add("Defendant 2 :"
-                                           + caseData.getRespondent2ClaimResponseIntentionType().getLabel());
+                                           + labelOrEmpty(caseData.getRespondent2ClaimResponseIntentionType()));
                 break;
             case TWO_V_ONE:
                 responseIntentions.add("Against Claimant 1: "
-                                           + caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+                                           + labelOrEmpty(caseData.getRespondent1ClaimResponseIntentionType()));
                 responseIntentions.add("Against Claimant 2: "
-                                           + caseData.getRespondent1ClaimResponseIntentionTypeApplicant2().getLabel());
+                                           + labelOrEmpty(caseData.getRespondent1ClaimResponseIntentionTypeApplicant2()));
                 break;
             default:
-                responseIntentions.add(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+                responseIntentions.add(labelOrEmpty(caseData.getRespondent1ClaimResponseIntentionType()));
                 return responseIntentions;
         }
         return responseIntentions;
+    }
+
+    private static String labelOrEmpty(ResponseIntention responseIntention) {
+        return ofNullable(responseIntention)
+            .map(ResponseIntention::getLabel)
+            .orElse("");
     }
 
     public static boolean isRespondent2Acknowledgement(CaseData caseData) {
