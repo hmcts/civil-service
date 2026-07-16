@@ -16,9 +16,9 @@ module "managed_redis" {
   sku_name          = var.managed_redis_sku
   clustering_policy = "EnterpriseCluster"
 
-  public_network_access       = "Disabled"
-  create_private_endpoint     = true
-  subnet_id                   = data.azurerm_subnet.core_infra_redis_subnet.id
+  public_network_access   = "Disabled"
+  create_private_endpoint = true
+  subnet_id               = data.azurerm_subnet.core_infra_redis_subnet.id
   private_dns_zone_ids = [
     "/subscriptions/${var.private_dns_subscription_id}/resourceGroups/core-infra-intsvc-rg/providers/Microsoft.Network/privateDnsZones/privatelink.redis.azure.net"
   ]
