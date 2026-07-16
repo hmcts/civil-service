@@ -13,7 +13,7 @@ CREATE TABLE dbs.draft_store (
        draft_claim_created_at TIMESTAMP default CURRENT_TIMESTAMP NOT NULL,
        created_at TIMESTAMP default CURRENT_TIMESTAMP NOT NULL,
        updated_at TIMESTAMP default CURRENT_TIMESTAMP NOT NULL,
-       expires_at TIMESTAMP GENERATED ALWAYS AS (draft_claim_created_at + INTERVAL ‘180 days’) STORED NOT NULL,
+       expires_at TIMESTAMP GENERATED ALWAYS AS (draft_claim_created_at + INTERVAL '180 days') STORED NOT NULL,
        FOREIGN KEY (draft_type_id) REFERENCES dbs.draft_type(id)
 );
 
