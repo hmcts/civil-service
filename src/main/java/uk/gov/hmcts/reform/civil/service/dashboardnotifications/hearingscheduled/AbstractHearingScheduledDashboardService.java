@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 
 public abstract class AbstractHearingScheduledDashboardService extends DashboardScenarioService {
 
@@ -32,7 +33,10 @@ public abstract class AbstractHearingScheduledDashboardService extends Dashboard
     }
 
     private void populateCourtName(CaseData caseData, String authToken) {
-        List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(authToken);
+        List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(
+            authToken,
+            getCaseServiceId(caseData.getCaseAccessCategory())
+        );
         LocationRefData locationRefData = courtLocationUtils.fillPreferredLocationData(
             locations,
             caseData.getHearingLocation()
