@@ -82,7 +82,7 @@ resilience4j:
         minimumNumberOfCalls: 5
         failureRateThreshold: 50
         slowCallRateThreshold: 50
-        slowCallDurationThreshold: ${CASE_ACCESS_DATA_STORE_SLOW_CALL_THRESHOLD:30s}
+        slowCallDurationThreshold: ${CASE_ACCESS_DATA_STORE_SLOW_CALL_THRESHOLD:20s}
         waitDurationInOpenState: ${CASE_ACCESS_DATA_STORE_OPEN_STATE_WAIT:30s}
         permittedNumberOfCallsInHalfOpenState: 2
         automaticTransitionFromOpenToHalfOpenEnabled: true

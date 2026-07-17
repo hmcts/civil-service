@@ -125,17 +125,31 @@ public class CoreCaseUserService {
                   caseId, userId, ex);
     }
 
+    @Recover
+    public CaseAssignmentUserRolesResource recover(RetryableCaseUserException ex, String caseId) {
+        log.error("[CoreCaseUserService] Retryable getUserRoles failed after retries for CaseId: {}", caseId, ex);
+        return CaseAssignmentUserRolesResource.builder().caseAssignmentUserRoles(Collections.emptyList()).build();
+    }
+
     public boolean userHasCaseRole(String caseId, String userId, CaseRole caseRole) {
         return getUserCaseRoles(caseId, userId).stream()
             .anyMatch(c -> c.equals(caseRole.getFormattedName()));
     }
 
+    @Retryable(retryFor = RetryableCaseUserException.class, backoff = @Backoff(delay = 500, multiplier = 2))
     public CaseAssignmentUserRolesResource getUserRoles(String caseId) {
-        return caseAssignmentApi.getUserRoles(
-            getCaaAccessToken(),
-            authTokenGenerator.generate(),
-            List.of(caseId)
-        );
+        try {
+            return caseAssignmentApi.getUserRoles(
+                getCaaAccessToken(),
+                authTokenGenerator.generate(),
+                List.of(caseId)
+            );
+        } catch (FeignException.GatewayTimeout | FeignException.BadGateway | FeignException.ServiceUnavailable e) {
+            throw new RetryableCaseUserException(e.getMessage(), e);
+        } catch (FeignException.NotFound ex) {
+            log.error("User Roles not found", ex);
+            return CaseAssignmentUserRolesResource.builder().caseAssignmentUserRoles(Collections.emptyList()).build();
+        }
     }
 
     private String getCaaAccessToken() {
