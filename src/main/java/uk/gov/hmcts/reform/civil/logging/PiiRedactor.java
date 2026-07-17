@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 public final class PiiRedactor {
 
     private static final String REDACTED = "[REDACTED]";
-    private static final String PII_FIELD_NAMES = String.join("|",
+    private static final String SENSITIVE_FIELD_NAMES = String.join("|",
         "firstName",
         "lastName",
         "fullName",
@@ -23,8 +23,24 @@ public final class PiiRedactor {
         "individualDateOfBirth",
         "dob",
         "amount",
+        "admittedAmount",
+        "calculatedAmountInPence",
+        "claimAmount",
         "claimFee",
+        "claimFeeInPence",
+        "defendantAdmittedAmount",
+        "feeAmount",
+        "instalmentAmount",
+        "interest",
+        "interestAmount",
+        "outstandingAmount",
+        "paidAmount",
+        "partialAmount",
+        "paymentAmount",
         "paymentReference",
+        "paymentDate",
+        "repaymentAmount",
+        "totalClaimAmount",
         "address",
         "primaryAddress",
         "addressLine[1-3]?",
@@ -36,9 +52,9 @@ public final class PiiRedactor {
     private static final Pattern EMAIL = Pattern.compile(
         "(?i)(?<![\\w.+-])[\\w.+-]+@[\\w.-]+\\.[a-z]{2,}(?![\\w.-])"
     );
-    private static final Pattern PII_FIELD = Pattern.compile(
-        "(?i)(?<![\\w])(\\\"?(?:" + PII_FIELD_NAMES + ")"
-            + "\\\"?\\s*[:=]\\s*)(\\\"[^\\\"]*\\\"|[^,})]+)"
+    private static final Pattern SENSITIVE_FIELD = Pattern.compile(
+        "(?i)(?<![\\w])(\\\"?(?:" + SENSITIVE_FIELD_NAMES + ")"
+            + "\\\"?\\s*[:=]\\s*)(\\\"[^\\\"]*\\\"|[^,})\\r\\n]+)"
     );
 
     private PiiRedactor() {
@@ -48,7 +64,7 @@ public final class PiiRedactor {
         if (message == null) {
             return null;
         }
-        String fieldRedacted = PII_FIELD.matcher(message).replaceAll("$1" + REDACTED);
+        String fieldRedacted = SENSITIVE_FIELD.matcher(message).replaceAll("$1" + REDACTED);
         return EMAIL.matcher(fieldRedacted).replaceAll(REDACTED);
     }
 }

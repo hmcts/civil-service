@@ -34,7 +34,8 @@ class PiiRedactorTest {
     void shouldRetainOperationalIdentifiersAndRedactFinancialValues() {
         String message = "caseId=1234567890123456, caseReference=ABC-123, userId=user-123, "
             + "taskId=task-123, documentId=document-123, reference=notification-123, "
-            + "amount=250.00, paymentReference=RC-123";
+            + "amount=250.00, totalClaimAmount=500.00, claimFeeInPence=7000, "
+            + "interestAmount=15.00, paymentReference=RC-123";
 
         assertThat(PiiRedactor.redact(message))
             .contains(
@@ -45,11 +46,22 @@ class PiiRedactorTest {
                 "documentId=document-123",
                 "reference=notification-123"
             )
-            .doesNotContain("250.00", "RC-123")
+            .doesNotContain("250.00", "500.00", "7000", "15.00", "RC-123")
             .contains(
                 "amount=[REDACTED]",
+                "totalClaimAmount=[REDACTED]",
+                "claimFeeInPence=[REDACTED]",
+                "interestAmount=[REDACTED]",
                 "paymentReference=[REDACTED]"
             );
+    }
+
+    @Test
+    void shouldRedactSensitiveValuesAcrossMultipleLines() {
+        String message = "Request failed for jane.doe@example.com\nclaimAmount=250.00\nat Example.method";
+
+        assertThat(PiiRedactor.redact(message))
+            .isEqualTo("Request failed for [REDACTED]\nclaimAmount=[REDACTED]\nat Example.method");
     }
 
     @Test
