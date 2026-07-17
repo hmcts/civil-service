@@ -54,7 +54,7 @@ public class DocUploadNotificationService implements NotificationDataGA {
                             caseData.getCcdCaseReference()
                     )
             );
-            log.info("Applicant evidence upload notification sent to: {} for Case ID: {}", email, caseData.getCcdCaseReference());
+            log.info("Applicant evidence upload notification sent for Case ID: {}", caseData.getCcdCaseReference());
         }
     }
 
