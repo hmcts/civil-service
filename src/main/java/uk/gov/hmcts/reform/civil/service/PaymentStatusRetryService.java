@@ -36,12 +36,15 @@ public class PaymentStatusRetryService {
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper objectMapper;
 
-    @Retryable(retryFor = CaseDataUpdateException.class, backoff = @Backoff(delay = 500))
+    @Retryable(retryFor = CaseDataUpdateException.class, noRetryFor = IllegalArgumentException.class, backoff = @Backoff(delay = 500))
     public void updatePaymentStatus(FeeType feeType, String caseReference, CaseData caseData) {
         try {
             Long caseId = Long.valueOf(caseReference);
             submitUpdatePaymentEvent(caseData, caseId, feeType);
+        } catch (IllegalArgumentException ex) {
+            throw ex;
         } catch (Exception ex) {
+            log.error("Payment status update failed for case {} and fee type {}", caseReference, feeType, ex);
             throw new CaseDataUpdateException(ex.getMessage(), ex);
         }
     }
@@ -57,6 +60,14 @@ public class PaymentStatusRetryService {
         } catch (IllegalArgumentException ex) {
             throw ex;
         } catch (Exception ex) {
+            log.error(
+                "Payment status update failed for case {} and fee type {}. Status: {}, ErrorCode: {}",
+                caseReference,
+                feeType,
+                getStatus(response),
+                getErrorCode(response),
+                ex
+            );
             throw new CaseDataUpdateException(ex.getMessage(), ex);
         }
     }
@@ -67,15 +78,12 @@ public class PaymentStatusRetryService {
                         String caseReference,
                         CardPaymentStatusResponse response) {
 
-        String status = response != null ? response.getStatus() : "N/A";
-        String errorCode = response != null ? response.getErrorCode() : "N/A";
-
         log.error(
             "Payment status update failed after retries for case {} and fee type {}. Status: {}, ErrorCode: {}",
             caseReference,
             feeType,
-            status,
-            errorCode,
+            getStatus(response),
+            getErrorCode(response),
             ex
         );
     }
@@ -166,5 +174,13 @@ public class PaymentStatusRetryService {
             .build();
 
         coreCaseDataService.submitUpdate(String.valueOf(caseId), caseDataContent);
+    }
+
+    private String getStatus(CardPaymentStatusResponse response) {
+        return response != null ? response.getStatus() : "N/A";
+    }
+
+    private String getErrorCode(CardPaymentStatusResponse response) {
+        return response != null ? response.getErrorCode() : "N/A";
     }
 }
