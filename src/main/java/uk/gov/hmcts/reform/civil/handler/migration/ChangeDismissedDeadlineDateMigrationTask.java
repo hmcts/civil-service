@@ -19,16 +19,6 @@ public class ChangeDismissedDeadlineDateMigrationTask extends MigrationTask<Dism
     }
 
     @Override
-    protected String getTaskName() {
-        return "ChangeDismissedDeadlineDateMigrationTask";
-    }
-
-    @Override
-    protected String getEventDescription() {
-        return "This task changes the dismissed deadline date for cases based on the provided case references.";
-    }
-
-    @Override
     protected CaseData migrateCaseData(CaseData caseData, DismissedDeadlineCaseReference caseReference) {
         if (caseData == null) {
             throw new IllegalArgumentException("CaseData must not be null");
@@ -41,5 +31,15 @@ public class ChangeDismissedDeadlineDateMigrationTask extends MigrationTask<Dism
             caseData.setClaimDismissedDeadline(LocalDateTime.parse(caseReference.getDismissedDeadline()));
         }
         return caseData;
+    }
+
+    @Override
+    protected String getEventDescription() {
+        return "This task changes the dismissed deadline date for cases based on the provided case references.";
+    }
+
+    @Override
+    protected String getTaskName() {
+        return "ChangeDismissedDeadlineDateMigrationTask";
     }
 }
