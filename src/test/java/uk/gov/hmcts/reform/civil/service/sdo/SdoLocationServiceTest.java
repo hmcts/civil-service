@@ -10,9 +10,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.TaskManagementLocationTab;
 import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.TaskManagementLocationTypes;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
@@ -33,6 +33,7 @@ import static org.mockito.Mockito.when;
 class SdoLocationServiceTest {
 
     private static final String AUTH_TOKEN = "auth-token";
+    private static final String SERVICE_ID = "AAA6";
 
     @Mock
     private LocationReferenceDataService locationReferenceDataService;
@@ -59,12 +60,12 @@ class SdoLocationServiceTest {
         LocationRefData location = new LocationRefData();
         location.setEpimmsId("123");
         List<LocationRefData> locations = List.of(location);
-        when(locationReferenceDataService.getHearingCourtLocations(AUTH_TOKEN)).thenReturn(locations);
+        when(locationReferenceDataService.getHearingCourtLocations(AUTH_TOKEN, "AAA6")).thenReturn(locations);
 
-        List<LocationRefData> result = service.fetchHearingLocations(AUTH_TOKEN);
+        List<LocationRefData> result = service.fetchHearingLocations(AUTH_TOKEN, SERVICE_ID);
 
         assertThat(result).isEqualTo(locations);
-        verify(locationReferenceDataService).getHearingCourtLocations(AUTH_TOKEN);
+        verify(locationReferenceDataService).getHearingCourtLocations(AUTH_TOKEN, "AAA6");
     }
 
     @Test
@@ -72,12 +73,13 @@ class SdoLocationServiceTest {
         LocationRefData location = new LocationRefData();
         location.setEpimmsId("456");
         List<LocationRefData> locations = List.of(location);
-        when(locationReferenceDataService.getCourtLocationsForDefaultJudgments(AUTH_TOKEN)).thenReturn(locations);
+        when(locationReferenceDataService.getCourtLocationsForDefaultJudgments(AUTH_TOKEN, SERVICE_ID))
+            .thenReturn(locations);
 
-        List<LocationRefData> result = service.fetchDefaultJudgmentLocations(AUTH_TOKEN);
+        List<LocationRefData> result = service.fetchDefaultJudgmentLocations(AUTH_TOKEN, SERVICE_ID);
 
         assertThat(result).isEqualTo(locations);
-        verify(locationReferenceDataService).getCourtLocationsForDefaultJudgments(AUTH_TOKEN);
+        verify(locationReferenceDataService).getCourtLocationsForDefaultJudgments(AUTH_TOKEN, SERVICE_ID);
     }
 
     @Test
@@ -85,12 +87,13 @@ class SdoLocationServiceTest {
         LocationRefData location = new LocationRefData();
         location.setEpimmsId("789");
         List<LocationRefData> locations = List.of(location);
-        when(locationReferenceDataService.getCourtLocationsByEpimmsId(AUTH_TOKEN, "789")).thenReturn(locations);
+        when(locationReferenceDataService.getCourtLocationsByEpimmsId(AUTH_TOKEN, "789", SERVICE_ID))
+            .thenReturn(locations);
 
-        List<LocationRefData> result = service.fetchCourtLocationsByEpimmsId(AUTH_TOKEN, "789");
+        List<LocationRefData> result = service.fetchCourtLocationsByEpimmsId(AUTH_TOKEN, "789", SERVICE_ID);
 
         assertThat(result).isEqualTo(locations);
-        verify(locationReferenceDataService).getCourtLocationsByEpimmsId(AUTH_TOKEN, "789");
+        verify(locationReferenceDataService).getCourtLocationsByEpimmsId(AUTH_TOKEN, "789", SERVICE_ID);
     }
 
     @Test

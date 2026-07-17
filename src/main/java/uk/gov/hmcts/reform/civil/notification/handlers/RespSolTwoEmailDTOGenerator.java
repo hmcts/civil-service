@@ -12,6 +12,8 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganiza
 @AllArgsConstructor
 public abstract class RespSolTwoEmailDTOGenerator extends EmailDTOGenerator {
 
+    protected static final String DEFENDANTS_TEXT = "'s claim against you";
+
     protected final OrganisationService organisationService;
 
     @Override
@@ -20,10 +22,25 @@ public abstract class RespSolTwoEmailDTOGenerator extends EmailDTOGenerator {
     }
 
     @Override
+    protected String getEmailTemplateId(CaseData caseData) {
+        return getEmailTemplateId(caseData, null);
+    }
+
+    @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         boolean isRespondent1 = false;
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
             isRespondent1, organisationService));
+        return properties;
+    }
+
+    protected Map<String, String> buildDefendantTwoNotificationProperties(Map<String, String> properties, CaseData caseData) {
+        properties.putAll(Map.of(
+            CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
+                false, organisationService),
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
+            PARTY_NAME, caseData.getApplicant1().getPartyName() + DEFENDANTS_TEXT
+        ));
         return properties;
     }
 
