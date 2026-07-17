@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDe
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
@@ -222,7 +223,7 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
         }
 
         return Optional.ofNullable(caseData.getGeneralAppInformOtherParty())
-            .map(informOtherParty -> informOtherParty.getIsWithNotice())
+            .map(GAInformOtherParty::getIsWithNotice)
             .orElse(null);
     }
 

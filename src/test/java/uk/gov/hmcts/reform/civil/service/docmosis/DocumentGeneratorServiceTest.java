@@ -102,8 +102,9 @@ class DocumentGeneratorServiceTest {
             () -> documentGeneratorService.generateDocmosisDocument(Map.of(), N1, "pdf")
         );
 
-        assertThat(exception).hasMessageContaining("Docmosis document generation returned an empty response");
-        assertThat(exception).hasMessageContaining(N1.getTemplate());
+        assertThat(exception)
+            .hasMessageContaining("Docmosis document generation returned an empty response")
+            .hasMessageContaining(N1.getTemplate());
     }
 
     @Test
@@ -115,7 +116,8 @@ class DocumentGeneratorServiceTest {
             () -> documentGeneratorService.generateDocmosisDocument(Map.of(), N1, "pdf")
         );
 
-        assertThat(exception).hasMessageContaining("Docmosis document generation returned an empty response");
-        assertThat(exception).hasMessageContaining(N1.getTemplate());
+        assertThat(exception)
+            .hasMessageContaining("Docmosis document generation returned an empty response")
+            .hasMessageContaining(N1.getTemplate());
     }
 }
