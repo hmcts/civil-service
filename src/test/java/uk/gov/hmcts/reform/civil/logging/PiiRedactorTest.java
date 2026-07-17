@@ -31,15 +31,22 @@ class PiiRedactorTest {
     }
 
     @Test
-    void shouldRetainCaseIdsAndRedactOtherIdentifiersAndFinancialValues() {
-        String message = "caseId=1234567890123456, caseReference=ABC-123, userId=abc-123, "
+    void shouldRetainOperationalIdentifiersAndRedactFinancialValues() {
+        String message = "caseId=1234567890123456, caseReference=ABC-123, userId=user-123, "
+            + "taskId=task-123, documentId=document-123, reference=notification-123, "
             + "amount=250.00, paymentReference=RC-123";
 
         assertThat(PiiRedactor.redact(message))
-            .contains("caseId=1234567890123456", "caseReference=ABC-123")
-            .doesNotContain("abc-123", "250.00", "RC-123")
             .contains(
-                "userId=[REDACTED]",
+                "caseId=1234567890123456",
+                "caseReference=ABC-123",
+                "userId=user-123",
+                "taskId=task-123",
+                "documentId=document-123",
+                "reference=notification-123"
+            )
+            .doesNotContain("250.00", "RC-123")
+            .contains(
                 "amount=[REDACTED]",
                 "paymentReference=[REDACTED]"
             );

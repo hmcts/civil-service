@@ -38,20 +38,18 @@ public class ValidateDateOfBirth implements CaseTask {
     private final RespondToClaimSpecUtils respondToClaimSpecUtils;
 
     public CallbackResponse execute(CallbackParams callbackParams) {
-        log.info("Executing date of birth validation callback task for caseId: {}",
-                 callbackParams.getCaseData().getCcdCaseReference());
+        log.info("Executing callback task for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
 
         Party respondent = getRespondent(callbackParams);
         List<String> errors = dateOfBirthValidator.validate(respondent);
-        log.info("Date of birth validation completed for caseId: {}",
-                 callbackParams.getCaseData().getCcdCaseReference());
+        log.info("CaseId {}: Date of birth validation errors: {}", callbackParams.getCaseData().getCcdCaseReference(), errors);
 
         CaseData caseData = callbackParams.getCaseData();
         errors.addAll(correspondenceAddressCorrect(caseData));
-        log.info("Correspondence address validation completed for caseId: {}", caseData.getCcdCaseReference());
+        log.info("CaseId {}: Correspondence address validation errors: {}", caseData.getCcdCaseReference(), errors);
 
         updateSolicitorResponse(callbackParams, caseData);
-        log.info("Solicitor response updated for caseId: {}", caseData.getCcdCaseReference());
+        log.info("CaseId {}: Solicitor response updated", caseData.getCcdCaseReference());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toMap(objectMapper))
@@ -60,16 +58,14 @@ public class ValidateDateOfBirth implements CaseTask {
     }
 
     private Party getRespondent(CallbackParams callbackParams) {
-        log.info("Retrieving respondent for date of birth validation for caseId: {}",
-                 callbackParams.getCaseData().getCcdCaseReference());
+        log.info("Retrieving respondent for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
 
         Party respondent = callbackParams.getCaseData().getRespondent1();
         if (respondent == null && callbackParams.getCaseData().getRespondent2() != null) {
             respondent = callbackParams.getCaseData().getRespondent2();
-            log.info("Respondent 1 is null, using Respondent 2 for caseId: {}",
-                     callbackParams.getCaseData().getCcdCaseReference());
+            log.info("CaseId {}: Respondent 1 is null, using Respondent 2", callbackParams.getCaseData().getCcdCaseReference());
         } else {
-            log.info("Using Respondent 1 for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
+            log.info("CaseId {}: Using Respondent 1", callbackParams.getCaseData().getCcdCaseReference());
         }
         return respondent;
     }
@@ -101,12 +97,10 @@ public class ValidateDateOfBirth implements CaseTask {
         log.info("Validating correspondence address for caseId: {}", caseData.getCcdCaseReference());
 
         if (isCorrespondenceAddressRequired(caseData.getIsRespondent1(), caseData.getSpecAoSRespondentCorrespondenceAddressRequired())) {
-            log.info("Respondent 1 correspondence address validation required for caseId: {}",
-                     caseData.getCcdCaseReference());
+            log.info("CaseId {}: Respondent 1 correspondence address validation required", caseData.getCcdCaseReference());
             return validatePostcode(caseData.getSpecAoSRespondentCorrespondenceAddressdetails());
         } else if (isCorrespondenceAddressRequired(caseData.getIsRespondent2(), caseData.getSpecAoSRespondent2CorrespondenceAddressRequired())) {
-            log.info("Respondent 2 correspondence address validation required for caseId: {}",
-                     caseData.getCcdCaseReference());
+            log.info("CaseId {}: Respondent 2 correspondence address validation required", caseData.getCcdCaseReference());
             return validatePostcode(caseData.getSpecAoSRespondent2CorrespondenceAddressdetails());
         }
         return Collections.emptyList();

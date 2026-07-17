@@ -240,8 +240,10 @@ public class CaseQueriesUtil {
                     caseDataBefore.getQmRespondentSolicitor2Queries()
                 ).stream().filter(Objects::nonNull)
                 .forEach(collection ->
-                             log.info("Successfully migrated queries for caseId {}",
-                                      caseDataBefore.getCcdCaseReference()));
+                             log.info(
+                                 "Successfully migrated [{}] queries for caseId {}",
+                                 collection.getPartyName(), caseDataBefore.getCcdCaseReference()
+                             ));
         }
     }
 
