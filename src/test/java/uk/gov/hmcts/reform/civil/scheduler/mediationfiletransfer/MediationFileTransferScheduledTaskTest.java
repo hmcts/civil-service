@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.scheduler.mediationfiletransfer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -28,12 +29,12 @@ class MediationFileTransferScheduledTaskTest {
     @Mock
     private DefaultBackPressureConfiguration defaultBackPressureConfiguration;
 
+    @InjectMocks
     private MediationFileTransferScheduledTask task;
     private CaseData caseData;
 
     @BeforeEach
     void setUp() {
-        task = new MediationFileTransferScheduledTask(coreCaseDataService, defaultBackPressureConfiguration);
         caseData = CaseData.builder().ccdCaseReference(CASE_ID).build();
     }
 

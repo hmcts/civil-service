@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.scheduler.automatedhearingnotice;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
@@ -24,16 +24,8 @@ class AutomatedHearingNoticeSchedulerTest {
     @Mock
     private AutomatedHearingNoticeScheduledTask scheduledTask;
 
+    @InjectMocks
     private AutomatedHearingNoticeScheduler scheduler;
-
-    @BeforeEach
-    void setUp() {
-        scheduler = new AutomatedHearingNoticeScheduler(
-            searchService,
-            scheduledTaskRunner,
-            scheduledTask
-        );
-    }
 
     @Test
     void shouldRunScheduledTaskRunner() {

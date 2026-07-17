@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.scheduler.pollingeventemitter;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -27,16 +27,8 @@ class PollingEventEmitterSchedulerTest {
     @Mock
     private PollingEventEmitterScheduledTask pollingEventEmitterScheduledTask;
 
+    @InjectMocks
     private PollingEventEmitterScheduler scheduler;
-
-    @BeforeEach
-    void setUp() {
-        scheduler = new PollingEventEmitterScheduler(
-            searchService,
-            scheduledTaskRunner,
-            pollingEventEmitterScheduledTask
-        );
-    }
 
     @Test
     void shouldRunScheduledTaskRunner() {

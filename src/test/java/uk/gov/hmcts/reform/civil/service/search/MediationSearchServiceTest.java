@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.service.search;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -24,12 +24,8 @@ class MediationSearchServiceTest {
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
 
+    @InjectMocks
     private MediationSearchService service;
-
-    @BeforeEach
-    void setUp() {
-        service = new MediationSearchService(mediationCasesSearchService, caseDetailsConverter);
-    }
 
     @Test
     void shouldReturnCsvCasesFromNonCarmMediationSearch() {

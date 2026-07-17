@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.scheduler.pollingeventemitter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -35,18 +36,13 @@ class PollingEventEmitterScheduledTaskTest {
     @Mock
     private DefaultBackPressureConfiguration defaultBackPressureConfiguration;
 
+    @InjectMocks
     private PollingEventEmitterScheduledTask task;
     private CaseDetails caseDetails;
     private CaseData caseData;
 
     @BeforeEach
     void setUp() {
-        task = new PollingEventEmitterScheduledTask(
-            caseDetailsConverter,
-            eventEmitterService,
-            defaultBackPressureConfiguration
-        );
-
         caseDetails = CaseDetails.builder().id(CASE_ID).data(Map.of()).build();
         caseData = mock(CaseData.class);
     }
