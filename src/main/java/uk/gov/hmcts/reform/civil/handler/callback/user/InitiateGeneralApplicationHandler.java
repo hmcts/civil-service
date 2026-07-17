@@ -312,7 +312,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .data(caseData.toMap(objectMapper))
                 .build();
         }
-        caseData = setWithNoticeByType(caseData);
+        setWithNoticeByType(caseData);
         final UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         if (caseData.getGeneralAppPBADetails() == null) {
