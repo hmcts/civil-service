@@ -72,16 +72,16 @@
   "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/determineLoggedInSolicitor"
 }, {
   "CaseFieldID" : "specAoSApplicantCorrespondenceAddressdetails",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specCorrespondenceAddress",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specCorrespondenceAddress"
 }, {
   "CaseFieldID" : "specAoSRespondent2HomeAddressDetails",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specCorrespondenceAddress",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specCorrespondenceAddress"
 }, {
   "CaseFieldID" : "solicitorReferences",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/confirm-details",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/confirm-details"
 }, {
   "CaseFieldID" : "respondentResponseIsSame",
   "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/confirm-details"
@@ -132,12 +132,12 @@
   "RetriesTimeoutURLMidEvent" : 0
 }, {
   "CaseFieldID" : "resp1MediationAvailability",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-mediation-unavailable-dates",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-mediation-unavailable-dates"
 }, {
   "CaseFieldID" : "resp2MediationAvailability",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/validate-mediation-unavailable-dates",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/validate-mediation-unavailable-dates"
 }, {
   "CaseFieldID" : "responseClaimMediationSpecLabelRes2",
   "RetriesTimeoutURLMidEvent" : 0
@@ -173,28 +173,28 @@
   "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/witnesses"
 }, {
   "CaseFieldID" : "SmallClaimHearingInterpreterRequired",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates"
 }, {
   "CaseFieldID" : "SmallClaimHearingInterpreter2Required",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates"
 }, {
   "CaseFieldID" : "respondent1DQHearingFastClaim",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates"
 }, {
   "CaseFieldID" : "respondent2DQHearingFastClaim",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates"
 }, {
   "CaseFieldID" : "respondent1DQHearingSmallClaim",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates"
 }, {
   "CaseFieldID" : "respondent2DQHearingSmallClaim",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates"
 }, {
   "CaseFieldID" : "uiStatementOfTruth",
   "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/statement-of-truth"
@@ -206,6 +206,6 @@
   "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/track"
 }, {
   "CaseFieldID" : "respondent1DQHearingFastClaimLabel",
-  "CallBackURLMidEvent" : "",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : ""
 } ]

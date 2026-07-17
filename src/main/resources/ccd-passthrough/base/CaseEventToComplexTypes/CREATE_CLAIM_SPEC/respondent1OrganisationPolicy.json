@@ -1,27 +1,7 @@
 [ {
   "CaseEventID" : "CREATE_CLAIM_SPEC",
   "CaseFieldID" : "respondent1OrganisationPolicy",
-  "ListElementCode" : "Organisation.OrganisationID",
-  "ID" : "SolicitorCreate",
-  "FieldDisplayOrder" : 1
-}, {
-  "CaseEventID" : "CREATE_CLAIM_SPEC",
-  "CaseFieldID" : "respondent1OrganisationPolicy",
-  "ListElementCode" : "Organisation.OrganisationName",
-  "ID" : "SolicitorCreate",
-  "FieldDisplayOrder" : 2
-}, {
-  "CaseEventID" : "CREATE_CLAIM_SPEC",
-  "CaseFieldID" : "respondent1OrganisationPolicy",
-  "ListElementCode" : "OrgPolicyReference",
-  "ID" : "SolicitorCreate",
-  "FieldDisplayOrder" : 4
-}, {
-  "CaseEventID" : "CREATE_CLAIM_SPEC",
-  "CaseFieldID" : "respondent1OrganisationPolicy",
   "ListElementCode" : "OrgPolicyCaseAssignedRole",
-  "ID" : "SolicitorCreate",
   "DefaultValue" : "[RESPONDENTSOLICITORONE]",
-  "FieldDisplayOrder" : 3,
   "RetainHiddenValue" : "TRUE"
 } ]

@@ -1,7 +1,0 @@
-[ {
-  "CaseEventID" : "CLAIMANT_RESPONSE",
-  "CaseFieldID" : "claimantDefenceResDocToDefendant2",
-  "ListElementCode" : "file",
-  "ID" : "DefenceDocument",
-  "FieldDisplayOrder" : 1
-} ]

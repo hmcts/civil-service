@@ -1,7 +1,0 @@
-[ {
-  "CaseEventID" : "PARTIAL_REMISSION_HWF_GRANTED",
-  "CaseFieldID" : "hearingHwfDetails",
-  "ListElementCode" : "remissionAmount",
-  "ID" : "HelpWithFeesDetails",
-  "FieldDisplayOrder" : 1
-} ]

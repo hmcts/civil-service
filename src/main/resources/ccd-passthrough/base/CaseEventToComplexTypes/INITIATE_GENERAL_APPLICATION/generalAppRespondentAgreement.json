@@ -1,7 +1,0 @@
-[ {
-  "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
-  "CaseFieldID" : "generalAppRespondentAgreement",
-  "ListElementCode" : "hasAgreed",
-  "ID" : "GARespondentAgreementPage",
-  "FieldDisplayOrder" : 1
-} ]

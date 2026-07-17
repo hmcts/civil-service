@@ -1,21 +1,11 @@
 [ {
   "CaseEventID" : "CLAIMANT_RESPONSE",
   "CaseFieldID" : "applicant1DQLanguage",
-  "ListElementCode" : "helpText",
-  "ID" : "Languages",
-  "FieldDisplayOrder" : 1
-}, {
-  "CaseEventID" : "CLAIMANT_RESPONSE",
-  "CaseFieldID" : "applicant1DQLanguage",
   "ListElementCode" : "court",
-  "ID" : "GARespondentAgreementPage",
-  "FieldDisplayOrder" : 2,
   "Publish" : "Y"
 }, {
   "CaseEventID" : "CLAIMANT_RESPONSE",
   "CaseFieldID" : "applicant1DQLanguage",
   "ListElementCode" : "documents",
-  "ID" : "GAUrgencyRecordPage",
-  "FieldDisplayOrder" : 3,
   "Publish" : "Y"
 } ]

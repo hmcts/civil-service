@@ -30,15 +30,15 @@
   "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/witnesses"
 }, {
   "CaseFieldID" : "applicant1DQHearingLRspec",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates"
 }, {
   "CaseFieldID" : "app1MediationContactInfo",
   "RetriesTimeoutURLMidEvent" : 0
 }, {
   "CaseFieldID" : "app1MediationAvailability",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-mediation-unavailable-dates",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-mediation-unavailable-dates"
 }, {
   "CaseFieldID" : "uiStatementOfTruth",
   "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/statement-of-truth"

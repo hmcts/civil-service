@@ -1,56 +1,6 @@
 [ {
   "CaseEventID" : "CREATE_SDO",
   "CaseFieldID" : "fastTrackHearingTime",
-  "ListElementCode" : "dateFromLabel",
-  "ID" : "FastTrackHearingTime",
-  "FieldDisplayOrder" : 1
-}, {
-  "CaseEventID" : "CREATE_SDO",
-  "CaseFieldID" : "fastTrackHearingTime",
-  "ListElementCode" : "dateFrom",
-  "ID" : "FastTrackHearingTime",
-  "FieldDisplayOrder" : 2
-}, {
-  "CaseEventID" : "CREATE_SDO",
-  "CaseFieldID" : "fastTrackHearingTime",
-  "ListElementCode" : "dateToToggle",
-  "ID" : "FastTrackHearingTime",
-  "FieldDisplayOrder" : 3
-}, {
-  "CaseEventID" : "CREATE_SDO",
-  "CaseFieldID" : "fastTrackHearingTime",
-  "ListElementCode" : "dateTo",
-  "ID" : "FastTrackHearingTime",
-  "FieldDisplayOrder" : 4
-}, {
-  "CaseEventID" : "CREATE_SDO",
-  "CaseFieldID" : "fastTrackHearingTime",
-  "ListElementCode" : "hearingDuration",
-  "ID" : "FastTrackHearingTime",
-  "FieldDisplayOrder" : 5
-}, {
-  "CaseEventID" : "CREATE_SDO",
-  "CaseFieldID" : "fastTrackHearingTime",
-  "ListElementCode" : "otherHours",
-  "ID" : "FastTrackHearingTime",
-  "FieldDisplayOrder" : 6
-}, {
-  "CaseEventID" : "CREATE_SDO",
-  "CaseFieldID" : "fastTrackHearingTime",
-  "ListElementCode" : "otherMinutes",
-  "ID" : "FastTrackHearingTime",
-  "FieldDisplayOrder" : 7
-}, {
-  "CaseEventID" : "CREATE_SDO",
-  "CaseFieldID" : "fastTrackHearingTime",
-  "ListElementCode" : "helpText1",
-  "ID" : "FastTrackHearingTime",
-  "FieldDisplayOrder" : 8
-}, {
-  "CaseEventID" : "CREATE_SDO",
-  "CaseFieldID" : "fastTrackHearingTime",
   "ListElementCode" : "helpText2",
-  "ID" : "FastTrackHearingTime",
-  "FieldDisplayOrder" : 9,
   "_comment" : "legacy field no longer in use"
 } ]

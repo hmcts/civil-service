@@ -6,12 +6,12 @@
   "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/eligibilityCheck"
 }, {
   "CaseFieldID" : "applicant1",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/applicant",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/applicant"
 }, {
   "CaseFieldID" : "applicant2",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/applicant2",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/applicant2"
 }, {
   "CaseFieldID" : "applicantSolicitor1CheckEmail",
   "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/idam-email"

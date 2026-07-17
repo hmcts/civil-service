@@ -1,7 +1,0 @@
-[ {
-  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
-  "CaseFieldID" : "finalOrderDownloadTemplateDocument",
-  "ListElementCode" : "documentLink",
-  "ID" : "FinalOrderIntermediateTrackAllocation",
-  "FieldDisplayOrder" : 2
-} ]

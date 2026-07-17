@@ -2,149 +2,55 @@
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "respondent2",
   "ListElementCode" : "individualTitle",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 1,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "respondent2",
   "ListElementCode" : "individualFirstName",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 2,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "respondent2",
   "ListElementCode" : "individualLastName",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 3,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "respondent2",
-  "ListElementCode" : "individualDateOfBirth",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 5
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "respondent2",
   "ListElementCode" : "companyName",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 5,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "respondent2",
   "ListElementCode" : "organisationName",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 6,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "respondent2",
   "ListElementCode" : "soleTraderTitle",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 7,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "respondent2",
   "ListElementCode" : "soleTraderFirstName",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 8,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "respondent2",
   "ListElementCode" : "soleTraderLastName",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 9,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "respondent2",
-  "ListElementCode" : "soleTraderTradingAs",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 10
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "respondent2",
-  "ListElementCode" : "soleTraderDateOfBirth",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 11
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "respondent2",
-  "ListElementCode" : "primaryAddress",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 12
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "respondent2",
-  "ListElementCode" : "primaryAddress.AddressLine1",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 13
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "respondent2",
-  "ListElementCode" : "primaryAddress.AddressLine2",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 14
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "respondent2",
-  "ListElementCode" : "primaryAddress.AddressLine3",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 15
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "respondent2",
-  "ListElementCode" : "primaryAddress.PostTown",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 16
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "respondent2",
-  "ListElementCode" : "primaryAddress.County",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 17
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "respondent2",
-  "ListElementCode" : "primaryAddress.Country",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 18
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "respondent2",
-  "ListElementCode" : "primaryAddress.PostCode",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 19
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "respondent2",
-  "ListElementCode" : "partyEmail",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 20
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "respondent2",
   "ListElementCode" : "partyPhone",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 21,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "respondent2",
   "ListElementCode" : "partyID",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 22,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "respondent2",
   "ListElementCode" : "flags",
-  "ID" : "SecondDefendant",
-  "FieldDisplayOrder" : 23,
   "RetainHiddenValue" : "Y"
 } ]

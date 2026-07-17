@@ -2,7 +2,5 @@
   "CaseEventID" : "REQUEST_FOR_RECONSIDERATION",
   "CaseFieldID" : "reasonForReconsiderationRespondent1",
   "ListElementCode" : "reasonForReconsiderationTxt",
-  "ID" : "ReasonForReconsideration",
-  "FieldDisplayOrder" : 1,
   "Publish" : "Y"
 } ]

@@ -3,33 +3,33 @@
   "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/statement-of-truth"
 }, {
   "CaseFieldID" : "respondent2DQWitnesses",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/witnesses",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/witnesses"
 }, {
   "CaseFieldID" : "respondent1DQWitnesses",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/witnesses",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/witnesses"
 }, {
   "CaseFieldID" : "respondent2DQExperts",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/experts",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/experts"
 }, {
   "CaseFieldID" : "respondent1DQExperts",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/experts",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/experts"
 }, {
   "CaseFieldID" : "respondent2ClaimResponseType",
   "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/set-generic-response-type-flag"
 }, {
   "CaseFieldID" : "respondent1",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/confirm-details",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/confirm-details"
 }, {
   "CaseFieldID" : "respondent1DQHearing",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates"
 }, {
   "CaseFieldID" : "respondent2DQHearing",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates"
 } ]

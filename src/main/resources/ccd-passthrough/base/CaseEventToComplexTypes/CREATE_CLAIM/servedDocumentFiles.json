@@ -2,63 +2,15 @@
   "CaseEventID" : "CREATE_CLAIM",
   "CaseFieldID" : "servedDocumentFiles",
   "ListElementCode" : "medicalReport",
-  "ID" : "Upload",
-  "FieldDisplayOrder" : 4,
   "Comment" : "medicalreports.document is just the document input,so this must be defined to hide the whole element"
 }, {
   "CaseEventID" : "CREATE_CLAIM",
   "CaseFieldID" : "servedDocumentFiles",
-  "ListElementCode" : "documentsLabel",
-  "ID" : "Upload",
-  "FieldDisplayOrder" : 1
-}, {
-  "CaseEventID" : "CREATE_CLAIM",
-  "CaseFieldID" : "servedDocumentFiles",
-  "ListElementCode" : "particularsOfClaimDocument",
-  "ID" : "Upload",
-  "FieldDisplayOrder" : 2
-}, {
-  "CaseEventID" : "CREATE_CLAIM",
-  "CaseFieldID" : "servedDocumentFiles",
-  "ListElementCode" : "particularsOfClaimText",
-  "ID" : "Upload",
-  "FieldDisplayOrder" : 3
-}, {
-  "CaseEventID" : "CREATE_CLAIM",
-  "CaseFieldID" : "servedDocumentFiles",
-  "ListElementCode" : "medicalReport.document",
-  "ID" : "Upload",
-  "FieldDisplayOrder" : 4
-}, {
-  "CaseEventID" : "CREATE_CLAIM",
-  "CaseFieldID" : "servedDocumentFiles",
   "ListElementCode" : "medicalReport",
-  "ID" : "Upload",
-  "FieldDisplayOrder" : 4,
   "Comment" : "medicalreports.document is just the document input,so this must be defined to hide the whole element"
 }, {
   "CaseEventID" : "CREATE_CLAIM",
   "CaseFieldID" : "servedDocumentFiles",
-  "ListElementCode" : "scheduleOfLoss.document",
-  "ID" : "Upload",
-  "FieldDisplayOrder" : 5
-}, {
-  "CaseEventID" : "CREATE_CLAIM",
-  "CaseFieldID" : "servedDocumentFiles",
-  "ListElementCode" : "certificateOfSuitability.document",
-  "ID" : "Upload",
-  "FieldDisplayOrder" : 6
-}, {
-  "CaseEventID" : "CREATE_CLAIM",
-  "CaseFieldID" : "servedDocumentFiles",
-  "ListElementCode" : "other.document",
-  "ID" : "Upload",
-  "FieldDisplayOrder" : 7
-}, {
-  "CaseEventID" : "CREATE_CLAIM",
-  "CaseFieldID" : "servedDocumentFiles",
   "ListElementCode" : "medicalReport",
-  "ID" : "Upload",
-  "FieldDisplayOrder" : 4,
   "Comment" : "medicalreports.document is just the document input,so this must be defined to hide the whole element"
 } ]

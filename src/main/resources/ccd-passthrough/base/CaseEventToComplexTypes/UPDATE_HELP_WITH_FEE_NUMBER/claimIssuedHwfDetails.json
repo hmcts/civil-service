@@ -1,7 +1,0 @@
-[ {
-  "CaseEventID" : "UPDATE_HELP_WITH_FEE_NUMBER",
-  "CaseFieldID" : "claimIssuedHwfDetails",
-  "ListElementCode" : "hwfReferenceNumber",
-  "ID" : "HelpWithFeesDetails",
-  "FieldDisplayOrder" : 2
-} ]

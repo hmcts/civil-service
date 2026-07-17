@@ -2,28 +2,20 @@
   "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
   "CaseFieldID" : "generalAppHearingDate",
   "ListElementCode" : "hearingScheduledPreferenceYesNoLabel",
-  "ID" : "GAHearingDate",
-  "FieldDisplayOrder" : 1,
   "ShowSummaryContentOption" : "Y"
 }, {
   "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
   "CaseFieldID" : "generalAppHearingDate",
   "ListElementCode" : "hearingScheduledPreferenceYesNo",
-  "ID" : "GAHearingDate",
-  "FieldDisplayOrder" : 2,
   "ShowSummaryContentOption" : "Y"
 }, {
   "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
   "CaseFieldID" : "generalAppHearingDate",
   "ListElementCode" : "hearingScheduledDateLabel",
-  "ID" : "GAHearingDate",
-  "FieldDisplayOrder" : 3,
   "ShowSummaryContentOption" : "Y"
 }, {
   "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
   "CaseFieldID" : "generalAppHearingDate",
   "ListElementCode" : "hearingScheduledDate",
-  "ID" : "GAHearingDate",
-  "FieldDisplayOrder" : 4,
   "ShowSummaryContentOption" : "Y"
 } ]

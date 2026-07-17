@@ -2,165 +2,75 @@
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "applicant1",
   "ListElementCode" : "individualTitle",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 2,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "applicant1",
   "ListElementCode" : "individualFirstName",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 3,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "applicant1",
   "ListElementCode" : "individualLastName",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 4,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "applicant1",
-  "ListElementCode" : "individualDateOfBirth",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 5
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "applicant1",
   "ListElementCode" : "companyName",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 6,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "applicant1",
   "ListElementCode" : "organisationName",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 7,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "applicant1",
   "ListElementCode" : "soleTraderTitle",
-  "ID" : "Claimant",
-  "RetainHiddenValue" : "Y",
-  "FieldDisplayOrder" : 8
+  "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "applicant1",
   "ListElementCode" : "soleTraderFirstName",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 9,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "applicant1",
   "ListElementCode" : "soleTraderLastName",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 10,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "applicant1",
   "ListElementCode" : "soleTraderTradingAs",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 11,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "applicant1",
-  "ListElementCode" : "soleTraderDateOfBirth",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 12
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "applicant1",
-  "ListElementCode" : "primaryAddress",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 13
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "applicant1",
-  "ListElementCode" : "primaryAddress.AddressLine1",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 13
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "applicant1",
-  "ListElementCode" : "primaryAddress.AddressLine2",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 14
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "applicant1",
-  "ListElementCode" : "primaryAddress.AddressLine3",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 15
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "applicant1",
-  "ListElementCode" : "primaryAddress.PostTown",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 16
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "applicant1",
-  "ListElementCode" : "primaryAddress.County",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 17
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "applicant1",
-  "ListElementCode" : "primaryAddress.Country",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 18
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "applicant1",
-  "ListElementCode" : "primaryAddress.PostCode",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 19
-}, {
-  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
-  "CaseFieldID" : "applicant1",
   "ListElementCode" : "partyEmail",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 20,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "applicant1",
   "ListElementCode" : "partyPhone",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 21,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "applicant1",
   "ListElementCode" : "partyID",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 22,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "applicant1",
   "ListElementCode" : "flags",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 23,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "applicant1",
   "ListElementCode" : "flags.roleOnCase",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 24,
   "RetainHiddenValue" : "Y"
 }, {
   "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
   "CaseFieldID" : "applicant1",
   "ListElementCode" : "flags.partyName",
-  "ID" : "Claimant",
-  "FieldDisplayOrder" : 25,
   "RetainHiddenValue" : "Y"
 } ]

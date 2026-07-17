@@ -1,7 +1,0 @@
-[ {
-  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
-  "CaseFieldID" : "finalOrderDocument",
-  "ListElementCode" : "documentLink",
-  "ID" : "FinalOrderPreview",
-  "FieldDisplayOrder" : 1
-} ]

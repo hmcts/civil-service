@@ -1,11 +1,11 @@
 [ {
   "CaseFieldID" : "claimProceedsInCaseman",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/transfer-date",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/transfer-date"
 }, {
   "CaseFieldID" : "claimProceedsInCasemanLR",
-  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/transfer-date",
-  "RetriesTimeoutURLMidEvent" : 0
+  "RetriesTimeoutURLMidEvent" : 0,
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/transfer-date"
 }, {
   "CaseFieldID" : "CaseAccessCategory",
   "RetriesTimeoutURLMidEvent" : 0

@@ -1,21 +1,11 @@
 [ {
   "CaseEventID" : "DEFENDANT_RESPONSE",
   "CaseFieldID" : "respondent2DQRequestedCourt",
-  "ListElementCode" : "otherPartyPreferredSite",
-  "ID" : "RequestedCourt",
-  "FieldDisplayOrder" : 4
-}, {
-  "CaseEventID" : "DEFENDANT_RESPONSE",
-  "CaseFieldID" : "respondent2DQRequestedCourt",
   "ListElementCode" : "responseCourtLocations",
-  "ID" : "RequestedCourt",
-  "FieldDisplayOrder" : 7,
   "_Comment" : "Condition to true, must override default"
 }, {
   "CaseEventID" : "DEFENDANT_RESPONSE",
   "CaseFieldID" : "respondent2DQRequestedCourt",
   "ListElementCode" : "reasonForHearingAtSpecificCourt",
-  "ID" : "RequestedCourt",
-  "FieldDisplayOrder" : 8,
   "_Comment" : "Condition to true, must override default"
 } ]
