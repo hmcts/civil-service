@@ -354,7 +354,7 @@ class CoreCaseUserServiceTest {
 
         @Test
         void shouldThrowRetryableCaseUserException_whenGatewayTimeoutThrown() {
-            when(caseAccessDataStoreApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+            when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
                 .thenThrow(gatewayTimeoutException);
 
             assertThatThrownBy(() -> service.getUserCaseRoles(CASE_ID, USER_ID))
@@ -364,7 +364,7 @@ class CoreCaseUserServiceTest {
 
         @Test
         void shouldReturnEmptyList_whenUserRolesNotFound() {
-            when(caseAccessDataStoreApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+            when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
                 .thenThrow(notFoundException);
 
             var userCaseRoles = service.getUserCaseRoles(CASE_ID, USER_ID);
@@ -373,18 +373,18 @@ class CoreCaseUserServiceTest {
         }
 
         @Test
-        void shouldReturnEmptyList_whenUnexpectedExceptionThrown() {
-            when(caseAccessDataStoreApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+        void shouldThrowRuntimeException_whenUnexpectedExceptionThrown() {
+            when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
                 .thenThrow(new RuntimeException("unexpected"));
 
-            var userCaseRoles = service.getUserCaseRoles(CASE_ID, USER_ID);
-
-            assertThat(userCaseRoles).isEmpty();
+            assertThatThrownBy(() -> service.getUserCaseRoles(CASE_ID, USER_ID))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("unexpected");
         }
 
         @Test
         void shouldReturnEmptyList_whenRecoveringRetryableCaseUserException() {
-            var userCaseRoles = service.recover(new RetryableCaseUserException("retry exhausted"));
+            var userCaseRoles = service.recover(new RetryableCaseUserException("retry exhausted"), CASE_ID);
 
             assertThat(userCaseRoles).isEmpty();
         }

@@ -51,15 +51,13 @@ public class CoreCaseUserService {
         } catch (FeignException.NotFound ex) {
             log.error("User Roles not found", ex);
             return Collections.emptyList();
-        } catch (Exception ex) {
-            log.error("[CoreCaseUserService] Unexpected error occurred", ex);
-            return Collections.emptyList();
         }
     }
 
     @Recover
-    public List<String> recover(RetryableCaseUserException ex) {
-        log.error("[CoreCaseUserService] Retryable User Case Roles lookup failed after retries", ex);
+    public List<String> recover(RetryableCaseUserException ex, String caseId) {
+        log.error("[CoreCaseUserService] Retryable User Case Roles lookup failed after retries for CaseId: {}",
+                  caseId, ex);
         return Collections.emptyList();
     }
 
