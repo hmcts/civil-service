@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -77,6 +78,10 @@ public class CaseAccessDataStoreService {
     }
 
     private CaseAccessDataStoreUnavailableException unavailable(String operation, Throwable throwable) {
+        if (throwable instanceof FeignException.NotFound) {
+            throw (FeignException.NotFound) throwable;
+        }
+
         log.warn(
             "CaseAccessDataStoreApi fallback invoked for operation {}. Failing fast. Reason: {}",
             operation,
