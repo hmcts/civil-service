@@ -22,9 +22,6 @@ public final class PiiRedactor {
         "dateOfBirth",
         "individualDateOfBirth",
         "dob",
-        "caseId",
-        "caseReference",
-        "claimId",
         "userId",
         "redisKey",
         "taskId",
@@ -45,7 +42,7 @@ public final class PiiRedactor {
         "(?i)(?<![\\w.+-])[\\w.+-]+@[\\w.-]+\\.[a-z]{2,}(?![\\w.-])"
     );
     private static final Pattern PII_FIELD = Pattern.compile(
-        "(?i)(\\\"?(?:" + PII_FIELD_NAMES + ")"
+        "(?i)(?<![\\w])(\\\"?(?:" + PII_FIELD_NAMES + ")"
             + "\\\"?\\s*[:=]\\s*)(\\\"[^\\\"]*\\\"|[^,})]+)"
     );
 

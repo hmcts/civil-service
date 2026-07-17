@@ -38,18 +38,20 @@ public class ValidateDateOfBirth implements CaseTask {
     private final RespondToClaimSpecUtils respondToClaimSpecUtils;
 
     public CallbackResponse execute(CallbackParams callbackParams) {
-        log.info("Executing date of birth validation callback task");
+        log.info("Executing date of birth validation callback task for caseId: {}",
+                 callbackParams.getCaseData().getCcdCaseReference());
 
         Party respondent = getRespondent(callbackParams);
         List<String> errors = dateOfBirthValidator.validate(respondent);
-        log.info("Date of birth validation completed");
+        log.info("Date of birth validation completed for caseId: {}",
+                 callbackParams.getCaseData().getCcdCaseReference());
 
         CaseData caseData = callbackParams.getCaseData();
         errors.addAll(correspondenceAddressCorrect(caseData));
-        log.info("Correspondence address validation completed");
+        log.info("Correspondence address validation completed for caseId: {}", caseData.getCcdCaseReference());
 
         updateSolicitorResponse(callbackParams, caseData);
-        log.info("Solicitor response updated");
+        log.info("Solicitor response updated for caseId: {}", caseData.getCcdCaseReference());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toMap(objectMapper))
@@ -58,14 +60,16 @@ public class ValidateDateOfBirth implements CaseTask {
     }
 
     private Party getRespondent(CallbackParams callbackParams) {
-        log.info("Retrieving respondent for date of birth validation");
+        log.info("Retrieving respondent for date of birth validation for caseId: {}",
+                 callbackParams.getCaseData().getCcdCaseReference());
 
         Party respondent = callbackParams.getCaseData().getRespondent1();
         if (respondent == null && callbackParams.getCaseData().getRespondent2() != null) {
             respondent = callbackParams.getCaseData().getRespondent2();
-            log.info("Respondent 1 is null, using Respondent 2");
+            log.info("Respondent 1 is null, using Respondent 2 for caseId: {}",
+                     callbackParams.getCaseData().getCcdCaseReference());
         } else {
-            log.info("Using Respondent 1");
+            log.info("Using Respondent 1 for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
         }
         return respondent;
     }
@@ -84,23 +88,25 @@ public class ValidateDateOfBirth implements CaseTask {
     }
 
     private boolean isTwoLegalRepsScenario(CaseData caseData) {
-        log.info("Checking if this is a two legal representatives scenario");
+        log.info("Checking if caseId {} is a two legal representatives scenario", caseData.getCcdCaseReference());
         return ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData));
     }
 
     private boolean isOneLegalRepScenario(CaseData caseData) {
-        log.info("Checking if this is a one legal representative scenario");
+        log.info("Checking if caseId {} is a one legal representative scenario", caseData.getCcdCaseReference());
         return ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData));
     }
 
     private List<String> correspondenceAddressCorrect(CaseData caseData) {
-        log.info("Validating correspondence address");
+        log.info("Validating correspondence address for caseId: {}", caseData.getCcdCaseReference());
 
         if (isCorrespondenceAddressRequired(caseData.getIsRespondent1(), caseData.getSpecAoSRespondentCorrespondenceAddressRequired())) {
-            log.info("Respondent 1 correspondence address validation required");
+            log.info("Respondent 1 correspondence address validation required for caseId: {}",
+                     caseData.getCcdCaseReference());
             return validatePostcode(caseData.getSpecAoSRespondentCorrespondenceAddressdetails());
         } else if (isCorrespondenceAddressRequired(caseData.getIsRespondent2(), caseData.getSpecAoSRespondent2CorrespondenceAddressRequired())) {
-            log.info("Respondent 2 correspondence address validation required");
+            log.info("Respondent 2 correspondence address validation required for caseId: {}",
+                     caseData.getCcdCaseReference());
             return validatePostcode(caseData.getSpecAoSRespondent2CorrespondenceAddressdetails());
         }
         return Collections.emptyList();
