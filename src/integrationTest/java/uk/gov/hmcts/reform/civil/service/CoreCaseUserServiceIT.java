@@ -65,14 +65,14 @@ class CoreCaseUserServiceIT {
     static class TestConfiguration {
         @Bean
         CoreCaseUserService coreCaseUserService(
-            CaseAccessDataStoreApi caseAccessDataStoreApi,
+            CaseAccessDataStoreService caseAccessDataStoreService,
             CaseAssignmentApi caseAssignmentApi,
             UserService userService,
             CrossAccessUserConfiguration crossAccessUserConfiguration,
             AuthTokenGenerator authTokenGenerator
         ) {
             return new CoreCaseUserService(
-                caseAccessDataStoreApi,
+                caseAccessDataStoreService,
                 caseAssignmentApi,
                 userService,
                 crossAccessUserConfiguration,
