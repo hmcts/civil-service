@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -34,26 +33,35 @@ import java.util.concurrent.atomic.AtomicReference;
  * reads in-memory state and never hammers the S2S service. The CSI driver re-mounts secrets on a
  * ~9 minute rotation, so this check is periodic (not start-up only) to catch a pod that goes
  * stale after a healthy start.</p>
+ *
+ * <p>The bean is always registered (so the {@code s2s} health group membership stays valid and the
+ * application starts in every configuration). When {@code civil.health.s2s.enabled} is false the
+ * check is inert: it reports UP and skips the scheduled S2S call, rather than removing the bean.</p>
  */
 @Slf4j
 @Component
-@ConditionalOnProperty(prefix = "civil.health.s2s", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class S2sSecretReadinessHealthIndicator implements HealthIndicator {
 
     private final AuthTokenGenerator serviceAuthTokenGenerator;
+    private final boolean enabled;
     private final int failureThreshold;
     private final AtomicReference<State> state = new AtomicReference<>(State.optimisticStartup());
 
     public S2sSecretReadinessHealthIndicator(
         AuthTokenGenerator serviceAuthTokenGenerator,
+        @Value("${civil.health.s2s.enabled:true}") boolean enabled,
         @Value("${civil.health.s2s.failure-threshold:2}") int failureThreshold
     ) {
         this.serviceAuthTokenGenerator = serviceAuthTokenGenerator;
+        this.enabled = enabled;
         this.failureThreshold = failureThreshold;
     }
 
     @Override
     public Health health() {
+        if (!enabled) {
+            return Health.up().withDetail("disabled", true).build();
+        }
         State current = state.get();
         Health.Builder builder = current.healthy ? Health.up() : Health.down();
         builder.withDetail("consecutiveFailures", current.consecutiveFailures);
@@ -78,6 +86,9 @@ public class S2sSecretReadinessHealthIndicator implements HealthIndicator {
         fixedDelayString = "${civil.health.s2s.check-interval-ms:120000}"
     )
     void refresh() {
+        if (!enabled) {
+            return;
+        }
         try {
             String token = serviceAuthTokenGenerator.generate();
             if (token == null || token.isBlank()) {

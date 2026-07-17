@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class S2sSecretReadinessHealthIndicatorTest {
@@ -20,7 +21,11 @@ class S2sSecretReadinessHealthIndicatorTest {
     private AuthTokenGenerator serviceAuthTokenGenerator;
 
     private S2sSecretReadinessHealthIndicator indicator() {
-        return new S2sSecretReadinessHealthIndicator(serviceAuthTokenGenerator, FAILURE_THRESHOLD);
+        return new S2sSecretReadinessHealthIndicator(serviceAuthTokenGenerator, true, FAILURE_THRESHOLD);
+    }
+
+    private S2sSecretReadinessHealthIndicator disabledIndicator() {
+        return new S2sSecretReadinessHealthIndicator(serviceAuthTokenGenerator, false, FAILURE_THRESHOLD);
     }
 
     @Test
@@ -131,5 +136,20 @@ class S2sSecretReadinessHealthIndicatorTest {
         Health health = indicator.health();
         assertThat(health.getStatus()).isEqualTo(Status.UP);
         assertThat(health.getDetails()).containsEntry("consecutiveFailures", 0);
+    }
+
+    @Test
+    void whenDisabledReportsUpAndNeverCallsS2s() {
+        S2sSecretReadinessHealthIndicator indicator = disabledIndicator();
+
+        // refresh must be inert when disabled, even if it were somehow scheduled
+        indicator.refresh();
+        Health health = indicator.health();
+
+        assertThat(health.getStatus())
+            .as("a disabled check must report UP so the s2s health group stays valid")
+            .isEqualTo(Status.UP);
+        assertThat(health.getDetails()).containsEntry("disabled", true);
+        verifyNoInteractions(serviceAuthTokenGenerator);
     }
 }
