@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidation
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.service.notify.NotificationClientException;
-import uk.gov.hmcts.reform.civil.exceptions.CaseAccessDataStoreUnavailableException;
 
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
@@ -164,20 +163,6 @@ public class ResourceExceptionHandler {
                                          getUserId(contentCachingRequestWrapper)));
         return ResponseEntity
             .status(FAILED_DEPENDENCY)
-            .body(exception.getMessage());
-    }
-
-    @ExceptionHandler(CaseAccessDataStoreUnavailableException.class)
-    public ResponseEntity<Object> handleCaseAccessDataStoreUnavailableException(
-        CaseAccessDataStoreUnavailableException exception,
-        ContentCachingRequestWrapper contentCachingRequestWrapper
-    ) {
-        log.info(exception.getMessage(), exception);
-        String errorMessage = "Case access data store unavailable with message: %s for case %s run by user %s";
-        log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
-                                         getUserId(contentCachingRequestWrapper)));
-        return ResponseEntity
-            .status(HttpStatus.SERVICE_UNAVAILABLE)
             .body(exception.getMessage());
     }
 

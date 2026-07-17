@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.exceptions.CaseAccessDataStoreUnavailableException;
 import uk.gov.hmcts.reform.civil.exceptions.RetryableCaseUserException;
 
 import java.util.Collections;
@@ -35,7 +36,7 @@ public class CoreCaseUserService {
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
     private final AuthTokenGenerator authTokenGenerator;
 
-    @Retryable(retryFor = RetryableCaseUserException.class, backoff = @Backoff(delay = 500))
+    @Retryable(retryFor = RetryableCaseUserException.class, backoff = @Backoff(delay = 500, multiplier = 2))
     public List<String> getUserCaseRoles(String caseId, String userId) {
         try {
             return caseAccessDataStoreService.getUserRoles(
@@ -46,7 +47,8 @@ public class CoreCaseUserService {
                 .getCaseAssignedUserRoles().stream()
                 .filter(c -> c.getUserId().equals(userId)).distinct()
                 .map(CaseAssignedUserRole::getCaseRole).toList();
-        } catch (FeignException.GatewayTimeout | FeignException.BadGateway | FeignException.ServiceUnavailable e) {
+        } catch (FeignException.GatewayTimeout | FeignException.BadGateway | FeignException.ServiceUnavailable
+                 | CaseAccessDataStoreUnavailableException e) {
             throw new RetryableCaseUserException(e.getMessage(), e);
         } catch (FeignException.NotFound ex) {
             log.error("User Roles not found", ex);
@@ -54,44 +56,73 @@ public class CoreCaseUserService {
         }
     }
 
+    @Retryable(retryFor = RetryableCaseUserException.class, backoff = @Backoff(delay = 500, multiplier = 2))
+    public void assignCase(String caseId, String userId, String organisationId, CaseRole caseRole) {
+        try {
+            String caaAccessToken = getCaaAccessToken();
+
+            if (!userWithCaseRoleExistsOnCase(caseId, caaAccessToken, caseRole, userId)) {
+                assignUserToCaseForRole(caseId, userId, organisationId, caseRole, caaAccessToken);
+            } else {
+                log.info("Case already have the user with {} role", caseRole.getFormattedName());
+            }
+        } catch (FeignException.GatewayTimeout | FeignException.BadGateway | FeignException.ServiceUnavailable
+                 | CaseAccessDataStoreUnavailableException e) {
+            throw new RetryableCaseUserException(e.getMessage(), e);
+        }
+    }
+
+    @Retryable(retryFor = RetryableCaseUserException.class, backoff = @Backoff(delay = 500, multiplier = 2))
+    public void unassignCase(String caseId, String userId, String organisationId, CaseRole caseRole) {
+        try {
+            String caaAccessToken = getCaaAccessToken();
+            if (userWithCaseRoleExistsOnCase(caseId, caaAccessToken, caseRole, userId)) {
+                CaseAssignedUserRoleWithOrganisation caseAssignedUserRoleWithOrganisation = new CaseAssignedUserRoleWithOrganisation()
+                    .setCaseDataId(caseId)
+                    .setUserId(userId)
+                    .setCaseRole(caseRole.getFormattedName())
+                    .setOrganisationId(organisationId);
+                removeAccessFromRole(caseAssignedUserRoleWithOrganisation, caaAccessToken);
+            }
+        } catch (FeignException.GatewayTimeout | FeignException.BadGateway | FeignException.ServiceUnavailable
+                 | CaseAccessDataStoreUnavailableException e) {
+            throw new RetryableCaseUserException(e.getMessage(), e);
+        }
+    }
+
+    @Retryable(retryFor = RetryableCaseUserException.class, backoff = @Backoff(delay = 500, multiplier = 2))
+    public void removeCreatorRoleCaseAssignment(String caseId, String userId, String organisationId) {
+        try {
+            String caaAccessToken = getCaaAccessToken();
+
+            if (userWithCaseRoleExistsOnCase(caseId, caaAccessToken, CaseRole.CREATOR, userId)) {
+                removeCreatorAccess(caseId, userId, organisationId, caaAccessToken);
+            } else {
+                log.info("User doesn't have {} role", CaseRole.CREATOR.getFormattedName());
+            }
+        } catch (FeignException.GatewayTimeout | FeignException.BadGateway | FeignException.ServiceUnavailable
+                 | CaseAccessDataStoreUnavailableException e) {
+            throw new RetryableCaseUserException(e.getMessage(), e);
+        }
+    }
+
     @Recover
-    public List<String> recover(RetryableCaseUserException ex, String caseId) {
-        log.error("[CoreCaseUserService] Retryable User Case Roles lookup failed after retries for CaseId: {}",
-                  caseId, ex);
+    public List<String> recover(RetryableCaseUserException ex, String caseId, String userId) {
+        log.error("[CoreCaseUserService] Retryable User Case Roles lookup failed after retries for CaseId: {}, UserId: {}",
+                  caseId, userId, ex);
         return Collections.emptyList();
     }
 
-    public void assignCase(String caseId, String userId, String organisationId, CaseRole caseRole) {
-        String caaAccessToken = getCaaAccessToken();
-
-        if (!userWithCaseRoleExistsOnCase(caseId, caaAccessToken, caseRole, userId)) {
-            assignUserToCaseForRole(caseId, userId, organisationId, caseRole, caaAccessToken);
-        } else {
-            log.info("Case already have the user with {} role", caseRole.getFormattedName());
-        }
+    @Recover
+    public void recover(RetryableCaseUserException ex, String caseId, String userId, String organisationId, CaseRole caseRole) {
+        log.error("[CoreCaseUserService] Retryable assignCase/unassignCase failed after retries for CaseId: {}, UserId: {}",
+                  caseId, userId, ex);
     }
 
-    public void unassignCase(String caseId, String userId, String organisationId, CaseRole caseRole) {
-        String caaAccessToken = getCaaAccessToken();
-        if (userWithCaseRoleExistsOnCase(caseId, caaAccessToken, caseRole, userId)) {
-            CaseAssignedUserRoleWithOrganisation caseAssignedUserRoleWithOrganisation = new CaseAssignedUserRoleWithOrganisation()
-                .setCaseDataId(caseId)
-                .setUserId(userId)
-                .setCaseRole(caseRole.getFormattedName())
-                .setOrganisationId(organisationId);
-            removeAccessFromRole(caseAssignedUserRoleWithOrganisation, caaAccessToken);
-        }
-    }
-
-    public void removeCreatorRoleCaseAssignment(String caseId, String userId, String organisationId) {
-
-        String caaAccessToken = getCaaAccessToken();
-
-        if (userWithCaseRoleExistsOnCase(caseId, caaAccessToken, CaseRole.CREATOR, userId)) {
-            removeCreatorAccess(caseId, userId, organisationId, caaAccessToken);
-        } else {
-            log.info("User doesn't have {} role", CaseRole.CREATOR.getFormattedName());
-        }
+    @Recover
+    public void recover(RetryableCaseUserException ex, String caseId, String userId, String organisationId) {
+        log.error("[CoreCaseUserService] Retryable removeCreatorRoleCaseAssignment failed after retries for CaseId: {}, UserId: {}",
+                  caseId, userId, ex);
     }
 
     public boolean userHasCaseRole(String caseId, String userId, CaseRole caseRole) {
