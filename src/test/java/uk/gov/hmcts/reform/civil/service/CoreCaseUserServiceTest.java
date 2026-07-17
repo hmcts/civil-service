@@ -373,6 +373,43 @@ class CoreCaseUserServiceTest {
         }
 
         @Test
+        void shouldReturnEmptyResource_getUserRoles_whenNotFoundThrown() {
+            when(caseAssignmentApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenThrow(notFoundException);
+
+            var response = service.getUserRoles(CASE_ID);
+
+            assertThat(response.getCaseAssignmentUserRoles()).isEmpty();
+        }
+
+        @Test
+        void shouldThrowRetryableCaseUserException_getUserRoles_whenGatewayTimeoutThrown() {
+            when(caseAssignmentApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenThrow(gatewayTimeoutException);
+
+            assertThatThrownBy(() -> service.getUserRoles(CASE_ID))
+                .isInstanceOf(RetryableCaseUserException.class)
+                .hasCause(gatewayTimeoutException);
+        }
+
+        @Test
+        void shouldThrowRuntimeException_getUserRoles_whenUnexpectedExceptionThrown() {
+            when(caseAssignmentApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenThrow(new RuntimeException("unexpected"));
+
+            assertThatThrownBy(() -> service.getUserRoles(CASE_ID))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("unexpected");
+        }
+
+        @Test
+        void shouldReturnEmptyResource_whenRecoveringRetryableCaseUserException_getUserRoles() {
+            var response = service.recover(new RetryableCaseUserException("retry exhausted"), CASE_ID);
+
+            assertThat(response.getCaseAssignmentUserRoles()).isEmpty();
+        }
+
+        @Test
         void shouldThrowRetryableCaseUserException_whenGatewayTimeoutThrown() {
             when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
                 .thenThrow(gatewayTimeoutException);
