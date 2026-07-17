@@ -31,6 +31,20 @@ class PiiRedactorTest {
     }
 
     @Test
+    void shouldRedactIdentifiersAndFinancialValues() {
+        String message = "caseId=1234567890123456, userId=abc-123, amount=250.00, paymentReference=RC-123";
+
+        assertThat(PiiRedactor.redact(message))
+            .doesNotContain("1234567890123456", "abc-123", "250.00", "RC-123")
+            .contains(
+                "caseId=[REDACTED]",
+                "userId=[REDACTED]",
+                "amount=[REDACTED]",
+                "paymentReference=[REDACTED]"
+            );
+    }
+
+    @Test
     void shouldHandleNull() {
         assertThat(PiiRedactor.redact(null)).isNull();
     }

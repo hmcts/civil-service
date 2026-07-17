@@ -21,10 +21,9 @@ public abstract class EmailDTOGenerator implements NotificationData {
     public EmailDTO buildEmailDTO(CaseData caseData, String taskId) {
         Map<String, String> properties = addProperties(caseData);
         addCustomProperties(properties, caseData);
-        String emailReference = String.format(getReferenceTemplate(),
-                                         caseData.getLegacyCaseReference());
-        log.info("buildEmailDTO for taskId: {} and email: {} and reference: {}",
-                 taskId, maskEmail(getEmailAddress(caseData)), emailReference);
+        final String emailReference = String.format(getReferenceTemplate(),
+                                                     caseData.getLegacyCaseReference());
+        log.info("Building EmailDTO for email: {}", maskEmail(getEmailAddress(caseData)));
         EmailDTO emailDTO = new EmailDTO();
         emailDTO.setTargetEmail(getEmailAddress(caseData));
         emailDTO.setEmailTemplate(getEmailTemplateId(caseData, taskId));

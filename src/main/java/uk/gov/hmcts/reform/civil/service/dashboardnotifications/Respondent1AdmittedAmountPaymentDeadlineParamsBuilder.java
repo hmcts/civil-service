@@ -91,8 +91,7 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
             log.debug("PartAdmitPayImmediately is false");
             final String amountIncludesTextEn = getStringParam(params, PARAM_AMOUNT_INCLUDES_TEXT_EN);
             final String amountIncludesTextCy = getStringParam(params, PARAM_AMOUNT_INCLUDES_TEXT_CY);
-            log.debug("paymentDate: {}, paymentDateEn: {}, paymentDateCy: {}, amountIncludesTextEn: {}, amountIncludesTextCy: {}",
-                      paymentDate, paymentDateEn, paymentDateCy, amountIncludesTextEn, amountIncludesTextCy);
+            log.debug("Building deferred payment deadline notification parameters");
 
             var descriptionEn = String.format("<p class=\"govuk-body\">You have offered to pay %s by %s%s. The payment must be received in %s's account by then, " +
                                                   "if not they can request a county court judgment.</p><p class=\"govuk-body\">" +
@@ -129,7 +128,6 @@ public class Respondent1AdmittedAmountPaymentDeadlineParamsBuilder extends Dashb
         BigDecimal defendantAdmittedAmount = claimantResponseUtils.getDefendantAdmittedAmount(caseData, true);
         if (nonNull(defendantAdmittedAmount)) {
             String formattedDefendantAmount = "£" + this.removeDoubleZeros(formatAmount(defendantAdmittedAmount));
-            log.debug("formattedDefendantAmount: {}", formattedDefendantAmount);
             return formattedDefendantAmount;
         }
         log.debug("defendantAdmittedAmount is null, returning empty string");
