@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.exceptions.CaseAccessDataStoreUnavailableException;
 import uk.gov.hmcts.reform.civil.exceptions.RetryableCaseUserException;
 
 import java.util.Collections;
@@ -33,6 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -143,6 +145,24 @@ class CoreCaseUserServiceTest {
                 SERVICE_AUTH_TOKEN,
                 getAddCaseAssignedUserRolesRequest(CaseRole.APPLICANTSOLICITORONE)
             );
+        }
+
+        @Test
+        void shouldThrowRetryableCaseUserException_whenCaseAccessDataStoreUnavailableExceptionThrown() {
+            CaseAccessDataStoreUnavailableException exception = new CaseAccessDataStoreUnavailableException("unavailable", new RuntimeException());
+            when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenThrow(exception);
+
+            assertThatThrownBy(() -> service.assignCase(CASE_ID, USER_ID, ORG_ID, CaseRole.APPLICANTSOLICITORONE))
+                .isInstanceOf(RetryableCaseUserException.class)
+                .hasCause(exception);
+        }
+
+        @Test
+        void shouldLogErrorMessage_whenRecoveringRetryableCaseUserException() {
+            service.recover(new RetryableCaseUserException("retry exhausted"), CASE_ID, USER_ID, ORG_ID, CaseRole.APPLICANTSOLICITORONE);
+
+            verify(caseAccessDataStoreService, never()).addCaseUserRoles(anyString(), anyString(), any());
         }
 
         private AddCaseAssignedUserRolesRequest getAddCaseAssignedUserRolesRequest(CaseRole caseRole) {
@@ -363,6 +383,17 @@ class CoreCaseUserServiceTest {
         }
 
         @Test
+        void shouldThrowRetryableCaseUserException_whenCaseAccessDataStoreUnavailableExceptionThrown() {
+            CaseAccessDataStoreUnavailableException exception = new CaseAccessDataStoreUnavailableException("unavailable", new RuntimeException());
+            when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenThrow(exception);
+
+            assertThatThrownBy(() -> service.getUserCaseRoles(CASE_ID, USER_ID))
+                .isInstanceOf(RetryableCaseUserException.class)
+                .hasCause(exception);
+        }
+
+        @Test
         void shouldReturnEmptyList_whenUserRolesNotFound() {
             when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
                 .thenThrow(notFoundException);
@@ -384,7 +415,7 @@ class CoreCaseUserServiceTest {
 
         @Test
         void shouldReturnEmptyList_whenRecoveringRetryableCaseUserException() {
-            var userCaseRoles = service.recover(new RetryableCaseUserException("retry exhausted"), CASE_ID);
+            var userCaseRoles = service.recover(new RetryableCaseUserException("retry exhausted"), CASE_ID, USER_ID);
 
             assertThat(userCaseRoles).isEmpty();
         }
