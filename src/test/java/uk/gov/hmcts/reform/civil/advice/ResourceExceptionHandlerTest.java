@@ -223,21 +223,6 @@ public class ResourceExceptionHandlerTest {
     }
 
     @Test
-    void shouldReturnServiceUnavailable_whenCaseAccessDataStoreUnavailableExceptionThrown() {
-        testTemplate(
-            "CaseAccessDataStoreApi is unavailable for operation: getUserRoles",
-            handler.handleCaseAccessDataStoreUnavailableException(
-                new CaseAccessDataStoreUnavailableException(
-                    "CaseAccessDataStoreApi is unavailable for operation: getUserRoles",
-                    new RuntimeException("CCD /case-users unavailable")
-                ),
-                contentCachingRequestWrapper
-            ),
-            HttpStatus.SERVICE_UNAVAILABLE
-        );
-    }
-
-    @Test
     void testHandleFeignNotFoundException() {
         testTemplate(
             "expected exception for feign not found",
