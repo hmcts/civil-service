@@ -167,10 +167,11 @@ class PaymentStatusRetryServiceTest {
         when(coreCaseDataService.getCase(CASE_ID)).thenThrow(cause);
 
         PaymentStatusRetryService spyService = spy(service);
+        String caseReference = CASE_ID.toString();
 
         CaseDataUpdateException exception = assertThrows(
             CaseDataUpdateException.class,
-            () -> spyService.updatePaymentStatus(FeeType.CLAIMISSUED, CASE_ID.toString(), response)
+            () -> spyService.updatePaymentStatus(FeeType.CLAIMISSUED, caseReference, response)
         );
 
         assertThat(exception)
@@ -200,10 +201,11 @@ class PaymentStatusRetryServiceTest {
     void shouldLogOriginalCauseWhenUpdatePaymentStatusCaseDataFails() {
         RuntimeException cause = new RuntimeException("CCD submit failed");
         when(caseData.isLipvLipOneVOne()).thenReturn(true);
-        when(coreCaseDataService.startUpdate(CASE_ID.toString(), CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT))
+        String caseReference = CASE_ID.toString();
+        when(coreCaseDataService.startUpdate(caseReference, CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT))
             .thenThrow(cause);
 
-        assertThatThrownBy(() -> service.updatePaymentStatus(FeeType.CLAIMISSUED, CASE_ID.toString(), caseData))
+        assertThatThrownBy(() -> service.updatePaymentStatus(FeeType.CLAIMISSUED, caseReference, caseData))
             .isInstanceOf(CaseDataUpdateException.class)
             .hasMessage("CCD submit failed")
             .hasCause(cause);
@@ -216,7 +218,9 @@ class PaymentStatusRetryServiceTest {
 
     @Test
     void shouldNotWrapUnsupportedFeeTypeWhenUpdatePaymentStatusCaseDataFails() {
-        assertThatThrownBy(() -> service.updatePaymentStatus(APPLICATION, CASE_ID.toString(), caseData))
+        String caseReference = CASE_ID.toString();
+
+        assertThatThrownBy(() -> service.updatePaymentStatus(APPLICATION, caseReference, caseData))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Unsupported fee type for event: APPLICATION");
 
