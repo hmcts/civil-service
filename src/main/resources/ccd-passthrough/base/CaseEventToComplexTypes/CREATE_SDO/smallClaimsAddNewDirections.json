@@ -1,0 +1,8 @@
+[ {
+  "ID" : "SmallClaimsAddNewDirections",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsAddNewDirections",
+  "ListElementCode" : "directionComment",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "OPTIONAL"
+} ]

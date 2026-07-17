@@ -1,0 +1,19 @@
+[ {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderCostsReserved",
+  "ListElementCode" : "detailsRepresentationLabel",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderCostsReserved",
+  "ListElementCode" : "detailsRepresentationSecondLabel",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderCostsReserved",
+  "ListElementCode" : "detailsRepresentationText",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 3
+} ]

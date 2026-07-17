@@ -1,0 +1,43 @@
+[ {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "specAoSRespondent2HomeAddressDetails",
+  "ListElementCode" : "AddressLine1",
+  "ID" : "SpecAoSCorrespondenceAddress",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "specAoSRespondent2HomeAddressDetails",
+  "ListElementCode" : "AddressLine2",
+  "ID" : "SpecAoSCorrespondenceAddress",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "specAoSRespondent2HomeAddressDetails",
+  "ListElementCode" : "AddressLine3",
+  "ID" : "SpecAoSCorrespondenceAddress",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "specAoSRespondent2HomeAddressDetails",
+  "ListElementCode" : "PostTown",
+  "ID" : "SpecAoSCorrespondenceAddress",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "specAoSRespondent2HomeAddressDetails",
+  "ListElementCode" : "County",
+  "ID" : "SpecAoSCorrespondenceAddress",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "specAoSRespondent2HomeAddressDetails",
+  "ListElementCode" : "Country",
+  "ID" : "SpecAoSCorrespondenceAddress",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "specAoSRespondent2HomeAddressDetails",
+  "ListElementCode" : "PostCode",
+  "ID" : "SpecAoSCorrespondenceAddress",
+  "FieldDisplayOrder" : 7
+} ]

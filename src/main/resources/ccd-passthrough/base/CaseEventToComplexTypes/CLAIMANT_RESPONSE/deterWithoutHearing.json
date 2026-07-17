@@ -1,0 +1,19 @@
+[ {
+  "CaseEventID" : "CLAIMANT_RESPONSE",
+  "CaseFieldID" : "deterWithoutHearing",
+  "ListElementCode" : "deterWithoutHearingLabel",
+  "ID" : "DeterWithoutHearing",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CLAIMANT_RESPONSE",
+  "CaseFieldID" : "deterWithoutHearing",
+  "ListElementCode" : "deterWithoutHearingYesNo",
+  "ID" : "DeterWithoutHearing",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "CLAIMANT_RESPONSE",
+  "CaseFieldID" : "deterWithoutHearing",
+  "ListElementCode" : "deterWithoutHearingWhyNot",
+  "ID" : "DeterWithoutHearing",
+  "FieldDisplayOrder" : 3
+} ]

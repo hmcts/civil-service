@@ -1,0 +1,33 @@
+[ {
+  "CaseEventID" : "ACKNOWLEDGE_CLAIM",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "individualDateOfBirth",
+  "ID" : "Party",
+  "FieldDisplayOrder" : 2,
+  "ShowSummaryChangeOption" : "Y"
+}, {
+  "CaseEventID" : "ACKNOWLEDGE_CLAIM",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "soleTraderDateOfBirth",
+  "ID" : "Party",
+  "FieldDisplayOrder" : 2,
+  "ShowSummaryChangeOption" : "Y"
+}, {
+  "CaseEventID" : "ACKNOWLEDGE_CLAIM",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "flags",
+  "ID" : "Party",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "ACKNOWLEDGE_CLAIM",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "flags.roleOnCase",
+  "ID" : "Party",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "ACKNOWLEDGE_CLAIM",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "flags.partyName",
+  "ID" : "Party",
+  "FieldDisplayOrder" : 5
+} ]

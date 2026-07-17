@@ -1,0 +1,19 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsPPI",
+  "ListElementCode" : "title",
+  "ID" : "PPI",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsPPI",
+  "ListElementCode" : "ppiDate",
+  "ID" : "PPI",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsPPI",
+  "ListElementCode" : "text",
+  "ID" : "PPI",
+  "FieldDisplayOrder" : 3
+} ]

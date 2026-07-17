@@ -1,0 +1,64 @@
+[ {
+  "ID" : "SdoR2QuestionsClaimantExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2QuestionsClaimantExpert",
+  "ListElementCode" : "sdoDefendantMayAskLbl",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2QuestionsClaimantExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2QuestionsClaimantExpert",
+  "ListElementCode" : "sdoDefendantMayAskTxt",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2QuestionsClaimantExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2QuestionsClaimantExpert",
+  "ListElementCode" : "sdoDefendantMayAskDate",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2QuestionsClaimantExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2QuestionsClaimantExpert",
+  "ListElementCode" : "sdoQuestionsShallBeAnsweredLbl",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2QuestionsClaimantExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2QuestionsClaimantExpert",
+  "ListElementCode" : "sdoQuestionsShallBeAnsweredTxt",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2QuestionsClaimantExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2QuestionsClaimantExpert",
+  "ListElementCode" : "sdoQuestionsShallBeAnsweredDate",
+  "FieldDisplayOrder" : 6,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2QuestionsClaimantExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2QuestionsClaimantExpert",
+  "ListElementCode" : "sdoUploadedToDigitalPortalLbl",
+  "FieldDisplayOrder" : 7,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2QuestionsClaimantExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2QuestionsClaimantExpert",
+  "ListElementCode" : "sdoUploadedToDigitalPortalTxt",
+  "FieldDisplayOrder" : 8,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2QuestionsClaimantExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2QuestionsClaimantExpert",
+  "ListElementCode" : "sdoR2RequireApplicationToRely",
+  "FieldDisplayOrder" : 9,
+  "DisplayContext" : "MANDATORY"
+} ]

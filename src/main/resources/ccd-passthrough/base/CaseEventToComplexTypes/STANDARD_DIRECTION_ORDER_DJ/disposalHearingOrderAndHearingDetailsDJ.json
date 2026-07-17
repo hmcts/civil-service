@@ -1,0 +1,7 @@
+[ {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "disposalHearingOrderAndHearingDetailsDJ",
+  "ListElementCode" : "text",
+  "ID" : "DisposalHearingOrderAndHearingDetailsDJ",
+  "FieldDisplayOrder" : 1
+} ]

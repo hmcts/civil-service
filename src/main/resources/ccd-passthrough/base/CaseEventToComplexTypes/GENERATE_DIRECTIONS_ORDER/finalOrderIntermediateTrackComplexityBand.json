@@ -1,0 +1,29 @@
+[ {
+  "ID" : "FinalOrderIntermediateTrackAllocation",
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderIntermediateTrackComplexityBand",
+  "ListElementCode" : "label",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "FinalOrderIntermediateTrackAllocation",
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderIntermediateTrackComplexityBand",
+  "ListElementCode" : "assignComplexityBand",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "FinalOrderIntermediateTrackAllocation",
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderIntermediateTrackComplexityBand",
+  "ListElementCode" : "band",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "FinalOrderIntermediateTrackAllocation",
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderIntermediateTrackComplexityBand",
+  "ListElementCode" : "reasons",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "OPTIONAL"
+} ]

@@ -1,0 +1,17 @@
+[ {
+  "ID" : "GAWithOrWithoutNoticePage",
+  "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
+  "CaseFieldID" : "generalAppInformOtherParty",
+  "ListElementCode" : "isWithNotice",
+  "EventElementLabel" : " ",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "GAWithOrWithoutNoticePage",
+  "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
+  "CaseFieldID" : "generalAppInformOtherParty",
+  "ListElementCode" : "reasonsForWithoutNotice",
+  "EventElementLabel" : " ",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+} ]

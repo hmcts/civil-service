@@ -1,0 +1,7 @@
+[ {
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1ClaimResponseDocumentSpec",
+  "ListElementCode" : "documentLink",
+  "ID" : "CaseDocument",
+  "FieldDisplayOrder" : 1
+} ]

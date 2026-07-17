@@ -1,0 +1,5 @@
+[ {
+  "ID" : "SEND_HEARING_TO_LIP_DEFENDANT_HMC",
+  "CallBackURLAboutToSubmitEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+  "RetriesTimeoutURLAboutToSubmitEvent" : 0
+} ]

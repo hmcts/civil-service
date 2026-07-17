@@ -1,0 +1,13 @@
+[ {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "uiStatementOfTruth",
+  "ListElementCode" : "name",
+  "ID" : "RespondToClaim",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "uiStatementOfTruth",
+  "ListElementCode" : "role",
+  "ID" : "RespondToClaim",
+  "FieldDisplayOrder" : 2
+} ]

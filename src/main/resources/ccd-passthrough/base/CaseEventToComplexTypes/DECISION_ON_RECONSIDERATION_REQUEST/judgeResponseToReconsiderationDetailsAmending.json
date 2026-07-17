@@ -1,0 +1,13 @@
+[ {
+  "CaseEventID" : "DECISION_ON_RECONSIDERATION_REQUEST",
+  "CaseFieldID" : "judgeResponseToReconsiderationDetailsAmending",
+  "ListElementCode" : "reasonForReconsiderationLblAmendingTitle",
+  "ID" : "JudgeDecisionOnReconsideration",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "DECISION_ON_RECONSIDERATION_REQUEST",
+  "CaseFieldID" : "judgeResponseToReconsiderationDetailsAmending",
+  "ListElementCode" : "reasonForReconsiderationLblAmendingTxt",
+  "ID" : "JudgeDecisionOnReconsideration",
+  "FieldDisplayOrder" : 2
+} ]

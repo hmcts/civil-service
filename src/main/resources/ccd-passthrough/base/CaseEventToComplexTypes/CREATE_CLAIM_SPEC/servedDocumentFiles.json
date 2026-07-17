@@ -1,0 +1,92 @@
+[ {
+  "ID" : "Upload",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "servedDocumentFiles",
+  "ListElementCode" : "medicalReport",
+  "DisplayContext" : "OPTIONAL",
+  "FieldDisplayOrder" : 6,
+  "FieldShowCondition" : "claimType=\"CLINICAL_NEGLIGENCE\" OR claimType=\"PERSONAL_INJURY\"",
+  "Comment" : "medicalreports.document is just the document input,so this must be defined to hide the whole element"
+}, {
+  "ID" : "Upload",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "servedDocumentFiles",
+  "ListElementCode" : "documentsLabel",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "Upload",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "servedDocumentFiles",
+  "ListElementCode" : "spreadsheetsLabel",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "Upload",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "servedDocumentFiles",
+  "ListElementCode" : "medicalReportsLabel",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "Upload",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "servedDocumentFiles",
+  "ListElementCode" : "particularsOfClaimDocument",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "Upload",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "servedDocumentFiles",
+  "ListElementCode" : "particularsOfClaimText",
+  "EventElementLabel" : "If you prefer you can copy and paste the details of claim here.",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "Upload",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "servedDocumentFiles",
+  "ListElementCode" : "medicalReport.document",
+  "FieldDisplayOrder" : 6,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "Upload",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "servedDocumentFiles",
+  "ListElementCode" : "medicalReport",
+  "DisplayContext" : "OPTIONAL",
+  "FieldDisplayOrder" : 6,
+  "FieldShowCondition" : "claimType=\"CLINICAL_NEGLIGENCE\" OR claimType=\"PERSONAL_INJURY\"",
+  "Comment" : "medicalreports.document is just the document input,so this must be defined to hide the whole element"
+}, {
+  "ID" : "Upload",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "servedDocumentFiles",
+  "ListElementCode" : "scheduleOfLoss.document",
+  "FieldDisplayOrder" : 7,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "Upload",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "servedDocumentFiles",
+  "ListElementCode" : "certificateOfSuitability.document",
+  "FieldDisplayOrder" : 8,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "Upload",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "servedDocumentFiles",
+  "ListElementCode" : "other.document",
+  "FieldDisplayOrder" : 9,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "Upload",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "servedDocumentFiles",
+  "ListElementCode" : "medicalReport",
+  "DisplayContext" : "OPTIONAL",
+  "FieldDisplayOrder" : 6,
+  "FieldShowCondition" : "claimType=\"CLINICAL_NEGLIGENCE\" OR claimType=\"PERSONAL_INJURY\"",
+  "Comment" : "medicalreports.document is just the document input,so this must be defined to hide the whole element"
+} ]

@@ -1,0 +1,31 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingDisclosureOfDocuments",
+  "ListElementCode" : "label",
+  "ID" : "DisposalHearingDisclosureOfDocuments",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingDisclosureOfDocuments",
+  "ListElementCode" : "input1",
+  "ID" : "DisposalHearingDisclosureOfDocuments",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingDisclosureOfDocuments",
+  "ListElementCode" : "date1",
+  "ID" : "DisposalHearingDisclosureOfDocuments",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingDisclosureOfDocuments",
+  "ListElementCode" : "input2",
+  "ID" : "DisposalHearingDisclosureOfDocuments",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingDisclosureOfDocuments",
+  "ListElementCode" : "date2",
+  "ID" : "DisposalHearingDisclosureOfDocuments",
+  "FieldDisplayOrder" : 5
+} ]

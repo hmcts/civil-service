@@ -1,0 +1,19 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackNotes",
+  "ListElementCode" : "label",
+  "ID" : "FastTrackNotes",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackNotes",
+  "ListElementCode" : "input",
+  "ID" : "FastTrackNotes",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackNotes",
+  "ListElementCode" : "date",
+  "ID" : "FastTrackNotes",
+  "FieldDisplayOrder" : 3
+} ]

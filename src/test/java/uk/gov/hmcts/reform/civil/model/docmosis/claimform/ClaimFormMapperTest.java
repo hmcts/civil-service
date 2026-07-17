@@ -83,7 +83,9 @@ class ClaimFormMapperTest {
             .timelineOfEvents(List.of(
                 new TimelineOfEvents(
                     new TimelineOfEventDetails(LocalDate.now(), "desc"),
-                    "1"
+                    "1",
+                    null,
+                    null
                 )))
             .respondent1(new Party()
                              .setIndividualLastName(INDIVIDUAL_LAST_NAME)

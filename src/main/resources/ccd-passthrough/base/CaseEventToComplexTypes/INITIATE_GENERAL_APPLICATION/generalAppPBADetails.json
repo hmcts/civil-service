@@ -1,0 +1,15 @@
+[ {
+  "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
+  "CaseFieldID" : "generalAppPBADetails",
+  "ListElementCode" : "generalAppFeeToPayInText",
+  "ID" : "GAPBADetailsGAspec",
+  "FieldDisplayOrder" : 1,
+  "ShowSummaryContentOption" : "Y"
+}, {
+  "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
+  "CaseFieldID" : "generalAppPBADetails",
+  "ListElementCode" : "generalAppPayInformationText",
+  "ID" : "GAPBADetailsGAspec",
+  "FieldDisplayOrder" : 2,
+  "ShowSummaryContentOption" : "Y"
+} ]

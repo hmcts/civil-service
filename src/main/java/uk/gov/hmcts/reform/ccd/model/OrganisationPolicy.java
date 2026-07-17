@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 import java.util.List;
 
@@ -27,5 +28,8 @@ public class OrganisationPolicy {
 
     @JsonProperty("PreviousOrganisations")
     private List<PreviousOrganisationCollectionItem> previousOrganisations;
+
+    @JsonProperty("PrepopulateToUsersOrganisation")
+    private YesOrNo prepopulateToUsersOrganisation;
 
 }

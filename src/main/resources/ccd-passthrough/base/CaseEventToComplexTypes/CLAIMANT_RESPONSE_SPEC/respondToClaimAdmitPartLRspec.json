@@ -1,0 +1,8 @@
+[ {
+  "ID" : "RespondToClaimAdmitPartLRspec",
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondToClaimAdmitPartLRspec",
+  "ListElementCode" : "whenWillThisAmountBePaid",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+} ]

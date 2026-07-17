@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
 
 @Data
 @NoArgsConstructor
@@ -12,7 +14,9 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @Accessors(chain = true)
 public class HelpWithFees {
 
+    @CCD(label = " ", searchable = false, typeOverride = FieldType.YesOrNo)
     private YesOrNo helpWithFee;
+    @CCD(label = " ", searchable = false)
     private String helpWithFeesReferenceNumber;
 
     public HelpWithFees copy() {

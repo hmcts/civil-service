@@ -15,6 +15,38 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
+import uk.gov.hmcts.reform.civil.ccd.access.DefaultAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CaseworkerCivilStaffJudgeProfileLegalAdviserRAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.RESSOLONESPECPROFILERESSOLTWOSPECPROFILECruAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.APPSOLUNSPECPROFILERRESSOLONEUNSPECPROFILECruAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CITIZENCLAIMANTPROFILERCITIZENDEFENDANTPROFILECruAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.WluAdminRAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.APPSOLSPECPROFILERRESSOLONESPECPROFILECruRESSOLTWOSPECPROFILECruAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CITIZENCLAIMANTPROFILERAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CITIZENCLAIMANTPROFILERCITIZENDEFENDANTPROFILECuAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CaseworkerCivilStaffRAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CaseworkerCivilAdminCruCaseworkerCivilSystemFieldReaderRAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CaseworkerCivilSystemupdateCuAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CITIZENCLAIMANTPROFILECaseworkerCivilSolicitorCruAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CaseworkerCivilSystemFieldReaderCaseworkerCivilSystemupdateRAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CITIZENDEFENDANTPROFILECaseworkerCivilSystemupdateCuAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.RESSOLONESPECPROFILERESSOLTWOSPECPROFILECuAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CaseworkerCivilStaffWluAdminRAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CaseworkerCivilStaffRCaseworkerCivilSystemupdateCruAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.RESSOLONESPECPROFILECruAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.APPSOLSPECPROFILERPlus10RolesDfldtcAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.APPSOLSPECPROFILECruPlus13RolesYennhdAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CaseworkerCivilStaffCaseworkerCivilSystemupdateRAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CITIZENCLAIMANTPROFILERPlus3RolesGudjikAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CaseworkerCivilSystemFieldReaderRAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CaseworkerCivilSystemFieldReaderRCaseworkerCivilSystemupdateCuAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CITIZENCLAIMANTPROFILECruCaseworkerCivilSolicitorCuAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.APPSOLSPECPROFILECruPlus13RolesRrmnypAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CITIZENDEFENDANTPROFILECuAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.RESSOLTWOUNSPECPROFILECruAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CaseworkerCivilAdminRAccess;
 
 @Data
 @NoArgsConstructor
@@ -22,42 +54,240 @@ import java.util.stream.Stream;
 @Accessors(chain = true)
 public class Respondent1DQ implements DQ {
 
+    @CCD(
+            label = "File directions questionnaire",
+            searchable = false,
+            access = {DefaultAccess.class, CaseworkerCivilStaffJudgeProfileLegalAdviserRAccess.class, RESSOLONESPECPROFILERESSOLTWOSPECPROFILECruAccess.class, APPSOLUNSPECPROFILERRESSOLONEUNSPECPROFILECruAccess.class, CITIZENCLAIMANTPROFILERCITIZENDEFENDANTPROFILECruAccess.class, WluAdminRAccess.class}
+    )
     private FileDirectionsQuestionnaire respondent1DQFileDirectionsQuestionnaire;
+    @CCD(
+            label = "Defendant 1 Fixed Recoverable Costs",
+            searchable = false,
+            access = {DefaultAccess.class, APPSOLSPECPROFILERRESSOLONESPECPROFILECruRESSOLTWOSPECPROFILECruAccess.class, CaseworkerCivilStaffJudgeProfileLegalAdviserRAccess.class, APPSOLUNSPECPROFILERRESSOLONEUNSPECPROFILECruAccess.class, CITIZENCLAIMANTPROFILERAccess.class}
+    )
     private FixedRecoverableCosts respondent1DQFixedRecoverableCosts;
+    @CCD(
+            label = "Defendant 1 Fixed Recoverable Costs",
+            searchable = false,
+            access = {DefaultAccess.class, APPSOLSPECPROFILERRESSOLONESPECPROFILECruRESSOLTWOSPECPROFILECruAccess.class, CaseworkerCivilStaffJudgeProfileLegalAdviserRAccess.class, APPSOLUNSPECPROFILERRESSOLONEUNSPECPROFILECruAccess.class, CITIZENCLAIMANTPROFILERCITIZENDEFENDANTPROFILECuAccess.class}
+    )
     private FixedRecoverableCosts respondent1DQFixedRecoverableCostsIntermediate;
+    @CCD(
+            label = "Defendant 1 Disclosure of electronic documents",
+            searchable = false,
+            access = {DefaultAccess.class, APPSOLUNSPECPROFILERRESSOLONEUNSPECPROFILECruAccess.class, CaseworkerCivilStaffRAccess.class}
+    )
     private DisclosureOfElectronicDocuments respondent1DQDisclosureOfElectronicDocuments;
+    @CCD(
+            label = "Defendant 1 Disclosure of electronic documents",
+            searchable = false,
+            access = {DefaultAccess.class, APPSOLSPECPROFILERRESSOLONESPECPROFILECruRESSOLTWOSPECPROFILECruAccess.class, CITIZENCLAIMANTPROFILERCITIZENDEFENDANTPROFILECuAccess.class, CaseworkerCivilStaffRAccess.class}
+    )
     private DisclosureOfElectronicDocuments specRespondent1DQDisclosureOfElectronicDocuments;
+    @CCD(
+            label = "Defendant 1 Disclosure of non-electronic documents",
+            searchable = false,
+            access = {DefaultAccess.class, APPSOLUNSPECPROFILERRESSOLONEUNSPECPROFILECruAccess.class, CaseworkerCivilStaffRAccess.class}
+    )
     private DisclosureOfNonElectronicDocuments respondent1DQDisclosureOfNonElectronicDocuments;
+    @CCD(
+            label = "Defendant 1 Disclosure of non-electronic documents",
+            searchable = false,
+            access = {DefaultAccess.class, APPSOLSPECPROFILERRESSOLONESPECPROFILECruRESSOLTWOSPECPROFILECruAccess.class, CITIZENCLAIMANTPROFILERCITIZENDEFENDANTPROFILECuAccess.class, CaseworkerCivilStaffRAccess.class}
+    )
     private DisclosureOfNonElectronicDocuments specRespondent1DQDisclosureOfNonElectronicDocuments;
+    @CCD(
+            label = "Defendant 1 Disclosure report",
+            searchable = false,
+            access = {DefaultAccess.class, RESSOLONESPECPROFILERESSOLTWOSPECPROFILECruAccess.class, APPSOLUNSPECPROFILERRESSOLONEUNSPECPROFILECruAccess.class, CITIZENCLAIMANTPROFILERCITIZENDEFENDANTPROFILECuAccess.class, CaseworkerCivilStaffRAccess.class}
+    )
     private DisclosureReport respondent1DQDisclosureReport;
+    @CCD(
+            label = "Defendant 1 experts",
+            searchable = false,
+            access = {CaseworkerCivilAdminCruCaseworkerCivilSystemFieldReaderRAccess.class, CaseworkerCivilStaffJudgeProfileLegalAdviserRAccess.class, RESSOLONESPECPROFILERESSOLTWOSPECPROFILECruAccess.class, APPSOLUNSPECPROFILERRESSOLONEUNSPECPROFILECruAccess.class, CITIZENCLAIMANTPROFILERCITIZENDEFENDANTPROFILECuAccess.class, CaseworkerCivilSystemupdateCuAccess.class}
+    )
     private Experts respondent1DQExperts;
+    @CCD(
+            label = "Expert Details",
+            hint = "If the name is unknown at this time please add TBC to both the first name and last name lines. Then use the Manage Contact Information event to provide the name when known\n",
+            searchable = false,
+            access = {CITIZENCLAIMANTPROFILECaseworkerCivilSolicitorCruAccess.class, CaseworkerCivilSystemFieldReaderCaseworkerCivilSystemupdateRAccess.class}
+    )
     private ExpertDetails respondToClaimExperts;
+    @CCD(
+            label = "Defendant 1 witnesses",
+            searchable = false,
+            access = {CaseworkerCivilAdminCruCaseworkerCivilSystemFieldReaderRAccess.class, CaseworkerCivilStaffJudgeProfileLegalAdviserRAccess.class, APPSOLUNSPECPROFILERRESSOLONEUNSPECPROFILECruAccess.class, CITIZENDEFENDANTPROFILECaseworkerCivilSystemupdateCuAccess.class, RESSOLONESPECPROFILERESSOLTWOSPECPROFILECuAccess.class}
+    )
     private Witnesses respondent1DQWitnesses;
+    @CCD(
+            label = "Defendant 1 Hearing",
+            searchable = false,
+            access = {DefaultAccess.class, CaseworkerCivilStaffJudgeProfileLegalAdviserRAccess.class, APPSOLUNSPECPROFILERRESSOLONEUNSPECPROFILECruAccess.class, CITIZENDEFENDANTPROFILECaseworkerCivilSystemupdateCuAccess.class, RESSOLONESPECPROFILERESSOLTWOSPECPROFILECuAccess.class}
+    )
     private Hearing respondent1DQHearing;
+    @CCD(
+            label = "Respondent 1 Hearing",
+            searchable = false,
+            access = {DefaultAccess.class, APPSOLSPECPROFILERRESSOLONESPECPROFILECruRESSOLTWOSPECPROFILECruAccess.class, CITIZENCLAIMANTPROFILERCITIZENDEFENDANTPROFILECuAccess.class, CaseworkerCivilStaffRAccess.class}
+    )
     private SmallClaimHearing respondent1DQHearingSmallClaim;
+    @CCD(
+            label = " ",
+            searchable = false,
+            access = {DefaultAccess.class, APPSOLSPECPROFILERRESSOLONESPECPROFILECruRESSOLTWOSPECPROFILECruAccess.class, CITIZENCLAIMANTPROFILERCITIZENDEFENDANTPROFILECuAccess.class, CaseworkerCivilStaffRAccess.class}
+    )
     private Hearing respondent1DQHearingFastClaim;
+    @CCD(
+            label = "Upload file",
+            hint = "We accept documents sized 10MB or smaller, in these formats: pdf, txt, doc, dot, docx, rtf, xlt, xlsx, jpg, jpeg or png",
+            regex = ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png",
+            searchable = false,
+            access = {DefaultAccess.class, RESSOLONESPECPROFILERESSOLTWOSPECPROFILECruAccess.class, APPSOLUNSPECPROFILERRESSOLONEUNSPECPROFILECruAccess.class, CITIZENCLAIMANTPROFILERCITIZENDEFENDANTPROFILECruAccess.class, CaseworkerCivilStaffWluAdminRAccess.class}
+    )
     private Document respondent1DQDraftDirections;
+    @CCD(
+            label = "Court location code",
+            searchable = false,
+            access = {DefaultAccess.class, CaseworkerCivilStaffRCaseworkerCivilSystemupdateCruAccess.class, APPSOLUNSPECPROFILERRESSOLONEUNSPECPROFILECruAccess.class, CITIZENCLAIMANTPROFILERCITIZENDEFENDANTPROFILECruAccess.class, RESSOLONESPECPROFILECruAccess.class, WluAdminRAccess.class}
+    )
     private RequestedCourt respondent1DQRequestedCourt;
+    @CCD(
+            label = "Defendant 1 Remote Hearing Questions",
+            searchable = false,
+            access = {DefaultAccess.class, CaseworkerCivilStaffJudgeProfileLegalAdviserRAccess.class, APPSOLUNSPECPROFILERRESSOLONEUNSPECPROFILECruAccess.class, RESSOLONESPECPROFILERESSOLTWOSPECPROFILECuAccess.class}
+    )
     private RemoteHearing respondent1DQRemoteHearing;
+    @CCD(
+            label = "Defendant 1 Remote Hearing Questions",
+            searchable = false,
+            access = {APPSOLSPECPROFILERPlus10RolesDfldtcAccess.class}
+    )
     private RemoteHearingLRspec respondent1DQRemoteHearingLRspec;
+    @CCD(
+            label = "Defendant 1 Hearing support requirements",
+            searchable = false,
+            access = {APPSOLSPECPROFILECruPlus13RolesYennhdAccess.class}
+    )
     private HearingSupport respondent1DQHearingSupport;
+    @CCD(
+            label = "Defendant 1 Further information",
+            searchable = false,
+            access = {DefaultAccess.class, CaseworkerCivilStaffJudgeProfileLegalAdviserRAccess.class, APPSOLUNSPECPROFILERRESSOLONEUNSPECPROFILECruAccess.class}
+    )
     private FurtherInformation respondent1DQFurtherInformation;
+    @CCD(
+            label = "Welsh language",
+            searchable = false,
+            access = {DefaultAccess.class, APPSOLSPECPROFILERRESSOLONESPECPROFILECruRESSOLTWOSPECPROFILECruAccess.class, CaseworkerCivilStaffCaseworkerCivilSystemupdateRAccess.class, APPSOLUNSPECPROFILERRESSOLONEUNSPECPROFILECruAccess.class, CITIZENCLAIMANTPROFILERCITIZENDEFENDANTPROFILECruAccess.class, WluAdminRAccess.class}
+    )
     private WelshLanguageRequirements respondent1DQLanguage;
+    @CCD(ignore = true)
     private WelshLanguageRequirements respondent1DQLanguageLRspec;
+    @CCD(
+            label = "Statement of truth",
+            searchable = false,
+            access = {DefaultAccess.class, APPSOLUNSPECPROFILERRESSOLONEUNSPECPROFILECruAccess.class, CaseworkerCivilStaffRAccess.class}
+    )
     private StatementOfTruth respondent1DQStatementOfTruth;
+    @CCD(
+            label = " ",
+            searchable = false,
+            access = {DefaultAccess.class, APPSOLSPECPROFILERRESSOLONESPECPROFILECruRESSOLTWOSPECPROFILECruAccess.class, CITIZENCLAIMANTPROFILERAccess.class, CaseworkerCivilStaffRAccess.class}
+    )
     private FutureApplications respondent1DQFutureApplications;
+    @CCD(
+            label = " ",
+            searchable = false,
+            typeOverride = FieldType.Collection,
+            typeParameterOverride = "BankAccount",
+            access = {DefaultAccess.class, CITIZENCLAIMANTPROFILERPlus3RolesGudjikAccess.class}
+    )
     private List<Element<AccountSimple>> respondent1BankAccountList;
+    @CCD(
+            label = " ",
+            searchable = false,
+            access = {APPSOLSPECPROFILERRESSOLONESPECPROFILECruRESSOLTWOSPECPROFILECruAccess.class, CITIZENCLAIMANTPROFILERCITIZENDEFENDANTPROFILECuAccess.class, CaseworkerCivilSystemFieldReaderRAccess.class}
+    )
     private HomeDetails respondent1DQHomeDetails;
+    @CCD(
+            label = "Does your client claim Carer's Allowance or Carer's Credit?",
+            searchable = false,
+            typeOverride = FieldType.YesOrNo,
+            access = {DefaultAccess.class, RESSOLONESPECPROFILERESSOLTWOSPECPROFILECruAccess.class, CITIZENCLAIMANTPROFILERCITIZENDEFENDANTPROFILECuAccess.class}
+    )
     private YesOrNo respondent1DQCarerAllowanceCredit;
+    @CCD(
+            label = "Does your client claim Carer's Allowance of Carer's Credit?",
+            searchable = false,
+            typeOverride = FieldType.YesOrNo,
+            access = {DefaultAccess.class, RESSOLONESPECPROFILERESSOLTWOSPECPROFILECruAccess.class, CITIZENCLAIMANTPROFILERCITIZENDEFENDANTPROFILECuAccess.class}
+    )
     private YesOrNo respondent1DQCarerAllowanceCreditFullAdmission;
+    @CCD(
+            label = "Add details of any regular income your client receives:",
+            searchable = false,
+            typeOverride = FieldType.Collection,
+            typeParameterOverride = "RecurringIncome",
+            access = {DefaultAccess.class, RESSOLONESPECPROFILERESSOLTWOSPECPROFILECruAccess.class, CITIZENCLAIMANTPROFILERCITIZENDEFENDANTPROFILECuAccess.class}
+    )
     private List<Element<RecurringIncomeLRspec>> respondent1DQRecurringIncome;
+    @CCD(
+            label = "Add details of any regular income your client receives:",
+            searchable = false,
+            typeOverride = FieldType.Collection,
+            typeParameterOverride = "RecurringIncome",
+            access = {DefaultAccess.class, RESSOLONESPECPROFILERESSOLTWOSPECPROFILECruAccess.class, CITIZENCLAIMANTPROFILERCITIZENDEFENDANTPROFILECuAccess.class}
+    )
     private List<Element<RecurringIncomeLRspec>> respondent1DQRecurringIncomeFA;
+    @CCD(
+            label = "Add details of any regular expenses your client has:",
+            searchable = false,
+            typeOverride = FieldType.Collection,
+            typeParameterOverride = "RecurringExpense",
+            access = {DefaultAccess.class, RESSOLONESPECPROFILERESSOLTWOSPECPROFILECruAccess.class, CITIZENCLAIMANTPROFILERCITIZENDEFENDANTPROFILECuAccess.class}
+    )
     private List<Element<RecurringExpenseLRspec>> respondent1DQRecurringExpenses;
+    @CCD(
+            label = "Add details of any regular expenses your client has:",
+            searchable = false,
+            typeOverride = FieldType.Collection,
+            typeParameterOverride = "RecurringExpense",
+            access = {DefaultAccess.class, RESSOLONESPECPROFILERESSOLTWOSPECPROFILECruAccess.class, CITIZENCLAIMANTPROFILERCITIZENDEFENDANTPROFILECuAccess.class}
+    )
     private List<Element<RecurringExpenseLRspec>> respondent1DQRecurringExpensesFA;
+    @CCD(
+            label = "Do you want hearing to be held at specific court ? \n",
+            hint = "If the defendant is an individual the case will be held at defendant's preferred court ",
+            searchable = false,
+            typeOverride = FieldType.YesOrNo,
+            access = {DefaultAccess.class, RESSOLONESPECPROFILERESSOLTWOSPECPROFILECruAccess.class}
+    )
     private YesOrNo responseClaimCourtLocationRequired;
+    @CCD(
+            label = "Court Location",
+            searchable = false,
+            access = {CaseworkerCivilSystemFieldReaderRCaseworkerCivilSystemupdateCuAccess.class, CITIZENCLAIMANTPROFILECruCaseworkerCivilSolicitorCuAccess.class}
+    )
     private RequestedCourt respondToCourtLocation;
+    @CCD(
+            label = "Defendant 1 Vulnerability Questions",
+            searchable = false,
+            access = {APPSOLSPECPROFILECruPlus13RolesRrmnypAccess.class}
+    )
     private VulnerabilityQuestions respondent1DQVulnerabilityQuestions;
+    @CCD(
+            label = "Defendant 1 claimant documents to be considered",
+            searchable = false,
+            access = {CITIZENDEFENDANTPROFILECuAccess.class, CaseworkerCivilSystemFieldReaderRAccess.class}
+    )
     private DocumentsToBeConsidered respondent1DQClaimantDocumentsToBeConsidered;
+    @CCD(
+            label = "Defendant 1 determination without a hearing",
+            searchable = false,
+            access = {APPSOLSPECPROFILERRESSOLONESPECPROFILECruRESSOLTWOSPECPROFILECruAccess.class, APPSOLUNSPECPROFILERRESSOLONEUNSPECPROFILECruAccess.class, RESSOLTWOUNSPECPROFILECruAccess.class, CaseworkerCivilAdminRAccess.class}
+    )
     private DeterWithoutHearing deterWithoutHearingRespondent1;
 
     @Override

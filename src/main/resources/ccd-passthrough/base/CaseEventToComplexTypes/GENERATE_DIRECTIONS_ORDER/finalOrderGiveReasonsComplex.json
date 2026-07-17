@@ -1,0 +1,13 @@
+[ {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderGiveReasonsComplex",
+  "ListElementCode" : "reasonsLabel",
+  "ID" : "AssistedOrderReasons",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderGiveReasonsComplex",
+  "ListElementCode" : "reasonsText",
+  "ID" : "AssistedOrderReasons",
+  "FieldDisplayOrder" : 2
+} ]

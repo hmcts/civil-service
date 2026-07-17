@@ -1,0 +1,37 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackClinicalNegligence",
+  "ListElementCode" : "label",
+  "ID" : "FastTrackClinicalNegligence",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackClinicalNegligence",
+  "ListElementCode" : "input1",
+  "ID" : "FastTrackClinicalNegligence",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackClinicalNegligence",
+  "ListElementCode" : "input2",
+  "ID" : "FastTrackClinicalNegligence",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackClinicalNegligence",
+  "ListElementCode" : "input3",
+  "ID" : "FastTrackClinicalNegligence",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackClinicalNegligence",
+  "ListElementCode" : "input4",
+  "ID" : "FastTrackClinicalNegligence",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackClinicalNegligence",
+  "ListElementCode" : "line",
+  "ID" : "FastTrackClinicalNegligence",
+  "FieldDisplayOrder" : 6
+} ]

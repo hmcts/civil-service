@@ -1,0 +1,8 @@
+[ {
+  "ID" : "RespondentSolicitor1Organisation",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "specRespondentSolicitor1OrganisationEmail",
+  "ListElementCode" : "email",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+} ]

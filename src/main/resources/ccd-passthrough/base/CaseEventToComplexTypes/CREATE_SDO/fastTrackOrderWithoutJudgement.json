@@ -1,0 +1,13 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackOrderWithoutJudgement",
+  "ListElementCode" : "input",
+  "ID" : "FastTrackOrderWithoutJudgement",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackOrderWithoutJudgement",
+  "ListElementCode" : "line",
+  "ID" : "FastTrackOrderWithoutJudgement",
+  "FieldDisplayOrder" : 2
+} ]

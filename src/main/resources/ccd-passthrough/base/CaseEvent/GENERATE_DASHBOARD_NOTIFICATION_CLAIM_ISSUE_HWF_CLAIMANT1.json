@@ -1,0 +1,7 @@
+[ {
+  "ID" : "GENERATE_DASHBOARD_NOTIFICATION_CLAIM_ISSUE_HWF_CLAIMANT1",
+  "CallBackURLAboutToSubmitEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+  "RetriesTimeoutAboutToStartEvent" : 0,
+  "RetriesTimeoutURLAboutToSubmitEvent" : 0,
+  "RetriesTimeoutURLSubmittedEvent" : 0
+} ]

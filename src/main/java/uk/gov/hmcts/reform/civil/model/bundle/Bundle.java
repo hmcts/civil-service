@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Value;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Value
@@ -13,6 +14,7 @@ import lombok.Value;
 @Data
 public class Bundle {
 
+    @CCD(ignore = true)
     private BundleDetails value;
 
     @JsonCreator

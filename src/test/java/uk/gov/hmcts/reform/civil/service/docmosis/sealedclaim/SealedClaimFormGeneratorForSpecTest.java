@@ -298,6 +298,8 @@ class  SealedClaimFormGeneratorForSpecTest {
         List<TimelineOfEvents> timelines = new ArrayList<>();
         timelines.add(new TimelineOfEvents(
             new TimelineOfEventDetails(LocalDate.now(), "test timeline"),
+            null,
+            null,
             null
         ));
 

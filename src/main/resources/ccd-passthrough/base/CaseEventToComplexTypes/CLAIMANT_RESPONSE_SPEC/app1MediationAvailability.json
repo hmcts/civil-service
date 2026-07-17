@@ -1,0 +1,37 @@
+[ {
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "app1MediationAvailability",
+  "ListElementCode" : "isMediationUnavailablityExists",
+  "ID" : "MediationAvailability",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "app1MediationAvailability",
+  "ListElementCode" : "unavailableDatesForMediation",
+  "ID" : "MediationAvailability",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "app1MediationAvailability",
+  "ListElementCode" : "unavailableDatesForMediation.unavailableDateType",
+  "ID" : "MediationAvailability",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "app1MediationAvailability",
+  "ListElementCode" : "unavailableDatesForMediation.date",
+  "ID" : "MediationAvailability",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "app1MediationAvailability",
+  "ListElementCode" : "unavailableDatesForMediation.fromDate",
+  "ID" : "MediationAvailability",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "app1MediationAvailability",
+  "ListElementCode" : "unavailableDatesForMediation.toDate",
+  "ID" : "MediationAvailability",
+  "FieldDisplayOrder" : 6
+} ]

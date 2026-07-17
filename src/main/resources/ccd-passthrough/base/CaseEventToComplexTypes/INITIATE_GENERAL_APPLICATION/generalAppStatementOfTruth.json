@@ -1,0 +1,13 @@
+[ {
+  "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
+  "CaseFieldID" : "generalAppStatementOfTruth",
+  "ListElementCode" : "name",
+  "ID" : "StatementOfTruth",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
+  "CaseFieldID" : "generalAppStatementOfTruth",
+  "ListElementCode" : "role",
+  "ID" : "StatementOfTruth",
+  "FieldDisplayOrder" : 2
+} ]

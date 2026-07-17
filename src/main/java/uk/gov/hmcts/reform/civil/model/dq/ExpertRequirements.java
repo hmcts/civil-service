@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
 
 @Data
 @AllArgsConstructor
@@ -14,8 +15,11 @@ import java.math.BigDecimal;
 @Accessors(chain = true)
 public class ExpertRequirements {
 
+    @CCD(ignore = true)
     private String expertName;
+    @CCD(ignore = true)
     private String fieldofExpertise;
+    @CCD(ignore = true)
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal estimatedCost;
 

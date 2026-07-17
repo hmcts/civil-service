@@ -1,0 +1,10 @@
+[ {
+  "CaseFieldID" : "respondentSolicitor1EmailAddress",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-respondent1-solicitor-email"
+}, {
+  "CaseFieldID" : "respondentSolicitor2EmailAddress",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-respondent2-solicitor-email"
+}, {
+  "CaseFieldID" : "applicantSolicitor1UserDetails",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-applicant1-solicitor-email"
+} ]

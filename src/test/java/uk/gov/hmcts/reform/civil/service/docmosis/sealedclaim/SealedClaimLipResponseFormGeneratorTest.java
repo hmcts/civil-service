@@ -517,8 +517,8 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     private static CaseData.CaseDataBuilder<?, ?> timeline(CaseData.CaseDataBuilder<?, ?> builder) {
         return builder.specResponseTimelineOfEvents(List.of(
-            new TimelineOfEvents(new TimelineOfEventDetails(LocalDate.now().minusMonths(7), "Event 1"), null),
-            new TimelineOfEvents(new TimelineOfEventDetails(LocalDate.now().minusMonths(5), "Event 2"), null)
+            new TimelineOfEvents(new TimelineOfEventDetails(LocalDate.now().minusMonths(7), "Event 1"), null, null, null),
+            new TimelineOfEvents(new TimelineOfEventDetails(LocalDate.now().minusMonths(5), "Event 2"), null, null, null)
         ));
     }
 

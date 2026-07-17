@@ -1,0 +1,19 @@
+[ {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1LoanCreditDetails",
+  "ListElementCode" : "loanCardDebtDetail",
+  "ID" : "PaymentOption",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1LoanCreditDetails",
+  "ListElementCode" : "totalOwed",
+  "ID" : "PaymentOption",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1LoanCreditDetails",
+  "ListElementCode" : "monthlyPayment",
+  "ID" : "PaymentOption",
+  "FieldDisplayOrder" : 3
+} ]

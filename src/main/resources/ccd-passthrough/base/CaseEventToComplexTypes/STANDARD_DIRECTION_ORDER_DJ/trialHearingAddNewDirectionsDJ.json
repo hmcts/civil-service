@@ -1,0 +1,7 @@
+[ {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialHearingAddNewDirectionsDJ",
+  "ListElementCode" : "directionComment",
+  "ID" : "TrialHearingAddNewDirectionsDJ",
+  "FieldDisplayOrder" : 1
+} ]

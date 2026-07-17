@@ -1,0 +1,29 @@
+[ {
+  "ID" : "OrderMadeOnDetails",
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "orderMadeOnDetailsOrderCourt",
+  "ListElementCode" : "ownInitiativeLabel",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "OrderMadeOnDetails",
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "orderMadeOnDetailsOrderCourt",
+  "ListElementCode" : "ownInitiativeText",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "OrderMadeOnDetails",
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "orderMadeOnDetailsOrderCourt",
+  "ListElementCode" : "ownInitiativeDateLabel",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "OrderMadeOnDetails",
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "orderMadeOnDetailsOrderCourt",
+  "ListElementCode" : "ownInitiativeDate",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "MANDATORY"
+} ]

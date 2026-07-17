@@ -1,0 +1,37 @@
+[ {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondToClaim2",
+  "ListElementCode" : "howMuchWasPaidLabel",
+  "ID" : "SpecAoSCorrespondenceAddress",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondToClaim2",
+  "ListElementCode" : "howMuchWasPaidWithInterestLabel",
+  "ID" : "SpecAoSCorrespondenceAddress",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondToClaim2",
+  "ListElementCode" : "howMuchWasPaid",
+  "ID" : "SpecAoSCorrespondenceAddress",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondToClaim2",
+  "ListElementCode" : "whenWasThisAmountPaid",
+  "ID" : "SpecAoSCorrespondenceAddress",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondToClaim2",
+  "ListElementCode" : "howWasThisAmountPaid",
+  "ID" : "SpecAoSCorrespondenceAddress",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondToClaim2",
+  "ListElementCode" : "howWasThisAmountPaidOther",
+  "ID" : "SpecAoSCorrespondenceAddress",
+  "FieldDisplayOrder" : 5
+} ]

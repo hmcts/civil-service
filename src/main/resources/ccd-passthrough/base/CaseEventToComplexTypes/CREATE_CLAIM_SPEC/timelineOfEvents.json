@@ -1,0 +1,15 @@
+[ {
+  "ID" : "TimelineEvents",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "timelineOfEvents",
+  "ListElementCode" : "timelineDate",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "TimelineEvents",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "timelineOfEvents",
+  "ListElementCode" : "timelineDescription",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+} ]

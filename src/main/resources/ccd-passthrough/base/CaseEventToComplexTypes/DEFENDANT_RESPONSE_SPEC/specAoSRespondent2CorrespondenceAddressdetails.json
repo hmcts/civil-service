@@ -1,0 +1,57 @@
+[ {
+  "ID" : "SpecAoSCorrespondenceAddress",
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "specAoSRespondent2CorrespondenceAddressdetails",
+  "ListElementCode" : "AddressLine1",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SpecAoSCorrespondenceAddress",
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "specAoSRespondent2CorrespondenceAddressdetails",
+  "ListElementCode" : "AddressLine2",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "SpecAoSCorrespondenceAddress",
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "specAoSRespondent2CorrespondenceAddressdetails",
+  "ListElementCode" : "AddressLine3",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "SpecAoSCorrespondenceAddress",
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "specAoSRespondent2CorrespondenceAddressdetails",
+  "ListElementCode" : "PostTown",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "SpecAoSCorrespondenceAddress",
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "specAoSRespondent2CorrespondenceAddressdetails",
+  "ListElementCode" : "County",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "SpecAoSCorrespondenceAddress",
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "specAoSRespondent2CorrespondenceAddressdetails",
+  "ListElementCode" : "Country",
+  "FieldDisplayOrder" : 6,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "SpecAoSCorrespondenceAddress",
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "specAoSRespondent2CorrespondenceAddressdetails",
+  "ListElementCode" : "PostCode",
+  "FieldDisplayOrder" : 7,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "LRSpecCaseDataExtension",
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "specAoSRespondent2CorrespondenceAddressdetails",
+  "ListElementCode" : "test456",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+} ]

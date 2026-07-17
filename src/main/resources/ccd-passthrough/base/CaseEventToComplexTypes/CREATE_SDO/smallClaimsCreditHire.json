@@ -1,0 +1,79 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsCreditHire",
+  "ListElementCode" : "label",
+  "ID" : "SmallClaimsCreditHire",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsCreditHire",
+  "ListElementCode" : "input1",
+  "ID" : "SmallClaimsCreditHire",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsCreditHire",
+  "ListElementCode" : "input2",
+  "ID" : "SmallClaimsCreditHire",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsCreditHire",
+  "ListElementCode" : "input3",
+  "ID" : "SmallClaimsCreditHire",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsCreditHire",
+  "ListElementCode" : "input4",
+  "ID" : "SmallClaimsCreditHire",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsCreditHire",
+  "ListElementCode" : "date2",
+  "ID" : "SmallClaimsCreditHire",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsCreditHire",
+  "ListElementCode" : "input5",
+  "ID" : "SmallClaimsCreditHire",
+  "FieldDisplayOrder" : 7
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsCreditHire",
+  "ListElementCode" : "input6",
+  "ID" : "SmallClaimsCreditHire",
+  "FieldDisplayOrder" : 8
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsCreditHire",
+  "ListElementCode" : "date3",
+  "ID" : "SmallClaimsCreditHire",
+  "FieldDisplayOrder" : 9
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsCreditHire",
+  "ListElementCode" : "input7",
+  "ID" : "SmallClaimsCreditHire",
+  "FieldDisplayOrder" : 10
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsCreditHire",
+  "ListElementCode" : "date4",
+  "ID" : "SmallClaimsCreditHire",
+  "FieldDisplayOrder" : 11
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsCreditHire",
+  "ListElementCode" : "input11",
+  "ID" : "SmallClaimsCreditHire",
+  "FieldDisplayOrder" : 12
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsCreditHire",
+  "ListElementCode" : "line",
+  "ID" : "SmallClaimsCreditHire",
+  "FieldDisplayOrder" : 13
+} ]

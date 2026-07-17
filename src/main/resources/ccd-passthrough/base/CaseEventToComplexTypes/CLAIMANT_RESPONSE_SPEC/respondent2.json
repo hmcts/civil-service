@@ -1,0 +1,19 @@
+[ {
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent2",
+  "ListElementCode" : "flags",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent2",
+  "ListElementCode" : "flags.roleOnCase",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent2",
+  "ListElementCode" : "flags.partyName",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 6
+} ]

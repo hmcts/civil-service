@@ -1,0 +1,64 @@
+[ {
+  "ID" : "TrialHousingDisrepair",
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialHousingDisrepair",
+  "ListElementCode" : "introLine",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "TrialHousingDisrepair",
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialHousingDisrepair",
+  "ListElementCode" : "clauseA",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "TrialHousingDisrepair",
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialHousingDisrepair",
+  "ListElementCode" : "clauseB",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "TrialHousingDisrepair",
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialHousingDisrepair",
+  "ListElementCode" : "firstReportDateBy",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "TrialHousingDisrepair",
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialHousingDisrepair",
+  "ListElementCode" : "clauseCBeforeDate",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "TrialHousingDisrepair",
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialHousingDisrepair",
+  "ListElementCode" : "jointStatementDateBy",
+  "FieldDisplayOrder" : 6,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "TrialHousingDisrepair",
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialHousingDisrepair",
+  "ListElementCode" : "clauseCAfterDate",
+  "FieldDisplayOrder" : 7,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "TrialHousingDisrepair",
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialHousingDisrepair",
+  "ListElementCode" : "clauseD",
+  "FieldDisplayOrder" : 8,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "TrialHousingDisrepair",
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialHousingDisrepair",
+  "ListElementCode" : "clauseE",
+  "FieldDisplayOrder" : 9,
+  "DisplayContext" : "MANDATORY"
+} ]

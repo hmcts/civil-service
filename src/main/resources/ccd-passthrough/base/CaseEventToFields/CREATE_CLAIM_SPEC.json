@@ -1,0 +1,138 @@
+[ {
+  "CaseFieldID" : "specCheckList",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/eligibilityCheck"
+}, {
+  "CaseFieldID" : "specEligibilityQuestions",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/eligibilityCheck"
+}, {
+  "CaseFieldID" : "applicant1",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/applicant",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "applicant2",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/applicant2",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "applicantSolicitor1CheckEmail",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/idam-email"
+}, {
+  "CaseFieldID" : "applicant1OrganisationPolicy",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/appOrgPolicy"
+}, {
+  "CaseFieldID" : "specCorrespondenceAddressSubHeadingLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specCorrespondenceAddress"
+}, {
+  "CaseFieldID" : "specApplicantCorrespondenceAddressRequired",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specCorrespondenceAddress"
+}, {
+  "CaseFieldID" : "specApplicantCorrespondenceAddressdetails",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specCorrespondenceAddress"
+}, {
+  "CaseFieldID" : "respondent1",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/respondent1"
+}, {
+  "CaseFieldID" : "specRespondent1RepresentedLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/get-airline-list"
+}, {
+  "CaseFieldID" : "respondent1OrgRegistered",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/repOrgPolicy"
+}, {
+  "CaseFieldID" : "respondentSolicitor1EmailAddress",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-spec-defendant-legal-rep-email"
+}, {
+  "CaseFieldID" : "respondentSolicitor1OrgLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/respondentSolicitor1"
+}, {
+  "CaseFieldID" : "respondentSolicitor1OrganisationDetails",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/respondentSolicitor1"
+}, {
+  "CaseFieldID" : "specRespondentCorrespondenceAddressSubHeadingLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specRespondentCorrespondenceAddress"
+}, {
+  "CaseFieldID" : "specRespondentCorrespondenceAddressRequired",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specRespondentCorrespondenceAddress"
+}, {
+  "CaseFieldID" : "specRespondentCorrespondenceAddressdetails",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specRespondentCorrespondenceAddress"
+}, {
+  "CaseFieldID" : "respondent2",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/respondent2"
+}, {
+  "CaseFieldID" : "specRespondent2Represented",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/setRespondent2SameLegalRepresentativeToNo"
+}, {
+  "CaseFieldID" : "respondent2OrgRegistered",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/rep2OrgPolicy"
+}, {
+  "CaseFieldID" : "respondentSolicitor2EmailAddress",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-spec-defendant2-legal-rep-email"
+}, {
+  "CaseFieldID" : "respondentSolicitor2OrgLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/respondentSolicitor2"
+}, {
+  "CaseFieldID" : "respondentSolicitor2OrganisationDetails",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/respondentSolicitor2"
+}, {
+  "CaseFieldID" : "specRespondent2CorrespondenceAddressSubHeadingLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specRespondent2CorrespondenceAddress"
+}, {
+  "CaseFieldID" : "specClaimTimeline",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/ValidateClaimTimelineDate"
+}, {
+  "CaseFieldID" : "timelineOfEvents",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/ValidateClaimTimelineDate"
+}, {
+  "CaseFieldID" : "specClaimAmountLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/amount-breakup"
+}, {
+  "CaseFieldID" : "claimAmountBreakup",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/amount-breakup"
+}, {
+  "CaseFieldID" : "claimInterestLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/ClaimInterest"
+}, {
+  "CaseFieldID" : "claimInterest",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/ClaimInterest"
+}, {
+  "CaseFieldID" : "claimInterestHelpTextLink",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/ClaimInterest"
+}, {
+  "CaseFieldID" : "interestClaimFromLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/interest-from"
+}, {
+  "CaseFieldID" : "interestClaimFrom",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/interest-from"
+}, {
+  "CaseFieldID" : "interestFromSpecificDateLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/ValidateClaimInterestDate"
+}, {
+  "CaseFieldID" : "interestFromSpecificDate",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/ValidateClaimInterestDate"
+}, {
+  "CaseFieldID" : "interestFromSpecificDateDescription",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/ValidateClaimInterestDate"
+}, {
+  "CaseFieldID" : "interestClaimUntilLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/interest-calc"
+}, {
+  "CaseFieldID" : "interestClaimUntil",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/interest-calc"
+}, {
+  "CaseFieldID" : "calculatedInterestLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/spec-fee"
+}, {
+  "CaseFieldID" : "calculatedInterestHeading",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/spec-fee"
+}, {
+  "CaseFieldID" : "calculatedInterest",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/spec-fee"
+}, {
+  "CaseFieldID" : "calculatedInterestPageLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/spec-fee"
+}, {
+  "CaseFieldID" : "respondStatementOfTruthHeaderLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/statement-of-truth"
+}, {
+  "CaseFieldID" : "flightDelayDetails",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validateFlightDelayDate"
+} ]

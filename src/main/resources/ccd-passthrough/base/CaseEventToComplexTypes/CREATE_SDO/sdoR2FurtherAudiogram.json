@@ -1,0 +1,43 @@
+[ {
+  "ID" : "SdoR2FurtherAudiogram",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2FurtherAudiogram",
+  "ListElementCode" : "sdoClaimantShallUndergoLbl",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2FurtherAudiogram",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2FurtherAudiogram",
+  "ListElementCode" : "sdoClaimantShallUndergoTxt",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2FurtherAudiogram",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2FurtherAudiogram",
+  "ListElementCode" : "sdoClaimantShallUndergoDate",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2FurtherAudiogram",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2FurtherAudiogram",
+  "ListElementCode" : "sdoServiceReportLbl",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2FurtherAudiogram",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2FurtherAudiogram",
+  "ListElementCode" : "sdoServiceReportTxt",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2FurtherAudiogram",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2FurtherAudiogram",
+  "ListElementCode" : "sdoServiceReportDate",
+  "FieldDisplayOrder" : 6,
+  "DisplayContext" : "MANDATORY"
+} ]

@@ -1,0 +1,25 @@
+[ {
+  "CaseEventID" : "MANAGE_DOCUMENTS",
+  "CaseFieldID" : "manageDocuments",
+  "ListElementCode" : "documentName",
+  "ID" : "StaffDocument",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "MANAGE_DOCUMENTS",
+  "CaseFieldID" : "manageDocuments",
+  "ListElementCode" : "documentType",
+  "ID" : "StaffDocument",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "MANAGE_DOCUMENTS",
+  "CaseFieldID" : "manageDocuments",
+  "ListElementCode" : "documentTypeOther",
+  "ID" : "StaffDocument",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "MANAGE_DOCUMENTS",
+  "CaseFieldID" : "manageDocuments",
+  "ListElementCode" : "documentLink",
+  "ID" : "StaffDocument",
+  "FieldDisplayOrder" : 4
+} ]

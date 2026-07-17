@@ -1,0 +1,13 @@
+[ {
+  "CaseEventID" : "ACKNOWLEDGE_CLAIM",
+  "CaseFieldID" : "solicitorReferences",
+  "ListElementCode" : "respondentSolicitor1Reference",
+  "ID" : "SolicitorReferences",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "ACKNOWLEDGE_CLAIM",
+  "CaseFieldID" : "solicitorReferences",
+  "ListElementCode" : "respondentSolicitor2Reference",
+  "ID" : "SolicitorReferences",
+  "FieldDisplayOrder" : 1
+} ]

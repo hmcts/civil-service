@@ -1,0 +1,73 @@
+[ {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQExperts",
+  "ListElementCode" : "expertRequired",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQExperts",
+  "ListElementCode" : "expertReportsSent",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQExperts",
+  "ListElementCode" : "jointExpertSuitable",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQExperts",
+  "ListElementCode" : "details.firstName",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQExperts",
+  "ListElementCode" : "details.lastName",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQExperts",
+  "ListElementCode" : "details.phoneNumber",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQExperts",
+  "ListElementCode" : "details.emailAddress",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 7
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQExperts",
+  "ListElementCode" : "details.fieldOfExpertise",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 8
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQExperts",
+  "ListElementCode" : "details.whyRequired",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 9
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQExperts",
+  "ListElementCode" : "details.estimatedCost",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 10
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQExperts",
+  "ListElementCode" : "details.eventAdded",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 9
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQExperts",
+  "ListElementCode" : "details.dateAdded",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 9
+} ]

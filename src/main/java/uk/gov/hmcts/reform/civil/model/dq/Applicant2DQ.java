@@ -9,6 +9,15 @@ import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.DeterWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.reform.civil.ccd.access.DefaultAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.APPSOLUNSPECPROFILECruRESSOLONEUNSPECPROFILERAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CaseworkerCivilStaffRAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CaseworkerCivilStaffJudgeProfileLegalAdviserRAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.APPSOLSPECPROFILECITIZENCLAIMANTPROFILECuAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.APPSOLSPECPROFILECuAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CaseworkerCivilSystemupdateCuAccess;
+import uk.gov.hmcts.reform.civil.ccd.access.CaseworkerCivilSystemFieldReaderRAccess;
 
 @Setter
 @Data
@@ -17,25 +26,107 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 @Accessors(chain = true)
 public class Applicant2DQ implements DQ {
 
+    @CCD(
+            label = "File directions questionnaire",
+            searchable = false,
+            access = {DefaultAccess.class, APPSOLUNSPECPROFILECruRESSOLONEUNSPECPROFILERAccess.class, CaseworkerCivilStaffRAccess.class}
+    )
     private FileDirectionsQuestionnaire applicant2DQFileDirectionsQuestionnaire;
+    @CCD(
+            label = "Claimant 2 Fixed Recoverable Costs",
+            searchable = false,
+            access = {DefaultAccess.class, CaseworkerCivilStaffJudgeProfileLegalAdviserRAccess.class, APPSOLUNSPECPROFILECruRESSOLONEUNSPECPROFILERAccess.class, APPSOLSPECPROFILECITIZENCLAIMANTPROFILECuAccess.class}
+    )
     private FixedRecoverableCosts applicant2DQFixedRecoverableCosts;
+    @CCD(
+            label = "Claimant 2 Fixed Recoverable Costs",
+            searchable = false,
+            access = {DefaultAccess.class, CaseworkerCivilStaffJudgeProfileLegalAdviserRAccess.class, APPSOLUNSPECPROFILECruRESSOLONEUNSPECPROFILERAccess.class, APPSOLSPECPROFILECuAccess.class}
+    )
     private FixedRecoverableCosts applicant2DQFixedRecoverableCostsIntermediate;
+    @CCD(
+            label = "Claimant 2 Disclosure of electronic documents",
+            searchable = false,
+            access = {DefaultAccess.class, APPSOLUNSPECPROFILECruRESSOLONEUNSPECPROFILERAccess.class, CaseworkerCivilStaffRAccess.class}
+    )
     private DisclosureOfElectronicDocuments applicant2DQDisclosureOfElectronicDocuments;
+    @CCD(
+            label = "Claimant 2 Disclosure of non-electronic documents",
+            searchable = false,
+            access = {DefaultAccess.class, APPSOLUNSPECPROFILECruRESSOLONEUNSPECPROFILERAccess.class, CaseworkerCivilStaffRAccess.class}
+    )
     private DisclosureOfNonElectronicDocuments applicant2DQDisclosureOfNonElectronicDocuments;
+    @CCD(
+            label = "Claimant 2 Disclosure report",
+            searchable = false,
+            access = {DefaultAccess.class, APPSOLUNSPECPROFILECruRESSOLONEUNSPECPROFILERAccess.class, CaseworkerCivilStaffRAccess.class}
+    )
     private DisclosureReport applicant2DQDisclosureReport;
+    @CCD(
+            label = "Claimant 2 experts",
+            searchable = false,
+            access = {DefaultAccess.class, CaseworkerCivilStaffJudgeProfileLegalAdviserRAccess.class, APPSOLUNSPECPROFILECruRESSOLONEUNSPECPROFILERAccess.class, APPSOLSPECPROFILECuAccess.class, CaseworkerCivilSystemupdateCuAccess.class}
+    )
     private Experts applicant2DQExperts;
+    @CCD(ignore = true)
     private ExpertDetails applicant2RespondToClaimExperts;
+    @CCD(
+            label = "Claimant 2 witnesses",
+            searchable = false,
+            access = {DefaultAccess.class, CaseworkerCivilStaffJudgeProfileLegalAdviserRAccess.class, APPSOLUNSPECPROFILECruRESSOLONEUNSPECPROFILERAccess.class, APPSOLSPECPROFILECuAccess.class, CaseworkerCivilSystemupdateCuAccess.class}
+    )
     private Witnesses applicant2DQWitnesses;
+    @CCD(
+            label = "Claimant 2 Hearing",
+            searchable = false,
+            access = {DefaultAccess.class, CaseworkerCivilStaffJudgeProfileLegalAdviserRAccess.class, APPSOLUNSPECPROFILECruRESSOLONEUNSPECPROFILERAccess.class, CaseworkerCivilSystemupdateCuAccess.class}
+    )
     private Hearing applicant2DQHearing;
+    @CCD(ignore = true)
     private SmallClaimHearing applicant2DQSmallClaimHearing;
+    @CCD(
+            label = "Upload file",
+            hint = "We accept documents sized 10MB or smaller, in these formats: pdf, txt, doc, dot, docx, rtf, xlt, xlsx, jpg, jpeg or png",
+            regex = ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png",
+            searchable = false,
+            access = {DefaultAccess.class, APPSOLUNSPECPROFILECruRESSOLONEUNSPECPROFILERAccess.class, CaseworkerCivilStaffRAccess.class}
+    )
     private Document applicant2DQDraftDirections;
+    @CCD(label = " ", searchable = false, access = {CaseworkerCivilSystemFieldReaderRAccess.class})
     private RequestedCourt applicant2DQRequestedCourt;
+    @CCD(
+            label = "Claimant 2 Hearing support requirements",
+            searchable = false,
+            access = {DefaultAccess.class, CaseworkerCivilStaffJudgeProfileLegalAdviserRAccess.class, APPSOLUNSPECPROFILECruRESSOLONEUNSPECPROFILERAccess.class}
+    )
     private HearingSupport applicant2DQHearingSupport;
+    @CCD(
+            label = "Claimant 2 Further information",
+            searchable = false,
+            access = {DefaultAccess.class, CaseworkerCivilStaffJudgeProfileLegalAdviserRAccess.class, APPSOLUNSPECPROFILECruRESSOLONEUNSPECPROFILERAccess.class}
+    )
     private FurtherInformation applicant2DQFurtherInformation;
+    @CCD(
+            label = "Welsh language",
+            searchable = false,
+            access = {DefaultAccess.class, APPSOLUNSPECPROFILECruRESSOLONEUNSPECPROFILERAccess.class, CaseworkerCivilStaffRAccess.class}
+    )
     private WelshLanguageRequirements applicant2DQLanguage;
+    @CCD(ignore = true)
     private WelshLanguageRequirements applicant2DQLanguageLRspec;
+    @CCD(ignore = true)
     private RemoteHearingLRspec applicant2DQRemoteHearingLRspec;
+    @CCD(
+            label = "Statement of truth",
+            searchable = false,
+            access = {DefaultAccess.class, APPSOLUNSPECPROFILECruRESSOLONEUNSPECPROFILERAccess.class, CaseworkerCivilStaffRAccess.class}
+    )
     private StatementOfTruth applicant2DQStatementOfTruth;
+    @CCD(
+            label = "Claimant 2 Vulnerability Questions",
+            searchable = false,
+            access = {DefaultAccess.class, CaseworkerCivilStaffJudgeProfileLegalAdviserRAccess.class, APPSOLUNSPECPROFILECruRESSOLONEUNSPECPROFILERAccess.class, APPSOLSPECPROFILECITIZENCLAIMANTPROFILECuAccess.class}
+    )
     private VulnerabilityQuestions applicant2DQVulnerabilityQuestions;
 
     private RemoteHearing remoteHearing;

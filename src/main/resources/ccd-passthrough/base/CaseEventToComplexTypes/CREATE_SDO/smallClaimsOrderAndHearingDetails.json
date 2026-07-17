@@ -1,0 +1,25 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsOrderAndHearingDetails",
+  "ListElementCode" : "label",
+  "ID" : "SmallClaimsOrderAndHearingDetails",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsOrderAndHearingDetails",
+  "ListElementCode" : "text1",
+  "ID" : "SmallClaimsOrderAndHearingDetails",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsOrderAndHearingDetails",
+  "ListElementCode" : "text2",
+  "ID" : "SmallClaimsOrderAndHearingDetails",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsOrderAndHearingDetails",
+  "ListElementCode" : "line",
+  "ID" : "SmallClaimsOrderAndHearingDetails",
+  "FieldDisplayOrder" : 4
+} ]

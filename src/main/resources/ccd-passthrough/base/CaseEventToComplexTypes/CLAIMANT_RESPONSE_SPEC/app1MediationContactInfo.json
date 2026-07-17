@@ -1,0 +1,25 @@
+[ {
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "app1MediationContactInfo",
+  "ListElementCode" : "firstName",
+  "ID" : "MediationContactInformation",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "app1MediationContactInfo",
+  "ListElementCode" : "lastName",
+  "ID" : "MediationContactInformation",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "app1MediationContactInfo",
+  "ListElementCode" : "emailAddress",
+  "ID" : "MediationContactInformation",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "app1MediationContactInfo",
+  "ListElementCode" : "telephoneNumber",
+  "ID" : "MediationContactInformation",
+  "FieldDisplayOrder" : 4
+} ]

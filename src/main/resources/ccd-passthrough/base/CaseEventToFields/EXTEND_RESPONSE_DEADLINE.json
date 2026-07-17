@@ -1,0 +1,5 @@
+[ {
+  "CaseFieldID" : "respondentSolicitor1AgreedDeadlineExtension",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/response-deadline-extension",
+  "RetriesTimeoutURLMidEvent" : 0
+} ]

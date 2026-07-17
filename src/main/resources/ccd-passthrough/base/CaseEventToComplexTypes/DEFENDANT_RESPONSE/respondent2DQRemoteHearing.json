@@ -1,0 +1,19 @@
+[ {
+  "ID" : "RequestedCourt",
+  "ListElementCode" : "remoteHearingRequested",
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : " respondent2DQRemoteHearing",
+  "EventElementLabel" : "Do you want to the hearing to held remotely?",
+  "EventHintText" : "This will be over telephone or video",
+  "FieldDisplayOrder" : 9,
+  "DisplayContext" : "MANDATORY",
+  "_Comment" : "Condition to true, must override default"
+}, {
+  "ID" : "RequestedCourt",
+  "ListElementCode" : "reasonForRemoteHearing",
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQRemoteHearing",
+  "EventElementLabel" : "Briefly explain your reasons",
+  "FieldDisplayOrder" : 10,
+  "DisplayContext" : "OPTIONAL"
+} ]

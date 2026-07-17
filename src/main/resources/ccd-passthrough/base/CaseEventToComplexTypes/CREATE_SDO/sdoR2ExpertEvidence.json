@@ -1,0 +1,15 @@
+[ {
+  "ID" : "SdoR2ExpertEvidence",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2ExpertEvidence",
+  "ListElementCode" : "label",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2ExpertEvidence",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2ExpertEvidence",
+  "ListElementCode" : "sdoClaimantPermissionToRelyTxt",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+} ]

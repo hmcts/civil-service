@@ -1,0 +1,79 @@
+[ {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "applicant2LitigationFriend",
+  "ListElementCode" : "firstName",
+  "ID" : "LitigationFriend",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "applicant2LitigationFriend",
+  "ListElementCode" : "lastName",
+  "ID" : "LitigationFriend",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "applicant2LitigationFriend",
+  "ListElementCode" : "emailAddress",
+  "ID" : "LitigationFriend",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "applicant2LitigationFriend",
+  "ListElementCode" : "phoneNumber",
+  "ID" : "LitigationFriend",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "applicant2LitigationFriend",
+  "ListElementCode" : "hasSameAddressAsLitigant",
+  "ID" : "LitigationFriend",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "applicant2LitigationFriend",
+  "ListElementCode" : "primaryAddress",
+  "ID" : "LitigationFriend",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "applicant2LitigationFriend",
+  "ListElementCode" : "primaryAddress.AddressLine1",
+  "ID" : "LitigationFriend",
+  "FieldDisplayOrder" : 7
+}, {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "applicant2LitigationFriend",
+  "ListElementCode" : "primaryAddress.AddressLine2",
+  "ID" : "LitigationFriend",
+  "FieldDisplayOrder" : 8
+}, {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "applicant2LitigationFriend",
+  "ListElementCode" : "primaryAddress.AddressLine3",
+  "ID" : "LitigationFriend",
+  "FieldDisplayOrder" : 9
+}, {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "applicant2LitigationFriend",
+  "ListElementCode" : "primaryAddress.PostTown",
+  "ID" : "LitigationFriend",
+  "FieldDisplayOrder" : 10
+}, {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "applicant2LitigationFriend",
+  "ListElementCode" : "primaryAddress.Country",
+  "ID" : "LitigationFriend",
+  "FieldDisplayOrder" : 12
+}, {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "applicant2LitigationFriend",
+  "ListElementCode" : "primaryAddress.PostCode",
+  "ID" : "LitigationFriend",
+  "FieldDisplayOrder" : 13
+}, {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "applicant2LitigationFriend",
+  "ListElementCode" : "certificateOfSuitability.document",
+  "ID" : "LitigationFriend",
+  "FieldDisplayOrder" : 14
+} ]

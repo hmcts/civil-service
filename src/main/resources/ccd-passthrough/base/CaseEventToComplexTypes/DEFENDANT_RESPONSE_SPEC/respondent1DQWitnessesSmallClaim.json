@@ -1,0 +1,37 @@
+[ {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQWitnessesSmallClaim",
+  "ListElementCode" : "witnessesToAppear",
+  "ID" : "SmallClaimWitnesses",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQWitnessesSmallClaim",
+  "ListElementCode" : "details.firstName",
+  "ID" : "SmallClaimWitnesses",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQWitnessesSmallClaim",
+  "ListElementCode" : "details.lastName",
+  "ID" : "SmallClaimWitnesses",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQWitnessesSmallClaim",
+  "ListElementCode" : "details.phoneNumber",
+  "ID" : "SmallClaimWitnesses",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQWitnessesSmallClaim",
+  "ListElementCode" : "details.emailAddress",
+  "ID" : "SmallClaimWitnesses",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQWitnessesSmallClaim",
+  "ListElementCode" : "details.reasonForWitness",
+  "ID" : "SmallClaimWitnesses",
+  "FieldDisplayOrder" : 6
+} ]

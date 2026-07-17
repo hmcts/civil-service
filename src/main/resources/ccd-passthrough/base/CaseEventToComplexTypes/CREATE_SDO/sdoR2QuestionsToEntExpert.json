@@ -1,0 +1,64 @@
+[ {
+  "ID" : "SdoR2QuestionsToEntExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2QuestionsToEntExpert",
+  "ListElementCode" : "sdoWrittenQuestionsLbl",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2QuestionsToEntExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2QuestionsToEntExpert",
+  "ListElementCode" : "sdoWrittenQuestionsTxt",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2QuestionsToEntExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2QuestionsToEntExpert",
+  "ListElementCode" : "sdoWrittenQuestionsDate",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2QuestionsToEntExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2QuestionsToEntExpert",
+  "ListElementCode" : "sdoWrittenQuestionsDigPortalTxt",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2QuestionsToEntExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2QuestionsToEntExpert",
+  "ListElementCode" : "sdoQuestionsShallBeAnsweredLbl",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2QuestionsToEntExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2QuestionsToEntExpert",
+  "ListElementCode" : "sdoQuestionsShallBeAnsweredTxt",
+  "FieldDisplayOrder" : 6,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2QuestionsToEntExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2QuestionsToEntExpert",
+  "ListElementCode" : "sdoQuestionsShallBeAnsweredDate",
+  "FieldDisplayOrder" : 7,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2QuestionsToEntExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2QuestionsToEntExpert",
+  "ListElementCode" : "sdoShallBeUploadedLbl",
+  "FieldDisplayOrder" : 8,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2QuestionsToEntExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2QuestionsToEntExpert",
+  "ListElementCode" : "sdoShallBeUploadedTxt",
+  "FieldDisplayOrder" : 9,
+  "DisplayContext" : "MANDATORY"
+} ]

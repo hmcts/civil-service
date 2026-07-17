@@ -1,0 +1,33 @@
+[ {
+  "ID" : "GAUrgencyRecordPage",
+  "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
+  "CaseFieldID" : "generalAppUrgencyRequirement",
+  "ListElementCode" : "generalAppUrgency",
+  "EventElementLabel" : " ",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "GAUrgencyRecordPage",
+  "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
+  "CaseFieldID" : "generalAppUrgencyRequirement",
+  "ListElementCode" : "urgentAppConsiderationDate",
+  "EventElementLabel" : " ",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "GAUrgencyRecordPage",
+  "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
+  "CaseFieldID" : "generalAppUrgencyRequirement",
+  "ListElementCode" : "reasonsForUrgency",
+  "EventElementLabel" : " ",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "GAUrgencyRecordPage",
+  "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
+  "CaseFieldID" : "generalAppUrgencyRequirement",
+  "ListElementCode" : "ConsentAgreementCheckBox",
+  "EventElementLabel" : " ",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "MANDATORY"
+} ]

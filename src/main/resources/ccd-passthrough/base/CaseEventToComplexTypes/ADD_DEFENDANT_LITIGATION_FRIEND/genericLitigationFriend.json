@@ -1,0 +1,85 @@
+[ {
+  "CaseEventID" : "ADD_DEFENDANT_LITIGATION_FRIEND",
+  "CaseFieldID" : "genericLitigationFriend",
+  "ListElementCode" : "firstName",
+  "ID" : "DefendantLitigationFriend",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "ADD_DEFENDANT_LITIGATION_FRIEND",
+  "CaseFieldID" : "genericLitigationFriend",
+  "ListElementCode" : "lastName",
+  "ID" : "DefendantLitigationFriend",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "ADD_DEFENDANT_LITIGATION_FRIEND",
+  "CaseFieldID" : "genericLitigationFriend",
+  "ListElementCode" : "emailAddress",
+  "ID" : "DefendantLitigationFriend",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "ADD_DEFENDANT_LITIGATION_FRIEND",
+  "CaseFieldID" : "genericLitigationFriend",
+  "ListElementCode" : "phoneNumber",
+  "ID" : "DefendantLitigationFriend",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "ADD_DEFENDANT_LITIGATION_FRIEND",
+  "CaseFieldID" : "genericLitigationFriend",
+  "ListElementCode" : "hasSameAddressAsLitigant",
+  "ID" : "CommonDefendantLitigationFriend",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "ADD_DEFENDANT_LITIGATION_FRIEND",
+  "CaseFieldID" : "genericLitigationFriend",
+  "ListElementCode" : "primaryAddress",
+  "ID" : "CommonDefendantLitigationFriend",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "ADD_DEFENDANT_LITIGATION_FRIEND",
+  "CaseFieldID" : "genericLitigationFriend",
+  "ListElementCode" : "primaryAddress.AddressLine1",
+  "ID" : "CommonDefendantLitigationFriend",
+  "FieldDisplayOrder" : 7
+}, {
+  "CaseEventID" : "ADD_DEFENDANT_LITIGATION_FRIEND",
+  "CaseFieldID" : "genericLitigationFriend",
+  "ListElementCode" : "primaryAddress.AddressLine2",
+  "ID" : "CommonDefendantLitigationFriend",
+  "FieldDisplayOrder" : 8
+}, {
+  "CaseEventID" : "ADD_DEFENDANT_LITIGATION_FRIEND",
+  "CaseFieldID" : "genericLitigationFriend",
+  "ListElementCode" : "primaryAddress.AddressLine3",
+  "ID" : "CommonDefendantLitigationFriend",
+  "FieldDisplayOrder" : 9
+}, {
+  "CaseEventID" : "ADD_DEFENDANT_LITIGATION_FRIEND",
+  "CaseFieldID" : "genericLitigationFriend",
+  "ListElementCode" : "primaryAddress.PostTown",
+  "ID" : "CommonDefendantLitigationFriend",
+  "FieldDisplayOrder" : 10
+}, {
+  "CaseEventID" : "ADD_DEFENDANT_LITIGATION_FRIEND",
+  "CaseFieldID" : "genericLitigationFriend",
+  "ListElementCode" : "primaryAddress.County",
+  "ID" : "CommonDefendantLitigationFriend",
+  "FieldDisplayOrder" : 11
+}, {
+  "CaseEventID" : "ADD_DEFENDANT_LITIGATION_FRIEND",
+  "CaseFieldID" : "genericLitigationFriend",
+  "ListElementCode" : "primaryAddress.Country",
+  "ID" : "CommonDefendantLitigationFriend",
+  "FieldDisplayOrder" : 12
+}, {
+  "CaseEventID" : "ADD_DEFENDANT_LITIGATION_FRIEND",
+  "CaseFieldID" : "genericLitigationFriend",
+  "ListElementCode" : "primaryAddress.PostCode",
+  "ID" : "CommonDefendantLitigationFriend",
+  "FieldDisplayOrder" : 13
+}, {
+  "CaseEventID" : "ADD_DEFENDANT_LITIGATION_FRIEND",
+  "CaseFieldID" : "genericLitigationFriend",
+  "ListElementCode" : "certificateOfSuitability.document",
+  "ID" : "CommonDefendantLitigationFriend",
+  "FieldDisplayOrder" : 14
+} ]

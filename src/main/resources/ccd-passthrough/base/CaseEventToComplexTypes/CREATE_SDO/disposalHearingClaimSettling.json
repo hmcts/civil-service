@@ -1,0 +1,13 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingClaimSettling",
+  "ListElementCode" : "label",
+  "ID" : "DisposalHearingClaimSettling",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingClaimSettling",
+  "ListElementCode" : "text",
+  "ID" : "DisposalHearingClaimSettling",
+  "FieldDisplayOrder" : 2
+} ]

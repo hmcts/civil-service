@@ -1,0 +1,19 @@
+[ {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialOrderMadeWithoutHearingDJ",
+  "ListElementCode" : "title",
+  "ID" : "TrialOrderMadeWithoutHearingDJ",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialOrderMadeWithoutHearingDJ",
+  "ListElementCode" : "input",
+  "ID" : "TrialOrderMadeWithoutHearingDJ",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialOrderMadeWithoutHearingDJ",
+  "ListElementCode" : "line",
+  "ID" : "TrialOrderMadeWithoutHearingDJ",
+  "FieldDisplayOrder" : 3
+} ]

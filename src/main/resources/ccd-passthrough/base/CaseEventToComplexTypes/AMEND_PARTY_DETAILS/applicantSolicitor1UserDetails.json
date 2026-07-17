@@ -1,0 +1,7 @@
+[ {
+  "CaseEventID" : "AMEND_PARTY_DETAILS",
+  "CaseFieldID" : "applicantSolicitor1UserDetails",
+  "ListElementCode" : "email",
+  "ID" : "WithdrawClaim",
+  "FieldDisplayOrder" : 1
+} ]

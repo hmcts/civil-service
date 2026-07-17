@@ -1,0 +1,218 @@
+[ {
+  "ID" : "SdoR2Trial",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "sdoR2TrialLabel",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2Trial",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "trialOnOptions",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2Trial",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "sdoR2TrialFirstOpenDateAfter",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2Trial",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "sdoR2TrialWindow",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2Trial",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "lengthListLabel",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2Trial",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "lengthList",
+  "FieldDisplayOrder" : 6,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2Trial",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "lengthListOther",
+  "FieldDisplayOrder" : 7,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2Trial",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "label",
+  "FieldDisplayOrder" : 8,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2Trial",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "hearingCourtLocationListLabel",
+  "FieldDisplayOrder" : 9,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2Trial",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "hearingCourtLocationList",
+  "FieldDisplayOrder" : 10,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2Trial",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "altHearingCourtLocationListLabel",
+  "FieldDisplayOrder" : 11,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2Trial",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "altHearingCourtLocationList",
+  "FieldDisplayOrder" : 12,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2Trial",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "methodOfHearingLabel",
+  "FieldDisplayOrder" : 13,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2Trial",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "methodOfHearing",
+  "FieldDisplayOrder" : 14,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2Trial",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "physicalBundleOptionsLabel",
+  "FieldDisplayOrder" : 15,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2Trial",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "physicalBundleOptions",
+  "FieldDisplayOrder" : 16,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2Trial",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "physicalBundlePartyTxtLabel",
+  "FieldDisplayOrder" : 17,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2Trial",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "physicalBundlePartyTxt",
+  "FieldDisplayOrder" : 18,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2Trial",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "hearingNotesLbl",
+  "FieldDisplayOrder" : 19,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2Trial",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "hearingNotesTxt",
+  "FieldDisplayOrder" : 20,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "SdoR2TrialHearingLengthOther",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "lengthListOther.trialLengthDays",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "COMPLEX"
+}, {
+  "ID" : "SdoR2TrialHearingLengthOther",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "lengthListOther.trialLengthHours",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "COMPLEX"
+}, {
+  "ID" : "SdoR2TrialHearingLengthOther",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "lengthListOther.trialLengthMinutes",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "COMPLEX"
+}, {
+  "ID" : "SdoR2TrialFromTo",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "sdoR2TrialWindow.sdoR2TrialWindowLabel",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2TrialFromTo",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "sdoR2TrialWindow.listFromLabel",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2TrialFromTo",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "sdoR2TrialWindow.listFrom",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "COMPLEX"
+}, {
+  "ID" : "SdoR2TrialFromTo",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "sdoR2TrialWindow.dateToLabel",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2TrialFromTo",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "sdoR2TrialWindow.dateTo",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "COMPLEX"
+}, {
+  "ID" : "SdoR2FirstOpenDateAfter",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "sdoR2TrialFirstOpenDateAfter.sdoR2FirstOpenDateAfterLabel",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2FirstOpenDateAfter",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "sdoR2TrialFirstOpenDateAfter.listFromLabel",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2FirstOpenDateAfter",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2Trial",
+  "ListElementCode" : "sdoR2TrialFirstOpenDateAfter.listFrom",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "COMPLEX"
+} ]

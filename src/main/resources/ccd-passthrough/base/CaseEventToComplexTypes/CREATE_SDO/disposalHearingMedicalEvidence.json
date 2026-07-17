@@ -1,0 +1,19 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingMedicalEvidence",
+  "ListElementCode" : "label",
+  "ID" : "DisposalHearingMedicalEvidence",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingMedicalEvidence",
+  "ListElementCode" : "input",
+  "ID" : "DisposalHearingMedicalEvidence",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingMedicalEvidence",
+  "ListElementCode" : "date",
+  "ID" : "DisposalHearingMedicalEvidence",
+  "FieldDisplayOrder" : 4
+} ]

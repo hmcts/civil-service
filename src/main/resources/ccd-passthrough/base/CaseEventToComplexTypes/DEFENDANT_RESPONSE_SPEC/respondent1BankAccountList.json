@@ -1,0 +1,19 @@
+[ {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1BankAccountList",
+  "ListElementCode" : "accountType",
+  "ID" : "BankAccount",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1BankAccountList",
+  "ListElementCode" : "jointAccount",
+  "ID" : "BankAccount",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1BankAccountList",
+  "ListElementCode" : "balance",
+  "ID" : "BankAccount",
+  "FieldDisplayOrder" : 3
+} ]

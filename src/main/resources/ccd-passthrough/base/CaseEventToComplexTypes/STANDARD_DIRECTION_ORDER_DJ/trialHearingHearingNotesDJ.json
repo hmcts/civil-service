@@ -1,0 +1,19 @@
+[ {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialHearingHearingNotesDJ",
+  "ListElementCode" : "label",
+  "ID" : "TrialHearingHearingNotesDJ",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialHearingHearingNotesDJ",
+  "ListElementCode" : "input",
+  "ID" : "TrialHearingHearingNotesDJ",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialHearingHearingNotesDJ",
+  "ListElementCode" : "line",
+  "ID" : "TrialHearingHearingNotesDJ",
+  "FieldDisplayOrder" : 3
+} ]

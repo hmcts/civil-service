@@ -1,0 +1,37 @@
+[ {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "disposalHearingFinalDisposalHearingTimeDJ",
+  "ListElementCode" : "input",
+  "ID" : "DisposalHearingFinalDisposalHearingTimeDJ",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "disposalHearingFinalDisposalHearingTimeDJ",
+  "ListElementCode" : "dateLabel",
+  "ID" : "DisposalHearingFinalDisposalHearingTimeDJ",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "disposalHearingFinalDisposalHearingTimeDJ",
+  "ListElementCode" : "date",
+  "ID" : "DisposalHearingFinalDisposalHearingTimeDJ",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "disposalHearingFinalDisposalHearingTimeDJ",
+  "ListElementCode" : "time",
+  "ID" : "DisposalHearingFinalDisposalHearingTimeDJ",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "disposalHearingFinalDisposalHearingTimeDJ",
+  "ListElementCode" : "otherHours",
+  "ID" : "DisposalHearingFinalDisposalHearingTimeDJ",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "disposalHearingFinalDisposalHearingTimeDJ",
+  "ListElementCode" : "otherMinutes",
+  "ID" : "DisposalHearingFinalDisposalHearingTimeDJ",
+  "FieldDisplayOrder" : 6
+} ]

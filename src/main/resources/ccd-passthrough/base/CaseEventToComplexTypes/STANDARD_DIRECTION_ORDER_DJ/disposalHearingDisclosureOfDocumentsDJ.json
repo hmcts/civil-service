@@ -1,0 +1,19 @@
+[ {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "disposalHearingDisclosureOfDocumentsDJ",
+  "ListElementCode" : "label",
+  "ID" : "DisposalHearingDisclosureOfDocumentsDJ",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "disposalHearingDisclosureOfDocumentsDJ",
+  "ListElementCode" : "input",
+  "ID" : "DisposalHearingDisclosureOfDocumentsDJ",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "disposalHearingDisclosureOfDocumentsDJ",
+  "ListElementCode" : "date",
+  "ID" : "DisposalHearingDisclosureOfDocumentsDJ",
+  "FieldDisplayOrder" : 4
+} ]

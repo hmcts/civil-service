@@ -1,0 +1,22 @@
+[ {
+  "ID" : "SdoR2AddendumReport",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2AddendumReport",
+  "ListElementCode" : "label",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2AddendumReport",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2AddendumReport",
+  "ListElementCode" : "sdoAddendumReportTxt",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2AddendumReport",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2AddendumReport",
+  "ListElementCode" : "sdoAddendumReportDate",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+} ]

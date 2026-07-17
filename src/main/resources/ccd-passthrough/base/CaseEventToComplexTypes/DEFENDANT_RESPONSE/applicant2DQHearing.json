@@ -1,0 +1,9 @@
+[ {
+  "ID" : "Hearing",
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "applicant2DQHearing",
+  "ListElementCode" : "unavailableDates.who",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "OPTIONAL",
+  "FieldShowCondition" : "applicant2DQHearing=\"DO NOT SHOW IN UI\""
+} ]

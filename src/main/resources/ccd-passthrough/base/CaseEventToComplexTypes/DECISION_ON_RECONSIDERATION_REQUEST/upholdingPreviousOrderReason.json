@@ -1,0 +1,7 @@
+[ {
+  "CaseEventID" : "DECISION_ON_RECONSIDERATION_REQUEST",
+  "CaseFieldID" : "upholdingPreviousOrderReason",
+  "ListElementCode" : "reasonForReconsiderationTxtYes",
+  "ID" : "JudgeDecisionOnReconsideration",
+  "FieldDisplayOrder" : 1
+} ]

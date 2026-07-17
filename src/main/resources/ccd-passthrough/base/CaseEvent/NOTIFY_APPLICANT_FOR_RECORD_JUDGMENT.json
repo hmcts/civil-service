@@ -1,0 +1,4 @@
+[ {
+  "ID" : "NOTIFY_APPLICANT_FOR_RECORD_JUDGMENT",
+  "CallBackURLAboutToSubmitEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit"
+} ]

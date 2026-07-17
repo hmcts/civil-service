@@ -1,0 +1,8 @@
+[ {
+  "ID" : "DisposalHearingAddNewDirections",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingAddNewDirections",
+  "ListElementCode" : "directionComment",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "OPTIONAL"
+} ]

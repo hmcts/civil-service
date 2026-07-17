@@ -1,0 +1,7 @@
+[ {
+  "CaseEventID" : "DECISION_ON_RECONSIDERATION_REQUEST",
+  "CaseFieldID" : "decisionOnReconsiderationDocument",
+  "ListElementCode" : "documentLink",
+  "ID" : "DecisionOnReconsiderationOrderDocumentPage",
+  "FieldDisplayOrder" : 1
+} ]

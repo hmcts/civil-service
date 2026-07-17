@@ -1,0 +1,19 @@
+[ {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "disposalHearingJudgesRecitalDJ",
+  "ListElementCode" : "label",
+  "ID" : "DisposalHearingJudgesRecitalDJ",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "disposalHearingJudgesRecitalDJ",
+  "ListElementCode" : "input",
+  "ID" : "DisposalHearingJudgesRecitalDJ",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "disposalHearingJudgesRecitalDJ",
+  "ListElementCode" : "line",
+  "ID" : "DisposalHearingJudgesRecitalDJ",
+  "FieldDisplayOrder" : 3
+} ]

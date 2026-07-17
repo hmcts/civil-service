@@ -1,0 +1,10 @@
+[ {
+  "ID" : "PaymentReference",
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "claimIssuedPaymentDetails",
+  "ListElementCode" : "customerReference",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY",
+  "EventElementLabel" : "Enter a reference for your PBA account statements",
+  "EventHintText" : "This should be your own unique reference to identify the case. It will appear on your statements."
+} ]

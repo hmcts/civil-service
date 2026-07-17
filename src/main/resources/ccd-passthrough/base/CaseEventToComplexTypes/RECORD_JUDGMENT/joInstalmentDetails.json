@@ -1,0 +1,19 @@
+[ {
+  "CaseEventID" : "RECORD_JUDGMENT",
+  "CaseFieldID" : "joInstalmentDetails",
+  "ListElementCode" : "amount",
+  "ID" : "InstalmentPaymentDetails",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "RECORD_JUDGMENT",
+  "CaseFieldID" : "joInstalmentDetails",
+  "ListElementCode" : "paymentFrequency",
+  "ID" : "InstalmentPaymentDetails",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "RECORD_JUDGMENT",
+  "CaseFieldID" : "joInstalmentDetails",
+  "ListElementCode" : "startDate",
+  "ID" : "InstalmentPaymentDetails",
+  "FieldDisplayOrder" : 3
+} ]

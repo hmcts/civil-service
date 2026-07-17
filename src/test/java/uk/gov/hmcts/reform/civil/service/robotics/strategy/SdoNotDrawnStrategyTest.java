@@ -82,7 +82,7 @@ class SdoNotDrawnStrategyTest {
     void contributeAddsSdoNotDrawnEvent() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_ONE)
-            .reasonNotSuitableSDO(new ReasonNotSuitableSDO("No SDO drawn"))
+            .reasonNotSuitableSDO(new ReasonNotSuitableSDO("No SDO drawn", null, null))
             .build();
 
         EventHistory builder = new EventHistory();
@@ -103,7 +103,7 @@ class SdoNotDrawnStrategyTest {
         String longReason = "x".repeat(600);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_ONE)
-            .reasonNotSuitableSDO(new ReasonNotSuitableSDO(longReason))
+            .reasonNotSuitableSDO(new ReasonNotSuitableSDO(longReason, null, null))
             .build();
 
         EventHistory builder = new EventHistory();

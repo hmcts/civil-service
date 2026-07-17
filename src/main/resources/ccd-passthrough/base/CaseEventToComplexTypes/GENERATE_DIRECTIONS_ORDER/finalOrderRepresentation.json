@@ -1,0 +1,391 @@
+[ {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationClaimantOneDynamic",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationClaimantTwoDynamic",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationDefendantOneDynamic",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationDefendantTwoDynamic",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationClaimantListLabel",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationClaimantList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationCounselForClaimantList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationSolicitorForClaimantList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationCostDraftsmanList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationTheClaimantInPersonList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationLayRepresentativeList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationLegalExecutiveList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationSolicitorsAgentList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.trialProcedureClaimantComplex",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 7
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationClaimantListTwoLabel",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 8
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationClaimantListTwo",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 9
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.CounselForClaimantListTwo",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 10
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.SolicitorForClaimantListTwo",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 10
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationCostDraftsmanListTwo",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 10
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationTheClaimantInPersonListTwo",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 10
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationLayRepresentativeListTwo",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 10
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationLegalExecutiveListTwo",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 10
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationSolicitorsAgentListTwo",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 10
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.trialProcedClaimTwoComplex",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 10
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationDefendantListLabel",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 11
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationDefendantList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 12
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationCounselForDefendantList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 13
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationSolicitorForDefendantList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 13
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationCostDraftsmanDefList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 13
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationTheDefendantInPersonList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 13
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationLayRepresentativeDefList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 13
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationLegalExecutiveDefList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 13
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationSolicitorsAgentDefList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 13
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.trialProcedureComplex",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 13
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationDefendantTwoListLabel",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 14
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.typeRepresentationDefendantTwoList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 15
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.CounselForDefendantTwoList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 16
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.SolicitorForDefendantTwoList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 16
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.CostDraftsmanDefTwoList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 16
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.TheDefendantInPersonTwoList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 16
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.LayRepresentativeDefTwoList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 16
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.LegalExecutiveDefTwoList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 16
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.SolicitorsAgentDefTwoList",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 16
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.trialProcedureDefTwoComplex",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 16
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationOtherComplex.detailsRepresentationLabel",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 17
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationOtherComplex.detailsRepresentationText",
+  "ID" : "ClaimantAndDefendantHeard",
+  "FieldDisplayOrder" : 18
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationList",
+  "ID" : "FinalOrderRepresentation",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex",
+  "ID" : "FinalOrderRepresentation",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationOtherComplex",
+  "ID" : "FinalOrderRepresentation",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.trialProcedureClaimantComplex.list",
+  "ID" : "TrialNoticeProcedure",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.trialProcedureClaimantComplex.label1",
+  "ID" : "TrialNoticeProcedure",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.trialProcedureClaimantComplex.label2",
+  "ID" : "TrialNoticeProcedure",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.trialProcedureClaimantComplex.label3",
+  "ID" : "TrialNoticeProcedure",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.trialProcedClaimTwoComplex.listClaimTwo",
+  "ID" : "TrialNoticeProcedure",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.trialProcedClaimTwoComplex.label1ClaimTwo",
+  "ID" : "TrialNoticeProcedure",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.trialProcedClaimTwoComplex.label2ClaimTwo",
+  "ID" : "TrialNoticeProcedure",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.trialProcedClaimTwoComplex.label3ClaimTwo",
+  "ID" : "TrialNoticeProcedure",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.trialProcedureComplex.listDef",
+  "ID" : "TrialNoticeProcedure",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.trialProcedureComplex.label1Def",
+  "ID" : "TrialNoticeProcedure",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.trialProcedureComplex.label2Def",
+  "ID" : "TrialNoticeProcedure",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.trialProcedureComplex.label3Def",
+  "ID" : "TrialNoticeProcedure",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.trialProcedureDefTwoComplex.listDefTwo",
+  "ID" : "TrialNoticeProcedure",
+  "FieldDisplayOrder" : 7
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.trialProcedureDefTwoComplex.label1DefTwo",
+  "ID" : "TrialNoticeProcedure",
+  "FieldDisplayOrder" : 8
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.trialProcedureDefTwoComplex.label2DefTwo",
+  "ID" : "TrialNoticeProcedure",
+  "FieldDisplayOrder" : 8
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "finalOrderRepresentation",
+  "ListElementCode" : "typeRepresentationComplex.trialProcedureDefTwoComplex.label3DefTwo",
+  "ID" : "TrialNoticeProcedure",
+  "FieldDisplayOrder" : 8
+} ]

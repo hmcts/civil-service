@@ -1,0 +1,19 @@
+[ {
+  "CaseEventID" : "MANAGE_CASE_FLAGS",
+  "CaseFieldID" : "respondent2OrgIndividuals",
+  "ListElementCode" : "firstName",
+  "ID" : "PartyFlagStructure",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "MANAGE_CASE_FLAGS",
+  "CaseFieldID" : "respondent2OrgIndividuals",
+  "ListElementCode" : "lastName",
+  "ID" : "PartyFlagStructure",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "MANAGE_CASE_FLAGS",
+  "CaseFieldID" : "respondent2OrgIndividuals",
+  "ListElementCode" : "flags",
+  "ID" : "PartyFlagStructure",
+  "FieldDisplayOrder" : 3
+} ]

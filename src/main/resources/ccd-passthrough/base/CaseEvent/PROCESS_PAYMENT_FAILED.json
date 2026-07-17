@@ -1,0 +1,4 @@
+[ {
+  "ID" : "PROCESS_PAYMENT_FAILED",
+  "RetriesTimeoutURLAboutToSubmitEvent" : 0
+} ]

@@ -1,0 +1,13 @@
+[ {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent2DQRemoteHearingLRspec",
+  "ListElementCode" : "remoteHearingRequested",
+  "ID" : "CourtLocationSpec",
+  "PageFieldDisplayOrder" : 7
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent2DQRemoteHearingLRspec",
+  "ListElementCode" : "reasonForRemoteHearing",
+  "ID" : "CourtLocationSpec",
+  "PageFieldDisplayOrder" : 8
+} ]

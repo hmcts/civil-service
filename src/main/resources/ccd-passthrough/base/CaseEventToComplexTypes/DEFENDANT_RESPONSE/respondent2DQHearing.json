@@ -1,0 +1,49 @@
+[ {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQHearing",
+  "ListElementCode" : "unavailableDates.who",
+  "ID" : "Hearing",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQHearing",
+  "ListElementCode" : "unavailableDatesRequired",
+  "ID" : "Hearing",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQHearing",
+  "ListElementCode" : "unavailableDates.unavailableDateType",
+  "ID" : "Hearing",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQHearing",
+  "ListElementCode" : "unavailableDates.date",
+  "ID" : "Hearing",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQHearing",
+  "ListElementCode" : "unavailableDates.fromDate",
+  "ID" : "Hearing",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQHearing",
+  "ListElementCode" : "unavailableDates.toDate",
+  "ID" : "Hearing",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQHearing",
+  "ListElementCode" : "unavailableDates.eventAdded",
+  "ID" : "Hearing",
+  "FieldDisplayOrder" : 9
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQHearing",
+  "ListElementCode" : "unavailableDates.dateAdded",
+  "ID" : "Hearing",
+  "FieldDisplayOrder" : 10
+} ]

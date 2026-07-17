@@ -1,0 +1,21 @@
+[ {
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "applicant1DQLanguage",
+  "ListElementCode" : "helpText",
+  "ID" : "Languages",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "applicant1DQLanguage",
+  "ListElementCode" : "court",
+  "ID" : "Languages",
+  "FieldDisplayOrder" : 2,
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "applicant1DQLanguage",
+  "ListElementCode" : "documents",
+  "ID" : "Languages",
+  "FieldDisplayOrder" : 3,
+  "Publish" : "Y"
+} ]

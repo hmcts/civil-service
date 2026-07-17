@@ -10,12 +10,15 @@ import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
 
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
 public class ClaimValue {
 
+    @CCD(label = "Statement of value", searchable = false, min = 100, typeOverride = FieldType.MoneyGBP)
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal statementOfValueInPennies;
 
@@ -31,4 +34,13 @@ public class ClaimValue {
     public String formData() {
         return "up to £" + this.toPounds();
     }
+
+  // ==== ccd-definition-converter: synthesised definition-only fields (retrofit) ====
+  @CCD(
+          label = "Your fee will be calculated based on the statement of value",
+          searchable = false,
+          typeOverride = FieldType.Label
+  )
+  private String label;
+  // ==== end synthesised definition-only fields ====
 }

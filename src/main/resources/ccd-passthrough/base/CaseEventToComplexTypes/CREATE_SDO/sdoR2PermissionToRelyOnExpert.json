@@ -1,0 +1,57 @@
+[ {
+  "ID" : "SdoR2PermissionToRelyOnExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2PermissionToRelyOnExpert",
+  "ListElementCode" : "label",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2PermissionToRelyOnExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2PermissionToRelyOnExpert",
+  "ListElementCode" : "sdoPermissionToRelyOnExpertTxt",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2PermissionToRelyOnExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2PermissionToRelyOnExpert",
+  "ListElementCode" : "sdoPermissionToRelyOnExpertDate",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2PermissionToRelyOnExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2PermissionToRelyOnExpert",
+  "ListElementCode" : "sdoJointMeetingOfExpertsLbl",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2PermissionToRelyOnExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2PermissionToRelyOnExpert",
+  "ListElementCode" : "sdoJointMeetingOfExpertsTxt",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2PermissionToRelyOnExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2PermissionToRelyOnExpert",
+  "ListElementCode" : "sdoJointMeetingOfExpertsDate",
+  "FieldDisplayOrder" : 6,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2PermissionToRelyOnExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2PermissionToRelyOnExpert",
+  "ListElementCode" : "sdoUploadedToDigitalPortalLbl",
+  "FieldDisplayOrder" : 7,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2PermissionToRelyOnExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2PermissionToRelyOnExpert",
+  "ListElementCode" : "sdoUploadedToDigitalPortalTxt",
+  "FieldDisplayOrder" : 8,
+  "DisplayContext" : "MANDATORY"
+} ]

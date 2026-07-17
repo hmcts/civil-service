@@ -1,0 +1,52 @@
+[ {
+  "ID" : "SmallClaimsWitnessStatement",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsWitnessStatement",
+  "ListElementCode" : "label",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SmallClaimsWitnessStatement",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsWitnessStatement",
+  "ListElementCode" : "input1",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SmallClaimsWitnessStatement",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsWitnessStatement",
+  "ListElementCode" : "smallClaimsNumberOfWitnessesToggle",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "SmallClaimsWitnessStatement",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsWitnessStatement",
+  "ListElementCode" : "input2",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "MANDATORY",
+  "EventHintText" : "Limit number of witnesses (claimant), e.g. 4"
+}, {
+  "ID" : "SmallClaimsWitnessStatement",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsWitnessStatement",
+  "ListElementCode" : "input3",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "MANDATORY",
+  "EventHintText" : "Limit number of witnesses (defendant), e.g. 4"
+}, {
+  "ID" : "SmallClaimsWitnessStatement",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsWitnessStatement",
+  "ListElementCode" : "input4",
+  "FieldDisplayOrder" : 6,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "SmallClaimsWitnessStatement",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsWitnessStatement",
+  "ListElementCode" : "text",
+  "FieldDisplayOrder" : 7,
+  "DisplayContext" : "READONLY"
+} ]

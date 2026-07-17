@@ -1,0 +1,31 @@
+[ {
+  "CaseEventID" : "ACKNOWLEDGEMENT_OF_SERVICE",
+  "CaseFieldID" : "respondent2",
+  "ListElementCode" : "individualDateOfBirth",
+  "ID" : "Party",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "ACKNOWLEDGEMENT_OF_SERVICE",
+  "CaseFieldID" : "respondent2",
+  "ListElementCode" : "soleTraderDateOfBirth",
+  "ID" : "Party",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "ACKNOWLEDGEMENT_OF_SERVICE",
+  "CaseFieldID" : "respondent2",
+  "ListElementCode" : "flags",
+  "ID" : "Party",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "ACKNOWLEDGEMENT_OF_SERVICE",
+  "CaseFieldID" : "respondent2",
+  "ListElementCode" : "flags.roleOnCase",
+  "ID" : "Party",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "ACKNOWLEDGEMENT_OF_SERVICE",
+  "CaseFieldID" : "respondent2",
+  "ListElementCode" : "flags.partyName",
+  "ID" : "Party",
+  "FieldDisplayOrder" : 6
+} ]

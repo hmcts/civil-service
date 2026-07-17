@@ -1,0 +1,8 @@
+[ {
+  "ID" : "FastTrackAddNewDirections",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackAddNewDirections",
+  "ListElementCode" : "directionComment",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "OPTIONAL"
+} ]

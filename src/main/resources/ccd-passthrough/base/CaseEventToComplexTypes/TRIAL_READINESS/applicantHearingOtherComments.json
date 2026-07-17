@@ -1,0 +1,13 @@
+[ {
+  "CaseEventID" : "TRIAL_READINESS",
+  "CaseFieldID" : "applicantHearingOtherComments",
+  "ListElementCode" : "startLabel",
+  "ID" : "OtherHearingComments",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "TRIAL_READINESS",
+  "CaseFieldID" : "applicantHearingOtherComments",
+  "ListElementCode" : "hearingOtherComments",
+  "ID" : "HearingOtherComments",
+  "FieldDisplayOrder" : 3
+} ]

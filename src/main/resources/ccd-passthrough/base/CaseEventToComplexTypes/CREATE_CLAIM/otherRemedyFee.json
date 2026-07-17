@@ -1,0 +1,7 @@
+[ {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "otherRemedyFee",
+  "ListElementCode" : "calculatedAmountInPence",
+  "ID" : "OtherRemedyFee",
+  "FieldDisplayOrder" : 1
+} ]

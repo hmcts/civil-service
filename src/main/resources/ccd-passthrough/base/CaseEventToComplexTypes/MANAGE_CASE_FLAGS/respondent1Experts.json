@@ -1,0 +1,19 @@
+[ {
+  "CaseEventID" : "MANAGE_CASE_FLAGS",
+  "CaseFieldID" : "respondent1Experts",
+  "ListElementCode" : "firstName",
+  "ID" : "DQPartyFlagStructure",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "MANAGE_CASE_FLAGS",
+  "CaseFieldID" : "respondent1Experts",
+  "ListElementCode" : "lastName",
+  "ID" : "DQPartyFlagStructure",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "MANAGE_CASE_FLAGS",
+  "CaseFieldID" : "respondent1Experts",
+  "ListElementCode" : "flags",
+  "ID" : "DQPartyFlagStructure",
+  "FieldDisplayOrder" : 3
+} ]

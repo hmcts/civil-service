@@ -1,0 +1,7 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoOrderDocument",
+  "ListElementCode" : "documentLink",
+  "ID" : "SdoOrderDocumentPage",
+  "FieldDisplayOrder" : 1
+} ]

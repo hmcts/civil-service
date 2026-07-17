@@ -1,0 +1,14 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "caseManagementLocation",
+  "ListElementCode" : "region",
+  "ID" : "CaseLocationCivil",
+  "ElementLabel" : "Region"
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "caseManagementLocation",
+  "ListElementCode" : "baseLocation",
+  "ID" : "CaseLocationCivil",
+  "ElementLabel" : "Base Location",
+  "FieldType" : "Text"
+} ]

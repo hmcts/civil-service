@@ -1,0 +1,7 @@
+[ {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "applicantSolicitor1UserDetails",
+  "ListElementCode" : "email",
+  "ID" : "IdamDetails",
+  "FieldDisplayOrder" : 3
+} ]

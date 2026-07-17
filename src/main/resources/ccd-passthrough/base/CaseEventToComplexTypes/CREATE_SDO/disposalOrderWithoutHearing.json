@@ -1,0 +1,22 @@
+[ {
+  "ID" : "DisposalOrderWithoutHearing",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalOrderWithoutHearing",
+  "ListElementCode" : "line",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "DisposalOrderWithoutHearing",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalOrderWithoutHearing",
+  "ListElementCode" : "title",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "DisposalOrderWithoutHearing",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalOrderWithoutHearing",
+  "ListElementCode" : "input",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+} ]

@@ -1,0 +1,7 @@
+[ {
+  "CaseFieldID" : "uploadMediationDocumentsExplanation",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/populate-party-options"
+}, {
+  "CaseFieldID" : "mediationDocumentUploadWarning",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-dates"
+} ]

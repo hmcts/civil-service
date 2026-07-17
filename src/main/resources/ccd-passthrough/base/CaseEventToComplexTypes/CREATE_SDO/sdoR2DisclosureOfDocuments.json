@@ -1,0 +1,43 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2DisclosureOfDocuments",
+  "ListElementCode" : "label",
+  "ID" : "SdoR2DisclosureOfDocuments",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2DisclosureOfDocuments",
+  "ListElementCode" : "standardDisclosureTxt",
+  "ID" : "SdoR2DisclosureOfDocuments",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2DisclosureOfDocuments",
+  "ListElementCode" : "standardDisclosureDate",
+  "ID" : "SdoR2DisclosureOfDocuments",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2DisclosureOfDocuments",
+  "ListElementCode" : "inspectionLabel",
+  "ID" : "SdoR2DisclosureOfDocuments",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2DisclosureOfDocuments",
+  "ListElementCode" : "inspectionTxt",
+  "ID" : "SdoR2DisclosureOfDocuments",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2DisclosureOfDocuments",
+  "ListElementCode" : "inspectionDate",
+  "ID" : "SdoR2DisclosureOfDocuments",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2DisclosureOfDocuments",
+  "ListElementCode" : "requestsWillBeCompiledLabel",
+  "ID" : "SdoR2DisclosureOfDocuments",
+  "FieldDisplayOrder" : 7
+} ]

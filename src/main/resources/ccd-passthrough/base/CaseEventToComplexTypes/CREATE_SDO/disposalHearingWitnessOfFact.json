@@ -1,0 +1,43 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingWitnessOfFact",
+  "ListElementCode" : "label",
+  "ID" : "DisposalHearingWitnessOfFact",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingWitnessOfFact",
+  "ListElementCode" : "input3",
+  "ID" : "DisposalHearingWitnessOfFact",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingWitnessOfFact",
+  "ListElementCode" : "date2",
+  "ID" : "DisposalHearingWitnessOfFact",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingWitnessOfFact",
+  "ListElementCode" : "input4",
+  "ID" : "DisposalHearingWitnessOfFact",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingWitnessOfFact",
+  "ListElementCode" : "input5",
+  "ID" : "DisposalHearingWitnessOfFact",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingWitnessOfFact",
+  "ListElementCode" : "date3",
+  "ID" : "DisposalHearingWitnessOfFact",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingWitnessOfFact",
+  "ListElementCode" : "input6",
+  "ID" : "DisposalHearingWitnessOfFact",
+  "FieldDisplayOrder" : 7
+} ]

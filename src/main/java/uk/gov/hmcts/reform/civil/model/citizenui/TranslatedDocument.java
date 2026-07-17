@@ -39,6 +39,8 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.WR
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.WRITTEN_REPRESENTATION_CONCURRENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.WRITTEN_REPRESENTATION_RESPONDENT_TRANSLATED;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.WRITTEN_REPRESENTATION_SEQUENTIAL;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
 
 @Data
 @NoArgsConstructor
@@ -46,7 +48,18 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.WR
 @Accessors(chain = true)
 public class TranslatedDocument {
 
+    @CCD(
+            label = "Document",
+            regex = ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png",
+            searchable = false
+    )
     private Document file;
+    @CCD(
+            label = "Document Type",
+            searchable = false,
+            typeOverride = FieldType.FixedList,
+            typeParameterOverride = "TranslatedDocumentType"
+    )
     private TranslatedDocumentType documentType;
 
     @JsonIgnore

@@ -1,0 +1,13 @@
+[ {
+  "CaseEventID" : "NO_REMISSION_HWF",
+  "CaseFieldID" : "hearingHwfDetails",
+  "ListElementCode" : "noRemissionDetails",
+  "ID" : "HelpWithFeesDetails",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "NO_REMISSION_HWF",
+  "CaseFieldID" : "hearingHwfDetails",
+  "ListElementCode" : "noRemissionDetailsSummary",
+  "ID" : "HelpWithFeesDetails",
+  "FieldDisplayOrder" : 1
+} ]

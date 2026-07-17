@@ -7,6 +7,8 @@ import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
 import jakarta.validation.constraints.Future;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
 
 @Data
 @NoArgsConstructor
@@ -14,8 +16,14 @@ import jakarta.validation.constraints.Future;
 @Accessors(chain = true)
 public class FastTrackNotes {
 
+    @CCD(label = " ", searchable = false, typeOverride = FieldType.TextArea)
     private String input;
+    @CCD(label = " ", searchable = false)
     @Future(message = "The date entered must be in the future")
     private LocalDate date;
 
+  // ==== ccd-definition-converter: synthesised definition-only fields (retrofit) ====
+  @CCD(label = "## Important", searchable = false, typeOverride = FieldType.Label)
+  private String label;
+  // ==== end synthesised definition-only fields ====
 }

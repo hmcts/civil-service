@@ -1,0 +1,5 @@
+[ {
+  "ID" : "SEND_DRO_ORDER_TO_LIP_DEFENDANT",
+  "CallBackURLAboutToSubmitEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+  "RetriesTimeoutURLAboutToSubmitEvent" : 0
+} ]

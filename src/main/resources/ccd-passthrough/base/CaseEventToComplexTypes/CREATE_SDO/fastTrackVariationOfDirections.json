@@ -1,0 +1,13 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackVariationOfDirections",
+  "ListElementCode" : "label",
+  "ID" : "FastTrackVariationOfDirections",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackVariationOfDirections",
+  "ListElementCode" : "text",
+  "ID" : "FastTrackVariationOfDirections",
+  "FieldDisplayOrder" : 2
+} ]

@@ -1,0 +1,107 @@
+[ {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "respondent2LitigationFriend",
+  "ListElementCode" : "firstName",
+  "ID" : "DefendantLitigationFriend",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "respondent2LitigationFriend",
+  "ListElementCode" : "lastName",
+  "ID" : "DefendantLitigationFriend",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "respondent2LitigationFriend",
+  "ListElementCode" : "emailAddress",
+  "ID" : "DefendantLitigationFriend",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "respondent2LitigationFriend",
+  "ListElementCode" : "phoneNumber",
+  "ID" : "DefendantLitigationFriend",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "respondent2LitigationFriend",
+  "ListElementCode" : "hasSameAddressAsLitigant",
+  "ID" : "Defendant2LitigationFriend",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "respondent2LitigationFriend",
+  "ListElementCode" : "primaryAddress",
+  "ID" : "Defendant2LitigationFriend",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "respondent2LitigationFriend",
+  "ListElementCode" : "primaryAddress.AddressLine1",
+  "ID" : "Defendant2LitigationFriend",
+  "FieldDisplayOrder" : 7
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "respondent2LitigationFriend",
+  "ListElementCode" : "primaryAddress.AddressLine2",
+  "ID" : "Defendant2LitigationFriend",
+  "FieldDisplayOrder" : 8
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "respondent2LitigationFriend",
+  "ListElementCode" : "primaryAddress.AddressLine3",
+  "ID" : "Defendant2LitigationFriend",
+  "FieldDisplayOrder" : 9
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "respondent2LitigationFriend",
+  "ListElementCode" : "primaryAddress.PostTown",
+  "ID" : "Defendant2LitigationFriend",
+  "FieldDisplayOrder" : 10
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "respondent2LitigationFriend",
+  "ListElementCode" : "primaryAddress.County",
+  "ID" : "Defendant2LitigationFriend",
+  "FieldDisplayOrder" : 11
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "respondent2LitigationFriend",
+  "ListElementCode" : "primaryAddress.Country",
+  "ID" : "Defendant2LitigationFriend",
+  "FieldDisplayOrder" : 12
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "respondent2LitigationFriend",
+  "ListElementCode" : "primaryAddress.PostCode",
+  "ID" : "Defendant2LitigationFriend",
+  "FieldDisplayOrder" : 13
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "respondent2LitigationFriend",
+  "ListElementCode" : "certificateOfSuitability",
+  "ID" : "LitigationFriend",
+  "FieldDisplayOrder" : 14,
+  "RetainHiddenValue" : "Y"
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "respondent2LitigationFriend",
+  "ListElementCode" : "flags",
+  "ID" : "LitigationFriend",
+  "FieldDisplayOrder" : 15,
+  "RetainHiddenValue" : "Y"
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "respondent2LitigationFriend",
+  "ListElementCode" : "flags.roleOnCase",
+  "ID" : "LitigationFriend",
+  "FieldDisplayOrder" : 16,
+  "RetainHiddenValue" : "Y"
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "respondent2LitigationFriend",
+  "ListElementCode" : "flags.partyName",
+  "ID" : "LitigationFriend",
+  "FieldDisplayOrder" : 17,
+  "RetainHiddenValue" : "Y"
+} ]

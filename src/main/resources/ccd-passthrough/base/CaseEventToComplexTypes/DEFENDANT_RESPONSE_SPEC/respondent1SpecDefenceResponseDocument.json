@@ -1,0 +1,8 @@
+[ {
+  "ID" : "ResponseDocument",
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1SpecDefenceResponseDocument",
+  "ListElementCode" : "file",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+} ]

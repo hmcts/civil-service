@@ -1,0 +1,37 @@
+[ {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialHearingTrialDJ",
+  "ListElementCode" : "input1",
+  "ID" : "TrialHearingTrialDJ",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialHearingTrialDJ",
+  "ListElementCode" : "date1",
+  "ID" : "TrialHearingTrialDJ",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialHearingTrialDJ",
+  "ListElementCode" : "date2",
+  "ID" : "TrialHearingTrialDJ",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialHearingTrialDJ",
+  "ListElementCode" : "input2",
+  "ID" : "TrialHearingTrialDJ",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialHearingTrialDJ",
+  "ListElementCode" : "input3",
+  "ID" : "TrialHearingTrialDJ",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "trialHearingTrialDJ",
+  "ListElementCode" : "type",
+  "ID" : "TrialHearingTrialDJ",
+  "FieldDisplayOrder" : 6
+} ]

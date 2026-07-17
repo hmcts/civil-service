@@ -1,0 +1,13 @@
+[ {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "disposalHearingAddNewDirectionsDJ",
+  "ListElementCode" : "directionComment",
+  "ID" : "DisposalHearingAddNewDirectionsDJ",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "disposalHearingAddNewDirectionsDJ",
+  "ListElementCode" : "directionComment",
+  "ID" : "DisposalHearingAddNewDirectionsDJ",
+  "FieldDisplayOrder" : 1
+} ]

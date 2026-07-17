@@ -1,0 +1,7 @@
+[ {
+  "CaseEventID" : "CREATE_CASE_FLAGS",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "flags",
+  "ID" : "Party",
+  "FieldDisplayOrder" : 1
+} ]

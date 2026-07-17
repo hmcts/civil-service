@@ -1,0 +1,13 @@
+[ {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicantSolicitor1CheckEmail",
+  "ListElementCode" : "email",
+  "ID" : "IdamEmail",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicantSolicitor1CheckEmail",
+  "ListElementCode" : "correct",
+  "ID" : "IdamEmail",
+  "FieldDisplayOrder" : 2
+} ]

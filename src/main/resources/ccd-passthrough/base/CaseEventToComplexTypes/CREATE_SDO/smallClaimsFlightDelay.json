@@ -1,0 +1,43 @@
+[ {
+  "ID" : "SmallClaimsFlightDelay",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsFlightDelay",
+  "ListElementCode" : "label",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SmallClaimsFlightDelay",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsFlightDelay",
+  "ListElementCode" : "smallClaimsNumberOfWitnessesToggle",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "SmallClaimsFlightDelay",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsFlightDelay",
+  "ListElementCode" : "relatedClaimsTitle",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SmallClaimsFlightDelay",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsFlightDelay",
+  "ListElementCode" : "relatedClaimsInput",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SmallClaimsFlightDelay",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsFlightDelay",
+  "ListElementCode" : "legalDocumentsTitle",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SmallClaimsFlightDelay",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsFlightDelay",
+  "ListElementCode" : "legalDocumentsInput",
+  "FieldDisplayOrder" : 6,
+  "DisplayContext" : "MANDATORY"
+} ]

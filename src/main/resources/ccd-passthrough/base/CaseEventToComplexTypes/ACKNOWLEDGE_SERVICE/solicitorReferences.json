@@ -1,0 +1,17 @@
+[ {
+  "ID" : "SolicitorReferences",
+  "CaseEventID" : "ACKNOWLEDGE_SERVICE",
+  "CaseFieldID" : "solicitorReferences",
+  "ListElementCode" : "applicantSolicitor1Reference",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "OPTIONAL",
+  "FieldShowCondition" : "respondentSolicitor1Reference = \"DO_NOT_SHOW_IN_UI\""
+}, {
+  "ID" : "SolicitorReferences",
+  "CaseEventID" : "ACKNOWLEDGE_SERVICE",
+  "CaseFieldID" : "solicitorReferences",
+  "ListElementCode" : "applicantSolicitor1Reference",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "OPTIONAL",
+  "FieldShowCondition" : "respondentSolicitor1Reference = \"DO_NOT_SHOW_IN_UI\""
+} ]

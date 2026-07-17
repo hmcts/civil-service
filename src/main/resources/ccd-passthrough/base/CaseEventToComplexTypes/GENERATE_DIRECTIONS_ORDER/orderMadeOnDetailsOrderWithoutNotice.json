@@ -1,0 +1,29 @@
+[ {
+  "ID" : "OrderMadeOnDetailsOrderWithoutNotice",
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "orderMadeOnDetailsOrderWithoutNotice",
+  "ListElementCode" : "withOutNoticeLabel",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "OrderMadeOnDetailsOrderWithoutNotice",
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "orderMadeOnDetailsOrderWithoutNotice",
+  "ListElementCode" : "withOutNoticeText",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "OrderMadeOnDetailsOrderWithoutNotice",
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "orderMadeOnDetailsOrderWithoutNotice",
+  "ListElementCode" : "withOutNoticeDateLabel",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "OrderMadeOnDetailsOrderWithoutNotice",
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "orderMadeOnDetailsOrderWithoutNotice",
+  "ListElementCode" : "withOutNoticeDate",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "MANDATORY"
+} ]

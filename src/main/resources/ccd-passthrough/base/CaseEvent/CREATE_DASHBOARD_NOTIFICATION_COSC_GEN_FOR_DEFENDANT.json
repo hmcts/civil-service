@@ -1,0 +1,5 @@
+[ {
+  "ID" : "CREATE_DASHBOARD_NOTIFICATION_COSC_GEN_FOR_DEFENDANT",
+  "CallBackURLAboutToSubmitEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+  "RetriesTimeoutURLAboutToSubmitEvent" : 0
+} ]

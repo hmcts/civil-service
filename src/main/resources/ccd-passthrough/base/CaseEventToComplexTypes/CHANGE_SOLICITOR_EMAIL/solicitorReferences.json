@@ -1,0 +1,9 @@
+[ {
+  "ID" : "ChangeSolicitorEmail",
+  "CaseEventID" : "CHANGE_SOLICITOR_EMAIL",
+  "CaseFieldID" : "solicitorReferences",
+  "ListElementCode" : "applicantSolicitor1Reference",
+  "EventElementLabel" : "Claimant's legal representative's reference",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "OPTIONAL"
+} ]

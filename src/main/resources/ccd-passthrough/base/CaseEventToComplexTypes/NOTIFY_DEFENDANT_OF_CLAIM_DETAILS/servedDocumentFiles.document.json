@@ -1,0 +1,8 @@
+[ {
+  "ID" : "Upload",
+  "CaseEventID" : "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+  "CaseFieldID" : "servedDocumentFiles.document",
+  "ListElementCode" : "other",
+  "FieldDisplayOrder" : 7,
+  "DisplayContext" : "OPTIONAL"
+} ]

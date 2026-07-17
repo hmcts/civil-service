@@ -1,0 +1,25 @@
+[ {
+  "CaseEventID" : "SEND_AND_REPLY",
+  "CaseFieldID" : "sendMessageMetadata",
+  "ListElementCode" : "recipientRoleType",
+  "ID" : "SendMessageMetadata",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "SEND_AND_REPLY",
+  "CaseFieldID" : "sendMessageMetadata",
+  "ListElementCode" : "isUrgent",
+  "ID" : "SendMessageMetadata",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "SEND_AND_REPLY",
+  "CaseFieldID" : "sendMessageMetadata",
+  "ListElementCode" : "subjectType",
+  "ID" : "SendMessageMetadata",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "SEND_AND_REPLY",
+  "CaseFieldID" : "sendMessageMetadata",
+  "ListElementCode" : "subject",
+  "ID" : "SendMessageMetadata",
+  "FieldDisplayOrder" : 4
+} ]

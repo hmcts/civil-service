@@ -1,0 +1,13 @@
+[ {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "uiStatementOfTruth",
+  "ListElementCode" : "name",
+  "ID" : "StatementOfTruth",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "uiStatementOfTruth",
+  "ListElementCode" : "role",
+  "ID" : "StatementOfTruth",
+  "FieldDisplayOrder" : 2
+} ]

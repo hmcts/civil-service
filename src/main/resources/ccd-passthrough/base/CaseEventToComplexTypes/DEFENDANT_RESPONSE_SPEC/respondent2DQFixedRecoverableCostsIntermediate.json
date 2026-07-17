@@ -1,0 +1,37 @@
+[ {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent2DQFixedRecoverableCostsIntermediate",
+  "ListElementCode" : "isSubjectToFixedRecoverableCostRegime",
+  "ID" : "FixedRecoverableCostsIntermediate",
+  "ElementLabel" : " ",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent2DQFixedRecoverableCostsIntermediate",
+  "ListElementCode" : "complexityBandingAgreed",
+  "ID" : "FixedRecoverableCostsIntermediate",
+  "ElementLabel" : " ",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent2DQFixedRecoverableCostsIntermediate",
+  "ListElementCode" : "band",
+  "ID" : "FixedRecoverableCostsIntermediate",
+  "ElementLabel" : " ",
+  "FieldTypeParameter" : "ComplexityBandIntermediate",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent2DQFixedRecoverableCostsIntermediate",
+  "ListElementCode" : "reasons",
+  "ID" : "FixedRecoverableCostsIntermediate",
+  "ElementLabel" : " ",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent2DQFixedRecoverableCostsIntermediate",
+  "ListElementCode" : "frcSupportingDocument",
+  "ID" : "FixedRecoverableCostsIntermediate",
+  "ElementLabel" : " ",
+  "FieldDisplayOrder" : 6
+} ]

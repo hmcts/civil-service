@@ -1,0 +1,31 @@
+[ {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent2DQHearingSmallClaim",
+  "ListElementCode" : "unavailableDatesRequired",
+  "ID" : "Hearing",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent2DQHearingSmallClaim",
+  "ListElementCode" : "smallClaimUnavailableDate.unavailableDateType",
+  "ID" : "Hearing",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent2DQHearingSmallClaim",
+  "ListElementCode" : "smallClaimUnavailableDate.date",
+  "ID" : "Hearing",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent2DQHearingSmallClaim",
+  "ListElementCode" : "smallClaimUnavailableDate.fromDate",
+  "ID" : "Hearing",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent2DQHearingSmallClaim",
+  "ListElementCode" : "smallClaimUnavailableDate.toDate",
+  "ID" : "Hearing",
+  "FieldDisplayOrder" : 6
+} ]

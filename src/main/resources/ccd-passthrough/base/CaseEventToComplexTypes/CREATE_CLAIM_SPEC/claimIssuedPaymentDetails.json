@@ -1,0 +1,7 @@
+[ {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "claimIssuedPaymentDetails",
+  "ListElementCode" : "customerReference",
+  "ID" : "PaymentReference",
+  "FieldDisplayOrder" : 1
+} ]

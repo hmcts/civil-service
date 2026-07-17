@@ -1,0 +1,68 @@
+[ {
+  "CaseEventID" : "DEFAULT_JUDGEMENT",
+  "CaseFieldID" : "hearingSupportRequirementsDJ",
+  "ListElementCode" : "hearingType",
+  "ID" : "HearingSupportRequirementsFieldDJ",
+  "ElementLabel" : "Choose your preferred type of hearing"
+}, {
+  "CaseEventID" : "DEFAULT_JUDGEMENT",
+  "CaseFieldID" : "hearingSupportRequirementsDJ",
+  "ListElementCode" : "hearingTypeTelephoneHearing",
+  "ID" : "HearingSupportRequirementsFieldDJ",
+  "ElementLabel" : "Who will set up the telephone meeting?",
+  "FieldType" : "Text"
+}, {
+  "CaseEventID" : "DEFAULT_JUDGEMENT",
+  "CaseFieldID" : "hearingSupportRequirementsDJ",
+  "ListElementCode" : "hearingTemporaryLocation",
+  "ID" : "HearingSupportRequirementsFieldDJ"
+}, {
+  "CaseEventID" : "DEFAULT_JUDGEMENT",
+  "CaseFieldID" : "hearingSupportRequirementsDJ",
+  "ListElementCode" : "hearingPreferredTelephoneNumber1",
+  "ID" : "HearingSupportRequirementsFieldDJ",
+  "ElementLabel" : "Preferred telephone number",
+  "FieldType" : "PhoneUK",
+  "SecurityClassification" : "Public"
+}, {
+  "CaseEventID" : "DEFAULT_JUDGEMENT",
+  "CaseFieldID" : "hearingSupportRequirementsDJ",
+  "ListElementCode" : "hearingPreferredEmail",
+  "ID" : "HearingSupportRequirementsFieldDJ",
+  "ElementLabel" : "Preferred email",
+  "FieldType" : "Email",
+  "SecurityClassification" : "Public"
+}, {
+  "CaseEventID" : "DEFAULT_JUDGEMENT",
+  "CaseFieldID" : "hearingSupportRequirementsDJ",
+  "ListElementCode" : "hearingUnavailableDates",
+  "ID" : "HearingSupportRequirementsFieldDJ",
+  "ElementLabel" : "Are there any dates when you cannot attend a hearing within the next 3 months?"
+}, {
+  "CaseEventID" : "DEFAULT_JUDGEMENT",
+  "CaseFieldID" : "hearingSupportRequirementsDJ",
+  "ListElementCode" : "hearingDates",
+  "ID" : "HearingSupportRequirementsFieldDJ",
+  "ElementLabel" : " "
+}, {
+  "CaseEventID" : "DEFAULT_JUDGEMENT",
+  "CaseFieldID" : "hearingSupportRequirementsDJ",
+  "ListElementCode" : "hearingDates.hearingUnavailableFrom",
+  "ID" : "HearingSupportRequirementsFieldDJ"
+}, {
+  "CaseEventID" : "DEFAULT_JUDGEMENT",
+  "CaseFieldID" : "hearingSupportRequirementsDJ",
+  "ListElementCode" : "hearingDates.hearingUnavailableUntil",
+  "ID" : "HearingSupportRequirementsFieldDJ"
+}, {
+  "CaseEventID" : "DEFAULT_JUDGEMENT",
+  "CaseFieldID" : "hearingSupportRequirementsDJ",
+  "ListElementCode" : "hearingSupportQuestion",
+  "ID" : "HearingSupportRequirementsFieldDJ",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "DEFAULT_JUDGEMENT",
+  "CaseFieldID" : "hearingSupportRequirementsDJ",
+  "ListElementCode" : "hearingSupportAdditional",
+  "ID" : "HearingSupportRequirementsFieldDJ"
+} ]

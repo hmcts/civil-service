@@ -1,0 +1,7 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsNotes",
+  "ListElementCode" : "input",
+  "ID" : "SmallClaimsNotes",
+  "FieldDisplayOrder" : 1
+} ]

@@ -1,0 +1,7 @@
+[ {
+  "CaseFieldID" : "helpWithFeesMoreInformationHearing",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/more-information-hwf"
+}, {
+  "CaseFieldID" : "helpWithFeesMoreInformationClaimIssue",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/more-information-hwf"
+} ]

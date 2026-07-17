@@ -1,0 +1,22 @@
+[ {
+  "ID" : "RespondToClaim",
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent2DQFurtherInformation",
+  "ListElementCode" : "futureApplications",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "RespondToClaim",
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent2DQFurtherInformation",
+  "ListElementCode" : "reasonForFutureApplications",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "RespondToClaim",
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent2DQFurtherInformation",
+  "ListElementCode" : "otherInformationForJudge",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "OPTIONAL"
+} ]

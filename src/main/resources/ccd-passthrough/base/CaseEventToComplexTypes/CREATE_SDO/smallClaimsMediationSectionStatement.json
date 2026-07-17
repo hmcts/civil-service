@@ -1,0 +1,7 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsMediationSectionStatement",
+  "ListElementCode" : "input",
+  "ID" : "SmallClaimsMediation",
+  "FieldDisplayOrder" : 1
+} ]

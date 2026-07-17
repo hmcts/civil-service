@@ -1,0 +1,10 @@
+[ {
+  "CaseFieldID" : "caseManagementOrder",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/trial-disposal-screen"
+}, {
+  "CaseFieldID" : "caseManagementOrderDisposal",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/create-order"
+}, {
+  "CaseFieldID" : "caseManagementOrderTrial",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/create-order"
+} ]

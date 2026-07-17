@@ -1,0 +1,81 @@
+[ {
+  "ID" : "FastTrackWitnessOfFact",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackWitnessOfFact",
+  "ListElementCode" : "label",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "FastTrackWitnessOfFact",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackWitnessOfFact",
+  "ListElementCode" : "input1",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "FastTrackWitnessOfFact",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackWitnessOfFact",
+  "ListElementCode" : "input2",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY",
+  "EventHintText" : "Number of witnesses (claimant), e.g. 4"
+}, {
+  "ID" : "FastTrackWitnessOfFact",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackWitnessOfFact",
+  "ListElementCode" : "input3",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "MANDATORY",
+  "EventHintText" : "Number of witnesses (defendant), e.g. 4"
+}, {
+  "ID" : "FastTrackWitnessOfFact",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackWitnessOfFact",
+  "ListElementCode" : "input4",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "FastTrackWitnessOfFact",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackWitnessOfFact",
+  "ListElementCode" : "input5",
+  "FieldDisplayOrder" : 6,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "FastTrackWitnessOfFact",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackWitnessOfFact",
+  "ListElementCode" : "input6",
+  "FieldDisplayOrder" : 7,
+  "DisplayContext" : "MANDATORY",
+  "EventHintText" : "Number of pages, e.g. 4"
+}, {
+  "ID" : "FastTrackWitnessOfFact",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackWitnessOfFact",
+  "ListElementCode" : "input7",
+  "FieldDisplayOrder" : 8,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "FastTrackWitnessOfFact",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackWitnessOfFact",
+  "ListElementCode" : "input8",
+  "FieldDisplayOrder" : 9,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "FastTrackWitnessOfFact",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackWitnessOfFact",
+  "ListElementCode" : "date",
+  "FieldDisplayOrder" : 10,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "FastTrackWitnessOfFact",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackWitnessOfFact",
+  "ListElementCode" : "input9",
+  "FieldDisplayOrder" : 11,
+  "DisplayContext" : "MANDATORY"
+} ]

@@ -1,0 +1,5 @@
+[ {
+  "ID" : "REQUEST_FOR_RECONSIDERATION_DEADLINE_CHECK",
+  "CallBackURLAboutToSubmitEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+  "RetriesTimeoutURLAboutToSubmitEvent" : 0
+} ]

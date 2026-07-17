@@ -1,0 +1,25 @@
+[ {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "updateWitnessesDetailsForm",
+  "ListElementCode" : "firstName",
+  "ID" : "Witnesses",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "updateWitnessesDetailsForm",
+  "ListElementCode" : "lastName",
+  "ID" : "Witnesses",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "updateWitnessesDetailsForm",
+  "ListElementCode" : "emailAddress",
+  "ID" : "Witnesses",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "updateWitnessesDetailsForm",
+  "ListElementCode" : "phoneNumber",
+  "ID" : "Witnesses",
+  "FieldDisplayOrder" : 4
+} ]

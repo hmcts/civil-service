@@ -1,0 +1,61 @@
+[ {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQExperts",
+  "ListElementCode" : "expertRequired",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQExperts",
+  "ListElementCode" : "expertReportsSent",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQExperts",
+  "ListElementCode" : "jointExpertSuitable",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQExperts",
+  "ListElementCode" : "details.firstName",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQExperts",
+  "ListElementCode" : "details.lastName",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQExperts",
+  "ListElementCode" : "details.phoneNumber",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQExperts",
+  "ListElementCode" : "details.emailAddress",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 7
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQExperts",
+  "ListElementCode" : "details.fieldOfExpertise",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 8
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQExperts",
+  "ListElementCode" : "details.whyRequired",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 9
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQExperts",
+  "ListElementCode" : "details.estimatedCost",
+  "ID" : "Experts",
+  "FieldDisplayOrder" : 10
+} ]

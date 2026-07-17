@@ -1,0 +1,37 @@
+[ {
+  "CaseEventID" : "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+  "CaseFieldID" : "servedDocumentFiles",
+  "ListElementCode" : "documentsLabel",
+  "ID" : "Upload",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+  "CaseFieldID" : "servedDocumentFiles",
+  "ListElementCode" : "particularsOfClaimDocument",
+  "ID" : "Upload",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+  "CaseFieldID" : "servedDocumentFiles",
+  "ListElementCode" : "particularsOfClaimText",
+  "ID" : "Upload",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+  "CaseFieldID" : "servedDocumentFiles",
+  "ListElementCode" : "medicalReport.document",
+  "ID" : "Upload",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+  "CaseFieldID" : "servedDocumentFiles",
+  "ListElementCode" : "scheduleOfLoss.document",
+  "ID" : "Upload",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+  "CaseFieldID" : "servedDocumentFiles",
+  "ListElementCode" : "certificateOfSuitability.document",
+  "ID" : "Upload",
+  "FieldDisplayOrder" : 6
+} ]

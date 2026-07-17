@@ -1,0 +1,55 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackHousingDisrepair",
+  "ListElementCode" : "introLine",
+  "ID" : "HousingDisrepair",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackHousingDisrepair",
+  "ListElementCode" : "clauseA",
+  "ID" : "HousingDisrepair",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackHousingDisrepair",
+  "ListElementCode" : "clauseB",
+  "ID" : "HousingDisrepair",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackHousingDisrepair",
+  "ListElementCode" : "firstReportDateBy",
+  "ID" : "HousingDisrepair",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackHousingDisrepair",
+  "ListElementCode" : "clauseCBeforeDate",
+  "ID" : "HousingDisrepair",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackHousingDisrepair",
+  "ListElementCode" : "jointStatementDateBy",
+  "ID" : "HousingDisrepair",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackHousingDisrepair",
+  "ListElementCode" : "clauseCAfterDate",
+  "ID" : "HousingDisrepair",
+  "FieldDisplayOrder" : 7
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackHousingDisrepair",
+  "ListElementCode" : "clauseD",
+  "ID" : "HousingDisrepair",
+  "FieldDisplayOrder" : 8
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackHousingDisrepair",
+  "ListElementCode" : "clauseE",
+  "ID" : "HousingDisrepair",
+  "FieldDisplayOrder" : 9
+} ]

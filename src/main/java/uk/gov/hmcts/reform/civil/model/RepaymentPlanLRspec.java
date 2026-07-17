@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
 
 @Slf4j
 @Accessors(chain = true)
@@ -21,9 +23,17 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class RepaymentPlanLRspec {
 
+    @CCD(
+            label = "Regular payments of\n",
+            hint = "For example, £50",
+            searchable = false,
+            typeOverride = FieldType.MoneyGBP
+    )
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal paymentAmount;
+    @CCD(label = "How often will your client make payments?", searchable = false)
     private PaymentFrequencyLRspec repaymentFrequency;
+    @CCD(label = "When will your client make the first payment?", hint = "For example, 12 11 2007 ", searchable = false)
     private LocalDate firstRepaymentDate;
 
     @JsonIgnore

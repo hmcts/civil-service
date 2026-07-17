@@ -9,6 +9,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.util.Optional;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
 
 @Setter
 @Data
@@ -16,10 +18,15 @@ import java.util.Optional;
 @Accessors(chain = true)
 public class GASolicitorDetailsGAspec {
 
+    @CCD(label = "Email ID", searchable = false, typeOverride = FieldType.Email)
     private String email;
+    @CCD(label = "User ID", searchable = false)
     private String id;
+    @CCD(label = "forename", searchable = false)
     private String forename;
+    @CCD(label = "surname", searchable = false, typeOverride = FieldType.Text)
     private Optional<String> surname;
+    @CCD(label = "organisationIdentifier", searchable = false)
     private String organisationIdentifier;
 
     @JsonCreator

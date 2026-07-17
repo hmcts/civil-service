@@ -1,0 +1,7 @@
+[ {
+  "CaseEventID" : "CHANGE_SOLICITOR_EMAIL",
+  "CaseFieldID" : "respondent1OrganisationPolicy",
+  "ListElementCode" : "OrgPolicyReference",
+  "ID" : "ChangeSolicitorEmail",
+  "FieldDisplayOrder" : 10
+} ]

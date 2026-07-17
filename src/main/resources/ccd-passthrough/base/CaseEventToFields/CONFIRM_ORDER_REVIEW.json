@@ -1,0 +1,7 @@
+[ {
+  "CaseFieldID" : "obligationData",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-obligation-date"
+}, {
+  "CaseFieldID" : "courtStaffNextSteps",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-tasks-left"
+} ]

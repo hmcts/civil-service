@@ -1,0 +1,13 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackHearingNotes",
+  "ListElementCode" : "input",
+  "ID" : "FastTrackNotes",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackHearingNotes",
+  "ListElementCode" : "line",
+  "ID" : "FastTrackNotes",
+  "FieldDisplayOrder" : 2
+} ]

@@ -15,6 +15,12 @@ plugins {
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.5"
+  id 'hmcts.ccd.sdk' version 'json-definition-converter-95.1-52d004c0'
+}
+
+ccd {
+  configDir = file('build/definitions')
+  rootPackage = 'uk.gov.hmcts.reform.civil'
 }
 
 group = 'uk.gov.hmcts.reform'

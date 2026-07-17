@@ -8,16 +8,21 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
 
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
 public class DefendantPinToPostLRspec {
 
+    @CCD(label = "Access Code", searchable = false)
     private String accessCode;
+    @CCD(label = "Case Role", searchable = false)
     private String respondentCaseRole;
+    @CCD(label = "Expiry Date", searchable = false)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate expiryDate;
+    @CCD(label = "Citizen Case Role", searchable = false)
     private String citizenCaseRole;
 
     @JsonCreator

@@ -1,0 +1,211 @@
+[ {
+  "CaseFieldID" : "respondToAdmittedClaim",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specHandleAdmitPartClaim"
+}, {
+  "CaseFieldID" : "respondToAdmittedClaim2",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specHandleAdmitPartClaim"
+}, {
+  "CaseFieldID" : "respondToAdmittedClaimOwingAmount",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specHandleAdmitPartClaim"
+}, {
+  "CaseFieldID" : "respondToAdmittedClaimOwingAmount2",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specHandleAdmitPartClaim"
+}, {
+  "CaseFieldID" : "respondToAdmittedClaimOwingAmountPounds",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specHandleAdmitPartClaim"
+}, {
+  "CaseFieldID" : "respondToAdmittedClaimOwingAmountPounds2",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specHandleAdmitPartClaim"
+}, {
+  "CaseFieldID" : "defenceAdmitPartPaymentTimeRouteRequired",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specHandleAdmitPartClaim"
+}, {
+  "CaseFieldID" : "defenceAdmitPartPaymentTimeRouteRequired2",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specHandleAdmitPartClaim"
+}, {
+  "CaseFieldID" : "respondToClaimAdmitPartLRspec",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-payment-date"
+}, {
+  "CaseFieldID" : "respondToClaimAdmitPartLRspec2",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-payment-date"
+}, {
+  "CaseFieldID" : "respondent1RepaymentPlan",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-repayment-plan"
+}, {
+  "CaseFieldID" : "respondent2RepaymentPlan",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-repayment-plan-2"
+}, {
+  "CaseFieldID" : "specDefenceRouteAdmittedAmountClaimedLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specHandleAdmitPartClaim"
+}, {
+  "CaseFieldID" : "specDefenceRouteAdmittedAmountClaimed2Label",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specHandleAdmitPartClaim"
+}, {
+  "CaseFieldID" : "specDefenceRouteAdmittedAmountClaimedLabel2V1",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specHandleAdmitPartClaim"
+}, {
+  "CaseFieldID" : "specDefenceRouteAdmittedAmountClaimedMPLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specHandleAdmitPartClaim"
+}, {
+  "CaseFieldID" : "specDefenceAdmittedRequired",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specHandleAdmitPartClaim"
+}, {
+  "CaseFieldID" : "specDefenceAdmitted2Required",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specHandleAdmitPartClaim"
+}, {
+  "CaseFieldID" : "specDefenceFullAdmittedRequired",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specHandleAdmitPartClaim"
+}, {
+  "CaseFieldID" : "specDefenceFullAdmitted2Required",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specHandleAdmitPartClaim"
+}, {
+  "CaseFieldID" : "respondToClaimAdmitPartEmploymentTypeLRspec",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specHandleAdmitPartClaim"
+}, {
+  "CaseFieldID" : "respondToClaimAdmitPartUnemployedLRspec",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-length-of-unemployment"
+}, {
+  "CaseFieldID" : "respondToClaimAdmitPartUnemployedLRspecRespondent2",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-length-of-unemployment"
+}, {
+  "CaseFieldID" : "specResponseCheckList",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/determineLoggedInSolicitor"
+}, {
+  "CaseFieldID" : "specAoSApplicantCorrespondenceAddressdetails",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specCorrespondenceAddress",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "specAoSRespondent2HomeAddressDetails",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specCorrespondenceAddress",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "solicitorReferences",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/confirm-details",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "respondentResponseIsSame",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/confirm-details"
+}, {
+  "CaseFieldID" : "claimant2ClaimResponseTypeForSpec",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/set-generic-response-type-flag"
+}, {
+  "CaseFieldID" : "respondent2ClaimResponseTypeForSpec",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/set-generic-response-type-flag"
+}, {
+  "CaseFieldID" : "respondent1ClaimResponseTypeForSpecLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/specHandleResponseType"
+}, {
+  "CaseFieldID" : "specDefenceRouteAmountClaimedLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/track"
+}, {
+  "CaseFieldID" : "specDefenceRouteAmountClaimedRespondent2Label",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/track"
+}, {
+  "CaseFieldID" : "specDefenceRouteAmountClaimedLabel2v1",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/track"
+}, {
+  "CaseFieldID" : "specMPDefenceRouteAmountClaimedLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/track"
+}, {
+  "CaseFieldID" : "defenceRouteRequired",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/track"
+}, {
+  "CaseFieldID" : "defenceRouteRequired2",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/track"
+}, {
+  "CaseFieldID" : "respondent1ClaimResponsePaymentAdmissionForSpec",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/set-generic-response-type-flag"
+}, {
+  "CaseFieldID" : "respondent1SpecDefenceResponseDocument",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "respondent2SpecDefenceResponseDocument",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "specClaimResponseTimelineLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/set-upload-timeline-type-flag"
+}, {
+  "CaseFieldID" : "resp1MediationContactInfo",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "resp2MediationContactInfo",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "resp1MediationAvailability",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-mediation-unavailable-dates",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "resp2MediationAvailability",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/validate-mediation-unavailable-dates",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "responseClaimMediationSpecLabelRes2",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "responseClaimMediationSpecLabel",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "responseMPClaimMediationSpecLabel",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "responseClaimMediationSpecLabel2",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "respondent1DQExperts",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/experts"
+}, {
+  "CaseFieldID" : "respondent2DQExperts",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/experts"
+}, {
+  "CaseFieldID" : "responseClaimExpertSpecLabel",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "respondent1DQWitnessesDetailsSpec",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/witnesses"
+}, {
+  "CaseFieldID" : "respondent2DQWitnesses",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/witnesses"
+}, {
+  "CaseFieldID" : "respondent1DQWitnessesSmallClaim",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/witnesses"
+}, {
+  "CaseFieldID" : "respondent2DQWitnessesSmallClaim",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/witnesses"
+}, {
+  "CaseFieldID" : "SmallClaimHearingInterpreterRequired",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "SmallClaimHearingInterpreter2Required",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "respondent1DQHearingFastClaim",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "respondent2DQHearingFastClaim",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "respondent1DQHearingSmallClaim",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "respondent2DQHearingSmallClaim",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "uiStatementOfTruth",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/statement-of-truth"
+}, {
+  "CaseFieldID" : "respondToClaim",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/track"
+}, {
+  "CaseFieldID" : "respondToClaim2",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/track"
+}, {
+  "CaseFieldID" : "respondent1DQHearingFastClaimLabel",
+  "CallBackURLMidEvent" : "",
+  "RetriesTimeoutURLMidEvent" : 0
+} ]

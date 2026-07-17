@@ -1,0 +1,15 @@
+[ {
+  "ID" : "SdoR2UploadOfDocuments",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2UploadOfDocuments",
+  "ListElementCode" : "sdoUploadOfDocumentsLbl",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2UploadOfDocuments",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2UploadOfDocuments",
+  "ListElementCode" : "sdoUploadOfDocumentsTxt",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+} ]

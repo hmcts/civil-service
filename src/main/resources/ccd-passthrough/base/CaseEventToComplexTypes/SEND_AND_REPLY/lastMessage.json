@@ -1,0 +1,15 @@
+[ {
+  "ID" : "SendMessageMetadata",
+  "CaseEventID" : "SEND_AND_REPLY",
+  "CaseFieldID" : "lastMessage",
+  "ListElementCode" : "recipientRoleType",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SendMessageMetadata",
+  "CaseEventID" : "SEND_AND_REPLY",
+  "CaseFieldID" : "lastMessage",
+  "ListElementCode" : "isUrgent",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+} ]

@@ -1,0 +1,15 @@
+[ {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "soleTraderDateOfBirth",
+  "FieldDisplayOrder" : 12,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "individualDateOfBirth",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "MANDATORY"
+} ]

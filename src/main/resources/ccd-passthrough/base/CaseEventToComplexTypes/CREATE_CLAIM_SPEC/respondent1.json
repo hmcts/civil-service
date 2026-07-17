@@ -1,0 +1,115 @@
+[ {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "type",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "individualTitle",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "individualFirstName",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "individualLastName",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "companyName",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "organisationName",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "soleTraderTitle",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 7
+}, {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "soleTraderFirstName",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 8
+}, {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "soleTraderLastName",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 9
+}, {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "soleTraderTradingAs",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 10
+}, {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "primaryAddress.AddressLine1",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 12
+}, {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "primaryAddress.AddressLine2",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 13
+}, {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "primaryAddress.AddressLine3",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 14
+}, {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "primaryAddress.PostTown",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 15
+}, {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "primaryAddress.County",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 16
+}, {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "primaryAddress.Country",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 17
+}, {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "primaryAddress.PostCode",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 18
+}, {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "partyEmail",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 12
+}, {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "respondent1",
+  "ListElementCode" : "partyPhone",
+  "ID" : "Defendant",
+  "FieldDisplayOrder" : 13
+} ]

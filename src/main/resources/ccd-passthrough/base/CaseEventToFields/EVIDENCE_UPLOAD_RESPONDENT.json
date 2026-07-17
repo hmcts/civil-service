@@ -1,0 +1,13 @@
+[ {
+  "CaseFieldID" : "disclosureLabelRes",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/createShowCondition"
+}, {
+  "CaseFieldID" : "witnessLabelSmallClaimRes",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/createShowCondition"
+}, {
+  "CaseFieldID" : "documentEvidenceForTrialRes",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validateValuesRespondent"
+}, {
+  "CaseFieldID" : "documentEvidenceForTrialRes2",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validateValuesRespondent"
+} ]

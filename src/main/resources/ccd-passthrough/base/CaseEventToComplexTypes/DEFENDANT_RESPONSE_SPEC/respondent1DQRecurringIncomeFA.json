@@ -1,0 +1,25 @@
+[ {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQRecurringIncomeFA",
+  "ListElementCode" : "type",
+  "ID" : "RecurringExpense",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQRecurringIncomeFA",
+  "ListElementCode" : "typeOtherDetails",
+  "ID" : "RecurringExpense",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQRecurringIncomeFA",
+  "ListElementCode" : "amount",
+  "ID" : "RecurringExpense",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQRecurringIncomeFA",
+  "ListElementCode" : "frequency",
+  "ID" : "RecurringExpense",
+  "FieldDisplayOrder" : 4
+} ]

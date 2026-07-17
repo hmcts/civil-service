@@ -1,0 +1,4 @@
+[ {
+  "ID" : "UPDATE_CASE_DETAILS_AFTER_NOC",
+  "CallBackURLAboutToSubmitEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit"
+} ]

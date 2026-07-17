@@ -1,0 +1,19 @@
+[ {
+  "CaseEventID" : "CLAIMANT_RESPONSE",
+  "CaseFieldID" : "applicant2DQFurtherInformation",
+  "ListElementCode" : "futureApplications",
+  "ID" : "RespondToClaim",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CLAIMANT_RESPONSE",
+  "CaseFieldID" : "applicant2DQFurtherInformation",
+  "ListElementCode" : "reasonForFutureApplications",
+  "ID" : "RespondToClaim",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "CLAIMANT_RESPONSE",
+  "CaseFieldID" : "applicant2DQFurtherInformation",
+  "ListElementCode" : "otherInformationForJudge",
+  "ID" : "RespondToClaim",
+  "FieldDisplayOrder" : 3
+} ]

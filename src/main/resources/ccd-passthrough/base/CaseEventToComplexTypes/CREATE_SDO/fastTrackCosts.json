@@ -1,0 +1,15 @@
+[ {
+  "ID" : "FastTrackCosts",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackCosts",
+  "ListElementCode" : "label",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "FastTrackCosts",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackCosts",
+  "ListElementCode" : "text",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+} ]

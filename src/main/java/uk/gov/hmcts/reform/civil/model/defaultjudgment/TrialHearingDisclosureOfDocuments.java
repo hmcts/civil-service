@@ -21,4 +21,8 @@ public class TrialHearingDisclosureOfDocuments {
     @Future(message = "The date entered must be in the future")
     private LocalDate date2;
     private String input3;
+    private String input4;
+    private String input5;
+    @Future(message = "The date entered must be in the future")
+    private LocalDate date3;
 }

@@ -22,6 +22,8 @@ import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
 
 @Data
 @Accessors(chain = true)
@@ -31,35 +33,62 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Party {
 
+    @CCD(label = " ", showCondition = "type = \"DO NOT SHOW\"", searchable = false, retainHiddenValue = true)
     private String partyID;
+    @CCD(label = "Party type", searchable = false, retainHiddenValue = true)
     private Type type;
+    @CCD(label = "Title", showCondition = "type = \"INDIVIDUAL\"", searchable = false, retainHiddenValue = true)
     private String individualTitle;
+    @CCD(label = "First name", showCondition = "type = \"INDIVIDUAL\"", searchable = false, retainHiddenValue = true)
     private String individualFirstName;
+    @CCD(label = "Last name", showCondition = "type = \"INDIVIDUAL\"", searchable = false, retainHiddenValue = true)
     private String individualLastName;
 
+    @CCD(label = "Date of birth", showCondition = "type = \"INDIVIDUAL\"", searchable = false, retainHiddenValue = true)
     @PastOrPresent(message = "The date entered cannot be in the future", groups = DateOfBirthGroup.class)
     private LocalDate individualDateOfBirth;
+    @CCD(label = "Name", showCondition = "type = \"COMPANY\"", searchable = false, retainHiddenValue = true)
     private String companyName;
+    @CCD(label = "Name", showCondition = "type = \"ORGANISATION\"", searchable = false, retainHiddenValue = true)
     private String organisationName;
+    @CCD(label = "Title", showCondition = "type = \"SOLE_TRADER\"", searchable = false, retainHiddenValue = true)
     private String soleTraderTitle;
+    @CCD(label = "First name", showCondition = "type = \"SOLE_TRADER\"", searchable = false, retainHiddenValue = true)
     private String soleTraderFirstName;
+    @CCD(label = "Last name", showCondition = "type = \"SOLE_TRADER\"", searchable = false, retainHiddenValue = true)
     private String soleTraderLastName;
+    @CCD(label = "Trading as", showCondition = "type = \"SOLE_TRADER\"", searchable = false, retainHiddenValue = true)
     private String soleTraderTradingAs;
 
+    @CCD(
+            label = "Date of birth",
+            showCondition = "type = \"SOLE_TRADER\"",
+            searchable = false,
+            retainHiddenValue = true
+    )
     @PastOrPresent(message = "The date entered cannot be in the future", groups = DateOfBirthGroup.class)
     private LocalDate soleTraderDateOfBirth;
+    @CCD(label = "Address", searchable = false, retainHiddenValue = true)
     private Address primaryAddress;
 
+    @CCD(label = "Party name", searchable = false, retainHiddenValue = true)
     private String partyName;
+    @CCD(label = "Party name", showCondition = "type = \"DO_NOT_SHOW\"", searchable = false, retainHiddenValue = true)
     private String bulkClaimPartyName;
+    @CCD(label = "Party type displayed value", searchable = false, retainHiddenValue = true)
     private String partyTypeDisplayValue;
 
+    @CCD(label = "Email", searchable = false, retainHiddenValue = true, max = 320, typeOverride = FieldType.Email)
     private String partyEmail;
+    @CCD(label = "Phone", searchable = false, retainHiddenValue = true, typeOverride = FieldType.PhoneUK)
     private String partyPhone;
+    @CCD(ignore = true)
     private String legalRepHeading;
 
+    @CCD(label = "Unavailable date", searchable = false, retainHiddenValue = true)
     private List<Element<UnavailableDate>> unavailableDates;
 
+    @CCD(label = " ", searchable = false, retainHiddenValue = true)
     private Flags flags;
 
     public enum Type {

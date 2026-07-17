@@ -1,0 +1,7 @@
+[ {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "solicitorReferences",
+  "ListElementCode" : "respondentSolicitor1Reference",
+  "ID" : "SolicitorReferences",
+  "FieldDisplayOrder" : 1
+} ]

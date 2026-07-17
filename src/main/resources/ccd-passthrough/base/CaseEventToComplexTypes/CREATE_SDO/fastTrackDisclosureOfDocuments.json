@@ -1,0 +1,49 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackDisclosureOfDocuments",
+  "ListElementCode" : "label",
+  "ID" : "FastTrackDisclosureOfDocuments",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackDisclosureOfDocuments",
+  "ListElementCode" : "input1",
+  "ID" : "FastTrackDisclosureOfDocuments",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackDisclosureOfDocuments",
+  "ListElementCode" : "date1",
+  "ID" : "FastTrackDisclosureOfDocuments",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackDisclosureOfDocuments",
+  "ListElementCode" : "input2",
+  "ID" : "FastTrackDisclosureOfDocuments",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackDisclosureOfDocuments",
+  "ListElementCode" : "date2",
+  "ID" : "FastTrackDisclosureOfDocuments",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackDisclosureOfDocuments",
+  "ListElementCode" : "input3",
+  "ID" : "FastTrackDisclosureOfDocuments",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackDisclosureOfDocuments",
+  "ListElementCode" : "input4",
+  "ID" : "FastTrackDisclosureOfDocuments",
+  "FieldDisplayOrder" : 7
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackDisclosureOfDocuments",
+  "ListElementCode" : "date3",
+  "ID" : "FastTrackDisclosureOfDocuments",
+  "FieldDisplayOrder" : 8
+} ]

@@ -1,0 +1,13 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingJudgementDeductionStatement",
+  "ListElementCode" : "line",
+  "ID" : "DisposalHearingJudgementDeductionStatement",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingJudgementDeductionStatement",
+  "ListElementCode" : "label",
+  "ID" : "DisposalHearingJudgementDeductionStatement",
+  "FieldDisplayOrder" : 2
+} ]

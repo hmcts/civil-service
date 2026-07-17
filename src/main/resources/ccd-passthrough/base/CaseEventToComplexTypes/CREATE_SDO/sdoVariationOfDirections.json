@@ -1,0 +1,13 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoVariationOfDirections",
+  "ListElementCode" : "includeInOrderToggle",
+  "ID" : "SdoR2VariationOfDirections",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoVariationOfDirections",
+  "ListElementCode" : "label",
+  "ID" : "SdoR2VariationOfDirections",
+  "FieldDisplayOrder" : 2
+} ]

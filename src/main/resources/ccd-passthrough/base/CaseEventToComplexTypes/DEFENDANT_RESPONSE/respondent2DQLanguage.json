@@ -1,0 +1,19 @@
+[ {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQLanguage",
+  "ListElementCode" : "helpText",
+  "ID" : "Languages",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQLanguage",
+  "ListElementCode" : "court",
+  "ID" : "GARespondentAgreementPage",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : "respondent2DQLanguage",
+  "ListElementCode" : "documents",
+  "ID" : "GAUrgencyRecordPage",
+  "FieldDisplayOrder" : 3
+} ]

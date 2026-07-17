@@ -1,0 +1,31 @@
+[ {
+  "CaseEventID" : "TRIAL_READINESS",
+  "CaseFieldID" : "respondent2RevisedHearingRequirements",
+  "ListElementCode" : "startLabel",
+  "ID" : "RevisedHearingRequirements",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "TRIAL_READINESS",
+  "CaseFieldID" : "respondent2RevisedHearingRequirements",
+  "ListElementCode" : "revisedHearingRequirements",
+  "ID" : "RevisedHearingRequirements",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "TRIAL_READINESS",
+  "CaseFieldID" : "respondent2RevisedHearingRequirements",
+  "ListElementCode" : "revisedHearingComments",
+  "ID" : "RevisedHearingRequirements",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "TRIAL_READINESS",
+  "CaseFieldID" : "respondent2RevisedHearingRequirements",
+  "ListElementCode" : "endLabel",
+  "ID" : "RevisedHearingRequirements",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "TRIAL_READINESS",
+  "CaseFieldID" : "respondent2RevisedHearingRequirements",
+  "ListElementCode" : "endLine",
+  "ID" : "RevisedHearingRequirements",
+  "FieldDisplayOrder" : 5
+} ]

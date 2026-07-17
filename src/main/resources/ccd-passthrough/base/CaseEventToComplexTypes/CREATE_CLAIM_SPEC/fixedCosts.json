@@ -1,0 +1,13 @@
+[ {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "fixedCosts",
+  "ListElementCode" : "claimFixedCosts",
+  "ID" : "FixedCosts",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "fixedCosts",
+  "ListElementCode" : "fixedCostAmount",
+  "ID" : "FixedCosts",
+  "FieldDisplayOrder" : 2
+} ]

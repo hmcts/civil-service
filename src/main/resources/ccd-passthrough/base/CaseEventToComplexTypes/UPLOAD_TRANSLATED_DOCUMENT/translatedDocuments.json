@@ -1,0 +1,13 @@
+[ {
+  "CaseEventID" : "UPLOAD_TRANSLATED_DOCUMENT",
+  "CaseFieldID" : "translatedDocuments",
+  "ListElementCode" : "documentType",
+  "ID" : "TranslatedDocument",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "UPLOAD_TRANSLATED_DOCUMENT",
+  "CaseFieldID" : "translatedDocuments",
+  "ListElementCode" : "file",
+  "ID" : "TranslatedDocument",
+  "FieldDisplayOrder" : 2
+} ]

@@ -1,0 +1,5 @@
+[ {
+  "ID" : "UPDATE_CLAIMANT_INTENTION_CLAIM_STATE",
+  "CallBackURLAboutToSubmitEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+  "RetriesTimeoutURLAboutToSubmitEvent" : 0
+} ]

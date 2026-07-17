@@ -1,0 +1,13 @@
+[ {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondToCourtLocation2",
+  "ListElementCode" : "responseCourtLocations",
+  "ID" : "CourtLocationSpec",
+  "PageFieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondToCourtLocation2",
+  "ListElementCode" : "reasonForHearingAtSpecificCourt",
+  "ID" : "CourtLocationSpec",
+  "PageFieldDisplayOrder" : 6
+} ]

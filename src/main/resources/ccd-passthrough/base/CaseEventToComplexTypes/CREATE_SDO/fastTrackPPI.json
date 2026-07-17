@@ -1,0 +1,19 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackPPI",
+  "ListElementCode" : "title",
+  "ID" : "PPI",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackPPI",
+  "ListElementCode" : "ppiDate",
+  "ID" : "PPI",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "fastTrackPPI",
+  "ListElementCode" : "text",
+  "ID" : "PPI",
+  "FieldDisplayOrder" : 3
+} ]

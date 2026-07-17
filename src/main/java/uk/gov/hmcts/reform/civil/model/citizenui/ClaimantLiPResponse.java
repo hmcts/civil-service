@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.civil.model.citizenui.dto.ClaimantResponseOnCourtDeci
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 
 import java.time.LocalDate;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
 
 @Data
 @NoArgsConstructor
@@ -17,14 +19,38 @@ import java.time.LocalDate;
 @Accessors(chain = true)
 public class ClaimantLiPResponse {
 
+    @CCD(label = " ", searchable = false)
     private DQExtraDetailsLip applicant1DQExtraDetails;
+    @CCD(label = " ", searchable = false)
     private HearingSupportLip applicant1DQHearingSupportLip;
+    @CCD(label = " ", searchable = false, typeOverride = FieldType.YesOrNo)
     private YesOrNo applicant1SignedSettlementAgreement;
+    @CCD(
+            label = " ",
+            searchable = false,
+            typeOverride = FieldType.FixedList,
+            typeParameterOverride = "ChooseHowToProceed"
+    )
     private ChooseHowToProceed applicant1ChoosesHowToProceed;
+    @CCD(
+            label = " ",
+            searchable = false,
+            typeOverride = FieldType.FixedList,
+            typeParameterOverride = "RepaymentDecisionType"
+    )
     private RepaymentDecisionType claimantCourtDecision;
+    @CCD(
+            label = " ",
+            searchable = false,
+            typeOverride = FieldType.FixedList,
+            typeParameterOverride = "ClaimantResponseOnCourtDecisionType"
+    )
     private ClaimantResponseOnCourtDecisionType claimantResponseOnCourtDecision;
+    @CCD(label = " ")
     private String applicant1RejectedRepaymentReason;
+    @CCD(label = " ", searchable = false)
     private LocalDate applicant1SuggestedImmediatePaymentDeadLine;
+    @CCD(label = " ", searchable = false)
     private EvidenceConfirmDetails applicant1DQEvidenceConfirmDetails;
 
     @JsonIgnore

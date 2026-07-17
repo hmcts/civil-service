@@ -1,0 +1,43 @@
+[ {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "respondentSolicitor2ServiceAddress",
+  "ListElementCode" : "AddressLine1",
+  "ID" : "Respondent2ServiceAddress",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "respondentSolicitor2ServiceAddress",
+  "ListElementCode" : "AddressLine2",
+  "ID" : "Respondent2ServiceAddress",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "respondentSolicitor2ServiceAddress",
+  "ListElementCode" : "AddressLine3",
+  "ID" : "Respondent2ServiceAddress",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "respondentSolicitor2ServiceAddress",
+  "ListElementCode" : "PostTown",
+  "ID" : "Respondent2ServiceAddress",
+  "FieldDisplayOrder" : 5
+}, {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "respondentSolicitor2ServiceAddress",
+  "ListElementCode" : "County",
+  "ID" : "Respondent2ServiceAddress",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "respondentSolicitor2ServiceAddress",
+  "ListElementCode" : "Country",
+  "ID" : "Respondent2ServiceAddress",
+  "FieldDisplayOrder" : 7
+}, {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "respondentSolicitor2ServiceAddress",
+  "ListElementCode" : "PostCode",
+  "ID" : "Respondent2ServiceAddress",
+  "FieldDisplayOrder" : 8
+} ]

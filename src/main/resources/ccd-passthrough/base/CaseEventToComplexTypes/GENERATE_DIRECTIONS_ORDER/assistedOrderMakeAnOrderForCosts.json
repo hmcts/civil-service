@@ -1,0 +1,133 @@
+[ {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "makeAnOrderForCostsLabel",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "makeAnOrderForCostsList",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "assistedOrderClaimantDefendantFirstDropdownLabelType1",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "assistedOrderClaimantDefendantFirstDropdownLabelType2",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "assistedOrderDefendantFirstDropdownLabelType1",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "assistedOrderDefendantFirstDropdownLabelType2",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "assistedOrderClaimantDefendantFirstDropdown",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 4
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "assistedOrderCostsFirstDropdownAmountLabel",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 6
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "assistedOrderCostsFirstDropdownAmount",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 7
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "assistedOrderCostsFirstDropdownDateLabel",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 8
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "assistedOrderCostsFirstDropdownDate",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 9
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "assistedOrderAssessmentSecondDropdownList1",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 10
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "assistedOrderAssessmentSecondDropdownListLabel",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 11
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "assistedOrderAssessmentSecondDropdownList2",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 12
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "assistedOrderClaimantThirdDropdownLabel",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 13
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "assistedOrderDefendantThirdDropdownLabel",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 13
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "assistedOrderAssessmentThirdDropdownAmount",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 14
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "assistedOrderAssessmentThirdDropdownDateLabel",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 15
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "assistedOrderAssessmentThirdDropdownDate",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 16
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "makeAnOrderForCostsQOCSLabel",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 17
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "makeAnOrderForCostsQOCSYesOrNo",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 18
+}, {
+  "CaseEventID" : "GENERATE_DIRECTIONS_ORDER",
+  "CaseFieldID" : "assistedOrderMakeAnOrderForCosts",
+  "ListElementCode" : "makeAnOrderForCostsQOCSText",
+  "ID" : "AssistedOrderCostDetails",
+  "FieldDisplayOrder" : 19
+} ]

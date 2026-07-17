@@ -1,0 +1,66 @@
+[ {
+  "ID" : "DisposalHearingHearingTime",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingHearingTime",
+  "ListElementCode" : "label",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "DisposalHearingHearingTime",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingHearingTime",
+  "ListElementCode" : "input",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "DisposalHearingHearingTime",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingHearingTime",
+  "ListElementCode" : "dateFromLabel",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "DisposalHearingHearingTime",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingHearingTime",
+  "ListElementCode" : "dateFrom",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "DisposalHearingHearingTime",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingHearingTime",
+  "ListElementCode" : "dateToLabel",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "DisposalHearingHearingTime",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingHearingTime",
+  "ListElementCode" : "dateTo",
+  "FieldDisplayOrder" : 6,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "DisposalHearingHearingTime",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingHearingTime",
+  "ListElementCode" : "time",
+  "FieldDisplayOrder" : 7,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "DisposalHearingHearingTime",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingHearingTime",
+  "ListElementCode" : "otherHours",
+  "FieldDisplayOrder" : 8,
+  "DisplayContext" : "MANDATORY",
+  "FieldShowCondition" : "disposalHearingHearingTime.time = \"OTHER\""
+}, {
+  "ID" : "DisposalHearingHearingTime",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingHearingTime",
+  "ListElementCode" : "otherMinutes",
+  "FieldDisplayOrder" : 9,
+  "DisplayContext" : "MANDATORY",
+  "FieldShowCondition" : "disposalHearingHearingTime.time = \"OTHER\""
+} ]

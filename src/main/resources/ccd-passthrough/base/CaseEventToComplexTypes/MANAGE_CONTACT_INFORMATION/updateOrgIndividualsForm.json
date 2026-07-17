@@ -1,0 +1,25 @@
+[ {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "updateOrgIndividualsForm",
+  "ListElementCode" : "firstName",
+  "ID" : "OrgIndividuals",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "updateOrgIndividualsForm",
+  "ListElementCode" : "lastName",
+  "ID" : "OrgIndividuals",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "updateOrgIndividualsForm",
+  "ListElementCode" : "emailAddress",
+  "ID" : "OrgIndividuals",
+  "FieldDisplayOrder" : 3
+}, {
+  "CaseEventID" : "MANAGE_CONTACT_INFORMATION",
+  "CaseFieldID" : "updateOrgIndividualsForm",
+  "ListElementCode" : "phoneNumber",
+  "ID" : "OrgIndividuals",
+  "FieldDisplayOrder" : 4
+} ]

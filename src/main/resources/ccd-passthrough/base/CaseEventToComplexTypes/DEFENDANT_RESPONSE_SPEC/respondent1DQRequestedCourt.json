@@ -1,0 +1,22 @@
+[ {
+  "ID" : "RespondToClaim",
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQRequestedCourt",
+  "ListElementCode" : "requestHearingAtSpecificCourt",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "RespondToClaim",
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQRequestedCourt",
+  "ListElementCode" : "responseCourtLocations",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "RespondToClaim",
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQRequestedCourt",
+  "ListElementCode" : "reasonForHearingAtSpecificCourt",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+} ]

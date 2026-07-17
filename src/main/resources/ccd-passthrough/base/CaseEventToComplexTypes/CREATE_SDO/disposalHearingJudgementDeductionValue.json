@@ -1,0 +1,19 @@
+[ {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingJudgementDeductionValue",
+  "ListElementCode" : "label",
+  "ID" : "DisposalHearingJudgementDeductionValue",
+  "FieldDisplayOrder" : 1
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingJudgementDeductionValue",
+  "ListElementCode" : "text",
+  "ID" : "DisposalHearingJudgementDeductionValue",
+  "FieldDisplayOrder" : 2
+}, {
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingJudgementDeductionValue",
+  "ListElementCode" : "value",
+  "ID" : "DisposalHearingJudgementDeductionValue",
+  "FieldDisplayOrder" : 3
+} ]

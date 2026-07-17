@@ -4039,7 +4039,9 @@ class SimpleStateFlowEngineTest {
             caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
             caseData.setResponseClaimMediationSpecRequired(NO);
             caseData.setApplicant1PartAdmitConfirmAmountPaidSpec(NO);
-            caseData.setReasonNotSuitableSDO(new ReasonNotSuitableSDO("test"));
+            ReasonNotSuitableSDO reasonNotSuitableSDO = new ReasonNotSuitableSDO();
+            reasonNotSuitableSDO.setInput("test");
+            caseData.setReasonNotSuitableSDO(reasonNotSuitableSDO);
             caseData.setTakenOfflineDate(LocalDateTime.now());
             caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
 
