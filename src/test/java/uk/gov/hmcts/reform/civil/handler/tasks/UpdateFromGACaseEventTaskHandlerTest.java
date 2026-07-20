@@ -924,7 +924,6 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
     @Test
     void testShouldAddApplicantPreTranslationDocumentWhenClaimantIsBilingual() {
-        String uid = "f000aa01-0451-4000-b000-000000000125";
         when(mockExternalTask.getTopicName()).thenReturn("test");
         when(mockExternalTask.getAllVariables())
             .thenReturn(Map.of(
@@ -938,6 +937,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
+        String uid = "f000aa01-0451-4000-b000-000000000125";
         CaseData generalCaseData = caseDataAtStateClaimDraftWithBusinessProcessStatusReady()
             .setParentClaimantIsApplicant(YesOrNo.YES)
             .setPreTranslationGaDocsApplicant(singletonList(new Element<CaseDocument>()
@@ -967,7 +967,6 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
     @Test
     void testShouldAddRespondentPreTranslationDocumentWhenRespondentIsBilingual() {
-        String uid = "f000aa01-0451-4000-b000-000000000126";
         when(mockExternalTask.getTopicName()).thenReturn("test");
         when(mockExternalTask.getAllVariables())
             .thenReturn(Map.of(
@@ -985,6 +984,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
+        String uid = "f000aa01-0451-4000-b000-000000000126";
         CaseData generalCaseData = caseDataAtStateClaimDraftWithBusinessProcessStatusReady()
             .setParentClaimantIsApplicant(YesOrNo.NO)
             .setPreTranslationGaDocsRespondent(singletonList(new Element<CaseDocument>()
