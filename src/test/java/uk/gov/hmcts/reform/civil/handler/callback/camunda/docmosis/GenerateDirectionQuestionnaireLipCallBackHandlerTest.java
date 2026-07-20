@@ -37,9 +37,12 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DIRECTIONS_QUESTIONNAIRE;
+import static uk.gov.hmcts.reform.civil.service.docmosis.dq.builders.DQGeneratorFormBuilder.ERROR_FLOW_STATE_PAST_DEADLINE;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -178,6 +181,35 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         verify(directionQuestionnaireLipResponseGenerator).generate(caseData, BEARER_TOKEN);
         verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.DQ_APP1.getValue()));
         // No longer expect duplicate copy with APP1_DQ category
+    }
+
+    @Test
+    void shouldSkipDQGeneration_whenFlowStateIsPastDeadline() {
+        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(
+            directionQuestionnaireLipResponseGenerator);
+        given(directionQuestionnaireLipResponseGenerator.generate(any(CaseData.class), anyString()))
+            .willThrow(new IllegalStateException(ERROR_FLOW_STATE_PAST_DEADLINE));
+        CaseData caseData = CaseDataBuilder.builder().build();
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+        assertThat(response.getData()).isNull();
+        verify(directionQuestionnaireLipResponseGenerator).generate(caseData, BEARER_TOKEN);
+        verifyNoInteractions(systemGeneratedDocumentService, assignCategoryId);
+    }
+
+    @Test
+    void shouldRethrowUnexpectedIllegalStateException() {
+        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(
+            directionQuestionnaireLipResponseGenerator);
+        given(directionQuestionnaireLipResponseGenerator.generate(any(CaseData.class), anyString()))
+            .willThrow(new IllegalStateException("Unexpected state"));
+        CaseData caseData = CaseDataBuilder.builder().build();
+
+        assertThatThrownBy(() -> handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT)))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("Unexpected state");
     }
 
     @Test
