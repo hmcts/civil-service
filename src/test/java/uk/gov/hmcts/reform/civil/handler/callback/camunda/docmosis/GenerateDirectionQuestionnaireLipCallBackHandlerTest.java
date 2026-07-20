@@ -206,8 +206,9 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         given(directionQuestionnaireLipResponseGenerator.generate(any(CaseData.class), anyString()))
             .willThrow(new IllegalStateException("Unexpected state"));
         CaseData caseData = CaseDataBuilder.builder().build();
+        CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-        assertThatThrownBy(() -> handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT)))
+        assertThatThrownBy(() -> handler.handle(callbackParams))
             .isInstanceOf(IllegalStateException.class)
             .hasMessage("Unexpected state");
     }
