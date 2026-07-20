@@ -1,3 +1,11 @@
+data "azurerm_client_config" "current" {}
+
+import {
+  for_each = toset(var.env == "aat" ? ["this"] : [])
+  to       = module.managed_redis.azurerm_managed_redis.redis
+  id       = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.product}-${var.component}-${var.env}-rg/providers/Microsoft.Cache/redisEnterprise/${var.product}-${var.component}-${var.env}"
+}
+
 data "azurerm_subnet" "core_infra_redis_subnet" {
   name                 = "core-infra-subnet-1-${var.env}"
   virtual_network_name = "core-infra-vnet-${var.env}"
