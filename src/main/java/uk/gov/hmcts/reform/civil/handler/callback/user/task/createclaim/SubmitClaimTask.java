@@ -256,6 +256,7 @@ public class SubmitClaimTask {
         UserDetails userDetails = userService.getUserDetails(authToken);
         IdamUserDetails idam = new IdamUserDetails();
         idam.setId(userDetails.getId());
+        idam.setEmail(userDetails.getEmail());
         CorrectEmail applicantSolicitor1CheckEmail = caseData.getApplicantSolicitor1CheckEmail();
 
         if (applicantSolicitor1CheckEmail != null && applicantSolicitor1CheckEmail.isCorrect()) {
@@ -263,7 +264,9 @@ public class SubmitClaimTask {
             caseData.setApplicantSolicitor1UserDetails(idam);
         } else {
             IdamUserDetails applicantSolicitor1UserDetails = caseData.getApplicantSolicitor1UserDetails();
-            idam.setEmail(applicantSolicitor1UserDetails.getEmail());
+            if (applicantSolicitor1UserDetails != null && applicantSolicitor1UserDetails.getEmail() != null) {
+                idam.setEmail(applicantSolicitor1UserDetails.getEmail());
+            }
             caseData.setApplicantSolicitor1UserDetails(idam);
         }
 
