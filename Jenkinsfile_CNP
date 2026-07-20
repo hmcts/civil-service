@@ -124,8 +124,6 @@ withPipeline(type, product, component) {
     env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
     env.CCD_DEFINITION_BRANCH = checkForCcdDefinitionBranchLabel()
     env.PR_FT_GROUPS = getFunctionalTestsGroups()
-    env.CCD_DEFINITION_BRANCH = "master"
-    env.SKIP_COMMON_AAT_CCD_SETUP = "true"
 
 
     setPreviewUrls(product, component)
