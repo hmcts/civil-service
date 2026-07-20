@@ -2,14 +2,19 @@ package uk.gov.hmcts.reform.civil.documentmanagement;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import feign.FeignException;
 import feign.Request;
 import org.apache.tika.Tika;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,6 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -82,6 +88,8 @@ class SecuredDocumentManagementServiceTest {
     private SecuredDocumentManagementService documentManagementService;
     @Mock
     private ResponseEntity<Resource> responseEntity;
+    private ListAppender<ILoggingEvent> listAppender;
+    private Logger logger;
 
     private static final String PNG_MIME_TYPE = "application/png";
 
@@ -97,6 +105,15 @@ class SecuredDocumentManagementServiceTest {
     public void setUp() {
         when(authTokenGenerator.generate()).thenReturn(BEARER_TOKEN);
         when(userService.getUserInfo(anyString())).thenReturn(userInfo);
+        logger = (Logger) LoggerFactory.getLogger(SecuredDocumentManagementService.class);
+        listAppender = new ListAppender<>();
+        listAppender.start();
+        logger.addAppender(listAppender);
+    }
+
+    @AfterEach
+    void tearDown() {
+        logger.detachAppender(listAppender);
     }
 
     @Nested
@@ -519,6 +536,12 @@ class SecuredDocumentManagementServiceTest {
 
             verify(caseDocumentClientApi)
                 .getMetadataForDocument(anyString(), anyString(), eq(documentId));
+            assertTrue(listAppender.list.stream()
+                           .map(ILoggingEvent::getFormattedMessage)
+                           .anyMatch(message -> message.contains(
+                               "Failed getting metadata for document 85d97996-22a5-40d7-882e-3a382c8ae1b5 with path "
+                                   + documentPath
+                           )));
         }
 
         @Test
