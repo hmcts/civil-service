@@ -9,6 +9,7 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -317,6 +318,19 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
 
         verify(coreCaseDataService).startGaUpdate(CASE_ID, WAIT_GA_DRAFT);
         verify(caseDetailsConverter).toGeneralApplicationCaseData(any());
+        ArgumentCaptor<CaseDataContent> caseDataContentCaptor = ArgumentCaptor.forClass(CaseDataContent.class);
+        verify(coreCaseDataService).submitGaUpdate(eq(CASE_ID), caseDataContentCaptor.capture());
+
+        GeneralApplicationCaseData updatedCaseData = mapper.convertValue(
+            caseDataContentCaptor.getValue().getData(),
+            GeneralApplicationCaseData.class
+        );
+        assertThat(updatedCaseData.getGaDraftDocument())
+            .extracting(element -> element.getValue().getDocumentName())
+            .containsExactly(
+                "Draft_application_2024-12-02 15:27:01.pdf",
+                "Translated_draft_application_2024-12-02 15:45:15.pdf"
+            );
     }
 
     public final CaseDocument pdfDocument = new CaseDocument()
