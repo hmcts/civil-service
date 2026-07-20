@@ -5,3 +5,5 @@ custom_alerts_enabled = 1
 ccd_service_bus_status = "Disabled"
 
 ccd_service_bus_filter_rule = "jurisdiction_id IN ('IMPOSSIBLE_VALUE')"
+
+managed_redis_sku = "Balanced_B0"
