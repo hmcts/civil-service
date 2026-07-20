@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -18,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE
 
 public class EnterBreathingSpaceSpecCallbackHandlerTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     private final EnterBreathingSpaceSpecCallbackHandler callbackHandler
         = new EnterBreathingSpaceSpecCallbackHandler(objectMapper);
 
@@ -84,6 +85,25 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
         Assertions.assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
+    public void whenStartDateIsNotPresent_thenDefaultToToday() {
+        BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
+        BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
+        breathingInfo.setEnter(enterInfo);
+        CaseData caseData = CaseData.builder().build();
+        caseData.setBreathing(breathingInfo);
+
+        CallbackParams params = new CallbackParams()
+            .caseData(caseData)
+            .type(CallbackType.ABOUT_TO_SUBMIT);
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
+        assertThat(response.getData())
+            .extracting("enterBreathing")
+            .extracting("start")
+            .isEqualTo(LocalDate.now().toString());
     }
 
     @Test

@@ -102,6 +102,7 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             .map(BreathingSpaceInfo::getEnter)
             .filter(enter -> enter.getStart() == null)
             .ifPresent(enter -> enter.setStart(LocalDate.now()));
+
         caseData.setBusinessProcess(BusinessProcess.ready(ENTER_BREATHING_SPACE_SPEC));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
