@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentAccessException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentNotFoundException;
 import uk.gov.hmcts.reform.civil.documentmanagement.InvalidDocumentReferenceException;
+import uk.gov.hmcts.reform.civil.exceptions.UpstreamIdamException;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
@@ -171,6 +172,18 @@ public class ResourceExceptionHandler {
                                                                     ContentCachingRequestWrapper contentCachingRequestWrapper) {
         log.info(exception.getMessage(), exception);
         String errorMessage = "Notification client error with message: %s for case %s run by user %s";
+        log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
+                                         getUserId(contentCachingRequestWrapper)));
+        return ResponseEntity
+            .status(FAILED_DEPENDENCY)
+            .body(exception.getMessage());
+    }
+
+    @ExceptionHandler(UpstreamIdamException.class)
+    public ResponseEntity<Object> handleUpstreamIdamException(UpstreamIdamException exception,
+                                                              ContentCachingRequestWrapper contentCachingRequestWrapper) {
+        log.info(exception.getMessage(), exception);
+        String errorMessage = "Upstream IDAM error with message: %s for case %s run by user %s";
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)));
         return ResponseEntity

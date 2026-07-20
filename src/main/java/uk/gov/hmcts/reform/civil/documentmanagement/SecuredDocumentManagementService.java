@@ -272,6 +272,12 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
             || ex instanceof InvalidDocumentReferenceException) {
             return (RuntimeException) ex;
         }
+        if (ex instanceof DocumentTtlExpiredException documentTtlExpiredException) {
+            return documentTtlExpiredException;
+        }
+        if (isDocumentTtlExpired(ex)) {
+            return new DocumentTtlExpiredException(documentPath, ex);
+        }
         if (ex instanceof FeignException.NotFound) {
             log.error("Document {} not found in document management", documentPath, ex);
             return new DocumentNotFoundException(documentPath, ex);

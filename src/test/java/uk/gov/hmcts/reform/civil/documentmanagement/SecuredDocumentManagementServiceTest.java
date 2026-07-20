@@ -507,6 +507,31 @@ class SecuredDocumentManagementServiceTest {
 
             verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
         }
+
+        @Test
+        void shouldThrowDocumentTtlExpiredException_whenBinaryDownloadFailsBecauseDocumentTtlExpired() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b5";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getDocumentBinary(
+                     anyString(),
+                     anyString(),
+                     eq(documentId)
+                 )
+            ).thenThrow(forbiddenFeignException(CDAM_TTL_EXPIRED_RESPONSE));
+
+            DocumentTtlExpiredException documentManagementException = assertThrows(
+                DocumentTtlExpiredException.class,
+                () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath)
+            );
+
+            assertEquals(
+                String.format(DocumentTtlExpiredException.MESSAGE_TEMPLATE, documentPath),
+                documentManagementException.getMessage()
+            );
+
+            verify(caseDocumentClientApi).getDocumentBinary(anyString(), anyString(), eq(documentId));
+        }
     }
 
     @Nested
@@ -591,6 +616,52 @@ class SecuredDocumentManagementServiceTest {
             );
 
             verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
+        }
+
+        @Test
+        void shouldThrowDocumentTtlExpiredException_whenMetadataDownloadFailsBecauseDocumentTtlExpired() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b5";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi
+                     .getMetadataForDocument(anyString(), anyString(), eq(documentId))
+            ).thenThrow(forbiddenFeignException(CDAM_TTL_EXPIRED_RESPONSE));
+
+            DocumentTtlExpiredException documentManagementException = assertThrows(
+                DocumentTtlExpiredException.class,
+                () -> documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath)
+            );
+
+            assertEquals(
+                String.format(DocumentTtlExpiredException.MESSAGE_TEMPLATE, documentPath),
+                documentManagementException.getMessage()
+            );
+
+            verify(caseDocumentClientApi)
+                .getMetadataForDocument(anyString(), anyString(), eq(documentId));
+        }
+
+        @Test
+        void shouldRethrowDocumentTtlExpiredException_whenDownloadingDocumentWithMetaData() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b5";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi
+                     .getMetadataForDocument(anyString(), anyString(), eq(documentId))
+            ).thenThrow(forbiddenFeignException(CDAM_TTL_EXPIRED_RESPONSE));
+
+            DocumentTtlExpiredException documentManagementException = assertThrows(
+                DocumentTtlExpiredException.class,
+                () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath)
+            );
+
+            assertEquals(
+                String.format(DocumentTtlExpiredException.MESSAGE_TEMPLATE, documentPath),
+                documentManagementException.getMessage()
+            );
+
+            verify(caseDocumentClientApi)
+                .getMetadataForDocument(anyString(), anyString(), eq(documentId));
         }
     }
 
