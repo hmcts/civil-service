@@ -201,6 +201,18 @@ public class ResourceExceptionHandlerTest {
     }
 
     @Test
+    void shouldReturnFailedDependency_whenUpstreamIdamExceptionThrown() {
+        testTemplate(
+            "IDAM temporarily unavailable",
+            handler.handleUpstreamIdamException(
+                new UpstreamIdamException("IDAM temporarily unavailable"),
+                contentCachingRequestWrapper
+            ),
+            HttpStatus.FAILED_DEPENDENCY
+        );
+    }
+
+    @Test
     void testHandleFeignNotFoundException() {
         testTemplate(
             "expected exception for feign not found",

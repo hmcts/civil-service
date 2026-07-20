@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@2.4.2")
+@Library("Infrastructure@2.4.4")
 
 import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
@@ -72,6 +72,12 @@ def secrets = [
 def secretsOtherenv = [
   'civil-${env}': [
     secret('microservicekey-civil-service', 'S2S_SECRET'),
+  ]
+]
+
+def secretsProd = [
+  'civil-prod': [
+    secret('microservicekey-civil-service', 'S2S_SECRET_PROD')
   ]
 ]
 
@@ -158,9 +164,14 @@ withPipeline(type, product, component) {
   }
 
   afterSuccess('checkout') {
-    def subscription = 'nonprod'
     if (env.ENVIRONMENT in ['ithc', 'demo', 'perftest']) {
-      withSubscription(subscription) {
+      def subscriptions = [
+        demo    : env.DEMO_SUBSCRIPTION_NAME ?: 'nonprod',
+        perftest: env.PERFTEST_SUBSCRIPTION_NAME ?: 'qa',
+        ithc    : env.ITHC_SUBSCRIPTION_NAME ?: 'qa'
+      ]
+
+      withSubscription(subscriptions[env.ENVIRONMENT], product, env.ENVIRONMENT) {
         withTeamSecrets(pipelineConf, env.ENVIRONMENT) {
           uploadBpmnDiagrams(env.ENVIRONMENT)
         }
@@ -199,7 +210,15 @@ withPipeline(type, product, component) {
   afterSuccess('functionalTest:aat') {
     createBpmnGithubRelease()
     uploadBpmnDiagrams('aat')
-    uploadBpmnDiagrams('prod')
+  }
+
+  afterSuccess('buildinfra:prod') {
+    withAzureKeyvault(
+      azureKeyVaultSecrets: secretsProd['civil-prod'],
+      keyVaultURLOverride: 'https://civil-prod.vault.azure.net/'
+    ) {
+      uploadBpmnDiagrams('prod')
+    }
   }
 
   afterAlways('functionalTest:aat') {

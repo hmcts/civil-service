@@ -37,6 +37,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import static feign.Request.HttpMethod.GET;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,6 +62,11 @@ class SecuredDocumentManagementServiceTest {
 
     private static final String USER_ROLES_JOINED = "caseworker-civil,caseworker-civil-solicitor";
     public static final String BEARER_TOKEN = "Bearer Token";
+    private static final String CDAM_TTL_EXPIRED_RESPONSE = """
+        {"status":403,
+        "error":"Forbidden: Insufficient permissions: Document 85d97996-22a5-40d7-882e-3a382c8ae1b5 can not be downloaded as TTL has expired",
+        "exception":"uk.gov.hmcts.reform.ccd.documentam.exception.ForbiddenException"}
+        """;
 
     @MockBean
     private CaseDocumentClientApi caseDocumentClientApi;
@@ -613,5 +619,13 @@ class SecuredDocumentManagementServiceTest {
 
     private UUID getDocumentIdFromSelfHref(String selfHref) {
         return UUID.fromString(selfHref.substring(selfHref.length() - DOC_UUID_LENGTH));
+    }
+
+    private FeignException forbiddenFeignException(String responseBody) {
+        return new FeignException.Forbidden(
+            "forbidden message",
+            Request.create(GET, "", Map.of(), new byte[]{}, StandardCharsets.UTF_8, null),
+            responseBody.getBytes(StandardCharsets.UTF_8),
+            Map.of());
     }
 }

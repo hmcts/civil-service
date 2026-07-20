@@ -45,6 +45,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
     protected static final int DOC_UUID_LENGTH = 36;
     protected static final String FILES_NAME = "files";
+    private static final String CDAM_FORBIDDEN_EXCEPTION = "ForbiddenException";
+    private static final String TTL_EXPIRED_MESSAGE = "TTL has expired";
 
     private final DocumentDownloadClientApi documentDownloadClientApi;
     private final AuthTokenGenerator authTokenGenerator;
@@ -292,5 +294,11 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
             throw new InvalidDocumentReferenceException(selfHref);
         }
         return UUID.fromString(selfHref.substring(selfHref.length() - DOC_UUID_LENGTH));
+    }
+
+    private boolean isDocumentTtlExpired(Exception ex) {
+        return ex instanceof FeignException.Forbidden feignException
+            && feignException.contentUTF8().contains(CDAM_FORBIDDEN_EXCEPTION)
+            && feignException.contentUTF8().contains(TTL_EXPIRED_MESSAGE);
     }
 }
