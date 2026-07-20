@@ -43,6 +43,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -260,7 +261,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             LocalDate hearingScheduledDate = gaHearingDate.getHearingScheduledDate();
             if (hearingScheduledDate == null) {
                 errors.add(HEARING_DATE_REQUIRED);
-            } else if (hearingScheduledDate.isBefore(LocalDate.now())) {
+            } else if (hearingScheduledDate.isBefore(LocalDate.now(ZoneId.systemDefault()))) {
                 errors.add(INVALID_HEARING_DATE);
             }
         }
