@@ -13,7 +13,7 @@ data "azurerm_subnet" "core_infra_redis_subnet" {
 }
 
 module "managed_redis" {
-  source = "git@github.com:hmcts/terraform-module-azure-managed-redis?ref=fix-null-outputs"
+  source = "git@github.com:hmcts/terraform-module-azure-managed-redis?ref=main"
 
   product     = var.product
   component   = var.component
