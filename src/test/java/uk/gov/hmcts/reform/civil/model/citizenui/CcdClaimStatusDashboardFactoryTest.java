@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -47,6 +48,8 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -297,6 +300,32 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService, Collections.emptyList()));
         assertThat(status).isEqualTo(DashboardClaimStatus.MORE_TIME_REQUESTED);
+    }
+
+    @ParameterizedTest
+    @MethodSource("matchers")
+    void givenExpiredExtendedDeadline_whenGetStatus_thenEligibleForCCJ(
+        Function<CaseData, CcdDashboardClaimMatcher> matcherFactory) {
+
+        CaseData claim = CaseData.builder()
+            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
+            .respondent1ResponseDeadline(LocalDate.now().minusDays(1).atTime(16, 0, 0))
+            .respondent1TimeExtensionDate(LocalDateTime.now().minusDays(10))
+            .build();
+
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(
+                matcherFactory.apply(claim));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.ELIGIBLE_FOR_CCJ);
+    }
+
+    static Stream<Function<CaseData, CcdDashboardClaimMatcher>> matchers() {
+        FeatureToggleService mockFeatureToggleService = Mockito.mock(FeatureToggleService.class);
+        return Stream.of(
+            caseData -> new CcdDashboardDefendantClaimMatcher(caseData, mockFeatureToggleService, Collections.emptyList()),
+            caseData -> new CcdDashboardClaimantClaimMatcher(caseData, mockFeatureToggleService, Collections.emptyList())
+        );
     }
 
     @Test

@@ -189,7 +189,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnError_WhenAboutToStartInvokeWhenRespondentResponseLanguageIsBilingual() {
+        void shouldNotReturnError_WhenRespondentResponseLanguageIsBilingualAndDeadlinePassed() {
             RespondentLiPResponse respondentLiPResponse  = new RespondentLiPResponse();
             respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
             CaseDataLiP caseDataLiP = new CaseDataLiP();
@@ -197,12 +197,13 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.setBreathing(new BreathingSpaceInfo().setLift(null));
             caseData.setCaseDataLiP(caseDataLiP);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(1));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            assertThat(response.getErrors()).contains("The Claim is not eligible for Default Judgment.");
+            assertThat(response.getErrors()).doesNotContain("The Claim is not eligible for Default Judgment.");
         }
 
     }

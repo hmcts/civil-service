@@ -192,9 +192,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
         var caseData = callbackParams.getCaseData();
         ArrayList<String> errors = new ArrayList<>();
-        if (caseData.isRespondentResponseBilingual()) {
-            errors.add(DJ_NOT_VALID_FOR_THIS_LIP_CLAIM);
-        } else if (nonNull(caseData.getRespondent1ResponseDeadline())
+        if (nonNull(caseData.getRespondent1ResponseDeadline())
             && caseData.getRespondent1ResponseDeadline().isAfter(LocalDateTime.now())) {
             String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
             errors.add(format(NOT_VALID_DJ, formattedDeadline));
