@@ -34,9 +34,17 @@ module "managed_redis" {
   access_keys_authentication_enabled = true
 }
 
+data "azurerm_managed_redis" "this" {
+  name                = "${var.product}-${var.component}-${var.env}"
+  resource_group_name = "${var.product}-${var.component}-${var.env}-rg"
+
+  depends_on = [module.managed_redis]
+}
+
+# ✅ REPLACE the secret with this version
 resource "azurerm_key_vault_secret" "managed_redis_access_key" {
   name         = "managed-redis-access-key"
-  value        = module.managed_redis.primary_access_key
+  value_wo     = data.azurerm_managed_redis.this.default_database[0].primary_access_key
   key_vault_id = module.key-vault.key_vault_id
 
   content_type = "secret"
@@ -44,5 +52,8 @@ resource "azurerm_key_vault_secret" "managed_redis_access_key" {
     "source" : "managed-redis ${module.managed_redis.hostname}"
   })
 
-  depends_on = [module.key-vault]
+  depends_on = [
+    module.key-vault,
+    data.azurerm_managed_redis.this
+  ]
 }
