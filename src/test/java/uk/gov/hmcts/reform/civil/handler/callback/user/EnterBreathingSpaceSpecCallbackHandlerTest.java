@@ -88,7 +88,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
     }
 
     @Test
-    public void whenStartDateIsNotPresent_thenDefaultToToday() {
+    public void whenStartDateFieldIsNotPresent_thenDefaultToToday() {
         BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
         BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
         breathingInfo.setEnter(enterInfo);
@@ -104,6 +104,26 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
             .extracting("enterBreathing")
             .extracting("start")
             .isEqualTo(LocalDate.now().toString());
+    }
+
+    @Test
+    public void whenStartDateFieldIsPresent_thenDontDefaultToToday() {
+        BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
+        enterInfo.setStart(LocalDate.now().minusDays(1));
+        BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
+        breathingInfo.setEnter(enterInfo);
+        CaseData caseData = CaseData.builder().build();
+        caseData.setBreathing(breathingInfo);
+
+        CallbackParams params = new CallbackParams()
+            .caseData(caseData)
+            .type(CallbackType.ABOUT_TO_SUBMIT);
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
+        assertThat(response.getData())
+            .extracting("enterBreathing")
+            .extracting("start")
+            .isEqualTo(LocalDate.now().minusDays(1).toString());
     }
 
     @Test
