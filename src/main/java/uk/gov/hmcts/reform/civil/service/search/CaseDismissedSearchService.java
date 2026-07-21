@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.search.common.CommonQueryConstructs;
 
 import java.util.List;
 
@@ -21,8 +22,12 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDGMENT_REQUESTED;
 @Slf4j
 public class CaseDismissedSearchService extends ElasticSearchService {
 
-    public CaseDismissedSearchService(CoreCaseDataService coreCaseDataService) {
+    private final CommonQueryConstructs commonQueryConstructs;
+
+    public CaseDismissedSearchService(CoreCaseDataService coreCaseDataService,
+                                      CommonQueryConstructs commonQueryConstructs) {
         super(coreCaseDataService);
+        this.commonQueryConstructs = commonQueryConstructs;
     }
 
     @Override
@@ -33,16 +38,19 @@ public class CaseDismissedSearchService extends ElasticSearchService {
                 .minimumShouldMatch(1)
                 .should(boolQuery()
                             .must(rangeQuery("data.claimDetailsNotificationDeadline").lt(timeNow))
-                            .must(beState(AWAITING_CASE_DETAILS_NOTIFICATION)))
+                            .must(beState(AWAITING_CASE_DETAILS_NOTIFICATION))
+                            .must(commonQueryConstructs.haveNoOngoingBusinessProcess()))
                 .should(boolQuery()
                             .must(rangeQuery("data.claimNotificationDeadline").lt(timeNow))
-                            .must(beState(CASE_ISSUED)))
+                            .must(beState(CASE_ISSUED))
+                            .must(commonQueryConstructs.haveNoOngoingBusinessProcess()))
                 .should(boolQuery()
                             .must(rangeQuery("data.claimDismissedDeadline").lt(timeNow))
                             .must(boolQuery()
                                       .minimumShouldMatch(1)
                                       .should(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
-                                      .should(beState(JUDGMENT_REQUESTED)))),
+                                      .should(beState(JUDGMENT_REQUESTED)))
+                            .must(commonQueryConstructs.haveNoOngoingBusinessProcess())),
             List.of("reference"),
             startIndex
         );

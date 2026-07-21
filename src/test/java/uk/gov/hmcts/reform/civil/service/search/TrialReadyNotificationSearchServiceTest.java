@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.search.Query;
+import uk.gov.hmcts.reform.civil.service.search.common.CommonQueryConstructs;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -18,11 +19,12 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 class TrialReadyNotificationSearchServiceTest extends ElasticSearchServiceTest {
 
+    private final CommonQueryConstructs commonQueryConstructs = new CommonQueryConstructs();
     private String capturedTimeNow;
 
     @BeforeEach
     void setup() {
-        searchService = new TrialReadyNotificationSearchService(coreCaseDataService) {
+        searchService = new TrialReadyNotificationSearchService(coreCaseDataService, commonQueryConstructs) {
             @Override
             public Query query(int startIndex, String timeNow) {
                 capturedTimeNow = timeNow;
@@ -50,6 +52,7 @@ class TrialReadyNotificationSearchServiceTest extends ElasticSearchServiceTest {
                           .minimumShouldMatch(1)
                           .should(matchQuery("data.allocatedTrack", "FAST_CLAIM"))
                           .should(matchQuery("data.responseClaimTrack", "FAST_CLAIM")))
+                .must(commonQueryConstructs.haveNoOngoingBusinessProcess())
                 .mustNot(matchQuery("data.listingOrRelisting", ListingOrRelisting.RELISTING))
                 .mustNot(matchQuery("data.trialReadyNotified", YesOrNo.YES)));
 

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.search.common.CommonQueryConstructs;
 
 import java.util.List;
 
@@ -17,8 +18,12 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 @Slf4j
 public class HearingFeeDueSearchService extends ElasticSearchService {
 
-    public HearingFeeDueSearchService(CoreCaseDataService coreCaseDataService) {
+    private final CommonQueryConstructs commonQueryConstructs;
+
+    public HearingFeeDueSearchService(CoreCaseDataService coreCaseDataService,
+                                      CommonQueryConstructs commonQueryConstructs) {
         super(coreCaseDataService);
+        this.commonQueryConstructs = commonQueryConstructs;
     }
 
     @Override
@@ -28,7 +33,8 @@ public class HearingFeeDueSearchService extends ElasticSearchService {
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(beState(HEARING_READINESS))),
+                            .must(beState(HEARING_READINESS))
+                            .must(commonQueryConstructs.haveNoOngoingBusinessProcess())),
             List.of("reference"),
             startIndex
         );

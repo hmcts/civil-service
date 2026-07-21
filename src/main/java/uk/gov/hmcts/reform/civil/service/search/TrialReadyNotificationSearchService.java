@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.search.common.CommonQueryConstructs;
 
 import java.time.LocalTime;
 import java.time.ZoneOffset;
@@ -24,8 +25,12 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_COND
 @Slf4j
 public class TrialReadyNotificationSearchService extends ElasticSearchService {
 
-    public TrialReadyNotificationSearchService(CoreCaseDataService coreCaseDataService) {
+    private final CommonQueryConstructs commonQueryConstructs;
+
+    public TrialReadyNotificationSearchService(CoreCaseDataService coreCaseDataService,
+                                               CommonQueryConstructs commonQueryConstructs) {
         super(coreCaseDataService);
+        this.commonQueryConstructs = commonQueryConstructs;
     }
 
     @Override
@@ -50,6 +55,7 @@ public class TrialReadyNotificationSearchService extends ElasticSearchService {
                                       .minimumShouldMatch(1)
                                       .should(matchQuery("data.allocatedTrack", "FAST_CLAIM"))
                                       .should(matchQuery("data.responseClaimTrack", "FAST_CLAIM")))
+                            .must(commonQueryConstructs.haveNoOngoingBusinessProcess())
                             .mustNot(matchQuery("data.listingOrRelisting", ListingOrRelisting.RELISTING))
                             .mustNot(matchQuery("data.trialReadyNotified", YesOrNo.YES))),
             List.of("reference"),
