@@ -38,6 +38,10 @@ public class VerifyHearingNoticeNamesTask extends MigrationTask<CaseReference> {
 
     private static final String LOG_PREFIX = "VERIFY_HEARING_NOTICE";
     private static final String DOWNLOAD_ERROR = "VERIFY_HEARING_NOTICE download failed for case {}";
+    private static final String TASK_NAME = "VerifyHearingNoticeNamesTask";
+    private static final String EVENT_SUMMARY = "Verify hearing notice attendee names against CCD";
+    private static final String EVENT_DESCRIPTION =
+        "Read-only check that generated hearing notices carry the current CCD party names";
 
     private final DocumentDownloadService documentDownloadService;
     private final UserService userService;
@@ -59,17 +63,17 @@ public class VerifyHearingNoticeNamesTask extends MigrationTask<CaseReference> {
 
     @Override
     protected String getTaskName() {
-        return "VerifyHearingNoticeNamesTask";
+        return TASK_NAME;
     }
 
     @Override
     protected String getEventSummary() {
-        return "Verify hearing notice attendee names against CCD";
+        return EVENT_SUMMARY;
     }
 
     @Override
     protected String getEventDescription() {
-        return "Read-only check that generated hearing notices carry the current CCD party names";
+        return EVENT_DESCRIPTION;
     }
 
     @Override
