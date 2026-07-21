@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,7 +36,7 @@ class FeatureToggleServiceTest {
 
     @BeforeEach
     void setUp() {
-        featureToggleService = new FeatureToggleService(featureToggleApi);
+        featureToggleService = new FeatureToggleService(featureToggleApi, List.of("JudgementBuffer", "DefendantResponseDeadline"));
     }
 
     @ParameterizedTest
@@ -104,15 +105,6 @@ class FeatureToggleServiceTest {
         boolean result = featureToggleService.isLocationWhiteListed(location);
 
         assertEquals(expected, result);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsJudgmentOnlineLive(Boolean toggleStat) {
-        var isJudgmentOnlineLiveKey = "isJudgmentOnlineLive";
-        givenToggle(isJudgmentOnlineLiveKey, toggleStat);
-
-        assertThat(featureToggleService.isJudgmentOnlineLive()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
@@ -211,10 +203,8 @@ class FeatureToggleServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenisJOLiveFeedActive(Boolean toggleStat) {
-        when(featureToggleService.isJudgmentOnlineLive())
-            .thenReturn(toggleStat);
-        when(featureToggleService.isJOLiveFeedActive())
-            .thenReturn(toggleStat);
+        givenToggle("isJOLiveFeedActive", toggleStat);
+
         assertThat(featureToggleService.isJOLiveFeedActive()).isEqualTo(toggleStat);
     }
 
@@ -231,15 +221,6 @@ class FeatureToggleServiceTest {
             .thenReturn(toggleStat);
 
         assertThat(featureToggleService.isDefendantNoCOnlineForCase(caseData)).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsQMForLRs(Boolean toggleStat) {
-        var caseFlagsKey = "query-management";
-        givenToggle(caseFlagsKey, toggleStat);
-
-        assertThat(featureToggleService.isQueryManagementLRsEnabled()).isEqualTo(toggleStat);
     }
 
     @Test
@@ -310,5 +291,20 @@ class FeatureToggleServiceTest {
     void shouldCallBoolVariation_whenJudgmentBufferEnabled(Boolean toggleStat) {
         givenToggle("judgment-buffer", toggleStat);
         assertThat(featureToggleService.isJudgmentBufferEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenSpringSchedulerEnabled(Boolean toggleStat) {
+        givenToggle("spring-scheduler-enabled", toggleStat);
+        assertThat(featureToggleService.isSpringSchedulerEnabled("JudgementBuffer")).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isSpringSchedulerEnabled("DefendantResponseDeadline")).isEqualTo(toggleStat);
+    }
+
+    @Test
+    void shouldReturnFalse_whenActiveSchedulersIsEmpty() {
+        FeatureToggleService emptyService = new FeatureToggleService(featureToggleApi, List.of());
+        givenToggle("spring-scheduler-enabled", true);
+        assertThat(emptyService.isSpringSchedulerEnabled("JudgementBufferScheduledTask")).isFalse();
     }
 }

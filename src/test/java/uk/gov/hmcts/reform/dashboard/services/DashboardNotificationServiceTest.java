@@ -335,6 +335,32 @@ class DashboardNotificationServiceTest {
     }
 
     @Test
+    void should_return_only_jr_cancelled_case_stayed_notifications_when_present() {
+        final UUID normalId = UUID.randomUUID();
+        final UUID stayedId = UUID.randomUUID();
+
+        DashboardNotificationsEntity normal = new DashboardNotificationsEntity();
+        normal.setId(normalId);
+        normal.setName("Some.Other.Template");
+        normal.setCreatedAt(OffsetDateTime.now().minusHours(1));
+
+        DashboardNotificationsEntity stayed = new DashboardNotificationsEntity();
+        stayed.setId(stayedId);
+        stayed.setName("Notice.AAA6.JR.Cancelled.Case.Stayed.Claimant");
+        stayed.setCreatedAt(OffsetDateTime.now());
+
+        when(dashboardNotificationsRepository.findByReferenceAndCitizenRole("case", "role"))
+            .thenReturn(List.of(normal, stayed));
+
+        List<Notification> result =
+            dashboardNotificationService.getNotifications("case", "role");
+
+        assertThat(result)
+            .extracting(Notification::getId)
+            .containsExactly(stayedId);
+    }
+
+    @Test
     void should_return_all_notifications_when_no_case_stayed_templates_exist() {
         final UUID id1 = UUID.randomUUID();
         final UUID id2 = UUID.randomUUID();

@@ -41,6 +41,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doReturn;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(MockitoExtension.class)
 class IncidentRetryEventHandlerTest {
@@ -65,6 +68,11 @@ class IncidentRetryEventHandlerTest {
 
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
 
     @InjectMocks
     private IncidentRetryEventHandler handler;
@@ -562,4 +570,11 @@ class IncidentRetryEventHandlerTest {
             any(), anyBoolean(), eq(processInstanceId), any(), any(), anyInt()
         )).thenReturn(List.of(incident));
     }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }

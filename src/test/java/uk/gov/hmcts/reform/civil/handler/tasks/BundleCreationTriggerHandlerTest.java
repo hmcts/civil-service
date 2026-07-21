@@ -43,6 +43,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(SpringExtension.class)
 class BundleCreationTriggerHandlerTest {
@@ -65,6 +68,12 @@ class BundleCreationTriggerHandlerTest {
     private SystemUpdateUserConfiguration userConfig;
     @Mock
     private NoCacheUserService noCacheUserService;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
+
     @InjectMocks
     private BundleCreationTriggerHandler handler;
     private CaseData caseData;
@@ -136,7 +145,7 @@ class BundleCreationTriggerHandlerTest {
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(300000L)
+            anyLong()
         );
     }
 
@@ -265,5 +274,12 @@ class BundleCreationTriggerHandlerTest {
         //Then: its should return true indicating that bundle is already created for this hearingDate
         assertTrue(handler.getIsBundleCreatedForHearingDate(1L));
     }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }
 

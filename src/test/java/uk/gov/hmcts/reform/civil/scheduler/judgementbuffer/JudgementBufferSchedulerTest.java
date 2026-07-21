@@ -6,18 +6,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.search.JudgementBufferExpiredSearchService;
-
-import java.util.function.Supplier;
+import uk.gov.hmcts.reform.civil.service.search.judgementbuffer.JudgementBufferExpiredSearchService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.scheduler.judgementbuffer.JudgementBufferScheduler.SCHEDULER_NAME;
 
 @ExtendWith(MockitoExtension.class)
 class JudgementBufferSchedulerTest {
@@ -26,7 +25,7 @@ class JudgementBufferSchedulerTest {
     private JudgementBufferExpiredSearchService searchService;
 
     @Mock
-    private ScheduledTaskRunner scheduledTaskRunner;
+    private ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
 
     @Mock
     private JudgementBufferScheduledTask judgementBufferScheduledTask;
@@ -40,23 +39,21 @@ class JudgementBufferSchedulerTest {
     @Nested
     class Execute {
 
-        @SuppressWarnings("unchecked")
         @Test
-        void shouldRunTaskRunner_whenSchedulerIsEnabledAndFeatureToggleIsEnabled() {
-            ScheduledTaskEventConfiguration expectedConfig = new ScheduledTaskEventConfiguration(scheduler.getName());
+        void shouldRunScheduledTaskRunner() {
             when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
 
             scheduler.runScheduledTask();
 
             verify(scheduledTaskRunner).run(
-                eq(expectedConfig),
-                any(Supplier.class),
+                eq(SCHEDULER_NAME),
+                any(),
                 eq(judgementBufferScheduledTask)
             );
         }
 
         @Test
-        void shouldNotRunTaskRunner_whenSchedulerIsEnabledAndFeatureToggleIsDisabled() {
+        void shouldNotRunScheduledTaskRunner_whenJudgmentBufferIsDisabled() {
             when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(false);
 
             scheduler.runScheduledTask();

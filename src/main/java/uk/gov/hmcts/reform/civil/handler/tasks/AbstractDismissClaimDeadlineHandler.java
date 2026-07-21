@@ -1,22 +1,33 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.event.DismissClaimEvent;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.service.search.ElasticSearchService;
 
 import java.util.Set;
 
 @Slf4j
-@RequiredArgsConstructor
 abstract class AbstractDismissClaimDeadlineHandler extends BaseExternalTaskHandler {
 
     private final ElasticSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    protected AbstractDismissClaimDeadlineHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        ElasticSearchService caseSearchService,
+        ApplicationEventPublisher applicationEventPublisher
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.caseSearchService = caseSearchService;
+        this.applicationEventPublisher = applicationEventPublisher;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -25,6 +36,7 @@ abstract class AbstractDismissClaimDeadlineHandler extends BaseExternalTaskHandl
 
         for (CaseDetails caseDetails : cases) {
             publishDismissClaimEvent(caseDetails);
+            throttle(cases.size());
         }
         return new ExternalTaskData();
     }

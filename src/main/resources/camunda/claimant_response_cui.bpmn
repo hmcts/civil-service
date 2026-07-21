@@ -12,7 +12,6 @@
       <bpmn:incoming>Flow_1uzxrbl</bpmn:incoming>
       <bpmn:outgoing>Flow_FullAdmitPayImmediatly</bpmn:outgoing>
       <bpmn:outgoing>IN_MEDIATION_FLOW</bpmn:outgoing>
-      <bpmn:outgoing>Flow_187wcee</bpmn:outgoing>
       <bpmn:outgoing>Flow_Full_Defence</bpmn:outgoing>
       <bpmn:outgoing>Flow_0slswz6</bpmn:outgoing>
       <bpmn:outgoing>Flow_Full_PartAdmit</bpmn:outgoing>
@@ -90,16 +89,12 @@
       <bpmn:outgoing>Flow_0beyd6n</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_0beyd6n" sourceRef="Generate_LIP_Claimant_DQ" targetRef="Gateway_0btqyj3" />
-    <bpmn:sequenceFlow id="Flow_187wcee" name="Applicant proposes new repayment plan (Respondent is LTD company or organization)" sourceRef="Gateway_RESPONSE_FLOW" targetRef="Gateway_0yyi3a3">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(flowState == "MAIN.FULL_ADMIT_REJECT_REPAYMENT" || flowState == "MAIN.PART_ADMIT_REJECT_REPAYMENT") &amp;&amp; (empty flowFlags.JO_ONLINE_LIVE_ENABLED || !flowFlags.JO_ONLINE_LIVE_ENABLED)}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
     <bpmn:exclusiveGateway id="Gateway_RPA_FLOW">
       <bpmn:incoming>Flow_0pcu8vp</bpmn:incoming>
       <bpmn:incoming>Flow_19cet4s</bpmn:incoming>
       <bpmn:incoming>Flow_1kkvaac</bpmn:incoming>
       <bpmn:outgoing>Flow_089b2nt</bpmn:outgoing>
       <bpmn:outgoing>Flow_0xsst33</bpmn:outgoing>
-      <bpmn:outgoing>Flow_0ia7tek</bpmn:outgoing>
       <bpmn:outgoing>Flow_1jcosxq</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:serviceTask id="NotifyRoboticsOnContinuousFeed" name="Notify RPA on Continuous Feed" camunda:type="external" camunda:topic="processCaseEvent">
@@ -153,15 +148,6 @@
       <bpmn:outgoing>Flow_192ex4z</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_192ex4z" sourceRef="RejectRepaymentPlanNotifyParties" targetRef="Generate_LIP_Claimant_MD" />
-    <bpmn:serviceTask id="ProceedOffline" name="Proceed offline" camunda:type="external" camunda:topic="processCaseEvent">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">PROCEEDS_IN_HERITAGE_SYSTEM</camunda:inputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0ia7tek</bpmn:incoming>
-      <bpmn:outgoing>Flow_0xrpi43</bpmn:outgoing>
-    </bpmn:serviceTask>
     <bpmn:serviceTask id="Generate_LIP_Claimant_MD" name="Generate Manual Determination" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -220,17 +206,6 @@
     <bpmn:sequenceFlow id="Flow_Full_PartAdmit" name="Applicant confirm repayment plan(Full/Part admit)" sourceRef="Gateway_RESPONSE_FLOW" targetRef="GenerateJudgmentByAdmissionPdf">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.FULL_ADMIT_AGREE_REPAYMENT" || flowState == "MAIN.PART_ADMIT_AGREE_REPAYMENT"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:serviceTask id="NotifyRoboticsOnCaseHandedOffline" name="Notify RPA on case handed offline" camunda:type="external" camunda:topic="processCaseEvent">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">NOTIFY_RPA_ON_CASE_HANDED_OFFLINE</camunda:inputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0xrpi43</bpmn:incoming>
-      <bpmn:outgoing>Flow_1osir9u</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_0xrpi43" sourceRef="ProceedOffline" targetRef="NotifyRoboticsOnCaseHandedOffline" />
-    <bpmn:sequenceFlow id="Flow_1osir9u" sourceRef="NotifyRoboticsOnCaseHandedOffline" targetRef="GenerateDashboardNotificationsClaimantResponseCui" />
     <bpmn:exclusiveGateway id="Gateway_0btqyj3" name="citizen language?">
       <bpmn:incoming>Flow_0beyd6n</bpmn:incoming>
       <bpmn:outgoing>Flow_0pcu8vp</bpmn:outgoing>
@@ -268,19 +243,15 @@
       <bpmn:outgoing>Flow_1daatex</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_1daatex" sourceRef="SendJudgmentDetailsToCJES" targetRef="GenerateJudgmentByAdmissionDocClaimant" />
-    <bpmn:sequenceFlow id="Flow_0ia7tek" name="Applicant accept or reject repayment plan (full/part admit) and request CCJ" sourceRef="Gateway_RPA_FLOW" targetRef="ProceedOffline">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState != "MAIN.IN_MEDIATION" &amp;&amp; (!empty flowFlags.LIP_JUDGMENT_ADMISSION &amp;&amp; flowFlags.LIP_JUDGMENT_ADMISSION) &amp;&amp; !(!empty flowFlags.JO_ONLINE_LIVE_ENABLED &amp;&amp; flowFlags.JO_ONLINE_LIVE_ENABLED)}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_1jcosxq" name="Applicant accept or reject repayment plan (full/part admit) and request CCJ" sourceRef="Gateway_RPA_FLOW" targetRef="updateClaimantClaimStateID">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.LIP_JUDGMENT_ADMISSION &amp;&amp; flowFlags.LIP_JUDGMENT_ADMISSION}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1jcosxq" name="Applicant accept or reject repayment plan (full/part admit), request CCJ and judgment online enabled" sourceRef="Gateway_RPA_FLOW" targetRef="updateClaimantClaimStateID">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(!empty flowFlags.LIP_JUDGMENT_ADMISSION &amp;&amp; flowFlags.LIP_JUDGMENT_ADMISSION) &amp;&amp; (!empty flowFlags.JO_ONLINE_LIVE_ENABLED &amp;&amp; flowFlags.JO_ONLINE_LIVE_ENABLED)}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:serviceTask id="GenerateDashboardNotificationsClaimantResponseCui" name="Dashboard Notifications" camunda:type="external" camunda:topic="processCaseEvent">
+    <bpmn:serviceTask id="GenerateDashboardNotificationsClaimantResponseCui" name="Dashboard Notifications" camunda:type="external" camunda:topic="dashboardNotifications">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="caseEvent">DASHBOARD_NOTIFICATION_EVENT</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1osir9u</bpmn:incoming>
       <bpmn:incoming>Flow_0mqrfuz</bpmn:incoming>
       <bpmn:incoming>Flow_12rbd4z</bpmn:incoming>
       <bpmn:incoming>Flow_0hgctdo</bpmn:incoming>
@@ -348,11 +319,11 @@
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_1msvhgp" sourceRef="GenerateJudgmentByDeterminationPdf" targetRef="TriggerAndUpdateGenAppLocation" />
     <bpmn:sequenceFlow id="Flow_0h4qr2u" sourceRef="TriggerAndUpdateGenAppLocation" targetRef="Gateway_1e1bap6" />
-    <bpmn:sequenceFlow id="Flow_1ylt8a2" name="Applicant Reject Repayment And accepts Court Calculator JO Enabled" sourceRef="Gateway_RESPONSE_FLOW" targetRef="GenerateJudgmentByAdmissionPdf">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(flowState == "MAIN.FULL_ADMIT_REJECT_REPAYMENT" || flowState == "MAIN.PART_ADMIT_REJECT_REPAYMENT") &amp;&amp; ((!empty flowFlags.JO_ONLINE_LIVE_ENABLED &amp;&amp; flowFlags.JO_ONLINE_LIVE_ENABLED) &amp;&amp; (!empty flowFlags.LIP_JUDGMENT_ADMISSION &amp;&amp; flowFlags.LIP_JUDGMENT_ADMISSION))}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_1ylt8a2" name="Applicant reject repayment and accepts court calculator" sourceRef="Gateway_RESPONSE_FLOW" targetRef="GenerateJudgmentByAdmissionPdf">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(flowState == "MAIN.FULL_ADMIT_REJECT_REPAYMENT" || flowState == "MAIN.PART_ADMIT_REJECT_REPAYMENT") &amp;&amp; (!empty flowFlags.LIP_JUDGMENT_ADMISSION &amp;&amp; flowFlags.LIP_JUDGMENT_ADMISSION)}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_0ogn4r0" name="Applicant proposes new repayment plan (Respondent is LTD company or organization) JO Enabled " sourceRef="Gateway_RESPONSE_FLOW" targetRef="Gateway_0yyi3a3">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(flowState == "MAIN.FULL_ADMIT_REJECT_REPAYMENT" || flowState == "MAIN.PART_ADMIT_REJECT_REPAYMENT") &amp;&amp; ((!empty flowFlags.JO_ONLINE_LIVE_ENABLED &amp;&amp; flowFlags.JO_ONLINE_LIVE_ENABLED) &amp;&amp; (!empty flowFlags.LIP_JUDGMENT_ADMISSION &amp;&amp; !flowFlags.LIP_JUDGMENT_ADMISSION))}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_0ogn4r0" name="Applicant proposes new repayment plan (Respondent is LTD company or organization)" sourceRef="Gateway_RESPONSE_FLOW" targetRef="Gateway_0yyi3a3">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(flowState == "MAIN.FULL_ADMIT_REJECT_REPAYMENT" || flowState == "MAIN.PART_ADMIT_REJECT_REPAYMENT") &amp;&amp; (!empty flowFlags.LIP_JUDGMENT_ADMISSION &amp;&amp; !flowFlags.LIP_JUDGMENT_ADMISSION)}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:exclusiveGateway id="Gateway_1e1bap6">
       <bpmn:incoming>Flow_0h4qr2u</bpmn:incoming>
@@ -367,7 +338,6 @@
     </bpmn:sequenceFlow>
     <bpmn:exclusiveGateway id="Gateway_0yyi3a3" name="welsh party ?">
       <bpmn:incoming>Flow_0ogn4r0</bpmn:incoming>
-      <bpmn:incoming>Flow_187wcee</bpmn:incoming>
       <bpmn:outgoing>Flow_0tnuy5r</bpmn:outgoing>
       <bpmn:outgoing>Flow_1b3kpvc</bpmn:outgoing>
     </bpmn:exclusiveGateway>
@@ -411,10 +381,10 @@
       <bpmn:outgoing>Flow_1kkvaac</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_15eyp4s" name="check for location update when admission document not generated" sourceRef="Gateway_1t4n5kp" targetRef="TriggerAndUpdateGenAppLocation">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!(flowState == "MAIN.FULL_ADMIT_AGREE_REPAYMENT" || flowState == "MAIN.PART_ADMIT_AGREE_REPAYMENT"  ||(flowState == "MAIN.FULL_ADMIT_REJECT_REPAYMENT" || flowState == "MAIN.PART_ADMIT_REJECT_REPAYMENT")  &amp;&amp; ((!empty flowFlags.JO_ONLINE_LIVE_ENABLED &amp;&amp; flowFlags.JO_ONLINE_LIVE_ENABLED) &amp;&amp; (!empty flowFlags.LIP_JUDGMENT_ADMISSION &amp;&amp; flowFlags.LIP_JUDGMENT_ADMISSION)))}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!(flowState == "MAIN.FULL_ADMIT_AGREE_REPAYMENT" || flowState == "MAIN.PART_ADMIT_AGREE_REPAYMENT"  ||(flowState == "MAIN.FULL_ADMIT_REJECT_REPAYMENT" || flowState == "MAIN.PART_ADMIT_REJECT_REPAYMENT")  &amp;&amp; (!empty flowFlags.LIP_JUDGMENT_ADMISSION &amp;&amp; flowFlags.LIP_JUDGMENT_ADMISSION))}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_1kkvaac" name="judgement admission document generated (no need to pause)" sourceRef="Gateway_1t4n5kp" targetRef="Gateway_RPA_FLOW">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.FULL_ADMIT_AGREE_REPAYMENT" || flowState == "MAIN.PART_ADMIT_AGREE_REPAYMENT"  ||(flowState == "MAIN.FULL_ADMIT_REJECT_REPAYMENT" || flowState == "MAIN.PART_ADMIT_REJECT_REPAYMENT") &amp;&amp; ((!empty flowFlags.JO_ONLINE_LIVE_ENABLED &amp;&amp; flowFlags.JO_ONLINE_LIVE_ENABLED)  &amp;&amp; (!empty flowFlags.LIP_JUDGMENT_ADMISSION &amp;&amp; flowFlags.LIP_JUDGMENT_ADMISSION))}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.FULL_ADMIT_AGREE_REPAYMENT" || flowState == "MAIN.PART_ADMIT_AGREE_REPAYMENT"  ||(flowState == "MAIN.FULL_ADMIT_REJECT_REPAYMENT" || flowState == "MAIN.PART_ADMIT_REJECT_REPAYMENT") &amp;&amp; (!empty flowFlags.LIP_JUDGMENT_ADMISSION &amp;&amp; flowFlags.LIP_JUDGMENT_ADMISSION)}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:exclusiveGateway id="Gateway_1ty49cn">
       <bpmn:incoming>Flow_08src12</bpmn:incoming>
@@ -504,10 +474,6 @@
         <dc:Bounds x="840" y="880" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_0azkwrd" bpmnElement="ProceedOffline">
-        <dc:Bounds x="1650" y="650" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1lw8al6" bpmnElement="Generate_LIP_Claimant_MD">
         <dc:Bounds x="1050" y="880" width="100" height="80" />
         <bpmndi:BPMNLabel />
@@ -526,10 +492,6 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1irg6vc" bpmnElement="GenerateJudgmentByAdmissionPdf">
         <dc:Bounds x="620" y="550" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_0l350c4" bpmnElement="NotifyRoboticsOnCaseHandedOffline">
-        <dc:Bounds x="1790" y="650" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1t6zna0" bpmnElement="Gateway_0btqyj3" isMarkerVisible="true">
@@ -652,14 +614,6 @@
         <di:waypoint x="1300" y="423" />
         <di:waypoint x="1345" y="423" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_187wcee_di" bpmnElement="Flow_187wcee">
-        <di:waypoint x="440" y="448" />
-        <di:waypoint x="440" y="920" />
-        <di:waypoint x="670" y="920" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="440" y="840" width="81" height="80" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_089b2nt_di" bpmnElement="Flow_089b2nt">
         <di:waypoint x="1530" y="448" />
         <di:waypoint x="1530" y="530" />
@@ -747,16 +701,6 @@
           <dc:Bounds x="579" y="463" width="85" height="53" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0xrpi43_di" bpmnElement="Flow_0xrpi43">
-        <di:waypoint x="1750" y="690" />
-        <di:waypoint x="1790" y="690" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1osir9u_di" bpmnElement="Flow_1osir9u">
-        <di:waypoint x="1890" y="690" />
-        <di:waypoint x="1920" y="690" />
-        <di:waypoint x="1920" y="423" />
-        <di:waypoint x="2190" y="423" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0pcu8vp_di" bpmnElement="Flow_0pcu8vp">
         <di:waypoint x="1395" y="423" />
         <di:waypoint x="1505" y="423" />
@@ -799,14 +743,6 @@
         <di:waypoint x="1770" y="1000" />
         <di:waypoint x="1860" y="1000" />
         <di:waypoint x="1860" y="880" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0ia7tek_di" bpmnElement="Flow_0ia7tek">
-        <di:waypoint x="1530" y="448" />
-        <di:waypoint x="1530" y="690" />
-        <di:waypoint x="1650" y="690" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1538" y="617" width="83" height="66" />
-        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1jcosxq_di" bpmnElement="Flow_1jcosxq">
         <di:waypoint x="1530" y="448" />

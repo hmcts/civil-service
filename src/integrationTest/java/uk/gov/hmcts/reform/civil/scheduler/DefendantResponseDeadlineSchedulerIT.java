@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.scheduler;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,15 +23,17 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
-    "test.id=DefendantResponseDeadlineSchedulerITest",
-    "scheduler.defendantResponse.enabled=true"
+    "test.id=DefendantResponseDeadlineSchedulerIT",
+    "scheduler.defendant-response.enabled=true",
+    "scheduler.lockAtLeastFor=PT0S"
 })
-public class DefendantResponseDeadlineSchedulerITest {
+public class DefendantResponseDeadlineSchedulerIT {
 
     @Autowired
     private DefendantResponseDeadlineScheduler scheduler;
@@ -44,10 +47,17 @@ public class DefendantResponseDeadlineSchedulerITest {
     @MockBean
     private FeatureToggleService featureToggleService;
 
+    @BeforeEach
+    void setUp() {
+        reset(telemetryService, featureToggleService, coreCaseDataService);
+        when(featureToggleService.isSpringSchedulerEnabled(DefendantResponseDeadlineScheduler.SCHEDULER_NAME))
+            .thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+    }
+
     @Test
     void shouldExecuteDefendantResponseDeadlineScheduler() {
         // Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         SearchResult searchResult = SearchResult.builder()
             .total(1)
