@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
@@ -188,21 +190,23 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 + "in breathing space");
         }
 
-        @Test
-        void shouldReturnError_WhenAboutToStartInvokeWhenRespondentResponseLanguageIsBilingual() {
+        @ParameterizedTest
+        @ValueSource(strings = {"WELSH", "BOTH"})
+        void shouldNotReturnError_WhenRespondentResponseLanguageIsBilingualAndDeadlinePassed(String responseLanguage) {
             RespondentLiPResponse respondentLiPResponse  = new RespondentLiPResponse();
-            respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
+            respondentLiPResponse.setRespondent1ResponseLanguage(responseLanguage);
             CaseDataLiP caseDataLiP = new CaseDataLiP();
             caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.setBreathing(new BreathingSpaceInfo().setLift(null));
             caseData.setCaseDataLiP(caseDataLiP);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(1));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            assertThat(response.getErrors()).contains("The Claim is not eligible for Default Judgment.");
+            assertThat(response.getErrors()).doesNotContain("The Claim is not eligible for Default Judgment.");
         }
 
     }
