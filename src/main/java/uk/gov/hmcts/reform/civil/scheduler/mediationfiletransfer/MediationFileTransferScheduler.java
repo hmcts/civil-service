@@ -7,10 +7,15 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.scheduler.common.ListTaskResult;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
+import uk.gov.hmcts.reform.civil.scheduler.common.TaskResult;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.mediation.MediationFileTransferService;
 import uk.gov.hmcts.reform.civil.service.search.MediationSearchService;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -24,6 +29,7 @@ public class MediationFileTransferScheduler implements CivilScheduler {
     private final ScheduledTaskRunner<CaseData, Long> scheduledTaskRunner;
     private final MediationFileTransferScheduledTask task;
     private final FeatureToggleService featureToggleService;
+    private final MediationFileTransferService mediationFileTransferService;
 
     @Override
     public String getName() {
@@ -41,7 +47,21 @@ public class MediationFileTransferScheduler implements CivilScheduler {
         }
 
         log.info("Running {} scheduler", SCHEDULER_NAME);
-        scheduledTaskRunner.run(SCHEDULER_NAME + "_CSV", searchService::getInMediationCsv, task);
-        scheduledTaskRunner.run(SCHEDULER_NAME + "_JSON", searchService::getInMediationJson, task);
+        scheduledTaskRunner.run(SCHEDULER_NAME, this::getCsvCasesAfterTransfer, task);
+        scheduledTaskRunner.run(SCHEDULER_NAME, this::getJsonCasesAfterTransfer, task);
+    }
+
+    private TaskResult<CaseData> getCsvCasesAfterTransfer() {
+        TaskResult<CaseData> result = searchService.getInMediationCsv();
+        List<CaseData> cases = result.itemStream().toList();
+        mediationFileTransferService.sendCsv(cases);
+        return new ListTaskResult<>(cases, result.totalResults());
+    }
+
+    private TaskResult<CaseData> getJsonCasesAfterTransfer() {
+        TaskResult<CaseData> result = searchService.getInMediationJson();
+        List<CaseData> cases = result.itemStream().toList();
+        mediationFileTransferService.sendJson(cases);
+        return new ListTaskResult<>(cases, result.totalResults());
     }
 }
