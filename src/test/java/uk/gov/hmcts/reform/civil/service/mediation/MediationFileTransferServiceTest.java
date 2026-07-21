@@ -60,9 +60,11 @@ class MediationFileTransferServiceTest {
             assertThat(attachment.getFilename()).isEqualTo("ocmc_mediation_data.csv");
             assertThat(attachment.getContentType()).isEqualTo("text/csv");
             assertThat(attachmentContent(attachment)).isEqualTo(
-                "SITE_ID,CASE_TYPE,CHECK_LIST,PARTY_STATUS,CASE_NUMBER,AMOUNT,PARTY_TYPE,"
-                    + "COMPANY_NAME,CONTACT_NAME,CONTACT_NUMBER,CONTACT_EMAIL,PILOT,CASE_TITLE\r\n"
-                    + "row-one\r\n"
+                """
+                    SITE_ID,CASE_TYPE,CHECK_LIST,PARTY_STATUS,CASE_NUMBER,AMOUNT,PARTY_TYPE,\
+                    COMPANY_NAME,CONTACT_NAME,CONTACT_NUMBER,CONTACT_EMAIL,PILOT,CASE_TITLE\r
+                    row-one\r
+                    """
             );
         });
     }
