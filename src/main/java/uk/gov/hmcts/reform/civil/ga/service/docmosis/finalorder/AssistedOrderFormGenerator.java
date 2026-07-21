@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
@@ -41,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.ga.enums.dq.ClaimantRepresentationType.C
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.FinalOrderConsideredToggle.CONSIDERED;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.HeardFromRepresentationTypes.OTHER_REPRESENTATION;
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.nowInLocalZone;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.ASSISTED_ORDER_FORM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.POST_JUDGE_ASSISTED_ORDER_FORM_LIP;
 
@@ -582,7 +582,7 @@ public class AssistedOrderFormGenerator implements TemplateDataGenerator<Assiste
     protected String getFileName(DocmosisTemplates template) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(FILE_TIMESTAMP_FORMAT);
         return String.format(template.getDocumentTitle(),
-                LocalDateTime.now().format(formatter));
+                nowInLocalZone().format(formatter));
     }
 
     protected String getCaseNumberFormatted(GeneralApplicationCaseData caseData) {
