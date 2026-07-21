@@ -17,10 +17,13 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -38,9 +41,10 @@ class VerifyHearingNoticeNamesTaskTest {
     private VerifyHearingNoticeNamesTask task;
 
     private final Party claimant = new Party()
-        .setType(Party.Type.INDIVIDUAL).setIndividualFirstName("John").setIndividualLastName("Smith");
+        .setType(Party.Type.INDIVIDUAL).setIndividualTitle("Mr")
+        .setIndividualFirstName("Aslesh").setIndividualLastName("Narra");
     private final Party defendant = new Party()
-        .setType(Party.Type.INDIVIDUAL).setIndividualFirstName("Jane").setIndividualLastName("Doe");
+        .setType(Party.Type.ORGANISATION).setOrganisationName("IQUW Syndicate Management Limited");
 
     @BeforeEach
     void setUp() {
@@ -55,30 +59,31 @@ class VerifyHearingNoticeNamesTaskTest {
     }
 
     @Test
-    void shouldReportMatch_whenNoticeContainsCurrentNames() throws Exception {
-        byte[] pdf = pdfContaining(claimant.getPartyName() + " v " + defendant.getPartyName());
+    void shouldReportOk_whenAttendeeIsACurrentParty() throws Exception {
+        // notice attendee matches the CCD claimant (title-insensitive)
+        byte[] pdf = noticeWithAttendee("Aslesh Narra");
         when(documentDownloadService.downloadDocument(any(CaseDocument.class), anyString(), anyString(), anyString()))
             .thenReturn(pdf);
         CaseData caseData = caseWithNotice();
 
-        CaseData result = task.migrateCaseData(caseData, caseReference("123"));
+        CaseData result = task.migrateCaseData(caseData, caseReference("1732030337525703"));
 
         assertEquals(caseData, result, "task must return the case unchanged");
         verify(documentDownloadService, times(1))
             .downloadDocument(any(CaseDocument.class), anyString(), anyString(), anyString());
-        verify(userService, times(1)).getAccessToken("system-user", "pass");
     }
 
     @Test
-    void shouldReportStale_whenNoticeMissesACurrentName() throws Exception {
-        byte[] pdf = pdfContaining("Old Claimant v Jane Doe");
+    void shouldFlagIncorrectAttendee_whenNoticeNamesSomeoneFromAnotherCase() throws Exception {
+        // the real defect: header is the CCD parties but the attendee is a foreign name
+        byte[] pdf = noticeWithAttendee("Charlie Sansom");
         when(documentDownloadService.downloadDocument(any(CaseDocument.class), anyString(), anyString(), anyString()))
             .thenReturn(pdf);
         CaseData caseData = caseWithNotice();
 
-        CaseData result = task.migrateCaseData(caseData, caseReference("123"));
+        CaseData result = task.migrateCaseData(caseData, caseReference("1732030337525703"));
 
-        assertEquals(caseData, result, "task must not mutate the case even when the notice is stale");
+        assertEquals(caseData, result, "task must not mutate the case even when an attendee is wrong");
         verify(documentDownloadService, times(1))
             .downloadDocument(any(CaseDocument.class), anyString(), anyString(), anyString());
     }
@@ -115,6 +120,27 @@ class VerifyHearingNoticeNamesTaskTest {
         assertEquals("CaseData and CaseReference must not be null", exception.getMessage());
     }
 
+    @Test
+    void extractAttendees_pullsNamesUnderTheAttendingHeadings() {
+        String text = String.join("\n",
+            "in person",
+            "Attending in person",
+            "Charlie Sansom",
+            "The time allocated for the hearing is 1 hour and 30 minutes.");
+
+        assertEquals(List.of("Charlie Sansom"), task.extractAttendees(text));
+    }
+
+    @Test
+    void participantNames_coversPartiesTitleStripped_butNotAForeignName() {
+        var participants = task.participantNames(caseWithNotice());
+
+        assertTrue(participants.contains("aslesh narra"), "claimant individual name, title stripped");
+        assertTrue(participants.contains("mr aslesh narra".replaceFirst("^mr ", "")));
+        assertTrue(participants.contains("iquw syndicate management limited"), "defendant org name");
+        assertFalse(participants.contains("charlie sansom"), "a foreign name must not be a participant");
+    }
+
     private CaseData caseWithNotice() {
         CaseDocument notice = new CaseDocument()
             .setDocumentLink(new Document(
@@ -133,15 +159,28 @@ class VerifyHearingNoticeNamesTaskTest {
         return caseReference;
     }
 
-    private byte[] pdfContaining(String text) throws Exception {
+    private byte[] noticeWithAttendee(String attendee) throws Exception {
+        List<String> lines = List.of(
+            "Notice of Hearing",
+            "Mr Aslesh Narra 1st Claimant",
+            "IQUW Syndicate Management Limited 1st Defendant",
+            "in person",
+            "Attending in person",
+            attendee,
+            "The time allocated for the hearing is 1 hour and 30 minutes.",
+            "Hearing fees");
         try (PDDocument document = new PDDocument()) {
             PDPage page = new PDPage();
             document.addPage(page);
             try (PDPageContentStream stream = new PDPageContentStream(document, page)) {
+                stream.setLeading(16);
                 stream.beginText();
-                stream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-                stream.newLineAtOffset(50, 700);
-                stream.showText(text);
+                stream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 11);
+                stream.newLineAtOffset(50, 750);
+                for (String line : lines) {
+                    stream.showText(line);
+                    stream.newLine();
+                }
                 stream.endText();
             }
             ByteArrayOutputStream out = new ByteArrayOutputStream();
