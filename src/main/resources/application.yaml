@@ -68,6 +68,9 @@ scheduler:
   defendant-response:
     cronExpression: ${CRON_EXPRESSION_DEFENDANT_RESPONSE:0 1 16 * * ?}
     enabled: ${SCHEDULER_ENABLED_DEFENDANT_RESPONSE:false}
+  hearing-fee:
+    cronExpression: ${CRON_EXPRESSION_HEARING_FEE:0 0 0 * * ?}
+    enabled: ${SCHEDULER_ENABLED_HEARING_FEE:true}
   default-back-pressure:
     initialDelay: ${DEFAULT_BACK_PRESSURE_INITIAL_DELAY:PT0S}
     maxDelay: ${DEFAULT_BACK_PRESSURE_MAX_DELAY:PT10S}

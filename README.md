@@ -447,6 +447,19 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 | `enabled` | Whether the scheduler is active. | `false` | `SCHEDULER_ENABLED_JUDGEMENT_BUFFER` |
 | `cronExpression` | When the scheduler runs. | `0 0 2 * * *` (Daily at 2 AM) | `CRON_EXPRESSION_JUDGEMENT_BUFFER` |
 
+### HearingFeeScheduler
+
+The `HearingFeeScheduler` searches for cases where a hearing fee decision is due and triggers the appropriate CCD event to mark the fee as paid, unpaid, or not due.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.judgement-buffer`.
+
+| Setting | Description | Default                               | Environment Variable |
+|---------|-------------|---------------------------------------|----------------------|
+| `enabled` | Whether the scheduler is active. | `false`                               | `SCHEDULER_ENABLED_HEARING_FEE` |
+| `cronExpression` | When the scheduler runs. | `0 0 0 * * ?` (Every day at midnight) | `CRON_EXPRESSION_HEARING_FEE` |
+
 #### Global Scheduler Settings
 
 | Setting | Description | Default | Environment Variable |
