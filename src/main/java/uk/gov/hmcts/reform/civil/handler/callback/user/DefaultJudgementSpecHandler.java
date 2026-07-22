@@ -80,7 +80,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     public static final String BREATHING_SPACE = "Default judgment cannot be applied for while claim is in"
         + " breathing space";
     public static final String PARTIAL_PAYMENT_OFFLINE = "This feature is currently not available, please see guidance below";
-    public static final String DJ_NOT_VALID_FOR_THIS_LIP_CLAIM = "The Claim is not eligible for Default Judgment.";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
     private static final int DEFAULT_JUDGEMENT_SPEC_DEADLINE_EXTENSION_MONTHS = 36;
     private static final String CASES_CASE_DETAILS_CLAIM_DOCUMENTS = "/cases/case-details/%s#Claim documents";
@@ -192,9 +191,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
         var caseData = callbackParams.getCaseData();
         ArrayList<String> errors = new ArrayList<>();
-        if (caseData.isRespondentResponseBilingual()) {
-            errors.add(DJ_NOT_VALID_FOR_THIS_LIP_CLAIM);
-        } else if (nonNull(caseData.getRespondent1ResponseDeadline())
+        if (nonNull(caseData.getRespondent1ResponseDeadline())
             && caseData.getRespondent1ResponseDeadline().isAfter(LocalDateTime.now())) {
             String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
             errors.add(format(NOT_VALID_DJ, formattedDeadline));
