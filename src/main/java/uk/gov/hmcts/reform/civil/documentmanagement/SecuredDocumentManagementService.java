@@ -56,8 +56,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     private final Tika tika;
 
     @Retryable(retryFor = {DocumentUploadException.class},
-        maxAttempts = 5,
-        backoff = @Backoff(delay = 1000, multiplier = 2))
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 1000, multiplier = 3))
     @Override
     public CaseDocument uploadDocument(String authorisation, PDF pdf) {
         String originalFileName = pdf.getFileBaseName();
@@ -108,8 +108,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     }
 
     @Retryable(retryFor = {DocumentUploadException.class},
-        maxAttempts = 5,
-        backoff = @Backoff(delay = 1000, multiplier = 2))
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 1000, multiplier = 3))
     @Override
     public CaseDocument uploadDocument(String authorisation, UploadedDocument uploadedDocument) {
 
@@ -161,8 +161,10 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     }
 
     @Retryable(retryFor = {DocumentDownloadException.class},
-        maxAttempts = 5,
-        backoff = @Backoff(delay = 1000, multiplier = 2))
+        noRetryFor = {DocumentNotFoundException.class, DocumentAccessException.class,
+            InvalidDocumentReferenceException.class},
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 1000, multiplier = 3))
     @Override
     public byte[] downloadDocument(String authorisation, String documentPath) {
         log.info("Downloading document {}", documentPath);
@@ -192,20 +194,15 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                 .map(ByteArrayResource::getByteArray)
                 .orElseThrow(RuntimeException::new);
         } catch (Exception ex) {
-            if (ex instanceof DocumentTtlExpiredException documentTtlExpiredException) {
-                throw documentTtlExpiredException;
-            }
-            if (isDocumentTtlExpired(ex)) {
-                throw new DocumentTtlExpiredException(documentPath, ex);
-            }
-            log.error("Failed downloading document {}", documentPath, ex);
-            throw new DocumentDownloadException(documentPath, ex);
+            throw classifyDownloadFailure(documentPath, ex);
         }
     }
 
     @Retryable(retryFor = {DocumentDownloadException.class},
-        maxAttempts = 5,
-        backoff = @Backoff(delay = 1000, multiplier = 2))
+        noRetryFor = {DocumentNotFoundException.class, DocumentAccessException.class,
+            InvalidDocumentReferenceException.class},
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 1000, multiplier = 3))
     @Override
     public DownloadedDocumentResponse downloadDocumentWithMetaData(String authorisation, String documentPath) {
         log.info("Downloading document {}", documentPath);
@@ -233,14 +230,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
             return new DownloadedDocumentResponse(responseEntity.getBody(), documentMetadata.originalDocumentName,
                                                   tika.detect(documentMetadata.originalDocumentName));
         } catch (Exception ex) {
-            if (ex instanceof DocumentTtlExpiredException documentTtlExpiredException) {
-                throw documentTtlExpiredException;
-            }
-            if (isDocumentTtlExpired(ex)) {
-                throw new DocumentTtlExpiredException(documentPath, ex);
-            }
-            log.error("Failed downloading document {}", documentPath, ex);
-            throw new DocumentDownloadException(documentPath, ex);
+            throw classifyDownloadFailure(documentPath, ex);
         }
     }
 
@@ -250,8 +240,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         try {
             caseDocumentClientApi.deleteDocument(authorisation, authTokenGenerator.generate(), getDocumentIdFromSelfHref(documentPath), true);
         } catch (Exception ex) {
-            log.error("Failed deleting document {}", documentPath, ex);
-            throw new DocumentDownloadException(documentPath, ex);
+            throw classifyDownloadFailure(documentPath, ex);
         }
     }
 
@@ -266,15 +255,50 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
             );
 
         } catch (Exception ex) {
-            if (isDocumentTtlExpired(ex)) {
-                throw new DocumentTtlExpiredException(documentPath, ex);
-            }
-            log.error("Failed getting metadata for {}", documentPath, ex);
-            throw new DocumentDownloadException(documentPath, ex);
+            throw classifyDownloadFailure(documentPath, ex);
         }
     }
 
+    /**
+     * Maps a download/metadata failure onto a specific exception so callers and the
+     * controller advice can return a meaningful status: CDAM 404 -> not found,
+     * CDAM 403 -> access refused, a malformed reference -> bad request, and any other
+     * (transient) failure -> the retryable {@link DocumentDownloadException}. An
+     * already-classified exception is returned as-is so it is not re-wrapped or retried.
+     */
+    private RuntimeException classifyDownloadFailure(String documentPath, Exception ex) {
+        if (ex instanceof DocumentNotFoundException
+            || ex instanceof DocumentAccessException
+            || ex instanceof InvalidDocumentReferenceException) {
+            return (RuntimeException) ex;
+        }
+        if (ex instanceof DocumentTtlExpiredException documentTtlExpiredException) {
+            return documentTtlExpiredException;
+        }
+        if (isDocumentTtlExpired(ex)) {
+            return new DocumentTtlExpiredException(documentPath, ex);
+        }
+        if (ex instanceof FeignException.NotFound) {
+            log.error("Document {} not found in document management", documentPath, ex);
+            return new DocumentNotFoundException(documentPath, ex);
+        }
+        if (ex instanceof FeignException.Forbidden) {
+            log.error("Access to document {} refused by document management", documentPath, ex);
+            return new DocumentAccessException(documentPath, ex);
+        }
+        if (ex instanceof IllegalArgumentException) {
+            log.error("Invalid document reference {}", documentPath, ex);
+            return new InvalidDocumentReferenceException(documentPath, ex);
+        }
+        log.error("Failed downloading document {}", documentPath, ex);
+        return new DocumentDownloadException(documentPath, ex);
+    }
+
     private UUID getDocumentIdFromSelfHref(String selfHref) {
+        if (selfHref == null || selfHref.length() < DOC_UUID_LENGTH) {
+            log.error("Invalid document reference, cannot extract document id: {}", selfHref);
+            throw new InvalidDocumentReferenceException(selfHref);
+        }
         return UUID.fromString(selfHref.substring(selfHref.length() - DOC_UUID_LENGTH));
     }
 

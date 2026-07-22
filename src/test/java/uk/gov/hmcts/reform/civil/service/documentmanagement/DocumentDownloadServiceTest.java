@@ -8,6 +8,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.InvalidDocumentReferenceException;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SETTLE_CLAIM_PAID_IN_FULL_LETTER;
 
@@ -91,5 +93,19 @@ class DocumentDownloadServiceTest {
 
         assertThrows(DocumentDownloadException.class, () ->
             documentDownloadService.downloadDocument(caseDocument, BEARER_TOKEN, documentId, "error"));
+    }
+
+    @Test
+    void shouldThrowInvalidDocumentReference_whenDocumentIdNull() {
+        assertThrows(InvalidDocumentReferenceException.class, () ->
+            documentDownloadService.downloadDocument(BEARER_TOKEN, (String) null));
+        verifyNoInteractions(documentManagementService);
+    }
+
+    @Test
+    void shouldThrowInvalidDocumentReference_whenDocumentIdBlank() {
+        assertThrows(InvalidDocumentReferenceException.class, () ->
+            documentDownloadService.downloadDocument(BEARER_TOKEN, "   "));
+        verifyNoInteractions(documentManagementService);
     }
 }

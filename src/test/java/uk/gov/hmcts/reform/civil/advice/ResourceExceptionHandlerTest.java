@@ -13,6 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentAccessException;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentNotFoundException;
+import uk.gov.hmcts.reform.civil.documentmanagement.InvalidDocumentReferenceException;
 import uk.gov.hmcts.reform.civil.exceptions.UpstreamIdamException;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
@@ -224,6 +227,42 @@ public class ResourceExceptionHandlerTest {
                 contentCachingRequestWrapper
             ),
             HttpStatus.NOT_FOUND
+        );
+    }
+
+    @Test
+    void shouldReturnNotFound_whenDocumentNotFoundExceptionThrown() {
+        testTemplate(
+            "could not be found in document management",
+            handler.documentManagementError(
+                new DocumentNotFoundException("documents/abc", new RuntimeException("cdam 404")),
+                contentCachingRequestWrapper
+            ),
+            HttpStatus.NOT_FOUND
+        );
+    }
+
+    @Test
+    void shouldReturnForbidden_whenDocumentAccessExceptionThrown() {
+        testTemplate(
+            "was refused by document management",
+            handler.documentManagementError(
+                new DocumentAccessException("documents/abc", new RuntimeException("cdam 403 ttl")),
+                contentCachingRequestWrapper
+            ),
+            HttpStatus.FORBIDDEN
+        );
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenInvalidDocumentReferenceExceptionThrown() {
+        testTemplate(
+            "Invalid document reference",
+            handler.documentManagementError(
+                new InvalidDocumentReferenceException("documents/null"),
+                contentCachingRequestWrapper
+            ),
+            HttpStatus.BAD_REQUEST
         );
     }
 
