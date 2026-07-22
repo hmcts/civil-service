@@ -16,10 +16,10 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.ga.utils.DocUploadUtils;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.nowInLocalZone;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.RESPOND_FOR_WRITTEN_REPRESENTATION;
 
 @Slf4j
@@ -72,7 +72,7 @@ public class RespondToWrittenRepresentationGenerator implements TemplateDataGene
 
     private String getFileName(DocmosisTemplates docmosisTemplate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return String.format(docmosisTemplate.getDocumentTitle(), LocalDateTime.now().format(formatter));
+        return String.format(docmosisTemplate.getDocumentTitle(), nowInLocalZone().format(formatter));
     }
 
     protected DocmosisTemplates getDocmosisTemplate() {
