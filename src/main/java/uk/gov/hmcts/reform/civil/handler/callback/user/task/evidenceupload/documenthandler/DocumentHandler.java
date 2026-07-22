@@ -165,8 +165,14 @@ public abstract class DocumentHandler<T> {
         renameUploadEvidenceDocumentType(documentUploads, evidenceUploadType.getDocumentTypeDisplayName());
     }
 
-    public void addUploadDocList(CaseData caseData) {
+    protected boolean shouldPopulatePostBundleUploadList() {
+        return true;
+    }
 
+    public void addUploadDocList(CaseData caseData) {
+        if (!shouldPopulatePostBundleUploadList()) {
+            return;
+        }
         if (getDocumentList(caseData) == null || getDocumentList(caseData).isEmpty()) {
             return;
         }
