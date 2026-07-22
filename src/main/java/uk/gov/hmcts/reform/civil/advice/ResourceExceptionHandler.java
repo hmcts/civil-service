@@ -90,6 +90,19 @@ public class ResourceExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_ACCEPTABLE);
     }
 
+    @ExceptionHandler(value = FeignException.UnprocessableEntity.class)
+    public ResponseEntity<Object> unprocessableEntity(FeignException.UnprocessableEntity exception,
+                                                      ContentCachingRequestWrapper contentCachingRequestWrapper) {
+        String errorMessage = "Unprocessable entity error with message: %s for case %s run by user %s";
+        log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
+                                         getUserId(contentCachingRequestWrapper)));
+        String body = exception.contentUTF8();
+        return new ResponseEntity<>(
+            body.isEmpty() ? exception.getMessage() : body,
+            new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY
+        );
+    }
+
     @ExceptionHandler(value =  FeignException.Unauthorized.class)
     public ResponseEntity<Object> unauthorizedFeign(Exception exception,
                                                     ContentCachingRequestWrapper contentCachingRequestWrapper) {

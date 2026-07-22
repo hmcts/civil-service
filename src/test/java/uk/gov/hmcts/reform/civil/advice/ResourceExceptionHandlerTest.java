@@ -228,6 +228,41 @@ public class ResourceExceptionHandlerTest {
     }
 
     @Test
+    void shouldReturnUnprocessableEntity_whenFeignException422Thrown() {
+        String callbackErrorBody = "{\"callbackErrors\":[\"The Claim is not eligible for Default Judgment.\"]}";
+        testTemplate(
+            "The Claim is not eligible for Default Judgment.",
+            handler.unprocessableEntity(
+                new FeignException.UnprocessableEntity(
+                    "422 Unprocessable Entity",
+                    Mockito.mock(feign.Request.class),
+                    callbackErrorBody.getBytes(StandardCharsets.UTF_8),
+                    Collections.emptyMap()
+                ),
+                contentCachingRequestWrapper
+            ),
+            HttpStatus.UNPROCESSABLE_ENTITY
+        );
+    }
+
+    @Test
+    void shouldReturnUnprocessableEntity_withMessageWhenBodyEmpty() {
+        testTemplate(
+            "422 empty body",
+            handler.unprocessableEntity(
+                new FeignException.UnprocessableEntity(
+                    "422 empty body",
+                    Mockito.mock(feign.Request.class),
+                    new byte[]{},
+                    Collections.emptyMap()
+                ),
+                contentCachingRequestWrapper
+            ),
+            HttpStatus.UNPROCESSABLE_ENTITY
+        );
+    }
+
+    @Test
     void shouldReturnExpectationFailed_whenJsonSchemaValidationExceptionThrown() {
         testTemplate(
             "expected exception from json schema rpa",
