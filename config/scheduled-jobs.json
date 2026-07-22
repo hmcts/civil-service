@@ -2,8 +2,8 @@
   "Bundle creation scheduler": {
     "purpose": "Builds bundles for eligible hearings each evening."
   },
-  "Case dismissed scheduler": {
-    "purpose": "Automatically dismisses claims that have missed their deadlines."
+  "Notify claim and claim dismissed deadline scheduler": {
+    "purpose": "Dismisses claims when the claim notification or claim dismissed deadline has passed."
   },
   "Decision outcome scheduler": {
     "purpose": "Moves cases awaiting judicial decisions into the decision outcome workflow."
@@ -47,8 +47,8 @@
   "Migrate cases scheduler": {
     "purpose": "Reserved cron to re-run large case migration batches."
   },
-  "Notify claim deadline scheduler": {
-    "purpose": "Notifies parties about upcoming claim deadlines, prior to dismissal."
+  "Notify claim details scheduler": {
+    "purpose": "Dismisses claims when the claim details notification deadline has passed."
   },
   "Incident retry scheduler": {
     "purpose": "Retries failed external incident tasks each night."
