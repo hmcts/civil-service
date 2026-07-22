@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGeneratorFactory;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -24,17 +26,39 @@ public final class CamundaDefinitionImporter {
 
     private static final Logger logger = LoggerFactory.getLogger(CamundaDefinitionImporter.class);
     private static final DateTimeFormatter BPMN_DEPLOYMENT_TIMESTAMP = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+    private static final int DEFAULT_MAX_UPLOAD_ATTEMPTS = 6;
+    private static final Duration DEFAULT_UPLOAD_RETRY_DELAY = Duration.ofSeconds(10);
 
     private final CamundaImportConfiguration configuration;
     private final RestTemplate restTemplate;
+    private final int maxUploadAttempts;
+    private final Duration uploadRetryDelay;
+    private final Sleeper sleeper;
 
     public CamundaDefinitionImporter(CamundaImportConfiguration configuration) {
         this(configuration, new RestTemplate());
     }
 
     CamundaDefinitionImporter(CamundaImportConfiguration configuration, RestTemplate restTemplate) {
+        this(
+            configuration,
+            restTemplate,
+            DEFAULT_MAX_UPLOAD_ATTEMPTS,
+            DEFAULT_UPLOAD_RETRY_DELAY,
+            duration -> Thread.sleep(duration.toMillis())
+        );
+    }
+
+    CamundaDefinitionImporter(CamundaImportConfiguration configuration,
+                              RestTemplate restTemplate,
+                              int maxUploadAttempts,
+                              Duration uploadRetryDelay,
+                              Sleeper sleeper) {
         this.configuration = configuration;
         this.restTemplate = restTemplate;
+        this.maxUploadAttempts = maxUploadAttempts;
+        this.uploadRetryDelay = uploadRetryDelay;
+        this.sleeper = sleeper;
     }
 
     public void importDefinitions() throws IOException {
@@ -56,7 +80,7 @@ public final class CamundaDefinitionImporter {
         List<String> failures = new ArrayList<>();
         for (CamundaImportConfiguration.CamundaDefinitionFile definitionFile : definitionFiles) {
             try {
-                uploadDefinition(serviceAuthorization, definitionFile);
+                uploadDefinitionWithRetry(serviceAuthorization, definitionFile);
             } catch (RestClientResponseException exception) {
                 String message = String.format(
                     "%s upload failed with status %s and response %s",
@@ -65,6 +89,12 @@ public final class CamundaDefinitionImporter {
                     exception.getResponseBodyAsString()
                 );
                 logger.error(message, exception);
+                if (isRetryable(exception)) {
+                    throw new IllegalStateException(
+                        "Camunda definition import failed after retrying transient deployment response: " + message,
+                        exception
+                    );
+                }
                 failures.add(message);
             } catch (Exception exception) {
                 String message = String.format("%s upload failed: %s", definitionFile.path().getFileName(), exception.getMessage());
@@ -75,6 +105,33 @@ public final class CamundaDefinitionImporter {
 
         if (!failures.isEmpty()) {
             throw new IllegalStateException("Camunda definition import failed for: " + String.join(", ", failures));
+        }
+    }
+
+    private void uploadDefinitionWithRetry(String serviceAuthorization,
+                                           CamundaImportConfiguration.CamundaDefinitionFile definitionFile) {
+        int attempt = 1;
+        while (true) {
+            try {
+                uploadDefinition(serviceAuthorization, definitionFile);
+                return;
+            } catch (RestClientResponseException exception) {
+                if (!isRetryable(exception) || attempt >= maxUploadAttempts) {
+                    throw exception;
+                }
+
+                logger.warn(
+                    "{} upload failed with status {} on attempt {}/{}. Retrying in {} seconds",
+                    definitionFile.path().getFileName(),
+                    exception.getStatusCode(),
+                    attempt,
+                    maxUploadAttempts,
+                    uploadRetryDelay.toSeconds()
+                );
+
+                sleepBeforeRetry(definitionFile, exception);
+                attempt++;
+            }
         }
     }
 
@@ -118,5 +175,32 @@ public final class CamundaDefinitionImporter {
         }
 
         return definitionFile.path().getFileName().toString();
+    }
+
+    private boolean isRetryable(RestClientResponseException exception) {
+        HttpStatusCode statusCode = exception.getStatusCode();
+        return statusCode.is5xxServerError() || statusCode.value() == 429;
+    }
+
+    private void sleepBeforeRetry(CamundaImportConfiguration.CamundaDefinitionFile definitionFile,
+                                  RestClientResponseException exception) {
+        try {
+            sleeper.sleep(uploadRetryDelay);
+        } catch (InterruptedException interruptedException) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException(
+                String.format(
+                    "%s upload retry interrupted after status %s",
+                    definitionFile.path().getFileName(),
+                    exception.getStatusCode()
+                ),
+                interruptedException
+            );
+        }
+    }
+
+    @FunctionalInterface
+    interface Sleeper {
+        void sleep(Duration duration) throws InterruptedException;
     }
 }
