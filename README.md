@@ -447,6 +447,34 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 | `enabled` | Whether the scheduler is active. | `false` | `SCHEDULER_ENABLED_JUDGEMENT_BUFFER` |
 | `cronExpression` | When the scheduler runs. | `0 0 2 * * *` (Daily at 2 AM) | `CRON_EXPRESSION_JUDGEMENT_BUFFER` |
 
+### CaseDismissedScheduler
+
+The `CaseDismissedScheduler` dismisses eligible claims at the midnight deadline for the notify-claim longstop and defendant-response dismissal paths.
+It runs when `CaseDismissed` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.case-dismissed`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_CASE_DISMISSED` |
+| `cronExpression` | When the scheduler runs. | `0 0 0 * * ?` (Daily at 00:00) | `CRON_EXPRESSION_CASE_DISMISSED` |
+
+### ClaimDetailsNotificationDeadlineScheduler
+
+The `ClaimDetailsNotificationDeadlineScheduler` dismisses eligible claims where the claim details notification deadline has passed.
+It runs when `ClaimDetailsNotificationDeadline` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.claim-details-notification-deadline`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_CLAIM_DETAILS_NOTIFICATION_DEADLINE` |
+| `cronExpression` | When the scheduler runs. | `0 1 16 * * ?` (Daily at 16:01) | `CRON_EXPRESSION_CLAIM_DETAILS_NOTIFICATION_DEADLINE` |
+
 #### Global Scheduler Settings
 
 | Setting | Description | Default | Environment Variable |
