@@ -53,6 +53,11 @@ public class VerifyHearingNoticeNamesTask extends MigrationTask<CaseReference> {
         "attending in person", "attending by telephone", "attending by video",
         "the time allocated for the hearing", "hearing fees");
     private static final Pattern TITLE_PREFIX = Pattern.compile("^(mr|mrs|ms|miss|mx|dr|prof)\\.?\\s+");
+    // Notice header/venue lines that PDFBox interleaves into the attendee run when the list
+    // spans a page break; skipped so they are not mistaken for foreign attendees.
+    private static final List<String> BOILERPLATE_PREFIXES = List.of(
+        "in the ", "claim reference", "claim number", "reference number",
+        "date ", "at ", "notice of hearing", "the hearing");
 
     private final DocumentDownloadService documentDownloadService;
     private final UserService userService;
@@ -171,7 +176,9 @@ public class VerifyHearingNoticeNamesTask extends MigrationTask<CaseReference> {
             if (startsWithAny(lines.get(i), ATTENDEE_LABELS)) {
                 i++;
                 while (i < lines.size() && !startsWithAny(lines.get(i), ATTENDEE_TERMINATORS)) {
-                    names.add(lines.get(i));
+                    if (!startsWithAny(lines.get(i), BOILERPLATE_PREFIXES)) {
+                        names.add(lines.get(i));
+                    }
                     i++;
                 }
             } else {
