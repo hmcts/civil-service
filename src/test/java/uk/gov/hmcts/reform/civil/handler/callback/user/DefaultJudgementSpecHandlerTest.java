@@ -205,7 +205,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            assertThat(response.getErrors()).doesNotContain("The Claim is not eligible for Default Judgment.");
+            assertThat(response.getErrors()).isEmpty();
         }
 
     }
