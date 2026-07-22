@@ -268,7 +268,7 @@ dashboard:
     url: ${CIVIL_SERVICE_URL:http://localhost:4000}
 
 migration:
-  batchsize: 500
+  batchsize: ${MIGRATION_BATCH_SIZE:100}
   wait-time-mins: 5
   csvFile:
     decrypt:
