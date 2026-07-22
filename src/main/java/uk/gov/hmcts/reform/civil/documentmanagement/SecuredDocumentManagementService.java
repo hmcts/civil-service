@@ -257,19 +257,20 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
     public Document getDocumentMetaData(String authorisation, String documentPath) {
         log.info("Getting metadata for file {}", documentPath);
+        UUID documentId = getDocumentIdFromSelfHref(documentPath);
 
         try {
             return caseDocumentClientApi.getMetadataForDocument(
                 authorisation,
                 authTokenGenerator.generate(),
-                getDocumentIdFromSelfHref(documentPath)
+                documentId
             );
 
         } catch (Exception ex) {
             if (isDocumentTtlExpired(ex)) {
                 throw new DocumentTtlExpiredException(documentPath, ex);
             }
-            log.error("Failed getting metadata for {}", documentPath, ex);
+            log.error("Failed getting metadata for document {} with path {}", documentId, documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);
         }
     }

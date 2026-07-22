@@ -29,6 +29,13 @@ public class DocumentDownloadService {
             letterContent = downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
         } catch (Exception e) {
             log.error(errorMessage, caseId, e);
+            log.error(
+                "Failed downloading document {} from {} for case {}",
+                documentId,
+                documentUrl,
+                caseId,
+                e
+            );
             throw new DocumentDownloadException(mailableSdoDocument.getDocumentLink().getDocumentFileName(), e);
         }
         return letterContent;
