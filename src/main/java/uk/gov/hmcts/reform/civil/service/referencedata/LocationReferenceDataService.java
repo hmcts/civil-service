@@ -86,8 +86,13 @@ public class LocationReferenceDataService {
     }
 
     public List<LocationRefData> getCourtLocationsForGeneralApplication(String authToken, String serviceId) {
+        log.info("Fetching court locations for General Application for serviceId: {}", serviceId);
         try {
-            List<LocationRefData> responseEntity = courtVenueService.getCMLAndHLCourts(authTokenGenerator.generate(), authToken, serviceId);
+            List<LocationRefData> responseEntity = courtVenueService.getHearingLocationCourts(
+                authTokenGenerator.generate(),
+                authToken,
+                serviceId);
+            log.info("Court locations for GA fetched: {}", responseEntity.size());
             return onlyEnglandAndWalesLocations(responseEntity)
                 .stream().sorted(Comparator.comparing(LocationRefData::getSiteName)).toList();
         } catch (Exception e) {
