@@ -51,7 +51,9 @@ public class VerifyHearingNoticeNamesTask extends MigrationTask<CaseReference> {
         "attending in person", "attending by telephone", "attending by video");
     private static final List<String> ATTENDEE_TERMINATORS = List.of(
         "attending in person", "attending by telephone", "attending by video",
-        "the time allocated for the hearing", "hearing fees");
+        // "the time allocated for the {hearing|trial}" ends the attendee block on both
+        // Notice of Hearing and Notice of Trial templates
+        "the time allocated for the", "hearing fees", "trial fees");
     private static final Pattern TITLE_PREFIX = Pattern.compile("^(mr|mrs|ms|miss|mx|dr|prof)\\.?\\s+");
     // Notice header/venue lines that PDFBox interleaves into the attendee run when the list
     // spans a page break; skipped so they are not mistaken for foreign attendees.

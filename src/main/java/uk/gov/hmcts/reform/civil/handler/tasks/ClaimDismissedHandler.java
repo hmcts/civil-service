@@ -1,28 +1,16 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import lombok.extern.slf4j.Slf4j;
-import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.event.DismissClaimEvent;
-import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.CaseDismissedSearchService;
 
-import java.util.Set;
-import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
-import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
-
-@Slf4j
 @Component
-public class ClaimDismissedHandler extends BaseExternalTaskHandler {
+public class ClaimDismissedHandler extends AbstractDismissClaimDeadlineHandler {
 
     private static final String SCHEDULER_NAME = "CaseDismissed";
-
-    private final CaseDismissedSearchService caseSearchService;
-    private final ApplicationEventPublisher applicationEventPublisher;
-    private final FeatureToggleService featureToggleService;
 
     public ClaimDismissedHandler(
         ExternalTaskCompletionService externalTaskCompletionService,
@@ -31,33 +19,13 @@ public class ClaimDismissedHandler extends BaseExternalTaskHandler {
         ApplicationEventPublisher applicationEventPublisher,
         FeatureToggleService featureToggleService
     ) {
-        super(externalTaskCompletionService, eventProperties);
-        this.caseSearchService = caseSearchService;
-        this.applicationEventPublisher = applicationEventPublisher;
-        this.featureToggleService = featureToggleService;
+        super(
+            externalTaskCompletionService,
+            eventProperties,
+            caseSearchService,
+            applicationEventPublisher,
+            featureToggleService,
+            SCHEDULER_NAME
+        );
     }
-
-    @Override
-    public ExternalTaskData handleTask(ExternalTask externalTask) {
-        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
-            return new ExternalTaskData();
-        }
-
-        Set<CaseDetails> cases = caseSearchService.getCases();
-        log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
-
-        cases.forEach(caseDetails -> {
-            try {
-                applicationEventPublisher.publishEvent(new DismissClaimEvent(caseDetails.getId()));
-                throttle(cases.size());
-            } catch (Exception e) {
-                //Continue for other cases if there is some error in some cases, as we don't want
-                // to stop processing other valid cases because error happened in some.
-                //We log the error to leave a trace that something needs to be looked into for failed cases
-                log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
-            }
-        });
-        return new ExternalTaskData();
-    }
-
 }

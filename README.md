@@ -77,32 +77,32 @@ The project defines a set of timer-driven Camunda processes that keep cases movi
 | Job | Purpose | Camunda topic(s) | Schedule (cron, UTC) | When it runs |
 | --- | --- | --- | --- | --- |
 | Bundle creation scheduler | Builds bundles for eligible hearings each evening. | `BUNDLE_CREATION_CHECK` | `0 0 21 * * ?` | Daily at 21:00 |
-| Case dismissed scheduler | Automatically dismisses claims that have missed their deadlines. | `CASE_DISMISSED` | `0 5 0,16 * * ?` | Daily at 00:05 and 16:05 |
 | Decision outcome scheduler | Moves cases awaiting judicial decisions into the decision outcome workflow. | `MOVE_TO_DECISION_OUTCOME` | `0 40 0 * * ?` | Daily at 00:40 |
 | Defendant response deadline check scheduler | Sweeps for defendants whose response deadline elapsed and triggers enforcement. | `DEFENDANT_RESPONSE_DEADLINE_CHECK` | `0 1 16 * * ?` | Daily at 16:01 |
 | Evidence upload scheduler | Prompts parties to upload evidence when deadlines are approaching. | `EVIDENCE_UPLOAD_CHECK` | `0 30 17 * * ?` | Daily at 17:30 |
 | Full admit pay immediately no payment scheduler | Escalates full-admit cases where an immediate payment was promised but not received. | `FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
 | GA doc upload notify scheduler | Sends notifications when GA supporting documents are uploaded. | `GADocUploadNotifyScheduler` | `0 0 23 * * ?` | Daily at 23:00 |
-| GA order made scheduler | Processes stay-order general applications once their order deadline has expired. | `GAOrderMadeScheduler` | `0 15 16 * * ?` | Daily at 16:15 |
+| GA order made scheduler | Publishes GA order-made events to downstream services each afternoon. | `GAOrderMadeScheduler` | `0 15 16 ? * * *` | Daily at 16:15 |
 | GA response deadline processor | Processes GA response deadlines, judge revisits and respondent checks. | `GAResponseDeadlineProcessor`<br>`GAJudgeRevisitProcessor`<br>`GARespondentResponseCheckScheduler` | `0 15 17 * * ?` | Daily at 17:15 |
-| GA unless order scheduler | Enforces GA Unless Orders once the compliance deadline passes. | `GAUnlessOrderScheduler` | `0 0 16 * * ?` | Daily at 16:00 |
+| GA unless order scheduler | Enforces GA Unless Orders once the compliance deadline passes. | `GAUnlessOrderScheduler` | `0 0 16 ? * * *` | Daily at 16:00 |
 | Generate CSV and send to MMT scheduler | Produces nightly CSV/JSON exports for the mediation service (MMT). | `GenerateCsvAndSendToMmt`<br>`GenerateJsonAndSendToMmt` | `0 0 1 ? * * *` | Daily at 01:00 |
 | Hearing cvp link scheduler | Issues CVP/remote hearing links on a daily cadence. | `HEARING_CVP_LINK` | `0 50 0 * * ?` | Daily at 00:50 |
 | Hearing fee check scheduler | Checks for unpaid hearing fees and raises the necessary follow-up tasks. | `HEARING_FEE_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
 | Incident retry scheduler | Retries failed external incident tasks each night. | `INCIDENT_RETRY_EVENT` | `0 1 23 * * ?` | Daily at 23:01 |
-| Manage Stay WA Task Scheduler | Maintains WA tasks for stayed cases so that no follow-up is missed. | `ManageStayWATask` | `0 20 1 * * ?` | Daily at 01:20 |
+| Manage Stay WA Task Scheduler | Maintains WA tasks for stayed cases so that no follow-up is missed. | `MANAGE_STAY_WA_TASK_SCHEDULER` | `0 20 1 ? * * *` | Daily at 01:20 |
 | Migrate cases scheduler | Reserved cron to re-run large case migration batches. | `MIGRATE_CASES_EVENTS` | `0 0 0 1 * ? 2080` | First day of each month until 2080 at 00:00 |
-| Notify claim deadline scheduler | Notifies parties about upcoming claim deadlines, prior to dismissal. | `CASE_DISMISSED` | `0 5 0,16 * * ?` | Daily at 00:05 and 16:05 |
-| Order Review Obligation check scheduler | Checks order review obligations and triggers outstanding actions. | `ORDER_REVIEW_OBLIGATION_CHECK` | `0 0 1 * * ?` | Daily at 01:00 |
+| Notify claim and claim dismissed deadline scheduler | Dismisses claims when the claim notification or claim dismissed deadline has passed. | `CLAIM_DISMISSED_DEADLINE` | `0 0 0 * * ?` | Daily at 00:00 |
+| Notify claim details scheduler | Dismisses claims when the claim details notification deadline has passed. | `CLAIM_DETAILS_NOTIFICATION_DEADLINE` | `0 1 16 * * ?` | Daily at 16:01 |
+| Order Review Obligation check scheduler | Checks order review obligations and triggers outstanding actions. | `ORDER_REVIEW_OBLIGATION_CHECK` | `0 10 1 * * ?` | Daily at 01:10 |
 | Polling event emitter scheduler | Emits polling events across the day so downstream pollers stay in sync. | `POLLING_EVENT_EMITTER` | `0 0 8-20 * * ?` | Hourly at the top of the hour from 08:00–20:00 |
 | Proof of debt scheduler | Generates proof-of-debt artefacts for COSC-linked general applications. | `CoscApplicationProcessor` | `0 0 16 * * ?` | Daily at 16:00 |
-| Request for reconsideration notification check scheduler | Ensures reconsideration notifications are sent when conditions are met. | `RequestForReconsiderationNotification` | `0 10 0 * * ?` | Daily at 00:10 |
+| Request for reconsideration notification check scheduler | Ensures reconsideration notifications are sent when conditions are met. | `REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK` | `0 10 0 * * ?` | Daily at 00:10 |
 | Retrigger cases scheduler | One-off cron to retrigger case updates as part of the 2026 migration plan. | `RETRIGGER_CASES_EVENTS` | `0 0 0 1 * ? 2026` | First day of each month until 2026 at 00:00 |
 | Settlement no response from defendant scheduler | Moves settlement agreements forward when the defendant failed to respond. | `SETTLEMENT_NO_RESPONSE_FROM_DEFENDANT_CHECK` | `0 0 1 * * ?` | Daily at 01:00 |
 | Spec automated hearing notice scheduler | Builds automated hearing notices for Spec claims twice per day. | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 ? * * *` | Twice daily at 00:00 and 12:00 |
 | Take case offline scheduler | Transitions cases that must move off digital rails. | `TAKE_CASE_OFFLINE` | `0 1 16 * * ?` | Daily at 16:01 |
 | Trial ready check scheduler | Verifies trial readiness status for outstanding cases. | `TRIAL_READY_CHECK` | `0 30 0 * * ?` | Daily at 00:30 |
-| Trial ready notification scheduler | Sends notifications when trial readiness has been confirmed. | `TRIAL_READY_NOTIFICATION_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
+| Trial ready notification scheduler | Sends notifications when trial readiness has been confirmed. | `TRIAL_READY_NOTIFICATION_CHECK` | `0 20 0 * * ?` | Daily at 00:20 |
 | Unspec automated hearing notice scheduler | Builds automated hearing notices for Unspec claims twice per day. | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 ? * * *` | Twice daily at 00:00 and 12:00 |
 | Update General application Case management Location | Future-dated cron to re-sync GA case management locations. | `RETRIGGER_GA_UPDATE_CMLOCATION_EVENTS` | `0 0 0 1 * ? 2046` | First day of each month until 2046 at 00:00 |
 | Update location | Future-dated cron to re-sync the main case location. | `RETRIGGER_UPDATE_LOCATION_EVENTS` | `0 0 0 1 * ? 2046` | First day of each month until 2046 at 00:00 |
@@ -434,217 +434,6 @@ To disable all Spring schedulers (even if the feature flag is on), set the list 
 export SCHEDULER_ACTIVE_SCHEDULERS=""
 ```
 
-### PollingEventEmitterScheduler
-
-The `PollingEventEmitterScheduler` emits pending business process events for cases that are ready to continue processing.
-It runs when `PollingEventEmitter` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
-
-#### Settings
-
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.polling-event-emitter`.
-
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_POLLING_EVENT_EMITTER` |
-| `cronExpression` | When the scheduler runs. | `0 0 8-20 * * ?` (Hourly between 8 AM and 8 PM) | `CRON_EXPRESSION_POLLING_EVENT_EMITTER` |
-
-### AutomatedHearingNoticeScheduler
-
-The `AutomatedHearingNoticeScheduler` creates automated hearing notices for unnotified Spec and Unspec hearings.
-It runs when `AutomatedHearingNotice` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
-
-#### Settings
-
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.automated-hearing-notice`.
-
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_AUTOMATED_HEARING_NOTICE` |
-| `cronExpression` | When the scheduler runs. | `0 0 0,12 * * ?` (Twice daily at midnight and midday) | `CRON_EXPRESSION_AUTOMATED_HEARING_NOTICE` |
-| `serviceIds` | HMC service IDs to check for unnotified hearings. | `AAA6,AAA7` | `AUTOMATED_HEARING_NOTICE_SERVICE_IDS` |
-
-### MediationFileTransferScheduler
-
-The `MediationFileTransferScheduler` generates CSV and JSON mediation files for eligible in-mediation cases and transfers them to MMT.
-It runs when `GenerateCsvAndSendToMmt` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
-
-#### Settings
-
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.mediation-file-transfer`.
-
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_MEDIATION_FILE_TRANSFER` |
-| `cronExpression` | When the scheduler runs. | `0 0 1 * * ?` (Daily at 1 AM) | `CRON_EXPRESSION_MEDIATION_FILE_TRANSFER` |
-
-### TakeCaseOfflineScheduler
-
-The `TakeCaseOfflineScheduler` transitions eligible cases off digital rails once their relevant deadlines have expired.
-It runs when `TakeCaseOffline` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
-
-#### Settings
-
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.take-case-offline`.
-
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_TAKE_CASE_OFFLINE` |
-| `cronExpression` | When the scheduler runs. | `0 1 16 * * ?` (Daily at 16:01) | `CRON_EXPRESSION_TAKE_CASE_OFFLINE` |
-
-### TrialReadyNotificationScheduler
-
-The `TrialReadyNotificationScheduler` publishes trial ready notification events for eligible fast-track cases with hearings within the existing six-week notification window.
-It runs when `TrialReadyNotification` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
-
-#### Settings
-
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.trial-ready-notification`.
-
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_TRIAL_READY_NOTIFICATION` |
-| `cronExpression` | When the scheduler runs. | `0 20 0 * * ?` (Daily at 00:20) | `CRON_EXPRESSION_TRIAL_READY_NOTIFICATION` |
-
-### TrialReadyCheckScheduler
-
-The `TrialReadyCheckScheduler` publishes trial ready check events for eligible cases approaching their hearing date.
-It runs when `TrialReadyCheck` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
-
-#### Settings
-
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.trial-ready-check`.
-
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_TRIAL_READY_CHECK` |
-| `cronExpression` | When the scheduler runs. | `0 30 0 * * ?` (Daily at 00:30) | `CRON_EXPRESSION_TRIAL_READY_CHECK` |
-
-### OrderReviewObligationCheckScheduler
-
-The `OrderReviewObligationCheckScheduler` checks eligible cases for due order review obligations and raises outstanding work-allocation tasks.
-It runs when `OrderReviewObligationCheck` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
-
-#### Settings
-
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.order-review-obligation-check`.
-
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_ORDER_REVIEW_OBLIGATION_CHECK` |
-| `cronExpression` | When the scheduler runs. | `0 10 1 * * ?` (Daily at 01:10) | `CRON_EXPRESSION_ORDER_REVIEW_OBLIGATION_CHECK` |
-
-### DecisionOutcomeScheduler
-
-The `DecisionOutcomeScheduler` moves eligible cases awaiting judicial decisions into the decision outcome workflow.
-It runs when `DecisionOutcome` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
-
-#### Settings
-
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.decision-outcome`.
-
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_DECISION_OUTCOME` |
-| `cronExpression` | When the scheduler runs. | `0 40 0 * * ?` (Daily at 00:40) | `CRON_EXPRESSION_DECISION_OUTCOME` |
-
-### CaseDismissedScheduler
-
-The `CaseDismissedScheduler` processes eligible cases for claim dismissal and claim deadline notification using the existing `CASE_DISMISSED` workflow.
-It runs when `CaseDismissed` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
-
-#### Settings
-
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.case-dismissed`.
-
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_CASE_DISMISSED` |
-| `cronExpression` | When the scheduler runs. | `0 5 0,16 * * ?` (Daily at 00:05 and 16:05) | `CRON_EXPRESSION_CASE_DISMISSED` |
-
-### GADocumentUploadNotifyScheduler
-
-The `GADocumentUploadNotifyScheduler` notifies General Application cases when supporting documents have been uploaded.
-It runs when `GADocUploadNotifyScheduler` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
-
-#### Settings
-
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.ga-document-upload-notify`.
-
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_GA_DOCUMENT_UPLOAD_NOTIFY` |
-| `cronExpression` | When the scheduler runs. | `0 0 23 * * ?` (Daily at 23:00) | `CRON_EXPRESSION_GA_DOCUMENT_UPLOAD_NOTIFY` |
-
-### GAProofOfDebtScheduler
-
-The `GAProofOfDebtScheduler` processes active Certificate of Satisfaction or Cancellation General Applications once their scheduler deadline has passed.
-It runs when `CoscApplicationProcessor` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
-
-#### Settings
-
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.ga-proof-of-debt`.
-
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_GA_PROOF_OF_DEBT` |
-| `cronExpression` | When the scheduler runs. | `0 0 16 * * ?` (Daily at 16:00) | `CRON_EXPRESSION_GA_PROOF_OF_DEBT` |
-
-### GAOrderMadeScheduler
-
-The `GAOrderMadeScheduler` processes General Application stay orders when their order deadline is today or has passed.
-It runs when `GAOrderMadeScheduler` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
-
-#### Settings
-
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.ga-order-made`.
-
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_GA_ORDER_MADE` |
-| `cronExpression` | When the scheduler runs. | `0 15 16 * * ?` (Daily at 16:15) | `CRON_EXPRESSION_GA_ORDER_MADE` |
-
-### GAUnlessOrderScheduler
-
-The `GAUnlessOrderScheduler` processes General Application unless orders when their compliance deadline is today or has passed.
-It runs when `GAUnlessOrderScheduler` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
-
-#### Settings
-
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.ga-unless-order`.
-
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_GA_UNLESS_ORDER` |
-| `cronExpression` | When the scheduler runs. | `0 0 16 * * ?` (Daily at 16:00) | `CRON_EXPRESSION_GA_UNLESS_ORDER` |
-
-### RequestForReconsiderationNotificationScheduler
-
-The `RequestForReconsiderationNotificationScheduler` processes cases where the request-for-reconsideration notification deadline has expired.
-It runs when `RequestForReconsiderationNotification` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
-
-#### Settings
-
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.request-for-reconsideration-notification`.
-
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_REQUEST_FOR_RECONSIDERATION_NOTIFICATION` |
-| `cronExpression` | When the scheduler runs. | `0 10 0 * * ?` (Daily at 00:10) | `CRON_EXPRESSION_REQUEST_FOR_RECONSIDERATION_NOTIFICATION` |
-
-### ManageStayWATaskScheduler
-
-The `ManageStayWATaskScheduler` processes stayed cases where a manage-stay update has been requested and the follow-up window has expired.
-It runs when `ManageStayWATask` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
-
-#### Settings
-
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.manage-stay-wa-task`.
-
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_MANAGE_STAY_WA_TASK` |
-| `cronExpression` | When the scheduler runs. | `0 20 1 * * ?` (Daily at 01:20) | `CRON_EXPRESSION_MANAGE_STAY_WA_TASK` |
-
 ### JudgementBufferScheduler
 
 The `JudgementBufferScheduler` is used to process cases where a default judgement has been requested and a buffer period has expired.
@@ -658,59 +447,12 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 | `enabled` | Whether the scheduler is active. | `false` | `SCHEDULER_ENABLED_JUDGEMENT_BUFFER` |
 | `cronExpression` | When the scheduler runs. | `0 0 2 * * *` (Daily at 2 AM) | `CRON_EXPRESSION_JUDGEMENT_BUFFER` |
 
-### DefendantResponseDeadlineScheduler
-
-The `DefendantResponseDeadlineScheduler` processes cases where the defendant response deadline has expired.
-
-#### Settings
-
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.defendant-response`.
-
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `false` | `SCHEDULER_ENABLED_DEFENDANT_RESPONSE` |
-| `cronExpression` | When the scheduler runs. | `0 1 16 * * ?` (Daily at 16:01) | `CRON_EXPRESSION_DEFENDANT_RESPONSE` |
-
-### BundleCreationScheduler
-
-The `BundleCreationScheduler` creates hearing bundles for eligible cases within the existing ten-day hearing window.
-It runs when `BundleCreation` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
-
-#### Settings
-
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.bundle-creation`.
-
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_BUNDLE_CREATION` |
-| `cronExpression` | When the scheduler runs. | `0 0 21 * * ?` (Daily at 9 PM) | `CRON_EXPRESSION_BUNDLE_CREATION` |
-
-### HearingCvpLinkScheduler
-
-The `HearingCvpLinkScheduler` publishes CVP join link events for eligible cases with upcoming hearing dates.
-It runs when `HearingCvpLink` is present in the active schedulers list and the Spring scheduler feature flag is enabled.
-
-#### Settings
-
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.hearing-cvp-link`.
-
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_HEARING_CVP_LINK` |
-| `cronExpression` | When the scheduler runs. | `0 50 0 * * ?` (Daily at 00:50) | `CRON_EXPRESSION_HEARING_CVP_LINK` |
-
 #### Global Scheduler Settings
 
 | Setting | Description | Default | Environment Variable |
 |---------|-------------|---------|----------------------|
 | `lockAtLeastFor` | Minimum time a task lock is held. | `PT1M` | `LOCK_AT_LEAST_FOR` |
 | `lockAtMostFor` | Maximum time a task lock is held. | `PT5M` | `LOCK_AT_MOST_FOR` |
-| `default-back-pressure.initialDelay` | Initial delay before processing a case. | `PT0S` | `DEFAULT_BACK_PRESSURE_INITIAL_DELAY` |
-| `default-back-pressure.maxDelay` | Maximum back-pressure delay between cases. | `PT10S` | `DEFAULT_BACK_PRESSURE_MAX_DELAY` |
-| `default-back-pressure.delayIncreaseOnFailure` | Delay added after a failed case. | `PT0.5S` | `DEFAULT_BACK_PRESSURE_DELAY_INCREASE_ON_FAILURE` |
-| `default-back-pressure.delayIncreaseOnSlowCase` | Delay added after a slow case. | `PT0.25S` | `DEFAULT_BACK_PRESSURE_DELAY_INCREASE_ON_SLOW_CASE` |
-| `default-back-pressure.delayReductionOnSuccess` | Delay removed after a successful case. | `PT0.1S` | `DEFAULT_BACK_PRESSURE_DELAY_REDUCTION_ON_SUCCESS` |
-| `default-back-pressure.slowCaseThreshold` | Case processing duration treated as slow. | `PT2S` | `DEFAULT_BACK_PRESSURE_SLOW_CASE_THRESHOLD` |
 
 ## License
 
