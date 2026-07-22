@@ -64,20 +64,19 @@ class SettleClaimPaidInFullNotificationTest extends BpmnBaseTest {
             variables
         );
 
-        ExternalTask nextTask = assertNextExternalTask(PROCESS_CASE_EVENT);
+        ExternalTask dashboardDefendant = assertNextExternalTask(PROCESS_CASE_EVENT);
         if (isLiPDefendant) {
             //complete the notification to Respondent
             assertCompleteExternalTask(
-                nextTask,
+                dashboardDefendant,
                 PROCESS_CASE_EVENT,
                 SEND_SETTLE_CLAIM_PAID_IN_FULL_LETTER_TO_LIP_DEFENDANT1_EVENT,
                 SEND_SETTLE_CLAIM_PAID_IN_FULL_LETTER_TO_LIP_DEFENDANT1_ID,
                 variables
             );
             //complete the dashboard notification to Respondent
-            nextTask = assertNextExternalTask(PROCESS_CASE_EVENT);
             assertCompleteExternalTask(
-                nextTask,
+                dashboardDefendant,
                 PROCESS_CASE_EVENT,
                 CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_SETTLE_CLAIM_PAID_IN_FULL_EVENT,
                 CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_SETTLE_CLAIM_PAID_IN_FULL_EVENT_ID,
@@ -86,9 +85,8 @@ class SettleClaimPaidInFullNotificationTest extends BpmnBaseTest {
         }
 
         //complete the notification to Respondent
-        nextTask = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(
-            nextTask,
+            dashboardDefendant,
             PROCESS_CASE_EVENT,
             NOTIFY_EVENT_SETTLE_CLAIM_MARKED_PAID_IN_FULL_EVENT_ID,
             NOTIFY_EVENT_SETTLE_CLAIM_MARKED_PAID_IN_FULL_ACTIVITY_ID,

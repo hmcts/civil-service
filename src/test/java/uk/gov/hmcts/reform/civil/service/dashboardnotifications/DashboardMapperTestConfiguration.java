@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 @ComponentScan(
     basePackages = "uk.gov.hmcts.reform.civil.service.dashboardnotifications",
     excludeFilters = {
-        @Filter(type = FilterType.ASSIGNABLE_TYPE, classes = DashboardNotificationTransactionalService.class),
         @Filter(type = FilterType.REGEX,
             pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\..*\\..*")
     }
