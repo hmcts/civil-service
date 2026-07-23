@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
@@ -31,15 +30,9 @@ public class RoboticsNotifier {
     private final JsonSchemaValidationService jsonSchemaValidationService;
     private final RoboticsDataMapperForUnspec roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
-    private final FeatureToggleService toggleService;
 
     public void notifyRobotics(CaseData caseData, String authToken) {
         String legacyCaseReference = caseData.getLegacyCaseReference();
-
-        if (!toggleService.isRPAEmailEnabled()) {
-            log.info("RPA email disabled, skipping notification for case reference: {}", caseData.getCcdCaseReference());
-            return;
-        }
 
         RoboticsCaseData roboticsCaseData = null;
         RoboticsCaseDataSpec roboticsCaseDataSpec = null;
