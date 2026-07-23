@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.civil.handler.event.BundleCreationTriggerEventHandler
 import uk.gov.hmcts.reform.civil.handler.event.TrialReadyNotificationEventHandler;
 import uk.gov.hmcts.reform.civil.ga.handler.tasks.CheckStayOrderDeadlineEndTaskHandler;
 import uk.gov.hmcts.reform.civil.ga.handler.tasks.CheckUnlessOrderDeadlineEndTaskHandler;
+import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDetailsNotificationDeadlineHandler;
 import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDismissedHandler;
 import uk.gov.hmcts.reform.civil.ga.handler.tasks.GAJudgeRevisitTaskHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -91,6 +92,7 @@ public class TestingSupportController {
     private final UserService userService;
 
     private final ClaimDismissedHandler claimDismissedHandler;
+    private final ClaimDetailsNotificationDeadlineHandler claimDetailsNotificationDeadlineHandler;
     private final HearingFeePaidEventHandler hearingFeePaidHandler;
     private final HearingFeeUnpaidEventHandler hearingFeeUnpaidHandler;
     private final TrialReadyNotificationEventHandler trialReadyNotificationHandler;
@@ -237,6 +239,19 @@ public class TestingSupportController {
         ExternalTaskImpl externalTask = new ExternalTaskImpl();
         try {
             claimDismissedHandler.handleTask(externalTask);
+        } catch (Exception e) {
+            responseMsg = FAILED;
+        }
+        return new ResponseEntity<>(responseMsg, HttpStatus.OK);
+    }
+
+    @GetMapping("/testing-support/trigger-notify-claim-details-scheduler")
+    public ResponseEntity<String> getNotifyClaimDetailsScheduler() {
+
+        String responseMsg = SUCCESS;
+        ExternalTaskImpl externalTask = new ExternalTaskImpl();
+        try {
+            claimDetailsNotificationDeadlineHandler.handleTask(externalTask);
         } catch (Exception e) {
             responseMsg = FAILED;
         }

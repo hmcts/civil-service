@@ -1,0 +1,147 @@
+rules:
+  - id: civil.java.pii-accessor-to-log
+    message: >-
+      PII or financial data reaches a log, MDC, or telemetry sink. Log an approved
+      operational identifier instead.
+    languages: [java]
+    severity: ERROR
+    metadata:
+      category: security
+      confidence: HIGH
+      cwe: "CWE-532: Insertion of Sensitive Information into Log File"
+    mode: taint
+    pattern-sources:
+      - exact: true
+        patterns:
+          - pattern: $OBJECT.$GETTER(...)
+          - metavariable-regex:
+              metavariable: $GETTER
+              regex: >-
+                (?i)^get(?:firstName|lastName|fullName|partyName|individualFirstName|individualLastName|soleTraderFirstName|soleTraderLastName|companyName|organisationName|email|emailAddress|partyEmail|dateOfBirth|individualDateOfBirth|dob|telephoneNumber|phoneNumber|amount|admittedAmount|calculatedAmountInPence|claimAmount|claimFee|claimFeeInPence|defendantAdmittedAmount|feeAmount|instalmentAmount|interest|interestAmount|outstandingAmount|paidAmount|partialAmount|paymentAmount|paymentReference|paymentDate|repaymentAmount|totalClaimAmount|address|primaryAddress|addressLine1|addressLine2|addressLine3|postCode|postTown|county|country)$
+    pattern-sanitizers:
+      - pattern: $OBJECT.getCcdCaseReference()
+      - pattern: $OBJECT.getLegacyCaseReference()
+      - pattern: $OBJECT.getFlags()
+      - pattern: OrgPolicyUtils.getRespondent1SolicitorOrgId(...)
+    pattern-sinks:
+      - patterns:
+          - pattern: $LOGGER.$LEVEL(..., $SINK, ...)
+          - metavariable-regex:
+              metavariable: $LEVEL
+              regex: ^(?:trace|debug|info|warn|error)$
+          - focus-metavariable: $SINK
+      - patterns:
+          - pattern: MDC.put(..., $SINK)
+          - focus-metavariable: $SINK
+      - patterns:
+          - pattern-either:
+              - pattern: $CLIENT.trackTrace(..., $SINK, ...)
+              - pattern: $CLIENT.trackEvent(..., $SINK, ...)
+          - focus-metavariable: $SINK
+
+  - id: civil.java.sensitive-object-to-log
+    message: >-
+      A PII-bearing object is passed to logging. Log an approved operational
+      identifier such as the CCD case reference instead.
+    languages: [java]
+    severity: ERROR
+    metadata:
+      category: security
+      confidence: MEDIUM
+      cwe: "CWE-532: Insertion of Sensitive Information into Log File"
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: $LOGGER.$LEVEL(..., $OBJECT, ...)
+              - metavariable-regex:
+                  metavariable: $LEVEL
+                  regex: ^(?:trace|debug|info|warn|error)$
+          - pattern: MDC.put(..., $OBJECT)
+          - pattern: $CLIENT.trackTrace(..., $OBJECT, ...)
+          - pattern: $CLIENT.trackEvent(..., $OBJECT, ...)
+      - metavariable-regex:
+          metavariable: $OBJECT
+          regex: >-
+            (?i)^(?:caseData|civilCaseData|generalApplication|generalAppCaseData|application|party|partyDetails|applicant1|applicant2|respondent1|respondent2|financialDetails|paymentInfo)$
+
+  - id: civil.typescript.pii-field-to-log
+    message: >-
+      PII or financial data reaches a logger, console, or telemetry sink. Log an
+      approved operational identifier instead.
+    languages: [typescript, javascript]
+    severity: ERROR
+    metadata:
+      category: security
+      confidence: HIGH
+      cwe: "CWE-532: Insertion of Sensitive Information into Log File"
+    mode: taint
+    pattern-sources:
+      - exact: true
+        patterns:
+          - pattern: $OBJECT.$FIELD
+          - metavariable-regex:
+              metavariable: $FIELD
+              regex: >-
+                (?i)^(?:firstName|lastName|fullName|partyName|individualFirstName|individualLastName|soleTraderFirstName|soleTraderLastName|companyName|organisationName|email|emailAddress|partyEmail|dateOfBirth|individualDateOfBirth|dob|telephoneNumber|phoneNumber|amount|admittedAmount|calculatedAmountInPence|claimAmount|claimFee|claimFeeInPence|defendantAdmittedAmount|feeAmount|instalmentAmount|interest|interestAmount|outstandingAmount|paidAmount|partialAmount|paymentAmount|paymentReference|paymentDate|repaymentAmount|totalClaimAmount|address|primaryAddress|addressLine1|addressLine2|addressLine3|postCode|postTown|county|country)$
+      - exact: true
+        patterns:
+          - pattern: $OBJECT[$FIELD]
+          - metavariable-regex:
+              metavariable: $FIELD
+              regex: >-
+                (?i)^['"](?:firstName|lastName|fullName|partyName|individualFirstName|individualLastName|soleTraderFirstName|soleTraderLastName|companyName|organisationName|email|emailAddress|partyEmail|dateOfBirth|individualDateOfBirth|dob|telephoneNumber|phoneNumber|amount|admittedAmount|calculatedAmountInPence|claimAmount|claimFee|claimFeeInPence|defendantAdmittedAmount|feeAmount|instalmentAmount|interest|interestAmount|outstandingAmount|paidAmount|partialAmount|paymentAmount|paymentReference|paymentDate|repaymentAmount|totalClaimAmount|address|primaryAddress|addressLine1|addressLine2|addressLine3|postCode|postTown|county|country)['"]$
+    pattern-sanitizers:
+      - pattern: $OBJECT.status
+      - pattern: $OBJECT.interestClaimOptions
+    pattern-sinks:
+      - patterns:
+          - pattern: $LOGGER.$LEVEL(..., $SINK, ...)
+          - metavariable-regex:
+              metavariable: $LEVEL
+              regex: ^(?:trace|debug|info|warn|error|log)$
+          - focus-metavariable: $SINK
+      - patterns:
+          - pattern-either:
+              - pattern: $CLIENT.trackTrace(..., $SINK, ...)
+              - pattern: $CLIENT.trackEvent(..., $SINK, ...)
+          - focus-metavariable: $SINK
+
+  - id: civil.typescript.sensitive-object-to-log
+    message: >-
+      A PII-bearing object is passed to logging. Log an approved operational
+      identifier such as the CCD case reference instead.
+    languages: [typescript, javascript]
+    severity: ERROR
+    metadata:
+      category: security
+      confidence: MEDIUM
+      cwe: "CWE-532: Insertion of Sensitive Information into Log File"
+    patterns:
+      - pattern-either:
+          - patterns:
+              - pattern: $LOGGER.$LEVEL(..., $OBJECT, ...)
+              - metavariable-regex:
+                  metavariable: $LEVEL
+                  regex: ^(?:trace|debug|info|warn|error|log)$
+          - pattern: $CLIENT.trackTrace(..., $OBJECT, ...)
+          - pattern: $CLIENT.trackEvent(..., $OBJECT, ...)
+      - metavariable-regex:
+          metavariable: $OBJECT
+          regex: >-
+            (?i)^(?:caseData|civilCaseData|claim|generalApplication|application|party|partyDetails|applicant|applicant1|applicant2|respondent|respondent1|respondent2|financialDetails|paymentInfo|paymentStatus)$
+
+  - id: civil.typescript.raw-console
+    message: >-
+      Raw console logging bypasses the application logger and its PII redaction.
+      Use @hmcts/nodejs-logging instead.
+    languages: [typescript, javascript]
+    severity: WARNING
+    metadata:
+      category: security
+      confidence: HIGH
+      cwe: "CWE-532: Insertion of Sensitive Information into Log File"
+    patterns:
+      - pattern: console.$LEVEL(...)
+      - metavariable-regex:
+          metavariable: $LEVEL
+          regex: ^(?:debug|info|log|warn|error)$
