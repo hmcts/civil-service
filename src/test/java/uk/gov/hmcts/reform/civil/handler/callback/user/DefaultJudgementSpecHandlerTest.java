@@ -48,6 +48,7 @@ import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,6 +62,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_REQUESTED_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.DefaultJudgementSpecHandler.JUDGMENT_GRANTED_HEADER;
@@ -189,7 +191,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnError_WhenAboutToStartInvokeWhenRespondentResponseLanguageIsBilingual() {
+        void shouldNotReturnError_WhenRespondentResponseLanguageIsBilingualAndDeadlinePassed() {
             RespondentLiPResponse respondentLiPResponse  = new RespondentLiPResponse();
             respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
             CaseDataLiP caseDataLiP = new CaseDataLiP();
@@ -197,12 +199,13 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.setBreathing(new BreathingSpaceInfo().setLift(null));
             caseData.setCaseDataLiP(caseDataLiP);
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(1));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            assertThat(response.getErrors()).contains("The Claim is not eligible for Default Judgment.");
+            assertThat(response.getErrors()).isEmpty();
         }
 
     }
@@ -218,6 +221,17 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNotNull();
+        }
+
+        @Test
+        void shouldNotReturnError_whenCPRisAccepted() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            // Convert CaseData to map and add CPRAcceptance to simulate it being accepted
+            Map<String, Object> caseDataMap = caseData.toMap(mapper);
+            caseDataMap.put("CPRAcceptance", "Yes");
+            CallbackParams params = callbackParamsOf(caseDataMap, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
         }
     }
 
@@ -1276,6 +1290,17 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 handler.handle(params);
             });
         }
+
+        @Test
+        void shouldSetCurrentDateboxAndRepaymentDue_whenOverallTotalIsSet() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setDefaultJudgementOverallTotal(BigDecimal.TEN);
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData().get("currentDatebox")).isNotNull();
+            assertThat(response.getData().get("repaymentDue")).isEqualTo("10");
+        }
     }
 
     @Nested
@@ -1567,6 +1592,61 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("activeJudgment")).extracting("defendant1Address").isNotNull();
             assertInterestIsPopulated(response, 0);
         }
+
+        @Test
+        void shouldGenerateDocumentAndContinueOnline_whenJudgmentBufferEnabledAndNotPreStayJudgmentRequested() {
+            Flags respondent1Flags = new Flags();
+            respondent1Flags.setPartyName("respondent1name");
+            respondent1Flags.setRoleOnCase("respondent1");
+            Party respondent = new Party();
+            respondent.setIndividualFirstName("Dis");
+            respondent.setIndividualLastName("Guy");
+            respondent.setType(INDIVIDUAL);
+            respondent.setFlags(respondent1Flags);
+
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .respondent1(respondent).build();
+            caseDataBefore.setRespondent1DetailsForClaimDetailsTab(respondent);
+            caseDataBefore.setCaseNameHmctsInternal("Mr. John Rambo v Dis Guy");
+            caseDataBefore.setCaseNamePublic("'John Rambo' v 'Dis Guy'");
+
+            when(interestCalculator.calculateInterest(any()))
+                .thenReturn(BigDecimal.valueOf(0)
+                );
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPaymentAmount("10");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1010));
+            caseData.setPartialPayment(YES);
+            caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("0123");
+            caseLocationCivil.setRegion("0321");;
+            caseData.setCaseManagementLocation(caseLocationCivil);
+            DynamicListElement element = new DynamicListElement(null, "John Smith");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
+            caseData.setRespondent1Represented(NO);
+            // preStayState is left null (not set to JUDGMENT_REQUESTED)
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, caseDataBefore.toMap(mapper));
+
+            when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getBusinessProcess()).isNotNull();
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(JUDGMENT_REQUESTED_SPEC.name());
+            assertThat(response.getState()).isEqualTo(CaseState.JUDGMENT_REQUESTED.name());
+            assertThat(updatedData.getIsJoRequested()).isEqualTo(YES);
+            // Verify activeJudgment was created with pending issue state
+            assertThat(response.getData()).extracting("activeJudgment").isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("PENDING_ISSUE");
+            assertInterestIsPopulated(response, 0);
+        }
     }
 
     @Nested
@@ -1677,6 +1757,23 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                                .confirmationHeader(JUDGMENT_GRANTED_HEADER)
                                .confirmationBody(format(body))
                                .build());
+        }
+
+        @Test
+        void shouldReturnJudgementRequestedResponse_whenJudgmentBufferEnabledAndNotPreStayJudgmentRequested() {
+            when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setApplicant1(new PartyBuilder().build());
+            caseData.setRespondent1(new PartyBuilder().build());
+            caseData.setRespondent1Represented(NO);
+            // preStayState is left null (not set to JUDGMENT_REQUESTED)
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response.getConfirmationHeader()).isEqualTo("# Default judgment requested");
+            assertThat(response.getConfirmationBody()).contains("A CCJ has been requested");
+            assertThat(response.getConfirmationBody()).contains("You will be notified when this is confirmed");
         }
     }
 
