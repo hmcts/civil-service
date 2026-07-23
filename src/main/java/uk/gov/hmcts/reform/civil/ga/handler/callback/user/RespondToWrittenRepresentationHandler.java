@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.ga.enums.welshenhancements.PreTranslationGaDocu
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -54,7 +53,6 @@ public class RespondToWrittenRepresentationHandler extends CallbackHandler imple
     private final RespondToWrittenRepresentationGenerator respondToWrittenRepresentation;
     private final DocUploadDashboardNotificationService docUploadDashboardNotificationService;
     private final GaForLipService gaForLipService;
-    private final FeatureToggleService featureToggleService;
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION);
 
@@ -142,7 +140,7 @@ public class RespondToWrittenRepresentationHandler extends CallbackHandler imple
     }
 
     private boolean isTranslationRequired(GeneralApplicationCaseData caseData) {
-        return featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual();
+        return caseData.isApplicationBilingual();
     }
 
     private void storeResponseDocuments(GeneralApplicationCaseData caseData,
@@ -172,9 +170,7 @@ public class RespondToWrittenRepresentationHandler extends CallbackHandler imple
     }
 
     private void updateResponseFlags(GeneralApplicationCaseData caseDataBuilder, String role) {
-        if (featureToggleService.isGaForWelshEnabled()) {
-            DocUploadUtils.setRespondedValues(caseDataBuilder, role);
-        }
+        DocUploadUtils.setRespondedValues(caseDataBuilder, role);
     }
 
     private GeneralApplicationCaseData buildUpdatedCaseData(GeneralApplicationCaseData caseDataBuilder) {

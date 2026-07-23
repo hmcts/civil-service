@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.ReflectionUtils;
@@ -19,11 +20,14 @@ import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
@@ -37,7 +41,6 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -79,21 +82,19 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     private UpdateFromGACaseEventTaskHandler handler;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         handler = new UpdateFromGACaseEventTaskHandler(
             new ExternalTaskCompletionService(),
             new EventProperties(),
             coreCaseDataService,
             caseDetailsConverter,
-            objectMapper,
-            featureToggleService
+            objectMapper
         );
     }
 
@@ -918,6 +919,96 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
+        verify(externalTaskService).complete(mockExternalTask, null);
+    }
+
+    @Test
+    void testShouldAddApplicantPreTranslationDocumentWhenClaimantIsBilingual() {
+        when(mockExternalTask.getTopicName()).thenReturn("test");
+        when(mockExternalTask.getAllVariables())
+            .thenReturn(Map.of(
+                "caseId", GENERAL_APP_CASE_ID,
+                "caseEvent", ADD_PDF_TO_MAIN_CASE,
+                "generalAppParentCaseLink", CIVIL_CASE_ID
+            ));
+
+        CaseData caseData = caseDataAtStateClaimDraftWithBusinessProcessStatusReady();
+        caseData.setClaimantBilingualLanguagePreference(Language.BOTH.toString());
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
+        StartEventResponse startEventResponse = startEventResponse(caseDetails);
+
+        String uid = "f000aa01-0451-4000-b000-000000000125";
+        CaseData generalCaseData = caseDataAtStateClaimDraftWithBusinessProcessStatusReady()
+            .setParentClaimantIsApplicant(YesOrNo.YES)
+            .setPreTranslationGaDocsApplicant(singletonList(new Element<CaseDocument>()
+                                                                .setId(UUID.fromString(uid))
+                                                                .setValue(pdfDocument)));
+
+        when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
+            .thenReturn(generalCaseData);
+        when(coreCaseDataService.startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE)).thenReturn(startEventResponse);
+        when(caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
+        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+
+        handler.execute(mockExternalTask, externalTaskService);
+
+        ArgumentCaptor<CaseDataContent> caseDataContentCaptor = ArgumentCaptor.forClass(CaseDataContent.class);
+        verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), caseDataContentCaptor.capture());
+        CaseData submittedCaseData = objectMapper.convertValue(
+            caseDataContentCaptor.getValue().getData(),
+            CaseData.class
+        );
+        assertThat(submittedCaseData.getGaAddlDocClaimant())
+            .extracting(Element::getId)
+            .containsExactly(UUID.fromString(uid));
+        assertThat(submittedCaseData.getGaAddlDocRespondentSol()).isNull();
+        verify(externalTaskService).complete(mockExternalTask, null);
+    }
+
+    @Test
+    void testShouldAddRespondentPreTranslationDocumentWhenRespondentIsBilingual() {
+        when(mockExternalTask.getTopicName()).thenReturn("test");
+        when(mockExternalTask.getAllVariables())
+            .thenReturn(Map.of(
+                "caseId", GENERAL_APP_CASE_ID,
+                "caseEvent", ADD_PDF_TO_MAIN_CASE,
+                "generalAppParentCaseLink", CIVIL_CASE_ID
+            ));
+
+        CaseData caseData = caseDataAtStateClaimDraftWithBusinessProcessStatusReady();
+        caseData.setCaseDataLiP(new CaseDataLiP()
+                                   .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                                 .setRespondent1ResponseLanguage(
+                                                                     Language.BOTH.toString()
+                                                                 )));
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
+        StartEventResponse startEventResponse = startEventResponse(caseDetails);
+
+        String uid = "f000aa01-0451-4000-b000-000000000126";
+        CaseData generalCaseData = caseDataAtStateClaimDraftWithBusinessProcessStatusReady()
+            .setParentClaimantIsApplicant(YesOrNo.NO)
+            .setPreTranslationGaDocsRespondent(singletonList(new Element<CaseDocument>()
+                                                                 .setId(UUID.fromString(uid))
+                                                                 .setValue(pdfDocument)));
+
+        when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
+            .thenReturn(generalCaseData);
+        when(coreCaseDataService.startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE)).thenReturn(startEventResponse);
+        when(caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
+        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+
+        handler.execute(mockExternalTask, externalTaskService);
+
+        ArgumentCaptor<CaseDataContent> caseDataContentCaptor = ArgumentCaptor.forClass(CaseDataContent.class);
+        verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), caseDataContentCaptor.capture());
+        CaseData submittedCaseData = objectMapper.convertValue(
+            caseDataContentCaptor.getValue().getData(),
+            CaseData.class
+        );
+        assertThat(submittedCaseData.getGaAddlDocRespondentSol())
+            .extracting(Element::getId)
+            .containsExactly(UUID.fromString(uid));
+        assertThat(submittedCaseData.getGaAddlDocClaimant()).isNull();
         verify(externalTaskService).complete(mockExternalTask, null);
     }
 

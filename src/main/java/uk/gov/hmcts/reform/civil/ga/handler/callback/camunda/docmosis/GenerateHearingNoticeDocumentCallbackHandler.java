@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.docmosis.GaHearingFormGenerator;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -54,7 +53,6 @@ public class GenerateHearingNoticeDocumentCallbackHandler extends CallbackHandle
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
     private final SendFinalOrderPrintService sendFinalOrderPrintService;
-    private final FeatureToggleService featureToggleService;
 
     CaseDocument postJudgeOrderToLipApplicant = null;
     CaseDocument postJudgeOrderToLipRespondent = null;
@@ -87,7 +85,7 @@ public class GenerateHearingNoticeDocumentCallbackHandler extends CallbackHandle
 
     private void buildDocument(CallbackParams callbackParams, GeneralApplicationCaseData caseDataBuilder,
                                GeneralApplicationCaseData caseData) {
-        if (featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual()) {
+        if (caseData.isApplicationBilingual()) {
             List<Element<CaseDocument>> preTranslatedDocuments =
                 Optional.ofNullable(caseData.getPreTranslationGaDocuments())
                     .orElseGet(ArrayList::new);
@@ -130,7 +128,7 @@ public class GenerateHearingNoticeDocumentCallbackHandler extends CallbackHandle
          * Generate Judge Request for Information order document with LIP Applicant Post Address
          * */
         if (gaForLipService.isLipApp(caseData)
-            && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
+            && !caseData.isApplicationBilingual()) {
             postJudgeOrderToLipApplicant = hearingFormGenerator.generate(
                 civilCaseData,
                 caseData,
@@ -144,7 +142,7 @@ public class GenerateHearingNoticeDocumentCallbackHandler extends CallbackHandle
          * if GA is with notice
          * */
         if (gaForLipService.isLipResp(caseData)
-            && (!featureToggleService.isGaForWelshEnabled() || !caseData.isApplicationBilingual())) {
+            && !caseData.isApplicationBilingual()) {
             postJudgeOrderToLipRespondent = hearingFormGenerator.generate(
                 civilCaseData,
                 caseData,

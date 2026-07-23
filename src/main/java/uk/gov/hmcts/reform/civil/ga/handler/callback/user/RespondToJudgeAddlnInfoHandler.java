@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.enums.welshenhancements.PreTranslationGaDocumentType;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -48,7 +47,6 @@ public class RespondToJudgeAddlnInfoHandler extends CallbackHandler implements G
     private final RespondForInformationGenerator respondForInformationGenerator;
     private final DocUploadDashboardNotificationService docUploadDashboardNotificationService;
     private final GaForLipService gaForLipService;
-    private final FeatureToggleService featureToggleService;
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(RESPOND_TO_JUDGE_ADDITIONAL_INFO);
 
@@ -74,7 +72,7 @@ public class RespondToJudgeAddlnInfoHandler extends CallbackHandler implements G
         boolean translationRequired = false;
         PreTranslationGaDocumentType waDocumentType = null;
         if (Objects.nonNull(caseData.getGeneralAppAddlnInfoText())) {
-            if (featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual()) {
+            if (caseData.isApplicationBilingual()) {
                 translationRequired = true;
                 waDocumentType = MORE_INFO_RESPONSE_DOC;
             }
@@ -98,9 +96,7 @@ public class RespondToJudgeAddlnInfoHandler extends CallbackHandler implements G
                 CaseEvent.RESPOND_TO_JUDGE_ADDITIONAL_INFO
             );
         }
-        if (featureToggleService.isGaForWelshEnabled()) {
-            DocUploadUtils.setRespondedValues(caseDataBuilder, role);
-        }
+        DocUploadUtils.setRespondedValues(caseDataBuilder, role);
         caseDataBuilder.generalAppAddlnInfoUpload(Collections.emptyList());
         caseDataBuilder.businessProcess(BusinessProcess.readyGa(RESPOND_TO_JUDGE_ADDITIONAL_INFO)).build();
         caseDataBuilder.generalAppAddlnInfoText(null);

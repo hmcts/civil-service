@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandle
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -84,8 +83,6 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     @Spy
     private AssignCategoryId assignCategoryId = new AssignCategoryId();
-    @Mock
-    private FeatureToggleService featureToggleService;
     @Mock
     private GeneralAppFeesService generalAppFeesService;
     @Mock
@@ -205,7 +202,6 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
     @Test
     void shouldSetTranslationDocumentsForWlu_Lip() {
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseDataLip(YES, YES, YES);
         caseData = caseData.copy()
             .applicantBilingualLanguagePreference(YES)
@@ -228,7 +224,6 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
     @Test
     void shouldSetTranslationDocumentsForWlu_LipRespondent() {
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseDataLip(YES, YES, YES);
         caseData = caseData.copy()
             .respondentBilingualLanguagePreference(YES)
@@ -252,7 +247,6 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
     @Test
     void shouldSetTranslationDocumentsForWlu_LipWhenRespondentRespond() {
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseDataWithResponse(YES, YES, YES);
         caseData = caseData.copy()
             .ccdState(CaseState.AWAITING_RESPONDENT_RESPONSE)
@@ -277,7 +271,6 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
     @Test
     void shouldSetTranslationDocumentsForWlu_LipWhenRespondentResponseNull() {
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseDataLip(YES, YES, YES);
         caseData = caseData.copy()
             .ccdState(CaseState.AWAITING_RESPONDENT_RESPONSE)
