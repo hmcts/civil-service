@@ -3,24 +3,31 @@ package uk.gov.hmcts.reform.civil.ga.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.UPLOADED_DOCUMENTS;
 
 @Slf4j
 @Service
@@ -31,12 +38,13 @@ public class DocUploadNotificationService implements NotificationDataGA {
     private final NotificationsProperties notificationProperties;
     private static final String REFERENCE_TEMPLATE_DOC_UPLOAD = "general-apps-notice-of-document-upload-%s";
     private static final String EMPTY_SOLICITOR_REFERENCES_1V1 = "Claimant Reference: Not provided - Defendant Reference: Not provided";
+    private static final String NOT_PROVIDED = "Not provided";
     private final GaForLipService gaForLipService;
-    private final Map<String, String> customProps = new HashMap<>();
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final FeatureToggleService featureToggleService;
     private final NotificationsSignatureConfiguration configuration;
+    private final OrganisationService organisationService;
 
     public void notifyApplicantEvidenceUpload(GeneralApplicationCaseData caseData) throws NotificationException {
         log.info("Starting applicant evidence upload notification for Case ID: {}", caseData.getCcdCaseReference());
@@ -48,7 +56,9 @@ public class DocUploadNotificationService implements NotificationDataGA {
                     email,
                     gaForLipService.isLipApp(caseData) ? getLiPApplicantTemplate(caseData)
                         : notificationProperties.getEvidenceUploadTemplate(),
-                    addProperties(caseData, civilCaseData),
+                    addProperties(caseData, civilCaseData, getLegalOrganisationName(
+                        caseData.getGeneralAppApplnSolicitor().getOrganisationIdentifier()
+                    )),
                     format(
                             REFERENCE_TEMPLATE_DOC_UPLOAD,
                             caseData.getCcdCaseReference()
@@ -71,7 +81,9 @@ public class DocUploadNotificationService implements NotificationDataGA {
                             gaForLipService.isLipResp(caseData)
                                 ? getLiPRespondentTemplate(caseData)
                                 : notificationProperties.getEvidenceUploadTemplate(),
-                            addProperties(caseData, civilCaseData),
+                            addProperties(caseData, civilCaseData, getLegalOrganisationName(
+                                respondentSolicitor.getValue().getOrganisationIdentifier()
+                            )),
                             format(
                                     REFERENCE_TEMPLATE_DOC_UPLOAD,
                                     caseData.getCcdCaseReference()
@@ -94,6 +106,15 @@ public class DocUploadNotificationService implements NotificationDataGA {
 
     @Override
     public Map<String, String> addProperties(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData) {
+        return addProperties(caseData, mainCaseData, getLegalOrganisationName(
+            caseData.getGeneralAppApplnSolicitor().getOrganisationIdentifier()
+        ));
+    }
+
+    private Map<String, String> addProperties(GeneralApplicationCaseData caseData,
+                                              GeneralApplicationCaseData mainCaseData,
+                                              String legalOrganisationName) {
+        Map<String, String> customProps = new HashMap<>();
 
         if (gaForLipService.isGaForLip(caseData)) {
             String caseTitle = getAllPartyNames(caseData);
@@ -124,6 +145,9 @@ public class DocUploadNotificationService implements NotificationDataGA {
         customProps.put(PARTY_REFERENCE,
                         Objects.requireNonNull(getSolicitorReferences(caseData.getEmailPartyReference())));
         customProps.put(GENAPP_REFERENCE, String.valueOf(Objects.requireNonNull(caseData.getCcdCaseReference())));
+        customProps.put(CASEMAN_REF, Objects.requireNonNullElse(mainCaseData.getLegacyCaseReference(), NOT_PROVIDED));
+        customProps.put(CLAIM_LEGAL_ORG_NAME_SPEC, legalOrganisationName);
+        customProps.put(UPLOADED_DOCUMENTS, getUploadedDocuments(caseData));
         addAllFooterItems(caseData, mainCaseData, customProps, configuration,
                            featureToggleService.isPublicQueryManagementEnabledGa(caseData));
         return customProps;
@@ -145,6 +169,30 @@ public class DocUploadNotificationService implements NotificationDataGA {
         } else {
             return EMPTY_SOLICITOR_REFERENCES_1V1;
         }
+    }
+
+    private String getLegalOrganisationName(String organisationIdentifier) {
+        if (organisationIdentifier != null) {
+            return organisationService.findOrganisationById(organisationIdentifier)
+                .map(Organisation::getName)
+                .orElse(NOT_PROVIDED);
+        }
+        return NOT_PROVIDED;
+    }
+
+    private String getUploadedDocuments(GeneralApplicationCaseData caseData) {
+        if (caseData.getGaAddlDoc() == null || caseData.getGaAddlDoc().isEmpty()) {
+            return NOT_PROVIDED;
+        }
+
+        String uploadedDocuments = caseData.getGaAddlDoc().stream()
+            .map(Element::getValue)
+            .filter(Objects::nonNull)
+            .map(CaseDocument::getDocumentName)
+            .filter(Objects::nonNull)
+            .collect(Collectors.joining("\n"));
+
+        return uploadedDocuments.isEmpty() ? NOT_PROVIDED : uploadedDocuments;
     }
 
     public String getSurname(GeneralApplicationCaseData caseData) {
