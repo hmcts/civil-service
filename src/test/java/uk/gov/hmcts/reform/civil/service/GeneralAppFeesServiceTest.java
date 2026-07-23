@@ -314,6 +314,58 @@ class GeneralAppFeesServiceTest {
         assertThat(exception.getCause()).hasMessage("fee lookup failed");
     }
 
+    @Test
+    void shouldRejectEmptyApplicationTypesWhenCalculatingFee() {
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> generalAppFeesService.getFeeForGALiP(Collections.emptyList(), false, false, null)
+        );
+
+        assertThat(exception).hasMessage("General application type is required to calculate a fee");
+    }
+
+    @Test
+    void shouldRejectNullApplicationTypesWhenCalculatingFee() {
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> generalAppFeesService.getFeeForGALiP(null, false, false, null)
+        );
+
+        assertThat(exception).hasMessage("General application type is required to calculate a fee");
+    }
+
+    @Test
+    void shouldNotReturnInternalMaxFeePlaceholderWhenCandidateFeeIsHigher() {
+        FeeLookupResponseDto highFeePounds = new FeeLookupResponseDto()
+            .setFeeAmount(new BigDecimal("21474836.48"))
+            .setCode(TEST_FEE_CODE)
+            .setVersion(1);
+        when(feesApiClient.lookupFee(
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            eq(GENERAL_APP_WITHOUT_NOTICE)
+        )).thenReturn(highFeePounds);
+        when(feesConfiguration.getService()).thenReturn(GENERAL_SERVICE);
+        when(feesConfiguration.getChannel()).thenReturn(DEFAULT_CHANNEL);
+        when(feesConfiguration.getJurisdiction1()).thenReturn(CIVIL_JURISDICTION);
+        when(feesConfiguration.getJurisdiction2()).thenReturn(CIVIL_JURISDICTION);
+        when(feesConfiguration.getEvent()).thenReturn(GENERAL_APPLICATION);
+        when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn(GENERAL_APP_WITHOUT_NOTICE);
+
+        Fee feeDto = generalAppFeesService.getFeeForGALiP(
+            List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT),
+            true,
+            false,
+            null
+        );
+
+        assertThat(feeDto.getCalculatedAmountInPence()).isEqualByComparingTo(new BigDecimal("2147483648"));
+        assertThat(feeDto.toPounds()).isEqualByComparingTo(new BigDecimal("21474836.48"));
+    }
+
     @Nested
     class FeeForGA {
 
