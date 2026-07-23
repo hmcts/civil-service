@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
@@ -269,6 +270,58 @@ public class DocUploadNotificationServiceTest {
                 getNotificationDataMapForLip(NO, YES),
                 "general-apps-notice-of-document-upload-" + CASE_REFERENCE
             );
+        }
+
+        @Test
+        void shouldUseNotProvidedWhenApplicantOrganisationIdentifierIsMissing() {
+            GeneralApplicationCaseData caseData = getCaseData(true, NO, NO).copy()
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id").setEmail(DUMMY_EMAIL))
+                .build();
+
+            Map<String, String> properties = docUploadNotificationService.addProperties(caseData, parentCaseData());
+
+            assertThat(properties)
+                .containsEntry(NotificationDataGA.CLAIM_LEGAL_ORG_NAME_SPEC, "Not provided")
+                .containsEntry(NotificationData.UPLOADED_DOCUMENTS, UPLOADED_DOCUMENT_NAMES);
+        }
+
+        @Test
+        void shouldUseNotProvidedWhenApplicantOrganisationCannotBeFound() {
+            GeneralApplicationCaseData caseData = getCaseData(true, NO, NO).copy()
+                .generalAppApplnSolicitor(new GASolicitorDetailsGAspec().setId("id")
+                                              .setEmail(DUMMY_EMAIL).setOrganisationIdentifier("missing-org"))
+                .build();
+            when(organisationService.findOrganisationById("missing-org")).thenReturn(Optional.empty());
+
+            Map<String, String> properties = docUploadNotificationService.addProperties(caseData, parentCaseData());
+
+            assertThat(properties).containsEntry(NotificationDataGA.CLAIM_LEGAL_ORG_NAME_SPEC, "Not provided");
+        }
+
+        @Test
+        void shouldUseNotProvidedWhenCaseHasNoUploadedDocumentsOrLegacyReference() {
+            GeneralApplicationCaseData caseData = getCaseData(true, NO, NO).gaAddlDoc(null);
+            GeneralApplicationCaseData mainCaseData = new GeneralApplicationCaseData()
+                .ccdState(CaseState.CASE_PROGRESSION)
+                .build();
+
+            Map<String, String> properties = docUploadNotificationService.addProperties(caseData, mainCaseData);
+
+            assertThat(properties)
+                .containsEntry(NotificationData.CASEMAN_REF, "Not provided")
+                .containsEntry(NotificationData.UPLOADED_DOCUMENTS, "Not provided");
+        }
+
+        @Test
+        void shouldUseNotProvidedWhenUploadedDocumentsHaveNoNames() {
+            GeneralApplicationCaseData caseData = getCaseData(true, NO, NO).gaAddlDoc(List.of(
+                element(new CaseDocument()),
+                new Element<>()
+            ));
+
+            Map<String, String> properties = docUploadNotificationService.addProperties(caseData, parentCaseData());
+
+            assertThat(properties).containsEntry(NotificationData.UPLOADED_DOCUMENTS, "Not provided");
         }
 
         private Map<String, String> getNotificationDataMapForLip(YesOrNo isLipAppln, YesOrNo isLipRespondent) {
