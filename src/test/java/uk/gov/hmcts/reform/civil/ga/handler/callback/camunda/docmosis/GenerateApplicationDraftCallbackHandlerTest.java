@@ -64,7 +64,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DRAFT_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.RELIEF_FROM_SANCTIONS;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SETTLE_BY_CONSENT;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CUSTOMER_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -328,6 +330,43 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, NO);
         when(generalAppFeesService.isFreeApplication(any(GeneralApplicationCaseData.class))).thenReturn(false);
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        handler.handle(params);
+
+        verifyNoInteractions(generalApplicationDraftGenerator);
+    }
+
+    @Test
+    void shouldGenerateDraftDocument_whenSettleByConsentIsOnlyApplicationType_LR() {
+        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+        GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, YES, NO)
+            .copy()
+            .generalAppType(new GAApplicationType().setTypes(List.of(SETTLE_BY_CONSENT)))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
+            .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        verify(generalApplicationDraftGenerator).generate(any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"));
+        verify(gaForLipService).isGaForLip(any(GeneralApplicationCaseData.class));
+
+        GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
+
+        assertThat(updatedData.getGaDraftDocument().getFirst().getValue())
+            .isEqualTo(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
+        assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
+    }
+
+    @Test
+    void shouldNotGenerateDraftDocument_whenSettleByConsentIsNotOnlyApplicationType_LR() {
+        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+        GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, YES, NO)
+            .copy()
+            .generalAppType(new GAApplicationType().setTypes(List.of(SETTLE_BY_CONSENT, EXTEND_TIME)))
+            .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         handler.handle(params);
