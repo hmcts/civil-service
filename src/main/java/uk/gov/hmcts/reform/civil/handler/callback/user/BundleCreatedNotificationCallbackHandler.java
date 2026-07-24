@@ -9,9 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -29,7 +27,6 @@ public class BundleCreatedNotificationCallbackHandler extends CallbackHandler {
     private static final String BUNDLE_CREATED_NOTIFICATION_EVENT = "BUNDLE_CREATED_NOTIFICATION";
 
     private final ObjectMapper mapper;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -48,11 +45,7 @@ public class BundleCreatedNotificationCallbackHandler extends CallbackHandler {
     private CallbackResponse startBundleCreatedNotification(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (featureToggleService.isAmendBundleEnabled()) {
-            caseData.setBundleEvent(BUNDLE_CREATED_NOTIFICATION_EVENT);
-        } else {
-            caseData.setBusinessProcess(BusinessProcess.ready(BUNDLE_CREATION_NOTIFICATION));
-        }
+        caseData.setBundleEvent(BUNDLE_CREATED_NOTIFICATION_EVENT);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))

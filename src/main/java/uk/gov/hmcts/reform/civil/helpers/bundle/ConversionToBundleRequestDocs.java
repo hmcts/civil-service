@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentTyp
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -34,7 +33,6 @@ public class ConversionToBundleRequestDocs {
     private static final String DOC_FILE_NAME_WITH_DATE = "DOC_FILE_NAME %s";
     private static final String DATE_FORMAT = "dd/MM/yyyy";
 
-    private final FeatureToggleService featureToggleService;
     private final BundleRequestDocsOrganizer bundleRequestDocsOrganizer;
     private static final String UNBUNDLED_FOLDER = "UnbundledFolder";
 
@@ -44,15 +42,13 @@ public class ConversionToBundleRequestDocs {
         log.debug("Converting other witness evidence to bundle request docs for party {}", party);
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         removePartyEntries(witnessStatmentsMap, party);
-        boolean amendBundleEnabled = featureToggleService.isAmendBundleEnabled();
         witnessStatmentsMap.forEach((witnessName, witnessEvidence) ->
             addOtherWitnessEvidenceDocuments(
                 bundlingRequestDocuments,
                 witnessEvidence,
                 filterDocumentsForBundle(
                     witnessEvidence,
-                    UploadEvidenceWitness::getWitnessOptionDocument,
-                    amendBundleEnabled
+                    UploadEvidenceWitness::getWitnessOptionDocument
                 ),
                 displayName,
                 documentType
@@ -219,15 +215,6 @@ public class ConversionToBundleRequestDocs {
     }
 
     private <T> List<Element<T>> filterDocumentsForBundle(List<Element<T>> documents, Function<T, Document> documentExtractor) {
-        return filterDocumentsForBundle(documents, documentExtractor, featureToggleService.isAmendBundleEnabled());
-    }
-
-    private <T> List<Element<T>> filterDocumentsForBundle(List<Element<T>> documents,
-                                                          Function<T, Document> documentExtractor,
-                                                          boolean amendBundleEnabled) {
-        if (!amendBundleEnabled) {
-            return documents;
-        }
         return new ArrayList<>(documents.stream()
             .filter(element -> isBundledDocument(documentExtractor.apply(element.getValue())))
             .toList());

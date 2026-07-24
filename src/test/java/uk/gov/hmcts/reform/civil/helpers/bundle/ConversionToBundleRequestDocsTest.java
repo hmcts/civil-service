@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,16 +22,12 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ConversionToBundleRequestDocsTest {
 
     @Mock
     private BundleRequestDocsOrganizer requestDocsOrganizer;
-
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private ConversionToBundleRequestDocs conversionToBundleRequestDocs;
@@ -70,7 +65,6 @@ class ConversionToBundleRequestDocsTest {
 
     @Test
     void shouldPreserveOriginalWitnessIndexWhenFilteringOtherWitnessEvidence() {
-        when(featureToggleService.isAmendBundleEnabled()).thenReturn(true);
         String displayName = "%s %s %s";
         String documentType = "documentType";
 
