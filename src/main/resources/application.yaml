@@ -68,6 +68,9 @@ scheduler:
   defendant-response:
     cronExpression: ${CRON_EXPRESSION_DEFENDANT_RESPONSE:0 1 16 * * ?}
     enabled: ${SCHEDULER_ENABLED_DEFENDANT_RESPONSE:false}
+  evidence-upload:
+    cronExpression: ${CRON_EXPRESSION_EVIDENCE_UPLOAD:0 30 17 * * ?}
+    enabled: ${SCHEDULER_ENABLED_EVIDENCE_UPLOAD:true}
   default-back-pressure:
     initialDelay: ${DEFAULT_BACK_PRESSURE_INITIAL_DELAY:PT0S}
     maxDelay: ${DEFAULT_BACK_PRESSURE_MAX_DELAY:PT10S}

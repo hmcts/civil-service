@@ -447,6 +447,19 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 | `enabled` | Whether the scheduler is active. | `false` | `SCHEDULER_ENABLED_JUDGEMENT_BUFFER` |
 | `cronExpression` | When the scheduler runs. | `0 0 2 * * *` (Daily at 2 AM) | `CRON_EXPRESSION_JUDGEMENT_BUFFER` |
 
+### EvidenceUpload
+
+The `EvidenceUpload` scheduler finds cases with upcoming evidence upload deadlines and runs the evidence upload notification task for each eligible case.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.judgement-buffer`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `false` | `CRON_EXPRESSION_EVIDENCE_UPLOAD` |
+| `cronExpression` | When the scheduler runs. | `0 30 17 * * ?` (At 17:30:00 every day) | `SCHEDULER_ENABLED_EVIDENCE_UPLOAD` |
+
 #### Global Scheduler Settings
 
 | Setting | Description | Default | Environment Variable |
