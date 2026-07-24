@@ -11,6 +11,7 @@ import java.util.Set;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.notification.handlers.claimantresponsecui.confirmproceed.ClaimantConfirmProceedDefendantEmailDTOGenerator.NO_EMAIL_OPERATION;
+import static uk.gov.hmcts.reform.civil.utils.MaskHelper.maskEmail;
 
 @AllArgsConstructor
 @Slf4j
@@ -21,7 +22,7 @@ public abstract class BaseNotifier {
     protected List<String> sendNotification(Set<EmailDTO> recipients) {
         List<String> errorMessages = new ArrayList<>();
         for (EmailDTO recipient : recipients) {
-            log.info("Sending notification for id {} and email {}", recipient.getReference(), recipient.getTargetEmail());
+            log.info("Sending notification for id {} and email {}", recipient.getReference(), maskEmail(recipient.getTargetEmail()));
             if (NO_EMAIL_OPERATION.equals(recipient.getEmailTemplate())) {
                 log.info("Skipping notification for id {} due to no op request", recipient.getReference());
                 continue;

@@ -112,7 +112,7 @@ public class ValidateDateOfBirth implements CaseTask {
     }
 
     private List<String> validatePostcode(Address address) {
-        log.info("Validating postcode for address: {}", address);
+        log.info("Validating postcode");
         return postcodeValidator.validate(Optional.ofNullable(address).map(Address::getPostCode).orElse(null));
     }
 }
