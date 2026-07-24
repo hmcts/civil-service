@@ -1,5 +1,6 @@
 java:
   image: ${IMAGE_NAME}
+  imagePullPolicy: Always
   ingressHost: ${SERVICE_NAME}.preview.platform.hmcts.net
   devcpuRequests: 50m
   devcpuLimits: 500m
@@ -284,6 +285,7 @@ ccd:
 camunda-bpm:
   enabled: true
   java:
+    imagePullPolicy: Always
     disableKeyVaults: true
     releaseNameOverride: ${SERVICE_NAME}-camunda
     ingressHost: camunda-${SERVICE_FQDN}

@@ -41,21 +41,19 @@
       "description": "Restrict HMCTS library upgrades to minor/patch versions. Major versions may introduce incompatibilities with Spring Boot or other core dependencies (e.g., ccd-case-document-am-client v1.60.0 requires Spring Boot 4.0.6, incompatible with project's Spring Boot 3.3.7)"
     },
     {
-      "matchPackageNames": [
-        "org.camunda.bpm:camunda-engine-rest-core",
-        "org.camunda.bpm:camunda-external-task-client"
-      ],
-      "groupName": "Camunda updates",
-      "groupSlug": "camunda",
-      "automerge": true
-    },
-    {
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "All non-major updates",
       "groupSlug": "all-non-major",
       "automerge": true,
       "automergeType": "pr",
       "automergeSchedule": ["before 4pm every weekday"]
+    },
+    {
+      "matchPackagePatterns": ["^org\\.camunda\\.bpm"],
+      "groupName": "Camunda updates",
+      "groupSlug": "camunda",
+      "automerge": false,
+      "description": "Camunda upgrades are isolated in their own group and require manual review to prevent build failures"
     },
     {
       "matchManagers": ["helmv3"],

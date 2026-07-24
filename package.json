@@ -15,6 +15,7 @@
   },
   "overrides": {
     "basic-ftp": "5.3.1",
+    "js-yaml": "4.2.0",
     "ip-address": "10.2.0",
     "ws": "8.21.0"
   }

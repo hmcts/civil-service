@@ -19,11 +19,11 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.nowInLocalZone;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.GENERAL_ORDER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.POST_JUDGE_GENERAL_ORDER_LIP;
 
@@ -67,7 +67,7 @@ public class GeneralOrderGenerator implements TemplateDataGenerator<JudgeDecisio
     private String getFileName(DocmosisTemplates docmosisTemplate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-        return String.format(docmosisTemplate.getDocumentTitle(), LocalDateTime.now().format(formatter));
+        return String.format(docmosisTemplate.getDocumentTitle(), nowInLocalZone().format(formatter));
     }
 
     @Override

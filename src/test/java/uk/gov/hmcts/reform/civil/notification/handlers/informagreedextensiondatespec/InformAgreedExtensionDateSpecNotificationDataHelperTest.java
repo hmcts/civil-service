@@ -45,6 +45,35 @@ class InformAgreedExtensionDateSpecNotificationDataHelperTest {
     }
 
     @Test
+    void shouldAddApplicantSolicitorPropertiesWithRespondentTwoExtensionWhenLater() {
+        LocalDate respondent1Extension = LocalDate.of(2025, 1, 1);
+        LocalDate respondent2Extension = LocalDate.of(2025, 2, 1);
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondentSolicitor1AgreedDeadlineExtension(respondent1Extension)
+            .respondentSolicitor2AgreedDeadlineExtension(respondent2Extension)
+            .build();
+
+        try (MockedStatic<MultiPartyScenario> multiPartyScenario = Mockito.mockStatic(MultiPartyScenario.class);
+             MockedStatic<PartyUtils> partyUtils = Mockito.mockStatic(PartyUtils.class);
+             MockedStatic<DateFormatHelper> dateFormatHelper = Mockito.mockStatic(DateFormatHelper.class)) {
+
+            multiPartyScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData))
+                .thenReturn(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP);
+            partyUtils.when(() -> PartyUtils.fetchDefendantName(caseData)).thenReturn("Defendant");
+            dateFormatHelper.when(() -> DateFormatHelper.formatLocalDate(respondent2Extension, DATE))
+                .thenReturn("01 February 2025");
+
+            Map<String, String> properties = new HashMap<>();
+            Map<String, String> updated = InformAgreedExtensionDateSpecNotificationDataHelper
+                .addApplicantSolicitorProperties(properties, caseData);
+
+            assertThat(updated)
+                .containsEntry(AGREED_EXTENSION_DATE, "01 February 2025")
+                .containsEntry(DEFENDANT_NAME, "Defendant");
+        }
+    }
+
+    @Test
     void shouldUseRespondentTwoExtensionWhenLater() {
         LocalDate respondent1Extension = LocalDate.of(2025, 1, 1);
         LocalDate respondent2Extension = LocalDate.of(2025, 2, 1);

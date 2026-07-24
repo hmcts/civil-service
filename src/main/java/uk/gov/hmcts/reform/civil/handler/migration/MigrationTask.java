@@ -37,6 +37,15 @@ public abstract class MigrationTask<T extends CaseReference> {
         return Collections.emptyList();
     }
 
+    /**
+     * Read-only tasks inspect a case and report without changing it. When true,
+     * {@link AsyncCaseMigrationService} fetches the case without starting or submitting a CCD
+     * event, so no entry is written to the case history.
+     */
+    public boolean isReadOnly() {
+        return false;
+    }
+
     protected Class<T> getType() {
         return type;
     }

@@ -53,6 +53,8 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
+
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.nowInLocalZone;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -862,7 +864,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private List<String> validateOrderAfterHearingDates(CaseData caseData) {
         List<String> errors = new ArrayList<>();
-        LocalDate now = LocalDate.now();
+        LocalDate now = nowInLocalZone().toLocalDate();
         OrderAfterHearingDate orderAfterHearingDate = caseData.getOrderAfterHearingDate();
         OrderAfterHearingDateType dateType = orderAfterHearingDate.getDateType();
 

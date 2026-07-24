@@ -54,4 +54,28 @@ class DashboardTaskContextTest {
 
         assertThat(context.authToken()).isNull();
     }
+
+    @Test
+    void shouldCreateCivilContextWithoutCallbackParams() {
+        CaseData caseData = CaseData.builder().build();
+
+        DashboardTaskContext context = DashboardTaskContext.civil(caseData, "direct-token");
+
+        assertThat(context.caseType()).isEqualTo(DashboardCaseType.CIVIL);
+        assertThat(context.caseData()).isSameAs(caseData);
+        assertThat(context.authToken()).isEqualTo("direct-token");
+        assertThat(context.callbackParams()).isNull();
+    }
+
+    @Test
+    void shouldCreateGaContextWithoutCallbackParams() {
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().build();
+
+        DashboardTaskContext context = DashboardTaskContext.generalApplication(caseData, "direct-token");
+
+        assertThat(context.caseType()).isEqualTo(DashboardCaseType.GENERAL_APPLICATION);
+        assertThat(context.generalApplicationCaseData()).isSameAs(caseData);
+        assertThat(context.authToken()).isEqualTo("direct-token");
+        assertThat(context.callbackParams()).isNull();
+    }
 }

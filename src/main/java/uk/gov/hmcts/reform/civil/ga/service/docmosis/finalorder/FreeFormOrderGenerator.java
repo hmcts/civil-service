@@ -18,10 +18,10 @@ import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.nowInLocalZone;
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.OrderOnCourtsList.ORDER_ON_COURT_INITIATIVE;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.OrderOnCourtsList.ORDER_WITHOUT_NOTICE;
@@ -152,7 +152,7 @@ public class FreeFormOrderGenerator implements TemplateDataGenerator<FreeFormOrd
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(FILE_TIMESTAMP_FORMAT);
         return String.format(
             template.getDocumentTitle(),
-            LocalDateTime.now().format(formatter)
+            nowInLocalZone().format(formatter)
         );
     }
 

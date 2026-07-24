@@ -14,7 +14,7 @@
       <bpmn:incoming>Flow_00hamjb</bpmn:incoming>
       <bpmn:outgoing>Flow_039hs5j</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="GenerateDashboardNotificationsDJNonDivergent" name="Generate Dashboard Notifications" camunda:type="external" camunda:topic="processCaseEvent">
+    <bpmn:serviceTask id="GenerateDashboardNotificationsDJNonDivergent" name="Generate Dashboard Notifications" camunda:type="external" camunda:topic="dashboardNotifications">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="caseEvent">DASHBOARD_NOTIFICATION_EVENT</camunda:inputParameter>

@@ -62,7 +62,7 @@
       <bpmn:outgoing>Flow_1hqmcdf</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_1hqmcdf" sourceRef="SendSetAsideLiPLetterDef1" targetRef="Gateway_0vm1a54" />
-    <bpmn:serviceTask id="GenerateDashboardNotificationsSetAsideJudgement" name="Generate Dashboard Notifications" camunda:type="external" camunda:topic="processCaseEvent">
+    <bpmn:serviceTask id="GenerateDashboardNotificationsSetAsideJudgement" name="Generate Dashboard Notifications" camunda:type="external" camunda:topic="dashboardNotifications">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="caseEvent">DASHBOARD_NOTIFICATION_EVENT</camunda:inputParameter>

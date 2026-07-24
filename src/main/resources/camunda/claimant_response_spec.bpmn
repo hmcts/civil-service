@@ -337,7 +337,7 @@
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(!empty flowFlags.UNREPRESENTED_DEFENDANT_ONE &amp;&amp; flowFlags.UNREPRESENTED_DEFENDANT_ONE) &amp;&amp; (flowState == "MAIN.FULL_DEFENCE_NOT_PROCEED") &amp;&amp; (!empty flowFlags.DASHBOARD_SERVICE_ENABLED &amp;&amp; flowFlags.DASHBOARD_SERVICE_ENABLED)}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_1dx6rl0" sourceRef="ClaimantResponseConfirmsNotToProceedLipNotify" targetRef="Gateway_10ndl16" />
-    <bpmn:serviceTask id="GenerateDashboardNotificationsClaimantResponseSpec" name="Dashboard Notifications" camunda:type="external" camunda:topic="processCaseEvent">
+    <bpmn:serviceTask id="GenerateDashboardNotificationsClaimantResponseSpec" name="Dashboard Notifications" camunda:type="external" camunda:topic="dashboardNotifications">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="caseEvent">DASHBOARD_NOTIFICATION_EVENT</camunda:inputParameter>
