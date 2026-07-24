@@ -34,7 +34,6 @@ class DraftClaimControllerTest {
     private static final String AUTH = "Token";
     private static final HashMap<String, Object> PAYLOAD = new  HashMap<>();
 
-
     @Mock
     private DraftStoreService draftStoreService;
 
@@ -71,8 +70,7 @@ class DraftClaimControllerTest {
     }
 
     @Test
-    void shouldReturnActiveDraftClaim()
-    {
+    void shouldReturnActiveDraftClaim() {
         when(draftStoreService.getActiveDraftClaimForUser(USER_ID)).thenReturn(Optional.of(draftStoreEntity));
 
         ResponseEntity<DraftClaimResponse> response =
@@ -84,7 +82,7 @@ class DraftClaimControllerTest {
     }
 
     @Test
-    void shouldReturnDraftClaim(){
+    void shouldReturnDraftClaim() {
         when(draftStoreService.getDraftClaim(DRAFT_ID, USER_ID)).thenReturn(Optional.of(draftStoreEntity));
 
         ResponseEntity<DraftClaimResponse> response = controller.getDraftClaim(DRAFT_ID, USER_ID);
@@ -95,9 +93,9 @@ class DraftClaimControllerTest {
     }
 
     @Test
-    void shouldUpdateDraftClaim(){
+    void shouldUpdateDraftClaim() {
         DraftClaimRequest request = new DraftClaimRequest(CASE_ID, PAYLOAD);
-        when(draftStoreService.updateDraftClaim(DRAFT_ID, USER_ID, CASE_ID,PAYLOAD)).thenReturn(draftStoreEntity);
+        when(draftStoreService.updateDraftClaim(DRAFT_ID, USER_ID, CASE_ID, PAYLOAD)).thenReturn(draftStoreEntity);
 
         ResponseEntity<DraftClaimResponse> response = controller.updateDraftClaim(DRAFT_ID, AUTH, request);
 
@@ -107,7 +105,7 @@ class DraftClaimControllerTest {
     }
 
     @Test
-    void shouldDeleteDraftClaim(){
+    void shouldDeleteDraftClaim() {
         ResponseEntity<Void> response = controller.deleteDraftClaim(DRAFT_ID, AUTH);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
