@@ -447,6 +447,20 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 | `enabled` | Whether the scheduler is active. | `false` | `SCHEDULER_ENABLED_JUDGEMENT_BUFFER` |
 | `cronExpression` | When the scheduler runs. | `0 0 2 * * *` (Daily at 2 AM) | `CRON_EXPRESSION_JUDGEMENT_BUFFER` |
 
+### FullAdmitPayImmediatelyNoPaymentFromDefendantScheduler
+
+The `FullAdmitPayImmediatelyNoPaymentFromDefendantScheduler` updates cases with Dashboard notification created successfully event.
+It runs daily at midnight when the Spring scheduler feature flag is enabled.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.full-admit-pay-immediately-no-payment-from-def`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF` |
+| `cronExpression` | When the scheduler runs. | `0 0 0 * * ?` (Daily at 00:00) | `CRON_EXPRESSION_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF` |
+
 #### Global Scheduler Settings
 
 | Setting | Description | Default | Environment Variable |
