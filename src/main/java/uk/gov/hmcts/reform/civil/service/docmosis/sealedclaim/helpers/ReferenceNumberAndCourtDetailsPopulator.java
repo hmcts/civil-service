@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import java.util.List;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 
 @Component
 public class ReferenceNumberAndCourtDetailsPopulator {
@@ -32,13 +32,15 @@ public class ReferenceNumberAndCourtDetailsPopulator {
             requestedCourt = caseData.getRespondent2DQ().getRespondent2DQRequestedCourt().getCaseLocation().getBaseLocation();
         }
 
+        String caseServiceId = getCaseServiceId(caseData.getCaseAccessCategory());
+
         List<LocationRefData> courtLocations = (locationRefDataService
             .getCourtLocationsByEpimmsId(
                 authorisation,
-                requestedCourt));
+                requestedCourt,
+                caseServiceId));
 
         Optional<LocationRefData> optionalCourtLocation = courtLocations.stream()
-            .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
             .findFirst();
 
         String hearingCourtLocation = optionalCourtLocation
