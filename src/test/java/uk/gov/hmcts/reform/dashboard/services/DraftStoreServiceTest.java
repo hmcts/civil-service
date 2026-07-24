@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.dashboard.services;
 
-
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,20 +20,26 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DraftStoreServiceTest {
 
     private static final String USER_ID = "user1";
     private static final String CASE_ID = "ccd1";
+    private static final String NEW_CASE_ID = "ccd2";
     private static final String AUTH = "Bearer token";
-    private final UUID DRAFT_ID = UUID.randomUUID();
-    private final HashMap<String, Object> PAYLOAD = new HashMap<>();
-    private final long DRAFT_EXPIRY_DAYS = 180;
-    private final int DRAFT_CLAIM_TYPE_ID = 1;
+    private static final UUID DRAFT_ID = UUID.randomUUID();
+    private static final long DRAFT_EXPIRY_DAYS = 180;
+    private static final int DRAFT_CLAIM_TYPE_ID = 1;
 
     @Mock
     private DraftStoreRepository draftStoreRepository;
@@ -53,11 +58,11 @@ class DraftStoreServiceTest {
 
         @Test
         void shouldCreateDraftClaimWithFixedExpiry() {
-           Map<String, Object> payload = new HashMap<>(Map.of("step", "claimant-details"));
-           when(draftStoreRepository.save(any(DraftStoreEntity.class)))
-               .thenAnswer(invocation -> invocation.getArgument(0));
+            Map<String, Object> payload = new HashMap<>(Map.of("step", "claimant-details"));
+            when(draftStoreRepository.save(any(DraftStoreEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
 
-           DraftStoreEntity result = draftStoreService.createDraftClaim(USER_ID, CASE_ID, payload);
+            DraftStoreEntity result = draftStoreService.createDraftClaim(USER_ID, CASE_ID, payload);
 
             ArgumentCaptor<DraftStoreEntity> captor = ArgumentCaptor.forClass(DraftStoreEntity.class);
             verify(draftStoreRepository).save(captor.capture());
@@ -184,9 +189,6 @@ class DraftStoreServiceTest {
 
         @Test
         void shouldUpdateDraftClaimWhenItExists() {
-            Map<String, Object> newPayload = new HashMap<>(Map.of("step", "updated-claimant-details"));
-            String newCaseId = "ccd2";
-
             DraftStoreEntity existingDraft = new DraftStoreEntity();
             existingDraft.setId(DRAFT_ID);
             existingDraft.setUserId(USER_ID);
@@ -203,7 +205,8 @@ class DraftStoreServiceTest {
             when(draftStoreRepository.save(any(DraftStoreEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-            DraftStoreEntity result = draftStoreService.updateDraftClaim(DRAFT_ID, USER_ID, newCaseId, newPayload);
+            Map<String, Object> newPayload = new HashMap<>(Map.of("step", "updated-claimant-details"));
+            DraftStoreEntity result = draftStoreService.updateDraftClaim(DRAFT_ID, USER_ID, NEW_CASE_ID, newPayload);
 
             ArgumentCaptor<DraftStoreEntity> captor = ArgumentCaptor.forClass(DraftStoreEntity.class);
 
@@ -211,7 +214,7 @@ class DraftStoreServiceTest {
             DraftStoreEntity updatedDraft = captor.getValue();
 
             assertThat(result).isSameAs(updatedDraft);
-            assertThat(updatedDraft.getCaseId()).isEqualTo(newCaseId);
+            assertThat(updatedDraft.getCaseId()).isEqualTo(NEW_CASE_ID);
             assertThat(updatedDraft.getPayload()).isEqualTo(newPayload);
             assertThat(updatedDraft.getUpdatedAt()).isNotNull();
         }
