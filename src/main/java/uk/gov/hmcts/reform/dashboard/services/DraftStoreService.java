@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.dashboard.exceptions.DraftClaimNotFoundException;
 import uk.gov.hmcts.reform.dashboard.repositories.DraftStoreRepository;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -22,6 +23,7 @@ public class DraftStoreService {
 
     private static final int DRAFT_CLAIM_TYPE_ID = 1;
     private static final long DRAFT_EXPIRY_DAYS = 180;
+    private static final String USER_ID_NOT_NULL = "userId must not be null";
 
     private final DraftStoreRepository draftStoreRepository;
 
@@ -31,8 +33,8 @@ public class DraftStoreService {
     }
 
     public DraftStoreEntity createDraftClaim(String userId, String caseId, Map<String, Object> payload) {
-        Objects.requireNonNull(userId, "userId must not be null");
-        OffsetDateTime now = OffsetDateTime.now();
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
 
         DraftStoreEntity draftStoreEntity = new DraftStoreEntity(
             UUID.randomUUID(),
@@ -49,16 +51,21 @@ public class DraftStoreService {
         return draftStoreRepository.save(draftStoreEntity);
     }
 
-    @Transactional(readOnly = true)
-    public Optional<DraftStoreEntity> getDraftClaim(UUID draftId, String userId) {
+    private Optional<DraftStoreEntity> findDraftClaim(UUID draftId, String userId) {
         Objects.requireNonNull(draftId, "draftId must not be null");
-        Objects.requireNonNull(userId, "userId must not be null");
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+
         return draftStoreRepository.findByIdAndUserIdAndDraftTypeIdAndExpiresAtAfter(
             draftId,
             userId,
             DRAFT_CLAIM_TYPE_ID,
-            OffsetDateTime.now()
+            OffsetDateTime.now(ZoneOffset.UTC)
         );
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<DraftStoreEntity> getDraftClaim(UUID draftId, String userId) {
+        return findDraftClaim(draftId, userId);
     }
 
     /**
@@ -67,11 +74,11 @@ public class DraftStoreService {
      */
     @Transactional(readOnly = true)
     public Optional<DraftStoreEntity> getActiveDraftClaimForUser(String userId) {
-        Objects.requireNonNull(userId, "userId must not be null");
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         return draftStoreRepository.findFirstByUserIdAndDraftTypeIdAndExpiresAtAfterOrderByUpdatedAtDesc(
             userId,
             DRAFT_CLAIM_TYPE_ID,
-            OffsetDateTime.now()
+            OffsetDateTime.now(ZoneOffset.UTC)
         );
     }
 
@@ -79,14 +86,14 @@ public class DraftStoreService {
                                              String userId,
                                              String caseId,
                                              Map<String, Object> payload) {
-        return getDraftClaim(draftId, userId)
-            .map(existingDraft -> applyDraftClaimUpdate(existingDraft, caseId, payload, OffsetDateTime.now()))
+        return findDraftClaim(draftId, userId)
+            .map(existingDraft -> applyDraftClaimUpdate(existingDraft, caseId, payload, OffsetDateTime.now(ZoneOffset.UTC)))
             .orElseThrow(() -> new DraftClaimNotFoundException(draftId));
     }
 
     public void deleteDraftClaim(UUID draftId, String userId) {
         Objects.requireNonNull(draftId, "draftId must not be null");
-        Objects.requireNonNull(userId, "userId must not be null");
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         log.info("Deleting draft claim draftId={}", draftId);
         long deleted = draftStoreRepository.deleteByIdAndUserIdAndDraftTypeId(
             draftId,
