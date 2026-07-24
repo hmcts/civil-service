@@ -36,7 +36,6 @@ class DraftStoreServiceTest {
     private static final String USER_ID = "user1";
     private static final String CASE_ID = "ccd1";
     private static final String NEW_CASE_ID = "ccd2";
-    private static final String AUTH = "Bearer token";
     private static final UUID DRAFT_ID = UUID.randomUUID();
     private static final long DRAFT_EXPIRY_DAYS = 180;
     private static final int DRAFT_CLAIM_TYPE_ID = 1;
@@ -44,14 +43,10 @@ class DraftStoreServiceTest {
     @Mock
     private DraftStoreRepository draftStoreRepository;
 
-    @Mock
-    private UserService userService;
-
     @InjectMocks
     private DraftStoreService draftStoreService;
 
     private DraftStoreEntity draftClaim;
-    private DraftClaimRequest request;
 
     @Nested
     class CreateDraftClaimTest {
