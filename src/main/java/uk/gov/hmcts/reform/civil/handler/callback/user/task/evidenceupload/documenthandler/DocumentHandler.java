@@ -48,10 +48,18 @@ public abstract class DocumentHandler<T> {
         if (getDocumentList(caseData) == null || getDocumentList(caseData).isEmpty()) {
             return;
         }
-        renameDocuments(getDocumentList(caseData));
         LocalDateTime halfFivePmYesterday = LocalDateTime.of(LocalDate.now().minusDays(1), LocalTime.of(17, 30));
         getDocumentList(caseData).forEach(document -> {
-            setCategoryId(document);
+            Document documentToAddId = uploadDocumentRetriever.getDocument(document);
+            if (documentToAddId == null) {
+                log.warn(
+                    "Skipping evidence upload document because underlying Document is missing. documentCategory={}, evidenceUploadType={}",
+                    documentCategory, evidenceUploadType
+                );
+                return;
+            }
+            renameDocuments(List.of(document));
+            setCategoryId(documentToAddId);
             LocalDateTime dateTime = uploadDocumentRetriever.getDocumentDateTime(document);
             buildNotificationText(litigantType, notificationStringBuilder, dateTime, halfFivePmYesterday);
         });
@@ -67,8 +75,7 @@ public abstract class DocumentHandler<T> {
         }
     }
 
-    private void setCategoryId(Element<T> document) {
-        Document documentToAddId = uploadDocumentRetriever.getDocument(document);
+    private void setCategoryId(Document documentToAddId) {
         documentToAddId.setCategoryID(documentCategory.getCategoryId());
     }
 

@@ -2,11 +2,16 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.helpers;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseFormForSpec;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,21 +29,13 @@ public class ReferenceNumberAndCourtDetailsPopulator {
     public void populateReferenceNumberDetails(SealedClaimResponseFormForSpec form, CaseData caseData,
                                                String authorisation) {
 
-        String requestedCourt = null;
-
-        if (caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() != null && !isRespondent2(caseData)) {
-            requestedCourt = caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getCaseLocation().getBaseLocation();
-        } else if (caseData.getRespondent2DQ().getRespondent2DQRequestedCourt() != null && isRespondent2(caseData)) {
-            requestedCourt = caseData.getRespondent2DQ().getRespondent2DQRequestedCourt().getCaseLocation().getBaseLocation();
-        }
+        Optional<String> requestedCourt = getRequestedCourt(caseData);
 
         String caseServiceId = getCaseServiceId(caseData.getCaseAccessCategory());
 
-        List<LocationRefData> courtLocations = (locationRefDataService
-            .getCourtLocationsByEpimmsId(
-                authorisation,
-                requestedCourt,
-                caseServiceId));
+        List<LocationRefData> courtLocations = requestedCourt
+            .map(epimmsId -> locationRefDataService.getCourtLocationsByEpimmsId(authorisation, epimmsId, caseServiceId))
+            .orElseGet(Collections::emptyList);
 
         Optional<LocationRefData> optionalCourtLocation = courtLocations.stream()
             .findFirst();
@@ -52,6 +49,20 @@ public class ReferenceNumberAndCourtDetailsPopulator {
             .setCaseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .setWhyDisputeTheClaim(isRespondent2(caseData) ? caseData.getDetailsOfWhyDoesYouDisputeTheClaim2() : caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
             .setHearingCourtLocation(hearingCourtLocation);
+    }
+
+    private Optional<String> getRequestedCourt(CaseData caseData) {
+        if (!isRespondent2(caseData)) {
+            return Optional.ofNullable(caseData.getRespondent1DQ())
+                .map(Respondent1DQ::getRespondent1DQRequestedCourt)
+                .map(RequestedCourt::getCaseLocation)
+                .map(CaseLocationCivil::getBaseLocation);
+        }
+
+        return Optional.ofNullable(caseData.getRespondent2DQ())
+            .map(Respondent2DQ::getRespondent2DQRequestedCourt)
+            .map(RequestedCourt::getCaseLocation)
+            .map(CaseLocationCivil::getBaseLocation);
     }
 
     private boolean isRespondent2(CaseData caseData) {
