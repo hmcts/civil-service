@@ -182,4 +182,8 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("spring-scheduler-enabled")
             && activeSchedulers.contains(schedulerName);
     }
+
+    public boolean isHmctsAccessMigrationEnabled() {
+        return featureToggleApi.isFeatureEnabled("hmcts-access-migration");
+    }
 }

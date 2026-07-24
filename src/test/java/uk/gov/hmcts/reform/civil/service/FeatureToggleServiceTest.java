@@ -307,4 +307,11 @@ class FeatureToggleServiceTest {
         givenToggle("spring-scheduler-enabled", true);
         assertThat(emptyService.isSpringSchedulerEnabled("JudgementBufferScheduledTask")).isFalse();
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenHmctsAccessMigrationEnabled(Boolean toggleStat) {
+        givenToggle("hmcts-access-migration", toggleStat);
+        assertThat(featureToggleService.isHmctsAccessMigrationEnabled()).isEqualTo(toggleStat);
+    }
 }
