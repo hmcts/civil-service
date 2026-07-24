@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -957,6 +958,43 @@ class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralApplication
                 .isEqualTo("Awaiting Respondent Response");
         }
 
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldMoveLrConsentApplicationToJudicialDecisionRegardlessOfLipStatus(boolean isGaForLip) {
+            ParentCaseUpdateHelper mockHelper = mock(ParentCaseUpdateHelper.class);
+            EndGeneralAppBusinessProcessCallbackHandler localHandler = new EndGeneralAppBusinessProcessCallbackHandler(
+                caseDetailsConverter,
+                gaForLipService,
+                mockHelper
+            );
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .ccdCaseReference(CHILD_CCD_REF)
+                .ccdState(PENDING_APPLICATION_ISSUED)
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CCD_REF.toString()))
+                .generalAppType(new GAApplicationType().setTypes(List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT)))
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setPaymentDetails(new PaymentDetails()))
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
+                .generalAppRespondentSolicitors(wrapElements(new GASolicitorDetailsGAspec().setEmail(DUMMY_EMAIL)))
+                .isMultiParty(NO)
+                .parentClaimantIsApplicant(YES)
+                .build();
+            CallbackParams callbackParams = getCallbackParams(caseData);
+
+            when(gaForLipService.isGaForLip(any())).thenReturn(isGaForLip);
+            when(caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails()))
+                .thenReturn(caseData);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) localHandler.handle(callbackParams);
+
+            assertThat(response.getState()).isEqualTo(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.name());
+            verify(mockHelper).updateParentWithGAState(
+                caseData,
+                APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue()
+            );
+        }
+
         @Test
         void theEndOfProcessShouldUpdateTheStateOfGAAndAlsoUpdateStateOnParentCaseGADetailsAndCollection_ToBeNotified() {
             when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponseForCollection(NO, YES));
@@ -1555,6 +1593,38 @@ class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralApplication
                 .caseData(getSampleGeneralApplicationCaseDataMulti(isConsented, isTobeNotified,
                                                                    respondentResponses, respondentDetails))
                 .version(null)
+                    .params(null);
+        }
+
+        private CallbackParams getCallbackParams(GeneralApplicationCaseData caseData) {
+            return new CallbackParams()
+                .type(ABOUT_TO_SUBMIT)
+                .pageId(null)
+                .request(CallbackRequest.builder()
+                             .caseDetails(CaseDetails.builder()
+                                              .data(objectMapper.convertValue(caseData, new TypeReference<>() {
+                                              })).id(CASE_ID).build())
+                             .eventId("END_BUSINESS_PROCESS_GASPEC")
+                             .build())
+                .caseData(caseData)
+                .version(null)
+                .params(null);
+        }
+
+        private CallbackParams getCallbackParams(YesOrNo isConsented, YesOrNo isTobeNotified) {
+            return new CallbackParams()
+                .type(ABOUT_TO_SUBMIT)
+                .pageId(null)
+                .request(CallbackRequest.builder()
+                             .caseDetails(CaseDetails.builder()
+                                              .data(objectMapper.convertValue(
+                                                  getSampleGeneralApplicationCaseData(isConsented, isTobeNotified),
+                                                  new TypeReference<>() {
+                                                  })).id(CASE_ID).build())
+                             .eventId("END_BUSINESS_PROCESS_GASPEC")
+                             .build())
+                .caseData(getSampleGeneralApplicationCaseData(isConsented, isTobeNotified))
+                .version(null)
                 .params(null);
         }
 
@@ -1574,23 +1644,6 @@ class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralApplication
                 .caseData(getSampleGeneralApplicationCaseDataForVaryJudgement(isConsented, isTobeNotified, respondentsResponses))
                 .version(null)
                 .params(null);
-        }
-
-        private CallbackParams getCallbackParams(YesOrNo isConsented, YesOrNo isTobeNotified) {
-            return new CallbackParams()
-                    .type(ABOUT_TO_SUBMIT)
-                    .pageId(null)
-                    .request(CallbackRequest.builder()
-                            .caseDetails(CaseDetails.builder()
-                                    .data(objectMapper.convertValue(
-                                            getSampleGeneralApplicationCaseData(isConsented, isTobeNotified),
-                                            new TypeReference<>() {
-                                            })).id(CASE_ID).build())
-                            .eventId("END_BUSINESS_PROCESS_GASPEC")
-                            .build())
-                    .caseData(getSampleGeneralApplicationCaseData(isConsented, isTobeNotified))
-                    .version(null)
-                    .params(null);
         }
 
         private StartEventResponse getStartEventResponse(YesOrNo isConsented, YesOrNo isTobeNotified) {
