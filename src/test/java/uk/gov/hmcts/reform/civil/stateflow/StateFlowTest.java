@@ -118,10 +118,14 @@ class StateFlowTest {
         @Test
         void shouldThrowStateFlowException_whenStateMachineHasErrors() {
             when(mockedStateMachine.hasStateMachineError()).thenReturn(true);
+            Map<Object, Object> mockedVariables = createMockedVariables();
+            ExtendedState mockedExtendedState = createMockedExtendedState(mockedVariables);
+            when(mockedStateMachine.getExtendedState()).thenReturn(mockedExtendedState);
+            when(mockedExtendedState.get(EXTENDED_STATE_CASE_KEY, CaseData.class)).thenReturn(CaseData.builder().ccdCaseReference(1234567890L).build());
             StateFlow stateFlow = new StateFlow(mockedStateMachine);
 
             Exception exception = assertThrows(StateFlowException.class, stateFlow::getState);
-            String expectedMessage = "The state machine is at error state.";
+            String expectedMessage = "The state machine is at error state. Case ID: 1234567890";
             String actualMessage = exception.getMessage();
 
             assertEquals(expectedMessage, actualMessage);
