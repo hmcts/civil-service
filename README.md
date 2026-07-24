@@ -77,8 +77,7 @@ The project defines a set of timer-driven Camunda processes that keep cases movi
 | Job | Purpose | Camunda topic(s) | Schedule (cron, UTC) | When it runs |
 | --- | --- | --- | --- | --- |
 | Bundle creation scheduler | Builds bundles for eligible hearings each evening. | `BUNDLE_CREATION_CHECK` | `0 0 21 * * ?` | Daily at 21:00 |
-| Case dismissed scheduler | Automatically dismisses claims that have missed their deadlines. | `CASE_DISMISSED` | `0 5 16 * * ?` | Daily at 16:05 |
-| Decision outcome scheduler | Moves cases awaiting judicial decisions into the decision outcome workflow. | `MOVE_TO_DECISION_OUTCOME` | `0 0 0 * * ?` | Daily at 00:00 |
+| Decision outcome scheduler | Moves cases awaiting judicial decisions into the decision outcome workflow. | `MOVE_TO_DECISION_OUTCOME` | `0 40 0 * * ?` | Daily at 00:40 |
 | Defendant response deadline check scheduler | Sweeps for defendants whose response deadline elapsed and triggers enforcement. | `DEFENDANT_RESPONSE_DEADLINE_CHECK` | `0 1 16 * * ?` | Daily at 16:01 |
 | Evidence upload scheduler | Prompts parties to upload evidence when deadlines are approaching. | `EVIDENCE_UPLOAD_CHECK` | `0 30 17 * * ?` | Daily at 17:30 |
 | Full admit pay immediately no payment scheduler | Escalates full-admit cases where an immediate payment was promised but not received. | `FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
@@ -87,22 +86,23 @@ The project defines a set of timer-driven Camunda processes that keep cases movi
 | GA response deadline processor | Processes GA response deadlines, judge revisits and respondent checks. | `GAResponseDeadlineProcessor`<br>`GAJudgeRevisitProcessor`<br>`GARespondentResponseCheckScheduler` | `0 15 17 * * ?` | Daily at 17:15 |
 | GA unless order scheduler | Enforces GA Unless Orders once the compliance deadline passes. | `GAUnlessOrderScheduler` | `0 0 16 ? * * *` | Daily at 16:00 |
 | Generate CSV and send to MMT scheduler | Produces nightly CSV/JSON exports for the mediation service (MMT). | `GenerateCsvAndSendToMmt`<br>`GenerateJsonAndSendToMmt` | `0 0 1 ? * * *` | Daily at 01:00 |
-| Hearing cvp link scheduler | Issues CVP/remote hearing links on a daily cadence. | `HEARING_CVP_LINK` | `0 0 0 ? * * *` | Daily at 00:00 |
+| Hearing cvp link scheduler | Issues CVP/remote hearing links on a daily cadence. | `HEARING_CVP_LINK` | `0 50 0 * * ?` | Daily at 00:50 |
 | Hearing fee check scheduler | Checks for unpaid hearing fees and raises the necessary follow-up tasks. | `HEARING_FEE_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
 | Incident retry scheduler | Retries failed external incident tasks each night. | `INCIDENT_RETRY_EVENT` | `0 1 23 * * ?` | Daily at 23:01 |
-| Manage Stay WA Task Scheduler | Maintains WA tasks for stayed cases so that no follow-up is missed. | `MANAGE_STAY_WA_TASK_SCHEDULER` | `0 0 1 ? * * *` | Daily at 01:00 |
+| Manage Stay WA Task Scheduler | Maintains WA tasks for stayed cases so that no follow-up is missed. | `MANAGE_STAY_WA_TASK_SCHEDULER` | `0 20 1 ? * * *` | Daily at 01:20 |
 | Migrate cases scheduler | Reserved cron to re-run large case migration batches. | `MIGRATE_CASES_EVENTS` | `0 0 0 1 * ? 2080` | First day of each month until 2080 at 00:00 |
-| Notify claim deadline scheduler | Notifies parties about upcoming claim deadlines, prior to dismissal. | `CASE_DISMISSED` | `0 5 0 * * ?` | Daily at 00:05 |
-| Order Review Obligation check scheduler | Checks order review obligations and triggers outstanding actions. | `ORDER_REVIEW_OBLIGATION_CHECK` | `0 0 1 * * ?` | Daily at 01:00 |
+| Notify claim and claim dismissed deadline scheduler | Dismisses claims when the claim notification or claim dismissed deadline has passed. | `CLAIM_DISMISSED_DEADLINE` | `0 0 0 * * ?` | Daily at 00:00 |
+| Notify claim details scheduler | Dismisses claims when the claim details notification deadline has passed. | `CLAIM_DETAILS_NOTIFICATION_DEADLINE` | `0 1 16 * * ?` | Daily at 16:01 |
+| Order Review Obligation check scheduler | Checks order review obligations and triggers outstanding actions. | `ORDER_REVIEW_OBLIGATION_CHECK` | `0 10 1 * * ?` | Daily at 01:10 |
 | Polling event emitter scheduler | Emits polling events across the day so downstream pollers stay in sync. | `POLLING_EVENT_EMITTER` | `0 0 8-20 * * ?` | Hourly at the top of the hour from 08:00–20:00 |
 | Proof of debt scheduler | Generates proof-of-debt artefacts for COSC-linked general applications. | `CoscApplicationProcessor` | `0 0 16 * * ?` | Daily at 16:00 |
-| Request for reconsideration notification check scheduler | Ensures reconsideration notifications are sent when conditions are met. | `REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
+| Request for reconsideration notification check scheduler | Ensures reconsideration notifications are sent when conditions are met. | `REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK` | `0 10 0 * * ?` | Daily at 00:10 |
 | Retrigger cases scheduler | One-off cron to retrigger case updates as part of the 2026 migration plan. | `RETRIGGER_CASES_EVENTS` | `0 0 0 1 * ? 2026` | First day of each month until 2026 at 00:00 |
 | Settlement no response from defendant scheduler | Moves settlement agreements forward when the defendant failed to respond. | `SETTLEMENT_NO_RESPONSE_FROM_DEFENDANT_CHECK` | `0 0 1 * * ?` | Daily at 01:00 |
 | Spec automated hearing notice scheduler | Builds automated hearing notices for Spec claims twice per day. | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 ? * * *` | Twice daily at 00:00 and 12:00 |
-| Take case offline scheduler | Transitions cases that must move off digital rails. | `TAKE_CASE_OFFLINE` | `0 5 16 * * ?` | Daily at 16:05 |
-| Trial ready check scheduler | Verifies trial readiness status for outstanding cases. | `TRIAL_READY_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
-| Trial ready notification scheduler | Sends notifications when trial readiness has been confirmed. | `TRIAL_READY_NOTIFICATION_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
+| Take case offline scheduler | Transitions cases that must move off digital rails. | `TAKE_CASE_OFFLINE` | `0 1 16 * * ?` | Daily at 16:01 |
+| Trial ready check scheduler | Verifies trial readiness status for outstanding cases. | `TRIAL_READY_CHECK` | `0 30 0 * * ?` | Daily at 00:30 |
+| Trial ready notification scheduler | Sends notifications when trial readiness has been confirmed. | `TRIAL_READY_NOTIFICATION_CHECK` | `0 20 0 * * ?` | Daily at 00:20 |
 | Unspec automated hearing notice scheduler | Builds automated hearing notices for Unspec claims twice per day. | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 ? * * *` | Twice daily at 00:00 and 12:00 |
 | Update General application Case management Location | Future-dated cron to re-sync GA case management locations. | `RETRIGGER_GA_UPDATE_CMLOCATION_EVENTS` | `0 0 0 1 * ? 2046` | First day of each month until 2046 at 00:00 |
 | Update location | Future-dated cron to re-sync the main case location. | `RETRIGGER_UPDATE_LOCATION_EVENTS` | `0 0 0 1 * ? 2046` | First day of each month until 2046 at 00:00 |
