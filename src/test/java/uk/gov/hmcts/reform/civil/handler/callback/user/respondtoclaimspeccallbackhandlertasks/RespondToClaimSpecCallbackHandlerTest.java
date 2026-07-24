@@ -128,6 +128,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -3001,44 +3002,44 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void whenProvided_thenValidateCorrespondence1() {
+        void whenProvided_thenDoNotValidateRespondent1CorrespondencePostcode() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.setIsRespondent1(YES);
             caseData.setSpecAoSRespondentCorrespondenceAddressRequired(YesOrNo.NO);
             Address address = new Address();
-            address.setPostCode("postal code");
+            address.setPostCode("BT1 1SS");
             caseData.setSpecAoSRespondentCorrespondenceAddressdetails(address);
             CallbackParams params = callbackParamsOf(caseData, MID, "confirm-details");
-            when(postcodeValidator.validate("postal code")).thenReturn(Collections.emptyList());
 
             // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
             // Then
-            verify(postcodeValidator).validate("postal code");
+            verifyNoInteractions(postcodeValidator);
+            assertThat(response.getErrors()).isEmpty();
             assertNotNull(response.getData());
         }
 
         @Test
-        void whenProvided_thenValidateCorrespondence2() {
+        void whenProvided_thenDoNotValidateRespondent2CorrespondencePostcode() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.setIsRespondent2(YES);
             caseData.setSpecAoSRespondent2CorrespondenceAddressRequired(YesOrNo.NO);
             Address address = new Address();
-            address.setPostCode("postal code");
+            address.setPostCode("BT1 1SS");
             caseData.setSpecAoSRespondent2CorrespondenceAddressdetails(address);
             CallbackParams params = callbackParamsOf(caseData, MID, "confirm-details");
-            when(postcodeValidator.validate("postal code")).thenReturn(Collections.emptyList());
 
             // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
 
             // Then
-            verify(postcodeValidator).validate("postal code");
+            verifyNoInteractions(postcodeValidator);
+            assertThat(response.getErrors()).isEmpty();
             assertNotNull(response.getData());
         }
     }

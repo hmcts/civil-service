@@ -402,6 +402,26 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldNotReturnPostcodeError_whenApplicant1AddressIsOutsideEnglandOrWales() {
+            // Given
+            Party party = new PartyBuilder().company().build();
+            party.getPrimaryAddress().setPostCode("BT1 1SS");
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant1(party)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            given(postcodeValidator.validate(any()))
+                .willReturn(List.of("Postcode must be in England or Wales"));
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
         void shouldReturnError_when_address_exceeds_max_length_in_Company_name() {
             // Given
 
@@ -615,6 +635,26 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isNotEmpty();
             assertThat(response.getErrors()).hasSize(6);
 
+        }
+
+        @Test
+        void shouldNotReturnPostcodeError_whenApplicant2AddressIsOutsideEnglandOrWales() {
+            // Given
+            Party party = new PartyBuilder().company().build();
+            party.getPrimaryAddress().setPostCode("BT1 1SS");
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(party)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            given(postcodeValidator.validate(any()))
+                .willReturn(List.of("Postcode must be in England or Wales"));
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isEmpty();
         }
 
         @Test
@@ -1709,6 +1749,28 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             }
 
             @Test
+            void shouldNotReturnPostcodeError_whenRespondent1AddressIsOutsideEnglandOrWales() {
+                // Given
+                Party respondent1 = new PartyBuilder().company().build();
+                respondent1.getPrimaryAddress().setPostCode("BT1 1SS");
+
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setRespondent1(respondent1);
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "respondent1");
+
+                given(postcodeValidator.validate(any()))
+                    .willReturn(List.of("Postcode must be in England or Wales"));
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getErrors()).isEmpty();
+            }
+
+            @Test
             void shouldReturnErrors_whenRespondent1AddressNotValid() {
                 // Given
                 Address invalidAddress = new Address();
@@ -1762,6 +1824,28 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(response).isNotNull();
                 assertThat(response.getData()).isNotNull();
                 assertEquals(0, response.getErrors().size());
+            }
+
+            @Test
+            void shouldNotReturnPostcodeError_whenRespondent2AddressIsOutsideEnglandOrWales() {
+                // Given
+                Party respondent2 = new PartyBuilder().company().build();
+                respondent2.getPrimaryAddress().setPostCode("BT1 1SS");
+
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setRespondent2(respondent2);
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "respondent2");
+
+                given(postcodeValidator.validate(any()))
+                    .willReturn(List.of("Postcode must be in England or Wales"));
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getErrors()).isEmpty();
             }
 
             @Test

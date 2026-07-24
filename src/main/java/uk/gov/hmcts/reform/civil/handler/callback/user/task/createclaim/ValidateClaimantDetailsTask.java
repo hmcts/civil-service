@@ -41,11 +41,15 @@ public class ValidateClaimantDetailsTask {
     }
 
     public CallbackResponse validateClaimantDetails(CaseData caseData, String eventId) {
+        return validateClaimantDetails(caseData, eventId, true);
+    }
+
+    public CallbackResponse validateClaimantDetails(CaseData caseData, String eventId, boolean validatePostcode) {
         Party applicant = getApplicant.apply(caseData);
 
         List<String> errors = validateApplicant(applicant);
 
-        if (errors.isEmpty() && eventId != null) {
+        if (validatePostcode && errors.isEmpty() && eventId != null) {
             validatePostcode(applicant, errors);
         }
 
