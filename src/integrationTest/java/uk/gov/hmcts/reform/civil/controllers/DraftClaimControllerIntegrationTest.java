@@ -147,7 +147,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void expiryIsEqualTo180DaysAfterCreatedAtTime() throws Exception {
+    void expiryIsEqualTo180DaysAfterCreatedAtTime() {
         DraftStoreEntity draftInDB = draftStoreRepository.findById(DRAFT_ID)
             .orElseThrow(() -> new AssertionError("Draft claim should exist in DB"));
 
