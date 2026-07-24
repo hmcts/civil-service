@@ -6,11 +6,13 @@ import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentForm;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormBuilderBase;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjWelshTextService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.JudgmentAmountsCalculator;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -40,8 +42,9 @@ public class NonDivergentSpecDefaultJudgementFormBuilder extends DefaultJudgment
     }
 
     public DefaultJudgmentForm getDefaultJudgmentForm(CaseData caseData, String partyType) {
-        BigDecimal debtAmount = getDebtAmount(caseData);
         BigDecimal cost = getClaimFee(caseData);
+        String debtAmount = getDebtAmountInPounds(caseData);
+        String totalAmount = getTotalAmountInPounds(caseData, debtAmount, cost);
 
         DefaultJudgmentForm defaultJudgmentForm = new DefaultJudgmentForm();
         defaultJudgmentForm
@@ -50,9 +53,9 @@ public class NonDivergentSpecDefaultJudgementFormBuilder extends DefaultJudgment
             .setFormText("No response,")
             .setApplicant(getApplicants(caseData))
             .setRespondent(getRespondentLROrLipDetails(caseData, partyType))
-            .setDebt(debtAmount.toString())
+            .setDebt(debtAmount)
             .setCosts(cost.toString())
-            .setTotalCost(debtAmount.add(cost).setScale(2).toString())
+            .setTotalCost(totalAmount)
             .setApplicantReference(getApplicantSolicitorRef(caseData))
             .setRespondentReference(getRespondent1SolicitorRef(caseData))
             .setRespondent1Name(getRespondent1NameWithLitigiousFriend(caseData))
@@ -120,5 +123,27 @@ public class NonDivergentSpecDefaultJudgementFormBuilder extends DefaultJudgment
                 return null;
             }
         }
+    }
+
+    private String getDebtAmountInPounds(CaseData caseData) {
+        JudgmentDetails activeJudgment = caseData.getActiveJudgment();
+        if (Objects.isNull(activeJudgment) || Objects.isNull(activeJudgment.getOrderedAmount())) {
+            return getDebtAmount(caseData).toString();
+        }
+
+        return penniesToPounds(activeJudgment.getOrderedAmount());
+    }
+
+    private String getTotalAmountInPounds(CaseData caseData, String debtAmount, BigDecimal cost) {
+        JudgmentDetails activeJudgment = caseData.getActiveJudgment();
+        if (Objects.isNull(activeJudgment) || Objects.isNull(activeJudgment.getTotalAmount())) {
+            return new BigDecimal(debtAmount).add(cost).setScale(2).toString();
+        }
+
+        return penniesToPounds(activeJudgment.getTotalAmount());
+    }
+
+    private String penniesToPounds(String amountInPennies) {
+        return MonetaryConversions.penniesToPounds(new BigDecimal(amountInPennies)).toString();
     }
 }

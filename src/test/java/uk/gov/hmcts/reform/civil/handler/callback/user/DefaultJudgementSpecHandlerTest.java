@@ -61,6 +61,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_REQUESTED_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.DefaultJudgementSpecHandler.JUDGMENT_GRANTED_HEADER;
@@ -1334,6 +1335,58 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("activeJudgment")).extracting("defendant1Address").isNotNull();
             assertInterestIsPopulated(response, 0);
 
+        }
+
+        @Test
+        void shouldRequestJudgmentWithoutLiveSummary_whenJudgmentBufferEnabledForLipDefendant() {
+            Flags respondent1Flags = new Flags();
+            respondent1Flags.setPartyName("respondent1name");
+            respondent1Flags.setRoleOnCase("respondent1");
+            Party respondent = new Party();
+            respondent.setIndividualFirstName("Dis");
+            respondent.setIndividualLastName("Guy");
+            respondent.setType(INDIVIDUAL);
+            respondent.setFlags(respondent1Flags);
+
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .respondent1(respondent).build();
+            caseDataBefore.setRespondent1DetailsForClaimDetailsTab(respondent);
+            caseDataBefore.setCaseNameHmctsInternal("Mr. John Rambo v Dis Guy");
+            caseDataBefore.setCaseNamePublic("'John Rambo' v 'Dis Guy'");
+
+            when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setRespondent1Represented(NO);
+            caseData.setPartialPaymentAmount("10");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1010));
+            caseData.setPartialPayment(YES);
+            caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("0123");
+            caseLocationCivil.setRegion("0321");
+            caseData.setCaseManagementLocation(caseLocationCivil);
+            DynamicListElement element = new DynamicListElement(null, "John Smith");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, caseDataBefore.toMap(mapper));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(updatedData.getBusinessProcess()).isNotNull();
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(JUDGMENT_REQUESTED_SPEC.name());
+            assertThat(response.getState()).isEqualTo(CaseState.JUDGMENT_REQUESTED.name());
+            assertThat(updatedData.getIsJoRequested()).isEqualTo(YES);
+            assertThat(updatedData.getActiveJudgment().getState()).hasToString("PENDING_ISSUE");
+            assertThat(updatedData.getActiveJudgment().getOrderedAmount()).isNull();
+            assertThat(updatedData.getJoIsLiveJudgmentExists()).isNull();
+            assertThat(updatedData.getJoRepaymentSummaryObject()).isNull();
+            assertThat(updatedData.getTotalInterest()).isNull();
         }
 
         @Test
