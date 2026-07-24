@@ -219,7 +219,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse validateClaimantDetails(CallbackParams callbackParams,
                                                      Function<CaseData, Party> getApplicant) {
         validateClaimantDetailsTask.setGetApplicant(getApplicant);
-        return validateClaimantDetailsTask.validateClaimantDetails(callbackParams.getCaseData(), callbackParams.getRequest().getEventId());
+        return validateClaimantDetailsTask.validateClaimantDetails(
+            callbackParams.getCaseData(),
+            callbackParams.getRequest().getEventId(),
+            false
+        );
     }
 
     private CallbackResponse validateApplicantSolicitorOrgPolicy(CallbackParams callbackParams) {
@@ -381,7 +385,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse validateRespondentDetails(CallbackParams callbackParams,
                                                        Function<CaseData, Party> getRespondent) {
         validateRespondentDetailsTask.setGetRespondent(getRespondent);
-        return validateRespondentDetailsTask.validateRespondentDetails(callbackParams.getCaseData());
+        return validateRespondentDetailsTask.validateRespondentDetails(callbackParams.getCaseData(), false);
     }
 
     private CallbackResponse validateRespondentSolicitorAddress(CallbackParams callbackParams) {

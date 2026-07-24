@@ -9,15 +9,12 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
-import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
-import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
@@ -33,7 +30,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class ValidateDateOfBirth implements CaseTask {
 
     private final DateOfBirthValidator dateOfBirthValidator;
-    private final PostcodeValidator postcodeValidator;
     private final ObjectMapper objectMapper;
     private final RespondToClaimSpecUtils respondToClaimSpecUtils;
 
@@ -97,11 +93,11 @@ public class ValidateDateOfBirth implements CaseTask {
         log.info("Validating correspondence address for caseId: {}", caseData.getCcdCaseReference());
 
         if (isCorrespondenceAddressRequired(caseData.getIsRespondent1(), caseData.getSpecAoSRespondentCorrespondenceAddressRequired())) {
-            log.info("CaseId {}: Respondent 1 correspondence address validation required", caseData.getCcdCaseReference());
-            return validatePostcode(caseData.getSpecAoSRespondentCorrespondenceAddressdetails());
+            log.info("CaseId {}: Respondent 1 correspondence address updated", caseData.getCcdCaseReference());
+            return Collections.emptyList();
         } else if (isCorrespondenceAddressRequired(caseData.getIsRespondent2(), caseData.getSpecAoSRespondent2CorrespondenceAddressRequired())) {
-            log.info("CaseId {}: Respondent 2 correspondence address validation required", caseData.getCcdCaseReference());
-            return validatePostcode(caseData.getSpecAoSRespondent2CorrespondenceAddressdetails());
+            log.info("CaseId {}: Respondent 2 correspondence address updated", caseData.getCcdCaseReference());
+            return Collections.emptyList();
         }
         return Collections.emptyList();
     }
@@ -109,10 +105,5 @@ public class ValidateDateOfBirth implements CaseTask {
     private boolean isCorrespondenceAddressRequired(YesOrNo isRespondent, YesOrNo isAddressRequired) {
         log.debug("Checking if correspondence address is required for respondent: {}, address required: {}", isRespondent, isAddressRequired);
         return isRespondent == YesOrNo.YES && isAddressRequired == YesOrNo.NO;
-    }
-
-    private List<String> validatePostcode(Address address) {
-        log.info("Validating postcode for address: {}", address);
-        return postcodeValidator.validate(Optional.ofNullable(address).map(Address::getPostCode).orElse(null));
     }
 }

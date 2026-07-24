@@ -25,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class ValidateRespondentDetailsTaskTest extends BaseCallbackHandlerTest {
@@ -65,6 +66,26 @@ class ValidateRespondentDetailsTaskTest extends BaseCallbackHandlerTest {
         assertThat(response).isNotNull();
         assertThat(response.getData()).isNotNull();
         assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    void shouldNotValidatePostcode_whenPostcodeValidationIsSkipped() {
+        Party respondent1 = new PartyBuilder().company().build();
+        Address address = new Address();
+        address.setAddressLine1("Address line 1");
+        address.setPostCode("BT1 1SS");
+        respondent1.setPrimaryAddress(address);
+
+        CaseData caseData = CaseDataBuilder.builder().respondent1(respondent1).build();
+        validateRespondentDetailsTask.setGetRespondent(CaseData::getRespondent1);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateRespondentDetailsTask
+            .validateRespondentDetails(caseData, false);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getData()).isNotNull();
+        assertThat(response.getErrors()).isEmpty();
+        verifyNoInteractions(postcodeValidator);
     }
 
     @Test
