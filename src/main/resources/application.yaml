@@ -68,6 +68,61 @@ scheduler:
   defendant-response:
     cronExpression: ${CRON_EXPRESSION_DEFENDANT_RESPONSE:0 1 16 * * ?}
     enabled: ${SCHEDULER_ENABLED_DEFENDANT_RESPONSE:false}
+  bundle-creation:
+    cronExpression: ${CRON_EXPRESSION_BUNDLE_CREATION:0 0 21 * * ?}
+    enabled: ${SCHEDULER_ENABLED_BUNDLE_CREATION:true}
+  hearing-cvp-link:
+    cronExpression: ${CRON_EXPRESSION_HEARING_CVP_LINK:0 50 0 * * ?}
+    enabled: ${SCHEDULER_ENABLED_HEARING_CVP_LINK:true}
+  polling-event-emitter:
+    cronExpression: ${CRON_EXPRESSION_POLLING_EVENT_EMITTER:0 0 8-20 * * ?}
+    enabled: ${SCHEDULER_ENABLED_POLLING_EVENT_EMITTER:true}
+  automated-hearing-notice:
+    cronExpression: ${CRON_EXPRESSION_AUTOMATED_HEARING_NOTICE:0 0 0,12 * * ?}
+    enabled: ${SCHEDULER_ENABLED_AUTOMATED_HEARING_NOTICE:true}
+    serviceIds: ${AUTOMATED_HEARING_NOTICE_SERVICE_IDS:AAA6,AAA7}
+  mediation-file-transfer:
+    cronExpression: ${CRON_EXPRESSION_MEDIATION_FILE_TRANSFER:0 0 1 * * ?}
+    enabled: ${SCHEDULER_ENABLED_MEDIATION_FILE_TRANSFER:true}
+  take-case-offline:
+    cronExpression: ${CRON_EXPRESSION_TAKE_CASE_OFFLINE:0 1 16 * * ?}
+    enabled: ${SCHEDULER_ENABLED_TAKE_CASE_OFFLINE:true}
+  trial-ready-notification:
+    cronExpression: ${CRON_EXPRESSION_TRIAL_READY_NOTIFICATION:0 20 0 * * ?}
+    enabled: ${SCHEDULER_ENABLED_TRIAL_READY_NOTIFICATION:true}
+  trial-ready-check:
+    cronExpression: ${CRON_EXPRESSION_TRIAL_READY_CHECK:0 30 0 * * ?}
+    enabled: ${SCHEDULER_ENABLED_TRIAL_READY_CHECK:true}
+  order-review-obligation-check:
+    cronExpression: ${CRON_EXPRESSION_ORDER_REVIEW_OBLIGATION_CHECK:0 10 1 * * ?}
+    enabled: ${SCHEDULER_ENABLED_ORDER_REVIEW_OBLIGATION_CHECK:true}
+  decision-outcome:
+    cronExpression: ${CRON_EXPRESSION_DECISION_OUTCOME:0 40 0 * * ?}
+    enabled: ${SCHEDULER_ENABLED_DECISION_OUTCOME:true}
+  case-dismissed:
+    cronExpression: ${CRON_EXPRESSION_CASE_DISMISSED:0 0 0 * * ?}
+    enabled: ${SCHEDULER_ENABLED_CASE_DISMISSED:true}
+  claim-details-notification-deadline:
+    cronExpression: ${CRON_EXPRESSION_CLAIM_DETAILS_NOTIFICATION_DEADLINE:0 1 16 * * ?}
+    enabled: ${SCHEDULER_ENABLED_CLAIM_DETAILS_NOTIFICATION_DEADLINE:true}
+  ga-document-upload-notify:
+    cronExpression: ${CRON_EXPRESSION_GA_DOCUMENT_UPLOAD_NOTIFY:0 0 23 * * ?}
+    enabled: ${SCHEDULER_ENABLED_GA_DOCUMENT_UPLOAD_NOTIFY:true}
+  ga-proof-of-debt:
+    cronExpression: ${CRON_EXPRESSION_GA_PROOF_OF_DEBT:0 0 16 * * ?}
+    enabled: ${SCHEDULER_ENABLED_GA_PROOF_OF_DEBT:true}
+  ga-order-made:
+    cronExpression: ${CRON_EXPRESSION_GA_ORDER_MADE:0 15 16 * * ?}
+    enabled: ${SCHEDULER_ENABLED_GA_ORDER_MADE:true}
+  ga-unless-order:
+    cronExpression: ${CRON_EXPRESSION_GA_UNLESS_ORDER:0 0 16 * * ?}
+    enabled: ${SCHEDULER_ENABLED_GA_UNLESS_ORDER:true}
+  request-for-reconsideration-notification:
+    cronExpression: ${CRON_EXPRESSION_REQUEST_FOR_RECONSIDERATION_NOTIFICATION:0 10 0 * * ?}
+    enabled: ${SCHEDULER_ENABLED_REQUEST_FOR_RECONSIDERATION_NOTIFICATION:true}
+  manage-stay-wa-task:
+    cronExpression: ${CRON_EXPRESSION_MANAGE_STAY_WA_TASK:0 20 1 * * ?}
+    enabled: ${SCHEDULER_ENABLED_MANAGE_STAY_WA_TASK:true}
   default-back-pressure:
     initialDelay: ${DEFAULT_BACK_PRESSURE_INITIAL_DELAY:PT0S}
     maxDelay: ${DEFAULT_BACK_PRESSURE_MAX_DELAY:PT10S}

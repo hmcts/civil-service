@@ -25,11 +25,14 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.ORDER_MADE;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.UNLESS_ORDER;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 @Slf4j
 @Component
 @ConditionalOnExpression("${judge.revisit.unlessOrder.event.emitter.enabled:true}")
 public class CheckUnlessOrderDeadlineEndTaskHandler extends BaseExternalTaskHandler {
+
+    private static final String SCHEDULER_NAME = "GAUnlessOrderScheduler";
 
     private final CaseStateSearchService caseSearchService;
 
@@ -37,6 +40,7 @@ public class CheckUnlessOrderDeadlineEndTaskHandler extends BaseExternalTaskHand
 
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
+    private final FeatureToggleService featureToggleService;
 
     public CheckUnlessOrderDeadlineEndTaskHandler(
         ExternalTaskCompletionService externalTaskCompletionService,
@@ -44,17 +48,23 @@ public class CheckUnlessOrderDeadlineEndTaskHandler extends BaseExternalTaskHand
         CaseStateSearchService caseSearchService,
         GaCoreCaseDataService coreCaseDataService,
         CaseDetailsConverter caseDetailsConverter,
-        ObjectMapper mapper
+        ObjectMapper mapper,
+        FeatureToggleService featureToggleService
     ) {
         super(externalTaskCompletionService, eventProperties);
         this.caseSearchService = caseSearchService;
         this.coreCaseDataService = coreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;
         this.mapper = mapper;
+        this.featureToggleService = featureToggleService;
     }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
+        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
+            return new ExternalTaskData();
+        }
+
         List<GeneralApplicationCaseData> cases = getUnlessOrderCasesThatAreEndingToday();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 

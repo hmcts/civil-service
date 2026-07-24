@@ -14,6 +14,78 @@ monitor_scheduler_alerts = {
     enabled      = false
     action_group = "demo-civil-service-slack-alert"
   }
+  "BundleCreation" = {
+    enabled      = false
+    action_group = "demo-civil-service-slack-alert"
+  }
+  "HearingCvpLink" = {
+    enabled      = false
+    action_group = "demo-civil-service-slack-alert"
+  }
+  "PollingEventEmitter" = {
+    enabled      = false
+    action_group = "demo-civil-service-slack-alert"
+  }
+  "AutomatedHearingNotice" = {
+    enabled      = false
+    action_group = "demo-civil-service-slack-alert"
+  }
+  "GenerateCsvAndSendToMmt" = {
+    enabled      = false
+    action_group = "demo-civil-service-slack-alert"
+  }
+  "TakeCaseOffline" = {
+    enabled      = false
+    action_group = "demo-civil-service-slack-alert"
+  }
+  "TrialReadyNotification" = {
+    enabled      = false
+    action_group = "demo-civil-service-slack-alert"
+  }
+  "TrialReadyCheck" = {
+    enabled      = false
+    action_group = "demo-civil-service-slack-alert"
+  }
+  "OrderReviewObligationCheck" = {
+    enabled      = false
+    action_group = "demo-civil-service-slack-alert"
+  }
+  "DecisionOutcome" = {
+    enabled      = false
+    action_group = "demo-civil-service-slack-alert"
+  }
+  "CaseDismissed" = {
+    enabled      = false
+    action_group = "demo-civil-service-slack-alert"
+  }
+  "ClaimDetailsNotificationDeadline" = {
+    enabled      = false
+    action_group = "demo-civil-service-slack-alert"
+  }
+  "GADocUploadNotifyScheduler" = {
+    enabled      = false
+    action_group = "demo-civil-service-slack-alert"
+  }
+  "CoscApplicationProcessor" = {
+    enabled      = false
+    action_group = "demo-civil-service-slack-alert"
+  }
+  "GAOrderMadeScheduler" = {
+    enabled      = false
+    action_group = "demo-civil-service-slack-alert"
+  }
+  "GAUnlessOrderScheduler" = {
+    enabled      = false
+    action_group = "demo-civil-service-slack-alert"
+  }
+  "RequestForReconsiderationNotification" = {
+    enabled      = false
+    action_group = "demo-civil-service-slack-alert"
+  }
+  "ManageStayWATask" = {
+    enabled      = false
+    action_group = "demo-civil-service-slack-alert"
+  }
 }
 
 job_not_run_threshold = 26
