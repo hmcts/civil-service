@@ -1,5 +1,6 @@
 java:
   image: ${IMAGE_NAME}
+  imagePullPolicy: Always
   ingressHost: ${SERVICE_NAME}.preview.platform.hmcts.net
   devcpuRequests: 50m
   devcpuLimits: 500m
