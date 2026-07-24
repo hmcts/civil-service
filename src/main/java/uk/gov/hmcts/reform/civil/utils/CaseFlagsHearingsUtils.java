@@ -9,8 +9,10 @@ import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toCollection;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
@@ -153,32 +155,30 @@ public class CaseFlagsHearingsUtils {
     }
 
     private static void findActiveFlags(List<PartyFlags> nonEmptyFlags) {
-        if (nonEmptyFlags != null && !nonEmptyFlags.isEmpty()) {
-            nonEmptyFlags.forEach(f -> f.getDetails().removeIf(d -> !d.getValue().getStatus().equals("Active")));
-        }
+        filterFlagDetails(nonEmptyFlags, d -> "Active".equals(d.getValue().getStatus()));
     }
 
     public static List<PartyFlags> getAllHearingRelevantCaseFlags(List<PartyFlags> flags) {
-        if (flags != null && !flags.isEmpty()) {
-            flags.forEach(f -> f.getDetails().removeIf(d -> !YES.equals(d.getValue().getHearingRelevant())));
-        }
+        filterFlagDetails(flags, d -> YES.equals(d.getValue().getHearingRelevant()));
         return flags;
     }
 
     public static List<PartyFlags> getSMCodeFlags(List<PartyFlags> flags) {
-        if (flags != null && !flags.isEmpty()) {
-            flags.forEach(f -> f.getDetails().removeIf(d -> !d.getValue().getFlagCode().contains(
-                SPECIAL_MEASURES_FLAG_CODE)));
-        }
+        filterFlagDetails(flags, d -> d.getValue().getFlagCode().contains(SPECIAL_MEASURES_FLAG_CODE));
         return flags;
     }
 
     public static List<PartyFlags> getRACodeFlags(List<PartyFlags> flags) {
-        if (flags != null && !flags.isEmpty()) {
-            flags.forEach(f -> f.getDetails().removeIf(d -> !d.getValue().getFlagCode().contains(
-                REASONABLE_ADJUSTMENTS_FLAG_CODE)));
-        }
+        filterFlagDetails(flags, d -> d.getValue().getFlagCode().contains(REASONABLE_ADJUSTMENTS_FLAG_CODE));
         return flags;
+    }
+
+    private static void filterFlagDetails(List<PartyFlags> flags, Predicate<Element<FlagDetail>> predicate) {
+        if (flags != null && !flags.isEmpty()) {
+            flags.forEach(f -> f.setDetails(f.getDetails().stream()
+                                        .filter(predicate)
+                                        .collect(toCollection(ArrayList::new))));
+        }
     }
 
     public static boolean detainedIndividualFlagExist(CaseData caseData) {
