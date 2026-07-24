@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
@@ -30,8 +29,6 @@ class DefaultJudgmentRoboticsNotifierTest {
     private RoboticsDataMapperForUnspec roboticsDataMapper;
     @Mock
     private RoboticsDataMapperForSpec roboticsDataMapperForSpec;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     DefaultJudgmentRoboticsNotifier defaultJudgmentRoboticsNotifier;

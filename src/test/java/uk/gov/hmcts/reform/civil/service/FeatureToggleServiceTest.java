@@ -67,15 +67,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenEnableRPAEmailsInvoked(Boolean toggleStat) {
-        var enableRPAEmailsKey = "enable-rpa-emails";
-        givenToggle(enableRPAEmailsKey, toggleStat);
-
-        assertThat(featureToggleService.isRPAEmailEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenLocationWhiteListed(Boolean toggleStat) {
         final String feature = "case-progression-location-whitelist";
         String location = "000000";
