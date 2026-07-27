@@ -19,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STAT
 
 public class StateFlow {
 
-    private StateMachine<String, String> stateMachine;
+    private final StateMachine<String, String> stateMachine;
 
     public StateFlow(StateMachine<String, String> stateMachine) {
         this.stateMachine = stateMachine;
@@ -32,7 +32,8 @@ public class StateFlow {
     public StateFlow evaluate(CaseData caseData) {
         Map<Object, Object> variables = stateMachine.getExtendedState().getVariables();
         variables.put(EXTENDED_STATE_CASE_KEY, caseData);
-        variables.put(EXTENDED_STATE_FLAGS_KEY, new HashMap<String, Boolean>());
+        variables.put(EXTENDED_STATE_FLAGS_KEY, new HashMap<>());
+        variables.put(EXTENDED_STATE_HISTORY_KEY, new ArrayList<String>());
         stateMachine.startReactively().block();
         return this;
     }
@@ -47,12 +48,16 @@ public class StateFlow {
     @SuppressWarnings("unchecked")
     public List<State> getStateHistory() {
         List<String> historyList = stateMachine.getExtendedState().get(EXTENDED_STATE_HISTORY_KEY, ArrayList.class);
+        if (historyList == null) {
+            return List.of();
+        }
         return historyList.stream().map(State::from).toList();
     }
 
     @SuppressWarnings("unchecked")
     public Map<String, Boolean> getFlags() {
-        return stateMachine.getExtendedState().get(EXTENDED_STATE_FLAGS_KEY, Map.class);
+        Map<String, Boolean> flags = stateMachine.getExtendedState().get(EXTENDED_STATE_FLAGS_KEY, Map.class);
+        return flags == null ? Map.of() : flags;
     }
 
     public boolean isFlagSet(FlowFlag flowFlag) {

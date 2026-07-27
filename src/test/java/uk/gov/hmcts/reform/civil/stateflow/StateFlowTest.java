@@ -15,12 +15,15 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -94,6 +97,8 @@ class StateFlowTest {
 
             assertThat(stateFlow.evaluate(caseData)).isSameAs(stateFlow);
             verify(mockedVariables).put(EXTENDED_STATE_CASE_KEY, caseData);
+            verify(mockedVariables).put(eq(EXTENDED_STATE_FLAGS_KEY), any(HashMap.class));
+            verify(mockedVariables).put(eq(EXTENDED_STATE_HISTORY_KEY), any(ArrayList.class));
             verify(mockedMono).block();
         }
     }
@@ -146,6 +151,16 @@ class StateFlowTest {
                 .extracting(State::getName)
                 .containsExactly("FLOW.STATE_1", "FLOW.STATE_2");
         }
+
+        @Test
+        void shouldReturnEmptyStateHistory_whenHistoryHasNotBeenSet() {
+            ExtendedState mockedExtendedState = createMockedExtendedState();
+            when(mockedStateMachine.getExtendedState()).thenReturn(mockedExtendedState);
+
+            StateFlow stateFlow = new StateFlow(mockedStateMachine);
+
+            assertThat(stateFlow.getStateHistory()).isEmpty();
+        }
     }
 
     @Nested
@@ -163,6 +178,16 @@ class StateFlowTest {
 
             assertThat(stateFlow.getFlags())
                 .contains(entry("flag", true));
+        }
+
+        @Test
+        void shouldReturnEmptyFlags_whenFlagsHaveNotBeenSet() {
+            ExtendedState mockedExtendedState = createMockedExtendedState();
+            when(mockedStateMachine.getExtendedState()).thenReturn(mockedExtendedState);
+
+            StateFlow stateFlow = new StateFlow(mockedStateMachine);
+
+            assertThat(stateFlow.getFlags()).isEmpty();
         }
     }
 
@@ -190,6 +215,16 @@ class StateFlowTest {
         @Test
         void shouldReturnFalse_whenFlagIsNotSet() {
             assertThat(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalse_whenFlagsHaveNotBeenSet() {
+            ExtendedState mockedExtendedState = createMockedExtendedState();
+            when(mockedStateMachine.getExtendedState()).thenReturn(mockedExtendedState);
+
+            StateFlow stateFlow = new StateFlow(mockedStateMachine);
+
+            assertThat(stateFlow.isFlagSet(ONE_RESPONDENT_REPRESENTATIVE)).isFalse();
         }
     }
 }

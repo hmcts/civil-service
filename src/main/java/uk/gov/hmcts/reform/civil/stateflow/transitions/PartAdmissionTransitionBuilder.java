@@ -6,19 +6,15 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimantPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LanguagePredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.MediationPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.OutOfTimePredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.PaymentPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.RepaymentPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
-import uk.gov.hmcts.reform.civil.utils.JudgmentAdmissionUtils;
-import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,20 +54,21 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
             .onlyWhen(MediationPredicate.isCarmMediation, transitions)
 
             .moveTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION, transitions)
-            .onlyWhen(ClaimantPredicate.isNotSettlePartAdmit.and(not(MediationPredicate.agreedToMediation)).and(not(MediationPredicate.isCarmApplicableCase))
+            .onlyWhen(ClaimantPredicate.isNotSettlePartAdmit
+                .and(not(MediationPredicate.agreedToMediation))
+                .and(not(MediationPredicate.isCarmApplicableCase))
                 .and(not(MediationPredicate.isCarmApplicableCaseLiP))
                 .and(not(TakenOfflinePredicate.byStaff)), transitions)
             .set((c, flags) -> {
-                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c));
-                flags.put(FlowFlag.SDO_ENABLED.name(),
-                    JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
-                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMultiOrIntermediateTrackEnabled(c));
+                setRespondentResponseLanguageFlag(c, flags);
+                setJudicialReferralFlags(c, flags);
             }, transitions)
 
             .moveTo(PART_ADMIT_PROCEED, transitions)
-            .onlyWhen(not(MediationPredicate.isCarmMediation).and(ClaimantPredicate.fullDefenceProceed).and(isNotPartAdmissionPaymentState), transitions)
-            .set((c, flags) ->
-                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c)), transitions)
+            .onlyWhen(not(MediationPredicate.isCarmMediation)
+                .and(ClaimantPredicate.fullDefenceProceed)
+                .and(isNotPartAdmissionPaymentState), transitions)
+            .set(this::setRespondentResponseLanguageFlag, transitions)
 
             .moveTo(PART_ADMIT_NOT_PROCEED, transitions)
             .onlyWhen(ClaimantPredicate.fullDefenceNotProceed, transitions)
@@ -84,11 +81,11 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
 
             .moveTo(PART_ADMIT_AGREE_REPAYMENT, transitions)
             .onlyWhen(RepaymentPredicate.acceptRepaymentPlan, transitions)
-            .set((c, flags) -> flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
+            .set(this::setLipJudgmentAdmissionFlag, transitions)
 
             .moveTo(PART_ADMIT_REJECT_REPAYMENT, transitions)
             .onlyWhen(RepaymentPredicate.rejectRepaymentPlan, transitions)
-            .set((c, flags) -> flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
+            .set(this::setLipJudgmentAdmissionFlag, transitions)
 
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(
                 TakenOfflinePredicate.byStaff.and(ClaimantPredicate.beforeResponse), transitions)
@@ -99,9 +96,14 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
 
     public static final Predicate<CaseData> isNotPartAdmissionPaymentState = caseData ->
         Optional.ofNullable(caseData)
-            .filter(data -> data.getShowResponseOneVOneFlag() != ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_INSTALMENT)
-            .filter(data -> data.getShowResponseOneVOneFlag() != ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE)
-            .filter(data -> data.getShowResponseOneVOneFlag() != ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
+            .filter(data ->
+                        data.getShowResponseOneVOneFlag() != ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_INSTALMENT)
+            .filter(data ->
+                        data.getShowResponseOneVOneFlag()
+                            != ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE)
+            .filter(data ->
+                        data.getShowResponseOneVOneFlag()
+                            != ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
             .filter(data -> data.getShowResponseOneVOneFlag() != ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_HAS_PAID)
             .isPresent();
 }

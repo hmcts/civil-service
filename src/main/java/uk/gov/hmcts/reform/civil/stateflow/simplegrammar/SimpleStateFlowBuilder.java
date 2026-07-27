@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.civil.stateflow.transitions.UnspecifiedDraftTransitio
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_CASE_KEY;
@@ -41,16 +40,10 @@ import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STAT
 public class SimpleStateFlowBuilder {
 
     private static final String STATE = "state";
-    // The internal stateFlowContext object. Methods in the DSL work on this
-    private final String flowName = "MAIN";
 
     private final UnspecifiedDraftTransitionBuilder unspecifiedDraftTransitionBuilder;
     private final SpecDraftTransitionBuilder specDraftTransitionBuilder;
     private final List<MidTransitionBuilder> transitionBuilders;
-
-    public static boolean isEmpty(String string) {
-        return string == null || string.length() == 0;
-    }
 
     private static void checkNull(Object object, String name) {
         if (object == null) {
@@ -121,25 +114,20 @@ public class SimpleStateFlowBuilder {
     }
 
     private void buildStatesOnContext(FlowState.Main initialState, StateFlowContext stateFlowContext) {
-        FlowState.Main[] states = FlowState.Main.values();
-        List<FlowState.Main> statesList = Arrays.asList(states);
-        if (initialState.equals(FlowState.Main.DRAFT)) {
-            statesList = new ArrayList<>(statesList);
-            statesList.remove(FlowState.Main.SPEC_DRAFT);
-            states = statesList.toArray(new FlowState.Main[0]);
-        } else {
-            statesList = new ArrayList<>(statesList);
-            statesList.remove(FlowState.Main.DRAFT);
-            states = statesList.toArray(new FlowState.Main[0]);
-        }
-        for (FlowState.Main state : states) {
-            addState(state, stateFlowContext);
-        }
+        Arrays.stream(FlowState.Main.values())
+            .filter(state -> shouldIncludeState(initialState, state))
+            .forEach(state -> addState(state, stateFlowContext));
+    }
+
+    private boolean shouldIncludeState(FlowState.Main initialState, FlowState.Main state) {
+        return FlowState.Main.DRAFT.equals(initialState)
+            ? !FlowState.Main.SPEC_DRAFT.equals(state)
+            : !FlowState.Main.DRAFT.equals(state);
     }
 
     private void buildTransitionsForContext(StateFlowContext stateFlowContext, FlowState.Main initialState) {
         List<TransitionBuilder> allTransitionBuilders = new ArrayList<>();
-        if (initialState.equals(FlowState.Main.DRAFT)) {
+        if (FlowState.Main.DRAFT.equals(initialState)) {
             allTransitionBuilders.add(unspecifiedDraftTransitionBuilder);
             allTransitionBuilders.addAll(transitionBuilders);
         } else {
@@ -150,10 +138,7 @@ public class SimpleStateFlowBuilder {
         allTransitionBuilders.forEach(transitionBuilder -> {
             transitions.addAll(transitionBuilder.buildTransitions());
         });
-        ListIterator<Transition> iterator = transitions.listIterator();
-        while (iterator.hasNext()) {
-            stateFlowContext.addTransition(iterator.next());
-        }
+        transitions.forEach(stateFlowContext::addTransition);
     }
 
     private void addState(FlowState.Main state, StateFlowContext stateFlowContext) {
@@ -162,7 +147,7 @@ public class SimpleStateFlowBuilder {
     }
 
     private String fullyQualified(FlowState.Main state) {
-        return String.format("%s.%s", flowName, state.toString());
+        return FlowState.Main.FLOW_NAME + "." + state;
     }
 
 }

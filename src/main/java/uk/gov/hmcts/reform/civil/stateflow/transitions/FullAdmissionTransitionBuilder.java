@@ -5,17 +5,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimantPredicate;
-import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LanguagePredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LipPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.OutOfTimePredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.PaymentPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.RepaymentPredicate;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
-import uk.gov.hmcts.reform.civil.utils.JudgmentAdmissionUtils;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -46,21 +43,18 @@ public class FullAdmissionTransitionBuilder extends MidTransitionBuilder {
 
             .moveTo(FULL_ADMIT_PROCEED, transitions)
             .onlyWhen(ClaimantPredicate.fullDefenceProceed, transitions)
-            .set((c, flags) ->
-                     flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), LanguagePredicate.respondentIsBilingual.test(c)), transitions)
+            .set(this::setRespondentResponseLanguageFlag, transitions)
 
             .moveTo(FULL_ADMIT_NOT_PROCEED, transitions)
             .onlyWhen(ClaimantPredicate.fullDefenceNotProceed, transitions)
 
             .moveTo(FULL_ADMIT_AGREE_REPAYMENT, transitions)
             .onlyWhen(RepaymentPredicate.acceptRepaymentPlan, transitions)
-            .set((c, flags) ->
-                flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
+            .set(this::setLipJudgmentAdmissionFlag, transitions)
 
             .moveTo(FULL_ADMIT_REJECT_REPAYMENT, transitions)
             .onlyWhen(RepaymentPredicate.rejectRepaymentPlan, transitions)
-            .set((c, flags) ->
-                flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
+            .set(this::setLipJudgmentAdmissionFlag, transitions)
 
             // For lip journeys
             .moveTo(FULL_ADMIT_JUDGMENT_ADMISSION, transitions)
@@ -68,7 +62,8 @@ public class FullAdmissionTransitionBuilder extends MidTransitionBuilder {
 
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
             .onlyWhen(TakenOfflinePredicate.byStaff
-                .and(ClaimantPredicate.beforeResponse).and(not(LipPredicate.ccjRequestJudgmentByAdmission)), transitions)
+                .and(ClaimantPredicate.beforeResponse)
+                .and(not(LipPredicate.ccjRequestJudgmentByAdmission)), transitions)
 
             .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA, transitions)
             .onlyWhen(OutOfTimePredicate.notBeingTakenOffline
@@ -80,14 +75,14 @@ public class FullAdmissionTransitionBuilder extends MidTransitionBuilder {
     }
 
     private Predicate<CaseData> takenOfflineSpecDefendantNocAfterJba() {
-        return isDefendantNoCOnlineForCase.and(PaymentPredicate.payImmediately)
+        return defendantNoCOnlineForCase().and(PaymentPredicate.payImmediately)
             .and(TakenOfflinePredicate.isDefendantNoCOnlineForCaseAfterJBA);
     }
 
     private static Predicate<CaseData> fullAdmitJudgementAdmission() {
-        return LipPredicate.ccjRequestJudgmentByAdmission.and(PaymentPredicate.payImmediately).and(LipPredicate.isLiPvLiPCase);
+        return LipPredicate.ccjRequestJudgmentByAdmission
+            .and(PaymentPredicate.payImmediately)
+            .and(LipPredicate.isLiPvLiPCase);
     }
-
-    public final Predicate<CaseData> isDefendantNoCOnlineForCase = featureToggleService::isDefendantNoCOnlineForCase;
 
 }

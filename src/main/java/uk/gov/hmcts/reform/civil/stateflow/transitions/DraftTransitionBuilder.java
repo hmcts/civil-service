@@ -37,20 +37,11 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
         this.moveTo(CLAIM_SUBMITTED, transitions)
             .onlyWhen(ClaimPredicate.submittedOneRespondentRepresentative
                 .or(ClaimPredicate.submitted1v1RespondentOneUnregistered), transitions)
-            .set((c, flags) -> flags.putAll(
-                // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
-                // camunda diagram for TAKE_CASE_OFFLINE is changed
-                Map.ofEntries(
-                    Map.entry(ONE_RESPONDENT_REPRESENTATIVE.name(), true),
-                    Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
-                    Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
-                    Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
-                    Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
-                    Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
-                    Map.entry(JBA_ISSUED_BEFORE_NOC.name(), isJudgmentByAdmissionIssuedForCase(c)),
-                    Map.entry(IS_CJES_SERVICE_ENABLED.name(), featureToggleService.isCjesServiceAvailable())
-                )), transitions)
+            .set((c, flags) -> putClaimSubmittedFlags(
+                c,
+                flags,
+                Map.ofEntries(Map.entry(ONE_RESPONDENT_REPRESENTATIVE.name(), true))
+            ), transitions)
 
             .moveTo(CLAIM_SUBMITTED, transitions)
             .onlyWhen(
@@ -58,37 +49,23 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     .or(ClaimPredicate.submittedTwoRespondentRepresentativesOneUnregistered)
                     .or(ClaimPredicate.submittedBothUnregisteredSolicitors), transitions
             )
-            .set((c, flags) -> flags.putAll(
-                // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
-                // camunda diagram for TAKE_CASE_OFFLINE is changed
+            .set((c, flags) -> putClaimSubmittedFlags(
+                c,
+                flags,
                 Map.ofEntries(
                     Map.entry(ONE_RESPONDENT_REPRESENTATIVE.name(), false),
-                    Map.entry(TWO_RESPONDENT_REPRESENTATIVES.name(), true),
-                    Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
-                    Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
-                    Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
-                    Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
-                    Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
-                    Map.entry(JBA_ISSUED_BEFORE_NOC.name(), isJudgmentByAdmissionIssuedForCase(c)),
-                    Map.entry(IS_CJES_SERVICE_ENABLED.name(), featureToggleService.isCjesServiceAvailable())
-                )), transitions)
+                    Map.entry(TWO_RESPONDENT_REPRESENTATIVES.name(), true)
+                )
+            ), transitions)
 
             // Only one unrepresented defendant
             .moveTo(CLAIM_SUBMITTED, transitions)
             .onlyWhen(ClaimPredicate.submittedOneUnrepresentedDefendantOnly, transitions)
-            .set((c, flags) -> flags.putAll(
-                Map.ofEntries(
-                    Map.entry(UNREPRESENTED_DEFENDANT_ONE.name(), true),
-                    Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
-                    Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
-                    Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
-                    Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
-                    Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
-                    Map.entry(JBA_ISSUED_BEFORE_NOC.name(), isJudgmentByAdmissionIssuedForCase(c)),
-                    Map.entry(IS_CJES_SERVICE_ENABLED.name(), featureToggleService.isCjesServiceAvailable())
-                )), transitions)
+            .set((c, flags) -> putClaimSubmittedFlags(
+                c,
+                flags,
+                Map.ofEntries(Map.entry(UNREPRESENTED_DEFENDANT_ONE.name(), true))
+            ), transitions)
 
             // Unrepresented defendant 1
             .moveTo(CLAIM_SUBMITTED, transitions)
@@ -97,19 +74,14 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     .and(ClaimPredicate.submittedOneUnrepresentedDefendantOnly.negate())
                     .and(ClaimPredicate.submittedRespondent2Unrepresented.negate()), transitions
             )
-            .set((c, flags) -> flags.putAll(
+            .set((c, flags) -> putClaimSubmittedFlags(
+                c,
+                flags,
                 Map.ofEntries(
                     Map.entry(UNREPRESENTED_DEFENDANT_ONE.name(), true),
-                    Map.entry(UNREPRESENTED_DEFENDANT_TWO.name(), false),
-                    Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
-                    Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
-                    Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
-                    Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
-                    Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
-                    Map.entry(JBA_ISSUED_BEFORE_NOC.name(), isJudgmentByAdmissionIssuedForCase(c)),
-                    Map.entry(IS_CJES_SERVICE_ENABLED.name(), featureToggleService.isCjesServiceAvailable())
-                )), transitions)
+                    Map.entry(UNREPRESENTED_DEFENDANT_TWO.name(), false)
+                )
+            ), transitions)
 
             // Unrepresented defendant 2
             .moveTo(CLAIM_SUBMITTED, transitions)
@@ -117,37 +89,51 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                 ClaimPredicate.submittedRespondent2Unrepresented
                     .and(ClaimPredicate.submittedRespondent1Unrepresented.negate()), transitions
             )
-            .set((c, flags) -> flags.putAll(
+            .set((c, flags) -> putClaimSubmittedFlags(
+                c,
+                flags,
                 Map.ofEntries(
                     Map.entry(UNREPRESENTED_DEFENDANT_ONE.name(), false),
-                    Map.entry(UNREPRESENTED_DEFENDANT_TWO.name(), true),
-                    Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
-                    Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
-                    Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
-                    Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
-                    Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
-                    Map.entry(JBA_ISSUED_BEFORE_NOC.name(), isJudgmentByAdmissionIssuedForCase(c)),
-                    Map.entry(IS_CJES_SERVICE_ENABLED.name(), featureToggleService.isCjesServiceAvailable())
-                )), transitions)
+                    Map.entry(UNREPRESENTED_DEFENDANT_TWO.name(), true)
+                )
+            ), transitions)
 
             // Unrepresented defendants
             .moveTo(CLAIM_SUBMITTED, transitions)
             .onlyWhen(ClaimPredicate.submittedRespondent1Unrepresented
                 .and(ClaimPredicate.submittedRespondent2Unrepresented), transitions)
-            .set((c, flags) -> flags.putAll(
+            .set((c, flags) -> putClaimSubmittedFlags(
+                c,
+                flags,
                 Map.ofEntries(
                     Map.entry(UNREPRESENTED_DEFENDANT_ONE.name(), true),
-                    Map.entry(UNREPRESENTED_DEFENDANT_TWO.name(), true),
-                    Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
-                    Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
-                    Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
-                    Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
-                    Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
-                    Map.entry(JBA_ISSUED_BEFORE_NOC.name(), isJudgmentByAdmissionIssuedForCase(c)),
-                    Map.entry(IS_CJES_SERVICE_ENABLED.name(), featureToggleService.isCjesServiceAvailable())
-                )), transitions);
+                    Map.entry(UNREPRESENTED_DEFENDANT_TWO.name(), true)
+                )
+            ), transitions);
+    }
+
+    private void putClaimSubmittedFlags(
+        CaseData caseData,
+        Map<String, Boolean> flags,
+        Map<String, Boolean> journeyFlags
+    ) {
+        // Do not default missing respondent representation flags to false unless
+        // the TAKE_CASE_OFFLINE Camunda diagram is changed.
+        flags.putAll(journeyFlags);
+        flags.putAll(commonClaimSubmittedFlags(caseData));
+    }
+
+    private Map<String, Boolean> commonClaimSubmittedFlags(CaseData caseData) {
+        return Map.ofEntries(
+            Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(caseData)),
+            Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
+            Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
+            Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(caseData)),
+            Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(caseData)),
+            Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
+            Map.entry(JBA_ISSUED_BEFORE_NOC.name(), isJudgmentByAdmissionIssuedForCase(caseData)),
+            Map.entry(IS_CJES_SERVICE_ENABLED.name(), featureToggleService.isCjesServiceAvailable())
+        );
     }
 
     public boolean isDashBoardEnabledForCase(CaseData caseData) {

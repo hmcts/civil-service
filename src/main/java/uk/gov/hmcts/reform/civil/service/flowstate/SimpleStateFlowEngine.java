@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StateFlowDTO;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
@@ -19,16 +18,12 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 public class SimpleStateFlowEngine implements IStateFlowEngine {
 
     protected final CaseDetailsConverter caseDetailsConverter;
-    protected final FeatureToggleService featureToggleService;
     protected final SimpleStateFlowBuilder stateFlowBuilder;
 
     @Autowired
-    public SimpleStateFlowEngine(CaseDetailsConverter caseDetailsConverter, FeatureToggleService featureToggleService,
-                                 SimpleStateFlowBuilder stateFlowBuilder) {
+    public SimpleStateFlowEngine(CaseDetailsConverter caseDetailsConverter, SimpleStateFlowBuilder stateFlowBuilder) {
         this.caseDetailsConverter = caseDetailsConverter;
-        this.featureToggleService = featureToggleService;
         this.stateFlowBuilder = stateFlowBuilder;
-
     }
 
     public StateFlow evaluate(CaseDetails caseDetails) {
@@ -36,10 +31,7 @@ public class SimpleStateFlowEngine implements IStateFlowEngine {
     }
 
     public StateFlow evaluate(CaseData caseData) {
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return stateFlowBuilder.build(FlowState.Main.SPEC_DRAFT).evaluate(caseData);
-        }
-        return stateFlowBuilder.build(FlowState.Main.DRAFT).evaluate(caseData);
+        return evaluateFrom(initialStateFor(caseData), caseData);
     }
 
     public StateFlow evaluateSpec(CaseDetails caseDetails) {
@@ -47,7 +39,7 @@ public class SimpleStateFlowEngine implements IStateFlowEngine {
     }
 
     public StateFlow evaluateSpec(CaseData caseData) {
-        return stateFlowBuilder.build(FlowState.Main.SPEC_DRAFT).evaluate(caseData);
+        return evaluateFrom(FlowState.Main.SPEC_DRAFT, caseData);
     }
 
     public StateFlowDTO getStateFlow(CaseDetails caseDetails) {
@@ -55,10 +47,7 @@ public class SimpleStateFlowEngine implements IStateFlowEngine {
     }
 
     public StateFlowDTO getStateFlow(CaseData caseData) {
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return stateFlowBuilder.build(FlowState.Main.SPEC_DRAFT).evaluate(caseData).toStateFlowDTO();
-        }
-        return stateFlowBuilder.build(FlowState.Main.DRAFT).evaluate(caseData).toStateFlowDTO();
+        return evaluate(caseData).toStateFlowDTO();
     }
 
     public StateFlowDTO getStateFlowSpec(CaseDetails caseDetails) {
@@ -67,12 +56,22 @@ public class SimpleStateFlowEngine implements IStateFlowEngine {
     }
 
     public StateFlowDTO getStateFlowSpec(CaseData caseData) {
-        return stateFlowBuilder.build(FlowState.Main.SPEC_DRAFT).evaluate(caseData).toStateFlowDTO();
+        return evaluateSpec(caseData).toStateFlowDTO();
     }
 
     public boolean hasTransitionedTo(CaseDetails caseDetails, FlowState.Main state) {
         return evaluate(caseDetails).getStateHistory().stream()
             .map(State::getName)
             .anyMatch(name -> name.equals(state.fullName()));
+    }
+
+    private StateFlow evaluateFrom(FlowState.Main initialState, CaseData caseData) {
+        return stateFlowBuilder.build(initialState).evaluate(caseData);
+    }
+
+    private FlowState.Main initialStateFor(CaseData caseData) {
+        return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            ? FlowState.Main.SPEC_DRAFT
+            : FlowState.Main.DRAFT;
     }
 }

@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_FAILED;
@@ -37,7 +35,11 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
     @Override
     void setUpTransitions(List<Transition> transitions) {
         this.moveTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL, transitions)
-            .onlyWhen(PaymentPredicate.successful.and(not(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.beforeClaimIssue))), transitions)
+            .onlyWhen(
+                PaymentPredicate.successful.and(not(TakenOfflinePredicate.byStaff
+                                                        .and(TakenOfflinePredicate.beforeClaimIssue))),
+                transitions
+            )
 
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
             .onlyWhen(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.beforeClaimIssue), transitions)
@@ -62,45 +64,38 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
 
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions)
             .onlyWhen(LipPredicate.nocApplyForLiPClaimant, transitions)
-            .set(flags -> flags.putAll(
-                Map.of(
-                    FlowFlag.LIP_CASE.name(), false,
-                    FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true
-                )), transitions)
+            .set(flags -> setLipCaseFlags(flags, false, true), transitions)
 
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions)
-            .onlyWhen(not(isDefendantNoCOnlineForCase)
+            .onlyWhen(not(defendantNoCOnlineForCase())
                 .and(LipPredicate.isLiPvLRCase.and(not(LipPredicate.nocSubmittedForLiPDefendant))
                 .and(not(LipPredicate.nocSubmittedForLiPDefendantBeforeOffline))), transitions)
-            .set(flags -> flags.putAll(
-                Map.of(
-                    FlowFlag.LIP_CASE.name(), true,
-                    FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
-                )), transitions)
+            .set(flags -> setLipCaseFlags(flags, true, false), transitions)
 
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions)
-            .onlyWhen(isDefendantNoCOnlineForCase.and(LipPredicate.isLiPvLRCase), transitions)
+            .onlyWhen(defendantNoCOnlineForCase().and(LipPredicate.isLiPvLRCase), transitions)
             .set(
                 (c, flags) -> {
-                    flags.putAll(
-                        Map.of(
-                            FlowFlag.LIP_CASE.name(), true,
-                            FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
-                        )
-                    );
+                    setLipCaseFlags(flags, true, false);
                     if (LanguagePredicate.claimantIsBilingual.test(c)) {
                         flags.put(FlowFlag.CLAIM_ISSUE_BILINGUAL.name(), true);
                     }
                 }, transitions)
 
-            .moveTo(SPEC_DEFENDANT_NOC, transitions).onlyWhen(not(isDefendantNoCOnlineForCase).and(
-                LipPredicate.nocSubmittedForLiPDefendantBeforeOffline), transitions)
-            .set(flags -> flags.putAll(
-                Map.of(
-                    FlowFlag.LIP_CASE.name(), true,
-                    FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
-                )), transitions);
+            .moveTo(SPEC_DEFENDANT_NOC, transitions)
+            .onlyWhen(
+                not(defendantNoCOnlineForCase()).and(LipPredicate.nocSubmittedForLiPDefendantBeforeOffline),
+                transitions
+            )
+            .set(flags -> setLipCaseFlags(flags, true, false), transitions);
     }
 
-    public final Predicate<CaseData> isDefendantNoCOnlineForCase = featureToggleService::isDefendantNoCOnlineForCase;
+    private void setLipCaseFlags(Map<String, Boolean> flags, boolean lipCase, boolean unrepresentedDefendantOne) {
+        flags.putAll(
+            Map.of(
+                FlowFlag.LIP_CASE.name(), lipCase,
+                FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), unrepresentedDefendantOne
+            )
+        );
+    }
 }

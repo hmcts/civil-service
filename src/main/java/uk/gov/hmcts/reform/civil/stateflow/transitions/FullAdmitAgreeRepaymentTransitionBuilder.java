@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.stateflow.transitions;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LipPredicate;
@@ -11,7 +10,6 @@ import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredica
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
@@ -34,8 +32,9 @@ public class FullAdmitAgreeRepaymentTransitionBuilder extends MidTransitionBuild
             .onlyWhen(TakenOfflinePredicate.byStaff, transitions)
 
             .moveTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA, transitions)
-            .onlyWhen(isDefendantNoCOnlineForCase.and(TakenOfflinePredicate.isDefendantNoCOnlineForCaseAfterJBA), transitions);
+            .onlyWhen(
+                defendantNoCOnlineForCase().and(TakenOfflinePredicate.isDefendantNoCOnlineForCaseAfterJBA),
+                transitions
+            );
     }
-
-    public final Predicate<CaseData> isDefendantNoCOnlineForCase = featureToggleService::isDefendantNoCOnlineForCase;
 }
