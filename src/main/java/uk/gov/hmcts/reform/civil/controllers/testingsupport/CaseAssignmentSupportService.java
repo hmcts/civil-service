@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.controllers.testingsupport;
 
+import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CaseAssignmentSupportService {
@@ -40,6 +42,7 @@ public class CaseAssignmentSupportService {
 
         CaseAssignmentUserRolesRequest request = CaseAssignmentUserRolesRequest.builder()
             .caseAssignmentUserRolesWithOrganisation(userRolesWithOrganisation).build();
+        log.info("unassigning: {} ", request);
         caseAssignmentApi.removeCaseUserRoles(caaAccessToken, authToken, request);
     }
 
