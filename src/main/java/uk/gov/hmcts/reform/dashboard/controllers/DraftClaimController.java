@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.dashboard.controllers;
 
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,7 +30,6 @@ public class DraftClaimController {
     private final DraftStoreService draftStoreService;
     private final UserService userService;
 
-    @Autowired
     public DraftClaimController(DraftStoreService draftStoreService, UserService userService) {
         this.draftStoreService = draftStoreService;
         this.userService = userService;
