@@ -1314,7 +1314,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID,
                     "validate-repayment-plan", "DEFENDANT_RESPONSE_SPEC"
             );
-            when(dateValidator.validateFuturePaymentDate(any())).thenReturn(List.of("Validation error"));
+            when(dateValidator.validateFuturePaymentDate(any())).thenReturn(new ArrayList<>(List.of("Validation error")));
 
             // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1323,6 +1323,24 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertEquals("Validation error", response.getErrors().get(0));
 
+        }
+
+        @Test
+        void shouldReturnError_whenRepaymentAmountIsZero() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().generateRepaymentDateForAdmitPartResponse().build();
+            caseData.getRespondent1RepaymentPlan().setPaymentAmount(BigDecimal.ZERO);
+            CallbackParams params = callbackParamsOf(caseData, MID,
+                                                     "validate-repayment-plan", "DEFENDANT_RESPONSE_SPEC"
+            );
+            when(dateValidator.validateFuturePaymentDate(any())).thenReturn(new ArrayList<>());
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response.getErrors()).contains("Regular payment amount must be greater than £0");
         }
 
         @Test

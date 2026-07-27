@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -35,7 +34,6 @@ public class ManageStayCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(MANAGE_STAY);
 
-    private final FeatureToggleService featureToggleService;
     private final DeadlinesCalculator deadlinesCalculator;
 
     private static final String HEADER_CONFIRMATION_LIFT_STAY = "# You have lifted the stay from this \n\n # case \n\n ## All parties have been notified";
@@ -50,7 +48,8 @@ public class ManageStayCallbackHandler extends CallbackHandler {
         CaseState.HEARING_READINESS.name(), CaseState.CASE_PROGRESSION,
         CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.name(), CaseState.CASE_PROGRESSION,
         CaseState.DECISION_OUTCOME.name(), CaseState.CASE_PROGRESSION,
-        CaseState.All_FINAL_ORDERS_ISSUED.name(), CaseState.CASE_PROGRESSION
+        CaseState.All_FINAL_ORDERS_ISSUED.name(), CaseState.CASE_PROGRESSION,
+        CaseState.JUDGMENT_REQUESTED.name(), CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT
     );
 
     private final ObjectMapper mapper;
@@ -85,7 +84,7 @@ public class ManageStayCallbackHandler extends CallbackHandler {
     private CallbackResponse manageStay(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseState newState;
-        if (nonNull(caseData.getManageStayOption()) && caseData.getManageStayOption().equals(LIFT_STAY)) {
+        if (LIFT_STAY.equals(caseData.getManageStayOption())) {
             newState = STATE_MAP.getOrDefault(caseData.getPreStayState(), CaseState.valueOf(caseData.getPreStayState()));
             caseData.setBusinessProcess(BusinessProcess.ready(STAY_LIFTED));
             caseData.setManageStayUpdateRequestDate(null);
