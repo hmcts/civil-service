@@ -152,7 +152,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
 
         List<String> errors = new ArrayList<>();
-        if (isFullDefenceForBothDefendants(caseData) && isRespondent2SameLegalRep(caseData)) {
+        if (isFullDefenceForBothDefendants(caseData) && caseData.respondent2HasSameLegalRep()) {
             errors.add(
                 "It is not possible to respond for both defendants with Reject all of the claim. "
                     + "Please go back and select single response option."
@@ -168,11 +168,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
         return setApplicantResponseDeadline.execute(callbackParams);
 
-    }
-
-    private boolean isRespondent2SameLegalRep(CaseData caseData) {
-        return caseData.getRespondent2SameLegalRepresentative() != null
-            && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
@@ -232,7 +227,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private boolean isSameSolicitorAndAnyRespondentResponseIsMatchingType(CaseData caseData,
                                                                           RespondentResponseType type) {
-        return isRespondent2SameLegalRep(caseData)
+        return caseData.respondent2HasSameLegalRep()
             && (type.equals(caseData.getRespondent1ClaimResponseType())
             || type.equals(caseData.getRespondent2ClaimResponseType()));
     }
