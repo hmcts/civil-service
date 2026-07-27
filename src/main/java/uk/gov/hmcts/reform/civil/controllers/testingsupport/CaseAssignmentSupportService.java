@@ -44,6 +44,7 @@ public class CaseAssignmentSupportService {
             .caseAssignmentUserRolesWithOrganisation(userRolesWithOrganisation).build();
         log.info("unassigning: {} ", request);
         caseAssignmentApi.removeCaseUserRoles(caaAccessToken, authToken, request);
+        log.info("unassignment complete");
     }
 
     private String getCaaAccessToken() {
