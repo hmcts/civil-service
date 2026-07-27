@@ -13,10 +13,10 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
-import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +25,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_PIP_LETTER;
+import static uk.gov.hmcts.reform.civil.utils.WaTaskUtil.confirmIfStateChangeRequired;
 
 @Slf4j
 @Service
@@ -36,7 +37,6 @@ public class GeneratePipLetterHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final PiPLetterGenerator pipLetterGenerator;
     private final BulkPrintService bulkPrintService;
-    private final Time time;
     private static final List<CaseEvent> EVENTS = List.of(GENERATE_PIP_LETTER);
 
     @Override
@@ -58,9 +58,8 @@ public class GeneratePipLetterHandler extends CallbackHandler {
 
     private CallbackResponse generatePipLetter(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        LocalDateTime claimNotificationDate = time.now();
         final CaseData.CaseDataBuilder<?, ?> caseDataBuilder =
-                caseData.toBuilder().claimNotificationDate(claimNotificationDate);
+                caseData.toBuilder().claimNotificationDate(LocalDateTime.now(ZoneId.of("Europe/London")));
 
         if (caseData.isRespondent1LiP()) {
             generateAndPrintPipLetter(callbackParams);
@@ -89,6 +88,9 @@ public class GeneratePipLetterHandler extends CallbackHandler {
     }
 
     private String setClaimState(CaseData caseData) {
+        if (ifClaimantLanguageChanged(caseData)) {
+            return caseData.getCcdState().name();
+        }
         if (!isBilingualForLipvsLip(caseData)) {
             return CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name();
         }
@@ -97,5 +99,9 @@ public class GeneratePipLetterHandler extends CallbackHandler {
 
     private boolean isBilingualForLipvsLip(CaseData caseData) {
         return caseData.isLipvLipOneVOne() && caseData.isClaimantBilingual();
+    }
+
+    private boolean ifClaimantLanguageChanged(CaseData caseData) {
+        return caseData.isLipvLipOneVOne() && confirmIfStateChangeRequired(caseData);
     }
 }
