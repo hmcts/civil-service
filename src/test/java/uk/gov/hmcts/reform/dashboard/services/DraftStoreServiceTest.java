@@ -24,8 +24,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,8 +44,6 @@ class DraftStoreServiceTest {
 
     @InjectMocks
     private DraftStoreService draftStoreService;
-
-    private DraftStoreEntity draftClaim;
 
     @Nested
     class CreateDraftClaimTest {
@@ -78,7 +77,7 @@ class DraftStoreServiceTest {
                 .isThrownBy(() -> draftStoreService.createDraftClaim(null, CASE_ID, Map.of()))
                 .withMessage("userId must not be null");
 
-            verify(draftStoreRepository, never()).save(any());
+            verifyNoInteractions(draftStoreRepository);
         }
 
         @Test
@@ -87,7 +86,7 @@ class DraftStoreServiceTest {
                 .isThrownBy(() -> draftStoreService.createDraftClaim(USER_ID, CASE_ID, null))
                 .withMessage("payload must not be null");
 
-            verify(draftStoreRepository, never()).save(any());
+            verifyNoInteractions(draftStoreRepository);
         }
 
     }
@@ -97,7 +96,7 @@ class DraftStoreServiceTest {
 
         @Test
         void shouldReturnDraftClaimUsingIdUserIdDraftIdAndExpiresAtAfter() {
-            draftClaim = mock(DraftStoreEntity.class);
+            DraftStoreEntity draftClaim = mock(DraftStoreEntity.class);
 
             when(draftStoreRepository.findByIdAndUserIdAndDraftTypeIdAndExpiresAtAfter(
                 eq(DRAFT_ID),
@@ -126,8 +125,7 @@ class DraftStoreServiceTest {
                 .isThrownBy(() -> draftStoreService.getDraftClaim(null, USER_ID))
                 .withMessage("draftId must not be null");
 
-            verify(draftStoreRepository, never()).save(any());
-
+            verifyNoInteractions(draftStoreRepository);
         }
 
         @Test
@@ -136,7 +134,7 @@ class DraftStoreServiceTest {
                 .isThrownBy(() -> draftStoreService.getDraftClaim(DRAFT_ID, null))
                 .withMessage("userId must not be null");
 
-            verify(draftStoreRepository, never()).save(any());
+            verifyNoInteractions(draftStoreRepository);
         }
 
     }
@@ -146,7 +144,7 @@ class DraftStoreServiceTest {
 
         @Test
         void shouldReturnActiveDraftClaimUsingUserId() {
-            draftClaim = mock(DraftStoreEntity.class);
+            DraftStoreEntity draftClaim = mock(DraftStoreEntity.class);
 
             when(draftStoreRepository.findFirstByUserIdAndDraftTypeIdAndExpiresAtAfterOrderByUpdatedAtDesc(
                 eq(USER_ID),
@@ -173,7 +171,7 @@ class DraftStoreServiceTest {
                 .isThrownBy(() -> draftStoreService.getActiveDraftClaimForUser(null))
                 .withMessage("userId must not be null");
 
-            verify(draftStoreRepository, never()).save(any());
+            verifyNoInteractions(draftStoreRepository);
         }
     }
 
@@ -224,7 +222,12 @@ class DraftStoreServiceTest {
             assertThatThrownBy(() -> draftStoreService.updateDraftClaim(DRAFT_ID, USER_ID, CASE_ID, Map.of()))
                 .isInstanceOf(DraftClaimNotFoundException.class);
 
-            verify(draftStoreRepository, never()).save(any());
+            verify(draftStoreRepository).findByIdAndUserIdAndDraftTypeIdAndExpiresAtAfter(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_CLAIM_TYPE_ID),
+                any(OffsetDateTime.class));
+            verifyNoMoreInteractions(draftStoreRepository);
         }
 
         @Test
@@ -291,7 +294,7 @@ class DraftStoreServiceTest {
                 .isThrownBy(() -> draftStoreService.deleteDraftClaim(null, USER_ID))
                 .withMessage("draftId must not be null");
 
-            verify(draftStoreRepository, never()).save(any());
+            verifyNoInteractions(draftStoreRepository);
         }
 
         @Test
@@ -300,7 +303,7 @@ class DraftStoreServiceTest {
                 .isThrownBy(() -> draftStoreService.deleteDraftClaim(DRAFT_ID, null))
                 .withMessage("userId must not be null");
 
-            verify(draftStoreRepository, never()).save(any());
+            verifyNoInteractions(draftStoreRepository);
         }
     }
 

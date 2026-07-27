@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,8 +33,6 @@ class DraftClaimControllerTest {
     private static final String CASE_ID = "CCD123";
     private static final UUID DRAFT_ID = UUID.randomUUID();
     private static final String AUTH = "Token";
-    private static final HashMap<String, Object> PAYLOAD = new  HashMap<>();
-
     @Mock
     private DraftStoreService draftStoreService;
 
@@ -44,10 +43,12 @@ class DraftClaimControllerTest {
     private DraftClaimController controller;
 
     private DraftStoreEntity draftStoreEntity;
+    private Map<String, Object> payload;
 
     @BeforeEach
     void init() {
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
+        payload = new HashMap<>();
         draftStoreEntity = new DraftStoreEntity();
         draftStoreEntity.setId(DRAFT_ID);
         draftStoreEntity.setCaseId(CASE_ID);
@@ -57,16 +58,16 @@ class DraftClaimControllerTest {
 
     @Test
     void shouldCreateDraftClaim() {
-        when(draftStoreService.createDraftClaim(USER_ID, CASE_ID, PAYLOAD)).thenReturn(draftStoreEntity);
+        payload.put("deadline", OffsetDateTime.now());
+        when(draftStoreService.createDraftClaim(USER_ID, CASE_ID, payload)).thenReturn(draftStoreEntity);
 
-        PAYLOAD.put("deadline", OffsetDateTime.now());
-        DraftClaimRequest request = new DraftClaimRequest(CASE_ID, PAYLOAD);
+        DraftClaimRequest request = new DraftClaimRequest(CASE_ID, payload);
 
         ResponseEntity<DraftClaimResponse> response = controller.createDraftClaim(AUTH, request);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isNotNull();
-        verify(draftStoreService).createDraftClaim(USER_ID, CASE_ID, PAYLOAD);
+        verify(draftStoreService).createDraftClaim(USER_ID, CASE_ID, payload);
     }
 
     @Test
@@ -74,7 +75,7 @@ class DraftClaimControllerTest {
         when(draftStoreService.getActiveDraftClaimForUser(USER_ID)).thenReturn(Optional.of(draftStoreEntity));
 
         ResponseEntity<DraftClaimResponse> response =
-            controller.getActiveDraftClaim(USER_ID);
+            controller.getActiveDraftClaim(AUTH);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
@@ -85,7 +86,7 @@ class DraftClaimControllerTest {
     void shouldReturnDraftClaim() {
         when(draftStoreService.getDraftClaim(DRAFT_ID, USER_ID)).thenReturn(Optional.of(draftStoreEntity));
 
-        ResponseEntity<DraftClaimResponse> response = controller.getDraftClaim(DRAFT_ID, USER_ID);
+        ResponseEntity<DraftClaimResponse> response = controller.getDraftClaim(DRAFT_ID, AUTH);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
@@ -94,14 +95,14 @@ class DraftClaimControllerTest {
 
     @Test
     void shouldUpdateDraftClaim() {
-        DraftClaimRequest request = new DraftClaimRequest(CASE_ID, PAYLOAD);
-        when(draftStoreService.updateDraftClaim(DRAFT_ID, USER_ID, CASE_ID, PAYLOAD)).thenReturn(draftStoreEntity);
+        DraftClaimRequest request = new DraftClaimRequest(CASE_ID, payload);
+        when(draftStoreService.updateDraftClaim(DRAFT_ID, USER_ID, CASE_ID, payload)).thenReturn(draftStoreEntity);
 
         ResponseEntity<DraftClaimResponse> response = controller.updateDraftClaim(DRAFT_ID, AUTH, request);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        verify(draftStoreService).updateDraftClaim(DRAFT_ID, USER_ID, CASE_ID, PAYLOAD);
+        verify(draftStoreService).updateDraftClaim(DRAFT_ID, USER_ID, CASE_ID, payload);
     }
 
     @Test
