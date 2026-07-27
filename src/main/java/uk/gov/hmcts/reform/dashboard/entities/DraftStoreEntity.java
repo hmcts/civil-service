@@ -6,17 +6,20 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
-@lombok.Data
-@lombok.NoArgsConstructor
-@lombok.AllArgsConstructor
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "draft_store", schema = "dbs")
 public class DraftStoreEntity implements Serializable {
@@ -43,7 +46,7 @@ public class DraftStoreEntity implements Serializable {
     @NotNull
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "payload", columnDefinition = "jsonb")
-    private HashMap<String, Object> payload;
+    private Map<String, Object> payload;
 
     @NotNull
     @Column(name = "draft_claim_created_at", updatable = false)
