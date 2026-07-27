@@ -127,9 +127,10 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void updateDoesNotReplaceCreatedAtAndExpiresAtTime() throws Exception {
+    void updateDoesNotReplaceDraftClaimCreatedAtCreatedAtOrExpiresAt() throws Exception {
         DraftStoreEntity initialDraft = draftStoreRepository.findById(DRAFT_ID)
                 .orElseThrow(() -> new AssertionError("Draft claim should exist in db"));
+        OffsetDateTime initialDraftClaimCreatedAt = initialDraft.getDraftClaimCreatedAt();
         OffsetDateTime initialCreatedAt = initialDraft.getCreatedAt();
         OffsetDateTime initialExpiresAt = initialDraft.getExpiresAt();
 
@@ -142,6 +143,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
         DraftStoreEntity updatedEntity = draftStoreRepository.findById(DRAFT_ID)
             .orElseThrow(() -> new AssertionError("Draft claim should exist in DB"));
 
+        assertThat(updatedEntity.getDraftClaimCreatedAt()).isEqualTo(initialDraftClaimCreatedAt);
         assertThat(updatedEntity.getCreatedAt()).isEqualTo(initialCreatedAt);
         assertThat(updatedEntity.getExpiresAt()).isEqualTo(initialExpiresAt);
     }
