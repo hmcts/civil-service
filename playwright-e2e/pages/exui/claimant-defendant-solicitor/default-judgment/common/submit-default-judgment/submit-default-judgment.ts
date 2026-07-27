@@ -1,0 +1,15 @@
+import BasePage from '../../../../../../base/base-page.ts';
+import { AllMethodsStep } from '../../../../../../decorators/test-steps.ts';
+import CCDCaseData from '../../../../../../models/ccd-case-data.ts';
+import ExuiPage from '../../../../mixin-pages/exui-page/exui-page.ts';
+
+@AllMethodsStep()
+export default class SubmitDefaultJudgmentPage extends ExuiPage(BasePage) {
+  async verifyContent(ccdCaseData: CCDCaseData) {
+    await super.runVerifications([super.verifyHeadings(ccdCaseData)]);
+  }
+
+  async submit() {
+    await super.retryClickSubmit(() => super.expectNoText('Check your answers', { timeout: 3000 }));
+  }
+}
