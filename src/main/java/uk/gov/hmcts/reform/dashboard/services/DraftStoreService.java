@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.dashboard.services;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.dashboard.entities.DraftStoreEntity;
@@ -27,7 +26,6 @@ public class DraftStoreService {
 
     private final DraftStoreRepository draftStoreRepository;
 
-    @Autowired
     public DraftStoreService(DraftStoreRepository draftStoreRepository) {
         this.draftStoreRepository = draftStoreRepository;
     }
@@ -69,8 +67,7 @@ public class DraftStoreService {
     }
 
     /**
-     * Convenience lookup for the current CUI autosave journey.
-     * Primary CRUD should use draftId + userId. If duplicate active drafts exist, the latest updated draft wins.
+     * Returns the most recently updated, unexpired draft claim for a user.
      */
     @Transactional(readOnly = true)
     public Optional<DraftStoreEntity> getActiveDraftClaimForUser(String userId) {
@@ -117,7 +114,7 @@ public class DraftStoreService {
         return draftStoreRepository.save(existingDraft);
     }
 
-    private HashMap<String, Object> copyPayload(Map<String, Object> payload) {
+    private Map<String, Object> copyPayload(Map<String, Object> payload) {
         return new HashMap<>(Objects.requireNonNull(payload, "payload must not be null"));
     }
 }
