@@ -4,15 +4,15 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
-import uk.gov.hmcts.reform.civil.service.search.CaseDismissedSearchService;
+import uk.gov.hmcts.reform.civil.service.search.ClaimDetailsNotificationDeadlineSearchService;
 
 @Component
-public class ClaimDismissedHandler extends AbstractDismissClaimDeadlineHandler {
+public class ClaimDetailsNotificationDeadlineHandler extends AbstractDismissClaimDeadlineHandler {
 
-    public ClaimDismissedHandler(
+    public ClaimDetailsNotificationDeadlineHandler(
         ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
-        CaseDismissedSearchService caseSearchService,
+        ClaimDetailsNotificationDeadlineSearchService caseSearchService,
         ApplicationEventPublisher applicationEventPublisher
     ) {
         super(externalTaskCompletionService, eventProperties, caseSearchService, applicationEventPublisher);
