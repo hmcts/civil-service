@@ -85,9 +85,8 @@ class DefendantNocClaimantDashboardServiceTest {
     }
 
     @Test
-    void shouldRecordJbaScenarioWhenOnlineAndJudgmentOnline() {
+    void shouldRecordJbaScenarioWhenNocOnlineAndActiveJudgment() {
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         PaymentDetails paymentDetails = new PaymentDetails();
         paymentDetails.setStatus(PaymentStatus.SUCCESS);
@@ -115,7 +114,6 @@ class DefendantNocClaimantDashboardServiceTest {
     @Test
     void shouldRecordMoveOfflineScenarioWhenOnlineEnabledWithoutActiveJudgment() {
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         PaymentDetails paymentDetails = new PaymentDetails();
         paymentDetails.setStatus(PaymentStatus.SUCCESS);
@@ -140,7 +138,6 @@ class DefendantNocClaimantDashboardServiceTest {
     @Test
     void shouldRecordMoveOfflineScenarioWhenPreviousStateNotFinalOrdersIssued() {
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         PaymentDetails paymentDetails = new PaymentDetails();
         paymentDetails.setStatus(PaymentStatus.SUCCESS);

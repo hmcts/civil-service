@@ -1089,8 +1089,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLive() {
-            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+        void shouldChangeCaseState_WhenRespondentRepaymentPlanAndJbaApplies() {
             Party party = new Party();
             party.setType(COMPANY);
             party.setCompanyName("Applicant1");
@@ -1118,8 +1117,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLiveAndLrVLr() {
-            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+        void shouldChangeCaseState_WhenRespondentRepaymentPlanAndJbaAppliesAndLrVLr() {
             CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
             ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
             ccjPaymentDetails.setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0));
@@ -1161,8 +1159,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldChangeCaseState_WhenRespondentRepaymentPlanAndFlagV2WithJudgementLiveAndLrVLrAdmissionBulk() {
-            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+        void shouldChangeCaseState_WhenRespondentRepaymentPlanAndJbaAppliesAndLrVLrAdmissionBulk() {
             CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
             ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
             ccjPaymentDetails.setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0));
@@ -1204,8 +1201,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldChangeCaseState_WhenRespondentPaymentSetByDateAndFlagV2WithJudgementLive() {
-            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+        void shouldChangeCaseState_WhenRespondentPaymentSetByDateAndJbaApplies() {
             CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
             ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
             ccjPaymentDetails.setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0));
@@ -1250,8 +1246,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldChangeCaseState_WhenRespondentPaymentImmediatelyAndFlagV2WithJudgementLive() {
-            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
+        void shouldChangeCaseState_WhenRespondentPaymentImmediatelyAndJbaApplies() {
             Party party = new Party();
             party.setType(COMPANY);
             party.setCompanyName("Applicant1");
@@ -2307,7 +2302,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void summary_when_all_finals_order_issued() {
-            given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
             CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
             ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
             ccjPaymentDetails.setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0));
@@ -3224,7 +3218,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnCorrectSummaryForAllFinalsOrderIssued() {
             final String expected = "The judgment request will be processed and a County"
                 + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Fee fee = new Fee();
             fee.setVersion("1");

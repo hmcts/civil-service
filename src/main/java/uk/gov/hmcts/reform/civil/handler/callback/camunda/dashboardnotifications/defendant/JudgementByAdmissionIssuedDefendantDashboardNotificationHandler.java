@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.callback.DashboardJudgementOnlineCallbackHandle
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
@@ -24,9 +23,8 @@ public class JudgementByAdmissionIssuedDefendantDashboardNotificationHandler ext
     public static final String TASK_ID = "GenerateDashboardNotificationJudgementByAdmissionDefendant";
 
     public JudgementByAdmissionIssuedDefendantDashboardNotificationHandler(DashboardScenariosService dashboardScenariosService,
-                                                                           DashboardNotificationsParamsMapper mapper,
-                                                                           FeatureToggleService featureToggleService) {
-        super(dashboardScenariosService, mapper, featureToggleService);
+                                                                           DashboardNotificationsParamsMapper mapper) {
+        super(dashboardScenariosService, mapper);
     }
 
     @Override

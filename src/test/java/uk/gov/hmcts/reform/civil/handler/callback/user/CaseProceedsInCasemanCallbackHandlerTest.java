@@ -17,6 +17,9 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
@@ -35,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDGMENT_REQUESTED;
 
 @ExtendWith(MockitoExtension.class)
 class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -198,5 +202,31 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("coSCApplicationStatus").isNull();
         }
+
+        @Test
+        void shouldClearPendingDefaultJudgment_whenCaseProceedsInCasemanFromJudgmentRequested() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .build().toBuilder()
+                .applicant1Represented(YesOrNo.YES)
+                .respondent1Represented(YesOrNo.NO)
+                .activeJudgment(new JudgmentDetails()
+                                    .setType(JudgmentType.DEFAULT_JUDGMENT)
+                                    .setState(JudgmentState.PENDING_ISSUE)
+                                    .setIsRegisterWithRTL(YesOrNo.NO))
+                .joState(JudgmentState.PENDING_ISSUE)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params.getRequest().getCaseDetailsBefore().setState(JUDGMENT_REQUESTED.name());
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .containsEntry("previousCCDState", JUDGMENT_REQUESTED.name())
+                .containsEntry("takenOfflineByStaffDate", takenOfflineByStaffDate.format(ISO_DATE_TIME));
+            assertThat(caseData.getActiveJudgment()).isNull();
+            assertThat(caseData.getJoState()).isNull();
+        }
+
     }
 }

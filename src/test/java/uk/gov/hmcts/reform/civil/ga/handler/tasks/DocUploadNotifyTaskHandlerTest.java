@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.search.GaEvidenceUploadNotificationSearchService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 import java.util.Map;
 import java.util.Set;
@@ -49,6 +50,7 @@ public class DocUploadNotifyTaskHandlerTest {
         EventProperties eventProperties = new EventProperties();
         eventProperties.setRetryCount(3);
         handler = new DocUploadNotifyTaskHandler(
+            new ExternalTaskCompletionService(),
             eventProperties,
             searchService,
             coreCaseDataService,

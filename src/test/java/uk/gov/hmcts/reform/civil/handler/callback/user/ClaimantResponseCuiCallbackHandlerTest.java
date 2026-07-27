@@ -59,8 +59,8 @@ import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
-import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -70,6 +70,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mockStatic;
@@ -133,7 +134,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         CaseFlagsInitialiser caseFlagsInitialiser = new CaseFlagsInitialiser(organisationService);
-        JudgementService judgementService = new JudgementService(featureToggleService, interestCalculator);
+        JudgementService judgementService = new JudgementService(interestCalculator);
         CourtLocationUtils courtLocationUtils = new CourtLocationUtils();
         UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService = new UpdateCaseManagementDetailsService(locationHelper,
                                                                                                                                locationRefDataService,
@@ -214,7 +215,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldOnlyUpdateClaimStatus_whenPartAdmitNotSettled_NoMediation() {
-            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+            given(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString(), anyString()))
                 .willReturn(getSampleCourLocationsRefObject());
             Applicant1DQ applicant1DQ = new Applicant1DQ()
                 .setApplicant1DQRequestedCourt(
@@ -435,7 +436,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateCaseManagementLocationForFlightDelayClaimSpecificAirline() {
-            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+            given(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString(), anyString()))
                 .willReturn(getSampleCourLocationsRefObject());
             when(airlineEpimsService.getEpimsIdForAirlineIgnoreCase("Sri Lankan")).thenReturn("111");
             CaseData caseData = CaseDataBuilder.builder()
@@ -455,7 +456,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateCaseManagementLocationForFlightDelayClaimInvalidAirline() {
-            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+            given(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString(), anyString()))
                 .willReturn(getSampleCourLocationsRefObject());
             when(airlineEpimsService.getEpimsIdForAirlineIgnoreCase("INVALID_AIRLINE")).thenReturn(null);
             CaseData caseData = CaseDataBuilder.builder()
@@ -536,7 +537,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetSettlementAgreementDeadLine_whenClaimantSignedSettlementAgreement() {
-            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+            given(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString(), anyString()))
                 .willReturn(getSampleCourLocationsRefObject());
             given(deadlinesCalculator.getRespondToSettlementAgreementDeadline(any())).willReturn(LocalDateTime.MAX);
             CaseData caseData = CaseDataBuilder.builder()
@@ -557,8 +558,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldAddActiveJudgmentWhenClaimantAcceptedRepaymentPlanAndJudgmentOnlineLiveEnabled() {
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        void shouldAddActiveJudgmentWhenClaimantAcceptedRepaymentPlan() {
             JudgmentDetails activeJudgment = new JudgmentDetails()
                 .setTotalAmount("10100.00")
                 .setClaimFeeAmount("100.00")

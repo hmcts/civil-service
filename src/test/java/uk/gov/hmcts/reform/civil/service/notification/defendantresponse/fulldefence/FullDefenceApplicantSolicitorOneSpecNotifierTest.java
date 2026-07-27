@@ -128,7 +128,7 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
             .build();
         caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
 
-        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
+        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA()).thenReturn("templateImm-id");
 
         notifier.notifySolicitorForDefendantResponse(caseData);
 
@@ -161,7 +161,7 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
             .build();
         caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
 
-        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
+        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA()).thenReturn("templateImm-id");
 
         notifier.notifySolicitorForDefendantResponse(caseData);
 
@@ -348,7 +348,7 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
             .build();
         caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
 
-        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
+        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA()).thenReturn("templateImm-id");
 
         notifier.notifySolicitorForDefendantResponse(caseData);
 
@@ -365,7 +365,7 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
     }
 
     @Test
-    void shouldNotifyApplicantSolicitorSpecImmediately_whenInvoked_JudgmentOnlineFlagEnabled() {
+    void shouldNotifyApplicantSolicitorSpecImmediatelyWithJbaTemplate_whenInvoked() {
 
         LocalDate whenWillPay = LocalDate.now().plusMonths(1);
         CaseData caseData = CaseDataBuilder.builder()
@@ -380,7 +380,6 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
             )
             .build();
         caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA()).thenReturn("templateImm-id-jo");
 
         notifier.notifySolicitorForDefendantResponse(caseData);

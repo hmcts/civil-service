@@ -77,7 +77,11 @@ public class DashboardNotificationHelper {
         return simpleStateFlowEngine.evaluate(caseData).isFlagSet(FlowFlag.DASHBOARD_SERVICE_ENABLED);
     }
 
-    public boolean isOrderMadeFastTrackTrialNotResponded(CaseData caseData) {
+    public boolean isOrderMadeFastTrackTrialNotRespondedDefendant(CaseData caseData) {
+        return sdoCaseClassificationService.isFastTrack(caseData) && isNull(caseData.getTrialReadyRespondent1());
+    }
+
+    public boolean isOrderMadeFastTrackTrialNotRespondedClaimant(CaseData caseData) {
         return sdoCaseClassificationService.isFastTrack(caseData) && isNull(caseData.getTrialReadyApplicant());
     }
 

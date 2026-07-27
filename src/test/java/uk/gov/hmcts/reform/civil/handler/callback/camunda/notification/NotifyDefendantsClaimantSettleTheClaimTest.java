@@ -38,6 +38,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_CLAIMANT_SETTLE_THE_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.dq.Language.WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_16_DIGIT_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
@@ -83,6 +84,7 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
         private static final String DEFENDANT_PARTY_NAME = "ABC ABC";
         private static final String REFERENCE_NUMBER = "8372942374";
         private static final String EMAIL_TEMPLATE = "test-notification-id";
+        private static final String EMAIL_TEMPLATE_WELSH = "test-notification-welsh-id";
         private static final String EMAIL_TEMPLATE_LR = "test-notification-lr-id";
         private static final String CLAIMANT_ORG_NAME = "Org Name";
 
@@ -136,6 +138,37 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(HMCTS_SIGNATURE, configuration.getHmctsSignature());
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(CNBC_CONTACT, configuration.getCnbcContact());
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        }
+
+        @Test
+        void shouldSendWelshNotificationToDefendantLip_whenClaimantBilingual() {
+            given(notificationsProperties.getNotifyDefendantLIPClaimantSettleTheClaimTemplateWelsh())
+                .willReturn(EMAIL_TEMPLATE_WELSH);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+
+            CaseData caseData = CaseData.builder()
+                .respondent1(new Party().setType(Party.Type.COMPANY).setCompanyName(DEFENDANT_PARTY_NAME).setPartyEmail(
+                    DEFENDANT_LIP_EMAIL_ADDRESS))
+                .applicant1(new Party().setType(Party.Type.COMPANY).setCompanyName(CLAIMANT_ORG_NAME))
+                .legacyCaseReference(REFERENCE_NUMBER)
+                .claimantBilingualLanguagePreference(WELSH.toString())
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_CLAIMANT_SETTLE_THE_CLAIM.name()).build()).build();
+            notificationHandler.handle(params);
+
+            verify(notificationService, times(1)).sendMail(targetEmail.capture(),
+                                                           emailTemplate.capture(),
+                                                           notificationDataMap.capture(),
+                                                           reference.capture()
+            );
+            assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_LIP_EMAIL_ADDRESS);
+            assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE_WELSH);
         }
 
         @ParameterizedTest

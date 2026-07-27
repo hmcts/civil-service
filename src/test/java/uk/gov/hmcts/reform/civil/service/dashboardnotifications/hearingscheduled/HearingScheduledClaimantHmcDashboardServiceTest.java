@@ -7,7 +7,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -18,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
@@ -26,8 +26,6 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
-
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -81,7 +79,7 @@ class HearingScheduledClaimantHmcDashboardServiceTest {
         locationRefData.setPostcode("Postcode");
 
         List<LocationRefData> locations = List.of(locationRefData);
-        when(locationRefDataService.getHearingCourtLocations(AUTH_TOKEN)).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(AUTH_TOKEN, "AAA7")).thenReturn(locations);
         when(courtLocationUtils.fillPreferredLocationData(locations, hearingLocation)).thenReturn(locationRefData);
 
         service.notifyHearingScheduled(caseData, AUTH_TOKEN);
@@ -252,7 +250,7 @@ class HearingScheduledClaimantHmcDashboardServiceTest {
     @Test
     void shouldNotPopulateCourtName_whenLocationRefDataIsNull() {
         CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted().build();
-        when(locationRefDataService.getHearingCourtLocations(AUTH_TOKEN)).thenReturn(List.of());
+        when(locationRefDataService.getHearingCourtLocations(AUTH_TOKEN, "AAA7")).thenReturn(List.of());
         when(courtLocationUtils.fillPreferredLocationData(any(), any())).thenReturn(null);
 
         service.notifyHearingScheduled(caseData, AUTH_TOKEN);

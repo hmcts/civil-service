@@ -41,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenari
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.MarkPaidInFullUtil.checkMarkPaidInFull;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Component
 public class CaseEventTaskHandler extends BaseExternalTaskHandler {
@@ -52,6 +53,7 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
     private final RoboticsEventTextFormatter textFormatter;
 
     public CaseEventTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         CoreCaseDataService coreCaseDataService,
         CaseDetailsConverter caseDetailsConverter,
@@ -59,7 +61,7 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
         IStateFlowEngine stateFlowEngine,
         RoboticsEventTextFormatter textFormatter
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.coreCaseDataService = coreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;
         this.mapper = mapper;

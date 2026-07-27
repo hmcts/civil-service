@@ -12,9 +12,9 @@ import java.util.List;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDGMENT_REQUESTED;
 
 @Service
 @Slf4j
@@ -31,14 +31,14 @@ public class CaseDismissedSearchService extends ElasticSearchService {
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(rangeQuery("data.claimDetailsNotificationDeadline").lt(timeNow))
-                            .must(beState(AWAITING_CASE_DETAILS_NOTIFICATION)))
-                .should(boolQuery()
                             .must(rangeQuery("data.claimNotificationDeadline").lt(timeNow))
                             .must(beState(CASE_ISSUED)))
                 .should(boolQuery()
                             .must(rangeQuery("data.claimDismissedDeadline").lt(timeNow))
-                            .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))),
+                            .must(boolQuery()
+                                      .minimumShouldMatch(1)
+                                      .should(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
+                                      .should(beState(JUDGMENT_REQUESTED)))),
             List.of("reference"),
             startIndex
         );

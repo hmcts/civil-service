@@ -1,0 +1,175 @@
+package uk.gov.hmcts.reform.civil.handler.migration;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardNotificationTaskCaseReference;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardCaseType;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardNotificationRegistry;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardWorkflowTask;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.UserService;
+
+import jakarta.persistence.EntityManager;
+import java.util.List;
+import java.util.Map;
+
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
+
+@Component
+@Slf4j
+public class RetriggerDashboardNotificationTask extends MigrationTask<DashboardNotificationTaskCaseReference> {
+
+    private final DashboardNotificationRegistry registry;
+    private final UserService userService;
+    private final SystemUpdateUserConfiguration userConfig;
+    private final PlatformTransactionManager transactionManager;
+    private final EntityManager entityManager;
+
+    public RetriggerDashboardNotificationTask(
+        DashboardNotificationRegistry registry,
+        UserService userService,
+        SystemUpdateUserConfiguration userConfig,
+        PlatformTransactionManager transactionManager,
+        EntityManager entityManager
+    ) {
+        super(DashboardNotificationTaskCaseReference.class);
+        this.registry = registry;
+        this.userService = userService;
+        this.userConfig = userConfig;
+        this.transactionManager = transactionManager;
+        this.entityManager = entityManager;
+    }
+
+    @Override
+    @SuppressWarnings("java:S4144")
+    protected String getEventSummary() {
+        return "Retrigger dashboard notification task via Migration Task";
+    }
+
+    @Override
+    @SuppressWarnings("java:S4144")
+    protected String getTaskName() {
+        return "RetriggerDashboardNotificationTask";
+    }
+
+    @Override
+    @SuppressWarnings("java:S4144")
+    protected String getEventDescription() {
+        return "This task runs the dashboard notification workflow for a Camunda dashboard task id";
+    }
+
+    @Override
+    protected CaseData migrateCaseData(CaseData caseData, DashboardNotificationTaskCaseReference dashboardReference) {
+        if (dashboardReference == null
+            || StringUtils.isBlank(dashboardReference.getCaseReference())
+            || StringUtils.isBlank(dashboardReference.getDashboardTaskId())) {
+            throw new IllegalArgumentException("Case reference and dashboardTaskId must not be blank");
+        }
+
+        CaseData dashboardCaseData = caseData.toBuilder().build();
+        dashboardCaseData.setBusinessProcess(businessProcessForDashboardTask(caseData, dashboardReference));
+
+        String dashboardTaskId = dashboardReference.getDashboardTaskId();
+        DashboardCaseType dashboardCaseType = dashboardCaseType(dashboardReference);
+        List<DashboardWorkflowTask> workflows = registry.workflowsFor(dashboardTaskId, dashboardCaseType);
+
+        if (workflows.isEmpty()) {
+            throw new IllegalArgumentException("No dashboard notification handlers registered for: " + dashboardTaskId);
+        }
+
+        String authToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        DashboardTaskContext context = DashboardTaskContext.from(new CallbackParams()
+            .caseData(dashboardCaseData)
+            .isCivilCaseType(dashboardCaseType == DashboardCaseType.CIVIL)
+            .isGeneralApplicationCaseType(dashboardCaseType == DashboardCaseType.GENERAL_APPLICATION)
+            .params(Map.of(BEARER_TOKEN, authToken)));
+
+        log.info("Retriggering dashboard task {} for case {}", dashboardTaskId, dashboardReference.getCaseReference());
+        new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
+            entityManager.joinTransaction();
+            workflows.forEach(task -> task.execute(context));
+            entityManager.flush();
+        });
+        return caseData;
+    }
+
+    @Override
+    protected CaseData migrateGeneralApplicationCaseData(
+        CaseData caseData,
+        GeneralApplicationCaseData gaCaseData,
+        DashboardNotificationTaskCaseReference dashboardReference
+    ) {
+        validateDashboardReference(dashboardReference);
+
+        GeneralApplicationCaseData dashboardCaseData = gaCaseData.copy();
+        dashboardCaseData.businessProcess(businessProcessForDashboardTask(gaCaseData.getBusinessProcess(), dashboardReference));
+
+        String dashboardTaskId = dashboardReference.getDashboardTaskId();
+        List<DashboardWorkflowTask> workflows = registry.workflowsFor(dashboardTaskId, DashboardCaseType.GENERAL_APPLICATION);
+
+        if (workflows.isEmpty()) {
+            throw new IllegalArgumentException("No dashboard notification handlers registered for: " + dashboardTaskId);
+        }
+
+        String authToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        DashboardTaskContext context = DashboardTaskContext.from(new CallbackParams()
+            .caseData(dashboardCaseData)
+            .isCivilCaseType(false)
+            .isGeneralApplicationCaseType(true)
+            .params(Map.of(BEARER_TOKEN, authToken)));
+
+        log.info("Retriggering GA dashboard task {} for case {}", dashboardTaskId, dashboardReference.getCaseReference());
+        new TransactionTemplate(transactionManager).executeWithoutResult(status -> {
+            entityManager.joinTransaction();
+            workflows.forEach(task -> task.execute(context));
+            entityManager.flush();
+        });
+        return caseData;
+    }
+
+    private void validateDashboardReference(DashboardNotificationTaskCaseReference dashboardReference) {
+        if (dashboardReference == null
+            || StringUtils.isBlank(dashboardReference.getCaseReference())
+            || StringUtils.isBlank(dashboardReference.getDashboardTaskId())) {
+            throw new IllegalArgumentException("Case reference and dashboardTaskId must not be blank");
+        }
+    }
+
+    private BusinessProcess businessProcessForDashboardTask(
+        CaseData caseData,
+        DashboardNotificationTaskCaseReference caseReference
+    ) {
+        return businessProcessForDashboardTask(caseData.getBusinessProcess(), caseReference);
+    }
+
+    private BusinessProcess businessProcessForDashboardTask(
+        BusinessProcess existingBusinessProcess,
+        DashboardNotificationTaskCaseReference caseReference
+    ) {
+        BusinessProcess businessProcess = existingBusinessProcess != null
+            ? existingBusinessProcess.copy()
+            : new BusinessProcess();
+
+        businessProcess.updateActivityId(caseReference.getDashboardTaskId());
+        if (StringUtils.isNotBlank(caseReference.getDashboardProcessInstanceId())) {
+            businessProcess.updateProcessInstanceId(caseReference.getDashboardProcessInstanceId());
+        }
+
+        return businessProcess;
+    }
+
+    private DashboardCaseType dashboardCaseType(DashboardNotificationTaskCaseReference dashboardReference) {
+        if (StringUtils.isBlank(dashboardReference.getDashboardCaseType())) {
+            return DashboardCaseType.CIVIL;
+        }
+        return DashboardCaseType.valueOf(dashboardReference.getDashboardCaseType().trim());
+    }
+}

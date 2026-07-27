@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.DefendantAddressValidator
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -242,14 +243,17 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse validateRepaymentPlan(RepaymentPlanLRspec repaymentPlan) {
-        List<String> errors;
+        List<String> errors = new ArrayList<>();
 
-        if (repaymentPlan != null
-                && repaymentPlan.getFirstRepaymentDate() != null) {
-            errors = unavailableDateValidator.validateFuturePaymentDate(repaymentPlan
-                    .getFirstRepaymentDate());
-        } else {
-            errors = new ArrayList<>();
+        if (repaymentPlan != null) {
+            if (repaymentPlan.getFirstRepaymentDate() != null) {
+                errors.addAll(unavailableDateValidator.validateFuturePaymentDate(repaymentPlan
+                                                                                    .getFirstRepaymentDate()));
+            }
+            if (repaymentPlan.getPaymentAmount() != null
+                && repaymentPlan.getPaymentAmount().compareTo(BigDecimal.ZERO) <= 0) {
+                errors.add("Regular payment amount must be greater than £0");
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

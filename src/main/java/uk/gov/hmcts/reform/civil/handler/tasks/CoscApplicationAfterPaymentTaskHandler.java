@@ -21,6 +21,7 @@ import java.util.Objects;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataContentFromStartEventResponse;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Component
 public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHandler {
@@ -30,12 +31,13 @@ public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHand
     private final IStateFlowEngine stateFlowEngine;
 
     public CoscApplicationAfterPaymentTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         CoreCaseDataService coreCaseDataService,
         ObjectMapper mapper,
         IStateFlowEngine stateFlowEngine
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.coreCaseDataService = coreCaseDataService;
         this.mapper = mapper;
         this.stateFlowEngine = stateFlowEngine;

@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.validation.PartyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
@@ -39,7 +38,6 @@ public class ShowWarningTask {
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper objectMapper;
     private final PartyValidator partyValidator;
-    private final FeatureToggleService featureToggleService;
     private final PostcodeValidator postcodeValidator;
     private static final String CHECK_LITIGATION_FRIEND_ERROR_TITLE = "Check the litigation friend's details";
     private static final String CHECK_LITIGATION_FRIEND_ERROR = "After making these changes, please ensure that the "
@@ -48,12 +46,11 @@ public class ShowWarningTask {
         + "If the parties are using the same litigation friend you must update the other litigation friend's details too.";
 
     public ShowWarningTask(CaseDetailsConverter caseDetailsConverter, ObjectMapper objectMapper,
-                           PartyValidator partyValidator, FeatureToggleService featureToggleService,
+                           PartyValidator partyValidator,
                            PostcodeValidator postcodeValidator) {
         this.caseDetailsConverter = caseDetailsConverter;
         this.objectMapper = objectMapper;
         this.partyValidator = partyValidator;
-        this.featureToggleService = featureToggleService;
         this.postcodeValidator = postcodeValidator;
     }
 
@@ -72,14 +69,12 @@ public class ShowWarningTask {
 
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             errors = postcodeValidator.validate(getPostCode(partyChosen, caseData));
-            if (featureToggleService.isJudgmentOnlineLive()) {
-                Party partyDetails = getPartyDetails(partyChosen, caseData);
-                if (partyDetails != null  && partyDetails.getPrimaryAddress() != null) {
-                    errors = partyValidator.validateAddress(partyDetails.getPrimaryAddress(), errors);
-                }
-                if (partyDetails != null && partyDetails.getPartyName() != null) {
-                    errors = partyValidator.validateName(partyDetails.getPartyName(), errors);
-                }
+            Party partyDetails = getPartyDetails(partyChosen, caseData);
+            if (partyDetails != null  && partyDetails.getPrimaryAddress() != null) {
+                errors = partyValidator.validateAddress(partyDetails.getPrimaryAddress(), errors);
+            }
+            if (partyDetails != null && partyDetails.getPartyName() != null) {
+                errors = partyValidator.validateName(partyDetails.getPartyName(), errors);
             }
         }
 

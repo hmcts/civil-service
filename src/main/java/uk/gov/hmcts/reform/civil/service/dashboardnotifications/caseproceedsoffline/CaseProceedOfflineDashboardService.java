@@ -15,6 +15,7 @@ public abstract class CaseProceedOfflineDashboardService extends DashboardScenar
     private static final List<CaseState> CASE_PROCEEDS_IN_CASEMAN_STATES = List.of(
         CaseState.AWAITING_APPLICANT_INTENTION,
         CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
+        CaseState.JUDGMENT_REQUESTED,
         CaseState.IN_MEDIATION,
         CaseState.JUDICIAL_REFERRAL
     );

@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormBuilder;
@@ -95,9 +94,6 @@ class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
 
     @MockBean
     private InterestCalculator interestCalculator;
-
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @MockBean
     private CivilStitchService civilStitchService;
@@ -255,7 +251,6 @@ class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
 
     @Test
     void shouldGenerateClaimantDocsNonDivergentWelsh_whenValidDataIsProvidedLip() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121_SPEC_CLAIMANT)))
             .thenReturn(new DocmosisDocument(N121_SPEC_CLAIMANT.getDocumentTitle(), bytes));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121_SPEC_CLAIMANT_WELSH)))

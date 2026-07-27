@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -55,9 +54,6 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     public static final String TASK_ID = "GenerateDashboardNotificationJudgementByAdmissionDefendant";
 
     HashMap<String, Object> params = new HashMap<>();
@@ -83,7 +79,6 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
     void shouldCreateDashboardNotifications_whenDashboardIsEnabled() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         JudgmentInstalmentDetails instalmentDetails = new JudgmentInstalmentDetails();
@@ -125,7 +120,6 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
     void shouldCreateDashboardNotificationsWhenPaymentPlanAcceptedAndCCJ() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -153,7 +147,6 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
     void shouldNotCreateDashboardNotificationsWhenRespondentIsNotLip() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -180,7 +173,6 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
     void shouldCreateDashboardNotifications_WhenLipvsLipIndividualOrSoleTraderWithJoIssued() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         DynamicListElement dynamicListElement = new DynamicListElement();
@@ -221,7 +213,6 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
     void shouldCreateDashboardNotifications_WhenLipvsLipCompanyOrOrganisationWithRepaymentPlanAccepted() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         DynamicListElement dynamicListElement = new DynamicListElement();

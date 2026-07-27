@@ -39,7 +39,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT_CARM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_CLAIMANT_REJECTS_DEF_PLAN_CLAIMANT_DISAGREES_COURT_PLAN_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_ACCEPTS_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT;
@@ -115,7 +114,6 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
             .or(() -> tryJudicialReferral(caseData))
             .or(() -> tryInMediation(caseData))
             .or(() -> tryClaimantRejectRepaymentPlan(caseData))
-            .or(() -> tryLrvLipPartFullAdmitAndPayByPlan(caseData))
             .or(() -> tryLrvLipFullDefenceNotProceed(caseData))
             .or(() -> tryCaseStayed(caseData))
             .orElse(null);
@@ -187,12 +185,6 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
             : Optional.empty();
     }
 
-    private Optional<String> tryLrvLipPartFullAdmitAndPayByPlan(CaseData caseData) {
-        return isLrvLipPartFullAdmitAndPayByPlan(caseData)
-            ? Optional.of(SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario())
-            : Optional.empty();
-    }
-
     private Optional<String> tryLrvLipFullDefenceNotProceed(CaseData caseData) {
         return isLrvLipFullDefenceNotProceed(caseData)
             ? Optional.of(SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario())
@@ -243,8 +235,7 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
     }
 
     private boolean isLrvLipFullAdmitImmediatePayClaimSettled(CaseData caseData) {
-        return getFeatureToggleService().isJudgmentOnlineLive()
-            && !caseData.isApplicantLiP()
+        return !caseData.isApplicantLiP()
             && caseData.isFullAdmitPayImmediatelyClaimSpec()
             && caseData.getApplicant1ProceedWithClaim() == null;
     }
@@ -261,13 +252,6 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
             && (caseData.isLRvLipOneVOne()
                     || (caseData.getRespondent1() != null && caseData.getRespondent1().isCompanyOROrganisation()))
             && caseData.hasApplicantRejectedRepaymentPlan());
-    }
-
-    private boolean isLrvLipPartFullAdmitAndPayByPlan(CaseData caseData) {
-        return !getFeatureToggleService().isJudgmentOnlineLive()
-            && !caseData.isApplicantLiP()
-            && caseData.hasApplicantAcceptedRepaymentPlan()
-            && caseData.isCcjRequestJudgmentByAdmission();
     }
 
     private boolean isLrvLipFullDefenceNotProceed(CaseData caseData) {

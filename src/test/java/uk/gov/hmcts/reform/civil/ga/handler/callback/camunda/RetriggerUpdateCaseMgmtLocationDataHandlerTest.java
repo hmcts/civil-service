@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -27,6 +28,7 @@ class RetriggerUpdateCaseMgmtLocationDataHandlerTest {
     @BeforeEach
     void setUp() {
         handler = new RetriggerUpdateCaseMgmtLocationDataHandler(
+            new ExternalTaskCompletionService(),
             new EventProperties(),
             coreCaseDataService
         );

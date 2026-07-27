@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,8 +32,6 @@ public class NotifySetAsideJudgementErrorScenarioTest extends DashboardBaseInteg
             .applicant1Represented(YesOrNo.NO)
             .joSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR)
             .build();
-
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         handler.handle(callbackParams(caseData));
 

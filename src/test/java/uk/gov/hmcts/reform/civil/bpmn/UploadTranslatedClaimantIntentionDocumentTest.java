@@ -119,8 +119,7 @@ public class UploadTranslatedClaimantIntentionDocumentTest extends BpmnBaseTest 
         ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
         VariableMap variables = Variables.createVariables();
         variables.putValue("flowState", "MAIN.FULL_ADMIT_AGREE_REPAYMENT");
-        variables.put(FLOW_FLAGS, Map.of("LIP_JUDGMENT_ADMISSION", true,
-                                         "JO_ONLINE_LIVE_ENABLED", false));
+        variables.put(FLOW_FLAGS, Map.of("LIP_JUDGMENT_ADMISSION", true));
         assertCompleteExternalTask(
             startBusiness,
             START_BUSINESS_TOPIC,
@@ -147,21 +146,38 @@ public class UploadTranslatedClaimantIntentionDocumentTest extends BpmnBaseTest 
             CLAIMANT_CONFIRMS_PROCEED_NOTIFY_PARTIES_ACTIVITY_ID
         );
 
-        //complete the state change task
-        ExternalTask proceedCaseOffline = assertNextExternalTask(PROCESS_CASE_EVENT);
+        ExternalTask updateClaimStateTask = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(
-            proceedCaseOffline,
+            updateClaimStateTask,
             PROCESS_CASE_EVENT,
-            PROCEED_OFFLINE_EVENT,
-            PROCEED_OFFLINE_EVENT_ACTIVITY_ID
+            UPDATE_CLAIM_STATE_EVENT,
+            UPDATE_CLAIMANT_CLAIM_STATE_ACTIVITY_ID
         );
 
-        ExternalTask notifyRPA = assertNextExternalTask(PROCESS_CASE_EVENT);
+        ExternalTask generateJudgmentByAdmissionClaimantDocument = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(
-            notifyRPA,
+            generateJudgmentByAdmissionClaimantDocument,
             PROCESS_CASE_EVENT,
-            NOTIFY_RPA_ON_CASE_HANDED_OFFLINE,
-            NOTIFY_RPA_ON_CASE_HANDED_OFFLINE_ACTIVITY_ID
+            GEN_JUDGMENT_BY_ADMISSION_DOC_CLAIMANT_EVENT,
+            GENERATE_JUDGMENT_BY_ADMISSION_DOC_CLAIMANT_ACTIVITY_ID
+        );
+
+        ExternalTask generateJudgmentByAdmissionDefendantDocument = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            generateJudgmentByAdmissionDefendantDocument,
+            PROCESS_CASE_EVENT,
+            GEN_JUDGMENT_BY_ADMISSION_DOC_DEFENDANT_EVENT,
+            GENERATE_JUDGMENT_BY_ADMISSION_DOC_DEFENDANT_ACTIVITY_ID
+        );
+
+        postClaimantLipJbaLetter();
+
+        ExternalTask pinAndPostLetter = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            pinAndPostLetter,
+            PROCESS_CASE_EVENT,
+            JUDGMENT_BY_ADMISSION_DEFENDANT1_PIN_IN_LETTER_EVENT_ID,
+            JUDGMENT_BY_ADMISSION_DEFENDANT1_PIN_IN_LETTER_ACTIVITY_ID
         );
 
         ExternalTask dashboardNotificationsTask = assertNextExternalTask(PROCESS_CASE_EVENT);
@@ -251,7 +267,7 @@ public class UploadTranslatedClaimantIntentionDocumentTest extends BpmnBaseTest 
 
     @ParameterizedTest
     @CsvSource({"true, true", "false, false"})
-    void  shouldRunProcessWhenJudgementOnlineLiveEnabled(boolean isRpaLiveFeed, boolean isCjesServiceEnabled) {
+    void shouldRunProcessWhenJudgmentByAdmissionApplies(boolean isRpaLiveFeed, boolean isCjesServiceEnabled) {
         //assert process has started
         assertFalse(processInstance.isEnded());
         //complete the start business process
@@ -259,7 +275,6 @@ public class UploadTranslatedClaimantIntentionDocumentTest extends BpmnBaseTest 
         VariableMap variables = Variables.createVariables();
         variables.putValue("flowState", "MAIN.FULL_ADMIT_AGREE_REPAYMENT");
         variables.put(FLOW_FLAGS, Map.of("LIP_JUDGMENT_ADMISSION", true,
-                                         "JO_ONLINE_LIVE_ENABLED", true,
                                          IS_JO_LIVE_FEED_ACTIVE, isRpaLiveFeed,
                                          IS_CJES_SERVICE_ENABLED, isCjesServiceEnabled));
         assertCompleteExternalTask(

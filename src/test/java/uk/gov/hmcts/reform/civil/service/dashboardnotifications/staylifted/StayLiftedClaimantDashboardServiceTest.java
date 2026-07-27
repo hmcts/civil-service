@@ -22,14 +22,17 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDGMENT_REQUESTED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_FEE_PAID_TASK;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_AVAILABLE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_DEADLINE_PASSED_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
 class StayLiftedClaimantDashboardServiceTest {
@@ -70,7 +73,7 @@ class StayLiftedClaimantDashboardServiceTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         caseData.setApplicant1Represented(YesOrNo.NO);
-        caseData.setPreStayState("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
+        caseData.setPreStayState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT.toString());
 
         stayLiftedClaimantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
 
@@ -91,6 +94,21 @@ class StayLiftedClaimantDashboardServiceTest {
         verifyRecordedScenarios(List.of(
             SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(),
             SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_CLAIMANT.getScenario()
+        ));
+    }
+
+    @Test
+    void shouldRecordExtraScenarios_forJudgmentRequested() {
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setPreStayState(JUDGMENT_REQUESTED.toString());
+
+        stayLiftedClaimantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
+
+        verifyRecordedScenarios(List.of(
+            SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(),
+            SCENARIO_AAA6_DEFENDANT_RESPONSE_DEADLINE_PASSED_CLAIMANT.getScenario()
         ));
     }
 

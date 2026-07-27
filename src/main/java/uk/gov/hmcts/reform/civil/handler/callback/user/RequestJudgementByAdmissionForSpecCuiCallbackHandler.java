@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -55,7 +54,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private final ObjectMapper objectMapper;
     private final JudgementService judgementService;
     private final CaseDetailsConverter caseDetailsConverter;
-    private final FeatureToggleService featureToggleService;
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
     private final InterestCalculator interestCalculator;
     private final Time time;
@@ -87,8 +85,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
                 null);
         final boolean judgementNotAllowed =
             caseData.isJudgementDateNotPermitted()
-                || (featureToggleService.isJudgmentOnlineLive()
-                && whenWillThisAmountBePaid != null
+                || (whenWillThisAmountBePaid != null
                 && caseData.isDateAfterToday(whenWillThisAmountBePaid)
                 && caseData.isPartAdmitPayImmediatelyClaimSpec());
 
@@ -143,13 +140,11 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         CaseData data = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
         logCcjPaymentDetails(data);
 
-        log.info("isJudgmentOnlineLive: {}", featureToggleService.isJudgmentOnlineLive());
         log.info("isOneVOne: {}", isOneVOne(data));
         log.info("isPayImmediately: {}", data.isPayImmediately());
         String nextState;
         BusinessProcess businessProcess;
-        if (featureToggleService.isJudgmentOnlineLive()
-            && (isOneVOne(data))
+        if ((isOneVOne(data))
             && data.isPayImmediately()) {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
@@ -164,19 +159,17 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         data.setBusinessProcess(businessProcess);
         data.setCcjPaymentDetails(ccjPaymentDetails);
 
-        if (featureToggleService.isJudgmentOnlineLive()) {
-            JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(data);
+        JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(data);
 
-            BigDecimal interest = interestCalculator.calculateInterest(data);
+        BigDecimal interest = interestCalculator.calculateInterest(data);
 
-            String joSummaryObject = data.isLipvLipOneVOne() ? JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
-                activeJudgment, true) : getJudgmentRepaymentSummaryObject(data, interest, activeJudgment);
+        String joSummaryObject = data.isLipvLipOneVOne() ? JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
+            activeJudgment, true) : getJudgmentRepaymentSummaryObject(data, interest, activeJudgment);
 
-            data.setActiveJudgment(activeJudgment);
-            data.setJoIsLiveJudgmentExists(YesOrNo.YES);
-            data.setJoRepaymentSummaryObject(joSummaryObject);
-            data.setJoJudgementByAdmissionIssueDate(time.now());
-        }
+        data.setActiveJudgment(activeJudgment);
+        data.setJoIsLiveJudgmentExists(YesOrNo.YES);
+        data.setJoRepaymentSummaryObject(joSummaryObject);
+        data.setJoJudgementByAdmissionIssueDate(time.now());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(data.toMap(objectMapper))

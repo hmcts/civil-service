@@ -17,6 +17,7 @@ import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
@@ -28,12 +29,13 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantHandler extends BaseEx
     private final CoreCaseDataService coreCaseDataService;
 
     public FullAdmitPayImmediatelyNoPaymentFromDefendantHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService caseSearchService,
         ApplicationEventPublisher applicationEventPublisher,
         CoreCaseDataService coreCaseDataService
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.caseSearchService = caseSearchService;
         this.applicationEventPublisher = applicationEventPublisher;
         this.coreCaseDataService = coreCaseDataService;

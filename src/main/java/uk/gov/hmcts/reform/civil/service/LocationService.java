@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 
 @Service
 @RequiredArgsConstructor
@@ -62,7 +63,7 @@ public class LocationService {
             courtLocation = assignCaseManagementLocationToMainCaseLocation(caseData, authToken);
             return Pair.of(courtLocation, true);
         } else {
-            LocationRefData cnbcLocation = locationRefDataService.getCnbcLocation(authToken);
+            LocationRefData cnbcLocation = locationRefDataService.getCnbcLocation(authToken, getCaseServiceId(caseData.getCaseAccessCategory()));
             courtLocation = new CaseLocationCivil();
             courtLocation.setRegion(cnbcLocation.getRegionId());
             courtLocation.setBaseLocation(cnbcLocation.getEpimmsId());
@@ -82,10 +83,14 @@ public class LocationService {
 
     }
 
-    public LocationRefData getWorkAllocationLocationDetails(String baseLocation, String authToken) {
-        List<LocationRefData> locationDetails = locationRefDataService.getCourtLocationsByEpimmsId(authToken, baseLocation);
+    public LocationRefData getWorkAllocationLocationDetails(String baseLocation, String authToken, String serviceId) {
+        List<LocationRefData> locationDetails = locationRefDataService.getCourtLocationsByEpimmsId(
+            authToken,
+            baseLocation,
+            serviceId
+        );
         if (locationDetails != null && !locationDetails.isEmpty()) {
-            return locationDetails.get(0);
+            return locationDetails.getFirst();
         } else {
             return new LocationRefData();
         }
@@ -112,7 +117,11 @@ public class LocationService {
         log.info("Case managementLocation region {} and base Location {} caseId {}", region, epimmsId, caseRef);
 
         List<LocationRefData> locationRefDataList =
-            locationRefDataService.getCourtLocationsByEpimmsIdWithCML(authToken, epimmsId);
+            locationRefDataService.getCourtLocationsByEpimmsIdWithCML(
+                authToken,
+                epimmsId,
+                getCaseServiceId(caseData.getCaseAccessCategory())
+            );
 
         log.info("CML court locations found : {} for caseId {}",
                  locationRefDataList, caseData.getCcdCaseReference());
@@ -124,7 +133,7 @@ public class LocationService {
             ));
         }
 
-        LocationRefData caseManagementLocationDetails = locationRefDataList.get(0);
+        LocationRefData caseManagementLocationDetails = locationRefDataList.getFirst();
 
         CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
         caseLocationCivil.setRegion(caseManagementLocationDetails.getRegionId());

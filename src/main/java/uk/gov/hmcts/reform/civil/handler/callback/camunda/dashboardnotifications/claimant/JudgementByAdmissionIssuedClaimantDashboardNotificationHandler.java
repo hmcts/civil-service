@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
@@ -24,9 +23,8 @@ public class JudgementByAdmissionIssuedClaimantDashboardNotificationHandler exte
     public static final String TASK_ID = "GenerateDashboardNotificationJudgementByAdmissionClaimant";
 
     public JudgementByAdmissionIssuedClaimantDashboardNotificationHandler(DashboardScenariosService dashboardScenariosService,
-                                                                          DashboardNotificationsParamsMapper mapper,
-                                                                          FeatureToggleService featureToggleService) {
-        super(dashboardScenariosService, mapper, featureToggleService);
+                                                                          DashboardNotificationsParamsMapper mapper) {
+        super(dashboardScenariosService, mapper);
     }
 
     @Override
@@ -56,8 +54,7 @@ public class JudgementByAdmissionIssuedClaimantDashboardNotificationHandler exte
     }
 
     private boolean isActiveJudgmentExist(CaseData caseData) {
-        return (featureToggleService.isJudgmentOnlineLive()
-            && caseData.getActiveJudgment() != null
+        return (caseData.getActiveJudgment() != null
             && JudgmentState.ISSUED.equals(caseData.getActiveJudgment().getState())
             && JudgmentType.JUDGMENT_BY_ADMISSION.equals(caseData.getActiveJudgment().getType()));
     }

@@ -338,7 +338,6 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldRecordDefendantNocMovesOfflineScenarioWhenDefendantNocOnlineAndActiveJO() {
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
             when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().build();

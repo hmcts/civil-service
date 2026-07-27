@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.util.stream.Stream;
@@ -49,9 +48,6 @@ public class ManageStayCallbackHandlerTest {
     private ManageStayCallbackHandler handler;
 
     @Mock
-    private FeatureToggleService featureToggleService;
-
-    @Mock
     private DeadlinesCalculator deadlinesCalculator;
 
     private final ObjectMapper mapper = new ObjectMapper();
@@ -60,7 +56,6 @@ public class ManageStayCallbackHandlerTest {
     public void setup() {
         mapper.registerModules(new JavaTimeModule(), new Jdk8Module());
         handler = new ManageStayCallbackHandler(
-            featureToggleService,
             deadlinesCalculator,
             mapper
         );
@@ -178,7 +173,8 @@ public class ManageStayCallbackHandlerTest {
                 Arguments.of(CaseState.DECISION_OUTCOME, CaseState.CASE_PROGRESSION),
                 Arguments.of(CaseState.All_FINAL_ORDERS_ISSUED, CaseState.CASE_PROGRESSION),
                 Arguments.of(CaseState.AWAITING_APPLICANT_INTENTION, CaseState.AWAITING_APPLICANT_INTENTION),
-                Arguments.of(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT, CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
+                Arguments.of(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT, CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT),
+                Arguments.of(CaseState.JUDGMENT_REQUESTED, CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             );
         }
     }

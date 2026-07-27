@@ -454,7 +454,7 @@ public class DashboardClaimInfoServiceTest {
     }
 
     @Test
-    void shouldIncludeDefaultJudgementIssuedDate_WhenJOFlagIsOff() {
+    void shouldIncludeDefaultJudgementIssuedDateWhenNoActiveJudgment() {
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
             .willReturn(CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
                             .defaultJudgmentDocuments(List.of(

@@ -30,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeMakeAnOrderOption.GIV
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeWrittenRepresentationsOptions.CONCURRENT_REPRESENTATIONS;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
@@ -45,6 +46,7 @@ public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
     private final DocUploadDashboardNotificationService dashboardNotificationService;
 
     public GAJudgeRevisitTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         CaseStateSearchService caseStateSearchService,
         GaCoreCaseDataService coreCaseDataService,
@@ -52,7 +54,7 @@ public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
         GaForLipService gaForLipService,
         DocUploadDashboardNotificationService dashboardNotificationService
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.caseStateSearchService = caseStateSearchService;
         this.coreCaseDataService = coreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;

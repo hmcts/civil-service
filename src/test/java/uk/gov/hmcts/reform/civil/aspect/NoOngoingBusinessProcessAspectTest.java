@@ -45,9 +45,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REMOVE_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.START_BUSINESS_PROCESS;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 
 @ExtendWith(MockitoExtension.class)
 class NoOngoingBusinessProcessAspectTest {
@@ -152,14 +150,14 @@ class NoOngoingBusinessProcessAspectTest {
 
         @ParameterizedTest
         @SneakyThrows
-        @EnumSource(value = BusinessProcessStatus.class, names = "FINISHED", mode = EnumSource.Mode.EXCLUDE)
-        void shouldNotProceedWhenOngoingBusinessProcessUpdateCaseData(BusinessProcessStatus status) {
+        @MethodSource("allowedCivilEvents")
+        void shouldProceedWhenOngoingBusinessProcessForAllowedEvent(BusinessProcessStatus status, CaseEvent event) {
             AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder().build();
             mockProceedingJoinPoint(response);
-            when(noOngoingBPAllowedEventService.isAllowed(UPDATE_CASE_DATA)).thenReturn(true);
+            when(noOngoingBPAllowedEventService.isAllowed(event)).thenReturn(true);
 
             CallbackParams callbackParams = createCallbackParams(
-                UPDATE_CASE_DATA.name(),
+                event.name(),
                 CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
                     .businessProcess(new BusinessProcess().setStatus(status))
@@ -172,26 +170,26 @@ class NoOngoingBusinessProcessAspectTest {
             verify(proceedingJoinPoint).proceed();
         }
 
-        @ParameterizedTest
-        @SneakyThrows
-        @EnumSource(value = BusinessProcessStatus.class, names = "FINISHED", mode = EnumSource.Mode.EXCLUDE)
-        void shouldProceedWhenOngoingBusinessProcessUpdateCaseData(BusinessProcessStatus status) {
-            AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder().build();
-            mockProceedingJoinPoint(response);
-            when(noOngoingBPAllowedEventService.isAllowed(REMOVE_DOCUMENT)).thenReturn(true);
-
-            CallbackParams callbackParams = createCallbackParams(
-                REMOVE_DOCUMENT.name(),
-                CaseDataBuilder.builder()
-                    .atStateClaimDetailsNotified()
-                    .businessProcess(new BusinessProcess().setStatus(status))
-                    .build()
-            );
-
-            Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
-
-            assertThat(result).isEqualTo(response);
-            verify(proceedingJoinPoint).proceed();
+        private static Stream<Arguments> allowedCivilEvents() {
+            return Stream.of(
+                CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS,
+                CaseEvent.CHANGE_SOLICITOR_EMAIL,
+                CaseEvent.CREATE_CASE_FLAGS,
+                CaseEvent.EVIDENCE_UPLOAD_JUDGE,
+                CaseEvent.MANAGE_CASE_FLAGS,
+                CaseEvent.MANAGE_DOCUMENTS,
+                CaseEvent.ORDER_REVIEW_OBLIGATION_CHECK,
+                CaseEvent.UPDATE_CASE_DATA,
+                CaseEvent.REMOVE_DOCUMENT,
+                CaseEvent.SERVICE_REQUEST_RECEIVED,
+                CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID,
+                CaseEvent.APPLICATION_PROCEEDS_IN_HERITAGE,
+                CaseEvent.migrateCase
+            ).filter(event -> !event.isCamundaEvent()).flatMap(event -> Stream.of(
+                BusinessProcessStatus.READY,
+                BusinessProcessStatus.DISPATCHED,
+                BusinessProcessStatus.STARTED
+            ).map(status -> Arguments.of(status, event)));
         }
 
         @ParameterizedTest

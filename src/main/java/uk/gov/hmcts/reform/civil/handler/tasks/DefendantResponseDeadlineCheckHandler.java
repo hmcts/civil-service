@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.service.search.DefendantResponseDeadlineCheckSe
 
 import java.util.Set;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
@@ -20,11 +21,12 @@ public class DefendantResponseDeadlineCheckHandler extends BaseExternalTaskHandl
     private final ApplicationEventPublisher applicationEventPublisher;
 
     public DefendantResponseDeadlineCheckHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         DefendantResponseDeadlineCheckSearchService caseSearchService,
         ApplicationEventPublisher applicationEventPublisher
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.caseSearchService = caseSearchService;
         this.applicationEventPublisher = applicationEventPublisher;
     }

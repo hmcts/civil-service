@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
@@ -70,6 +71,7 @@ class GaSpecExternalCaseEventTaskHandlerTest {
         EventProperties eventProperties = new EventProperties();
         eventProperties.setRetryCount(3);
         gaSpecCaseEventTaskHandler = new GaSpecExternalCaseEventTaskHandler(
+            new ExternalTaskCompletionService(),
             eventProperties,
             coreCaseDataService,
             caseDetailsConverter,

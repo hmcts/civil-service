@@ -64,6 +64,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.INVALID_SETTLE_BY_CONSENT;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 
 @Service
 @RequiredArgsConstructor
@@ -157,7 +158,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         GAHearingDetails generalAppHearingDetails = new GAHearingDetails();
         generalAppHearingDetails.setHearingPreferredLocation(getLocationsFromList(locationRefDataService
-            .getCourtLocationsForGeneralApplication(authToken)));
+            .getCourtLocationsForGeneralApplication(authToken, getCaseServiceId(caseData.getCaseAccessCategory()))));
         caseData.setGeneralAppHearingDetails(generalAppHearingDetails);
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)

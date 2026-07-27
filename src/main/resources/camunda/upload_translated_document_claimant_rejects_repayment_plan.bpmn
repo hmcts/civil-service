@@ -46,7 +46,6 @@
     <bpmn:exclusiveGateway id="Gateway_0d76l1r" name="Claimant response">
       <bpmn:incoming>Flow_1frgk8s</bpmn:incoming>
       <bpmn:outgoing>Flow_1c3xg0g</bpmn:outgoing>
-      <bpmn:outgoing>Flow_06qewwe</bpmn:outgoing>
       <bpmn:outgoing>Flow_02qaqh4</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_1frgk8s" sourceRef="ClaimantResponseNotAgreedRepaymentNotify" targetRef="Gateway_0d76l1r" />
@@ -63,41 +62,17 @@
       <bpmn:outgoing>Flow_0vf73ag</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_0vf73ag" sourceRef="UpdateClaimStateAfterTranslatedDocUploaded" targetRef="GenerateDashboardNotificationsUploadTranslatedDocumentClaimantRejectsRepaymentPlan" />
-    <bpmn:serviceTask id="Activity_0fb0527" name="Proceed offline" camunda:type="external" camunda:topic="processCaseEvent">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">PROCEEDS_IN_HERITAGE_SYSTEM</camunda:inputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_06qewwe</bpmn:incoming>
-      <bpmn:outgoing>Flow_0naqrrm</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="Activity_0vcs82d" name="Notify RPA on case handed offline" camunda:type="external" camunda:topic="processCaseEvent">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">NOTIFY_RPA_ON_CASE_HANDED_OFFLINE</camunda:inputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0naqrrm</bpmn:incoming>
-      <bpmn:outgoing>Flow_1fbgsij</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_06qewwe" name="Applicant accept or reject repayment plan (full/part admit) and request CCJ" sourceRef="Gateway_0d76l1r" targetRef="Activity_0fb0527">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState != "MAIN.IN_MEDIATION" &amp;&amp; (!empty flowFlags.LIP_JUDGMENT_ADMISSION &amp;&amp; flowFlags.LIP_JUDGMENT_ADMISSION) &amp;&amp; !(!empty flowFlags.JO_ONLINE_LIVE_ENABLED &amp;&amp; flowFlags.JO_ONLINE_LIVE_ENABLED)}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_0naqrrm" sourceRef="Activity_0fb0527" targetRef="Activity_0vcs82d" />
-    <bpmn:serviceTask id="GenerateDashboardNotificationsUploadTranslatedDocumentClaimantRejectsRepaymentPlan" name="Dashboard Notifications" camunda:type="external" camunda:topic="processCaseEvent">
+    <bpmn:serviceTask id="GenerateDashboardNotificationsUploadTranslatedDocumentClaimantRejectsRepaymentPlan" name="Dashboard Notifications" camunda:type="external" camunda:topic="dashboardNotifications">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="caseEvent">DASHBOARD_NOTIFICATION_EVENT</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1fbgsij</bpmn:incoming>
       <bpmn:incoming>Flow_0vf73ag</bpmn:incoming>
       <bpmn:incoming>Flow_0ziizku</bpmn:incoming>
       <bpmn:incoming>Flow_0qjf0g9</bpmn:incoming>
       <bpmn:outgoing>Flow_1p1siqy</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_1fbgsij" sourceRef="Activity_0vcs82d" targetRef="GenerateDashboardNotificationsUploadTranslatedDocumentClaimantRejectsRepaymentPlan" />
     <bpmn:sequenceFlow id="Flow_1p1siqy" sourceRef="GenerateDashboardNotificationsUploadTranslatedDocumentClaimantRejectsRepaymentPlan" targetRef="END_BUSINESS_PROCESS" />
     <bpmn:serviceTask id="UpdateClaimStateAfterTranslatedDocUpload" name="Update Claim State" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
@@ -162,8 +137,8 @@
     <bpmn:sequenceFlow id="Flow_IS_JO_LIVE_FEED_ACTIVE_ENABLED" name="JO live feed active enabled" sourceRef="Gateway_08rlyk5" targetRef="NotifyJoRoboticsOnContinuousFeed">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.IS_JO_LIVE_FEED_ACTIVE &amp;&amp; flowFlags.IS_JO_LIVE_FEED_ACTIVE}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_02qaqh4" name="Applicant accept or reject repayment plan (full/part admit), request CCJ and judgment online enabled" sourceRef="Gateway_0d76l1r" targetRef="UpdateClaimStateAfterTranslatedDocUpload">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(!empty flowFlags.LIP_JUDGMENT_ADMISSION &amp;&amp; flowFlags.LIP_JUDGMENT_ADMISSION) &amp;&amp; (!empty flowFlags.JO_ONLINE_LIVE_ENABLED &amp;&amp; flowFlags.JO_ONLINE_LIVE_ENABLED)}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_02qaqh4" name="Applicant accept or reject repayment plan (full/part admit) and request CCJ" sourceRef="Gateway_0d76l1r" targetRef="UpdateClaimStateAfterTranslatedDocUpload">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.LIP_JUDGMENT_ADMISSION &amp;&amp; flowFlags.LIP_JUDGMENT_ADMISSION}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_1k9eh3i" sourceRef="UpdateClaimStateAfterTranslatedDocUpload" targetRef="Gateway_1ik4g6o" />
     <bpmn:sequenceFlow id="Flow_1qwbe29" sourceRef="SendJudgmentDetailsToCJES" targetRef="GenerateJudgmentByAdmissionDocClaimant" />
@@ -225,14 +200,6 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_0v1h905" bpmnElement="UpdateClaimStateAfterTranslatedDocUploaded">
         <dc:Bounds x="900" y="180" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_16mix7e" bpmnElement="Activity_0fb0527">
-        <dc:Bounds x="830" y="370" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_131sc0w" bpmnElement="Activity_0vcs82d">
-        <dc:Bounds x="970" y="370" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_0bxsnxe" bpmnElement="GenerateDashboardNotificationsUploadTranslatedDocumentClaimantRejectsRepaymentPlan">
@@ -303,24 +270,6 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0vf73ag_di" bpmnElement="Flow_0vf73ag">
         <di:waypoint x="1000" y="220" />
-        <di:waypoint x="1180" y="220" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_06qewwe_di" bpmnElement="Flow_06qewwe">
-        <di:waypoint x="770" y="245" />
-        <di:waypoint x="770" y="410" />
-        <di:waypoint x="830" y="410" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="678" y="287" width="83" height="66" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0naqrrm_di" bpmnElement="Flow_0naqrrm">
-        <di:waypoint x="930" y="410" />
-        <di:waypoint x="970" y="410" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1fbgsij_di" bpmnElement="Flow_1fbgsij">
-        <di:waypoint x="1070" y="410" />
-        <di:waypoint x="1115" y="410" />
-        <di:waypoint x="1115" y="220" />
         <di:waypoint x="1180" y="220" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1p1siqy_di" bpmnElement="Flow_1p1siqy">

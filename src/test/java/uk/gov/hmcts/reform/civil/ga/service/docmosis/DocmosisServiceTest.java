@@ -4,6 +4,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,18 +23,19 @@ import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService.DATE_FORMATTER;
 
 @ExtendWith(MockitoExtension.class)
-public class DocmosisServiceTest {
+class DocmosisServiceTest {
 
+    private static final String AUTH_TOKEN = "auth";
     private static final List<LocationRefData> locationRefData = Arrays
         .asList(
             new LocationRefData().setEpimmsId("1").setVenueName("Reading"),
@@ -49,47 +53,41 @@ public class DocmosisServiceTest {
         setField(docmosisService, "cnbcEpimmId", "420219");
     }
 
-    @Test
-    void shouldReturnLocationRefData() {
-        when(generalAppLocationRefDataService.getCourtLocations(any())).thenReturn(locationRefData);
+    @ParameterizedTest
+    @MethodSource("provideCategoryData")
+    void shouldReturnLocationRefData(CaseCategory claimCategory, String serviceId) {
+        when(generalAppLocationRefDataService.getCourtLocations(AUTH_TOKEN, serviceId)).thenReturn(locationRefData);
 
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
-            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("2")).build();
-        LocationRefData locationRefData = docmosisService.getCaseManagementLocationVenueName(caseData, "auth");
-        assertThat(locationRefData.getVenueName())
-            .isEqualTo("London");
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("2"))
+            .caseAccessCategory(claimCategory)
+            .build();
+        LocationRefData locationRefDataObj = docmosisService.getCaseManagementLocationVenueName(caseData, "auth");
+        assertThat(locationRefDataObj.getVenueName()).isEqualTo("London");
     }
 
-    @Test
-    void shouldReturnLocationRefData_whenSpecAndCnbc() {
-        when(generalAppLocationRefDataService.getCnbcLocation(any())).thenReturn(locationRefData);
+    @ParameterizedTest
+    @MethodSource("provideCategoryData")
+    void shouldReturnLocationRefData_whenUspecAndCnbc(CaseCategory claimCategory, String serviceId) {
+        when(generalAppLocationRefDataService.getCnbcLocation(AUTH_TOKEN, serviceId)).thenReturn(locationRefData);
 
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .caseAccessCategory(claimCategory)
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("420219")).build();
         LocationRefData cnbcLocationRefData = docmosisService.getCaseManagementLocationVenueName(caseData, "auth");
         assertThat(cnbcLocationRefData.getVenueName())
             .isEqualTo("CNBC");
     }
 
-    @Test
-    void shouldReturnLocationRefData_whenUspecAndCnbc() {
-        when(generalAppLocationRefDataService.getCnbcLocation(any())).thenReturn(locationRefData);
+    @ParameterizedTest
+    @MethodSource("provideCategoryData")
+    void shouldThrowExceptionWhenNoLocationMatch(CaseCategory claimCategory, String serviceId) {
+        when(generalAppLocationRefDataService.getCourtLocations(AUTH_TOKEN, serviceId)).thenReturn(locationRefData);
 
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
-            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("420219")).build();
-        LocationRefData cnbcLocationRefData = docmosisService.getCaseManagementLocationVenueName(caseData, "auth");
-        assertThat(cnbcLocationRefData.getVenueName())
-            .isEqualTo("CNBC");
-    }
-
-    @Test
-    void shouldThrowExceptionWhenNoLocationMatch() {
-        when(generalAppLocationRefDataService.getCourtLocations(any())).thenReturn(locationRefData);
-
-        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
-            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("8")).build();
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("8"))
+            .caseAccessCategory(claimCategory)
+            .build();
 
         Exception exception =
             assertThrows(
@@ -177,4 +175,10 @@ public class DocmosisServiceTest {
             .isEqualTo("abcdef ".concat(LocalDate.now().format(DATE_FORMATTER)));
     }
 
+    private static Stream<Arguments> provideCategoryData() {
+        return Stream.of(
+            Arguments.of(CaseCategory.UNSPEC_CLAIM, "AAA7"),
+            Arguments.of(CaseCategory.SPEC_CLAIM, "AAA6")
+        );
+    }
 }

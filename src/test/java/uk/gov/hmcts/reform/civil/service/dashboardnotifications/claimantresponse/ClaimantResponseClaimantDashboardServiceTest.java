@@ -36,7 +36,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_CLAIMANT_CARM;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_JO_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_JUDGE_PLAN_REQUESTED_CCJ_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT;
@@ -329,8 +328,7 @@ class ClaimantResponseClaimantDashboardServiceTest {
     }
 
     @Test
-    void shouldRecordScenarioForRejectRepaymentCompanyWhenJoEnabled() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+    void shouldRecordScenarioForRejectRepaymentCompanyOnJbaPath() {
 
         Party respondent = new Party();
         respondent.setType(Party.Type.COMPANY);
@@ -392,8 +390,7 @@ class ClaimantResponseClaimantDashboardServiceTest {
     }
 
     @Test
-    void shouldRecordScenarioForRejectRepaymentCompanyWhenJoDisabled() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
+    void shouldRecordJoScenarioForRejectRepaymentCompany() {
 
         Party respondent = new Party();
         respondent.setType(Party.Type.COMPANY);
@@ -410,7 +407,7 @@ class ClaimantResponseClaimantDashboardServiceTest {
 
         verify(dashboardScenariosService).recordScenarios(
             eq(AUTH_TOKEN),
-            eq(SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT.getScenario()),
+            eq(SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_JO_CLAIMANT.getScenario()),
             eq("1234"),
             any(ScenarioRequestParams.class)
         );

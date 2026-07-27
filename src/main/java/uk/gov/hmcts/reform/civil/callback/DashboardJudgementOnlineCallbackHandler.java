@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -20,13 +19,10 @@ public abstract class DashboardJudgementOnlineCallbackHandler extends CallbackHa
 
     protected final DashboardScenariosService dashboardScenariosService;
     protected final DashboardNotificationsParamsMapper mapper;
-    protected final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return featureToggleService.isJudgmentOnlineLive()
-            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureDashboardScenario)
-            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureDashboardScenario);
     }
 
     protected abstract String getScenario(CaseData caseData);

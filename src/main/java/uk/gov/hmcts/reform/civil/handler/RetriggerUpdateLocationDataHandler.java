@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import static java.lang.Long.parseLong;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
@@ -18,10 +19,11 @@ public class RetriggerUpdateLocationDataHandler extends BaseExternalTaskHandler 
     private final CoreCaseDataService coreCaseDataService;
 
     public RetriggerUpdateLocationDataHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         CoreCaseDataService coreCaseDataService
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.coreCaseDataService = coreCaseDataService;
     }
 

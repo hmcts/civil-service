@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class DefendantJudgementByAdmissionIssuedScenarioTest extends DashboardBaseIntegrationTest {
@@ -29,8 +28,6 @@ public class DefendantJudgementByAdmissionIssuedScenarioTest extends DashboardBa
                 .ccdCaseReference(Long.valueOf(caseId))
                 .respondent1Represented(YesOrNo.NO)
                 .build();
-
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         handler.handle(callbackParams(caseData));
 

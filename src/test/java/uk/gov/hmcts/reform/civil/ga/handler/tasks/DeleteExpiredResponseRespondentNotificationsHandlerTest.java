@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.ga.event.DeleteExpiredResponseRespondentNotific
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.search.DeleteExpiredResponseRespondentNotificationSearchService;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +45,7 @@ class DeleteExpiredResponseRespondentNotificationsHandlerTest {
         EventProperties eventProperties = new EventProperties();
         eventProperties.setRetryCount(3);
         handler = new DeleteExpiredResponseRespondentNotificationsHandler(
+            new ExternalTaskCompletionService(),
             eventProperties,
             applicationEventPublisher,
             searchService

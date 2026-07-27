@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReferenceCsvLoader;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -79,11 +80,18 @@ class AsyncCaseMigrationServiceTest {
         when(startEventResponse.getCaseDetails()).thenReturn(caseDetails);
 
         CaseData caseData = mock(CaseData.class);
+        GeneralApplicationCaseData gaCaseData = mock(GeneralApplicationCaseData.class);
+        when(caseData.toMap(ArgumentMatchers.any())).thenReturn(Map.of());
 
-        List<CaseReference> mockReferences = List.of(new CaseReference("12345"), new CaseReference("67890"));
+        final List<CaseReference> mockReferences = List.of(new CaseReference("12345"), new CaseReference("67890"));
 
         when(caseDetailsConverter.toGACaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
-        when(migrationTask.migrateCaseData(ArgumentMatchers.any(CaseData.class), ArgumentMatchers.any(CaseReference.class))).thenReturn(caseData);
+        when(caseDetailsConverter.toGeneralApplicationCaseData(startEventResponse.getCaseDetails())).thenReturn(gaCaseData);
+        when(migrationTask.migrateGeneralApplicationCaseData(
+            ArgumentMatchers.any(CaseData.class),
+            ArgumentMatchers.any(GeneralApplicationCaseData.class),
+            ArgumentMatchers.any(CaseReference.class)
+        )).thenReturn(caseData);
 
         asyncCaseMigrationService.migrateCasesAsync(migrationTask, mockReferences, null, true);
 
@@ -297,5 +305,47 @@ class AsyncCaseMigrationServiceTest {
 
         assertEquals("b", contentData.get("a"));
         assertNull(contentData.get("caseDismissedHearingFeeDueDate"));
+    }
+
+    @Test
+    void shouldFetchWithoutSubmittingEvent_whenTaskIsReadOnly() {
+        @SuppressWarnings("unchecked")
+        MigrationTask<CaseReference> readOnlyTask = mock(MigrationTask.class);
+        when(readOnlyTask.isReadOnly()).thenReturn(true);
+
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        CaseData caseData = mock(CaseData.class);
+        when(coreCaseDataService.getCase(12345L)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+
+        CaseReference caseReference = new CaseReference("12345");
+        asyncCaseMigrationService.migrateCasesAsync(readOnlyTask, List.of(caseReference), null, false);
+
+        verify(coreCaseDataService).getCase(12345L);
+        verify(readOnlyTask).migrateCaseData(caseData, caseReference);
+        verify(coreCaseDataService, times(0)).startUpdate(ArgumentMatchers.anyString(), ArgumentMatchers.any(CaseEvent.class));
+        verify(coreCaseDataService, times(0)).submitUpdate(ArgumentMatchers.anyString(), ArgumentMatchers.any(CaseDataContent.class));
+    }
+
+    @Test
+    void shouldFetchGaCaseWithoutSubmittingEvent_whenReadOnlyTaskIsGA() {
+        @SuppressWarnings("unchecked")
+        MigrationTask<CaseReference> readOnlyTask = mock(MigrationTask.class);
+        when(readOnlyTask.isReadOnly()).thenReturn(true);
+
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        CaseData caseData = mock(CaseData.class);
+        GeneralApplicationCaseData gaCaseData = mock(GeneralApplicationCaseData.class);
+        when(coreCaseDataService.getCase(67890L)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toGACaseData(caseDetails)).thenReturn(caseData);
+        when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(gaCaseData);
+
+        CaseReference caseReference = new CaseReference("67890");
+        asyncCaseMigrationService.migrateCasesAsync(readOnlyTask, List.of(caseReference), null, true);
+
+        verify(coreCaseDataService).getCase(67890L);
+        verify(readOnlyTask).migrateGeneralApplicationCaseData(caseData, gaCaseData, caseReference);
+        verify(coreCaseDataService, times(0)).startGeneralApplicationUpdate(ArgumentMatchers.anyString(), ArgumentMatchers.any(CaseEvent.class));
+        verify(coreCaseDataService, times(0)).submitGeneralApplicationUpdate(ArgumentMatchers.anyString(), ArgumentMatchers.any(CaseDataContent.class));
     }
 }

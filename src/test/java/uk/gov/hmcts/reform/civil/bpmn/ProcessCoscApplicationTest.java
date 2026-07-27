@@ -30,7 +30,7 @@ class ProcessCoscApplicationTest extends BpmnBaseTest {
         "true, false, true",
         "true, true, true",
     })
-    void shouldSuccessfullyCompleteAcknowledgeClaim_whenCalled(boolean cjes, boolean joFlag, boolean isCjesServiceEnabled) {
+    void shouldSuccessfullyCompleteAcknowledgeClaim_whenCalled(boolean cjes, boolean joLiveFeedActive, boolean isCjesServiceEnabled) {
         //assert process has started
         assertFalse(processInstance.isEnded());
 
@@ -39,7 +39,7 @@ class ProcessCoscApplicationTest extends BpmnBaseTest {
 
         VariableMap variables = Variables.createVariables();
         variables.put("flowFlags", Map.of(
-            IS_JO_LIVE_FEED_ACTIVE, joFlag,
+            IS_JO_LIVE_FEED_ACTIVE, joLiveFeedActive,
             IS_CJES_SERVICE_ENABLED, isCjesServiceEnabled
         ));
         variables.put(SEND_DETAILS_CJES, cjes);
@@ -87,7 +87,7 @@ class ProcessCoscApplicationTest extends BpmnBaseTest {
                                    variables
         );
 
-        if (joFlag) {
+        if (joLiveFeedActive) {
             ExternalTask notifyRPA = assertNextExternalTask(PROCESS_CASE_EVENT);
             assertCompleteExternalTask(
                 notifyRPA,

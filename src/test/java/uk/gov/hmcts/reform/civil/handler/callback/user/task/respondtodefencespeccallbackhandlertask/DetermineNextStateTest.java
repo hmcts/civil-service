@@ -40,6 +40,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
@@ -188,8 +189,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldSetStateAllFinalOrdersIssuedWhenApplicantAcceptedRepaymentPlan() {
-
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
 
@@ -392,8 +391,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     @Test
     void shouldSetProceedsInHeritageSystemWhenApplicantAcceptedRepaymentPlanAndNotLrVLip() {
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-
         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
 
         JudgmentDetails activeJudgment = new JudgmentDetails();
@@ -452,8 +449,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
             .build();
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-
         String resultState;
         if (postTranslation) {
             resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
@@ -468,7 +463,7 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldSetAwaitingApplicantIntentionWhenApplicantWantToProceedImmediatePaymentPlanFor1V1() {
+    void shouldSetStateJudicialReferralWhenLrVlrClaimantRejectsPartAdmitImmediatePaymentFor1V1() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1AcceptAdmitAmountPaidSpec(NO)
@@ -478,12 +473,208 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
             .build();
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         BusinessProcess businessProcess = new BusinessProcess();
         String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
                                                                    "", businessProcess);
         assertNotNull(resultState);
-        assertEquals(All_FINAL_ORDERS_ISSUED.name(), resultState);
+        assertEquals(JUDICIAL_REFERRAL.name(), resultState);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldSetStateJudicialReferralWhenLrVlrClaimantRejectsPartAdmitImmediatePaymentForFastClaim(
+        boolean postTranslation) {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1AcceptAdmitAmountPaidSpec(NO)
+            .respondent1Represented(YES)
+            .applicant1Represented(YES)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+            .responseClaimTrack(FAST_CLAIM.name())
+            .build();
+
+        String resultState;
+        if (postTranslation) {
+            resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
+        } else {
+            BusinessProcess businessProcess = new BusinessProcess();
+            resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                               "", businessProcess);
+        }
+
+        assertEquals(JUDICIAL_REFERRAL.name(), resultState);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldSetStateJudicialReferralWhenLrVlrClaimantRejectsPartAdmitImmediatePaymentForIntermediateClaim(
+        boolean postTranslation) {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1AcceptAdmitAmountPaidSpec(NO)
+            .respondent1Represented(YES)
+            .applicant1Represented(YES)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+            .responseClaimTrack(INTERMEDIATE_CLAIM.name())
+            .build();
+
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        String resultState;
+        if (postTranslation) {
+            resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
+        } else {
+            BusinessProcess businessProcess = new BusinessProcess();
+            resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                               "", businessProcess);
+        }
+
+        assertEquals(JUDICIAL_REFERRAL.name(), resultState);
+    }
+
+    @Test
+    void shouldSetStateJudicialReferralWhenLrVlrClaimantRejectsPartAdmitRepaymentPlanForIntermediateClaim() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
+            .applicant1ProceedWithClaim(YES)
+            .respondent1Represented(YES)
+            .applicant1Represented(YES)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
+            .responseClaimTrack(INTERMEDIATE_CLAIM.name())
+            .build();
+
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        BusinessProcess businessProcess = new BusinessProcess();
+        String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                                   "", businessProcess);
+
+        assertEquals(JUDICIAL_REFERRAL.name(), resultState);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldSetStateJudicialReferralWhenLrVlrClaimantRejectsPartAdmitImmediatePaymentForMultiClaim(
+        boolean postTranslation) {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1AcceptAdmitAmountPaidSpec(NO)
+            .respondent1Represented(YES)
+            .applicant1Represented(YES)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+            .responseClaimTrack(MULTI_CLAIM.name())
+            .build();
+
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        String resultState;
+        if (postTranslation) {
+            resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
+        } else {
+            BusinessProcess businessProcess = new BusinessProcess();
+            resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                               "", businessProcess);
+        }
+
+        assertEquals(JUDICIAL_REFERRAL.name(), resultState);
+    }
+
+    @Test
+    void shouldSetStateJudicialReferralWhenLrVlrClaimantRejectsPartAdmitRepaymentPlanForMultiClaim() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
+            .applicant1ProceedWithClaim(YES)
+            .respondent1Represented(YES)
+            .applicant1Represented(YES)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
+            .responseClaimTrack(MULTI_CLAIM.name())
+            .build();
+
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        BusinessProcess businessProcess = new BusinessProcess();
+        String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                                   "", businessProcess);
+
+        assertEquals(JUDICIAL_REFERRAL.name(), resultState);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldSetStateJudicialReferralWhenLrVlipClaimantRejectsPartAdmitImmediatePaymentForFastClaim(
+        boolean postTranslation) {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1AcceptAdmitAmountPaidSpec(NO)
+            .respondent1Represented(NO)
+            .applicant1Represented(YES)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+            .responseClaimTrack(FAST_CLAIM.name())
+            .build();
+
+        String resultState;
+        if (postTranslation) {
+            resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
+        } else {
+            BusinessProcess businessProcess = new BusinessProcess();
+            resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                               "", businessProcess);
+        }
+
+        assertEquals(JUDICIAL_REFERRAL.name(), resultState);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldSetStateJudicialReferralWhenDefendantLrClaimantLipRejectsPartAdmitImmediatePaymentForFastClaim(
+        boolean postTranslation) {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1AcceptAdmitAmountPaidSpec(NO)
+            .respondent1Represented(YES)
+            .applicant1Represented(NO)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+            .responseClaimTrack(FAST_CLAIM.name())
+            .build();
+
+        String resultState;
+        if (postTranslation) {
+            resultState = determineNextState.determineNextStatePostTranslation(caseData, callbackParams(caseData));
+        } else {
+            BusinessProcess businessProcess = new BusinessProcess();
+            resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                               "", businessProcess);
+        }
+
+        assertEquals(JUDICIAL_REFERRAL.name(), resultState);
+    }
+
+    @Test
+    void shouldSetStateJudicialReferralWhenLrVlipClaimantRejectsPartAdmitRepaymentPlanForFastClaim() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
+            .applicant1ProceedWithClaim(YES)
+            .respondent1Represented(NO)
+            .applicant1Represented(YES)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
+            .responseClaimTrack(FAST_CLAIM.name())
+            .build();
+
+        BusinessProcess businessProcess = new BusinessProcess();
+        String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                                   "", businessProcess);
+
+        assertEquals(JUDICIAL_REFERRAL.name(), resultState);
+        assertNotEquals(All_FINAL_ORDERS_ISSUED.name(), resultState);
     }
 
     private CallbackParams callbackParams(CaseData caseData) {

@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.GeneralAppLocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CaseServiceUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -51,8 +52,8 @@ public class UpdateGaLocationCallbackHandler extends CallbackHandler implements 
         );
     }
 
-    private LocationRefData getWorkAllocationLocationDetails(String baseLocation, String authToken) {
-        List<LocationRefData> locationDetails = locationRefDataService.getCourtLocationsByEpimmsId(authToken, baseLocation);
+    private LocationRefData getWorkAllocationLocationDetails(String baseLocation, String authToken, String serviceId) {
+        List<LocationRefData> locationDetails = locationRefDataService.getCourtLocationsByEpimmsId(authToken, baseLocation, serviceId);
         if (locationDetails != null && !locationDetails.isEmpty()) {
             return locationDetails.get(0);
         } else {
@@ -68,8 +69,9 @@ public class UpdateGaLocationCallbackHandler extends CallbackHandler implements 
         GeneralApplicationCaseData civilCaseData = caseDetailsConverter
             .toGeneralApplicationCaseData(coreCaseDataService
                             .getCase(Long.parseLong(parentCaseReference)));
+        String serviceId = CaseServiceUtil.getCaseServiceId(caseData);
         LocationRefData locationDetails = getWorkAllocationLocationDetails(civilCaseData.getCaseManagementLocation().getBaseLocation(),
-                                                                           authToken);
+                                                                           authToken, serviceId);
         GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder
             .businessProcess(

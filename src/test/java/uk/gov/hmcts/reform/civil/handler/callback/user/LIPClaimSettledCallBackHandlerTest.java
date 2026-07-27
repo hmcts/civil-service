@@ -91,12 +91,12 @@ public class LIPClaimSettledCallBackHandlerTest extends BaseCallbackHandlerTest 
         }
 
         @Test
-        void shouldClearJoDataWhenJudgmentBufferEnabledForJudgmentRequestedCase() {
+        void shouldClearJoDataWhenJudgmentBufferEnabledAndJoRequested() {
             given(featureToggleService.isJudgmentBufferEnabled()).willReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .build();
-            caseData.setCcdState(CaseState.JUDGMENT_REQUESTED);
+            caseData.setIsJoRequested(YesOrNo.YES);
             caseData.setJoRepaymentSummaryObject("jo-summary");
             caseData.setJoState(JudgmentState.REQUESTED);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -106,9 +106,29 @@ public class LIPClaimSettledCallBackHandlerTest extends BaseCallbackHandlerTest 
                 .registerModule(new JavaTimeModule())
                 .convertValue(response.getData(), CaseData.class);
 
-            assertThat(updatedCaseData.getPreviousCCDState()).isEqualTo(CaseState.JUDGMENT_REQUESTED);
+            assertThat(updatedCaseData.getPreviousCCDState()).isEqualTo(CaseState.CASE_ISSUED);
             assertThat(updatedCaseData.getJoRepaymentSummaryObject()).isNull();
             assertThat(updatedCaseData.getJoState()).isNull();
+        }
+
+        @Test
+        void shouldNotClearJoDataWhenJudgmentBufferEnabledAndJoNotRequested() {
+            given(featureToggleService.isJudgmentBufferEnabled()).willReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .build();
+            caseData.setIsJoRequested(YesOrNo.NO);
+            caseData.setJoRepaymentSummaryObject("jo-summary");
+            caseData.setJoState(JudgmentState.REQUESTED);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .convertValue(response.getData(), CaseData.class);
+
+            assertThat(updatedCaseData.getJoRepaymentSummaryObject()).isEqualTo("jo-summary");
+            assertThat(updatedCaseData.getJoState()).isEqualTo(JudgmentState.REQUESTED);
         }
     }
 

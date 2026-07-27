@@ -531,7 +531,6 @@ class RoboticsNotificationServiceTest {
         caseData.setBusinessProcess(businessProcessBuilder()
             .camundaEvent(camundaEvent)
             .build());
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = roboticsCaseDataSpecBuilder()

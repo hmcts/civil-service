@@ -67,8 +67,8 @@ class CaseProceedOfflineClaimantScenarioServiceTest {
     }
 
     @Test
-    void shouldRecordScenarioInCaseProgressionOnlyForLip() {
-        CaseData lipCase =
+    void shouldRecordScenarioInCaseProgression() {
+        CaseData lipvLipCase =
                 CaseData.builder()
                         .applicant1Represented(YesOrNo.NO)
                         .respondent1Represented(YesOrNo.NO)
@@ -76,9 +76,30 @@ class CaseProceedOfflineClaimantScenarioServiceTest {
                         .previousCCDState(CaseState.CASE_PROGRESSION)
                         .build();
 
-        CaseData nonLipCase = lipCase.toBuilder().applicant1Represented(YesOrNo.YES).build();
+        CaseData lipvLrCase =
+            CaseData.builder()
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.YES)
+                .ccdCaseReference(1L)
+                .previousCCDState(CaseState.CASE_PROGRESSION)
+                .build();
 
-        assertThat(service.shouldRecordScenarioInCaseProgression(lipCase)).isTrue();
+        CaseData lrvLipCase =
+            CaseData.builder()
+                .applicant1Represented(YesOrNo.YES)
+                .respondent1Represented(YesOrNo.NO)
+                .ccdCaseReference(1L)
+                .previousCCDState(CaseState.CASE_PROGRESSION)
+                .build();
+
+        CaseData nonLipCase = lipvLipCase.toBuilder()
+            .applicant1Represented(YesOrNo.YES)
+            .respondent1Represented(YesOrNo.YES)
+            .build();
+
+        assertThat(service.shouldRecordScenarioInCaseProgression(lipvLipCase)).isTrue();
+        assertThat(service.shouldRecordScenarioInCaseProgression(lipvLrCase)).isTrue();
+        assertThat(service.shouldRecordScenarioInCaseProgression(lrvLipCase)).isTrue();
         assertThat(service.shouldRecordScenarioInCaseProgression(nonLipCase)).isFalse();
     }
 }

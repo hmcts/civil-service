@@ -51,7 +51,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
 
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(any(), any())).thenReturn(locations);
 
         DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
         DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
@@ -132,7 +132,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
 
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(any(), any())).thenReturn(locations);
         when(hearingFeesService.getFeeForHearingSmallClaims(any()))
             .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(10)));
         when(hearingNoticeCamundaService.getProcessVariables(any()))
@@ -221,7 +221,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
 
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(any(), any())).thenReturn(locations);
 
         DynamicListElement location = new DynamicListElement().setLabel("Name - Loc - 1");
         DynamicList list = new DynamicList().setValue(location).setListItems(List.of(location));
@@ -294,7 +294,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
 
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(any(), any())).thenReturn(locations);
         when(hearingFeesService.getFeeForHearingSmallClaims(any()))
             .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(20000)));
         when(hearingNoticeCamundaService.getProcessVariables(any()))

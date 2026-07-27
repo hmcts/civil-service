@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
+import uk.gov.hmcts.reform.civil.exceptions.UpstreamIdamException;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.service.notify.NotificationClientException;
@@ -193,6 +194,18 @@ public class ResourceExceptionHandlerTest {
             "expected exception from notification api",
             handler.handleNotificationClientException(new NotificationClientException(
                 "expected exception from notification api"), contentCachingRequestWrapper),
+            HttpStatus.FAILED_DEPENDENCY
+        );
+    }
+
+    @Test
+    void shouldReturnFailedDependency_whenUpstreamIdamExceptionThrown() {
+        testTemplate(
+            "IDAM temporarily unavailable",
+            handler.handleUpstreamIdamException(
+                new UpstreamIdamException("IDAM temporarily unavailable"),
+                contentCachingRequestWrapper
+            ),
             HttpStatus.FAILED_DEPENDENCY
         );
     }

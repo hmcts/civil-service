@@ -47,6 +47,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.math.BigDecimal;
@@ -124,6 +125,7 @@ public class CreateApplicationTaskHandlerTest {
         EventProperties eventProperties = new EventProperties();
         eventProperties.setRetryCount(3);
         createApplicationTaskHandler = new CreateApplicationTaskHandler(
+            new ExternalTaskCompletionService(),
             eventProperties,
             coreCaseDataService,
             caseDetailsConverter,

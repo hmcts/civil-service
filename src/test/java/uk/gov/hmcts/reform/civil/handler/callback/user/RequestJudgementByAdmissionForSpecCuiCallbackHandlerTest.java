@@ -36,7 +36,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
@@ -84,9 +83,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @Autowired
     private JudgementService judgementService;
@@ -144,7 +140,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
         @Test
         void shouldReturnError_WhenAboutToStartIsInvokedForPAPayImmediately() {
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
             caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
@@ -160,9 +155,10 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
         }
 
         @ParameterizedTest
-        @CsvSource({"true,IMMEDIATELY", "true,BY_SET_DATE", "false,IMMEDIATELY"})
-        void shouldNotReturnError_WhenAboutToStartIsInvokedForPAPayImmediately(boolean toggleState, RespondentResponsePartAdmissionPaymentTimeLRspec paymentOption) {
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(toggleState);
+        @CsvSource({"IMMEDIATELY", "BY_SET_DATE"})
+        void shouldNotReturnError_WhenAboutToStartIsInvokedForPAPayImmediately(
+            RespondentResponsePartAdmissionPaymentTimeLRspec paymentOption
+        ) {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.setDefenceAdmitPartPaymentTimeRouteRequired(paymentOption);
             caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
@@ -414,8 +410,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             final String expected = "The judgment request will be processed and a County"
                 + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
 
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-
             CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
             ccjPaymentDetails.setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(10000));
             ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
@@ -572,60 +566,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
         }
 
         @Test
-        void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIsJudgmentOnlineLiveDisabled() {
-            CaseData caseData = CaseDataBuilder.builder().build();
-            caseData.setRespondent1Represented(YES);
-            caseData.setSpecRespondent1Represented(YES);
-            caseData.setApplicant1Represented(YES);
-            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
-            DynamicListElement dynamicListElement = new DynamicListElement();
-            dynamicListElement.setLabel("John Doe");
-            DynamicList dynamicList = new DynamicList();
-            dynamicList.setValue(dynamicListElement);
-            caseData.setDefendantDetailsSpec(dynamicList);
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-            assertThat(response.getState())
-                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("camundaEvent")
-                .isEqualTo(REQUEST_JUDGEMENT_ADMISSION_SPEC.name());
-        }
-
-        @Test
-        void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIsLRvLROneVOne() {
-            CaseData caseData = CaseDataBuilder.builder().build();
-            caseData.setRespondent1Represented(YES);
-            caseData.setSpecRespondent1Represented(YES);
-            caseData.setApplicant1Represented(YES);
-            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
-            DynamicListElement dynamicListElement = new DynamicListElement();
-            dynamicListElement.setLabel("John Doe");
-            DynamicList dynamicList = new DynamicList();
-            dynamicList.setValue(dynamicListElement);
-            caseData.setDefendantDetailsSpec(dynamicList);
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-            assertThat(response.getState())
-                .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("camundaEvent")
-                .isEqualTo(REQUEST_JUDGEMENT_ADMISSION_SPEC.name());
-        }
-
-        @Test
         void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIsLRvLiPOneVOneAndNotPaidImmediately() {
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setRespondent1Represented(NO);
@@ -643,7 +583,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             AboutToStartOrSubmitCallbackResponse response;
             try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
@@ -682,7 +621,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
             when(time.now()).thenReturn(now);
 
             AboutToStartOrSubmitCallbackResponse response;
@@ -735,7 +673,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             AboutToStartOrSubmitCallbackResponse response;
             try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
@@ -775,7 +712,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -807,6 +743,9 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             DynamicList dynamicList = new DynamicList();
             dynamicList.setValue(dynamicListElement);
             caseData.setDefendantDetailsSpec(dynamicList);
+            caseData.setRespondent1(new PartyBuilder().individual().build());
+            caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"));
+            caseData.setActiveJudgment(activeJudgment);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
@@ -832,7 +771,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
         }
 
         @Test
-        void shouldSetUpBusinessProcessAndContinueOnlineAndCaseState_whenIsJudgmentOnlineLiveEnabledLRvLR1V1() {
+        void shouldSetUpBusinessProcessAndContinueOnlineAndCaseState_whenLRvLR1V1() {
             CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails();
             ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
             ccjPaymentDetails.setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0));
@@ -850,7 +789,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             AboutToStartOrSubmitCallbackResponse response;
             try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
@@ -891,7 +829,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             CaseData data = getCaseData(response);
@@ -941,7 +878,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
                 .handle(params);

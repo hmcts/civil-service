@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PartyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
@@ -22,7 +21,6 @@ public class ValidateClaimantDetailsTask {
     private final DateOfBirthValidator dateOfBirthValidator;
     private final PartyValidator partyValidator;
     private final PostcodeValidator postcodeValidator;
-    private final FeatureToggleService featureToggleService;
     private final ObjectMapper objectMapper;
 
     private Function<CaseData, Party> getApplicant;
@@ -31,12 +29,10 @@ public class ValidateClaimantDetailsTask {
     public ValidateClaimantDetailsTask(DateOfBirthValidator dateOfBirthValidator,
                                        PartyValidator partyValidator,
                                        PostcodeValidator postcodeValidator,
-                                       FeatureToggleService featureToggleService,
                                        ObjectMapper objectMapper) {
         this.dateOfBirthValidator = dateOfBirthValidator;
         this.partyValidator = partyValidator;
         this.postcodeValidator = postcodeValidator;
-        this.featureToggleService = featureToggleService;
         this.objectMapper = objectMapper;
     }
 
@@ -60,9 +56,7 @@ public class ValidateClaimantDetailsTask {
         List<String> errors = new ArrayList<>();
         errors.addAll(dateOfBirthValidator.validate(applicant));
 
-        if (featureToggleService.isJudgmentOnlineLive()) {
-            validateAddressAndName(applicant, errors);
-        }
+        validateAddressAndName(applicant, errors);
         return errors;
     }
 

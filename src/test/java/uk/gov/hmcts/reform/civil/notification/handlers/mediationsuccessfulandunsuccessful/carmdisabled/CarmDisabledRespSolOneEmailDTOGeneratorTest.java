@@ -22,6 +22,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME_ONE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME_TWO;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.MediationSuccessfulNotifyParties;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +42,8 @@ class CarmDisabledRespSolOneEmailDTOGeneratorTest {
     private CarmDisabledRespSolOneEmailDTOGenerator generator;
 
     private CaseData caseData;
+    private CaseData lipVLrCaseData;
+    private CaseData twoVOneCaseData;
 
     @BeforeEach
     void setUp() {
@@ -48,48 +53,118 @@ class CarmDisabledRespSolOneEmailDTOGeneratorTest {
                             .setIndividualFirstName("Alice")
                             .setIndividualLastName("Smith")
                             .setIndividualTitle("Mrs"))
+            .respondent1Represented(YesOrNo.YES)
+            .applicant1Represented(YesOrNo.YES)
+            .build();
+
+        lipVLrCaseData = CaseData.builder()
+            .applicant1(new Party()
+                            .setType(Party.Type.INDIVIDUAL)
+                            .setIndividualFirstName("Alice")
+                            .setIndividualLastName("Smith")
+                            .setIndividualTitle("Mrs"))
+            .respondent1Represented(YesOrNo.YES)
+            .applicant1Represented(YesOrNo.NO)
+            .build();
+
+        twoVOneCaseData = CaseData.builder()
+            .applicant1(new Party()
+                            .setType(Party.Type.INDIVIDUAL)
+                            .setIndividualFirstName("Alice")
+                            .setIndividualLastName("Smith")
+                            .setIndividualTitle("Mrs"))
+            .applicant2(new Party()
+                            .setType(Party.Type.INDIVIDUAL)
+                            .setIndividualFirstName("Bob")
+                            .setIndividualLastName("Jones")
+                            .setIndividualTitle("Mr"))
+            .addApplicant2(YesOrNo.YES)
+            .respondent1Represented(YesOrNo.YES)
+            .applicant1Represented(YesOrNo.YES)
             .build();
     }
 
     @Test
-    void shouldReturnSuccessfulTemplate_whenTaskIdMatches() {
+    void shouldReturnLipVLrSuccessfulTemplate_whenLipVLrCase() {
         when(notificationsProperties.getNotifyLrDefendantSuccessfulMediationForLipVLrClaim())
-            .thenReturn("success-template");
+            .thenReturn("lip-v-lr-success-template");
+
+        String templateId = generator.getEmailTemplateId(lipVLrCaseData, MediationSuccessfulNotifyParties.toString());
+
+        assertThat(templateId).isEqualTo("lip-v-lr-success-template");
+    }
+
+    @Test
+    void shouldReturnTwoVOneSuccessfulTemplate_whenTwoVOneCase() {
+        when(notificationsProperties.getNotifyTwoVOneDefendantSuccessfulMediation())
+            .thenReturn("two-v-one-success-template");
+
+        String templateId = generator.getEmailTemplateId(twoVOneCaseData, MediationSuccessfulNotifyParties.toString());
+
+        assertThat(templateId).isEqualTo("two-v-one-success-template");
+    }
+
+    @Test
+    void shouldReturnGenericLrSuccessfulTemplate_whenLrVLrCase() {
+        when(notificationsProperties.getNotifyLrDefendantSuccessfulMediation())
+            .thenReturn("lr-success-template");
 
         String templateId = generator.getEmailTemplateId(caseData, MediationSuccessfulNotifyParties.toString());
 
-        assertThat(templateId).isEqualTo("success-template");
+        assertThat(templateId).isEqualTo("lr-success-template");
     }
 
     @Test
-    void shouldReturnUnsuccessfulTemplate_whenTaskIdDoesNotMatch() {
+    void shouldReturnLipVLrUnsuccessfulTemplate_whenLipVLrCase() {
         when(notificationsProperties.getMediationUnsuccessfulLRTemplateForLipVLr())
-            .thenReturn("unsuccessful-template");
+            .thenReturn("lip-v-lr-unsuccessful-template");
+
+        String templateId = generator.getEmailTemplateId(lipVLrCaseData, "other-task");
+
+        assertThat(templateId).isEqualTo("lip-v-lr-unsuccessful-template");
+    }
+
+    @Test
+    void shouldReturnGenericUnsuccessfulTemplate_whenLrVLrCase() {
+        when(notificationsProperties.getMediationUnsuccessfulLRTemplate())
+            .thenReturn("lr-unsuccessful-template");
 
         String templateId = generator.getEmailTemplateId(caseData, "other-task");
 
-        assertThat(templateId).isEqualTo("unsuccessful-template");
+        assertThat(templateId).isEqualTo("lr-unsuccessful-template");
     }
 
     @Test
-    void shouldReturnUnsuccessfulTemplate_whenTaskIdIsNull() {
-        when(notificationsProperties.getMediationUnsuccessfulLRTemplateForLipVLr())
-            .thenReturn("unsuccessful-template");
+    void shouldReturnGenericUnsuccessfulTemplate_whenTaskIdIsNull() {
+        when(notificationsProperties.getMediationUnsuccessfulLRTemplate())
+            .thenReturn("lr-unsuccessful-template");
 
-        String templateId = generator.getEmailTemplateId(caseData);
+        String templateId = generator.getEmailTemplateId(caseData, null);
 
-        assertThat(templateId).isEqualTo("unsuccessful-template");
+        assertThat(templateId).isEqualTo("lr-unsuccessful-template");
     }
 
     @Test
     void shouldReturnReferenceTemplate() {
         String reference = generator.getReferenceTemplate();
 
-        assertThat(reference).isEqualTo("mediation-update-defendant-notification-LIP-%s");
+        assertThat(reference).isEqualTo("mediation-update-defendant-notification-%s");
     }
 
     @Test
-    void shouldReturnTrueForShouldNotify_whenLipvLROneVOneIsTrue() {
+    void shouldReturnTrueForShouldNotify_whenRespondentIsRepresented() {
+        CaseData caseDataWithFlag = CaseData.builder()
+            .respondent1Represented(YesOrNo.YES)
+            .applicant1Represented(YesOrNo.YES)
+            .build();
+
+        boolean shouldNotify = generator.getShouldNotify(caseDataWithFlag);
+
+        assertThat(shouldNotify).isTrue();
+    }
+
+    @Test
+    void shouldReturnTrueForShouldNotify_whenLipvLROneVOne() {
         CaseData caseDataWithFlag = CaseData.builder()
             .respondent1Represented(YesOrNo.YES)
             .applicant1Represented(YesOrNo.NO)
@@ -101,7 +176,7 @@ class CarmDisabledRespSolOneEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldReturnFalseForShouldNotify_whenLipvLROneVOneIsFalse() {
+    void shouldReturnFalseForShouldNotify_whenRespondentIsNotRepresented() {
         CaseData caseDataWithFlag = CaseData.builder()
             .respondent1Represented(YesOrNo.NO)
             .build();
@@ -112,7 +187,7 @@ class CarmDisabledRespSolOneEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldAddCustomPropertiesToMap() {
+    void shouldAddCustomPropertiesToMap_forStandardCase() {
         Map<String, String> properties = new HashMap<>();
 
         try (MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class)) {
@@ -123,7 +198,26 @@ class CarmDisabledRespSolOneEmailDTOGeneratorTest {
 
             assertThat(result)
                 .containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, RESPONDENT_LEGAL_ORG_NAME)
-                .containsEntry(CLAIMANT_NAME, "Mrs Alice Smith");
+                .containsEntry(CLAIMANT_NAME, "Mrs Alice Smith")
+                .containsEntry(PARTY_NAME, "Mrs Alice Smith's claim against you");
+        }
+    }
+
+    @Test
+    void shouldAddCustomPropertiesToMap_forTwoVOneCase() {
+        Map<String, String> properties = new HashMap<>();
+
+        try (MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class)) {
+            notificationUtilsMockedStatic.when(() -> NotificationUtils.getLegalOrganizationNameForRespondent(twoVOneCaseData, Boolean.TRUE, organisationService))
+                .thenReturn(RESPONDENT_LEGAL_ORG_NAME);
+
+            Map<String, String> result = generator.addCustomProperties(properties, twoVOneCaseData);
+
+            assertThat(result)
+                .containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, RESPONDENT_LEGAL_ORG_NAME)
+                .containsEntry(CLAIMANT_NAME_ONE, "Mrs Alice Smith")
+                .containsEntry(CLAIMANT_NAME_TWO, "Mr Bob Jones")
+                .containsEntry(PARTY_NAME, "Mrs Alice Smith and Mr Bob Jones's claim against you");
         }
     }
 }

@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -66,12 +67,18 @@ public class AsyncCaseMigrationService {
                     batchCount++;
                 }
                 log.info("Migrating case with ID: {}", caseReference);
+                if (task.isReadOnly()) {
+                    verifyReadOnly(task, caseReference, isGA);
+                    continue;
+                }
                 CaseData caseData;
                 StartEventResponse startEventResponse;
                 if (isGA) {
                     startEventResponse = coreCaseDataService.startGeneralApplicationUpdate(caseReference.getCaseReference(), CaseEvent.UPDATE_CASE_DATA);
                     CaseDetails caseDetails = startEventResponse.getCaseDetails();
                     caseData = caseDetailsConverter.toGACaseData(caseDetails);
+                    GeneralApplicationCaseData gaCaseData = caseDetailsConverter.toGeneralApplicationCaseData(caseDetails);
+                    caseData = task.migrateGeneralApplicationCaseData(caseData, gaCaseData, caseReference);
                 } else {
                     startEventResponse = coreCaseDataService.startUpdate(
                         caseReference.getCaseReference(),
@@ -79,8 +86,8 @@ public class AsyncCaseMigrationService {
                     );
                     CaseDetails caseDetails = startEventResponse.getCaseDetails();
                     caseData = caseDetailsConverter.toCaseData(caseDetails);
+                    caseData = task.migrateCaseData(caseData, caseReference);
                 }
-                caseData = task.migrateCaseData(caseData, caseReference);
                 Optional<String> updatedState = task.getUpdatedState(state);
                 if (updatedState.isPresent()) {
                     String newState = updatedState.get();
@@ -106,6 +113,19 @@ public class AsyncCaseMigrationService {
                 RequestContextHolder.resetRequestAttributes();
             }
         }
+    }
+
+    private <T extends CaseReference> void verifyReadOnly(MigrationTask<T> task, T caseReference, boolean isGA) {
+        CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(caseReference.getCaseReference()));
+        if (isGA) {
+            CaseData caseData = caseDetailsConverter.toGACaseData(caseDetails);
+            GeneralApplicationCaseData gaCaseData = caseDetailsConverter.toGeneralApplicationCaseData(caseDetails);
+            task.migrateGeneralApplicationCaseData(caseData, gaCaseData, caseReference);
+        } else {
+            CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+            task.migrateCaseData(caseData, caseReference);
+        }
+        log.info("Read-only verification completed for case ID: {}", caseReference.getCaseReference());
     }
 
     protected CaseDataContent buildCaseDataContent(StartEventResponse startEventResponse, CaseData caseData, MigrationTask<?> task) {

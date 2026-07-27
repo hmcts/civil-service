@@ -44,7 +44,6 @@
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0evghcx</bpmn:incoming>
       <bpmn:incoming>Flow_0u83asq</bpmn:incoming>
-      <bpmn:incoming>Flow_00f0sau</bpmn:incoming>
       <bpmn:incoming>Flow_0qtr7fz</bpmn:incoming>
       <bpmn:incoming>Flow_0vpn38g</bpmn:incoming>
       <bpmn:outgoing>Flow_12hrz4u</bpmn:outgoing>
@@ -63,8 +62,8 @@
       <bpmn:outgoing>Flow_0f1j5lb</bpmn:outgoing>
       <bpmn:outgoing>Flow_0fq9s3w</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_FULL_DEFENCE_NOT_PROCEED" name="Applicant confirms not to proceed(full/part admit) and JO online disabled" sourceRef="Gateway_PROCEED_OR_NOT_PROCEED" targetRef="ProceedOfflineForResponseToDefence">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.FULL_ADMIT_NOT_PROCEED" || flowState == "MAIN.PART_ADMIT_NOT_PROCEED" || (flowState == "MAIN.PART_ADMIT_PAY_IMMEDIATELY" &amp;&amp; (empty flowFlags.JO_ONLINE_LIVE_ENABLED || !flowFlags.JO_ONLINE_LIVE_ENABLED))}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_FULL_DEFENCE_NOT_PROCEED" name="Applicant confirms not to proceed(full/part admit)" sourceRef="Gateway_PROCEED_OR_NOT_PROCEED" targetRef="ProceedOfflineForResponseToDefence">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.FULL_ADMIT_NOT_PROCEED" || flowState == "MAIN.PART_ADMIT_NOT_PROCEED"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_FULL_DEFENCE_PROCEED" name="Applicant confirms to proceed (full/part admit)" sourceRef="Gateway_PROCEED_OR_NOT_PROCEED" targetRef="Activity_0izac4m">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.FULL_ADMIT_PROCEED" || flowState == "MAIN.PART_ADMIT_PROCEED"}</bpmn:conditionExpression>
@@ -263,19 +262,9 @@
       <bpmn:incoming>Flow_ADMIT_PART_SETTLE_CLAIM</bpmn:incoming>
       <bpmn:outgoing>Flow_0unqxdq</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="proceedsInHeritageSystem" name="Proceed offline (Response to defence)" camunda:type="external" camunda:topic="processCaseEvent">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">PROCEEDS_IN_HERITAGE_SYSTEM</camunda:inputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_JO_ONLINE_DISABLED</bpmn:incoming>
-      <bpmn:outgoing>Flow_00f0sau</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_Flow_PAY_IMMEDIATELY" name="Defendant confirm to pay immediately" sourceRef="Gateway_PROCEED_OR_NOT_PROCEED" targetRef="Gateway_1jhr7mx">
+    <bpmn:sequenceFlow id="Flow_Flow_PAY_IMMEDIATELY" name="Defendant confirm to pay immediately" sourceRef="Gateway_PROCEED_OR_NOT_PROCEED" targetRef="Gateway_10ndl16">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.FULL_ADMIT_PAY_IMMEDIATELY"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_00f0sau" sourceRef="proceedsInHeritageSystem" targetRef="NotifyRoboticsOnCaseHandedOffline" />
     <bpmn:serviceTask id="Activity_00lleen" name="Proceed offline (Response to defence)" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -320,7 +309,7 @@
     <bpmn:exclusiveGateway id="Gateway_10ndl16">
       <bpmn:incoming>Flow_12hrz4u</bpmn:incoming>
       <bpmn:incoming>Flow_0rg51dv</bpmn:incoming>
-      <bpmn:incoming>Flow_JO_ONLINE_ENABLED</bpmn:incoming>
+      <bpmn:incoming>Flow_Flow_PAY_IMMEDIATELY</bpmn:incoming>
       <bpmn:incoming>Flow_1dx6rl0</bpmn:incoming>
       <bpmn:incoming>Flow_0unqxdq</bpmn:incoming>
       <bpmn:incoming>Flow_0daff23</bpmn:incoming>
@@ -348,18 +337,7 @@
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(!empty flowFlags.UNREPRESENTED_DEFENDANT_ONE &amp;&amp; flowFlags.UNREPRESENTED_DEFENDANT_ONE) &amp;&amp; (flowState == "MAIN.FULL_DEFENCE_NOT_PROCEED") &amp;&amp; (!empty flowFlags.DASHBOARD_SERVICE_ENABLED &amp;&amp; flowFlags.DASHBOARD_SERVICE_ENABLED)}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_1dx6rl0" sourceRef="ClaimantResponseConfirmsNotToProceedLipNotify" targetRef="Gateway_10ndl16" />
-    <bpmn:exclusiveGateway id="Gateway_1jhr7mx">
-      <bpmn:incoming>Flow_Flow_PAY_IMMEDIATELY</bpmn:incoming>
-      <bpmn:outgoing>Flow_JO_ONLINE_DISABLED</bpmn:outgoing>
-      <bpmn:outgoing>Flow_JO_ONLINE_ENABLED</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_JO_ONLINE_DISABLED" name="JO ONLINE DISABLED" sourceRef="Gateway_1jhr7mx" targetRef="proceedsInHeritageSystem">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.JO_ONLINE_LIVE_ENABLED &amp;&amp; !flowFlags.JO_ONLINE_LIVE_ENABLED}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_JO_ONLINE_ENABLED" name="JO ONLINE Enabled" sourceRef="Gateway_1jhr7mx" targetRef="Gateway_10ndl16">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.JO_ONLINE_LIVE_ENABLED &amp;&amp; flowFlags.JO_ONLINE_LIVE_ENABLED}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:serviceTask id="GenerateDashboardNotificationsClaimantResponseSpec" name="Dashboard Notifications" camunda:type="external" camunda:topic="processCaseEvent">
+    <bpmn:serviceTask id="GenerateDashboardNotificationsClaimantResponseSpec" name="Dashboard Notifications" camunda:type="external" camunda:topic="dashboardNotifications">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="caseEvent">DASHBOARD_NOTIFICATION_EVENT</camunda:inputParameter>
@@ -369,8 +347,8 @@
       <bpmn:outgoing>Flow_0throvl</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_0throvl" sourceRef="GenerateDashboardNotificationsClaimantResponseSpec" targetRef="Activity_0xp7fjj" />
-    <bpmn:sequenceFlow id="Flow_0fq9s3w" name="Applicant confirms not to proceed part admit(pay immediately) and JO online Enabled" sourceRef="Gateway_PROCEED_OR_NOT_PROCEED" targetRef="ClaimantResponsePartAdmitPayImmediatelyNotifier">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.JO_ONLINE_LIVE_ENABLED &amp;&amp; flowFlags.JO_ONLINE_LIVE_ENABLED &amp;&amp; flowState == "MAIN.PART_ADMIT_PAY_IMMEDIATELY"}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_0fq9s3w" name="Applicant confirms part admit pay immediately" sourceRef="Gateway_PROCEED_OR_NOT_PROCEED" targetRef="ClaimantResponsePartAdmitPayImmediatelyNotifier">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.PART_ADMIT_PAY_IMMEDIATELY"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0zesk9e" sourceRef="ClaimantDefendantAgreedMediationNotify" targetRef="ClaimantGenerateDQMeditation" />
     <bpmn:serviceTask id="ClaimantResponseConfirmsNotToProceedNotify" name="Notify parites claimant confirms not to proceed" camunda:type="external" camunda:topic="processCaseEvent">
@@ -534,9 +512,6 @@ In mediation.</bpmn:text>
         <dc:Bounds x="940" y="1480" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1mc7i0d_di" bpmnElement="proceedsInHeritageSystem">
-        <dc:Bounds x="1560" y="1190" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1nidhyn" bpmnElement="Activity_00lleen">
         <dc:Bounds x="940" y="1040" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -554,9 +529,6 @@ In mediation.</bpmn:text>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1m3hfgy" bpmnElement="Gateway_1ogom39" isMarkerVisible="true">
         <dc:Bounds x="835" y="915" width="50" height="50" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_1jhr7mx_di" bpmnElement="Gateway_1jhr7mx" isMarkerVisible="true">
-        <dc:Bounds x="1339" y="1205" width="50" height="50" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1ovf9ab_di" bpmnElement="GenerateDashboardNotificationsClaimantResponseSpec">
         <dc:Bounds x="2270" y="483" width="100" height="80" />
@@ -742,15 +714,11 @@ In mediation.</bpmn:text>
       <bpmndi:BPMNEdge id="Flow_15h287v_di" bpmnElement="Flow_Flow_PAY_IMMEDIATELY">
         <di:waypoint x="690" y="545" />
         <di:waypoint x="690" y="1230" />
-        <di:waypoint x="1339" y="1230" />
+        <di:waypoint x="2050" y="1230" />
+        <di:waypoint x="2050" y="548" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="702" y="1190" width="70" height="40" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_00f0sau_di" bpmnElement="Flow_00f0sau">
-        <di:waypoint x="1660" y="1230" />
-        <di:waypoint x="1700" y="1230" />
-        <di:waypoint x="1700" y="560" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0qiuirk_di" bpmnElement="Flow_0qiuirk">
         <di:waypoint x="1040" y="1080" />
@@ -830,22 +798,6 @@ In mediation.</bpmn:text>
         <di:waypoint x="1010" y="1020" />
         <di:waypoint x="2050" y="1020" />
         <di:waypoint x="2050" y="550" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1qx9pjm_di" bpmnElement="Flow_JO_ONLINE_DISABLED">
-        <di:waypoint x="1389" y="1230" />
-        <di:waypoint x="1560" y="1230" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1400" y="1196" width="59" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1qw8k3y_di" bpmnElement="Flow_JO_ONLINE_ENABLED">
-        <di:waypoint x="1364" y="1205" />
-        <di:waypoint x="1364" y="1160" />
-        <di:waypoint x="2050" y="1160" />
-        <di:waypoint x="2050" y="548" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1415" y="1126" width="59" height="27" />
-        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0throvl_di" bpmnElement="Flow_0throvl">
         <di:waypoint x="2370" y="523" />

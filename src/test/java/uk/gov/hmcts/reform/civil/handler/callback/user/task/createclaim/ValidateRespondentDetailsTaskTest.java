@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.validation.PartyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
@@ -26,7 +25,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ValidateRespondentDetailsTaskTest extends BaseCallbackHandlerTest {
@@ -38,17 +36,13 @@ class ValidateRespondentDetailsTaskTest extends BaseCallbackHandlerTest {
     private PostcodeValidator postcodeValidator;
 
     @Mock
-    private FeatureToggleService featureToggleService;
-
-    @Mock
     private PartyValidator partyValidator;
 
     @BeforeEach
     public void setUp() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        validateRespondentDetailsTask = new ValidateRespondentDetailsTask(postcodeValidator, featureToggleService, partyValidator, objectMapper);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        validateRespondentDetailsTask = new ValidateRespondentDetailsTask(postcodeValidator, partyValidator, objectMapper);
     }
 
     @Test

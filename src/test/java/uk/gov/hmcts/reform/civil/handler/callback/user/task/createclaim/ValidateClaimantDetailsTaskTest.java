@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PartyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
@@ -40,9 +39,6 @@ class ValidateClaimantDetailsTaskTest {
     private DateOfBirthValidator dateOfBirthValidator;
 
     @Mock
-    private FeatureToggleService featureToggleService;
-
-    @Mock
     private PartyValidator partyValidator;
 
     String event = "Event";
@@ -51,7 +47,7 @@ class ValidateClaimantDetailsTaskTest {
     public void setUp() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        validateClaimantDetailsTask = new ValidateClaimantDetailsTask(dateOfBirthValidator, partyValidator, postcodeValidator, featureToggleService, objectMapper);
+        validateClaimantDetailsTask = new ValidateClaimantDetailsTask(dateOfBirthValidator, partyValidator, postcodeValidator, objectMapper);
     }
 
     @Test

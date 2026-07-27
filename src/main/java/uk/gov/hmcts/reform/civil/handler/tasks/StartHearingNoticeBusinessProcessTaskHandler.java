@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
 import java.util.Map;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Component
 public class StartHearingNoticeBusinessProcessTaskHandler extends BaseExternalTaskHandler {
@@ -31,13 +32,14 @@ public class StartHearingNoticeBusinessProcessTaskHandler extends BaseExternalTa
     private final IStateFlowEngine stateFlowEngine;
 
     public StartHearingNoticeBusinessProcessTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         CoreCaseDataService coreCaseDataService,
         CaseDetailsConverter caseDetailsConverter,
         ObjectMapper mapper,
         IStateFlowEngine stateFlowEngine
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.coreCaseDataService = coreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;
         this.mapper = mapper;

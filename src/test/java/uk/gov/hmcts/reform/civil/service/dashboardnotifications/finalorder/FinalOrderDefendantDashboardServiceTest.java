@@ -45,7 +45,7 @@ class FinalOrderDefendantDashboardServiceTest {
         caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
 
-        when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData)).thenReturn(true);
+        when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedDefendant(caseData)).thenReturn(true);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
 
         finalOrderDefendantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
@@ -67,7 +67,7 @@ class FinalOrderDefendantDashboardServiceTest {
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         caseData.setTrialReadyRespondent1(YesOrNo.YES);
 
-        when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData)).thenReturn(false);
+        when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedDefendant(caseData)).thenReturn(false);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
 
         finalOrderDefendantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
@@ -89,7 +89,7 @@ class FinalOrderDefendantDashboardServiceTest {
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         caseData.setTrialReadyRespondent1(YesOrNo.YES);
 
-        when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData)).thenReturn(false);
+        when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedDefendant(caseData)).thenReturn(false);
 
         finalOrderDefendantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
 
@@ -105,7 +105,7 @@ class FinalOrderDefendantDashboardServiceTest {
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         caseData.setTrialReadyRespondent1(YesOrNo.YES);
 
-        when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData)).thenReturn(false);
+        when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedDefendant(caseData)).thenReturn(false);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(false);
 
         finalOrderDefendantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
