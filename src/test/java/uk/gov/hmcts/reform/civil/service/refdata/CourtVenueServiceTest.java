@@ -148,4 +148,11 @@ class CourtVenueServiceTest {
         List<LocationRefData> result = courtVenueService.getCMLAndHLCourts(serviceAuth, auth, serviceId);
         assertThat(result).containsExactly(court1);
     }
+
+    @ParameterizedTest()
+    @ValueSource(strings = {"AAA6", "AAA7"})
+    void shouldReturnHearingLocationCourtsOnly(String serviceId) {
+        List<LocationRefData> result = courtVenueService.getHearingLocationCourts(serviceAuth, auth, serviceId);
+        assertThat(result).containsExactlyInAnyOrder(court1, court2);
+    }
 }
