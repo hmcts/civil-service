@@ -132,6 +132,40 @@ class VerifyHearingNoticeNamesTaskTest {
     }
 
     @Test
+    void extractAttendees_skipsNoticeHeaderBoilerplateInterleavedByPageBreaks() {
+        // reproduces the AAT case: a long attendee list crosses a page break, so PDFBox
+        // interleaves the repeated notice header (court / claim / date) into the run.
+        String text = String.join("\n",
+            "Attending in person",
+            "Claimant1 Individual",
+            "In the county court at Central London",
+            "Claim reference 1782920322477820",
+            "Claim number 008KA010",
+            "Date 07 July 2026",
+            "Defendant2Witness2 Witness",
+            "The time allocated for the hearing is 1 hour.");
+
+        assertEquals(List.of("Claimant1 Individual", "Defendant2Witness2 Witness"),
+                     task.extractAttendees(text));
+    }
+
+    @Test
+    void extractAttendees_stopsAtTheTrialTerminatorOnNoticeOfTrial() {
+        // Notice of Trial says "trial" not "hearing"; without a generalised terminator the
+        // parser runs off the end of the attendee list and sweeps in the whole document body.
+        String text = String.join("\n",
+            "Attending in person",
+            "John Doe",
+            "Jane Doe",
+            "The time allocated for the trial is 1 hour.",
+            "The court usually doesn't hear cases between 1pm and 2pm each day.",
+            "Trial fees",
+            "The trial fee is 619 which must be paid by 30 March 2026.");
+
+        assertEquals(List.of("John Doe", "Jane Doe"), task.extractAttendees(text));
+    }
+
+    @Test
     void participantNames_coversPartiesTitleStripped_butNotAForeignName() {
         var participants = task.participantNames(caseWithNotice());
 

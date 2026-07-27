@@ -62,7 +62,7 @@
       <bpmn:outgoing>Flow_0vf73ag</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_0vf73ag" sourceRef="UpdateClaimStateAfterTranslatedDocUploaded" targetRef="GenerateDashboardNotificationsUploadTranslatedDocumentClaimantRejectsRepaymentPlan" />
-    <bpmn:serviceTask id="GenerateDashboardNotificationsUploadTranslatedDocumentClaimantRejectsRepaymentPlan" name="Dashboard Notifications" camunda:type="external" camunda:topic="processCaseEvent">
+    <bpmn:serviceTask id="GenerateDashboardNotificationsUploadTranslatedDocumentClaimantRejectsRepaymentPlan" name="Dashboard Notifications" camunda:type="external" camunda:topic="dashboardNotifications">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="caseEvent">DASHBOARD_NOTIFICATION_EVENT</camunda:inputParameter>

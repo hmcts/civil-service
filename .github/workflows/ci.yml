@@ -12,6 +12,34 @@ on:
       - '*'
 
 jobs:
+  pii-log-check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Semgrep
+        run: python -m pip install semgrep==1.136.0
+      - name: Test PII logging rules
+        run: semgrep test .semgrep
+      - name: Scan changed application code for PII logging
+        env:
+          SEMGREP_BASELINE_COMMIT: ${{ github.event.pull_request.base.sha }}
+        run: |
+          semgrep scan --strict --metrics=off --no-rewrite-rule-ids \
+            --config .semgrep/logging-pii.yml \
+            --json-output semgrep-results.json \
+            src/main
+          python .semgrep/annotate.py semgrep-results.json
+
   build:
     runs-on: ubuntu-latest
     env:

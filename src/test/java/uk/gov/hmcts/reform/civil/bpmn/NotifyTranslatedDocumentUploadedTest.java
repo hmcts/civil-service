@@ -52,7 +52,8 @@ public class NotifyTranslatedDocumentUploadedTest extends BpmnBaseTest {
                                    UPDATE_CLAIM_STATE_AFTER_TRANSLATED_DOCUMENT_UPLOADED_ID,
                                    variables);
 
-        assertCompleteExternalTask(notificationTask,
+        ExternalTask dashboardTask = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(dashboardTask,
                                    PROCESS_CASE_EVENT,
                                    DASHBOARD_NOTIFICATION_EVENT,
                                    GENERATE_DASHBOARD_ACTIVITY
