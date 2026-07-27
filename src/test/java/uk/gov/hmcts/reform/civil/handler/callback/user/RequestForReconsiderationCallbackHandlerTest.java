@@ -182,7 +182,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {"APPLICANTSOLICITORONE", "RESPONDENTSOLICITORONE", "RESPONDENTSOLICITORTWO"})
+        @ValueSource(strings = {"APPLICANTSOLICITORONE", "RESPONDENTSOLICITORONE", "RESPONDENTSOLICITORTWO", "CLAIMANT", "DEFENDANT"})
         void shouldGetSelectedUserRole(String userRole) {
             //Given : Casedata and return applicant solicitor role
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
@@ -200,10 +200,10 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then: It should set casePartyRequestForReconsideration to selected user
-            if (userRole.equals("APPLICANTSOLICITORONE")) {
+            if (userRole.equals("APPLICANTSOLICITORONE") || userRole.equals("CLAIMANT")) {
                 assertThat(response.getData()).extracting("casePartyRequestForReconsideration")
                     .isEqualTo("Applicant");
-            } else if (userRole.equals("RESPONDENTSOLICITORONE")) {
+            } else if (userRole.equals("RESPONDENTSOLICITORONE") || userRole.equals("DEFENDANT")) {
                 assertThat(response.getData()).extracting("casePartyRequestForReconsideration")
                     .isEqualTo("Respondent1");
             } else {

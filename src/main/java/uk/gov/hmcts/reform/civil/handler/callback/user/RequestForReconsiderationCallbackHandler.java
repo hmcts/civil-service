@@ -171,9 +171,9 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
         List<String> roles = getUserRole(callbackParams);
 
         Optional<String> party = Optional.empty();
-        if (isApplicantSolicitor(roles)) {
+        if (isApplicantSolicitor(roles) || isLIPClaimant(roles)) {
             party = Optional.of("Applicant");
-        } else if (isRespondentSolicitorOne(roles)) {
+        } else if (isRespondentSolicitorOne(roles) || isLIPDefendant(roles)) {
             party = Optional.of("Respondent1");
         } else if (isRespondentSolicitorTwo(roles)) {
             party = Optional.of("Respondent2");
