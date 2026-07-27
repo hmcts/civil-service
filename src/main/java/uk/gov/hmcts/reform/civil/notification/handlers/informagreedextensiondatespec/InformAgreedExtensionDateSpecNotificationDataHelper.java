@@ -22,8 +22,8 @@ final class InformAgreedExtensionDateSpecNotificationDataHelper {
     }
 
     static Map<String, String> addApplicantSolicitorProperties(Map<String, String> properties, CaseData caseData) {
-        properties.put(AGREED_EXTENSION_DATE,
-            formatLocalDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE));
+        LocalDate extensionDate = resolveRespondentExtensionDate(caseData);
+        properties.put(AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE));
         properties.put(DEFENDANT_NAME, fetchDefendantName(caseData));
         return properties;
     }

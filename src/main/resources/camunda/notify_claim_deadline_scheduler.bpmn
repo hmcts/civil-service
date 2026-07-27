@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1hi25ni" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
-  <bpmn:process id="NOTIFY_CLAIM_DEADLINE_SCHEDULER" name="Notify claim deadline scheduler" isExecutable="true" camunda:historyTimeToLive="P90D">
+  <bpmn:process id="NOTIFY_CLAIM_DEADLINE_SCHEDULER" name="Notify claim details scheduler" isExecutable="true" camunda:historyTimeToLive="P90D">
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>Flow_0pqxboc</bpmn:outgoing>
       <bpmn:timerEventDefinition id="TimerEventDefinition_19uik9q">
-        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">0 5 0 * * ?</bpmn:timeCycle>
+        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">0 1 16 * * ?</bpmn:timeCycle>
       </bpmn:timerEventDefinition>
     </bpmn:startEvent>
     <bpmn:sequenceFlow id="Flow_0pqxboc" sourceRef="StartEvent_1" targetRef="Activity_1wq7ps2" />
-    <bpmn:serviceTask id="Activity_1wq7ps2" name="Notify Claim Deadline Scheduler" camunda:type="external" camunda:topic="CASE_DISMISSED">
+    <bpmn:serviceTask id="Activity_1wq7ps2" name="Notify claim details scheduler" camunda:type="external" camunda:topic="CLAIM_DETAILS_NOTIFICATION_DEADLINE">
       <bpmn:incoming>Flow_0pqxboc</bpmn:incoming>
       <bpmn:outgoing>Flow_01t0yfm</bpmn:outgoing>
     </bpmn:serviceTask>

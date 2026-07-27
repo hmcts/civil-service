@@ -70,6 +70,19 @@ public class DetermineNextState extends CallbackHandler {
             || caseData.isFastTrackClaim());
     }
 
+    private static boolean isRepresentedPartyPartAdmitRejected(CaseData caseData) {
+        return caseData.isPartAdmitClaimSpec()
+            && !caseData.isPartAdmitClaimSettled()
+            && isApplicantOrRespondentRepresented(caseData)
+            && (caseData.isClaimantNotSettlePartAdmitClaim()
+            || caseData.hasApplicantRejectedRepaymentPlan());
+    }
+
+    private static boolean isApplicantOrRespondentRepresented(CaseData caseData) {
+        return YesOrNo.YES.equals(caseData.getApplicant1Represented())
+            || YesOrNo.YES.equals(caseData.getRespondent1Represented());
+    }
+
     @Override
     protected Map<String, Callback> callbacks() {
         return callbackMap;
@@ -104,14 +117,16 @@ public class DetermineNextState extends CallbackHandler {
             log.info("Pin in Post enabled for Case: {}", caseData.getCcdCaseReference());
             if (caseData.hasClaimantAgreedToFreeMediation()) {
                 nextState = CaseState.IN_MEDIATION.name();
-            } else if (isDefenceAdmitPayImmediately(caseData)) {
-                nextState = getNextState(caseData);
+            } else if (isRepresentedPartyPartAdmitRejected(caseData)) {
+                nextState = CaseState.JUDICIAL_REFERRAL.name();
             } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
                 nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
             } else if (caseData.isPartAdmitClaimSettled()) {
                 nextState = CaseState.CASE_SETTLED.name();
             } else if (isClaimNotSettled(caseData)) {
                 nextState = CaseState.JUDICIAL_REFERRAL.name();
+            } else if (isDefenceAdmitPayImmediately(caseData)) {
+                nextState = getNextState(caseData);
             } else if (isLipVLipOneVOne(caseData)) {
                 nextState = CaseState.CASE_STAYED.name();
             }
@@ -154,14 +169,16 @@ public class DetermineNextState extends CallbackHandler {
                 Pair<String, BusinessProcess> result = handleAcceptedRepaymentPlan(caseData, businessProcess);
                 nextState = result.getLeft();
                 businessProcess = result.getRight();
-            } else if (isDefenceAdmitPayImmediately(caseData)) {
-                nextState = getNextState(caseData);
+            } else if (isRepresentedPartyPartAdmitRejected(caseData)) {
+                nextState = CaseState.JUDICIAL_REFERRAL.name();
             } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
                 nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
             } else if (isClaimNotSettled(caseData)) {
                 nextState = CaseState.JUDICIAL_REFERRAL.name();
             } else if (caseData.isPartAdmitClaimSettled()) {
                 nextState = CaseState.CASE_SETTLED.name();
+            } else if (isDefenceAdmitPayImmediately(caseData)) {
+                nextState = getNextState(caseData);
             } else if (isLipVLipOneVOne(caseData)) {
                 nextState = CaseState.CASE_STAYED.name();
             }
@@ -210,6 +227,9 @@ public class DetermineNextState extends CallbackHandler {
         if ((caseData.isFullAdmitClaimSpec() && caseData.getApplicant1ProceedWithClaim() == null)
             || (caseData.isPartAdmitImmediatePaymentClaimSettled())) {
             return AWAITING_APPLICANT_INTENTION.name();
+        }
+        if (isRepresentedPartyPartAdmitRejected(caseData)) {
+            return CaseState.JUDICIAL_REFERRAL.name();
         }
         return CaseState.All_FINAL_ORDERS_ISSUED.name();
     }

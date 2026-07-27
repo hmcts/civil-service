@@ -15,7 +15,7 @@ public class MaskHelper {
         return Optional.ofNullable(text)
             .map(t -> Arrays.stream(t.split(" "))
                 .map(word -> word.contains("@") ? maskEmail(word) : word)
-                .collect(Collectors.joining()))
+                .collect(Collectors.joining(" ")))
             .orElse(StringUtils.EMPTY);
     }
 

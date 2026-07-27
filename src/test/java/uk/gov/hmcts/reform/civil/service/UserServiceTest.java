@@ -1,19 +1,26 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import com.google.common.collect.Lists;
+import feign.FeignException;
+import feign.Request;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.exceptions.UpstreamIdamException;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -84,14 +91,87 @@ class UserServiceTest {
     @Test
     void shouldThrowIllegalArgumentExceptionWithMaskedEmail_whenFailingToParseIdamResponse() {
         String errorMessage = "Email is " + SUB;
-        when(idamClient.getUserDetails(AUTHORISATION)).thenThrow(new IllegalArgumentException(errorMessage));
+        IllegalArgumentException cause = new IllegalArgumentException(errorMessage);
+        when(idamClient.getUserDetails(AUTHORISATION)).thenThrow(cause);
 
         var exception = assertThrows(
             IllegalArgumentException.class,
             () -> userService.getUserDetails(AUTHORISATION)
         );
 
+        assertThat(exception).hasCause(cause);
+        assertThat(exception.getMessage()).contains("Email is");
         assertThat(exception.getMessage()).contains(MASKED_SUB);
         assertThat(exception.getMessage()).doesNotContain(SUB);
+    }
+
+    @Test
+    void shouldRetryOnceAndReturnUserDetails_whenIdamUserDetailsFirstReturnsServerError() {
+        UserDetails expectedUserDetails = UserDetails.builder()
+            .email(SUB)
+            .build();
+        when(idamClient.getUserDetails(AUTHORISATION))
+            .thenThrow(internalServerError())
+            .thenReturn(expectedUserDetails);
+
+        var actualUserDetails = userService.getUserDetails(AUTHORISATION);
+
+        assertThat(actualUserDetails).isEqualTo(expectedUserDetails);
+        verify(idamClient, times(2)).getUserDetails(AUTHORISATION);
+    }
+
+    @Test
+    void shouldThrowUpstreamIdamExceptionWithCause_whenIdamUserDetailsServerErrorRetryFails() {
+        FeignException.InternalServerError serverError = internalServerError();
+        when(idamClient.getUserDetails(AUTHORISATION)).thenThrow(serverError);
+
+        var exception = assertThrows(
+            UpstreamIdamException.class,
+            () -> userService.getUserDetails(AUTHORISATION)
+        );
+
+        assertThat(exception)
+            .hasMessage("IDAM temporarily unavailable")
+            .hasCause(serverError);
+        verify(idamClient, times(2)).getUserDetails(AUTHORISATION);
+    }
+
+    @Test
+    void shouldRethrowFeignUnauthorized_whenIdamRejectsToken() {
+        FeignException.Unauthorized unauthorized = new FeignException.Unauthorized(
+            "Unauthorized",
+            request(),
+            new byte[]{},
+            Collections.emptyMap()
+        );
+        when(idamClient.getUserDetails(AUTHORISATION)).thenThrow(unauthorized);
+
+        var exception = assertThrows(
+            FeignException.Unauthorized.class,
+            () -> userService.getUserDetails(AUTHORISATION)
+        );
+
+        assertThat(exception).isSameAs(unauthorized);
+        verify(idamClient).getUserDetails(AUTHORISATION);
+    }
+
+    private FeignException.InternalServerError internalServerError() {
+        return new FeignException.InternalServerError(
+            "Internal Server Error",
+            request(),
+            "Internal Server Error".getBytes(StandardCharsets.UTF_8),
+            Collections.emptyMap()
+        );
+    }
+
+    private Request request() {
+        return Request.create(
+            Request.HttpMethod.GET,
+            "/details",
+            Collections.emptyMap(),
+            null,
+            StandardCharsets.UTF_8,
+            null
+        );
     }
 }
