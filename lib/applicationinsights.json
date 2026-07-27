@@ -18,6 +18,73 @@
           "percentage" : 1
         }
       ]
-    }
+    },
+    "processors": [
+      {
+        "type": "log",
+        "body": {
+          "toAttributes": {
+            "rules": [
+              "(?<redactedEmail>[\\w.+-]+@[\\w.-]+\\.[a-zA-Z]{2,})",
+              "(?i)(?:firstName|lastName|fullName|partyName|individualFirstName|individualLastName|soleTraderFirstName|soleTraderLastName|companyName|organisationName|email|emailAddress|partyEmail|dateOfBirth|individualDateOfBirth|dob|address|primaryAddress|addressLine[1-3]?|postCode|postTown|county|country)\"?\\s*[:=]\\s*\"?(?<redactedPii>[^\",})\\r\\n]+)",
+              "(?i)(?:amount|admittedAmount|calculatedAmountInPence|claimAmount|claimFee|claimFeeInPence|defendantAdmittedAmount|feeAmount|instalmentAmount|interest|interestAmount|outstandingAmount|paidAmount|partialAmount|paymentAmount|paymentReference|paymentDate|repaymentAmount|totalClaimAmount)\"?\\s*[:=]\\s*\"?(?<redactedFinancial>[^\",})\\r\\n]+)"
+            ]
+          }
+        }
+      },
+      {
+        "type": "attribute",
+        "actions": [
+          {
+            "key": "redactedEmail",
+            "action": "delete"
+          },
+          {
+            "key": "redactedPii",
+            "action": "delete"
+          },
+          {
+            "key": "redactedFinancial",
+            "action": "delete"
+          },
+          {
+            "key": "exception.message",
+            "pattern": "[\\w.+-]+@[\\w.-]+\\.[a-zA-Z]{2,}",
+            "replace": "[REDACTED]",
+            "action": "mask"
+          },
+          {
+            "key": "exception.message",
+            "pattern": "(?i)(?<piiMessagePrefix>(?:firstName|lastName|fullName|partyName|individualFirstName|individualLastName|soleTraderFirstName|soleTraderLastName|companyName|organisationName|email|emailAddress|partyEmail|dateOfBirth|individualDateOfBirth|dob|address|primaryAddress|addressLine[1-3]?|postCode|postTown|county|country)\"?\\s*[:=]\\s*\"?)[^\",})\\r\\n]+",
+            "replace": "${piiMessagePrefix}[REDACTED]",
+            "action": "mask"
+          },
+          {
+            "key": "exception.message",
+            "pattern": "(?i)(?<financialMessagePrefix>(?:amount|admittedAmount|calculatedAmountInPence|claimAmount|claimFee|claimFeeInPence|defendantAdmittedAmount|feeAmount|instalmentAmount|interest|interestAmount|outstandingAmount|paidAmount|partialAmount|paymentAmount|paymentReference|paymentDate|repaymentAmount|totalClaimAmount)\"?\\s*[:=]\\s*\"?)[^\",})\\r\\n]+",
+            "replace": "${financialMessagePrefix}[REDACTED]",
+            "action": "mask"
+          },
+          {
+            "key": "exception.stacktrace",
+            "pattern": "[\\w.+-]+@[\\w.-]+\\.[a-zA-Z]{2,}",
+            "replace": "[REDACTED]",
+            "action": "mask"
+          },
+          {
+            "key": "exception.stacktrace",
+            "pattern": "(?i)(?<piiStackPrefix>(?:firstName|lastName|fullName|partyName|individualFirstName|individualLastName|soleTraderFirstName|soleTraderLastName|companyName|organisationName|email|emailAddress|partyEmail|dateOfBirth|individualDateOfBirth|dob|address|primaryAddress|addressLine[1-3]?|postCode|postTown|county|country)\"?\\s*[:=]\\s*\"?)[^\",})\\r\\n]+",
+            "replace": "${piiStackPrefix}[REDACTED]",
+            "action": "mask"
+          },
+          {
+            "key": "exception.stacktrace",
+            "pattern": "(?i)(?<financialStackPrefix>(?:amount|admittedAmount|calculatedAmountInPence|claimAmount|claimFee|claimFeeInPence|defendantAdmittedAmount|feeAmount|instalmentAmount|interest|interestAmount|outstandingAmount|paidAmount|partialAmount|paymentAmount|paymentReference|paymentDate|repaymentAmount|totalClaimAmount)\"?\\s*[:=]\\s*\"?)[^\",})\\r\\n]+",
+            "replace": "${financialStackPrefix}[REDACTED]",
+            "action": "mask"
+          }
+        ]
+      }
+    ]
   }
 }
