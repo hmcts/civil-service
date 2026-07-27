@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.scheduler.common;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
@@ -14,14 +13,13 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@ConditionalOnExpression("${testing.support.enabled:false}")
-public class TestingSupportSchedulerRegistry {
+public class SchedulerRegistry {
 
     private final Map<String, CivilScheduler> schedulers;
     private final TaskExecutor taskExecutor;
 
-    public TestingSupportSchedulerRegistry(List<CivilScheduler> schedulers,
-                                           @Qualifier("asyncHandlerExecutor") TaskExecutor taskExecutor) {
+    public SchedulerRegistry(List<CivilScheduler> schedulers,
+                             @Qualifier("asyncHandlerExecutor") TaskExecutor taskExecutor) {
         this.schedulers = schedulers.stream()
             .collect(Collectors.toMap(
                 CivilScheduler::getName,
