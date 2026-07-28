@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_CASE_KEY;
 import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_FLAGS_KEY;
 import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_HISTORY_KEY;
@@ -39,7 +40,11 @@ public class StateFlow {
 
     public State getState() {
         if (stateMachine.hasStateMachineError()) {
-            throw new StateFlowException("The state machine is at error state.");
+            CaseData caseData = stateMachine.getExtendedState().get(EXTENDED_STATE_CASE_KEY, CaseData.class);
+            throw new StateFlowException(
+                format("The state machine is at error state. Case ID: %s",
+                              caseData != null ? caseData.getCcdCaseReference() : "unknown")
+            );
         }
         return State.from(stateMachine.getState().getId());
     }

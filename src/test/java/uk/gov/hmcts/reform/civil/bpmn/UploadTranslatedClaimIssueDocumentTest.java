@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.civil.bpmn;
 
 import org.camunda.bpm.engine.externaltask.ExternalTask;
-import org.junit.jupiter.api.Test;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class UploadTranslatedClaimIssueDocumentTest extends BpmnBaseTest {
+class UploadTranslatedClaimIssueDocumentTest extends BpmnBaseTest {
 
     public static final String MESSAGE_NAME = "UPLOAD_TRANSLATED_DOCUMENT_LIP";
     private static final String PROCESS_CLAIM_ISSUE_EVENT = "PROCESS_CLAIM_ISSUE_SPEC";
@@ -20,6 +23,10 @@ public class UploadTranslatedClaimIssueDocumentTest extends BpmnBaseTest {
     //notify RPA
     private static final String NOTIFY_RPA_ON_CONTINUOUS_FEED_EVENT = "NOTIFY_RPA_ON_CONTINUOUS_FEED";
     private static final String NOTIFY_RPA_ON_CONTINUOUS_FEED_ACTIVITY_ID = "NotifyRoboticsOnContinuousFeed";
+
+    private static final String CANCEL_DOCUMENT_TRANSLATION_TASK_EVENT = "CANCEL_DOCUMENT_TRANSLATION_TASK";
+    private static final String CANCEL_DOCUMENT_TRANSLATION_TASK_ACTIVITY_ID = "cancelWATask";
+
     public static final String NOTIFY_EVENT = "NOTIFY_EVENT";
 
     public static final String GENERATE_PIP_LETTER = "GENERATE_PIP_LETTER";
@@ -32,8 +39,9 @@ public class UploadTranslatedClaimIssueDocumentTest extends BpmnBaseTest {
         super("upload_translated_document_claim_issue_notify.bpmn", "UPLOAD_TRANSLATED_DOCUMENT_LIP_ID");
     }
 
-    @Test
-    void shouldRunProcess() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldRunProcess(boolean isApplicantUploadTranslatedDocumentTaskRequiredCancellation) {
         //assert process has started
         assertFalse(processInstance.isEnded());
         //complete the start business process
@@ -99,13 +107,26 @@ public class UploadTranslatedClaimIssueDocumentTest extends BpmnBaseTest {
 
         //complete the Robotics notification
         ExternalTask forRobotics = assertNextExternalTask(PROCESS_CASE_EVENT);
+        VariableMap variables = Variables.createVariables();
+        variables.put("isApplicantUploadTranslatedDocumentTaskRequiredCancellation",
+                      isApplicantUploadTranslatedDocumentTaskRequiredCancellation);
         assertCompleteExternalTask(
-                forRobotics,
-                PROCESS_CASE_EVENT,
-                NOTIFY_RPA_ON_CONTINUOUS_FEED_EVENT,
-                NOTIFY_RPA_ON_CONTINUOUS_FEED_ACTIVITY_ID
+            forRobotics,
+            PROCESS_CASE_EVENT,
+            NOTIFY_RPA_ON_CONTINUOUS_FEED_EVENT,
+            NOTIFY_RPA_ON_CONTINUOUS_FEED_ACTIVITY_ID,
+            variables
         );
 
+        if (isApplicantUploadTranslatedDocumentTaskRequiredCancellation) {
+            ExternalTask forWATaskCancellation = assertNextExternalTask(PROCESS_CASE_EVENT);
+            assertCompleteExternalTask(
+                forWATaskCancellation,
+                PROCESS_CASE_EVENT,
+                CANCEL_DOCUMENT_TRANSLATION_TASK_EVENT,
+                CANCEL_DOCUMENT_TRANSLATION_TASK_ACTIVITY_ID
+            );
+        }
         //end business process
         ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);
         completeBusinessProcess(endBusinessProcess);
