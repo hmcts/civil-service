@@ -54,13 +54,14 @@ class DraftStoreServiceTest {
             when(draftStoreRepository.save(any(DraftStoreEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-            DraftStoreEntity result = draftStoreService.createDraftClaim(USER_ID, CASE_ID, payload);
+            DraftClaimCreationResult result = draftStoreService.createDraftClaim(USER_ID, CASE_ID, payload);
 
             ArgumentCaptor<DraftStoreEntity> captor = ArgumentCaptor.forClass(DraftStoreEntity.class);
             verify(draftStoreRepository).save(captor.capture());
             DraftStoreEntity savedDraft = captor.getValue();
 
-            assertThat(result).isSameAs(savedDraft);
+            assertThat(result.newlyCreated()).isTrue();
+            assertThat(result.draftClaim()).isSameAs(savedDraft);
             assertThat(savedDraft.getId()).isNotNull();
             assertThat(savedDraft.getUserId()).isEqualTo(USER_ID);
             assertThat(savedDraft.getCaseId()).isEqualTo(CASE_ID);
@@ -69,6 +70,53 @@ class DraftStoreServiceTest {
             assertThat(savedDraft.getDraftClaimCreatedAt()).isEqualTo(savedDraft.getCreatedAt());
             assertThat(savedDraft.getUpdatedAt()).isEqualTo(savedDraft.getCreatedAt());
             assertThat(savedDraft.getExpiresAt()).isEqualTo(savedDraft.getDraftClaimCreatedAt().plusDays(DRAFT_EXPIRY_DAYS));
+        }
+
+        @Test
+        void shouldReturnExistingActiveDraftClaim() {
+            OffsetDateTime createdAt = OffsetDateTime.now().minusDays(1);
+            DraftStoreEntity existingDraft = draftClaim(createdAt, createdAt.plusDays(DRAFT_EXPIRY_DAYS));
+            when(draftStoreRepository.findByUserIdAndDraftTypeId(USER_ID, DRAFT_CLAIM_TYPE_ID))
+                .thenReturn(Optional.of(existingDraft));
+
+            DraftClaimCreationResult result = draftStoreService.createDraftClaim(
+                USER_ID,
+                NEW_CASE_ID,
+                Map.of("step", "new-payload")
+            );
+
+            assertThat(result.newlyCreated()).isFalse();
+            assertThat(result.draftClaim()).isSameAs(existingDraft);
+            assertThat(existingDraft.getCaseId()).isEqualTo(CASE_ID);
+            assertThat(existingDraft.getPayload()).containsEntry("step", "existing-payload");
+            assertThat(existingDraft.getDraftClaimCreatedAt()).isEqualTo(createdAt);
+            assertThat(existingDraft.getExpiresAt()).isEqualTo(createdAt.plusDays(DRAFT_EXPIRY_DAYS));
+            verify(draftStoreRepository).findByUserIdAndDraftTypeId(USER_ID, DRAFT_CLAIM_TYPE_ID);
+            verifyNoMoreInteractions(draftStoreRepository);
+        }
+
+        @Test
+        void shouldReplaceExpiredDraftClaim() {
+            OffsetDateTime createdAt = OffsetDateTime.now().minusDays(DRAFT_EXPIRY_DAYS + 1);
+            DraftStoreEntity expiredDraft = draftClaim(createdAt, createdAt.plusDays(DRAFT_EXPIRY_DAYS));
+            when(draftStoreRepository.findByUserIdAndDraftTypeId(USER_ID, DRAFT_CLAIM_TYPE_ID))
+                .thenReturn(Optional.of(expiredDraft));
+            when(draftStoreRepository.save(any(DraftStoreEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+            DraftClaimCreationResult result = draftStoreService.createDraftClaim(
+                USER_ID,
+                NEW_CASE_ID,
+                Map.of("step", "new-payload")
+            );
+
+            assertThat(result.newlyCreated()).isTrue();
+            assertThat(result.draftClaim().getId()).isNotEqualTo(expiredDraft.getId());
+            assertThat(result.draftClaim().getCaseId()).isEqualTo(NEW_CASE_ID);
+            assertThat(result.draftClaim().getPayload()).containsEntry("step", "new-payload");
+            verify(draftStoreRepository).delete(expiredDraft);
+            verify(draftStoreRepository).flush();
+            verify(draftStoreRepository).save(result.draftClaim());
         }
 
         @Test
@@ -146,7 +194,7 @@ class DraftStoreServiceTest {
         void shouldReturnActiveDraftClaimUsingUserId() {
             DraftStoreEntity draftClaim = mock(DraftStoreEntity.class);
 
-            when(draftStoreRepository.findFirstByUserIdAndDraftTypeIdAndExpiresAtAfterOrderByUpdatedAtDesc(
+            when(draftStoreRepository.findByUserIdAndDraftTypeIdAndExpiresAtAfter(
                 eq(USER_ID),
                 eq(DRAFT_CLAIM_TYPE_ID),
                 any(OffsetDateTime.class)))
@@ -156,7 +204,7 @@ class DraftStoreServiceTest {
 
             ArgumentCaptor<OffsetDateTime> dateCaptor = ArgumentCaptor.forClass(OffsetDateTime.class);
 
-            verify(draftStoreRepository).findFirstByUserIdAndDraftTypeIdAndExpiresAtAfterOrderByUpdatedAtDesc(
+            verify(draftStoreRepository).findByUserIdAndDraftTypeIdAndExpiresAtAfter(
                 eq(USER_ID),
                 eq(DRAFT_CLAIM_TYPE_ID),
                 dateCaptor.capture());
@@ -305,6 +353,20 @@ class DraftStoreServiceTest {
 
             verifyNoInteractions(draftStoreRepository);
         }
+    }
+
+    private DraftStoreEntity draftClaim(OffsetDateTime createdAt, OffsetDateTime expiresAt) {
+        return new DraftStoreEntity(
+            DRAFT_ID,
+            USER_ID,
+            CASE_ID,
+            DRAFT_CLAIM_TYPE_ID,
+            new HashMap<>(Map.of("step", "existing-payload")),
+            createdAt,
+            createdAt,
+            createdAt,
+            expiresAt
+        );
     }
 
 }
