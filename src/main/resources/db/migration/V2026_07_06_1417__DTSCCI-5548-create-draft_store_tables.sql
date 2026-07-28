@@ -29,3 +29,4 @@ CREATE TABLE dbs.draft_store
 
 CREATE INDEX idx_draft_store_user_type ON dbs.draft_store(user_id, draft_type_id);
 CREATE INDEX idx_draft_store_expires_at ON dbs.draft_store(expires_at);
+CREATE UNIQUE INDEX uq_draft_store_user_draft_claim ON dbs.draft_store(user_id) WHERE draft_type_id = 1;

@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.dashboard.data.DraftClaimRequest;
 import uk.gov.hmcts.reform.dashboard.data.DraftClaimResponse;
 import uk.gov.hmcts.reform.dashboard.entities.DraftStoreEntity;
+import uk.gov.hmcts.reform.dashboard.services.DraftClaimCreationResult;
 import uk.gov.hmcts.reform.dashboard.services.DraftStoreService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -59,7 +60,8 @@ class DraftClaimControllerTest {
     @Test
     void shouldCreateDraftClaim() {
         payload.put("deadline", OffsetDateTime.now());
-        when(draftStoreService.createDraftClaim(USER_ID, CASE_ID, payload)).thenReturn(draftStoreEntity);
+        when(draftStoreService.createDraftClaim(USER_ID, CASE_ID, payload))
+            .thenReturn(DraftClaimCreationResult.newDraft(draftStoreEntity));
 
         DraftClaimRequest request = new DraftClaimRequest(CASE_ID, payload);
 
@@ -67,6 +69,21 @@ class DraftClaimControllerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isNotNull();
+        verify(draftStoreService).createDraftClaim(USER_ID, CASE_ID, payload);
+    }
+
+    @Test
+    void shouldReturnExistingDraftClaim() {
+        when(draftStoreService.createDraftClaim(USER_ID, CASE_ID, payload))
+            .thenReturn(DraftClaimCreationResult.existingDraft(draftStoreEntity));
+
+        DraftClaimRequest request = new DraftClaimRequest(CASE_ID, payload);
+
+        ResponseEntity<DraftClaimResponse> response = controller.createDraftClaim(AUTH, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getDraftId()).isEqualTo(DRAFT_ID);
         verify(draftStoreService).createDraftClaim(USER_ID, CASE_ID, payload);
     }
 

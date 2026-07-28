@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.dashboard.repositories;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.dashboard.entities.DraftStoreEntity;
 
@@ -9,9 +9,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface DraftStoreRepository extends CrudRepository<DraftStoreEntity, UUID> {
+public interface DraftStoreRepository extends JpaRepository<DraftStoreEntity, UUID> {
 
-    Optional<DraftStoreEntity> findFirstByUserIdAndDraftTypeIdAndExpiresAtAfterOrderByUpdatedAtDesc(
+    Optional<DraftStoreEntity> findByUserIdAndDraftTypeId(String userId, Integer draftTypeId);
+
+    Optional<DraftStoreEntity> findByUserIdAndDraftTypeIdAndExpiresAtAfter(
         String userId,
         Integer draftTypeId,
         OffsetDateTime now
