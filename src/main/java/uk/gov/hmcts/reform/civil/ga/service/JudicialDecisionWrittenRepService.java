@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialWrittenRepresentations;
 
 import java.time.LocalDate;
+
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.nowInLocalZone;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,8 +29,8 @@ public class JudicialDecisionWrittenRepService {
                 .getWrittenSequentailRepresentationsBy();
             LocalDate sequentialApplicantMustRespondWithinDate = judicialWrittenRepresentationsDate
                 .getSequentialApplicantMustRespondWithin();
-            if (LocalDate.now().isAfter(writtenSequentailRepresentationDate)
-                || LocalDate.now().isAfter(sequentialApplicantMustRespondWithinDate)) {
+            if (nowInLocalZone().toLocalDate().isAfter(writtenSequentailRepresentationDate)
+                || nowInLocalZone().toLocalDate().isAfter(sequentialApplicantMustRespondWithinDate)) {
                 errors.add(WRITTEN_REPRESENTATION_DATE_CANNOT_BE_IN_PAST);
             }
         }
@@ -36,7 +38,7 @@ public class JudicialDecisionWrittenRepService {
             && judicialWrittenRepresentationsDate.getWrittenConcurrentRepresentationsBy() != null) {
             LocalDate writtenConcurrentRepresentationDate = judicialWrittenRepresentationsDate
                 .getWrittenConcurrentRepresentationsBy();
-            if (LocalDate.now().isAfter(writtenConcurrentRepresentationDate)) {
+            if (nowInLocalZone().toLocalDate().isAfter(writtenConcurrentRepresentationDate)) {
                 errors.add(WRITTEN_REPRESENTATION_DATE_CANNOT_BE_IN_PAST);
             }
         }

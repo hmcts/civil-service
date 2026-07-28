@@ -51,9 +51,14 @@ class RoboticsNotifierTest {
 
     @Test
     void shouldNotExecute_ifRpaDisabled() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .legacyCaseReference(LEGACY_REFERENCE)
+            .ccdCaseReference(1234L)
+            .build();
+
         when(featureToggleService.isRPAEmailEnabled()).thenReturn(false);
 
-        roboticsNotifier.notifyRobotics(null, null);
+        roboticsNotifier.notifyRobotics(caseData, null);
 
         verifyNoInteractions(jsonSchemaValidationService);
         verifyNoInteractions(roboticsDataMapper);
