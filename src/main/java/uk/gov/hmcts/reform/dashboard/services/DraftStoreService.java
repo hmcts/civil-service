@@ -30,23 +30,39 @@ public class DraftStoreService {
         this.draftStoreRepository = draftStoreRepository;
     }
 
-    public DraftStoreEntity createDraftClaim(String userId, String caseId, Map<String, Object> payload) {
+    public DraftClaimCreationResult createDraftClaim(String userId, String caseId, Map<String, Object> payload) {
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Map<String, Object> copiedPayload = copyPayload(payload);
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
+
+        Optional<DraftStoreEntity> existingDraft = draftStoreRepository.findByUserIdAndDraftTypeId(
+            userId,
+            DRAFT_CLAIM_TYPE_ID
+        );
+        if (existingDraft.isPresent()) {
+            DraftStoreEntity draft = existingDraft.get();
+            if (draft.getExpiresAt().isAfter(now)) {
+                log.info("Returning existing active draft claim draftId={}", draft.getId());
+                return DraftClaimCreationResult.existingDraft(draft);
+            }
+            log.info("Removing expired draft claim draftId={}", draft.getId());
+            draftStoreRepository.delete(draft);
+            draftStoreRepository.flush();
+        }
 
         DraftStoreEntity draftStoreEntity = new DraftStoreEntity(
             UUID.randomUUID(),
             userId,
             caseId,
             DRAFT_CLAIM_TYPE_ID,
-            copyPayload(payload),
+            copiedPayload,
             now,
             now,
             now,
             now.plusDays(DRAFT_EXPIRY_DAYS)
         );
         log.info("Creating new draft claim draftId={}", draftStoreEntity.getId());
-        return draftStoreRepository.save(draftStoreEntity);
+        return DraftClaimCreationResult.newDraft(draftStoreRepository.save(draftStoreEntity));
     }
 
     private Optional<DraftStoreEntity> findDraftClaim(UUID draftId, String userId) {
@@ -66,13 +82,10 @@ public class DraftStoreService {
         return findDraftClaim(draftId, userId);
     }
 
-    /**
-     * Returns the most recently updated, unexpired draft claim for a user.
-     */
     @Transactional(readOnly = true)
     public Optional<DraftStoreEntity> getActiveDraftClaimForUser(String userId) {
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
-        return draftStoreRepository.findFirstByUserIdAndDraftTypeIdAndExpiresAtAfterOrderByUpdatedAtDesc(
+        return draftStoreRepository.findByUserIdAndDraftTypeIdAndExpiresAtAfter(
             userId,
             DRAFT_CLAIM_TYPE_ID,
             OffsetDateTime.now(ZoneOffset.UTC)
