@@ -31,6 +31,22 @@ class PiiRedactorTest {
     }
 
     @Test
+    void shouldRedactRoboticsPartyNamesContactDetailsAndFinancialValues() {
+        String message = "LitigiousParty(name=Mr Synthetic Claimant, contactTelephoneNumber=07123456789, "
+            + "contactFaxNumber=02079460000), ClaimDetails(amountClaimed=153, courtFee=35.00)";
+
+        assertThat(PiiRedactor.redact(message))
+            .doesNotContain("Synthetic Claimant", "07123456789", "02079460000", "153", "35.00")
+            .contains(
+                "name=[REDACTED]",
+                "contactTelephoneNumber=[REDACTED]",
+                "contactFaxNumber=[REDACTED]",
+                "amountClaimed=[REDACTED]",
+                "courtFee=[REDACTED]"
+            );
+    }
+
+    @Test
     void shouldRetainOperationalIdentifiersAndRedactFinancialValues() {
         String message = "caseId=1234567890123456, caseReference=ABC-123, userId=user-123, "
             + "taskId=task-123, documentId=document-123, reference=notification-123, "
