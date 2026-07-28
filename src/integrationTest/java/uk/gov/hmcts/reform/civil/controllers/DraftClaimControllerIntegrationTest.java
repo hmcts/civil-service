@@ -8,8 +8,12 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.DraftClaimRequest;
@@ -128,7 +132,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
         Map<String, Object> updatedPayload = Map.of("step", "updated-step");
         DraftClaimRequest updatedRequest = new DraftClaimRequest("12345", updatedPayload);
 
-        doPut(BEARER_TOKEN, updatedRequest, DRAFT_CLAIM_BY_ID_URL, draftId)
+        doDraftPut(BEARER_TOKEN, updatedRequest, draftId)
             .andExpectAll(
                 status().isOk(),
                 jsonPath("$.draftId").value(draftId.toString()),
@@ -152,7 +156,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
         Map<String, Object> updatedPayload = Map.of("step", "updated-step");
         DraftClaimRequest updatedRequest = new DraftClaimRequest("123", updatedPayload);
 
-        doPut(BEARER_TOKEN, updatedRequest, DRAFT_CLAIM_BY_ID_URL, draftId)
+        doDraftPut(BEARER_TOKEN, updatedRequest, draftId)
             .andExpect(status().isOk());
 
         DraftStoreEntity updatedEntity = draftStoreRepository.findById(draftId)
@@ -207,7 +211,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
             .andExpect(status().isNotFound());
 
         DraftClaimRequest updateRequest = new DraftClaimRequest("1234", Map.of("step", "unauthorised-step"));
-        doPut(bearerToken2, updateRequest, DRAFT_CLAIM_BY_ID_URL, draftId)
+        doDraftPut(bearerToken2, updateRequest, draftId)
             .andExpect(status().isNotFound());
 
         doDelete(bearerToken2, null, DRAFT_CLAIM_BY_ID_URL, draftId)
@@ -230,5 +234,15 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
 
         doGet(BEARER_TOKEN, DRAFT_CLAIM_BY_ID_URL, draftId)
             .andExpect(status().isNotFound());
+    }
+
+    private ResultActions doDraftPut(String authorisation, DraftClaimRequest request, UUID draftClaimId)
+        throws Exception {
+        return mockMvc.perform(
+            MockMvcRequestBuilders.put(DRAFT_CLAIM_BY_ID_URL, draftClaimId)
+                .header(HttpHeaders.AUTHORIZATION, authorisation)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request))
+        );
     }
 }
