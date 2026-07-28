@@ -244,8 +244,7 @@ public abstract class BaseIntegrationTest {
         return mockMvc.perform(
             MockMvcRequestBuilders.put(urlTemplate, uriVars)
                 .header(HttpHeaders.AUTHORIZATION, auth)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(toJson(content)));
+                .contentType(MediaType.APPLICATION_JSON));
     }
 
     @SneakyThrows
