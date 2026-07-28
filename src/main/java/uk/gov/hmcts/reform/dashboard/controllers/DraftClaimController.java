@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.dashboard.data.DraftClaimRequest;
 import uk.gov.hmcts.reform.dashboard.data.DraftClaimResponse;
 import uk.gov.hmcts.reform.dashboard.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.dashboard.exceptions.DraftClaimNotFoundException;
+import uk.gov.hmcts.reform.dashboard.services.DraftClaimCreationResult;
 import uk.gov.hmcts.reform.dashboard.services.DraftStoreService;
 
 import java.util.UUID;
@@ -40,12 +41,13 @@ public class DraftClaimController {
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
         @Valid @RequestBody DraftClaimRequest request
     ) {
-        DraftStoreEntity draftClaim = draftStoreService.createDraftClaim(
+        DraftClaimCreationResult result = draftStoreService.createDraftClaim(
             getUserId(authorisation),
             request.getCaseId(),
             request.getPayload()
         );
-        return new ResponseEntity<>(DraftClaimResponse.from(draftClaim), HttpStatus.CREATED);
+        HttpStatus status = result.newlyCreated() ? HttpStatus.CREATED : HttpStatus.OK;
+        return new ResponseEntity<>(DraftClaimResponse.from(result.draftClaim()), status);
     }
 
     @GetMapping("/active")
