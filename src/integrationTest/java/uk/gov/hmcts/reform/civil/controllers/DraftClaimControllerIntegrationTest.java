@@ -8,6 +8,7 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,6 +28,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -83,6 +85,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void shouldCreateDraftAndStorePayload() throws Exception {
+        draftStoreRepository.deleteAll();
         DraftClaimRequest request = new DraftClaimRequest("123", PAYLOAD);
 
         MvcResult result = doPost(BEARER_TOKEN, request, DRAFT_CLAIMS_URL)
@@ -101,6 +104,57 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
 
         assertThat(draftInDb.getPayload()).extracting("step").isEqualTo("claimant-details");
         assertThat(draftInDb.getUserId()).isEqualTo(USER_ID);
+    }
+
+    @Test
+    void repeatedCreationReturnsExistingDraftWithoutChangingIt() throws Exception {
+        DraftStoreEntity originalDraft = draftStoreRepository.findById(draftId)
+            .orElseThrow(() -> new AssertionError("Draft claim should exist in DB"));
+        OffsetDateTime originalCreatedAt = originalDraft.getDraftClaimCreatedAt();
+        OffsetDateTime originalExpiresAt = originalDraft.getExpiresAt();
+
+        DraftClaimRequest request = new DraftClaimRequest("new-case-id", PAYLOAD);
+
+        doPost(BEARER_TOKEN, request, DRAFT_CLAIMS_URL)
+            .andExpectAll(
+                status().isOk(),
+                jsonPath("$.draftId").value(draftId.toString()),
+                jsonPath("$.caseId").value("12345"),
+                jsonPath("$.payload.step").value("active-test")
+            );
+
+        assertThat(draftStoreRepository.count()).isOne();
+        DraftStoreEntity unchangedDraft = draftStoreRepository.findById(draftId)
+            .orElseThrow(() -> new AssertionError("Draft claim should exist in DB"));
+        assertThat(unchangedDraft.getDraftClaimCreatedAt()).isEqualTo(originalCreatedAt);
+        assertThat(unchangedDraft.getExpiresAt()).isEqualTo(originalExpiresAt);
+    }
+
+    @Test
+    void shouldCreateDraftForDifferentUser() throws Exception {
+        String otherUserToken = "Bearer other-user";
+        given(userService.getUserInfo(otherUserToken))
+            .willReturn(UserInfo.builder().uid("user2").build());
+
+        doPost(otherUserToken, new DraftClaimRequest("case2", PAYLOAD), DRAFT_CLAIMS_URL)
+            .andExpect(status().isCreated());
+
+        assertThat(draftStoreRepository.count()).isEqualTo(2);
+    }
+
+    @Test
+    void databasePreventsDuplicateDraftClaimsForUser() {
+        OffsetDateTime now = OffsetDateTime.now();
+        DraftStoreEntity duplicateDraft = draftClaim(
+            UUID.randomUUID(),
+            USER_ID,
+            now,
+            now.plusDays(180),
+            "duplicate"
+        );
+
+        assertThatThrownBy(() -> draftStoreRepository.saveAndFlush(duplicateDraft))
+            .isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
@@ -180,24 +234,76 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
         draftStoreRepository.deleteById(draftId);
         OffsetDateTime expiredDate = OffsetDateTime.now().minusDays(181);
 
-        DraftStoreEntity expiredDraft = new DraftStoreEntity();
-        expiredDraft.setId(draftId);
-        expiredDraft.setUserId(USER_ID);
-        expiredDraft.setDraftTypeId(1);
-        expiredDraft.setCaseId("1234");
-        expiredDraft.setPayload(new HashMap<>(Map.of("step", "expired-test")));
-        expiredDraft.setDraftClaimCreatedAt(expiredDate);
-        expiredDraft.setCreatedAt(expiredDate);
-        expiredDraft.setExpiresAt(OffsetDateTime.now().minusDays(1));
-        expiredDraft.setUpdatedAt(expiredDate);
-
-        draftStoreRepository.save(expiredDraft);
+        draftStoreRepository.save(draftClaim(
+            draftId,
+            USER_ID,
+            expiredDate,
+            OffsetDateTime.now().minusDays(1),
+            "expired-test"
+        ));
 
         doGet(BEARER_TOKEN, DRAFT_CLAIM_BY_ID_URL, draftId)
             .andExpect(status().isNotFound());
 
         doGet(BEARER_TOKEN, ACTIVE_DRAFT_CLAIM_URL)
             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void expiredDraftCannotBeUpdated() throws Exception {
+        draftStoreRepository.deleteById(draftId);
+        OffsetDateTime expiredDate = OffsetDateTime.now().minusDays(181);
+        draftStoreRepository.save(draftClaim(
+            draftId,
+            USER_ID,
+            expiredDate,
+            expiredDate.plusDays(180),
+            "expired-test"
+        ));
+
+        DraftClaimRequest updateRequest = new DraftClaimRequest(
+            "updated-case-id",
+            Map.of("step", "updated-step")
+        );
+
+        doDraftPut(BEARER_TOKEN, updateRequest, draftId)
+            .andExpect(status().isNotFound());
+
+        assertThat(draftStoreRepository.count()).isOne();
+        DraftStoreEntity expiredDraft = draftStoreRepository.findById(draftId)
+            .orElseThrow(() -> new AssertionError("Expired draft claim should remain in DB"));
+        assertThat(expiredDraft.getCaseId()).isEqualTo("1234");
+        assertThat(expiredDraft.getPayload()).containsEntry("step", "expired-test");
+    }
+
+    @Test
+    void shouldReplaceExpiredDraftWhenCreatingDraftClaim() throws Exception {
+        draftStoreRepository.deleteById(draftId);
+        OffsetDateTime expiredDate = OffsetDateTime.now().minusDays(181);
+        draftStoreRepository.save(draftClaim(
+            draftId,
+            USER_ID,
+            expiredDate,
+            expiredDate.plusDays(180),
+            "expired-test"
+        ));
+
+        MvcResult result = doPost(
+            BEARER_TOKEN,
+            new DraftClaimRequest("new-case-id", PAYLOAD),
+            DRAFT_CLAIMS_URL
+        )
+            .andExpect(status().isCreated())
+            .andReturn();
+
+        UUID newDraftId = UUID.fromString(JsonPath.read(result.getResponse().getContentAsString(), "$.draftId"));
+        assertThat(newDraftId).isNotEqualTo(draftId);
+        assertThat(draftStoreRepository.findById(draftId)).isEmpty();
+        assertThat(draftStoreRepository.count()).isOne();
+
+        DraftStoreEntity newDraft = draftStoreRepository.findById(newDraftId)
+            .orElseThrow(() -> new AssertionError("New draft claim should exist in DB"));
+        assertThat(newDraft.getExpiresAt()).isEqualTo(newDraft.getDraftClaimCreatedAt().plusDays(180));
     }
 
     @Test
@@ -243,6 +349,24 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
                 .header(HttpHeaders.AUTHORIZATION, authorisation)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(request))
+        );
+    }
+
+    private DraftStoreEntity draftClaim(UUID id,
+                                        String userId,
+                                        OffsetDateTime createdAt,
+                                        OffsetDateTime expiresAt,
+                                        String step) {
+        return new DraftStoreEntity(
+            id,
+            userId,
+            "1234",
+            1,
+            new HashMap<>(Map.of("step", step)),
+            createdAt,
+            createdAt,
+            createdAt,
+            expiresAt
         );
     }
 }
