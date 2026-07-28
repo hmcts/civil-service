@@ -74,7 +74,7 @@
     <bpmn:sequenceFlow id="Flow_0urkbiq" sourceRef="ClaimDismissedNotifyParties" targetRef="GenerateDashboardNotificationsClaimDismissed" />
     <bpmn:sequenceFlow id="Flow_0o65a0g" sourceRef="UpdateClaimWithApplicationStatus" targetRef="ClaimDismissedNotifyParties" />
     <bpmn:sequenceFlow id="Flow_0y6x89y" sourceRef="Activity_0emdthr" targetRef="UpdateGeneralApplicationStatus" />
-    <bpmn:serviceTask id="GenerateDashboardNotificationsClaimDismissed" name="Dashboard Notifications" camunda:type="external" camunda:topic="processCaseEvent">
+    <bpmn:serviceTask id="GenerateDashboardNotificationsClaimDismissed" name="Dashboard Notifications" camunda:type="external" camunda:topic="dashboardNotifications">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="caseEvent">DASHBOARD_NOTIFICATION_EVENT</camunda:inputParameter>
