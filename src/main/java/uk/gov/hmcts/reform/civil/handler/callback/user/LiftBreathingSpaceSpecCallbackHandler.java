@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -70,18 +71,22 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         List<String> errors = new ArrayList<>();
+        LocalDate startDate = caseData.getBreathing().getEnter().getStart();
 
-        if (caseData.getBreathing().getLift().getExpectedEnd() != null) {
-            if (caseData.getBreathing().getLift().getExpectedEnd().isAfter(LocalDate.now())) {
-                errors.add("End date must be today or in the past.");
-            } else if (caseData.getBreathing().getEnter().getStart() != null
-                && caseData.getBreathing().getEnter().getStart().isAfter(
-                caseData.getBreathing().getLift().getExpectedEnd()
-            )) {
-                errors.add("End date must be after " + DateFormatHelper
-                    .formatLocalDate(caseData.getBreathing().getEnter().getStart(), DateFormatHelper.DATE));
-            }
+        int STANDARD_BREATHING_SPACE_MAX_DURATION_DAYS = 60;
+        if (caseData.getBreathing().getEnter().getType() == BreathingSpaceType.STANDARD
+         && caseData.getBreathing().getLift().getExpectedEnd().isAfter(startDate.plusDays(
+            STANDARD_BREATHING_SPACE_MAX_DURATION_DAYS))) {
+            errors.add("Standard breathing space cannot last for longer than 60 days");
         }
+
+         if (startDate != null
+             && startDate.isAfter(
+                 caseData.getBreathing().getLift().getExpectedEnd()))
+         {
+             errors.add("End date must be after " + DateFormatHelper
+                 .formatLocalDate(startDate, DateFormatHelper.DATE));
+         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
