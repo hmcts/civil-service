@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.dashboard.data;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.dashboard.entities.DraftStoreEntity;
+import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
@@ -28,7 +28,7 @@ public class DraftClaimResponse {
             draftStoreEntity.getId(),
             draftStoreEntity.getCaseId(),
             new HashMap<>(draftStoreEntity.getPayload()),
-            draftStoreEntity.getDraftClaimCreatedAt(),
+            draftStoreEntity.getDraftCreatedAt(),
             draftStoreEntity.getExpiresAt(),
             draftStoreEntity.getCreatedAt(),
             draftStoreEntity.getUpdatedAt()
