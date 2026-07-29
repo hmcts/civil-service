@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.dashboard.entities;
+package uk.gov.hmcts.reform.draftstore.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,8 +49,8 @@ public class DraftStoreEntity implements Serializable {
     private Map<String, Object> payload;
 
     @NotNull
-    @Column(name = "draft_claim_created_at", updatable = false)
-    private OffsetDateTime draftClaimCreatedAt;
+    @Column(name = "draft_created_at", updatable = false)
+    private OffsetDateTime draftCreatedAt;
 
     @NotNull
     @Column(name = "created_at", updatable = false)

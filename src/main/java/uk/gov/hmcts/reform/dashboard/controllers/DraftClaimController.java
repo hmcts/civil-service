@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.dashboard.data.DraftClaimRequest;
 import uk.gov.hmcts.reform.dashboard.data.DraftClaimResponse;
-import uk.gov.hmcts.reform.dashboard.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.dashboard.exceptions.DraftClaimNotFoundException;
 import uk.gov.hmcts.reform.dashboard.services.DraftClaimCreationResult;
-import uk.gov.hmcts.reform.dashboard.services.DraftStoreService;
+import uk.gov.hmcts.reform.dashboard.services.DraftClaimService;
+import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 
 import java.util.UUID;
 
@@ -28,11 +28,11 @@ import java.util.UUID;
 @RequestMapping(path = "/dashboard/draft-claims", produces = MediaType.APPLICATION_JSON_VALUE)
 public class DraftClaimController {
 
-    private final DraftStoreService draftStoreService;
+    private final DraftClaimService draftClaimService;
     private final UserService userService;
 
-    public DraftClaimController(DraftStoreService draftStoreService, UserService userService) {
-        this.draftStoreService = draftStoreService;
+    public DraftClaimController(DraftClaimService draftClaimService, UserService userService) {
+        this.draftClaimService = draftClaimService;
         this.userService = userService;
     }
 
@@ -41,7 +41,7 @@ public class DraftClaimController {
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
         @Valid @RequestBody DraftClaimRequest request
     ) {
-        DraftClaimCreationResult result = draftStoreService.createDraftClaim(
+        DraftClaimCreationResult result = draftClaimService.createDraftClaim(
             getUserId(authorisation),
             request.getCaseId(),
             request.getPayload()
@@ -54,7 +54,7 @@ public class DraftClaimController {
     public ResponseEntity<DraftClaimResponse> getActiveDraftClaim(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
-        DraftStoreEntity draftClaim = draftStoreService.getActiveDraftClaimForUser(getUserId(authorisation))
+        DraftStoreEntity draftClaim = draftClaimService.getActiveDraftClaimForUser(getUserId(authorisation))
             .orElseThrow(DraftClaimNotFoundException::new);
         return ResponseEntity.ok(DraftClaimResponse.from(draftClaim));
     }
@@ -64,7 +64,7 @@ public class DraftClaimController {
         @PathVariable("draft-id") UUID draftId,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
-        DraftStoreEntity draftClaim = draftStoreService.getDraftClaim(draftId, getUserId(authorisation))
+        DraftStoreEntity draftClaim = draftClaimService.getDraftClaim(draftId, getUserId(authorisation))
             .orElseThrow(() -> new DraftClaimNotFoundException(draftId));
         return ResponseEntity.ok(DraftClaimResponse.from(draftClaim));
     }
@@ -75,7 +75,7 @@ public class DraftClaimController {
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
         @Valid @RequestBody DraftClaimRequest request
     ) {
-        DraftStoreEntity draftClaim = draftStoreService.updateDraftClaim(
+        DraftStoreEntity draftClaim = draftClaimService.updateDraftClaim(
             draftId,
             getUserId(authorisation),
             request.getCaseId(),
@@ -89,7 +89,7 @@ public class DraftClaimController {
         @PathVariable("draft-id") UUID draftId,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
-        draftStoreService.deleteDraftClaim(draftId, getUserId(authorisation));
+        draftClaimService.deleteDraftClaim(draftId, getUserId(authorisation));
         return ResponseEntity.noContent().build();
     }
 
