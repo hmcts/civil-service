@@ -7,9 +7,12 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.DefendantResponseDeadlineCheckEvent;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
+import uk.gov.hmcts.reform.civil.scheduler.defendantresponse.DefendantResponseDeadlineScheduler;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.DefendantResponseDeadlineCheckSearchService;
 
 import java.util.Set;
+
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
@@ -19,30 +22,34 @@ public class DefendantResponseDeadlineCheckHandler extends BaseExternalTaskHandl
 
     private final DefendantResponseDeadlineCheckSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final FeatureToggleService featureToggleService;
 
     public DefendantResponseDeadlineCheckHandler(
         ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         DefendantResponseDeadlineCheckSearchService caseSearchService,
-        ApplicationEventPublisher applicationEventPublisher
+        ApplicationEventPublisher applicationEventPublisher, FeatureToggleService featureToggleService
     ) {
         super(externalTaskCompletionService, eventProperties);
         this.caseSearchService = caseSearchService;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.featureToggleService = featureToggleService;
     }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        Set<CaseDetails> cases = caseSearchService.getCases();
-        log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
+        if (!featureToggleService.isSpringSchedulerEnabled(DefendantResponseDeadlineScheduler.SCHEDULER_NAME)) {
+            Set<CaseDetails> cases = caseSearchService.getCases();
+            log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
-        cases.forEach(caseDetails -> {
-            try {
-                applicationEventPublisher.publishEvent(new DefendantResponseDeadlineCheckEvent(caseDetails.getId()));
-            } catch (Exception e) {
-                log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
-            }
-        });
+            cases.forEach(caseDetails -> {
+                try {
+                    applicationEventPublisher.publishEvent(new DefendantResponseDeadlineCheckEvent(caseDetails.getId()));
+                } catch (Exception e) {
+                    log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
+                }
+            });
+        }
         return new ExternalTaskData();
     }
 
