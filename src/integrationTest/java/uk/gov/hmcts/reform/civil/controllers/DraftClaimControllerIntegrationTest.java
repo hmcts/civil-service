@@ -107,7 +107,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void repeatedCreationReturnsExistingDraftWithoutChangingIt() throws Exception {
+    void whenCreatedRepeatedlyThenReturnExistingDraftWithoutChangingIt() throws Exception {
         DraftStoreEntity originalDraft = draftStoreRepository.findById(draftId)
             .orElseThrow(() -> new AssertionError("Draft claim should exist in DB"));
         OffsetDateTime originalCreatedAt = originalDraft.getDraftClaimCreatedAt();
@@ -143,7 +143,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void databasePreventsDuplicateDraftClaimsForUser() {
+    void shouldPreventsDuplicateDraftClaimsForUserInDatabase() {
         OffsetDateTime now = OffsetDateTime.now();
         DraftStoreEntity duplicateDraft = draftClaim(
             UUID.randomUUID(),
@@ -178,7 +178,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void updatingDraftUpdatesPayloadAndUpdatedAtTime() throws Exception {
+    void shouldUpdatePayloadAndUpdatedAtTimeWhenDraftIsUpdated() throws Exception {
         DraftStoreEntity draftClaim = draftStoreRepository.findById(draftId)
             .orElseThrow(() -> new AssertionError("Draft claim should exist in DB"));
         OffsetDateTime initialUpdatedAt = draftClaim.getUpdatedAt();
@@ -200,7 +200,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void updatePreservesCreationAndExpiryTimestamps() throws Exception {
+    void shouldUpdatePreservesCreationAndExpiryTimestamps() throws Exception {
         DraftStoreEntity initialDraft = draftStoreRepository.findById(draftId)
             .orElseThrow(() -> new AssertionError("Draft claim should exist in db"));
         OffsetDateTime initialDraftClaimCreatedAt = initialDraft.getDraftClaimCreatedAt();
@@ -222,7 +222,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void expiryIsEqualTo180DaysAfterCreatedAtTime() {
+    void shouldEqualTo180DaysAfterCreatedAtTimeForExpiry() {
         DraftStoreEntity draftInDB = draftStoreRepository.findById(draftId)
             .orElseThrow(() -> new AssertionError("Draft claim should exist in DB"));
 
@@ -230,7 +230,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void expiredDraftsReturn404AndAreExcludedFromActiveLookup() throws Exception {
+    void shouldReturn404AndAreExcludedFromActiveLookupForExpiredDraft() throws Exception {
         draftStoreRepository.deleteById(draftId);
         OffsetDateTime expiredDate = OffsetDateTime.now().minusDays(181);
 
@@ -250,7 +250,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void expiredDraftCannotBeUpdated() throws Exception {
+    void shouldNoyAllowExpiredDraftToBeUpdated() throws Exception {
         draftStoreRepository.deleteById(draftId);
         OffsetDateTime expiredDate = OffsetDateTime.now().minusDays(181);
         draftStoreRepository.save(draftClaim(
@@ -307,7 +307,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void differentUserCannotRetrieveUpdateOrDeleteDraft() throws Exception {
+    void shouldNotAllowAnotherUserToRetrieveUpdateOrDeleteDraft() throws Exception {
         String bearerToken2 = "Bearer jgiofdjbinaiogokfabinnaojpefjeapb.user2";
 
         given(userService.getUserInfo(bearerToken2))
@@ -330,7 +330,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void deleteRemovesDraftFromDataBaseAndReturns404IfCalled() throws Exception {
+    void whenDraftDeletedThenRemoveFromDatabaseAndReturn404() throws Exception {
         assertThat(draftStoreRepository.findById(draftId)).isPresent();
 
         doDelete(BEARER_TOKEN, null, DRAFT_CLAIM_BY_ID_URL, draftId)
