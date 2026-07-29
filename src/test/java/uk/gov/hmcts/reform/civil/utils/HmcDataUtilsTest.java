@@ -1411,6 +1411,7 @@ class HmcDataUtilsTest {
             "TRI, FAST_CLAIM, trial",
             "DRH, SMALL_CLAIM, dispute resolution hearing",
             "DIS, SMALL_CLAIM, disposal hearing",
+            "CCM, SMALL_CLAIM, case management conference",
         })
         void shouldReturnExpectedTitle(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
@@ -1428,6 +1429,7 @@ class HmcDataUtilsTest {
             "TRI, FAST_CLAIM, trial",
             "DRH, SMALL_CLAIM, dispute resolution hearing",
             "DIS, SMALL_CLAIM, disposal hearing",
+            "CCM, SMALL_CLAIM, case management conference",
         })
         void shouldReturnExpectedTitle_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
@@ -1443,7 +1445,8 @@ class HmcDataUtilsTest {
             "TRI, SMALL_CLAIM, wrandawiad",
             "TRI, FAST_CLAIM, dreial",
             "DRH, SMALL_CLAIM, wrandawiad datrys anghydfod",
-            "DIS, SMALL_CLAIM, wrandawiad gwaredu"
+            "DIS, SMALL_CLAIM, wrandawiad gwaredu",
+            "CCM, SMALL_CLAIM, cynhadledd rheoli achos"
         })
         void shouldReturnExpectedTitleWelsh_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
@@ -1464,6 +1467,7 @@ class HmcDataUtilsTest {
             "TRI, FAST_CLAIM, trial",
             "DRH, SMALL_CLAIM, hearing",
             "DIS, SMALL_CLAIM, hearing",
+            "CCM, SMALL_CLAIM, hearing",
         })
         void shouldReturnExpectedText_unspecClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
@@ -1481,6 +1485,7 @@ class HmcDataUtilsTest {
             "TRI, FAST_CLAIM, trial",
             "DRH, SMALL_CLAIM, hearing",
             "DIS, SMALL_CLAIM, hearing",
+            "CCM, SMALL_CLAIM, hearing",
         })
         void shouldReturnExpectedText_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
@@ -1497,6 +1502,7 @@ class HmcDataUtilsTest {
             "TRI, FAST_CLAIM, treial",
             "DRH, SMALL_CLAIM, gwrandawiad",
             "DIS, FAST_CLAIM, gwrandawiad",
+            "CCM, SMALL_CLAIM, gwrandawiad",
         })
         void shouldReturnExpectedTextWelsh_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);
@@ -1513,6 +1519,7 @@ class HmcDataUtilsTest {
             "TRI, FAST_CLAIM, dreialon",
             "DRH, SMALL_CLAIM, wrandawiadau",
             "DIS, SMALL_CLAIM, wrandawiadau",
+            "CCM, SMALL_CLAIM, wrandawiadau",
         })
         void shouldReturnExpectedPluralTextWelsh_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
             HearingGetResponse hearing = buildHearing(hearingType);

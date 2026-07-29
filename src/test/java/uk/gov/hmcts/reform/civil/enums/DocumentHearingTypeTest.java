@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.CCM;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.DIS;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.DRH;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.TRI;
@@ -55,6 +56,16 @@ public class DocumentHearingTypeTest {
         }
 
         @Test
+        void shouldReturnExpectedType_withCCM() {
+            assertEquals(CCM, DocumentHearingType.getType("AAA7-CCM"));
+        }
+
+        @Test
+        void shouldReturnExpectedType_withCCM_withoutHyphen() {
+            assertEquals(CCM, DocumentHearingType.getType("CCM"));
+        }
+
+        @Test
         void shouldThrowIllegalArgumentException_withInvalidInput() {
             assertThrows(IllegalArgumentException.class, () -> DocumentHearingType.getType("BAD"));
         }
@@ -67,7 +78,9 @@ public class DocumentHearingTypeTest {
         "DRH, SMALL_CLAIM, dispute resolution hearing",
         "DRH, FAST_CLAIM, dispute resolution hearing",
         "DIS, SMALL_CLAIM, disposal hearing",
-        "DIS, FAST_CLAIM, disposal hearing"
+        "DIS, FAST_CLAIM, disposal hearing",
+        "CCM, SMALL_CLAIM, case management conference",
+        "CCM, FAST_CLAIM, case management conference"
     })
     void shouldReturnExpectedTitleText(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, String expected) {
         assertEquals(expected, getTitleText(hearingType, allocatedTrack, false));
@@ -80,7 +93,9 @@ public class DocumentHearingTypeTest {
         "DRH, SMALL_CLAIM, hearing",
         "DRH, FAST_CLAIM, hearing",
         "DIS, SMALL_CLAIM, hearing",
-        "DIS, FAST_CLAIM, hearing"
+        "DIS, FAST_CLAIM, hearing",
+        "CCM, SMALL_CLAIM, hearing",
+        "CCM, FAST_CLAIM, hearing"
     })
     void shouldReturnExpectedContentText(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, String expected) {
         assertEquals(expected, getContentText(hearingType, allocatedTrack, false));
@@ -93,7 +108,9 @@ public class DocumentHearingTypeTest {
         "DRH, SMALL_CLAIM, wrandawiad datrys anghydfod",
         "DRH, FAST_CLAIM, wrandawiad datrys anghydfod",
         "DIS, SMALL_CLAIM, wrandawiad gwaredu",
-        "DIS, FAST_CLAIM, wrandawiad gwaredu"
+        "DIS, FAST_CLAIM, wrandawiad gwaredu",
+        "CCM, SMALL_CLAIM, cynhadledd rheoli achos",
+        "CCM, FAST_CLAIM, cynhadledd rheoli achos"
     })
     void shouldReturnExpectedTitleTextWelsh(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, String expected) {
         assertEquals(expected, getTitleText(hearingType, allocatedTrack, true));
@@ -106,7 +123,9 @@ public class DocumentHearingTypeTest {
         "DRH, SMALL_CLAIM, gwrandawiad",
         "DRH, FAST_CLAIM, gwrandawiad",
         "DIS, SMALL_CLAIM, gwrandawiad",
-        "DIS, FAST_CLAIM, gwrandawiad"
+        "DIS, FAST_CLAIM, gwrandawiad",
+        "CCM, SMALL_CLAIM, gwrandawiad",
+        "CCM, FAST_CLAIM, gwrandawiad"
     })
     void shouldReturnExpectedContentTextWelsh(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, String expected) {
         assertEquals(expected, getContentText(hearingType, allocatedTrack, true));
@@ -116,7 +135,8 @@ public class DocumentHearingTypeTest {
     @CsvSource({
         "TRI, FAST_CLAIM, dreialon",
         "TRI, SMALL_CLAIM, wrandawiadau",
-        "DIS, FAST_CLAIM, wrandawiadau"
+        "DIS, FAST_CLAIM, wrandawiadau",
+        "CCM, FAST_CLAIM, wrandawiadau"
     })
     void shouldReturnExpectedPluralTypeTextWelsh(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, String expected) {
         assertEquals(expected, getPluralTypeTextWelsh(hearingType, allocatedTrack));

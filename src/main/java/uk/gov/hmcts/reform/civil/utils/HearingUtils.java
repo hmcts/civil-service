@@ -17,6 +17,7 @@ import java.util.function.Predicate;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.CCM;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.DIS;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.DRH;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getType;
@@ -145,7 +146,7 @@ public class HearingUtils {
     }
 
     public static boolean hearingFeeRequired(String hearingType) {
-        List<DocumentHearingType> hearingTypesExcludedFromFee = List.of(DIS, DRH);
+        List<DocumentHearingType> hearingTypesExcludedFromFee = List.of(CCM, DIS, DRH);
         return hearingTypesExcludedFromFee.stream().filter(
             type -> getType(hearingType).equals(type)).count() < 1;
     }

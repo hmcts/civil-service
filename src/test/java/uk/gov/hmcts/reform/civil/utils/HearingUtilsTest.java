@@ -193,6 +193,7 @@ class HearingUtilsTest {
     @CsvSource({
         "AAA7-DIS,false",
         "AAA7-DRH,false",
+        "AAA7-CCM,false",
         "AAA7-TRI,true"
     })
     void shouldReturnCorrectValue_whenHearingTypeIs(String hearingType, boolean expected) {

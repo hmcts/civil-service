@@ -12,7 +12,8 @@ import static uk.gov.hmcts.reform.civil.enums.DocumentContext.TITLE;
 public enum DocumentHearingType {
     TRI("trial", "dreial"),
     DIS("disposal hearing", "wrandawiad gwaredu"),
-    DRH("dispute resolution hearing", "wrandawiad datrys anghydfod");
+    DRH("dispute resolution hearing", "wrandawiad datrys anghydfod"),
+    CCM("case management conference", "cynhadledd rheoli achos");
 
     private final String label;
     private final String labelWelsh;
