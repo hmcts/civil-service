@@ -109,7 +109,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         // Given
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(new LocationRefData().setSiteName("Site Name").setCourtAddress("Address").setPostcode("28000"));
-        given(locationRefDataService.getHearingCourtLocations(any())).willReturn(locations);
+        given(locationRefDataService.getHearingCourtLocations(any(), any())).willReturn(locations);
 
         // When
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();

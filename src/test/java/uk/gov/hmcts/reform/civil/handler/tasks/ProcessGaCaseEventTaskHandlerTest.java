@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.Spy;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(SpringExtension.class)
 public class ProcessGaCaseEventTaskHandlerTest {
@@ -25,6 +26,9 @@ public class ProcessGaCaseEventTaskHandlerTest {
 
     @Spy
     private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
 
     @InjectMocks
     private ProcessGaCaseEventTaskHandler handler;

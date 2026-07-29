@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.HearingFeeUtils;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 import uk.gov.hmcts.reform.civil.utils.HmcDataUtils;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
 
 import java.time.LocalDate;
@@ -30,6 +31,7 @@ import java.util.List;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC_WELSH;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.hearingFeeRequired;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingDaysText;
@@ -91,10 +93,18 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
             .setCreationDateWelshText(isWelsh ? formatDateInWelsh(creationDate, true) : null)
             .setHearingType(getHearingTypeContentText(caseData, hearing, isWelsh))
             .setHearingTypePluralWelsh(isWelsh ? getPluralHearingTypeTextWelsh(caseData, hearing) : null)
-            .setClaimant(caseData.getApplicant1().getPartyName())
+            .setClaimant(nonNull(caseData.getApplicant1())
+                ? (PartyUtils.isMinor(caseData.getApplicant1())
+                ? PartyUtils.getPartyNameWithLitigiousFriend(caseData.getApplicant1(),
+                                                             caseData.getApplicant1LitigationFriend())
+                : caseData.getApplicant1().getPartyName()) : null)
             .setClaimantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
-            .setClaimant2(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
+            .setClaimant2(nonNull(caseData.getApplicant2())
+                ? (PartyUtils.isMinor(caseData.getApplicant2())
+                ? PartyUtils.getPartyNameWithLitigiousFriend(caseData.getApplicant2(),
+                                                             caseData.getApplicant2LitigationFriend())
+                : caseData.getApplicant2().getPartyName()) : null)
             .setClaimant2Reference(nonNull(caseData.getApplicant2())
                     && nonNull(caseData.getSolicitorReferences()) ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
             .setDefendant(caseData.getRespondent1().getPartyName())
@@ -153,6 +163,7 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
             hearingId,
             caseData.getCaseManagementLocation().getBaseLocation(),
             bearerToken,
+            getCaseServiceId(caseData.getCaseAccessCategory()),
             locationRefDataService
         );
     }

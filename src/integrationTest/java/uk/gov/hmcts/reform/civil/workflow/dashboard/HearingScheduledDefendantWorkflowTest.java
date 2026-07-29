@@ -25,7 +25,7 @@ class HearingScheduledDefendantWorkflowTest extends DashboardWorkflowIntegration
 
     @BeforeEach
     void setup() {
-        when(locationReferenceDataService.getHearingCourtLocations(any()))
+        when(locationReferenceDataService.getHearingCourtLocations(any(), any()))
             .thenReturn(HearingScheduledDefendantFixtures.locations());
     }
 

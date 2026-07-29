@@ -86,9 +86,7 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
 
     private String getEmailTemplate(CaseData caseData) {
         if (isImmediateFullAdmission(caseData)) {
-            return featureToggleService.isJudgmentOnlineLive()
-                ? notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA()
-                : notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec();
+            return notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA();
         }
         if (ONE_V_TWO_TWO_LEGAL_REP.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
             return notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();

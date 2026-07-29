@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -11,6 +10,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -35,7 +35,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION_LIP;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler {
@@ -67,9 +66,13 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     private CallbackResponse applyNoticeOfChangeDecision(CallbackParams callbackParams) {
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
         ChangeOrganisationRequest changeOrganisationRequest = callbackParams.getCaseData().getChangeOrganisationRequestField();
-        if (changeOrganisationRequest == null) {
-            log.info("Change organisation request is null, skipping NoC decision application");
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        if (changeOrganisationRequest == null
+            || changeOrganisationRequest.getCaseRoleId() == null
+            || changeOrganisationRequest.getCaseRoleId().getValue() == null) {
+            throw new CallbackException(
+                "ChangeOrganisationRequest is missing or invalid - NoC decision cannot be applied (case "
+                    + callbackParams.getCaseData().getCcdCaseReference() + ")"
+            );
         }
         // Keep the original CoR payload before NoC decision mutates/nullifies parts of the request.
         CaseData preDecisionData = objectMapper.convertValue(caseDetails.getData(), CaseData.class);
@@ -191,6 +194,9 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     }
 
     private void clearAddLegalRepDeadlineForRole(CaseData caseData, String caseRole) {
+        if (caseData == null) {
+            throw new CallbackException("No case data returned when applying the NoC decision");
+        }
         if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)) {
             caseData.setAddLegalRepDeadlineRes1(null);
         } else if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(caseRole)) {

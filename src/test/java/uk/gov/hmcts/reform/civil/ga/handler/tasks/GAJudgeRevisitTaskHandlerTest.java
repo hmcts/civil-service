@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialWrittenRepres
 import uk.gov.hmcts.reform.civil.ga.service.DocUploadDashboardNotificationService;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.time.LocalDate;
@@ -102,6 +103,7 @@ class GAJudgeRevisitTaskHandlerTest {
         EventProperties eventProperties = new EventProperties();
         eventProperties.setRetryCount(3);
         gaJudgeRevisitTaskHandler = new GAJudgeRevisitTaskHandler(
+            new ExternalTaskCompletionService(),
             eventProperties,
             caseStateSearchService,
             coreCaseDataService,

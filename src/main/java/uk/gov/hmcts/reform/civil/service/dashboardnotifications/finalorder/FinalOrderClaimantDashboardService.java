@@ -33,11 +33,11 @@ public class FinalOrderClaimantDashboardService extends DashboardScenarioService
     @Override
     protected String getScenario(CaseData caseData) {
 
-        dashboardTasksHelper.deleteNotificationAndInactiveTasksForDefendant(caseData);
+        dashboardTasksHelper.deleteNotificationAndInactiveTasksForClaimant(caseData);
 
         final String scenario;
 
-        if (dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData)) {
+        if (dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedClaimant(caseData)) {
             scenario = SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_CLAIMANT.getScenario();
         } else {
             scenario = SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.getScenario();

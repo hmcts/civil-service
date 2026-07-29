@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
@@ -29,12 +30,13 @@ public class PollingEventEmitterHandler extends BaseExternalTaskHandler {
     private final EventEmitterService eventEmitterService;
 
     public PollingEventEmitterHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         CaseReadyBusinessProcessSearchService caseSearchService,
         CaseDetailsConverter caseDetailsConverter,
         EventEmitterService eventEmitterService
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.caseSearchService = caseSearchService;
         this.caseDetailsConverter = caseDetailsConverter;
         this.eventEmitterService = eventEmitterService;

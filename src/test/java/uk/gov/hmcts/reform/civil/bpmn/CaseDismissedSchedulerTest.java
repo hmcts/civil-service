@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class CaseDismissedSchedulerTest extends BpmnBaseTest {
 
-    public static final String TOPIC_NAME = "CASE_DISMISSED";
+    public static final String TOPIC_NAME = "CLAIM_DISMISSED_DEADLINE";
 
     public CaseDismissedSchedulerTest() {
         super("claim_dismissed_scheduler.bpmn", "CASE_DISMISSED_SCHEDULER");
@@ -36,12 +36,12 @@ class CaseDismissedSchedulerTest extends BpmnBaseTest {
         assertThat(jobDefinitions).hasSize(1);
         assertThat(jobDefinitions.get(0).getJobType()).isEqualTo("timer-start-event");
 
-        String cronString = "0 5 16 * * ?";
+        String cronString = "0 0 0 * * ?";
         assertThat(jobDefinitions.get(0).getJobConfiguration()).isEqualTo("CYCLE: " + cronString);
         assertCronTriggerFiresAtExpectedTime(
             new CronExpression(cronString),
             LocalDateTime.of(2020, 1, 1, 0, 0, 0),
-            LocalDateTime.of(2020, 1, 1, 16, 5, 0)
+            LocalDateTime.of(2020, 1, 2, 0, 0, 0)
         );
 
         //get external tasks

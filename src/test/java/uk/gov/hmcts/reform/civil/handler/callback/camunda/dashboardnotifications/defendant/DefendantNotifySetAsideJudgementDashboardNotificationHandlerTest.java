@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -43,9 +42,6 @@ class DefendantNotifySetAsideJudgementDashboardNotificationHandlerTest extends B
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     public static final String TASK_ID = "GenerateDashboardNotificationSetAsideDefendant";
 
     HashMap<String, Object> params = new HashMap<>();
@@ -68,10 +64,9 @@ class DefendantNotifySetAsideJudgementDashboardNotificationHandlerTest extends B
     }
 
     @Test
-    void shouldCreateDashboardNotifications_whenJudgmentOnlineLiveAndDefendantIsLiPAndSetAsideError() {
+    void shouldCreateDashboardNotifications_whenDefendantIsLiPAndSetAsideError() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -95,10 +90,9 @@ class DefendantNotifySetAsideJudgementDashboardNotificationHandlerTest extends B
     }
 
     @Test
-    void shouldNotCreateDashboardNotifications_whenJudgmentOnlineLiveAndDefendantIsLiP() {
+    void shouldNotCreateDashboardNotifications_whenDefendantIsLiP() {
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseDataBuilder.builder().build();

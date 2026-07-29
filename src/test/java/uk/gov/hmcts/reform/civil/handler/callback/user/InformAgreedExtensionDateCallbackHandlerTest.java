@@ -542,6 +542,21 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
         }
 
         @Test
+        void shouldReturnError_whenRespondent1AgreedExtensionDateIsMissing() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
+                .addRespondent2(NO)
+                .respondentSolicitor1AgreedDeadlineExtension(null)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors())
+                .containsOnly(InformAgreedExtensionDateCallbackHandler.ERROR_EXTENSION_DATE_REQUIRED);
+            assertThat(response.getData()).isNull();
+        }
+
+        @Test
         void shouldUpdateRespondent2ResponseDeadlineToExtensionDate_whenRepresentingRespondent2() {
             // Given
             LocalDateTime nextDeadline = LocalDateTime.now().plusDays(7);
@@ -569,6 +584,24 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getData())
                 .extracting("nextDeadline")
                 .isEqualTo(nextDeadline.toLocalDate().toString());
+        }
+
+        @Test
+        void shouldReturnError_whenRespondent2AgreedExtensionDateIsMissing() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .respondent2Represented(YES)
+                .respondent2OrgRegistered(YES)
+                .respondentSolicitor2AgreedDeadlineExtension(null)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors())
+                .containsOnly(InformAgreedExtensionDateCallbackHandler.ERROR_EXTENSION_DATE_REQUIRED);
+            assertThat(response.getData()).isNull();
         }
 
         @Test

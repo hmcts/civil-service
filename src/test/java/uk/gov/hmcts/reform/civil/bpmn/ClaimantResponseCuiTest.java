@@ -181,8 +181,11 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
 
         generateJudgmentByAdmissionPdf();
         notifyPartiesClaimantConfirmsToProceed();
-        proceedCaseOffline();
-        notifyRPACaseHandledOffline();
+        updateClaimantClaimState();
+        generateJudgmentByAdmissionClaimantDocument();
+        generateJudgmentByAdmissionDefendantDocument();
+        sendPinInPOstLetterForJudgmentByAdmission();
+        postClaimantLipJbaLetter();
         generateDashboardNotifications();
         endBusinessProcess();
         assertNoExternalTasksLeft();
@@ -201,8 +204,7 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
         variables.putValue("flowState", "MAIN.PART_ADMIT_AGREE_REPAYMENT");
         variables.put(FLOW_FLAGS, Map.of(
                 LIP_JUDGMENT_ADMISSION, true,
-                CLAIM_ISSUE_BILINGUAL, false,
-                JO_ONLINE_LIVE_ENABLED, false
+                CLAIM_ISSUE_BILINGUAL, false
         ));
         assertCompleteExternalTask(
             startBusiness,
@@ -214,8 +216,11 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
 
         generateJudgmentByAdmissionPdf();
         notifyPartiesClaimantConfirmsToProceed();
-        proceedCaseOffline();
-        notifyRPACaseHandledOffline();
+        updateClaimantClaimState();
+        generateJudgmentByAdmissionClaimantDocument();
+        generateJudgmentByAdmissionDefendantDocument();
+        sendPinInPOstLetterForJudgmentByAdmission();
+        postClaimantLipJbaLetter();
         generateDashboardNotifications();
         endBusinessProcess();
         assertNoExternalTasksLeft();
@@ -225,9 +230,8 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
         assertFalse(processInstance.isEnded());
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"true", "false"})
-    void shouldRunProcess_ClaimIsInFullAdmitRejectRepayment(boolean joEnabled) {
+    @Test
+    void shouldRunProcess_ClaimIsInFullAdmitRejectRepayment() {
 
         //assert process has started
         assertFalse(processInstance.isEnded());
@@ -239,8 +243,7 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
         variables.putValue("flowState", "MAIN.FULL_ADMIT_REJECT_REPAYMENT");
         variables.put(FLOW_FLAGS, Map.of(
                 LIP_JUDGMENT_ADMISSION, false,
-                CLAIM_ISSUE_BILINGUAL, false,
-                JO_ONLINE_LIVE_ENABLED, joEnabled
+                CLAIM_ISSUE_BILINGUAL, false
         ));
         assertCompleteExternalTask(
             startBusiness,
@@ -278,8 +281,7 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
             LIP_JUDGMENT_ADMISSION, false,
             CLAIM_ISSUE_BILINGUAL, isClaimantBilingual,
             RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL, isRespondentBilingual,
-            WELSH_ENABLED, true,
-            JO_ONLINE_LIVE_ENABLED, false));
+            WELSH_ENABLED, true));
         assertCompleteExternalTask(
             startBusiness,
             START_BUSINESS_TOPIC,
@@ -313,8 +315,7 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
             LIP_JUDGMENT_ADMISSION, false,
             CLAIM_ISSUE_BILINGUAL, isClaimantBilingual,
             RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL, isRespondentBilingual,
-            WELSH_ENABLED, false,
-            JO_ONLINE_LIVE_ENABLED, false));
+            WELSH_ENABLED, false));
 
         assertCompleteExternalTask(
             startBusiness,
@@ -334,9 +335,8 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
         assertNoExternalTasksLeft();
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"true", "false"})
-    void shouldRunProcess_ClaimIsInPartAdmitRejectPayment(boolean joEnabled) {
+    @Test
+    void shouldRunProcess_ClaimIsInPartAdmitRejectPayment() {
 
         //assert process has started
         assertFalse(processInstance.isEnded());
@@ -348,8 +348,7 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
         variables.putValue("flowState", "MAIN.PART_ADMIT_REJECT_REPAYMENT");
         variables.put(FLOW_FLAGS, Map.of(
                 LIP_JUDGMENT_ADMISSION, false,
-                CLAIM_ISSUE_BILINGUAL, false,
-                JO_ONLINE_LIVE_ENABLED, joEnabled
+                CLAIM_ISSUE_BILINGUAL, false
         ));
         assertCompleteExternalTask(
             startBusiness,
@@ -611,8 +610,7 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
         variables.putValue("flowState", "MAIN.FULL_DEFENCE_NOT_PROCEED");
         variables.put(FLOW_FLAGS, Map.of(
                 LIP_JUDGMENT_ADMISSION, false,
-                CLAIM_ISSUE_BILINGUAL, false,
-                JO_ONLINE_LIVE_ENABLED, false
+                CLAIM_ISSUE_BILINGUAL, false
         ));
         assertCompleteExternalTask(
                 startBusiness,
@@ -644,7 +642,6 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
         variables.put(FLOW_FLAGS, Map.of(
             LIP_JUDGMENT_ADMISSION, false,
             CLAIM_ISSUE_BILINGUAL, false,
-            JO_ONLINE_LIVE_ENABLED, false,
             DEFENDANT_NOC_ONLINE, true
         ));
         assertCompleteExternalTask(
@@ -664,7 +661,7 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"true", "false"})
-    void shouldRunProcess_ClaimIsInFullAdmitRepaymentAcceptedAndJudgmentOnlineLive(boolean isRpaLiveFeed) {
+    void shouldRunProcess_ClaimIsInFullAdmitRepaymentAcceptedAndJudgmentByAdmissionApplies(boolean isRpaLiveFeed) {
 
         //assert process has started
         assertFalse(processInstance.isEnded());
@@ -677,7 +674,6 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
         variables.put(FLOW_FLAGS, Map.of(
             LIP_JUDGMENT_ADMISSION, true,
             CLAIM_ISSUE_BILINGUAL, false,
-            JO_ONLINE_LIVE_ENABLED, true,
             IS_CJES_SERVICE_ENABLED, true,
             IS_JO_LIVE_FEED_ACTIVE, isRpaLiveFeed
         ));
@@ -706,7 +702,7 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"true", "false"})
-    void shouldRunProcess_ClaimIsInFullAdmitRepaymentRejectedJBAAndJudgmentOnlineLive(boolean isRpaLiveFeed) {
+    void shouldRunProcess_ClaimIsInFullAdmitRepaymentRejectedJBA(boolean isRpaLiveFeed) {
 
         //assert process has started
         assertFalse(processInstance.isEnded());
@@ -719,7 +715,6 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
         variables.put(FLOW_FLAGS, Map.of(
             LIP_JUDGMENT_ADMISSION, true,
             CLAIM_ISSUE_BILINGUAL, false,
-            JO_ONLINE_LIVE_ENABLED, true,
             IS_CJES_SERVICE_ENABLED, true,
             IS_JO_LIVE_FEED_ACTIVE, isRpaLiveFeed
         ));
@@ -748,7 +743,7 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"true", "false"})
-    void shouldRunProcess_ClaimIsInPartAdmitRepaymentRejectedJBAAndJudgmentOnlineLive(boolean isRpaLiveFeed) {
+    void shouldRunProcess_ClaimIsInPartAdmitRepaymentRejectedJBA(boolean isRpaLiveFeed) {
 
         //assert process has started
         assertFalse(processInstance.isEnded());
@@ -761,7 +756,6 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
         variables.put(FLOW_FLAGS, Map.of(
             LIP_JUDGMENT_ADMISSION, true,
             CLAIM_ISSUE_BILINGUAL, false,
-            JO_ONLINE_LIVE_ENABLED, true,
             IS_CJES_SERVICE_ENABLED, false,
             IS_JO_LIVE_FEED_ACTIVE, isRpaLiveFeed
         ));
@@ -802,7 +796,6 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
         variables.put(FLOW_FLAGS, Map.of(
             LIP_JUDGMENT_ADMISSION, true,
             CLAIM_ISSUE_BILINGUAL, false,
-            JO_ONLINE_LIVE_ENABLED, true,
             IS_CJES_SERVICE_ENABLED, true,
             DEFENDANT_NOC_ONLINE, defendantNocOnline
         ));

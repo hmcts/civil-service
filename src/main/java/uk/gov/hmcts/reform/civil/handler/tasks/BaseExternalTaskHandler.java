@@ -7,20 +7,17 @@ import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Recover;
-import org.springframework.retry.annotation.Retryable;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
-import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 import uk.gov.hmcts.reform.civil.helpers.ExternalTaskExceptionHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 import java.util.Objects;
 
 /**
- * Interface for standard implementation of task handler that is invoked for each fetched and locked task.
+ * Interface for a standard implementation of a task handler that is invoked for each fetched and locked task.
  */
 @SuppressWarnings({"java:S6813", "java:S1874"})
 public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
@@ -31,9 +28,11 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
 
     protected final Logger log = LoggerFactory.getLogger(BaseExternalTaskHandler.class);
 
+    private final ExternalTaskCompletionService externalTaskCompletionService;
     private final EventProperties eventProperties;
 
-    protected BaseExternalTaskHandler(EventProperties eventProperties) {
+    protected BaseExternalTaskHandler(ExternalTaskCompletionService externalTaskCompletionService, EventProperties eventProperties) {
+        this.externalTaskCompletionService = externalTaskCompletionService;
         this.eventProperties = eventProperties;
     }
 
@@ -47,70 +46,29 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
     public void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
         String topicName = externalTask.getTopicName();
         String processInstanceId = externalTask.getProcessInstanceId();
-        boolean handleTaskSucceeded = false;
-        ExternalTaskData externalTaskData = null;
 
         try {
-            log.info("External task '{}' started with processInstanceId '{}'",
-                     topicName, processInstanceId
-            );
-            externalTaskData = handleTask(externalTask);
-            handleTaskSucceeded = true;
+            log.info("External task '{}' started, processInstanceId '{}'", topicName, processInstanceId);
+            ExternalTaskData externalTaskData = handleTask(externalTask);
+            externalTaskCompletionService.completeTask(this, externalTask, externalTaskService, externalTaskData);
+            log.debug("External task '{}' completed, processInstanceId '{}'", topicName, processInstanceId);
         } catch (BpmnError e) {
-            log.error("Bpmn error for external task '{}' with processInstanceId '{}'",
-                      topicName, processInstanceId, e
-            );
+            log.error("External task '{}' BPMN error, processInstanceId '{}'", topicName, processInstanceId, e);
             externalTaskService.handleBpmnError(externalTask, e.getErrorCode());
         } catch (NotRetryableException e) {
-            log.error("External task '{}' errored  with processInstanceId '{}'",
-                      topicName, processInstanceId, e
-            );
-            handleFailureNotRetryable(externalTask, externalTaskService, e);
+            log.error("External task '{}' Not Recoverable error, processInstanceId '{}'", topicName, processInstanceId, e);
+            handleTaskFailureNotRetryable(externalTask, externalTaskService, e);
+        } catch (AssertionError | IllegalArgumentException e) {
+            log.error("External task '{}' assertion / argument failure, processInstanceId '{}'", topicName, processInstanceId, e);
+            handleTaskFailureNotRetryable(externalTask, externalTaskService, e);
         } catch (Exception e) {
-            log.error("External task before handleFailure '{}' errored  with processInstanceId '{}'",
-                      topicName, processInstanceId, e
-            );
-            handleFailure(externalTask, externalTaskService, e);
+            log.error("External task '{}' errored before handleFailure, processInstanceId '{}'", topicName, processInstanceId, e);
+            if (ExternalTaskExceptionHelper.isRetryable(e)) {
+                handleTaskFailure(externalTask, externalTaskService, e);
+            } else {
+                handleTaskFailureNotRetryable(externalTask, externalTaskService, e);
+            }
         }
-
-        if (handleTaskSucceeded) {
-            completeTask(externalTask, externalTaskService, externalTaskData);
-        }
-    }
-
-    @Retryable(value = CompleteTaskException.class, backoff = @Backoff(delay = 60000, multiplier = 15))
-    protected void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService, ExternalTaskData data) throws CompleteTaskException {
-        String topicName = externalTask.getTopicName();
-        String processInstanceId = externalTask.getProcessInstanceId();
-        log.info("Trying to complete external task '{}' finished with processInstanceId '{}'",
-                 topicName, processInstanceId
-        );
-
-        try {
-            externalTaskService.complete(externalTask, getVariableMap(data));
-            log.info("External task '{}' completed with processInstanceId '{}'",
-                     topicName, processInstanceId
-            );
-        } catch (Exception e) {
-            log.error("Completing external task '{}' errored  with processInstanceId '{}'",
-                      topicName, processInstanceId, e
-            );
-            throw new CompleteTaskException(e);
-        }
-    }
-
-    protected boolean isEventAlreadyProcessed(ExternalTask externalTask, BusinessProcess businessProcess) {
-        return businessProcess != null
-            && businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())
-            && Objects.equals(externalTask.getActivityId(), businessProcess.getActivityId());
-    }
-
-    @Recover
-    void recover(CompleteTaskException exception, ExternalTask externalTask, ExternalTaskService externalTaskService) {
-        log.error("All attempts to completing task '{}' failed  with processInstanceId '{}' with error message '{}'",
-                  externalTask.getTopicName(), externalTask.getProcessInstanceId(), exception.getMessage()
-        );
-        handleFailureNotRetryable(externalTask, externalTaskService, exception);
     }
 
     /**
@@ -120,7 +78,7 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
      * @param externalTaskService to interact with fetched and locked tasks.
      * @param e                   the exception thrown by business logic.
      */
-    void handleFailureNotRetryable(ExternalTask externalTask, ExternalTaskService externalTaskService, Throwable e) {
+    public void handleTaskFailureNotRetryable(ExternalTask externalTask, ExternalTaskService externalTaskService, Throwable e) {
         log.info("Handle task failure Not Retryable, processInstanceId: '{}' ", externalTask.getProcessInstanceId());
         externalTaskService.handleFailure(
             externalTask,
@@ -138,7 +96,7 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
      * @param externalTaskService to interact with fetched and locked tasks.
      * @param e                   the exception thrown by business logic.
      */
-    void handleFailure(ExternalTask externalTask, ExternalTaskService externalTaskService, Throwable e) {
+    public void handleTaskFailure(ExternalTask externalTask, ExternalTaskService externalTaskService, Throwable e) {
         log.info("Handle task failure Retryable, processInstanceId: '{}' ", externalTask.getProcessInstanceId());
         int maxRetries = getMaxAttempts();
         Integer extRetries = externalTask.getRetries();
@@ -157,6 +115,12 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
     @SuppressWarnings("java:S1168")
     public VariableMap getVariableMap(ExternalTaskData data) {
         return null;
+    }
+
+    protected boolean isEventAlreadyProcessed(ExternalTask externalTask, BusinessProcess businessProcess) {
+        return businessProcess != null
+            && businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())
+            && Objects.equals(externalTask.getActivityId(), businessProcess.getActivityId());
     }
 
     protected int getMaxAttempts() {

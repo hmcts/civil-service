@@ -35,7 +35,6 @@ public class NocLipCaseOfflineAllFinalOrdersClaimantScenarioTest extends Dashboa
     void should_create_noc_lip_offline_scenario() throws Exception {
 
         String caseId = "72014544355416";
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
 
         JudgmentDetails activeJudgment = new JudgmentDetails()

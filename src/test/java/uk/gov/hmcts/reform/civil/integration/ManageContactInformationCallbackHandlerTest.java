@@ -55,7 +55,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.PartyDetailsChangedUtil;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
@@ -146,9 +145,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @MockBean
     private PostcodeValidator postcodeValidator;
-
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;
@@ -2174,13 +2170,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Nested
-        class MidShowWarningJudgmentOnline {
+        class MidShowWarningSpecValidation {
             private static final String PAGE_ID = "show-warning";
-
-            @BeforeEach
-            void setup() {
-                when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-            }
 
             @ParameterizedTest
             @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID})

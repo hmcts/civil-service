@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.service.search.BundleCreationTriggerService;
 import java.util.List;
 import java.util.Set;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 import static uk.gov.hmcts.reform.civil.service.tasklisteners.BundleCreationTriggerHandlerExternalTaskListener.LOCK_DURATION;
 
@@ -37,6 +38,7 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
     private final NoCacheUserService noCacheUserService;
 
     public BundleCreationTriggerHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         BundleCreationTriggerService bundleCreationTriggerService,
         ApplicationEventPublisher applicationEventPublisher,
@@ -45,7 +47,7 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
         SystemUpdateUserConfiguration userConfig,
         NoCacheUserService noCacheUserService
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.bundleCreationTriggerService = bundleCreationTriggerService;
         this.applicationEventPublisher = applicationEventPublisher;
         this.caseDetailsConverter = caseDetailsConverter;

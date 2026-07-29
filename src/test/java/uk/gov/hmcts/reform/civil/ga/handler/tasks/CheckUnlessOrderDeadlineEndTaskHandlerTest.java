@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialMakeAnOrder;
 import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
@@ -85,6 +86,7 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
         EventProperties eventProperties = new EventProperties();
         eventProperties.setRetryCount(3);
         gaUnlessOrderMadeTaskHandler = new CheckUnlessOrderDeadlineEndTaskHandler(
+            new ExternalTaskCompletionService(),
             eventProperties,
             searchService,
             coreCaseDataService,

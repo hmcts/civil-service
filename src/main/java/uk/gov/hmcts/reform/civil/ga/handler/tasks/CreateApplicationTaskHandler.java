@@ -40,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.ga.utils.OrgPolicyUtils.getRespondent1SolicitorOrgId;
 import static uk.gov.hmcts.reform.civil.ga.utils.OrgPolicyUtils.getRespondent2SolicitorOrgId;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Component
 public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
@@ -52,13 +53,14 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
     private final GaStateFlowEngine stateFlowEngine;
 
     public CreateApplicationTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         GaCoreCaseDataService coreCaseDataService,
         CaseDetailsConverter caseDetailsConverter,
         ObjectMapper mapper,
         GaStateFlowEngine stateFlowEngine
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.coreCaseDataService = coreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;
         this.mapper = mapper;

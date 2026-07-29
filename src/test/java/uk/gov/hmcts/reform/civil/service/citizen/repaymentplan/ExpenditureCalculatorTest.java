@@ -82,6 +82,50 @@ class ExpenditureCalculatorTest {
         assertThat(result).isEqualTo(expectedResult);
     }
 
+    @Test
+    void shouldTreatNullRecurringExpenseAmountAsZero() {
+        List<Element<RecurringExpenseLRspec>> expenses = wrapElements(
+            new RecurringExpenseLRspec().setFrequency(ONCE_TWO_WEEKS)
+        );
+
+        double result = new ExpenditureCalculator().calculateTotalExpenditure(expenses, null, null);
+
+        assertThat(result).isZero();
+    }
+
+    @Test
+    void shouldTreatNullCourtOrderMonthlyInstalmentAmountAsZero() {
+        List<Element<Respondent1CourtOrderDetails>> courtOrders = wrapElements(
+            new Respondent1CourtOrderDetails()
+        );
+
+        double result = new ExpenditureCalculator().calculateTotalExpenditure(null, null, courtOrders);
+
+        assertThat(result).isZero();
+    }
+
+    @Test
+    void shouldTreatNullCreditCardDebtMonthlyPaymentAsZero() {
+        Respondent1DebtLRspec debts = new Respondent1DebtLRspec()
+            .setHasLoanCardDebt(YesOrNo.YES)
+            .setLoanCardDebtDetails(wrapElements(new LoanCardDebtLRspec()));
+
+        double result = new ExpenditureCalculator().calculateTotalExpenditure(null, debts, null);
+
+        assertThat(result).isZero();
+    }
+
+    @Test
+    void shouldTreatNullDebtPaymentAmountAsZero() {
+        Respondent1DebtLRspec debts = new Respondent1DebtLRspec()
+            .setHasLoanCardDebt(YesOrNo.NO)
+            .setDebtDetails(wrapElements(new DebtLRspec().setPaymentFrequency(ONCE_TWO_WEEKS)));
+
+        double result = new ExpenditureCalculator().calculateTotalExpenditure(null, debts, null);
+
+        assertThat(result).isZero();
+    }
+
     private List<Element<RecurringExpenseLRspec>> createExpensesList() {
         return wrapElements(new RecurringExpenseLRspec()
                                 .setAmount(new BigDecimal(20000))

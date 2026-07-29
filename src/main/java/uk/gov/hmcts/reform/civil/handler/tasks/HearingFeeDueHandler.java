@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
 import java.time.LocalDate;
 import java.util.Set;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
@@ -32,6 +33,7 @@ public class HearingFeeDueHandler extends BaseExternalTaskHandler {
     private final FeatureToggleService featureToggleService;
 
     public HearingFeeDueHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         HearingFeeDueSearchService caseSearchService,
         ApplicationEventPublisher applicationEventPublisher,
@@ -39,7 +41,7 @@ public class HearingFeeDueHandler extends BaseExternalTaskHandler {
         CaseDetailsConverter caseDetailsConverter,
         FeatureToggleService featureToggleService
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.caseSearchService = caseSearchService;
         this.applicationEventPublisher = applicationEventPublisher;
         this.coreCaseDataService = coreCaseDataService;

@@ -366,7 +366,41 @@ class DashboardNotificationHelperTest {
     }
 
     @Nested
-    class IsOrderMadeFastTrackTrialNotRespondedTests {
+    class IsOrderMadeFastTrackTrialNotRespondedDefendantTests {
+
+        @Test
+        void shouldReturnTrue_whenFastTrackAndTrialReadyRespondent1IsNull() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setTrialReadyRespondent1(null);
+
+            when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);
+
+            assertTrue(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedDefendant(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenNotFastTrackAndTrialReadyRespondent1IsNull() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setTrialReadyRespondent1(null);
+
+            when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(false);
+
+            assertFalse(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedDefendant(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenFastTrackAndTrialReadyRespondent1IsSet() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setTrialReadyRespondent1(YES);
+
+            when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);
+
+            assertFalse(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedDefendant(caseData));
+        }
+    }
+
+    @Nested
+    class IsOrderMadeFastTrackTrialNotRespondedClaimantTests {
 
         @Test
         void shouldReturnTrue_whenFastTrackAndTrialReadyApplicantIsNull() {
@@ -375,7 +409,7 @@ class DashboardNotificationHelperTest {
 
             when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);
 
-            assertTrue(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData));
+            assertTrue(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedClaimant(caseData));
         }
 
         @Test
@@ -385,7 +419,7 @@ class DashboardNotificationHelperTest {
 
             when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(false);
 
-            assertFalse(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData));
+            assertFalse(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedClaimant(caseData));
         }
 
         @Test
@@ -395,7 +429,7 @@ class DashboardNotificationHelperTest {
 
             when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);
 
-            assertFalse(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData));
+            assertFalse(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedClaimant(caseData));
         }
     }
 }

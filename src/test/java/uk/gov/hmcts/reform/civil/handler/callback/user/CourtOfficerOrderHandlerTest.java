@@ -103,7 +103,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
             when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefData);
             List<LocationRefData> locationRefDataList = new ArrayList<>();
             locationRefDataList.add(locationRefData);
-            when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locationRefDataList);
+            when(locationRefDataService.getHearingCourtLocations(any(), any())).thenReturn(locationRefDataList);
         }
 
         @Test

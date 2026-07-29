@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.service.search.CaseHearingDateSearchService;
 
 import java.util.Set;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
@@ -20,11 +21,12 @@ public class CvpJoinLinkSchedulerHandler extends BaseExternalTaskHandler {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     public CvpJoinLinkSchedulerHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         CaseHearingDateSearchService searchService,
         ApplicationEventPublisher applicationEventPublisher
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.searchService = searchService;
         this.applicationEventPublisher = applicationEventPublisher;
     }

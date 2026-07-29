@@ -25,6 +25,9 @@ public class NotifyDefendantClaimantSettleTheClaimDefendantEmailDTOGenerator ext
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
+        if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
+            return notificationsProperties.getNotifyDefendantLIPClaimantSettleTheClaimTemplateWelsh();
+        }
         return notificationsProperties.getNotifyDefendantLIPClaimantSettleTheClaimTemplate();
     }
 

@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
@@ -51,8 +50,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 class JudgmentByAdmissionMapperTest {
 
     private RoboticsAddressMapper addressMapper;
-    @Mock
-    private FeatureToggleService featureToggleService;
     private InterestCalculator interestCalculator;
     private JudgementService judgementService;
     private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
@@ -64,7 +61,7 @@ class JudgmentByAdmissionMapperTest {
     void setUp() {
         addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
         interestCalculator = new InterestCalculator();
-        judgementService = new JudgementService(featureToggleService, interestCalculator);
+        judgementService = new JudgementService(interestCalculator);
         judgmentByAdmissionOnlineMapper =
             new JudgmentByAdmissionOnlineMapper(time, addressMapper, judgementService, interestCalculator);
     }
@@ -389,16 +386,18 @@ class JudgmentByAdmissionMapperTest {
         assertEquals("120", activeJudgment.getInstalmentDetails().getAmount());
         assertEquals(paymentFrequency, activeJudgment.getInstalmentDetails().getPaymentFrequency());
         assertEquals(LocalDate.now().plusDays(10), activeJudgment.getInstalmentDetails().getStartDate());
+        assertEquals("120", caseData.getJoRepaymentAmount());
         assertEquals(paymentFrequency, caseData.getJoRepaymentFrequency());
     }
 
     @ParameterizedTest
     @CsvSource({
         "120,120",
-        "120.50,120.50",
-        "120.49,120.49"
+        "120.00,120",
+        "12050,12050",
+        "12049,12049"
     })
-    void testIfJudgmentByAdmission_scenario6_rounding(BigDecimal inputAmount, String expectedAmount) {
+    void testIfJudgmentByAdmission_scenario6_keepsPenceForCcdMoneyFields(BigDecimal inputAmount, String expectedAmount) {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
             .specRespondent1Represented(YesOrNo.NO)
@@ -419,6 +418,7 @@ class JudgmentByAdmissionMapperTest {
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
         assertNotNull(activeJudgment);
         assertEquals(expectedAmount, activeJudgment.getInstalmentDetails().getAmount());
+        assertEquals(expectedAmount, caseData.getJoRepaymentAmount());
     }
 
     @Test

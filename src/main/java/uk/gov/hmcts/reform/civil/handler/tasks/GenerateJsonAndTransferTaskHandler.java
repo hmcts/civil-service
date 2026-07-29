@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCase;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCases;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationDTO;
@@ -36,7 +37,8 @@ public class GenerateJsonAndTransferTaskHandler extends GenerateMediationFileAnd
 
     private static final String FILENAME = "ocmc_mediation_data.json";
 
-    protected GenerateJsonAndTransferTaskHandler(EventProperties eventProperties,
+    protected GenerateJsonAndTransferTaskHandler(ExternalTaskCompletionService externalTaskCompletionService,
+                                                 EventProperties eventProperties,
                                                  MediationCasesSearchService caseSearchService,
                                                  CoreCaseDataService coreCaseDataService,
                                                  CaseDetailsConverter caseDetailsConverter,
@@ -45,6 +47,7 @@ public class GenerateJsonAndTransferTaskHandler extends GenerateMediationFileAnd
                                                  MediationJsonService mediationJsonService,
                                                  MediationCSVEmailConfiguration mediationCSVEmailConfiguration1) {
         super(
+            externalTaskCompletionService,
             eventProperties,
             caseSearchService,
             coreCaseDataService,

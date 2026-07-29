@@ -64,6 +64,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.INVALID_SETTLE_BY_CONSENT;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 
 @Service
 @RequiredArgsConstructor
@@ -87,7 +88,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         + "is assigned to the case.";
     public static final String NOT_IN_EA_REGION = "Sorry this service is not available in the current case management location, please raise an application manually.";
     public static final String NOT_ALLOWED_SETTLE_DISCONTINUE = "Sorry this service is not available, please raise an application manually.";
-    private static final String LR_VS_LIP = "Sorry this service is not available, please raise an application manually.";
     private static final String CONFIRMATION_BODY_FREE = "<br/> <p> The court will make a decision"
         + " on this application."
         + "<br/> <p>  The other party's legal representative has been notified that you have"
@@ -138,17 +138,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
         log.info("initiating general application allowed for caseId {}", caseData.getCcdCaseReference());
-        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
 
         if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
-            if ((caseData.isRespondentResponseBilingual() && !featureToggleService.isGaForWelshEnabled() && !caseData.isLipvLROneVOne()
-                && !(caseEvent == INITIATE_GENERAL_APPLICATION_COSC))) {
-                errors.add(LR_VS_LIP);
-            } else if (featureToggleService.isDefendantNoCOnlineForCase(caseData) && caseData.isLipvLROneVOne()
-                && caseData.isClaimantBilingual() && !featureToggleService.isGaForWelshEnabled()) {
-                errors.add(LR_VS_LIP);
-            } else if (
-                !(featureToggleService.isLocationWhiteListed(caseData.getCaseManagementLocation()
+            if (!(featureToggleService.isLocationWhiteListed(caseData.getCaseManagementLocation()
                                                                                     .getBaseLocation()))
                     && !(featureToggleService.isCuiGaNroEnabled())) {
                 errors.add(NOT_IN_EA_REGION);
@@ -157,7 +149,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         GAHearingDetails generalAppHearingDetails = new GAHearingDetails();
         generalAppHearingDetails.setHearingPreferredLocation(getLocationsFromList(locationRefDataService
-            .getCourtLocationsForGeneralApplication(authToken)));
+            .getCourtLocationsForGeneralApplication(authToken, getCaseServiceId(caseData.getCaseAccessCategory()))));
         caseData.setGeneralAppHearingDetails(generalAppHearingDetails);
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)

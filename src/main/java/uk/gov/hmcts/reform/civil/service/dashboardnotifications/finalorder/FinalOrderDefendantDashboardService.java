@@ -37,7 +37,7 @@ public class FinalOrderDefendantDashboardService extends DashboardScenarioServic
 
         final String scenario;
 
-        if (dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData)) {
+        if (dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedDefendant(caseData)) {
             scenario = SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_DEFENDANT.getScenario();
         } else {
             scenario = SCENARIO_AAA6_UPDATE_DASHBOARD_DEFENDANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.getScenario();
