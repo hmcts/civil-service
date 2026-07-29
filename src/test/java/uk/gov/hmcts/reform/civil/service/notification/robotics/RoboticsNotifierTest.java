@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
@@ -26,7 +25,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,27 +41,9 @@ class RoboticsNotifierTest {
     private RoboticsDataMapperForUnspec roboticsDataMapper;
     @Mock
     private RoboticsDataMapperForSpec roboticsDataMapperForSpec;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private RoboticsNotifier roboticsNotifier;
-
-    @Test
-    void shouldNotExecute_ifRpaDisabled() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .legacyCaseReference(LEGACY_REFERENCE)
-            .ccdCaseReference(1234L)
-            .build();
-
-        when(featureToggleService.isRPAEmailEnabled()).thenReturn(false);
-
-        roboticsNotifier.notifyRobotics(caseData, null);
-
-        verifyNoInteractions(jsonSchemaValidationService);
-        verifyNoInteractions(roboticsDataMapper);
-        verifyNoInteractions(roboticsNotificationService);
-    }
 
     @Test
     void shouldSendNotifications_whenValidSpecClaim() throws JsonProcessingException {
@@ -71,7 +51,6 @@ class RoboticsNotifierTest {
         CaseData caseData = CaseDataBuilder.builder().legacyCaseReference(LEGACY_REFERENCE)
             .caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
 
-        when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
         when(roboticsDataMapperForSpec.toRoboticsCaseData(eq(caseData), eq(TOKEN))).thenReturn(roboticsCaseDataSpec);
         when(jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString())).thenReturn(Set.of());
 
@@ -86,7 +65,6 @@ class RoboticsNotifierTest {
         CaseData caseData = CaseDataBuilder.builder().legacyCaseReference(LEGACY_REFERENCE)
             .caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
 
-        when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
         when(roboticsDataMapperForSpec.toRoboticsCaseData(eq(caseData), eq(TOKEN))).thenReturn(roboticsCaseDataSpec);
         when(jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString())).thenReturn(Set.of(
             ValidationMessage.builder().message("whoops").build()
@@ -101,7 +79,6 @@ class RoboticsNotifierTest {
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM).build();
         RoboticsCaseData roboticsCaseData = new RoboticsCaseData();
 
-        when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
         when(roboticsDataMapper.toRoboticsCaseData(eq(caseData), eq(TOKEN))).thenReturn(roboticsCaseData);
         when(jsonSchemaValidationService.validate(roboticsCaseData.toJsonString())).thenReturn(Set.of());
 
@@ -116,7 +93,6 @@ class RoboticsNotifierTest {
         CaseData caseData = CaseDataBuilder.builder().legacyCaseReference(LEGACY_REFERENCE)
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM).build();
 
-        when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
         when(roboticsDataMapper.toRoboticsCaseData(eq(caseData), eq(TOKEN))).thenReturn(roboticsCaseData);
         when(jsonSchemaValidationService.validate(roboticsCaseData.toJsonString())).thenReturn(Set.of(
             ValidationMessage.builder().message("whoops").build()
