@@ -11,9 +11,9 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.dashboard.data.DraftClaimRequest;
 import uk.gov.hmcts.reform.dashboard.data.DraftClaimResponse;
-import uk.gov.hmcts.reform.dashboard.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.dashboard.services.DraftClaimCreationResult;
-import uk.gov.hmcts.reform.dashboard.services.DraftStoreService;
+import uk.gov.hmcts.reform.dashboard.services.DraftClaimService;
+import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.OffsetDateTime;
@@ -35,7 +35,7 @@ class DraftClaimControllerTest {
     private static final UUID DRAFT_ID = UUID.randomUUID();
     private static final String AUTH = "Token";
     @Mock
-    private DraftStoreService draftStoreService;
+    private DraftClaimService draftClaimService;
 
     @Mock
     private UserService userService;
@@ -58,9 +58,9 @@ class DraftClaimControllerTest {
     }
 
     @Test
-    void shouldCreateDraftClaim() {
+    void shouldReturnCreatedWhenNewDraftIsCreated() {
         payload.put("deadline", OffsetDateTime.now());
-        when(draftStoreService.createDraftClaim(USER_ID, CASE_ID, payload))
+        when(draftClaimService.createDraftClaim(USER_ID, CASE_ID, payload))
             .thenReturn(DraftClaimCreationResult.newDraft(draftStoreEntity));
 
         DraftClaimRequest request = new DraftClaimRequest(CASE_ID, payload);
@@ -69,12 +69,12 @@ class DraftClaimControllerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isNotNull();
-        verify(draftStoreService).createDraftClaim(USER_ID, CASE_ID, payload);
+        verify(draftClaimService).createDraftClaim(USER_ID, CASE_ID, payload);
     }
 
     @Test
-    void shouldReturnExistingDraftClaim() {
-        when(draftStoreService.createDraftClaim(USER_ID, CASE_ID, payload))
+    void shouldReturnOkWhenActiveDraftAlreadyExists() {
+        when(draftClaimService.createDraftClaim(USER_ID, CASE_ID, payload))
             .thenReturn(DraftClaimCreationResult.existingDraft(draftStoreEntity));
 
         DraftClaimRequest request = new DraftClaimRequest(CASE_ID, payload);
@@ -84,49 +84,49 @@ class DraftClaimControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getDraftId()).isEqualTo(DRAFT_ID);
-        verify(draftStoreService).createDraftClaim(USER_ID, CASE_ID, payload);
+        verify(draftClaimService).createDraftClaim(USER_ID, CASE_ID, payload);
     }
 
     @Test
-    void shouldReturnActiveDraftClaim() {
-        when(draftStoreService.getActiveDraftClaimForUser(USER_ID)).thenReturn(Optional.of(draftStoreEntity));
+    void shouldReturnActiveDraftWhenItExists() {
+        when(draftClaimService.getActiveDraftClaimForUser(USER_ID)).thenReturn(Optional.of(draftStoreEntity));
 
         ResponseEntity<DraftClaimResponse> response =
             controller.getActiveDraftClaim(AUTH);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        verify(draftStoreService).getActiveDraftClaimForUser(USER_ID);
+        verify(draftClaimService).getActiveDraftClaimForUser(USER_ID);
     }
 
     @Test
-    void shouldReturnDraftClaim() {
-        when(draftStoreService.getDraftClaim(DRAFT_ID, USER_ID)).thenReturn(Optional.of(draftStoreEntity));
+    void shouldReturnDraftWhenItExists() {
+        when(draftClaimService.getDraftClaim(DRAFT_ID, USER_ID)).thenReturn(Optional.of(draftStoreEntity));
 
         ResponseEntity<DraftClaimResponse> response = controller.getDraftClaim(DRAFT_ID, AUTH);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        verify(draftStoreService).getDraftClaim(DRAFT_ID, USER_ID);
+        verify(draftClaimService).getDraftClaim(DRAFT_ID, USER_ID);
     }
 
     @Test
-    void shouldUpdateDraftClaim() {
+    void shouldReturnUpdatedDraftWhenDraftExists() {
         DraftClaimRequest request = new DraftClaimRequest(CASE_ID, payload);
-        when(draftStoreService.updateDraftClaim(DRAFT_ID, USER_ID, CASE_ID, payload)).thenReturn(draftStoreEntity);
+        when(draftClaimService.updateDraftClaim(DRAFT_ID, USER_ID, CASE_ID, payload)).thenReturn(draftStoreEntity);
 
         ResponseEntity<DraftClaimResponse> response = controller.updateDraftClaim(DRAFT_ID, AUTH, request);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        verify(draftStoreService).updateDraftClaim(DRAFT_ID, USER_ID, CASE_ID, payload);
+        verify(draftClaimService).updateDraftClaim(DRAFT_ID, USER_ID, CASE_ID, payload);
     }
 
     @Test
-    void shouldDeleteDraftClaim() {
+    void shouldReturnNoContentWhenDraftIsDeleted() {
         ResponseEntity<Void> response = controller.deleteDraftClaim(DRAFT_ID, AUTH);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        verify(draftStoreService).deleteDraftClaim(DRAFT_ID, USER_ID);
+        verify(draftClaimService).deleteDraftClaim(DRAFT_ID, USER_ID);
     }
 }

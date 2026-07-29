@@ -7,7 +7,13 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
 @Profile("!contract-test")
-@EnableJpaRepositories(basePackages = {"uk.gov.hmcts.reform.dashboard"})
-@EntityScan("uk.gov.hmcts.reform.dashboard")
+@EnableJpaRepositories(basePackages = {
+    "uk.gov.hmcts.reform.dashboard",
+    "uk.gov.hmcts.reform.draftstore"
+})
+@EntityScan(basePackages = {
+    "uk.gov.hmcts.reform.dashboard",
+    "uk.gov.hmcts.reform.draftstore"
+})
 public class DashboardJpaConfiguration {
 }
