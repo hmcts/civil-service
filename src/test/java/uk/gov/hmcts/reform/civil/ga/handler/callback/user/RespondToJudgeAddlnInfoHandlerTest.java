@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.ga.model.GARespondentRepresentative;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -70,8 +69,6 @@ public class RespondToJudgeAddlnInfoHandlerTest extends GeneralApplicationBaseCa
     DocUploadDashboardNotificationService docUploadDashboardNotificationService;
 
     @Mock
-    FeatureToggleService featureToggleService;
-    @Mock
     GaForLipService gaForLipService;
 
     private static final String CAMUNDA_EVENT = "INITIATE_GENERAL_APPLICATION";
@@ -99,7 +96,6 @@ public class RespondToJudgeAddlnInfoHandlerTest extends GeneralApplicationBaseCa
 
         @Test
         void shouldPopulateDocListAndReturnNullWrittenRepUpload() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
 
             List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
 
@@ -177,10 +173,9 @@ public class RespondToJudgeAddlnInfoHandlerTest extends GeneralApplicationBaseCa
         }
 
         @Test
-        void shouldPopulateDocListWithExitingDocElementWhenGaForWelshEnabled() {
+        void shouldPopulateDocListWithExistingDocElementAndSetRespondedFlag() {
 
             List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
 
             Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
                 .setDocumentBinaryUrl(TEST_STRING)
@@ -226,7 +221,6 @@ public class RespondToJudgeAddlnInfoHandlerTest extends GeneralApplicationBaseCa
 
         @Test
         void shouldConvertToDocAndReturnNullAddlnInfoText() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             when(respondForInformationGenerator.generate(any(), anyString(), anyString()))
                 .thenReturn(new CaseDocument().setDocumentLink(new Document()));
 
@@ -250,7 +244,6 @@ public class RespondToJudgeAddlnInfoHandlerTest extends GeneralApplicationBaseCa
 
         @Test
         void shouldCreateDashboardNotificationIfGaForLipIsTrue() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
 
             List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
 
@@ -285,7 +278,6 @@ public class RespondToJudgeAddlnInfoHandlerTest extends GeneralApplicationBaseCa
 
         @Test
         void shouldNotCreateDashboardNotificationIfTranslationRequired() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             when(respondForInformationGenerator.generate(any(), anyString(), anyString()))
                 .thenReturn(new CaseDocument().setDocumentLink(new Document()));
             List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
@@ -319,7 +311,6 @@ public class RespondToJudgeAddlnInfoHandlerTest extends GeneralApplicationBaseCa
 
         @Test
         void shouldNotCreateDashboardNotificationIfTranslationAwaiting() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
 
             List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
 
