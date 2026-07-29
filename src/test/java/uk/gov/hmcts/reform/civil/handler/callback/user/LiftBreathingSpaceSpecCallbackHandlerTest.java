@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
@@ -81,11 +82,14 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
     class MidCallback {
 
         @Test
-        public void whenEndDateIsFuture_thenReturnError() {
+        public void whenEndDateExceeds60DaysForStandardBS_thenReturnError() {
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
-            breathingSpaceInfo.setEnter(new BreathingSpaceEnterInfo());
+            BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
+            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceEnterInfo.setType(BreathingSpaceType.STANDARD);
+            breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
             BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
-            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now().plusDays(1));
+            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now().plusDays(61));
             breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setBreathing(breathingSpaceInfo);
@@ -96,15 +100,18 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
                 .pageId("enter-info");
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
-            Assertions.assertFalse(response.getErrors().isEmpty());
+            assertThat(response.getErrors().getFirst()).isEqualTo("Standard breathing space cannot last for longer than 60 days");
         }
 
         @Test
-        public void whenEndDateIsNotFuture_thenReturnNoError() {
+        public void whenEndDateExceeds60DaysForMentalHealthBS_thenReturnNoError() {
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
-            breathingSpaceInfo.setEnter(new BreathingSpaceEnterInfo());
+            BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
+            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceEnterInfo.setType(BreathingSpaceType.MENTAL_HEALTH);
+            breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
             BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
-            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now());
+            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now().plusDays(61));
             breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setBreathing(breathingSpaceInfo);
@@ -119,7 +126,7 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
         }
 
         @Test
-        public void whenDatesDoNotMatch_thenReturnError() {
+        public void whenEndDateIsNotAfterStartDate_thenReturnError() {
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
             BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
             breathingSpaceEnterInfo.setStart(LocalDate.now().minusDays(30));
@@ -137,6 +144,48 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
             Assertions.assertFalse(response.getErrors().isEmpty());
+        }
+
+        @Test
+        public void whenEndDateIsSameDateAsStartDate_thenReturnNoError() {
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
+            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
+            BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
+            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now());
+            breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setBreathing(breathingSpaceInfo);
+
+            CallbackParams params = new CallbackParams()
+                .caseData(caseData)
+                .type(CallbackType.MID)
+                .pageId("enter-info");
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
+            Assertions.assertTrue(response.getErrors().isEmpty());
+        }
+
+        @Test
+        public void whenEndDateIsAfterStartDate_thenReturnNoError() {
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
+            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
+            BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
+            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now().plusDays(1));
+            breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setBreathing(breathingSpaceInfo);
+
+            CallbackParams params = new CallbackParams()
+                .caseData(caseData)
+                .type(CallbackType.MID)
+                .pageId("enter-info");
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
+            Assertions.assertTrue(response.getErrors().isEmpty());
         }
     }
 
