@@ -22,6 +22,9 @@ public class DocumentPurgeReference extends CaseReference implements ExcelMappab
     @JsonProperty
     private String documentId;
 
+    @JsonProperty
+    private String incidentId;
+
     @Override
     public void fromExcelRow(Map<String, Object> rowValues) throws Exception {
         if (rowValues.containsKey("caseReference")) {
@@ -29,6 +32,9 @@ public class DocumentPurgeReference extends CaseReference implements ExcelMappab
         }
         if (rowValues.containsKey("documentId")) {
             setDocumentId(asString(rowValues.get("documentId")));
+        }
+        if (rowValues.containsKey("incidentId")) {
+            setIncidentId(asString(rowValues.get("incidentId")));
         }
     }
 

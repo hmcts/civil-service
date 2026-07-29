@@ -63,10 +63,11 @@ public class PurgeDocStoreDocumentTask extends MigrationTask<DocumentPurgeRefere
 
         String caseId = reference.getCaseReference();
         String documentId = reference.getDocumentId().trim();
+        String incidentId = reference.getIncidentId();
 
         String authorisation = getSystemUserToken();
         documentManagementService.deleteDocument(authorisation, documentId);
-        log.info("{} case={} documentId={} result=DELETED", LOG_PREFIX, caseId, documentId);
+        log.info("{} case={} documentId={} incidentId={} result=DELETED", LOG_PREFIX, caseId, documentId, incidentId);
 
         return caseData;
     }
