@@ -80,11 +80,11 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             errors.add("Standard breathing space cannot last for longer than 60 days");
         }
 
-         if (startDate != null
-             && startDate.isAfter(caseData.getBreathing().getLift().getExpectedEnd())) {
-             errors.add("End date must be after " + DateFormatHelper
-                 .formatLocalDate(startDate, DateFormatHelper.DATE));
-         }
+        if (startDate != null
+            && startDate.isAfter(caseData.getBreathing().getLift().getExpectedEnd())) {
+            errors.add("End date must be after " + DateFormatHelper
+                .formatLocalDate(startDate, DateFormatHelper.DATE));
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
