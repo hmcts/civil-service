@@ -67,7 +67,7 @@ scheduler:
     enabled: ${SCHEDULER_ENABLED_JUDGEMENT_BUFFER:false}
   defendant-response:
     cronExpression: ${CRON_EXPRESSION_DEFENDANT_RESPONSE:0 1 16 * * ?}
-    enabled: ${SCHEDULER_ENABLED_DEFENDANT_RESPONSE:false}
+    enabled: ${SCHEDULER_ENABLED_DEFENDANT_RESPONSE:true}
   default-back-pressure:
     initialDelay: ${DEFAULT_BACK_PRESSURE_INITIAL_DELAY:PT0S}
     maxDelay: ${DEFAULT_BACK_PRESSURE_MAX_DELAY:PT10S}
