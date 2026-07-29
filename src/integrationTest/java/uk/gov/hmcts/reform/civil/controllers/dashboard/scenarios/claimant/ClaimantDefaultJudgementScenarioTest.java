@@ -67,7 +67,7 @@ public class ClaimantDefaultJudgementScenarioTest extends DashboardBaseIntegrati
             .andExpect(status().isOk())
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].titleEn").value("A judgment against the defendant has been now been entered"),
+                jsonPath("$[0].titleEn").value("A judgment against the defendant has been made"),
                 jsonPath("$[0].descriptionEn")
                     .value("<p class=\"govuk-body\">The defendant should now pay you according to the terms " +
                                "of the judgment.<br>Once they do, you should <a href=\"{CONFIRM_YOU_HAVE_BEEN_PAID_URL}\" class=\"govuk-link\">" +

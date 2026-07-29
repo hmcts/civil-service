@@ -33,6 +33,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -76,7 +77,7 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+            given(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString(), anyString()))
                 .willReturn(getSampleCourLocationsRefObject());
         }
 
@@ -140,7 +141,7 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+            given(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString(), anyString()))
                 .willReturn(getSampleCourLocationsRefObject());
         }
 

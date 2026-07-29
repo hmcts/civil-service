@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.CaseServiceUtil;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 
 import java.util.Collections;
@@ -122,10 +123,10 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
 
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> locations = (locationRefDataService
-            .getCourtLocationsByEpimmsIdAndCourtType(authToken, epimmsId));
+            .getCourtLocationsByEpimmsIdAndCourtType(authToken, epimmsId, CaseServiceUtil.getCaseServiceId(SPEC_CLAIM)));
 
         if (!locations.isEmpty()) {
-            LocationRefData locationRefData = locations.get(0);
+            LocationRefData locationRefData = locations.getFirst();
             CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
             caseLocationCivil.setRegion(locationRefData.getRegionId());
             caseLocationCivil.setBaseLocation(locationRefData.getEpimmsId());

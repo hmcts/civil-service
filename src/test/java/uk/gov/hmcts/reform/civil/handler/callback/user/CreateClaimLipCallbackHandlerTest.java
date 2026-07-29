@@ -219,7 +219,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetCaseManagementLocation() {
             List<LocationRefData> locations = new ArrayList<>();
             locations.add(new LocationRefData().setCourtName("Court Name").setRegionId("2").setEpimmsId("420219").setSiteName("Civil National Business Centre"));
-            when(locationReferenceDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any())).thenReturn(locations);
+            when(locationReferenceDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any(), any())).thenReturn(locations);
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();

@@ -17,9 +17,9 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.nowInLocalZone;
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.CONSENT_ORDER_FORM;
 
@@ -83,7 +83,7 @@ public class ConsentOrderGenerator implements TemplateDataGenerator<ConsentOrder
 
     private String getFileName(DocmosisTemplates docmosisTemplate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return String.format(docmosisTemplate.getDocumentTitle(), LocalDateTime.now().format(formatter));
+        return String.format(docmosisTemplate.getDocumentTitle(), nowInLocalZone().format(formatter));
     }
 
     private DocmosisTemplates getDocmosisTemplate() {

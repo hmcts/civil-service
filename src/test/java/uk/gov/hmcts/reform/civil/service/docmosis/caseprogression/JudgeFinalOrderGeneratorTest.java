@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -164,7 +163,7 @@ class JudgeFinalOrderGeneratorTest {
         .setEpimmsId("000000");
 
     @BeforeEach
-    public void setUp() throws JsonProcessingException {
+    void setUp() {
 
         when(userService.getUserDetails(any()))
             .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
@@ -172,9 +171,9 @@ class JudgeFinalOrderGeneratorTest {
             .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
 
         when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefData);
-        when(locationRefDataService.getCcmccLocation(any())).thenReturn(locationRefData);
-        when(locationRefDataService.getCnbcLocation(any())).thenReturn(locationRefData);
-        when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(List.of(locationRefData));
+        when(locationRefDataService.getCcmccLocation(any(), any())).thenReturn(locationRefData);
+        when(locationRefDataService.getCnbcLocation(any(), any())).thenReturn(locationRefData);
+        when(locationRefDataService.getHearingCourtLocations(anyString(), anyString())).thenReturn(List.of(locationRefData));
     }
 
     @Test

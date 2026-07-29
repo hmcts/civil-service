@@ -551,7 +551,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER).build();
             List<LocationRefData> locations = new ArrayList<>();
             locations.add(locationRefDataWithCourtNameRegion());
-            when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
+            when(locationRefDataService.getHearingCourtLocations(any(), any())).thenReturn(locations);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             String advancedDate = LocalDate.now().plusDays(14).toString();
             when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefDataAfterSdo);
@@ -648,7 +648,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER).build();
             List<LocationRefData> locations = new ArrayList<>();
             locations.add(locationRefDataWithCourtNameRegion());
-            when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
+            when(locationRefDataService.getHearingCourtLocations(any(), any())).thenReturn(locations);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefDataAfterSdo);
             // When
@@ -675,7 +675,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // may run again but should not overwrite user's edited penal notice content
             List<LocationRefData> locations = new ArrayList<>();
             locations.add(locationRefDataWithCourtNameRegion());
-            when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
+            when(locationRefDataService.getHearingCourtLocations(any(), any())).thenReturn(locations);
             when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefDataAfterSdo);
             when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class)))
                 .thenReturn(LocalDate.now())

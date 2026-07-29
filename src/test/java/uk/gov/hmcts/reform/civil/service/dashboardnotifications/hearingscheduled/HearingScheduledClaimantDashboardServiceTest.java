@@ -67,7 +67,7 @@ class HearingScheduledClaimantDashboardServiceTest {
         locationRefData.setPostcode("Postcode");
 
         List<LocationRefData> locations = List.of(locationRefData);
-        when(locationRefDataService.getHearingCourtLocations(AUTH_TOKEN)).thenReturn(locations);
+        when(locationRefDataService.getHearingCourtLocations(AUTH_TOKEN, "AAA7")).thenReturn(locations);
         when(courtLocationUtils.fillPreferredLocationData(locations, hearingLocation)).thenReturn(locationRefData);
 
         service.notifyHearingScheduled(caseData, AUTH_TOKEN);
@@ -78,7 +78,7 @@ class HearingScheduledClaimantDashboardServiceTest {
     @Test
     void shouldNotPopulateCourtName_whenLocationRefDataIsNull() {
         CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted().build();
-        when(locationRefDataService.getHearingCourtLocations(AUTH_TOKEN)).thenReturn(List.of());
+        when(locationRefDataService.getHearingCourtLocations(AUTH_TOKEN, "AAA7")).thenReturn(List.of());
         when(courtLocationUtils.fillPreferredLocationData(any(), any())).thenReturn(null);
 
         service.notifyHearingScheduled(caseData, AUTH_TOKEN);

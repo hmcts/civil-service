@@ -12,7 +12,9 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
@@ -42,25 +44,33 @@ public class CoreCaseDataApiMockHelper {
         when(authTokenGenerator.generate()).thenReturn(GENERATED_TOKEN);
     }
 
+    public void resetMocks() {
+        reset(coreCaseDataApi, idamClient, authTokenGenerator);
+    }
+
     public void mockElasticSearchResult(SearchResult searchResult) {
         when(coreCaseDataApi.searchCases(eq(ACCESS_TOKEN), eq(GENERATED_TOKEN), eq(CASE_TYPE), any(String.class)))
             .thenReturn(searchResult);
     }
 
     public void mockElasticSearchResultPaginated(SearchResult searchResult, SearchResult... nextSearchResults) {
-        when(coreCaseDataApi.searchCases(any(), any(), any(), any()))
+        when(coreCaseDataApi.searchCases(eq(ACCESS_TOKEN), eq(GENERATED_TOKEN), eq(CASE_TYPE), any()))
             .thenReturn(searchResult, nextSearchResults);
+    }
+
+    public void mockGetCase(String caseIdString, CaseDetails caseDetails) {
+        when(coreCaseDataApi.getCase(eq(ACCESS_TOKEN), eq(GENERATED_TOKEN), eq(caseIdString))).thenReturn(caseDetails);
     }
 
     public void mockStartEvent(String caseIdString, StartEventResponse startEventResponse, String eventId) {
         when(coreCaseDataApi.startEventForCaseWorker(
-            ACCESS_TOKEN,
-            GENERATED_TOKEN,
-            USER_ID,
-            JURISDICTION,
-            CASE_TYPE,
-            caseIdString,
-            eventId
+            eq(ACCESS_TOKEN),
+            eq(GENERATED_TOKEN),
+            eq(USER_ID),
+            eq(JURISDICTION),
+            eq(CASE_TYPE),
+            eq(caseIdString),
+            eq(eventId)
         )).thenReturn(startEventResponse);
     }
 
@@ -110,7 +120,7 @@ public class CoreCaseDataApiMockHelper {
             any(),
             any(),
             any(),
-            org.mockito.ArgumentMatchers.anyBoolean(),
+            anyBoolean(),
             any()
         );
     }

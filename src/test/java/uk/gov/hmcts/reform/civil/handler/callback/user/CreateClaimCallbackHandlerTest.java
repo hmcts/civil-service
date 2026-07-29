@@ -1941,7 +1941,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 given(courtLocationUtility.findPreferredLocationData(any(), any(DynamicList.class)))
                     .willReturn(locationA);
 
-                given(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any()))
+                given(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any(), any()))
                     .willReturn(List.of(locationA));
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

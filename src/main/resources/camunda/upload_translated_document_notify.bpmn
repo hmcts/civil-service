@@ -55,7 +55,7 @@
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_1kb2qfb" sourceRef="updateClaimStateAfterTranslateDocumentUploadedID" targetRef="Gateway_165j6ji" />
     <bpmn:sequenceFlow id="Flow_0qmsc9o" sourceRef="Activity_1cweuly" targetRef="Event_07ek9xj" />
-    <bpmn:serviceTask id="GenerateDashboardNotificationsDefendantResponse" name="Generate Dashboard Notifications" camunda:type="external" camunda:topic="processCaseEvent">
+    <bpmn:serviceTask id="GenerateDashboardNotificationsDefendantResponse" name="Generate Dashboard Notifications" camunda:type="external" camunda:topic="dashboardNotifications">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="caseEvent">DASHBOARD_NOTIFICATION_EVENT</camunda:inputParameter>
