@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.ga.model.GARespondentRepresentative;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -71,8 +70,6 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
     private DocUploadDashboardNotificationService docUploadDashboardNotificationService;
     @Mock
     private GaForLipService gaForLipService;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     private static final String CAMUNDA_EVENT = "INITIATE_GENERAL_APPLICATION";
     private static final String BUSINESS_PROCESS_INSTANCE_ID = "11111";
@@ -99,7 +96,6 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
 
         @Test
         void shouldPopulateDocListAndReturnNullWrittenRepUpload() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
 
             List<Element<Document>> generalAppWrittenRepUpload = new ArrayList<>();
 
@@ -134,7 +130,6 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
 
         @Test
         void shouldPopulateDocListWithExitingDocElement() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
 
             List<Element<Document>> generalAppWrittenRepUpload = new ArrayList<>();
 
@@ -178,11 +173,9 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
         }
 
         @Test
-        void shouldPopulateDocListWithExitingDocElementWhenGaForWelshEnabled() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+        void shouldPopulateDocListWithExistingDocElementAndSetRespondedFlag() {
 
             List<Element<Document>> generalAppWrittenRepUpload = new ArrayList<>();
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
                 .setDocumentBinaryUrl(TEST_STRING)
                 .setDocumentHash(TEST_STRING);
@@ -226,8 +219,7 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
         }
 
         @Test
-        void shouldKeepUploadedWrittenRepresentationInAddlDocsWhenWelshEnabledAndBilingualButNoTextResponse() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        void shouldKeepUploadedWrittenRepresentationInAddlDocsWhenBilingualButNoTextResponse() {
 
             List<Element<Document>> generalAppWrittenRepUpload = new ArrayList<>();
 
@@ -266,7 +258,6 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
 
         @Test
         void shouldConvertToDocAndReturnNullWrittenRepText() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             when(respondToWrittenRepresentationGenerator.generate(any(), anyString(), anyString()))
                 .thenReturn(new CaseDocument().setDocumentLink(new Document()));
 
@@ -290,7 +281,6 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
 
         @Test
         void shouldCreateDashboardNotificationIfGaForLipIsTrue() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
 
             List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
 
@@ -336,7 +326,6 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
 
         @Test
         void shouldNotCreateDashboardNotificationIfTranslationRequired() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             when(respondToWrittenRepresentationGenerator.generate(any(), anyString(), anyString()))
                 .thenReturn(new CaseDocument().setDocumentLink(new Document()));
             List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
@@ -380,7 +369,6 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
 
         @Test
         void shouldNotCreateDashboardNotificationIfTranslationAwaiting() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
 
             List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
 
@@ -423,7 +411,6 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
 
         @Test
         void shouldGenerateRespondentWrittenRepAndSetRespondedFlagWhenRespondentSubmits() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             when(respondToWrittenRepresentationGenerator.generate(any(), anyString(), anyString()))
                 .thenReturn(new CaseDocument().setDocumentLink(new Document()));
@@ -464,7 +451,6 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
 
         @Test
         void shouldOnlyCreateRespondentResponseNotificationWhenRespondentTranslationRequired() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             when(respondToWrittenRepresentationGenerator.generate(any(), anyString(), anyString()))
                 .thenReturn(new CaseDocument().setDocumentLink(new Document()));

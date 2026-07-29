@@ -32,7 +32,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.util.ArrayList;
@@ -75,8 +74,6 @@ class ParentCaseUpdateHelperTest {
     private GaCoreCaseDataService coreCaseDataService;
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
-    @Mock
-    private FeatureToggleService featureToggleService;
     @Spy
     private ObjectMapper objectMapper = ObjectMapperFactory.instance();
     @Captor
@@ -785,7 +782,6 @@ class ParentCaseUpdateHelperTest {
             translationList).build();
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse());
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(updatedCaseData);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData gaCase = getGaVaryCaseDataForCollection(
             "Claimant",
                 NO,
@@ -814,7 +810,6 @@ class ParentCaseUpdateHelperTest {
 
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse());
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(updatedCaseData);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData gaCase = getGaVaryCaseDataForCollection(
             "RespondentSol",
                 NO,

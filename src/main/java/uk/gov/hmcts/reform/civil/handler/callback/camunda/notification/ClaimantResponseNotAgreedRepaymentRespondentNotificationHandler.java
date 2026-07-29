@@ -69,7 +69,7 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
     }
 
     private String getTemplateForLip(CaseData caseData) {
-        if (featureToggleService.isGaForWelshEnabled() && caseData.isClaimantBilingual()) {
+        if (caseData.isClaimantBilingual()) {
             return notificationsProperties.getNotifyClaimantLipTemplateManualDeterminationForWelsh();
         }
         return notificationsProperties.getNotifyClaimantLipTemplateManualDetermination();

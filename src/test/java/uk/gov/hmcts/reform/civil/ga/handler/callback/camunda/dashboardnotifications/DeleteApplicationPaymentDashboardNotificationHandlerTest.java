@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.ga.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 
@@ -32,8 +31,6 @@ public class DeleteApplicationPaymentDashboardNotificationHandlerTest extends Ge
     @Mock
     private DashboardApiClient dashboardApiClient;
     @Mock
-    private FeatureToggleService featureToggleService;
-    @Mock
     private GaForLipService gaForLipService;
 
     @Test
@@ -49,7 +46,6 @@ public class DeleteApplicationPaymentDashboardNotificationHandlerTest extends Ge
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
             when(gaForLipService.isLipApp(caseData)).thenReturn(true);
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(DELETE_APPLICATION_PAYMENT_DASHBOARD_NOTIFICATION.name()).build()
             ).build();
@@ -65,9 +61,9 @@ public class DeleteApplicationPaymentDashboardNotificationHandlerTest extends Ge
         }
 
         @Test
-        void shouldNotRemoveNotification_whenInvoked() {
+        void shouldNotRemoveNotification_whenCaseIsNotGaForLip() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+            when(gaForLipService.isGaForLip(caseData)).thenReturn(false);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(DELETE_APPLICATION_PAYMENT_DASHBOARD_NOTIFICATION.name()).build()
             ).build();
