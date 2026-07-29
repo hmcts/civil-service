@@ -73,10 +73,10 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         LocalDate startDate = caseData.getBreathing().getEnter().getStart();
 
-        int STANDARD_BREATHING_SPACE_MAX_DURATION_DAYS = 60;
+        int standardBSMaxDurationDays = 60;
         if (caseData.getBreathing().getEnter().getType() == BreathingSpaceType.STANDARD
          && caseData.getBreathing().getLift().getExpectedEnd().isAfter(startDate.plusDays(
-            STANDARD_BREATHING_SPACE_MAX_DURATION_DAYS))) {
+            standardBSMaxDurationDays))) {
             errors.add("Standard breathing space cannot last for longer than 60 days");
         }
 
