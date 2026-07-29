@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -15,8 +17,22 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuppressWarnings("java:S1700")
-public class DocumentPurgeReference extends CaseReference {
+public class DocumentPurgeReference extends CaseReference implements ExcelMappable {
 
     @JsonProperty
     private String documentId;
+
+    @Override
+    public void fromExcelRow(Map<String, Object> rowValues) throws Exception {
+        if (rowValues.containsKey("caseReference")) {
+            setCaseReference(asString(rowValues.get("caseReference")));
+        }
+        if (rowValues.containsKey("documentId")) {
+            setDocumentId(asString(rowValues.get("documentId")));
+        }
+    }
+
+    private String asString(Object value) {
+        return value != null ? value.toString() : null;
+    }
 }
