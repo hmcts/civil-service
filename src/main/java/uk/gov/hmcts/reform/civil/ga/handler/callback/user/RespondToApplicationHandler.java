@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.GeneralAppLocationRefDataService;
 import uk.gov.hmcts.reform.civil.ga.utils.DocUploadUtils;
 import uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil;
+import uk.gov.hmcts.reform.civil.utils.CaseServiceUtil;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -136,11 +137,12 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
             log.info("General app does not vary judgement type for caseId: {}", caseData.getCcdCaseReference());
         }
 
+        final String serviceId = CaseServiceUtil.getCaseServiceId(caseData);
         caseDataBuilder
             .hearingDetailsResp(
                 new GAHearingDetails()
                     .setHearingPreferredLocation(getLocationsFromList(locationRefDataService
-                                                                       .getCourtLocations(authToken))));
+                                                                       .getCourtLocations(authToken, serviceId))));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(applicationExistsValidation(callbackParams))

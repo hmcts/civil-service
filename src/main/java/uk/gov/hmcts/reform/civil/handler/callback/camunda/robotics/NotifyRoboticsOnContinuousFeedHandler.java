@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.robotics;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -17,6 +18,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_ON_CONTINUOUS_FEED;
 
+@Slf4j
 @Service
 public class NotifyRoboticsOnContinuousFeedHandler extends CallbackHandler {
 
@@ -40,8 +42,16 @@ public class NotifyRoboticsOnContinuousFeedHandler extends CallbackHandler {
     private CallbackResponse notifyRobotics(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = (String) callbackParams.getParams().get(BEARER_TOKEN);
+        String caseReference = caseData.getLegacyCaseReference();
 
-        roboticsNotifier.notifyRobotics(caseData, authToken);
+        log.info("Notifying RPA on continuous feed for case: {}", caseReference);
+        try {
+            roboticsNotifier.notifyRobotics(caseData, authToken);
+        } catch (Exception e) {
+            log.error("Failed to notify RPA on continuous feed for case: {}, error: {}",
+                      caseReference, e.getMessage(), e);
+            throw e;
+        }
 
         return SubmittedCallbackResponse.builder().build();
     }

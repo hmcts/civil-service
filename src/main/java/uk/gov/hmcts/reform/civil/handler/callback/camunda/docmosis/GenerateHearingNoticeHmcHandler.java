@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.hearing.HearingNoticeHmcGenerator;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
@@ -38,12 +39,14 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC_WELSH;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.convertFromUTC;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingDays;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getLocationRefData;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getTotalHearingDurationInMinutes;
+import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.isWelshHearingTemplate;
 
 @Service
 @RequiredArgsConstructor
@@ -61,6 +64,7 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final LocationReferenceDataService locationRefDataService;
     private final HearingFeesService hearingFeesService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -90,13 +94,20 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
 
         var hearingStartDay = HmcDataUtils.getHearingStartDay(hearing);
         String hearingLocation = getHearingLocation(camundaVars.getHearingId(), hearing,
-                                                    bearerToken, locationRefDataService, false);
+                                                    bearerToken, getCaseServiceId(caseData.getCaseAccessCategory()),
+                                                    locationRefDataService, false);
 
         buildDocument(callbackParams, hearing, hearingLocation, camundaVars.getHearingId(), HEARING_NOTICE_HMC);
 
-        if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
-            String hearingLocationWelsh = getHearingLocation(camundaVars.getHearingId(), hearing,
-                                                        bearerToken, locationRefDataService, true);
+        // Check DQ document language if Welsh not enabled, only check main language flag if enabled
+        if ((!featureToggleService.isWelshEnabledForMainCase() && isWelshHearingTemplate(caseData))
+                || (featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()))) {
+            String hearingLocationWelsh = getHearingLocation(camundaVars.getHearingId(),
+                                                             hearing,
+                                                             bearerToken,
+                                                             getCaseServiceId(caseData.getCaseAccessCategory()),
+                                                             locationRefDataService,
+                                                             true);
             buildDocument(callbackParams, hearing, hearingLocationWelsh, camundaVars.getHearingId(), HEARING_NOTICE_HMC_WELSH);
         }
 
@@ -158,12 +169,14 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
     }
 
     private String getHearingLocation(String hearingId, HearingGetResponse hearing,
-                                      String bearerToken, LocationReferenceDataService locationRefDataService,
+                                      String bearerToken, String serviceId,
+                                      LocationReferenceDataService locationRefDataService,
                                       boolean isWelsh) {
         LocationRefData hearingLocation = getLocationRefData(
             hearingId,
             HmcDataUtils.getHearingStartDay(hearing).getHearingVenueId(),
             bearerToken,
+            serviceId,
             locationRefDataService);
         if (hearingLocation != null) {
             return isWelsh

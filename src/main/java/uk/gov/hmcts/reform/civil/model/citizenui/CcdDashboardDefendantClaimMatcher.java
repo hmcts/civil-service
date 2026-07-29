@@ -252,18 +252,24 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isCourtReviewing() {
-        return (!hasSdoBeenDrawn()
-            && caseData.isRespondentResponseFullDefence()
-            && caseData.getCcdState().equals(CaseState.JUDICIAL_REFERRAL))
-            || (caseData.hasApplicantRejectedRepaymentPlan())
-            || (CaseState.AWAITING_APPLICANT_INTENTION.equals(caseData.getCcdState())
-            && isMintiClaim(caseData) && isClaimantProceeding(caseData));
+        return !isInState(CaseState.All_FINAL_ORDERS_ISSUED)
+            && ((!hasSdoBeenDrawn()
+                && caseData.isRespondentResponseFullDefence()
+                && isInState(CaseState.JUDICIAL_REFERRAL))
+                || (caseData.hasApplicantRejectedRepaymentPlan())
+                || (isInState(CaseState.AWAITING_APPLICANT_INTENTION)
+                    && isMintiClaim(caseData)
+                    && isClaimantProceeding(caseData)));
     }
 
     private boolean isMintiClaim(CaseData caseData) {
         return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
             && (AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
             || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack()));
+    }
+
+    private boolean isInState(CaseState caseState) {
+        return caseState != null && caseState.equals(caseData.getCcdState());
     }
 
     private boolean isClaimantProceeding(CaseData caseData) {
@@ -334,9 +340,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         return (
             caseData.isCcjRequestJudgmentByAdmission()
             && CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getCcdState()))
-            || caseData.getRespondent1ResponseDeadline() != null
+            || (caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
-            && caseData.getPaymentTypeSelection() != null;
+            && caseData.getPaymentTypeSelection() != null);
     }
 
     @Override

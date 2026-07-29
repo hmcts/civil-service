@@ -11,6 +11,7 @@ public class ScheduledTaskEventConfiguration {
     String caseFailedEvent;
     String jobCompletedEvent;
     String jobAbortedEvent;
+    String backPressureUpdatedEvent;
 
     public ScheduledTaskEventConfiguration(String schedulerName) {
         this.schedulerName = schedulerName;
@@ -19,5 +20,6 @@ public class ScheduledTaskEventConfiguration {
         this.caseFailedEvent = schedulerName + "CaseFailed";
         this.jobCompletedEvent = schedulerName + "JobCompleted";
         this.jobAbortedEvent = schedulerName + "JobAborted";
+        this.backPressureUpdatedEvent = schedulerName + "BackPressureUpdated";
     }
 }
