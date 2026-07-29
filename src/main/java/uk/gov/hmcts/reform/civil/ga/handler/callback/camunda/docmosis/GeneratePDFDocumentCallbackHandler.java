@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.ga.enums.welshenhancements.PreTranslationGaDocu
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialRequestMoreInfo;
@@ -88,7 +87,6 @@ public class GeneratePDFDocumentCallbackHandler extends CallbackHandler implemen
 
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
-    private final FeatureToggleService featureToggleService;
 
     @Value("${print.service.enabled}")
     public String printServiceEnabled;
@@ -521,7 +519,7 @@ public class GeneratePDFDocumentCallbackHandler extends CallbackHandler implemen
     }
 
     private boolean isWelshBilingual(GeneralApplicationCaseData caseData) {
-        return featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual();
+        return caseData.isApplicationBilingual();
     }
 
     private CaseDocument generateFreeFormLipApplicantDocument(GenerationContext context) {
@@ -575,7 +573,7 @@ public class GeneratePDFDocumentCallbackHandler extends CallbackHandler implemen
     }
 
     private boolean shouldGenerateLipPost(GeneralApplicationCaseData caseData) {
-        return featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual();
+        return caseData.isApplicationBilingual();
     }
 
     private GAJudgeRequestMoreInfoOption getRequestMoreInfoOption(GeneralApplicationCaseData caseData) {
