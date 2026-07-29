@@ -279,17 +279,6 @@ In your concrete test, mock only the dependencies needed for the scenario:
 - location reference data
 - any other boundary the callback genuinely depends on
 
-Example:
-
-```java
-@MockBean
-private FeatureToggleService featureToggleService;
-
-@BeforeEach
-void setup() {
-    when(featureToggleService.isFeatureEnabled("example-toggle")).thenReturn(true);
-}
-```
 If a scenario needs IDAM behaviour, add the relevant mock/stub in that concrete test rather than putting it in the
 workflow base.
 
