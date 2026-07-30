@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.docmosis.GeneralApplicationDraftGenerator;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
@@ -52,7 +51,6 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
 
     private final GeneralAppFeesService generalAppFeesService;
     private final GaForLipService gaForLipService;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -135,9 +133,8 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
     }
 
     private boolean shouldUseWelshTranslation(GeneralApplicationCaseData caseData) {
-        return featureToggleService.isGaForWelshEnabled()
-            && ((caseData.getIsGaApplicantLip() == YES && caseData.isApplicantBilingual())
-            || (caseData.isRespondentBilingual() && caseData.getIsGaRespondentOneLip() == YES));
+        return (caseData.getIsGaApplicantLip() == YES && caseData.isApplicantBilingual())
+            || (caseData.isRespondentBilingual() && caseData.getIsGaRespondentOneLip() == YES);
     }
 
     private void updateWelshTranslationDocuments(GeneralApplicationCaseData caseData,
