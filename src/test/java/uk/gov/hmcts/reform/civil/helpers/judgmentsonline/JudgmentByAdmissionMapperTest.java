@@ -386,16 +386,18 @@ class JudgmentByAdmissionMapperTest {
         assertEquals("120", activeJudgment.getInstalmentDetails().getAmount());
         assertEquals(paymentFrequency, activeJudgment.getInstalmentDetails().getPaymentFrequency());
         assertEquals(LocalDate.now().plusDays(10), activeJudgment.getInstalmentDetails().getStartDate());
+        assertEquals("120", caseData.getJoRepaymentAmount());
         assertEquals(paymentFrequency, caseData.getJoRepaymentFrequency());
     }
 
     @ParameterizedTest
     @CsvSource({
         "120,120",
-        "120.50,120.50",
-        "120.49,120.49"
+        "120.00,120",
+        "12050,12050",
+        "12049,12049"
     })
-    void testIfJudgmentByAdmission_scenario6_rounding(BigDecimal inputAmount, String expectedAmount) {
+    void testIfJudgmentByAdmission_scenario6_keepsPenceForCcdMoneyFields(BigDecimal inputAmount, String expectedAmount) {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
             .specRespondent1Represented(YesOrNo.NO)
@@ -416,6 +418,7 @@ class JudgmentByAdmissionMapperTest {
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
         assertNotNull(activeJudgment);
         assertEquals(expectedAmount, activeJudgment.getInstalmentDetails().getAmount());
+        assertEquals(expectedAmount, caseData.getJoRepaymentAmount());
     }
 
     @Test
