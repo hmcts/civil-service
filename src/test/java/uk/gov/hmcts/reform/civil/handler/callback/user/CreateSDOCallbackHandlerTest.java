@@ -34,12 +34,10 @@ import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingOnRadioOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
-import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
@@ -152,7 +150,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -487,7 +484,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldPopulateLocationListsWithPreselectedCourtAndEnableWelshFlagWithClaimantLanguagePreference() {
+        void shouldPopulateLocationListsAndBilingualHintForBilingualClaimant() {
             Category category = hearingChannelCategory("INTER", "In Person");
             CategorySearchResult categorySearchResult = categorySearchResult(category);
             String preSelectedCourt = "214320";
@@ -521,7 +518,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldPopulateLocationListsWithPreselectedCourtAndEnableWelshFlagWithRespondentLanguagePreference() {
+        void shouldPopulateLocationListsAndBilingualHintForBilingualRespondent() {
             Category category = hearingChannelCategory("INTER", "In Person");
             CategorySearchResult categorySearchResult = categorySearchResult(category);
             String preSelectedCourt = "214320";
@@ -563,7 +560,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldPopulateLocationListsWithPreselectedCourtAndEnableWelshFlagWithNoClaimantAndRespondentLanguagePreference() {
+        void shouldPopulateLocationListsAndBilingualHintForBothBilingualParties() {
             Category category = hearingChannelCategory("INTER", "In Person");
             CategorySearchResult categorySearchResult = categorySearchResult(category);
             String preSelectedCourt = "214320";
@@ -605,7 +602,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldPopulateLocationListsWithPreselectedCourtAndEnableWelshFlagWithClaimantAndRespondentLanguagePreference() {
+        void shouldPopulateLocationListsWithoutBilingualHintForEnglishParties() {
             Category category = hearingChannelCategory("INTER", "In Person");
             CategorySearchResult categorySearchResult = categorySearchResult(category);
             String preSelectedCourt = "214320";
@@ -1208,7 +1205,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             given(time.now()).willReturn(submittedDate);
 
-            given(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).willReturn(true);
         }
 
         @Test
@@ -1304,83 +1300,24 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldSetEarlyAdoptersFlagToFalse_WhenLiP(Boolean isLocationWhiteListed) {
-        DynamicListElement optionOne = createDynamicListElement("00001", "court 1 - 1 address - Y01 7RB");
-        DynamicListElement optionTwo = createDynamicListElement("00002", "court 2 - 2 address - Y02 7RB");
-        DynamicListElement optionThree = createDynamicListElement("00003", "court 3 - 3 address - Y03 7RB");
-        DynamicList localOptions = createDynamicList(List.of(optionOne, optionTwo, optionThree), null);
-
+    @CsvSource({
+        "YES, YES",
+        "NO, YES",
+        "YES, NO",
+        "NO, NO"
+    })
+    void shouldSetEaCourtLocationForAllSpecRepresentationCombinations(YesOrNo applicantRepresented,
+                                                                      YesOrNo respondent1Represented) {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-        caseData.setDisposalHearingMethod(DisposalHearingMethod.DISPOSAL_HEARING_METHOD_IN_PERSON);
-        caseData.setDisposalHearingMethodInPerson(cloneDynamicListWithValue(localOptions, optionTwo));
-        caseData.setFastTrackMethodInPerson(localOptions);
-        caseData.setSmallClaimsMethodInPerson(localOptions);
-        caseData.setDisposalHearingMethodInPerson(cloneDynamicListWithValue(localOptions, optionTwo));
-        caseData.setDisposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW));
-        caseData.setOrderType(OrderType.DISPOSAL);
-        caseData.setRespondent1Represented(NO);
-        caseData.setCaseManagementLocation(createCaseLocation(optionTwo.getCode(), null));
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        caseData.setApplicant1Represented(applicantRepresented);
+        caseData.setRespondent1Represented(respondent1Represented);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression(optionTwo.getCode()))
-            .thenReturn(isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel(optionTwo.getCode(), params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString(), "AAA6"))
-            .thenReturn(Optional.of(locationRefDataWithRegion()));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(NO);
-        } else {
-            assertThat(responseCaseData.getEaCourtLocation()).isNull();
-        }
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        //LR scenarios trigger and ignore hmcLipEnabled
-        "true, YES, YES, true, YES",
-        "false, YES, YES, true, YES",
-        // LiP vs LR - ignore HMC court
-        "true,  NO, YES, false, NO",
-        "true,  NO, YES, TRUE, YES",
-        "false,  NO, YES, true, NO",
-        //LR vs LiP - ignore HMC court
-        "true, YES, NO, true, YES",
-        "false, YES, NO, true, NO",
-        //LiP vs LiP - ignore HMC court
-        "true, NO, NO, true, YES",
-        "false, NO, NO, true, NO"
-    })
-    void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabled(boolean isCPAndWhitelisted, YesOrNo applicantRepresented,
-                                                             YesOrNo respondent1Represented, boolean defendantNocOnline,
-                                                             YesOrNo eaCourtLocation) {
-
-        if (NO.equals(respondent1Represented) || NO.equals(applicantRepresented)) {
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
-        } else {
-            when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(isCPAndWhitelisted);
-        }
-        when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(defendantNocOnline);
-        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
-        DynamicListElement transferValue = createDynamicListElement(null, "Site 1 - Adr 1 - AAA 111");
-        DynamicList transferList = createDynamicList(null, transferValue);
-        caseData.setTransferCourtLocationList(transferList);
-        caseData.setCaseManagementLocation(createCaseLocation("111", "2"));
-
-        CaseData caseData2 = CaseDataBuilder.builder().build();
-        caseData2.setApplicant1Represented(applicantRepresented);
-        caseData2.setRespondent1Represented(respondent1Represented);
-        CallbackParams params = callbackParamsOf(caseData2, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
-        } else {
-            assertThat(responseCaseData.getEaCourtLocation()).isNull();
-        }
+
+        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(YES);
     }
 
     @Nested

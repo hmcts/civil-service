@@ -24,14 +24,6 @@ public class SdoFeatureToggleService {
         return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData);
     }
 
-    public boolean isDefendantNoCOnlineForCase(CaseData caseData) {
-        return featureToggleService.isDefendantNoCOnlineForCase(caseData);
-    }
-
-    public boolean isCaseProgressionEnabledAndLocationWhiteListed(String baseLocation) {
-        return featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(baseLocation);
-    }
-
     public boolean isMultiOrIntermediateTrackCase(CaseData caseData) {
         if (!isMultiOrIntermediateTrackEnabled(caseData)) {
             return false;

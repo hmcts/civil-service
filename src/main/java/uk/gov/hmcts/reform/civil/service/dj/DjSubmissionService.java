@@ -30,9 +30,7 @@ public class DjSubmissionService {
         assignDocumentCategories(caseData);
         directionsOrderCaseProgressionService.applyCaseProgressionRouting(
             caseData,
-            authToken,
-            false,
-            false
+            authToken
         );
 
         return caseData;

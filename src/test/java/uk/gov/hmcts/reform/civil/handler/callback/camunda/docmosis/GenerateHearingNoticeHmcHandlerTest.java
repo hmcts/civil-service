@@ -377,12 +377,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldCreateWelshDocument_whenConditionsAreMetOnClaimantLip() {
-        RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
-        respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
-        CaseDataLiP caseDataLiP = new CaseDataLiP();
-        caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimantFullDefence().build();
-        caseData.setCaseDataLiP(caseDataLiP);
         BusinessProcess businessProcess = new BusinessProcess();
         businessProcess.setProcessInstanceId(PROCESS_INSTANCE_ID);
         caseData.setBusinessProcess(businessProcess);

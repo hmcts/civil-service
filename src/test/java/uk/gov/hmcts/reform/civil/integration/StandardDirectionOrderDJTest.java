@@ -928,8 +928,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         "YES, NO",
         "NO, NO"
     })
-    void shouldPopulateEaCourtLocationAsYesWhenLipAndHmcLipEnabled(YesOrNo applicantRepresented,
-                                                                   YesOrNo respondent1Represented) {
+    void shouldPopulateEaCourtLocationAsYesForSpecClaimsRegardlessOfRepresentation(YesOrNo applicantRepresented,
+                                                                                    YesOrNo respondent1Represented) {
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
             .caseAccessCategory(SPEC_CLAIM)
             .caseManagementLocation(caseLocation("111", "2"))
@@ -941,35 +941,11 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
-        assertEquals(YES, responseCaseData.getEaCourtLocation());
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        "YES, YES",
-        "NO, YES",
-        "YES, NO",
-        "NO, NO"
-    })
-    void shouldPopulateEaCourtLocationAsYesWhenLipAndBilingualMainCase(YesOrNo applicantRepresented,
-                                                                          YesOrNo respondent1Represented) {
-        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-            .caseAccessCategory(SPEC_CLAIM)
-            .caseManagementLocation(caseLocation("111", "2"))
-            .transferCourtLocationList(dynamicListWithValue(dynamicListElementWithLabel())).build();
-
-        caseData.setApplicant1Represented(applicantRepresented);
-        caseData.setRespondent1Represented(respondent1Represented);
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
-
         assertEquals(YES, responseCaseData.getEaCourtLocation());
     }
 
     @Test
-    void shouldSetEaCourtLocationYes_whenSpecClaimAndWelshEnabled() {
+    void shouldSetEaCourtLocationYes_whenSpecClaim() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
@@ -1020,24 +996,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
         assertNull(responseCaseData.getEaCourtLocation());
-    }
-
-    @Test
-    void shouldSetEaCourtLocationYes_whenSpecClaimLipCaseAndBilingualMainCase() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
-            .caseAccessCategory(SPEC_CLAIM)
-            .applicant1Represented(NO) // LiP
-            .respondent1Represented(YES)
-            .caseManagementLocation(caseLocation("111", "2"))
-            .build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
-
-        assertEquals(YES, responseCaseData.getEaCourtLocation());
     }
 
     @Test

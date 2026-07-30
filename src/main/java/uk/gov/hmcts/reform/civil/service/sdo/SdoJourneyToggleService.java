@@ -67,7 +67,7 @@ public class SdoJourneyToggleService {
         }
     }
 
-    public YesOrNo resolveEaCourtLocation(CaseData caseData, boolean allowLipvLrWithNoC) {
+    public YesOrNo resolveEaCourtLocation(CaseData caseData) {
         if (!CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return null;
         }

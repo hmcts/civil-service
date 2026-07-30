@@ -569,7 +569,7 @@ public class DashboardNotificationsParamsMapperTest {
         "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT",
         "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT"
     })
-    void shouldNotMapOrderDocument_whenWelshEnabledAndBilingual(CaseEvent caseEvent) {
+    void shouldNotMapOrderDocument_whenClaimantIsBilingual(CaseEvent caseEvent) {
         caseData.setClaimantBilingualLanguagePreference(Language.WELSH.toString());
 
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();

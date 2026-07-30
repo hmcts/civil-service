@@ -368,7 +368,7 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"true", "false"})
-    void shouldRunProcess_ClaimFullDefenceNotAgreeMediation_defendantBilingualToggle(boolean defendantBilingual) {
+    void shouldRunProcess_ClaimFullDefenceNotAgreeMediation_whenDefendantBilingualStatusVaries(boolean defendantBilingual) {
         //Given
         VariableMap variables = Variables.createVariables();
         variables.putValue("flowState", "MAIN.FULL_DEFENCE_PROCEED");
@@ -436,7 +436,7 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
     }
 
     @Test
-    void shouldRunProcess_ClaimIsInPartAdmitPayImmediately_whenDefendantBilingual_EnglishToWelshEnabled() {
+    void shouldRunProcess_ClaimIsInPartAdmitPayImmediately_whenDefendantBilingual() {
 
         //assert process has started
         assertFalse(processInstance.isEnded());
@@ -466,7 +466,7 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
     }
 
     @Test
-    void shouldRunProcess_ClaimIsInPartAdmitPayImmediately_whenBothBilingual_EnglishToWelshEnabled() {
+    void shouldRunProcess_ClaimIsInPartAdmitPayImmediately_whenBothPartiesBilingual() {
 
         //assert process has started
         assertFalse(processInstance.isEnded());
@@ -478,7 +478,7 @@ public class ClaimantResponseCuiTest extends BpmnBaseTest {
         variables.putValue("flowState", "MAIN.PART_ADMIT_PAY_IMMEDIATELY");
         variables.put(FLOW_FLAGS, Map.of(
             LIP_JUDGMENT_ADMISSION, false,
-            RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL, false,
+            RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL, true,
             CLAIM_ISSUE_BILINGUAL, true
         ));
         assertCompleteExternalTask(

@@ -121,7 +121,7 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldAddDefendantClaimFormInTempCollection_whenWelshFlagIsOn() {
+    void shouldAddDefendantClaimFormToPreTranslationDocuments_whenClaimantIsBilingual() {
         //Given
         given(claimFormGenerator.generate(
             any(CaseData.class),

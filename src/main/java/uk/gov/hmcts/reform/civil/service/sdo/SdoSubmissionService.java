@@ -38,7 +38,7 @@ public class SdoSubmissionService {
 
         moveGeneratedDocument(caseData);
         updateClaimsTrack(caseData);
-        directionsOrderCaseProgressionService.applyCaseProgressionRouting(caseData, authToken, false, true);
+        directionsOrderCaseProgressionService.applyCaseProgressionRouting(caseData, authToken);
         trimMethodLocations(caseData);
         updateSmallClaimsHearing(caseData);
         updateTrialLocations(caseData);

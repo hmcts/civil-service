@@ -39,7 +39,6 @@ import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
-import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -477,19 +476,6 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             } else {
                 assertThat(newState).isNull();
             }
-        }
-
-        @Test
-        void shouldSetDefendantResponseLanguageDisplayToEnglishForBilingualMainCase() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .totalClaimAmount(BigDecimal.valueOf(1000))
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData updatedCaseData = getCaseData(response);
-
-            assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isEqualTo(PreferredLanguage.ENGLISH);
         }
 
         @Test

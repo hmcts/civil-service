@@ -148,7 +148,7 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         }
 
         @Test
-        void shouldPopulateUpholdingPreviousOrderReasonWithWelshFlagEnabledWithClaimant() {
+        void shouldPopulateBilingualHintWhenClaimantIsBilingual() {
             //Given : Casedata
             CaseData caseData = CaseDataBuilder.builder().claimantBilingualLanguagePreference("BOTH").atStateClaimDetailsNotified()
                 .systemGeneratedCaseDocuments(sdoDocList).build();
@@ -166,7 +166,7 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         }
 
         @Test
-        void shouldPopulateUpholdingPreviousOrderReasonWithWelshFlagEnabledWithRespondentLang() {
+        void shouldPopulateBilingualHintWhenRespondentIsBilingual() {
             //Given : Casedata
             CaseData caseData = CaseDataBuilder.builder().claimantBilingualLanguagePreference("ENGLISH")
                 .atStateClaimDetailsNotified()
@@ -191,7 +191,7 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         }
 
         @Test
-        void shouldPopulateUpholdingPreviousOrderReasonWithWelshFlagEnabledWithRespondentLangAndClaimant() {
+        void shouldPopulateBilingualHintWhenBothPartiesAreBilingual() {
             //Given : Casedata
             CaseData caseData = CaseDataBuilder.builder().claimantBilingualLanguagePreference("BOTH")
                 .atStateClaimDetailsNotified()
@@ -216,7 +216,7 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         }
 
         @Test
-        void shouldPopulateUpholdingPreviousOrderReasonWithWelshFlagEnabledWithNoRespondentLangAndClaimant() {
+        void shouldNotPopulateBilingualHintWhenNeitherPartyIsBilingual() {
             //Given : Casedata
             CaseData caseData = CaseDataBuilder.builder().claimantBilingualLanguagePreference("ENGLISH")
                 .atStateClaimDetailsNotified()

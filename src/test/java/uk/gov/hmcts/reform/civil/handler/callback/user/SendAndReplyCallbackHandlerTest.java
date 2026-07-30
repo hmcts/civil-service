@@ -87,7 +87,13 @@ class SendAndReplyCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @BeforeEach
     void  setup() {
-        handler = new SendAndReplyCallbackHandler(messageService, new ObjectMapper(), userService, featureToggleService, taskManagementService);
+        handler = new SendAndReplyCallbackHandler(
+            messageService,
+            new ObjectMapper(),
+            userService,
+            featureToggleService,
+            taskManagementService
+        );
     }
 
     @Test

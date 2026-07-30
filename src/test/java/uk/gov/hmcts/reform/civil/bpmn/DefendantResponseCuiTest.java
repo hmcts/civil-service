@@ -62,7 +62,7 @@ public class DefendantResponseCuiTest extends BpmnBaseTest {
     }
 
     @Test
-    void shouldNotCompleteTheProcessWithNotificationsAndPdfGeneration_whenNotBilingualButClaimantBilingual_whenEnglishToWelshEnabled() {
+    void shouldSkipPartyNotificationWhenResponseIsEnglishAndClaimantIsBilingual() {
 
         //assert process has started
         assertFalse(processInstance.isEnded());

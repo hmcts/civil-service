@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -43,15 +41,9 @@ class DefendantResponseWelshClaimantDashboardNotificationHandlerTest extends Bas
     private DashboardNotificationService dashboardNotificationService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @Mock
-    private FeatureToggleService toggleService;
 
     @Nested
     class AboutToSubmitCallback {
-        @BeforeEach
-        void setup() {
-        }
-
         @Test
         void shouldRecordScenarioWhenDefendantHasEnglishLanguagePreference_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
@@ -104,33 +96,6 @@ class DefendantResponseWelshClaimantDashboardNotificationHandlerTest extends Bas
 
         @Test
         void shouldRecordScenarioWhenDefendantHasWelshLanguagePreference_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
-            caseData.setApplicant1Represented(NO);
-            RespondentLiPResponse respondentLiPResponse  = new RespondentLiPResponse();
-            respondentLiPResponse.setRespondent1ResponseLanguage("WELSH");
-            CaseDataLiP caseDataLiP = new CaseDataLiP();
-            caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
-            caseData.setCaseDataLiP(caseDataLiP);
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_WELSH.name()).build()
-            ).build();
-
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-
-            handler.handle(params);
-
-            verify(dashboardScenariosService).recordScenarios(
-                "BEARER_TOKEN",
-                "Scenario.AAA6.DefResponse.BilingualFlagSet.WelshEnabled.Claimant",
-                caseData.getCcdCaseReference().toString(),
-                new ScenarioRequestParams(scenarioParams)
-            );
-        }
-
-        @Test
-        void shouldRecordEnabledScenarioWhenDefendantHasWelshLanguagePreference_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData.setApplicant1Represented(NO);
             RespondentLiPResponse respondentLiPResponse  = new RespondentLiPResponse();

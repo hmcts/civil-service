@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
@@ -29,6 +30,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -185,34 +187,29 @@ class DashboardNotificationHelperTest {
             assertTrue(dashboardDecisionHelper.isEligibleForReconsideration(caseData));
         }
 
-        @ParameterizedTest
-        @MethodSource("provideCsvSourceTrueCases")
-        void shouldReturnTrue_ForGiven_whenClaimantBilingual(String responseClaimTrack,
-                                                                BigDecimal totalClaimAmount,
-                                                                DecisionOnRequestReconsiderationOptions option) {
+        @Test
+        void shouldReturnTrue_whenClaimantBilingual() {
             CaseData caseData = new CaseDataBuilder()
                 .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION))
                 .build();
-            caseData.setResponseClaimTrack(responseClaimTrack);
-            caseData.setTotalClaimAmount(totalClaimAmount);
-            caseData.setDecisionOnRequestReconsiderationOptions(option);
+            caseData.setResponseClaimTrack("SMALL_CLAIM");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(500));
+            caseData.setClaimantBilingualLanguagePreference(Language.BOTH.toString());
 
             assertTrue(dashboardDecisionHelper.isEligibleForReconsideration(caseData));
+            verifyNoInteractions(featureToggleService);
         }
 
-        @ParameterizedTest
-        @MethodSource("provideCsvSourceTrueCases")
-        void shouldReturnTrue_ForGiven_whenLocationIsNotWhitelisted(String responseClaimTrack,
-                                                                    BigDecimal totalClaimAmount,
-                                                                    DecisionOnRequestReconsiderationOptions option) {
+        @Test
+        void shouldReturnTrue_whenLocationWhitelistingIsNotConsulted() {
             CaseData caseData = new CaseDataBuilder()
                 .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION))
                 .build();
-            caseData.setResponseClaimTrack(responseClaimTrack);
-            caseData.setTotalClaimAmount(totalClaimAmount);
-            caseData.setDecisionOnRequestReconsiderationOptions(option);
+            caseData.setResponseClaimTrack("SMALL_CLAIM");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(500));
 
             assertTrue(dashboardDecisionHelper.isEligibleForReconsideration(caseData));
+            verifyNoInteractions(featureToggleService);
         }
 
         @ParameterizedTest

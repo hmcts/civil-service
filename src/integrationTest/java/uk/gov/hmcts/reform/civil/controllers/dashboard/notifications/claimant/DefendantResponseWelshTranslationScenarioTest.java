@@ -2,27 +2,33 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.notifications.claimant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
-import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.defendantresponse.DefendantResponseWelshClaimantDashboardService;
 
 import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskIds.DEFENDANT_RESPONSE_CUI;
 
 public class DefendantResponseWelshTranslationScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
     private DashboardNotificationHandler handler;
+
+    @SpyBean
+    private DefendantResponseWelshClaimantDashboardService welshClaimantDashboardService;
 
     @Test
     void should_create_defendant_response_claimant_dashboard_welsh_scenario() throws Exception {
@@ -68,12 +74,12 @@ public class DefendantResponseWelshTranslationScenarioTest extends DashboardBase
     }
 
     @Test
-    void should_not_create_defendant_response_welsh_claimant_dashboard_for_english_response() throws Exception {
+    void should_route_english_response_through_welsh_claimant_dashboard_for_bilingual_claimant() throws Exception {
         String caseId = "123452";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
             .toBuilder()
             .applicant1Represented(YesOrNo.NO)
-            .claimantLanguagePreferenceDisplay(PreferredLanguage.WELSH)
+            .claimantBilingualLanguagePreference(Language.WELSH.toString())
             .respondent1ResponseDeadline(LocalDateTime.MAX)
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
@@ -84,6 +90,8 @@ public class DefendantResponseWelshTranslationScenarioTest extends DashboardBase
             .build();
 
         handler.handle(callbackParams(caseData));
+
+        verify(welshClaimantDashboardService).notifyDefendantResponse(caseData, BEARER_TOKEN);
 
         //Verify Notification is not created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT")

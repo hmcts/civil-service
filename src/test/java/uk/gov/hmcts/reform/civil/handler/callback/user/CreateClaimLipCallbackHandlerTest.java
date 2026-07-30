@@ -260,16 +260,6 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldSetLanguageDisplayToEnglishForBilingualMainCase() {
-            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                    CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
-                .build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
-
-            assertThat(response.getData().get("claimantLanguagePreferenceDisplay")).isEqualTo("ENGLISH");
-        }
-
-        @Test
         void shouldSetLanguageDisplayToEnglishIfNotSpecified() {
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())

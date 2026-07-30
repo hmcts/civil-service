@@ -52,7 +52,7 @@ class DefendantResponseWelshClaimantDashboardServiceTest {
     }
 
     @Test
-    void shouldDeleteDjNotificationWhenWelshEnabledAndDeadlinePassed() {
+    void shouldDeleteDjNotificationWhenResponseIsBilingualAndDeadlinePassed() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(5678L)
@@ -78,7 +78,7 @@ class DefendantResponseWelshClaimantDashboardServiceTest {
     }
 
     @Test
-    void shouldRecordBilingualScenarioWhenClaimIssueBilingualAndToggleEnabled() {
+    void shouldRecordEnglishResponseScenarioWhenClaimantIsBilingual() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(4321L)

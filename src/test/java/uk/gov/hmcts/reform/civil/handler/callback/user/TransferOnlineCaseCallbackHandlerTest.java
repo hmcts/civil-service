@@ -289,44 +289,8 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             "YES, NO",
             "NO, NO"
         })
-        void shouldPopulateEaCourtLocationAsYesWhenLipAndHmcLipEnabled(YesOrNo applicantRepresented,
-                                                                       YesOrNo respondent1Represented) {
-            LocationRefData locationRefData = new LocationRefData();
-            locationRefData.setEpimmsId("222");
-            locationRefData.setSiteName("Site 2");
-            locationRefData.setCourtAddress("Adr 2");
-            locationRefData.setPostcode("BBB 222");
-            locationRefData.setCourtLocationCode("other code");
-            when(courtLocationUtils.findPreferredLocationData(any(), any()))
-                .thenReturn(locationRefData);
-            CaseLocationCivil caseLocation = new CaseLocationCivil();
-            caseLocation.setRegion("2");
-            caseLocation.setBaseLocation("111");
-            DynamicListElement transferCourtElement = new DynamicListElement(null, "Site 1 - Adr 1 - AAA 111");
-            DynamicList transferCourtList = new DynamicList();
-            transferCourtList.setValue(transferCourtElement);
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .caseManagementLocation(caseLocation)
-                .transferCourtLocationList(transferCourtList).build();
-            caseData.setApplicant1Represented(applicantRepresented);
-            caseData.setRespondent1Represented(respondent1Represented);
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-            assertEquals(YES, responseCaseData.getEaCourtLocation());
-        }
-
-        @ParameterizedTest
-        @CsvSource({
-            "YES, YES",
-            "NO, YES",
-            "YES, NO",
-            "NO, NO"
-        })
-        void shouldPopulateEaCourtLocationAsYes(YesOrNo applicantRepresented,
-                                                YesOrNo respondent1Represented) {
+        void shouldPopulateEaCourtLocationAsYesRegardlessOfRepresentation(YesOrNo applicantRepresented,
+                                                                           YesOrNo respondent1Represented) {
             LocationRefData locationRefData = new LocationRefData();
             locationRefData.setEpimmsId("222");
             locationRefData.setSiteName("Site 2");

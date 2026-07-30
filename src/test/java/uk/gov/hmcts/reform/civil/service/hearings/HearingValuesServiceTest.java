@@ -463,7 +463,7 @@ public class HearingValuesServiceTest {
     }
 
     @Nested
-    class EarlyAdopter {
+    class HearingValuesAvailability {
         Applicant1DQ applicant1DQ;
         Respondent1DQ respondent1DQ;
 
@@ -499,59 +499,7 @@ public class HearingValuesServiceTest {
 
         @SneakyThrows
         @Test
-        void shouldThrowErrorIfLocationIsNotWhiteListed() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .caseAccessCategory(UNSPEC_CLAIM)
-                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
-                                            .setRegion(WELSH_REGION_ID))
-                .applicant1Represented(YesOrNo.NO)
-                .applicant1DQ(applicant1DQ)
-                .respondent1DQ(respondent1DQ)
-                .build();
-            Flags flags = new Flags();
-            flags.setPartyName("party name");
-            Party applicant1 = caseData.getApplicant1();
-            applicant1.setFlags(flags);
-            caseData.setApplicant1(applicant1);
-
-            Long caseId = 1L;
-            CaseDetails caseDetails = CaseDetails.builder()
-                .data(caseData.toMap(mapper))
-                .id(caseId).build();
-            when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
-            when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
-            assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
-        }
-
-        @Test
-        void shouldThrowNotThrowErrorIfLocationIsWhiteListed() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .caseAccessCategory(UNSPEC_CLAIM)
-                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
-                                            .setRegion(WELSH_REGION_ID))
-                .applicant1DQ(applicant1DQ)
-                .respondent1DQ(respondent1DQ)
-                .build();
-            Flags flags = new Flags();
-            flags.setPartyName("party name");
-            Party applicant1 = caseData.getApplicant1();
-            applicant1.setFlags(flags);
-            caseData.setApplicant1(applicant1);
-
-            Long caseId = 1L;
-            CaseDetails caseDetails = CaseDetails.builder()
-                .data(caseData.toMap(mapper))
-                .id(caseId).build();
-            when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
-            when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
-            assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
-        }
-
-        @SneakyThrows
-        @Test
-        void shouldNotThrowErrorIfLocationIsNotWhiteListedButWelshEnabled() {
+        void shouldAllowApplicantLip() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
@@ -578,35 +526,7 @@ public class HearingValuesServiceTest {
 
         @SneakyThrows
         @Test
-        void shouldNotThrowErrorIfApplicantLiPPresent() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .caseAccessCategory(UNSPEC_CLAIM)
-                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
-                                            .setRegion(WELSH_REGION_ID))
-                .applicant1Represented(YesOrNo.NO)
-                .applicant1DQ(applicant1DQ)
-                .respondent1DQ(respondent1DQ)
-                .build();
-            Flags flags = new Flags();
-            flags.setPartyName("party name");
-            Party applicant1 = caseData.getApplicant1();
-            applicant1.setFlags(flags);
-            caseData.setApplicant1(applicant1);
-
-            Long caseId = 1L;
-            CaseDetails caseDetails = CaseDetails.builder()
-                .data(caseData.toMap(mapper))
-                .id(caseId).build();
-            when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
-            when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
-
-            assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "auth"));
-        }
-
-        @SneakyThrows
-        @Test
-        void shouldNotThrowErrorIfRespondentLiPPresentAndHmcLipToggleOn() {
+        void shouldAllowRespondentLip() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
@@ -634,7 +554,7 @@ public class HearingValuesServiceTest {
 
         @SneakyThrows
         @Test
-        void shouldNotThrowErrorIfRespondent2LiPPresentAndHmcLipEnabled() {
+        void shouldAllowSecondRespondentLip() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
@@ -662,7 +582,7 @@ public class HearingValuesServiceTest {
 
         @SneakyThrows
         @Test
-        void shouldNotThrowErrorIfNoLiPPresent() {
+        void shouldAllowCaseWithoutLipParties() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)
@@ -688,7 +608,7 @@ public class HearingValuesServiceTest {
         }
 
         @Test
-        void shouldThrowNotThrowErrorIfEaCourtIsYes() {
+        void shouldAllowCaseWithEaCourtLocation() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(UNSPEC_CLAIM)

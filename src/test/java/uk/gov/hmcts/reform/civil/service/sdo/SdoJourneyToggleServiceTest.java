@@ -16,7 +16,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -85,54 +84,14 @@ class SdoJourneyToggleServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
 
-        assertThat(service.resolveEaCourtLocation(caseData, true)).isNull();
+        assertThat(service.resolveEaCourtLocation(caseData)).isNull();
     }
 
     @Test
-    void shouldReturnYesWhenWelshJourneyEnabled() {
+    void shouldReturnYesForSpecCasesWhenResolvingEaCourt() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
 
-        assertThat(service.resolveEaCourtLocation(caseData, true)).isEqualTo(YesOrNo.YES);
-    }
-
-    @Test
-    void shouldReturnYesForLipCaseWhenLocationNotWhitelisted() {
-        CaseData caseData = mock(CaseData.class);
-        when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.SPEC_CLAIM);
-
-        assertThat(service.resolveEaCourtLocation(caseData, false)).isEqualTo(YesOrNo.YES);
-    }
-
-    @Test
-    void shouldReturnYesForLipCaseWhenLocationWhitelisted() {
-        CaseData caseData = mock(CaseData.class);
-        when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.SPEC_CLAIM);
-
-        assertThat(service.resolveEaCourtLocation(caseData, false)).isEqualTo(YesOrNo.YES);
-    }
-
-    @Test
-    void shouldReturnYesForLipvLROneVOneEvenWhenNoCEnabledAndWhitelisted() {
-        CaseData caseData = mock(CaseData.class);
-        when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.SPEC_CLAIM);
-
-        assertThat(service.resolveEaCourtLocation(caseData, false)).isEqualTo(YesOrNo.YES);
-    }
-
-    @Test
-    void shouldReturnYesWhenBaseLocationMissingForLipCase() {
-        CaseData caseData = mock(CaseData.class);
-        when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.SPEC_CLAIM);
-
-        assertThat(service.resolveEaCourtLocation(caseData, true)).isEqualTo(YesOrNo.YES);
-    }
-
-    @Test
-    void shouldReturnYesForLipvLROneVOneWhenAllowedAndNoCEnabledAndWhitelisted() {
-        CaseData caseData = mock(CaseData.class);
-        when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.SPEC_CLAIM);
-
-        assertThat(service.resolveEaCourtLocation(caseData, true)).isEqualTo(YesOrNo.YES);
+        assertThat(service.resolveEaCourtLocation(caseData)).isEqualTo(YesOrNo.YES);
     }
 }
