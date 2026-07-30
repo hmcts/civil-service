@@ -37,10 +37,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("bulk_claim_enabled");
     }
 
-    public boolean isRPAEmailEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("enable-rpa-emails");
-    }
-
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
         return
             // because default value is true
@@ -134,10 +130,6 @@ public class FeatureToggleService {
         return true;
     }
 
-    public boolean isGaForWelshEnabled() {
-        return featureToggleApi.isFeatureEnabled("generalApplicationsForWelshParty");
-    }
-
     public boolean isWelshEnabledForMainCase() {
         return featureToggleApi.isFeatureEnabled("enableWelshForMainCase");
     }
@@ -177,5 +169,9 @@ public class FeatureToggleService {
     public boolean isSpringSchedulerEnabled(String schedulerName) {
         return featureToggleApi.isFeatureEnabled("spring-scheduler-enabled")
             && activeSchedulers.contains(schedulerName);
+    }
+
+    public boolean isHmctsAccessMigrationEnabled() {
+        return featureToggleApi.isFeatureEnabled("hmcts-access-migration");
     }
 }

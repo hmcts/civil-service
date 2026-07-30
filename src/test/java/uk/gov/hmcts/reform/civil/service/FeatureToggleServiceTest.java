@@ -58,15 +58,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenEnableRPAEmailsInvoked(Boolean toggleStat) {
-        var enableRPAEmailsKey = "enable-rpa-emails";
-        givenToggle(enableRPAEmailsKey, toggleStat);
-
-        assertThat(featureToggleService.isRPAEmailEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenLocationWhiteListed(Boolean toggleStat) {
         final String feature = "case-progression-location-whitelist";
         String location = "000000";
@@ -297,5 +288,12 @@ class FeatureToggleServiceTest {
         FeatureToggleService emptyService = new FeatureToggleService(featureToggleApi, List.of());
         givenToggle("spring-scheduler-enabled", true);
         assertThat(emptyService.isSpringSchedulerEnabled("JudgementBufferScheduledTask")).isFalse();
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenHmctsAccessMigrationEnabled(Boolean toggleStat) {
+        givenToggle("hmcts-access-migration", toggleStat);
+        assertThat(featureToggleService.isHmctsAccessMigrationEnabled()).isEqualTo(toggleStat);
     }
 }
