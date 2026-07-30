@@ -58,7 +58,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.math.BigDecimal;
@@ -118,9 +117,6 @@ class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralApplication
     @Mock
     private GaForLipService gaForLipService;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     private ParentCaseUpdateHelper parentCaseUpdateHelper;
 
     @BeforeEach
@@ -128,7 +124,6 @@ class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralApplication
         parentCaseUpdateHelper = spy(new ParentCaseUpdateHelper(
             caseDetailsConverter,
             coreCaseDataService,
-            featureToggleService,
             objectMapper
         ));
         handler = new EndGeneralAppBusinessProcessCallbackHandler(

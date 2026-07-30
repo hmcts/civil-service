@@ -50,6 +50,8 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(
     classes = {Application.class, TestIdamConfiguration.class},
     properties = {
+        "scheduler.full-admit-pay-immediately-no-payment-from-def.enabled=false",
+        "scheduler.defendantResponse.enabled=false",
         "scheduler.bundle-creation.enabled=false",
         "scheduler.hearing-cvp-link.enabled=false",
         "scheduler.polling-event-emitter.enabled=false",
@@ -68,8 +70,8 @@ import static org.mockito.Mockito.when;
         "scheduler.ga-unless-order.enabled=false",
         "scheduler.request-for-reconsideration-notification.enabled=false",
         "scheduler.manage-stay-wa-task.enabled=false"
-    }
-)
+
+    })
 @AutoConfigureMockMvc
 @SuppressWarnings({"java:S112", "java:S6813", "java:S1874"})
 public abstract class BaseIntegrationTest {
