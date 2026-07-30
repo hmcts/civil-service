@@ -460,6 +460,18 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 |---------|-------------|---------|----------------------|
 | `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF` |
 | `cronExpression` | When the scheduler runs. | `0 0 0 * * ?` (Daily at 00:00) | `CRON_EXPRESSION_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF` |
+### DefendantResponseDeadlineScheduler
+
+The `DefendantResponseDeadlineScheduler` is used to process cases where a defendant response deadline has been reached.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.defendantResponse`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|--------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `CRON_EXPRESSION_DEFENDANT_RESPONSE` |
+| `cronExpression` | When the scheduler runs. | `0 1 16 * * ?` (Daily at 4:01 PM) | `CRON_EXPRESSION_DEFENDANT_RESPONSE` |
 
 #### Global Scheduler Settings
 
