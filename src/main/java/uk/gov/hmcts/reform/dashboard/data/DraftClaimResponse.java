@@ -18,7 +18,6 @@ public class DraftClaimResponse {
     private UUID draftId;
     private String caseId;
     private Map<String, Object> payload;
-    private OffsetDateTime draftClaimCreatedAt;
     private OffsetDateTime expiresAt;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
@@ -28,7 +27,6 @@ public class DraftClaimResponse {
             draftStoreEntity.getId(),
             draftStoreEntity.getCaseId(),
             new HashMap<>(draftStoreEntity.getPayload()),
-            draftStoreEntity.getCreatedAt(),
             draftStoreEntity.getExpiresAt(),
             draftStoreEntity.getCreatedAt(),
             draftStoreEntity.getUpdatedAt()
