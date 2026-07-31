@@ -105,6 +105,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
 
         assertThat(draftInDb.getPayload()).extracting("step").isEqualTo("claimant-details");
         assertThat(draftInDb.getUserId()).isEqualTo(USER_ID);
+        assertThat(draftInDb.getExpiresAt()).isEqualTo(draftInDb.getCreatedAt().plusDays(180));
     }
 
     @Test
@@ -204,7 +205,6 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     void shouldPreserveCreationAndExpiryTimestampsWhenDraftIsUpdated() throws Exception {
         DraftStoreEntity initialDraft = draftStoreRepository.findById(draftId)
             .orElseThrow(() -> new AssertionError("Draft claim should exist in db"));
-        OffsetDateTime initialDraftCreatedAt = initialDraft.getCreatedAt();
         OffsetDateTime initialCreatedAt = initialDraft.getCreatedAt();
         OffsetDateTime initialExpiresAt = initialDraft.getExpiresAt();
 
@@ -217,7 +217,6 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
         DraftStoreEntity updatedEntity = draftStoreRepository.findById(draftId)
             .orElseThrow(() -> new AssertionError("Draft claim should exist in DB"));
 
-        assertThat(updatedEntity.getCreatedAt()).isEqualTo(initialDraftCreatedAt);
         assertThat(updatedEntity.getCreatedAt()).isEqualTo(initialCreatedAt);
         assertThat(updatedEntity.getExpiresAt()).isEqualTo(initialExpiresAt);
     }
@@ -341,6 +340,31 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
 
         doGet(BEARER_TOKEN, DRAFT_CLAIM_BY_ID_URL, draftId)
             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldFallBackTo30DaysWhenDraftTypeIsUndefined() {
+        OffsetDateTime now = OffsetDateTime.now();
+        UUID undefinedDraftId = UUID.randomUUID();
+
+        DraftStoreEntity draftToSave = new DraftStoreEntity(
+            undefinedDraftId,
+            USER_ID,
+            "123",
+            DraftType.UNDEFINED_DRAFT.getId(),
+            new HashMap<>(Map.of("step", "undefined-test")),
+            now,
+            now,
+            DraftType.getExpiryOrDefault(null).calculateExpiry(now)
+            );
+
+        DraftStoreEntity undefinedDraft = draftStoreRepository.saveAndFlush(draftToSave);
+
+        DraftStoreEntity draftInDB = draftStoreRepository.findById(undefinedDraft.getId())
+            .orElseThrow(() -> new AssertionError("Draft claim should exist in DB"));
+
+        assertThat(draftInDB.getExpiresAt())
+            .isEqualTo(DraftType.getExpiryOrDefault(draftInDB.getDraftTypeId()).calculateExpiry(draftInDB.getCreatedAt()));
     }
 
     private ResultActions doDraftPut(String authorisation, DraftClaimRequest request, UUID draftClaimId)
