@@ -28,7 +28,7 @@ public class DraftClaimResponse {
             draftStoreEntity.getId(),
             draftStoreEntity.getCaseId(),
             new HashMap<>(draftStoreEntity.getPayload()),
-            draftStoreEntity.getDraftCreatedAt(),
+            draftStoreEntity.getCreatedAt(),
             draftStoreEntity.getExpiresAt(),
             draftStoreEntity.getCreatedAt(),
             draftStoreEntity.getUpdatedAt()

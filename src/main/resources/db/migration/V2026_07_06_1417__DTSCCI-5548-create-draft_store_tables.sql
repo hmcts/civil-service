@@ -19,7 +19,6 @@ CREATE TABLE dbs.draft_store
   case_id VARCHAR(200),
   draft_type_id INT NOT NULL,
   payload JSONB NOT NULL,
-  draft_created_at TIMESTAMP NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   expires_at TIMESTAMP NOT NULL,
