@@ -72,7 +72,6 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
         draftClaim.setCaseId("12345");
         draftClaim.setDraftTypeId(DRAFT_TYPE.getId());
         draftClaim.setPayload(new HashMap<>(Map.of("step", "active-test")));
-        draftClaim.setDraftCreatedAt(now);
         draftClaim.setCreatedAt(now);
         draftClaim.setUpdatedAt(now);
         draftClaim.setExpiresAt(DRAFT_TYPE.calculateExpiry(now));
@@ -112,7 +111,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     void shouldReturnExistingDraftWithoutChangesWhenActiveDraftExists() throws Exception {
         DraftStoreEntity originalDraft = draftStoreRepository.findById(draftId)
             .orElseThrow(() -> new AssertionError("Draft claim should exist in DB"));
-        OffsetDateTime originalCreatedAt = originalDraft.getDraftCreatedAt();
+        OffsetDateTime originalCreatedAt = originalDraft.getCreatedAt();
         OffsetDateTime originalExpiresAt = originalDraft.getExpiresAt();
 
         DraftClaimRequest request = new DraftClaimRequest("new-case-id", PAYLOAD);
@@ -128,7 +127,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
         assertThat(draftStoreRepository.count()).isOne();
         DraftStoreEntity unchangedDraft = draftStoreRepository.findById(draftId)
             .orElseThrow(() -> new AssertionError("Draft claim should exist in DB"));
-        assertThat(unchangedDraft.getDraftCreatedAt()).isEqualTo(originalCreatedAt);
+        assertThat(unchangedDraft.getCreatedAt()).isEqualTo(originalCreatedAt);
         assertThat(unchangedDraft.getExpiresAt()).isEqualTo(originalExpiresAt);
     }
 
@@ -205,7 +204,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     void shouldPreserveCreationAndExpiryTimestampsWhenDraftIsUpdated() throws Exception {
         DraftStoreEntity initialDraft = draftStoreRepository.findById(draftId)
             .orElseThrow(() -> new AssertionError("Draft claim should exist in db"));
-        OffsetDateTime initialDraftCreatedAt = initialDraft.getDraftCreatedAt();
+        OffsetDateTime initialDraftCreatedAt = initialDraft.getCreatedAt();
         OffsetDateTime initialCreatedAt = initialDraft.getCreatedAt();
         OffsetDateTime initialExpiresAt = initialDraft.getExpiresAt();
 
@@ -218,7 +217,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
         DraftStoreEntity updatedEntity = draftStoreRepository.findById(draftId)
             .orElseThrow(() -> new AssertionError("Draft claim should exist in DB"));
 
-        assertThat(updatedEntity.getDraftCreatedAt()).isEqualTo(initialDraftCreatedAt);
+        assertThat(updatedEntity.getCreatedAt()).isEqualTo(initialDraftCreatedAt);
         assertThat(updatedEntity.getCreatedAt()).isEqualTo(initialCreatedAt);
         assertThat(updatedEntity.getExpiresAt()).isEqualTo(initialExpiresAt);
     }
@@ -228,7 +227,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
         DraftStoreEntity draftInDB = draftStoreRepository.findById(draftId)
             .orElseThrow(() -> new AssertionError("Draft claim should exist in DB"));
 
-        assertThat(draftInDB.getExpiresAt()).isEqualTo(DRAFT_TYPE.calculateExpiry(draftInDB.getDraftCreatedAt()));
+        assertThat(draftInDB.getExpiresAt()).isEqualTo(DRAFT_TYPE.calculateExpiry(draftInDB.getCreatedAt()));
     }
 
     @Test
@@ -305,7 +304,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
 
         DraftStoreEntity newDraft = draftStoreRepository.findById(newDraftId)
             .orElseThrow(() -> new AssertionError("New draft claim should exist in DB"));
-        assertThat(newDraft.getExpiresAt()).isEqualTo(DRAFT_TYPE.calculateExpiry(newDraft.getDraftCreatedAt()));
+        assertThat(newDraft.getExpiresAt()).isEqualTo(DRAFT_TYPE.calculateExpiry(newDraft.getCreatedAt()));
     }
 
     @Test
@@ -365,7 +364,6 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
             "1234",
             DRAFT_TYPE.getId(),
             new HashMap<>(Map.of("step", step)),
-            createdAt,
             createdAt,
             createdAt,
             expiresAt
