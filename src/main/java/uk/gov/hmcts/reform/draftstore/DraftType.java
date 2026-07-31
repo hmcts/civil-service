@@ -14,7 +14,7 @@ public enum DraftType {
     private final int id;
     private final long retentionDays;
 
-    public OffsetDateTime calculateExpiry(OffsetDateTime draftCreatedAt) {
-        return draftCreatedAt.plusDays(retentionDays);
+    public OffsetDateTime calculateExpiry(OffsetDateTime createdAt) {
+        return createdAt.plusDays(retentionDays);
     }
 }
