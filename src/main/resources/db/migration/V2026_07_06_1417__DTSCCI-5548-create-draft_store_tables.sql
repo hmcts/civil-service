@@ -12,6 +12,9 @@ CREATE TABLE dbs.draft_type
 INSERT INTO dbs.draft_type (id, draft_type)
 VALUES (1, 'DRAFT_CLAIM');
 
+INSERT INTO dbs.draft_type (id, draft_type)
+VALUES (2, 'UNDEFINED_DRAFT');
+
 CREATE TABLE dbs.draft_store
 (
   id UUID NOT NULL,
