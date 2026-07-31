@@ -49,10 +49,6 @@ public class DraftStoreEntity implements Serializable {
     private Map<String, Object> payload;
 
     @NotNull
-    @Column(name = "draft_created_at", updatable = false)
-    private OffsetDateTime draftCreatedAt;
-
-    @NotNull
     @Column(name = "created_at", updatable = false)
     private OffsetDateTime createdAt;
 

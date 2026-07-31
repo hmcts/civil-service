@@ -46,7 +46,6 @@ public class DraftStoreService {
             copyPayload(payload),
             now,
             now,
-            now,
             draftType.calculateExpiry(now)
         );
         log.info("Creating draft type={} draftId={}", draftType, draft.getId());
