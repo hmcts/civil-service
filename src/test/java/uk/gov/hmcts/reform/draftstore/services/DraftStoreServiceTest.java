@@ -61,9 +61,9 @@ class DraftStoreServiceTest {
             assertThat(savedDraft.getCaseId()).isEqualTo(CASE_ID);
             assertThat(savedDraft.getDraftTypeId()).isEqualTo(DRAFT_TYPE.getId());
             assertThat(savedDraft.getPayload()).isEqualTo(payload).isNotSameAs(payload);
-            assertThat(savedDraft.getDraftCreatedAt()).isEqualTo(savedDraft.getCreatedAt());
+            assertThat(savedDraft.getCreatedAt()).isNotNull();
             assertThat(savedDraft.getUpdatedAt()).isEqualTo(savedDraft.getCreatedAt());
-            assertThat(savedDraft.getExpiresAt()).isEqualTo(DRAFT_TYPE.calculateExpiry(savedDraft.getDraftCreatedAt()));
+            assertThat(savedDraft.getExpiresAt()).isEqualTo(DRAFT_TYPE.calculateExpiry(savedDraft.getCreatedAt()));
         }
 
         @Test
@@ -277,7 +277,6 @@ class DraftStoreServiceTest {
             CASE_ID,
             DRAFT_TYPE.getId(),
             new HashMap<>(Map.of("step", "existing")),
-            createdAt,
             createdAt,
             createdAt,
             DRAFT_TYPE.calculateExpiry(createdAt)
