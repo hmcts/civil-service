@@ -1,36 +1,35 @@
 package uk.gov.hmcts.reform.draftstore;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.time.OffsetDateTime;
 
 @Getter
-@RequiredArgsConstructor
 public enum DraftType {
 
-    DRAFT_CLAIM(1, 180),
-    UNDEFINED_DRAFT(2, 30);
+    DRAFT_CLAIM(1, 180L);
+
+    private static final long DEFAULT_RETENTION_DAYS = 30L;
 
     private final int id;
     private final long retentionDays;
 
+    DraftType(int id, Long retentionDays) {
+        this.id = id;
+        this.retentionDays = resolveRetentionDays(retentionDays);
+    }
+
     public OffsetDateTime calculateExpiry(OffsetDateTime createdAt) {
-        if (createdAt == null) {
-            return null;
-        }
         return createdAt.plusDays(retentionDays);
     }
 
-    public static DraftType getExpiryOrDefault(Integer draftTypeId) {
-        if (draftTypeId == null) {
-            return UNDEFINED_DRAFT;
+    static long resolveRetentionDays(Long retentionDays) {
+        if (retentionDays == null) {
+            return DEFAULT_RETENTION_DAYS;
         }
-        for (DraftType type : values()) {
-            if (type.getId() == draftTypeId) {
-                return type;
-            }
+        if (retentionDays <= 0) {
+            throw new IllegalArgumentException("retentionDays must be positive");
         }
-        return UNDEFINED_DRAFT;
+        return retentionDays;
     }
 }
