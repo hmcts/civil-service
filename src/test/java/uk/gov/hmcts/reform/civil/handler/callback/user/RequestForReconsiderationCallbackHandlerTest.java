@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.enums.ReconsiderationParties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -203,13 +204,43 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             if (userRole.equals("APPLICANTSOLICITORONE") || userRole.equals("CLAIMANT")) {
                 assertThat(response.getData()).extracting("casePartyRequestForReconsideration")
                     .isEqualTo("Applicant");
+                assertThat(response.getData()).extracting("casePartiesRequestingReconsideration")
+                    .isEqualTo(List.of("APPLICANT"));
             } else if (userRole.equals("RESPONDENTSOLICITORONE") || userRole.equals("DEFENDANT")) {
                 assertThat(response.getData()).extracting("casePartyRequestForReconsideration")
                     .isEqualTo("Respondent1");
+                assertThat(response.getData()).extracting("casePartiesRequestingReconsideration")
+                    .isEqualTo(List.of("RESPONDENT1"));
             } else {
                 assertThat(response.getData()).extracting("casePartyRequestForReconsideration")
                     .isEqualTo("Respondent2");
+                assertThat(response.getData()).extracting("casePartiesRequestingReconsideration")
+                    .isEqualTo(List.of("RESPONDENT2"));
             }
+        }
+
+        @Test
+        void shouldAddSelectedUserRoleToListWhenOtherPartiesAlreadyRequested() {
+            //Given : Casedata with Respondent1 already requested
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .totalClaimAmount(BigDecimal.valueOf(800))
+                .systemGeneratedCaseDocuments(List.of(ElementUtils
+                                                          .element(new CaseDocument()
+                                                                       .setDocumentType(DocumentType.SDO_ORDER)
+                                                                       .setCreatedDatetime(
+                                                                           LocalDateTime.now().minusDays(5)))))
+                .casePartiesRequestingReconsideration(List.of(ReconsiderationParties.RESPONDENT1))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
+
+            //When: handler is called with ABOUT_TO_START event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: It should add APPLICANT to casePartiesRequestingReconsideration list
+            assertThat(response.getData()).extracting("casePartiesRequestingReconsideration")
+                .isEqualTo(List.of("RESPONDENT1", "APPLICANT"));
         }
 
         @Test
