@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
 import uk.gov.hmcts.reform.civil.enums.CourtStaffNextSteps;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
+import uk.gov.hmcts.reform.civil.enums.ReconsiderationParties;
 import uk.gov.hmcts.reform.civil.enums.SettlementReason;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.ConfirmListingTickBox;
@@ -372,6 +373,7 @@ public class CaseDataCaseProgression extends CivilCaseData implements MappableOb
     private ReasonForReconsideration reasonForReconsiderationRespondent1;
     private ReasonForReconsideration reasonForReconsiderationRespondent2;
     private String casePartyRequestForReconsideration;
+    private List<ReconsiderationParties> casePartiesRequestingReconsideration;
     private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;
     private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
     private String dashboardNotificationTypeOrder;
