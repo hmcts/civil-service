@@ -50,7 +50,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -95,8 +94,6 @@ class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallbackHand
     @InjectMocks
     RespondToApplicationHandler handler;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
     @Mock
     private DocUploadDashboardNotificationService dashboardNotificationService;
     @Mock
@@ -160,7 +157,6 @@ class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallbackHand
 
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenGaHasLip() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
         CallbackParams params = callbackParamsOf(getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
                                                  CallbackType.SUBMITTED);
@@ -173,7 +169,6 @@ class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallbackHand
 
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenGaHasLipAndVaryJudgeApppLipVLip() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(true);
@@ -198,8 +193,7 @@ class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallbackHand
     }
 
     @Test
-    void buildResponseConfirmationReturnsCorrectMessageWhenWelshFlagEnabledAndApplicantBilingual() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+    void buildResponseConfirmationReturnsCorrectMessageWhenApplicantBilingual() {
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
         GeneralApplicationCaseData casedata = getVaryCase().copy()
             .isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES).build();
@@ -213,35 +207,20 @@ class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallbackHand
     }
 
     @Test
-    void buildResponseConfirmationReturnsCorrectMessageWhenWelshFlagEnabledAndApplicantNotBilingual() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+    void buildResponseConfirmationCreatesOfflineNotificationsWhenApplicantNotBilingual() {
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(gaForLipService.isLipApp(any())).thenReturn(true);
+        when(gaForLipService.isLipResp(any())).thenReturn(true);
         GeneralApplicationCaseData casedata = getVaryCase().copy()
             .isGaApplicantLip(YES).applicantBilingualLanguagePreference(NO).build();
 
         CallbackParams params = callbackParamsOf(casedata, CallbackType.SUBMITTED);
         var response = (SubmittedCallbackResponse) handler.handle(params);
-        verifyNoInteractions(dashboardNotificationService);
+        verify(dashboardNotificationService, times(2))
+            .createOfflineResponseDashboardNotification(any(), any(), anyString());
 
         assertThat(response).isNotNull();
         assertThat(response.getConfirmationHeader()).isEqualTo("# You have provided the requested information");
-    }
-
-    @Test
-    void buildResponseConfirmationReturnsCorrectMessageWhenWelshFlagDisabledAndApplicantNotBilingual() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
-        when(gaForLipService.isLipApp(any())).thenReturn(true);
-        when(gaForLipService.isLipResp(any())).thenReturn(true);
-        GeneralApplicationCaseData casedata = getVaryCase().copy()
-            .isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES).build();
-
-        CallbackParams params = callbackParamsOf(casedata, CallbackType.SUBMITTED);
-
-        var response = (SubmittedCallbackResponse) handler.handle(params);
-        verify(dashboardNotificationService, times(2))
-            .createOfflineResponseDashboardNotification(any(), any(), anyString());
-        assertThat(response).isNotNull();
     }
 
     @Test
