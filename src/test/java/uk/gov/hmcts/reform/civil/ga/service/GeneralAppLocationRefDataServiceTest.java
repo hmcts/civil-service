@@ -194,7 +194,7 @@ class GeneralAppLocationRefDataServiceTest {
     @CsvSource({"AAA6", "AAA7"})
     void shouldReturnLocations_whenLRDReturnsAllLocations(String serviceId) {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(courtVenueService.getCMLAndHLCourts(
+        when(courtVenueService.getHearingLocationCourts(
             anyString(),
             anyString(),
             anyString()
@@ -203,7 +203,7 @@ class GeneralAppLocationRefDataServiceTest {
         List<LocationRefData> courtLocations = refDataService
             .getCourtLocations("user_token", serviceId);
 
-        DynamicList courtLocationString = getLocationsFromListWithServiceId(courtLocations);
+        DynamicList courtLocationString = getLocationsFromList(courtLocations);
 
         assertThat(locationsFromDynamicList(courtLocationString))
             .containsOnly("site_name_01 - court address 1111 - AA0 0BC",
@@ -225,7 +225,7 @@ class GeneralAppLocationRefDataServiceTest {
     @CsvSource({"AAA6", "AAA7"})
     void shouldReturnLocations_whenLRDReturnsNullBody(String serviceId) {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(courtVenueService.getCMLAndHLCourts(
+        when(courtVenueService.getHearingLocationCourts(
             anyString(),
             anyString(),
             anyString()
@@ -241,7 +241,7 @@ class GeneralAppLocationRefDataServiceTest {
     @CsvSource({"AAA6", "AAA7"})
     void shouldReturnLocations_whenLRDReturnsOnlyScotlandLocations(String serviceId) {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(courtVenueService.getCMLAndHLCourts(
+        when(courtVenueService.getHearingLocationCourts(
             anyString(),
             anyString(),
             anyString()
@@ -256,7 +256,7 @@ class GeneralAppLocationRefDataServiceTest {
     @CsvSource({"AAA6", "AAA7"})
     void shouldReturnLocations_whenLRDReturnsNonScotlandLocations(String serviceId) {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(courtVenueService.getCMLAndHLCourts(
+        when(courtVenueService.getHearingLocationCourts(
             anyString(),
             anyString(),
             anyString()
@@ -287,7 +287,7 @@ class GeneralAppLocationRefDataServiceTest {
     @CsvSource({"AAA6", "AAA7"})
     void shouldReturnEmptyList_whenLRDThrowsException(String serviceId) {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(courtVenueService.getCMLAndHLCourts(
+        when(courtVenueService.getHearingLocationCourts(
             anyString(),
             anyString(),
             anyString()
