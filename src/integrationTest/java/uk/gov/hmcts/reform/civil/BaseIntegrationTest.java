@@ -49,6 +49,8 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class},
     properties = {
+        "scheduler.full-admit-pay-immediately-no-payment-from-def.enabled=false",
+        "scheduler.defendantResponse.enabled=false",
         "scheduler.evidence-upload.enabled=false"
     })
 @AutoConfigureMockMvc
