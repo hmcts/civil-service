@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.service.EventEmitterService;
 import uk.gov.hmcts.reform.civil.workflow.helper.WorkflowBuilder;
 
 import java.util.HashMap;
@@ -34,6 +35,9 @@ public abstract class WorkflowIntegrationTest extends BaseIntegrationTest {
 
     @MockBean
     protected SystemUpdateUserConfiguration systemUpdateUserConfiguration;
+
+    @MockBean
+    protected EventEmitterService eventEmitterService;
 
     @BeforeEach
     void setUpWorkflowIntegrationTest() {
@@ -177,11 +181,7 @@ public abstract class WorkflowIntegrationTest extends BaseIntegrationTest {
         if (callbackResponse.getState() != null) {
             return callbackResponse.getState();
         }
-        String currentState = stateExtractor.apply(currentCaseData);
-        if (currentState != null) {
-            return currentState;
-        }
-        return null;
+        return stateExtractor.apply(currentCaseData);
     }
 
     protected record CallbackInvocationResult<T>(
