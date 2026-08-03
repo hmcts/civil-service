@@ -94,6 +94,12 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
                 } else {
                     caseData.setConfirmOrderGivesPermission(caseData.getConfirmOrderGivesPermission());
                 }
+            } else if (DiscontinuanceTypeList.PART_DISCONTINUANCE.equals(caseData.getTypeOfDiscontinuance())) {
+                if (featureToggleService.isJudgmentBufferEnabled()
+                    && CaseState.JUDGMENT_REQUESTED.equals(caseData.getCcdState())) {
+                    JudgmentsOnlineHelper.clearJOCaseData(caseData);
+                }
+                aboutToStartOrSubmitCallbackResponseBuilder.state(CaseState.CASE_DISCONTINUED.name());
             } else {
                 caseData.setConfirmOrderGivesPermission(caseData.getConfirmOrderGivesPermission());
             }
