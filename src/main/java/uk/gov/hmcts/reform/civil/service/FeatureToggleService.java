@@ -37,10 +37,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("bulk_claim_enabled");
     }
 
-    public boolean isRPAEmailEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("enable-rpa-emails");
-    }
-
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
         return
             // because default value is true
@@ -94,10 +90,6 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
     }
 
-    public boolean isAmendBundleEnabled() {
-        return featureToggleApi.isFeatureEnabled("amend-bundle-enabled");
-    }
-
     public boolean isCaseProgressionEnabledAndLocationWhiteListed(String location) {
         return location != null
             && featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", location, true);
@@ -136,10 +128,6 @@ public class FeatureToggleService {
             return isLipQueryManagementEnabledGa(caseData);
         }
         return true;
-    }
-
-    public boolean isGaForWelshEnabled() {
-        return featureToggleApi.isFeatureEnabled("generalApplicationsForWelshParty");
     }
 
     public boolean isWelshEnabledForMainCase() {
@@ -181,5 +169,9 @@ public class FeatureToggleService {
     public boolean isSpringSchedulerEnabled(String schedulerName) {
         return featureToggleApi.isFeatureEnabled("spring-scheduler-enabled")
             && activeSchedulers.contains(schedulerName);
+    }
+
+    public boolean isHmctsAccessMigrationEnabled() {
+        return featureToggleApi.isFeatureEnabled("hmcts-access-migration");
     }
 }
