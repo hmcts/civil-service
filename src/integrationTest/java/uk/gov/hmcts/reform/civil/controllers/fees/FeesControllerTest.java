@@ -59,10 +59,21 @@ public class FeesControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     public void shouldReturnClaimInterestToDate() {
         CaseData caseData = CaseData.builder().build();
+        when(interestCalculator.getInterestValidationErrors(any(CaseData.class))).thenReturn(List.of());
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(new BigDecimal("0.1"));
         doPost(BEARER_TOKEN, caseData, FEES_CLAIM_CALCULATE_INTEREST_URL, caseData)
             .andExpect(content().json("0.1"))
             .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    public void shouldReturnBadRequestWhenInterestRateIsNegative() {
+        CaseData caseData = CaseData.builder().build();
+        when(interestCalculator.getInterestValidationErrors(any(CaseData.class)))
+            .thenReturn(List.of("Interest rate must not be negative"));
+        doPost(BEARER_TOKEN, caseData, FEES_CLAIM_CALCULATE_INTEREST_URL, caseData)
+            .andExpect(status().isBadRequest());
     }
 
     @Test

@@ -107,6 +107,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -1260,6 +1262,11 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class MidCalculateInterest {
 
+        @BeforeEach
+        void setUpInterestValidation() {
+            when(interestCalculator.getInterestValidationErrors(any(CaseData.class))).thenReturn(List.of());
+        }
+
         @Test
         void shouldCalculateInterest_whenPopulated() {
             // Given
@@ -1295,7 +1302,29 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData updatedData = objMapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedData.getCalculatedInterest()).isNull();
-            verifyNoInteractions(interestCalculator);
+            verify(interestCalculator).getInterestValidationErrors(any(CaseData.class));
+            verify(interestCalculator, never()).calculateInterest(any(CaseData.class));
+        }
+
+        @Test
+        void shouldReturnError_whenInterestRateIsNegative() {
+            SameRateInterestSelection sameRateInterestSelection = new SameRateInterestSelection();
+            sameRateInterestSelection.setSameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE);
+            sameRateInterestSelection.setDifferentRate(BigDecimal.valueOf(-5));
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setClaimInterest(YES);
+            caseData.setInterestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST);
+            caseData.setSameRateInterestSelection(sameRateInterestSelection);
+            caseData.setTotalClaimAmount(new BigDecimal(1000));
+
+            when(interestCalculator.getInterestValidationErrors(any(CaseData.class)))
+                .thenReturn(List.of(InterestCalculator.INTEREST_RATE_MUST_NOT_BE_NEGATIVE));
+            CallbackParams params = callbackParamsOf(caseData, MID, "interest-calc");
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains(InterestCalculator.INTEREST_RATE_MUST_NOT_BE_NEGATIVE);
+            verify(interestCalculator, never()).calculateInterest(any(CaseData.class));
         }
 
         @Test
@@ -1329,6 +1358,11 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class MidSpecValidateClaimInterestDate {
 
+        @BeforeEach
+        void setUpInterestValidation() {
+            when(interestCalculator.getInterestValidationErrors(any(CaseData.class))).thenReturn(List.of());
+        }
+
         @Test
         void shouldValidateClaimInterestDate_whenPopulated() {
             // Given
@@ -1337,7 +1371,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, "ValidateClaimInterestDate");
             params.getRequest().setEventId("CREATE_CLAIM_SPEC");
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -1353,7 +1386,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, "ValidateClaimInterestDate");
             params.getRequest().setEventId("CREATE_CLAIM_SPEC");
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
