@@ -208,12 +208,12 @@ class EnterBreathingSpaceSpecTest extends BpmnBaseTest {
                                           boolean twoRespondentRepresentatives,
                                           boolean lipCase,
                                           boolean unrepresentedDefendantOne) {
-        VariableMap variables = Variables.createVariables();
         Map<String, Object> flags = new HashMap<>();
         flags.put(ONE_RESPONDENT_REPRESENTATIVE, oneRespondentRepresentative);
         flags.put(TWO_RESPONDENT_REPRESENTATIVES, twoRespondentRepresentatives);
         flags.put(LIP_CASE, lipCase);
         flags.put(UNREPRESENTED_DEFENDANT_ONE, unrepresentedDefendantOne);
+        VariableMap variables = Variables.createVariables();
         variables.putValue(FLOW_FLAGS, flags);
         return variables;
     }
