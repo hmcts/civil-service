@@ -86,8 +86,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             + "respondent solicitor are assigned to the case.";
     private static final String RESP_NOT_ASSIGNED_ERROR_LIP = "Application cannot be created until the Defendant "
         + "is assigned to the case.";
+    public static final String NOT_IN_EA_REGION = "Sorry this service is not available in the current case management location, please raise an application manually.";
     public static final String NOT_ALLOWED_SETTLE_DISCONTINUE = "Sorry this service is not available, please raise an application manually.";
-    private static final String LR_VS_LIP = "Sorry this service is not available, please raise an application manually.";
     private static final String CONFIRMATION_BODY_FREE = "<br/> <p> The court will make a decision"
         + " on this application."
         + "<br/> <p>  The other party's legal representative has been notified that you have"
@@ -138,15 +138,12 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
         log.info("initiating general application allowed for caseId {}", caseData.getCcdCaseReference());
-        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
 
         if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
-            if ((caseData.isRespondentResponseBilingual() && !featureToggleService.isGaForWelshEnabled() && !caseData.isLipvLROneVOne()
-                && !(caseEvent == INITIATE_GENERAL_APPLICATION_COSC))) {
-                errors.add(LR_VS_LIP);
-            } else if (featureToggleService.isDefendantNoCOnlineForCase(caseData) && caseData.isLipvLROneVOne()
-                && caseData.isClaimantBilingual() && !featureToggleService.isGaForWelshEnabled()) {
-                errors.add(LR_VS_LIP);
+            if (!(featureToggleService.isLocationWhiteListed(caseData.getCaseManagementLocation()
+                                                                                    .getBaseLocation()))
+                    && !(featureToggleService.isCuiGaNroEnabled())) {
+                errors.add(NOT_IN_EA_REGION);
             }
         }
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();

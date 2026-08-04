@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.enums.welshenhancements.PreTranslationGaDocumentType;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -19,7 +20,6 @@ import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.docmosis.GeneralApplicationDraftGenerator;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
@@ -51,7 +51,6 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
 
     private final GeneralAppFeesService generalAppFeesService;
     private final GaForLipService gaForLipService;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -75,6 +74,12 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
             .map(GAUrgencyRequirement::getGeneralAppUrgency)
             .filter(YES::equals)
             .isPresent();
+    }
+
+    // Generate Draft Document for LRvLR Consent application
+    private boolean isLRConsentApplication(GeneralApplicationCaseData caseData) {
+        return caseData.getGeneralAppType().getTypes().size() == 1
+            && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.SETTLE_BY_CONSENT);
     }
 
     // Generate Draft Document if it's an Urgent application and after fee is paid
@@ -128,9 +133,8 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
     }
 
     private boolean shouldUseWelshTranslation(GeneralApplicationCaseData caseData) {
-        return featureToggleService.isGaForWelshEnabled()
-            && ((caseData.getIsGaApplicantLip() == YES && caseData.isApplicantBilingual())
-            || (caseData.isRespondentBilingual() && caseData.getIsGaRespondentOneLip() == YES));
+        return (caseData.getIsGaApplicantLip() == YES && caseData.isApplicantBilingual())
+            || (caseData.isRespondentBilingual() && caseData.getIsGaRespondentOneLip() == YES);
     }
 
     private void updateWelshTranslationDocuments(GeneralApplicationCaseData caseData,
@@ -192,7 +196,8 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
         return (isApplicationUrgentAndFreeFee(caseData)
             || isGANonUrgentWithOutNoticeFeePaid(caseData)
             || isApplicationUrgentAndFeePaid(caseData)
-            || isRespondentsResponseSatisfied(caseData, caseData))
+            || isRespondentsResponseSatisfied(caseData, caseData)
+            || isLRConsentApplication(caseData))
             && Objects.isNull(caseData.getJudicialDecision());
     }
 

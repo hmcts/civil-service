@@ -244,11 +244,14 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isCourtReviewing() {
-        return (!hasSdoBeenDrawn() && (caseData.isRespondentResponseFullDefence() || caseData.isPartAdmitClaimSpec())
-            && CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState()))
-            || (caseData.hasApplicantRejectedRepaymentPlan())
-            || (CaseState.AWAITING_APPLICANT_INTENTION.equals(caseData.getCcdState())
-            && isMintiClaim(caseData) && isClaimantProceeding(caseData));
+        return !isInState(CaseState.All_FINAL_ORDERS_ISSUED)
+            && ((!hasSdoBeenDrawn() && (caseData.isRespondentResponseFullDefence()
+                    || caseData.isPartAdmitClaimSpec())
+                    && isInState(CaseState.JUDICIAL_REFERRAL))
+                || (caseData.hasApplicantRejectedRepaymentPlan())
+                || (isInState(CaseState.AWAITING_APPLICANT_INTENTION)
+                    && isMintiClaim(caseData)
+                    && isClaimantProceeding(caseData)));
     }
 
     private boolean isMintiClaim(CaseData caseData) {
@@ -321,9 +324,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean isClaimantDefaultJudgement() {
         return (caseData.isCcjRequestJudgmentByAdmission()
             && CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getCcdState()))
-            || Objects.nonNull(caseData.getRespondent1ResponseDeadline())
+            || (Objects.nonNull(caseData.getRespondent1ResponseDeadline())
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
-            && caseData.getPaymentTypeSelection() != null;
+            && caseData.getPaymentTypeSelection() != null);
     }
 
     @Override
@@ -497,6 +500,10 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return caseData.isHWFTypeHearing() && caseData.getHwFEvent() == null
             && (eventTime.isPresent())
             && (orderTime.isEmpty() || eventTime.get().isAfter(orderTime.get()));
+    }
+
+    private boolean isInState(CaseState caseState) {
+        return caseState != null && caseState.equals(caseData.getCcdState());
     }
 
     @Override
