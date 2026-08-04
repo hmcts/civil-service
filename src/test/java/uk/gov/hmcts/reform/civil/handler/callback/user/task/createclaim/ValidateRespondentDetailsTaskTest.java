@@ -89,6 +89,26 @@ class ValidateRespondentDetailsTaskTest extends BaseCallbackHandlerTest {
     }
 
     @Test
+    void shouldReturnPostcodeRequiredError_whenPostcodeValidationIsSkippedAndPostcodeIsNull() {
+        Party respondent1 = new PartyBuilder().company().build();
+        Address address = new Address();
+        address.setAddressLine1("Address line 1");
+        address.setPostCode(null);
+        respondent1.setPrimaryAddress(address);
+
+        CaseData caseData = CaseDataBuilder.builder().respondent1(respondent1).build();
+        validateRespondentDetailsTask.setGetRespondent(CaseData::getRespondent1);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateRespondentDetailsTask
+            .validateRespondentDetails(caseData, false);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getData()).isNull();
+        assertThat(response.getErrors()).containsOnly("Please enter Postcode");
+        verifyNoInteractions(postcodeValidator);
+    }
+
+    @Test
     void shouldReturnErrors_whenRespondent1AddressNotValid() {
         Address address = new Address();
         address.setAddressLine1("Line 1 test again for more than 35 characters");

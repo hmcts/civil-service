@@ -1771,6 +1771,27 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             }
 
             @Test
+            void shouldReturnPostcodeRequiredError_whenRespondent1PostcodeIsNull() {
+                // Given
+                Party respondent1 = new PartyBuilder().company().build();
+                respondent1.getPrimaryAddress().setPostCode(null);
+
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setRespondent1(respondent1);
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "respondent1");
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getData()).isNull();
+                assertThat(response.getErrors()).containsOnly("Please enter Postcode");
+                verifyNoInteractions(postcodeValidator);
+            }
+
+            @Test
             void shouldReturnErrors_whenRespondent1AddressNotValid() {
                 // Given
                 Address invalidAddress = new Address();

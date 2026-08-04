@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+import static uk.gov.hmcts.reform.civil.validation.PostcodeValidator.POSTCODE_REQUIRED_ERROR;
+
 @Component
 public class ValidateRespondentDetailsTask {
 
@@ -42,7 +44,7 @@ public class ValidateRespondentDetailsTask {
 
         List<String> errors = validatePostcode
             ? postcodeValidator.validate(respondent.getPrimaryAddress().getPostCode())
-            : new ArrayList<>();
+            : validatePostcodeRequired(respondent);
         if (respondent.getPrimaryAddress() != null) {
             partyValidator.validateAddress(respondent.getPrimaryAddress(), errors);
         }
@@ -52,5 +54,15 @@ public class ValidateRespondentDetailsTask {
             .data(errors.isEmpty()
                       ? caseData.toMap(objectMapper) : null)
             .build();
+    }
+
+    private List<String> validatePostcodeRequired(Party respondent) {
+        List<String> errors = new ArrayList<>();
+        if (respondent.getPrimaryAddress() != null
+            && (respondent.getPrimaryAddress().getPostCode() == null
+            || respondent.getPrimaryAddress().getPostCode().isBlank())) {
+            errors.add(POSTCODE_REQUIRED_ERROR);
+        }
+        return errors;
     }
 }

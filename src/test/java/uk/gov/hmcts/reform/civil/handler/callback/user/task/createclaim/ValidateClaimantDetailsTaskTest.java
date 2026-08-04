@@ -97,6 +97,29 @@ class ValidateClaimantDetailsTaskTest {
     }
 
     @Test
+    void shouldReturnPostcodeRequiredError_whenPostcodeValidationIsSkippedAndPostcodeIsNull() {
+        Party applicant1 = new PartyBuilder().company().build();
+        Address address = new Address();
+        address.setAddressLine1("Address line 1");
+        address.setPostCode(null);
+        applicant1.setPrimaryAddress(address);
+
+        validateClaimantDetailsTask.setGetApplicant(CaseData::getApplicant1);
+
+        given(dateOfBirthValidator.validate(any())).willReturn(List.of());
+
+        CaseData caseData = CaseDataBuilder.builder().applicant1(applicant1).build();
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateClaimantDetailsTask
+            .validateClaimantDetails(caseData, event, false);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getData()).isNull();
+        assertThat(response.getErrors()).containsOnly("Please enter Postcode");
+        verifyNoInteractions(postcodeValidator);
+    }
+
+    @Test
     void shouldReturnErrors_whenClaimant1AddressNotValid() {
         Address address = new Address();
         address.setAddressLine1("Line 1 test again for more than 35 characters");
