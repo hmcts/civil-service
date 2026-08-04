@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.civil.handler.event.TrialReadyNotificationEventHandle
 import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDetailsNotificationDeadlineHandler;
 import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDismissedHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.scheduler.common.TestingSupportSchedulerRegistry;
+import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerRegistry;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -90,7 +90,7 @@ class TestingSupportControllerTest {
     @Mock
     private GAJudgeRevisitTaskHandler gaJudgeRevisitTaskHandler;
     @Mock
-    private TestingSupportSchedulerRegistry civilSchedulerRepository;
+    private SchedulerRegistry civilSchedulerRepository;
 
     @InjectMocks
     private TestingSupportController controller;

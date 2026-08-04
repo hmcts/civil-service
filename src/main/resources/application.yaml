@@ -68,6 +68,9 @@ scheduler:
   defendant-response:
     cronExpression: ${CRON_EXPRESSION_DEFENDANT_RESPONSE:0 1 16 * * ?}
     enabled: ${SCHEDULER_ENABLED_DEFENDANT_RESPONSE:false}
+  full-admit-pay-immediately-no-payment-from-def:
+    cronExpression: ${CRON_EXPRESSION_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF:0 0 0 * * ?}
+    enabled: ${SCHEDULER_ENABLED_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF:false}
   default-back-pressure:
     initialDelay: ${DEFAULT_BACK_PRESSURE_INITIAL_DELAY:PT0S}
     maxDelay: ${DEFAULT_BACK_PRESSURE_MAX_DELAY:PT10S}
