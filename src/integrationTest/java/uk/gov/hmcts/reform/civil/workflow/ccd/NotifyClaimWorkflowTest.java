@@ -109,7 +109,9 @@ class NotifyClaimWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(result.submittedResponse().path("confirmation_header").asText())
                     .contains("Notification of claim sent", CLAIM_REFERENCE);
                 assertThat(result.submittedResponse().path("confirmation_body").asText())
-                    .contains("defendant legal representative's organisation has been notified")
+                    .contains(
+                        "The defendant legal representative's organisation has been notified and granted access to this claim."
+                    )
                     .doesNotContain("proceed offline");
             });
     }
@@ -211,7 +213,10 @@ class NotifyClaimWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(result.submittedResponse().path("confirmation_header").asText())
                     .contains("Certificate of Service", CLAIM_REFERENCE);
                 assertThat(result.submittedResponse().path("confirmation_body").asText())
-                    .contains("complete the certificate of service notify claim details next step");
+                    .contains(
+                        "You must serve the claim details and",
+                        "complete the certificate of service notify claim details next step"
+                    );
             });
     }
 
@@ -244,7 +249,10 @@ class NotifyClaimWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(result.submittedResponse().path("confirmation_header").asText())
                     .contains("Certificate of Service", CLAIM_REFERENCE);
                 assertThat(result.submittedResponse().path("confirmation_body").asText())
-                    .contains("complete the certificate of service notify claim details next step");
+                    .contains(
+                        "You must serve the claim details and",
+                        "complete the certificate of service notify claim details next step"
+                    );
             });
     }
 
@@ -282,8 +290,15 @@ class NotifyClaimWorkflowTest extends WorkflowIntegrationTest {
                 assertState(caseData, CLAIM_NOTIFIED.fullName());
             })
             .submitted()
-            .then(result -> assertThat(result.submittedResponse().path("confirmation_header").asText())
-                .contains("Certificate of Service", CLAIM_REFERENCE));
+            .then(result -> {
+                assertThat(result.submittedResponse().path("confirmation_header").asText())
+                    .contains("Certificate of Service", CLAIM_REFERENCE);
+                assertThat(result.submittedResponse().path("confirmation_body").asText())
+                    .contains(
+                        "You must serve the claim details and",
+                        "complete the certificate of service notify claim details next step"
+                    );
+            });
     }
 
     private void assertState(CaseData caseData, String expectedState) {

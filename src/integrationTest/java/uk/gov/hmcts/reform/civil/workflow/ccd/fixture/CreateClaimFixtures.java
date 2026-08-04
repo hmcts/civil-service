@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.workflow.ccd.fixture;
 
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -16,6 +17,15 @@ import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ClaimLifecycleFixtu
 public final class CreateClaimFixtures {
 
     private static final String CREATE_CLAIM_START = "create-claim-start";
+    private static final Address RESPONDENT_SOLICITOR_SERVICE_ADDRESS = new Address(
+        "1 Service Road",
+        null,
+        null,
+        "London",
+        null,
+        "United Kingdom",
+        "SW1A 1AA"
+    );
 
     private CreateClaimFixtures() {
     }
@@ -70,6 +80,8 @@ public final class CreateClaimFixtures {
             .atStateClaimDraft()
             .multiPartyClaimTwoDefendantSolicitors()
             .respondent2SameLegalRepresentative(YES)
+            .respondentSolicitor1ServiceAddressRequired(YES)
+            .respondentSolicitor1ServiceAddress(RESPONDENT_SOLICITOR_SERVICE_ADDRESS)
             .respondent1OrganisationPolicy(ClaimLifecycleFixtures.registeredPolicy(
                 RESPONDENT_ONE_ORGANISATION,
                 RESPONDENTSOLICITORONE,

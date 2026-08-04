@@ -116,7 +116,9 @@ class NotifyClaimDetailsWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(result.submittedResponse().path("confirmation_header").asText())
                     .contains("Defendant notified", CLAIM_REFERENCE);
                 assertThat(result.submittedResponse().path("confirmation_body").asText())
-                    .contains("notified of the claim details")
+                    .contains(
+                        "The defendant legal representative's organisation has been notified of the claim details."
+                    )
                     .contains("They must respond by")
                     .doesNotContain("proceed offline");
             });

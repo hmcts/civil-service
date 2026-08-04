@@ -6,11 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StateFlowDTO;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.CasemanReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -43,6 +45,8 @@ import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ClaimLifecycleFixtu
 @SuppressWarnings({"java:S5960", "java:S6813"})
 class CreateClaimWorkflowTest extends WorkflowIntegrationTest {
 
+    private static final String PREFERRED_LOCATION_LABEL =
+        "Central London County Court - Thomas More Building - WC2A 2LL";
     private static final LocationRefData PREFERRED_LOCATION = new LocationRefData()
         .setCourtLocationCode("312")
         .setEpimmsId("214320")
@@ -72,6 +76,9 @@ class CreateClaimWorkflowTest extends WorkflowIntegrationTest {
     @Autowired
     private IStateFlowEngine stateFlowEngine;
 
+    @Autowired
+    private ToggleConfiguration toggleConfiguration;
+
     @BeforeEach
     void setUpCreateClaimLifecycle() {
         when(time.now()).thenReturn(CALLBACK_TIME);
@@ -84,6 +91,8 @@ class CreateClaimWorkflowTest extends WorkflowIntegrationTest {
             .thenReturn(List.of(PREFERRED_LOCATION));
         when(courtLocationUtils.findPreferredLocationData(any(), any()))
             .thenReturn(PREFERRED_LOCATION);
+        when(courtLocationUtils.getLocationsFromList(any()))
+            .thenReturn(DynamicList.fromList(List.of(PREFERRED_LOCATION_LABEL)));
         when(locationReferenceDataService.getCourtLocationsByEpimmsId(anyString(), anyString(), anyString()))
             .thenReturn(List.of(PREFERRED_LOCATION));
     }
@@ -98,7 +107,15 @@ class CreateClaimWorkflowTest extends WorkflowIntegrationTest {
             .then(result -> {
                 assertThat(result.response().getErrors()).isNullOrEmpty();
                 assertThat(result.caseData().getClaimStarted()).isEqualTo(YES);
-                assertThat(result.response().getData()).containsKey("claimStarted");
+                assertThat(result.caseData().getFeatureToggleWA()).isEqualTo(toggleConfiguration.getFeatureToggle());
+                assertThat(result.caseData().getCourtLocation().getApplicantPreferredCourtLocationList().getListItems())
+                    .extracting("label")
+                    .containsExactly(PREFERRED_LOCATION_LABEL);
+                assertThat(result.response().getData()).containsKeys(
+                    "claimStarted",
+                    "featureToggleWA",
+                    "courtLocation"
+                );
             });
     }
 
@@ -153,7 +170,7 @@ class CreateClaimWorkflowTest extends WorkflowIntegrationTest {
             .submitted()
             .then(result -> {
                 assertThat(result.submittedResponse().path("confirmation_header").asText())
-                    .contains("Please now pay your claim fee");
+                    .contains("Please now pay your claim fee", "using the link below");
                 assertThat(result.submittedResponse().path("confirmation_body").asText())
                     .contains("Your claim will not be issued until payment is confirmed")
                     .doesNotContain("litigant in person");
@@ -212,7 +229,13 @@ class CreateClaimWorkflowTest extends WorkflowIntegrationTest {
 
     @Test
     void shouldCreateRepresentedClaimWithOneSolicitorForBothDefendants() throws Exception {
-        startWorkflow(CreateClaimFixtures.representedSameSolicitorClaimDraft())
+        CaseData claimDraft = CreateClaimFixtures.representedSameSolicitorClaimDraft();
+        assertThat(claimDraft.getRespondentSolicitor1ServiceAddressRequired()).isEqualTo(YES);
+        assertThat(claimDraft.getRespondentSolicitor1ServiceAddress()).isNotNull();
+        assertThat(claimDraft.getRespondentSolicitor2ServiceAddressRequired()).isNull();
+        assertThat(claimDraft.getRespondentSolicitor2ServiceAddress()).isNull();
+
+        startWorkflow(claimDraft)
             .eventId(CaseEvent.CREATE_CLAIM)
             .aboutToSubmit()
             .then(result -> {
@@ -232,6 +255,10 @@ class CreateClaimWorkflowTest extends WorkflowIntegrationTest {
                     .isEqualTo(caseData.getRespondentSolicitor1EmailAddress());
                 assertThat(caseData.getSolicitorReferences().getRespondentSolicitor2Reference())
                     .isEqualTo(caseData.getSolicitorReferences().getRespondentSolicitor1Reference());
+                assertThat(caseData.getRespondentSolicitor2ServiceAddressRequired())
+                    .isEqualTo(caseData.getRespondentSolicitor1ServiceAddressRequired());
+                assertThat(caseData.getRespondentSolicitor2ServiceAddress())
+                    .isEqualTo(caseData.getRespondentSolicitor1ServiceAddress());
                 assertState(caseData, CLAIM_SUBMITTED.fullName());
             });
     }
@@ -260,8 +287,15 @@ class CreateClaimWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(stateFlow.isFlagSet(UNREPRESENTED_DEFENDANT_TWO)).isFalse();
             })
             .submitted()
-            .then(result -> assertThat(result.submittedResponse().path("confirmation_body").asText())
-                .contains("litigant in person"));
+            .then(result -> {
+                assertThat(result.submittedResponse().path("confirmation_header").asText())
+                    .contains("Please now pay your claim fee", "using the link below");
+                assertThat(result.submittedResponse().path("confirmation_body").asText())
+                    .contains(
+                        "Your claim will not be issued until payment is confirmed",
+                        "litigant in person"
+                    );
+            });
     }
 
     @Test
@@ -291,7 +325,10 @@ class CreateClaimWorkflowTest extends WorkflowIntegrationTest {
             })
             .submitted()
             .then(result -> assertThat(result.submittedResponse().path("confirmation_body").asText())
-                .contains("litigant in person"));
+                .contains(
+                    "Your claim will not be issued until payment is confirmed",
+                    "litigant in person"
+                ));
     }
 
     @Test
@@ -308,7 +345,13 @@ class CreateClaimWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(caseData.getRespondent1OrganisationIDCopy()).isNull();
                 assertThat(caseData.getRespondent2OrganisationIDCopy()).isNull();
                 assertState(caseData, CLAIM_SUBMITTED.fullName());
-            });
+            })
+            .submitted()
+            .then(result -> assertThat(result.submittedResponse().path("confirmation_body").asText())
+                .contains(
+                    "Your claim will not be issued until payment is confirmed",
+                    "litigant in person"
+                ));
     }
 
     private StateFlowDTO assertState(CaseData caseData, String expectedState) {
