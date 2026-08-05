@@ -150,6 +150,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.validation.PostcodeValidator.POSTCODE_REQUIRED_ERROR;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -243,7 +244,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void midSpecCorrespondenceAddress_checkAddressIfWasIncorrect() {
+    void midSpecCorrespondenceAddress_shouldNotValidatePostcodeRegionWhenPostcodeIsProvided() {
         // Given
         String postCode = "postCode";
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -257,14 +258,34 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "specCorrespondenceAddress")
                 .copy().request(request);
 
-        List<String> errors = Collections.singletonList("error 1");
-        Mockito.when(postcodeValidator.validate(postCode)).thenReturn(errors);
+        // When
+        CallbackResponse response = handler.handle(params);
+
+        // Then
+        verifyNoInteractions(postcodeValidator);
+        assertThat(((AboutToStartOrSubmitCallbackResponse) response).getErrors()).isEmpty();
+    }
+
+    @Test
+    void midSpecCorrespondenceAddress_shouldReturnPostcodeRequiredErrorWhenPostcodeIsNull() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setSpecAoSApplicantCorrespondenceAddressRequired(YesOrNo.NO);
+        Address address = new Address();
+        address.setPostCode(null);
+        caseData.setSpecAoSApplicantCorrespondenceAddressdetails(address);
+        CallbackRequest request = CallbackRequest.builder()
+                .eventId(SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC)
+                .build();
+        CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "specCorrespondenceAddress")
+                .copy().request(request);
 
         // When
         CallbackResponse response = handler.handle(params);
 
         // Then
-        assertEquals(errors, ((AboutToStartOrSubmitCallbackResponse) response).getErrors());
+        verifyNoInteractions(postcodeValidator);
+        assertThat(((AboutToStartOrSubmitCallbackResponse) response).getErrors()).containsOnly(POSTCODE_REQUIRED_ERROR);
     }
 
     @Test
