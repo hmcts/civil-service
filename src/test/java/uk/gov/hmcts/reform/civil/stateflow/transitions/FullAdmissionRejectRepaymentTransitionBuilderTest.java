@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimDismissedPastClaimDetailsNotifcationDeadlineTransitionBuilderTest {
+public class FullAdmissionRejectRepaymentTransitionBuilderTest {
 
     @Mock
     private FeatureToggleService mockFeatureToggleService;
@@ -23,18 +23,16 @@ public class ClaimDismissedPastClaimDetailsNotifcationDeadlineTransitionBuilderT
 
     @BeforeEach
     void setUp() {
-        ClaimDismissedPastClaimDetailsNotifcationDeadlineTransitionBuilder claimDismissedPastClaimDetailsNotifcationDeadlineTransitionBuilder =
-            new ClaimDismissedPastClaimDetailsNotifcationDeadlineTransitionBuilder(mockFeatureToggleService);
-        result = claimDismissedPastClaimDetailsNotifcationDeadlineTransitionBuilder.buildTransitions();
+        FullAdmissionRejectRepaymentTransitionBuilder fullAdmissionRejectRepaymentTransitionBuilder = new FullAdmissionRejectRepaymentTransitionBuilder(
+            mockFeatureToggleService);
+        result = fullAdmissionRejectRepaymentTransitionBuilder.buildTransitions();
         assertNotNull(result);
-
     }
 
     @Test
     void shouldSetUpTransitions_withExpectedSizeAndStates() {
         assertThat(result).hasSize(1);
-
-        assertTransition(result.get(0), "MAIN.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE", "MAIN.TAKEN_OFFLINE_BY_STAFF");
+        assertTransition(result.get(0), "MAIN.FULL_ADMIT_REJECT_REPAYMENT", "MAIN.TAKEN_OFFLINE_BY_STAFF");
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

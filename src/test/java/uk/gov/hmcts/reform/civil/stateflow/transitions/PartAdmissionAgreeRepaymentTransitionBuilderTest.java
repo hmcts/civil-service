@@ -19,6 +19,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PartAdmissionAgreeRepaymentTransitionBuilderTest {
@@ -59,6 +60,20 @@ class PartAdmissionAgreeRepaymentTransitionBuilderTest {
             .build();
 
         assertTrue(TakenOfflinePredicate.isDefendantNoCOnlineForCaseAfterJBA.test(caseData));
+    }
+
+    @Test
+    void shouldTransitionToTakenOfflineSpecDefendantNocAfterJba_whenDefendantNocOnline() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(YesOrNo.NO)
+            .takenOfflineDate(LocalDateTime.now())
+            .activeJudgment(new JudgmentDetails().setType(JudgmentType.JUDGMENT_BY_ADMISSION))
+            .changeOfRepresentation(new ChangeOfRepresentation())
+            .build();
+
+        when(mockFeatureToggleService.isDefendantNoCOnlineForCase(caseData)).thenReturn(true);
+
+        assertTrue(result.get(1).getCondition().test(caseData));
     }
 
     @Test

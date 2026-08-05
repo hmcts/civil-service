@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LanguagePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.MoveToNext;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.OnlyWhenNext;
@@ -67,6 +68,10 @@ public abstract class TransitionBuilder implements MoveToNext<FlowState.Main> {
 
     protected Predicate<CaseData> defendantNoCOnlineForCase() {
         return featureToggleService::isDefendantNoCOnlineForCase;
+    }
+
+    protected Predicate<CaseData> defendantNoCOnlineAfterJba() {
+        return defendantNoCOnlineForCase().and(TakenOfflinePredicate.isDefendantNoCOnlineForCaseAfterJBA);
     }
 
     protected void setRespondentResponseLanguageFlag(CaseData caseData, Map<String, Boolean> flags) {

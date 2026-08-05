@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
-public class FullAdmitRejectRepaymentTransitionBuilderTest {
+class UnspecifiedDraftTransitionBuilderTest {
 
     @Mock
     private FeatureToggleService mockFeatureToggleService;
@@ -23,16 +23,15 @@ public class FullAdmitRejectRepaymentTransitionBuilderTest {
 
     @BeforeEach
     void setUp() {
-        FullAdmissionRejectRepaymentTransitionBuilder fullAdmissionRejectRepaymentTransitionBuilder = new FullAdmissionRejectRepaymentTransitionBuilder(
-            mockFeatureToggleService);
-        result = fullAdmissionRejectRepaymentTransitionBuilder.buildTransitions();
+        UnspecifiedDraftTransitionBuilder builder = new UnspecifiedDraftTransitionBuilder(mockFeatureToggleService);
+        result = builder.buildTransitions();
         assertNotNull(result);
     }
 
     @Test
     void shouldSetUpTransitions_withExpectedSizeAndStates() {
-        assertThat(result).hasSize(1);
-        assertTransition(result.get(0), "MAIN.FULL_ADMIT_REJECT_REPAYMENT", "MAIN.TAKEN_OFFLINE_BY_STAFF");
+        assertThat(result).hasSize(6);
+        result.forEach(transition -> assertTransition(transition, "MAIN.DRAFT", "MAIN.CLAIM_SUBMITTED"));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

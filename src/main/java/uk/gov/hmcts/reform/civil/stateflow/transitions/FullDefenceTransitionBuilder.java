@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredica
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
 
@@ -36,93 +38,28 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
     @Override
     void setUpTransitions(List<Transition> transitions) {
         this.moveTo(IN_MEDIATION, transitions)
-            .onlyWhen(
-                (MediationPredicate.agreedToMediation.and(MediationPredicate.allAgreedToLrMediationSpec.negate())
-                    .and(ClaimantPredicate.fullDefenceNotProceed.negate()))
-                    // for carm cases, fullDefenceProcced is tracked with lipFullDefenceProceed
-                    // and move to in mediation if the applicant does not settle
-                    .or(MediationPredicate.isCarmApplicableCaseLiP
-                            .and(LipPredicate.fullDefenceProceed.or(ClaimantPredicate.fullDefenceProceed)))
-                    // for carm LR cases
-                    .or(MediationPredicate.isCarmApplicableCase.and(ClaimantPredicate.fullDefenceProceed)), transitions
-            )
-            .set(
-                this::setRespondentResponseLanguageFlag, transitions
-            )
+            .onlyWhen(moveToMediation(), transitions)
+            .set(this::setRespondentResponseLanguageFlag, transitions)
 
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
-            .onlyWhen(ClaimantPredicate.fullDefenceProceed
-                .and(MediationPredicate.allAgreedToLrMediationSpec)
-                .and(MediationPredicate.agreedToMediation.negate())
-                .and(MediationPredicate.declinedMediation.negate())
-                .and(MediationPredicate.isCarmApplicableCaseLiP.negate())
-                .and(MediationPredicate.isCarmApplicableCase.negate()), transitions)
-            .set((c, flags) -> {
-                setRespondentResponseLanguageFlag(c, flags);
-                flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
-                setJudicialReferralFlags(c, flags);
-            }, transitions)
+            .onlyWhen(fullDefenceProceedWithLrMediationAgreement(), transitions)
+            .set(this::setAgreedMediationAndJudicialReferralFlags, transitions)
 
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
-            .onlyWhen(ClaimantPredicate.fullDefenceProceed
-                .and(MediationPredicate.allAgreedToLrMediationSpec.negate()
-                .and(MediationPredicate.agreedToMediation.negate())
-                .or(MediationPredicate.declinedMediation))
-                .and(OutOfTimePredicate.notBeingTakenOffline.negate())
-                .and(ClaimPredicate.isMulti.and(ClaimPredicate.isUnspec)), transitions)
-            .set((c, flags) -> {
-                setRespondentResponseLanguageFlag(c, flags);
-                flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
-                setJudicialReferralFlags(c, flags);
-            }, transitions)
+            .onlyWhen(multiTrackFullDefenceProceedWithoutMediation(), transitions)
+            .set(this::setMultiTrackAndJudicialReferralFlags, transitions)
 
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
-            .onlyWhen(ClaimantPredicate.fullDefenceProceed
-                .and(MediationPredicate.isCarmApplicableCaseLiP.negate())
-                .and(MediationPredicate.isCarmApplicableCase.negate())
-                .and(
-                    MediationPredicate.allAgreedToLrMediationSpec.negate()
-                        .and(MediationPredicate.agreedToMediation.negate())
-                        .or(MediationPredicate.declinedMediation)
-                )
-                .and(OutOfTimePredicate.notBeingTakenOffline.negate())
-                .and(ClaimPredicate.isMulti.and(ClaimPredicate.isUnspec).negate())
-                .and(
-                    LipPredicate.isLiPvLiPCase.negate().and(not(CaseData::isLipvLROneVOne))
-                ), transitions)
-            .set((c, flags) -> {
-                setRespondentResponseLanguageFlag(c, flags);
-                setJudicialReferralFlags(c, flags);
-            }, transitions)
+            .onlyWhen(nonCarmFullDefenceProceedWithoutMediation(), transitions)
+            .set(this::setRespondentLanguageAndJudicialReferralFlags, transitions)
 
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
-            .onlyWhen(
-                (ClaimantPredicate.fullDefenceProceed
-                    .or(ClaimantPredicate.isIntentionNotSettlePartAdmit)
-                    .or(ClaimPredicate.isFullDefenceNotPaid)
-                    .or(LipPredicate.fullDefenceProceed)
-                )
-                .and(not(MediationPredicate.agreedToMediation))
-                .and(MediationPredicate.isCarmApplicableCaseLiP.negate())
-                .and(
-                    LipPredicate.isLiPvLiPCase.or(CaseData::isLipvLROneVOne)
-                ), transitions)
-            .set((c, flags) -> {
-                setRespondentResponseLanguageFlag(c, flags);
-                flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
-                flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
-            }, transitions)
+            .onlyWhen(lipFullDefenceProceedWithoutMediation(), transitions)
+            .set(this::setLipNotSettlingFlags, transitions)
 
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
-            .onlyWhen(
-                ClaimantPredicate.isIntentionSettlePartAdmit.and(not(MediationPredicate.agreedToMediation)),
-                transitions
-            )
-            .set((c, flags) -> {
-                setRespondentResponseLanguageFlag(c, flags);
-                flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
-                flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), true);
-            }, transitions)
+            .onlyWhen(partAdmitSettleWithoutMediation(), transitions)
+            .set(this::setPartAdmitSettlingFlags, transitions)
 
             .moveTo(FULL_DEFENCE_NOT_PROCEED, transitions)
             .onlyWhen(ClaimantPredicate.fullDefenceNotProceed, transitions)
@@ -132,6 +69,97 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
 
             .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA, transitions)
             .onlyWhen(OutOfTimePredicate.notBeingTakenOffline, transitions);
+    }
+
+    private static Predicate<CaseData> moveToMediation() {
+        return MediationPredicate.agreedToMediation.and(MediationPredicate.allAgreedToLrMediationSpec.negate())
+            .and(ClaimantPredicate.fullDefenceNotProceed.negate())
+            .or(carmLipFullDefenceProceed())
+            .or(carmLrFullDefenceProceed());
+    }
+
+    private static Predicate<CaseData> carmLipFullDefenceProceed() {
+        return MediationPredicate.isCarmApplicableCaseLiP
+            .and(LipPredicate.fullDefenceProceed.or(ClaimantPredicate.fullDefenceProceed));
+    }
+
+    private static Predicate<CaseData> carmLrFullDefenceProceed() {
+        return MediationPredicate.isCarmApplicableCase.and(ClaimantPredicate.fullDefenceProceed);
+    }
+
+    private static Predicate<CaseData> fullDefenceProceedWithLrMediationAgreement() {
+        return ClaimantPredicate.fullDefenceProceed
+            .and(MediationPredicate.allAgreedToLrMediationSpec)
+            .and(MediationPredicate.agreedToMediation.negate())
+            .and(MediationPredicate.declinedMediation.negate())
+            .and(MediationPredicate.isCarmApplicableCaseLiP.negate())
+            .and(MediationPredicate.isCarmApplicableCase.negate());
+    }
+
+    private static Predicate<CaseData> multiTrackFullDefenceProceedWithoutMediation() {
+        return ClaimantPredicate.fullDefenceProceed
+            .and(mediationNotAgreedOrDeclined())
+            .and(OutOfTimePredicate.notBeingTakenOffline.negate())
+            .and(ClaimPredicate.isMulti.and(ClaimPredicate.isUnspec));
+    }
+
+    private static Predicate<CaseData> nonCarmFullDefenceProceedWithoutMediation() {
+        return ClaimantPredicate.fullDefenceProceed
+            .and(MediationPredicate.isCarmApplicableCaseLiP.negate())
+            .and(MediationPredicate.isCarmApplicableCase.negate())
+            .and(mediationNotAgreedOrDeclined())
+            .and(OutOfTimePredicate.notBeingTakenOffline.negate())
+            .and(ClaimPredicate.isMulti.and(ClaimPredicate.isUnspec).negate())
+            .and(LipPredicate.isLiPvLiPCase.negate().and(not(CaseData::isLipvLROneVOne)));
+    }
+
+    private static Predicate<CaseData> mediationNotAgreedOrDeclined() {
+        return MediationPredicate.allAgreedToLrMediationSpec.negate()
+            .and(MediationPredicate.agreedToMediation.negate())
+            .or(MediationPredicate.declinedMediation);
+    }
+
+    private static Predicate<CaseData> lipFullDefenceProceedWithoutMediation() {
+        return ClaimantPredicate.fullDefenceProceed
+            .or(ClaimantPredicate.isIntentionNotSettlePartAdmit)
+            .or(ClaimPredicate.isFullDefenceNotPaid)
+            .or(LipPredicate.fullDefenceProceed)
+            .and(not(MediationPredicate.agreedToMediation))
+            .and(MediationPredicate.isCarmApplicableCaseLiP.negate())
+            .and(LipPredicate.isLiPvLiPCase.or(CaseData::isLipvLROneVOne));
+    }
+
+    private static Predicate<CaseData> partAdmitSettleWithoutMediation() {
+        return ClaimantPredicate.isIntentionSettlePartAdmit.and(not(MediationPredicate.agreedToMediation));
+    }
+
+    private void setAgreedMediationAndJudicialReferralFlags(CaseData caseData, Map<String, Boolean> flags) {
+        setRespondentResponseLanguageFlag(caseData, flags);
+        flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
+        setJudicialReferralFlags(caseData, flags);
+    }
+
+    private void setMultiTrackAndJudicialReferralFlags(CaseData caseData, Map<String, Boolean> flags) {
+        setRespondentResponseLanguageFlag(caseData, flags);
+        flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
+        setJudicialReferralFlags(caseData, flags);
+    }
+
+    private void setRespondentLanguageAndJudicialReferralFlags(CaseData caseData, Map<String, Boolean> flags) {
+        setRespondentResponseLanguageFlag(caseData, flags);
+        setJudicialReferralFlags(caseData, flags);
+    }
+
+    private void setLipNotSettlingFlags(CaseData caseData, Map<String, Boolean> flags) {
+        setRespondentResponseLanguageFlag(caseData, flags);
+        flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
+        flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
+    }
+
+    private void setPartAdmitSettlingFlags(CaseData caseData, Map<String, Boolean> flags) {
+        setRespondentResponseLanguageFlag(caseData, flags);
+        flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
+        flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), true);
     }
 
 }

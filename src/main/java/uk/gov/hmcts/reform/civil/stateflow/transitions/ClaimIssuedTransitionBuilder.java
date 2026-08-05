@@ -4,6 +4,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredica
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED;
@@ -39,6 +41,10 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
+
+    private static final Predicate<CaseData> RESPONSE_CAN_ROUTE_DIRECTLY =
+        not(ClaimantPredicate.correspondenceAddressNotRequired)
+            .and(not(LanguagePredicate.onlyInitialResponseIsBilingual));
 
     public ClaimIssuedTransitionBuilder(FeatureToggleService featureToggleService) {
         super(FlowState.Main.CLAIM_ISSUED, featureToggleService);
@@ -69,24 +75,20 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
 
             .moveTo(FULL_DEFENCE, transitions)
             .onlyWhen(ResponsePredicate.isType(RespondentResponseTypeSpec.FULL_DEFENCE)
-                  .and(not(ClaimantPredicate.correspondenceAddressNotRequired))
-                  .and(not(LanguagePredicate.onlyInitialResponseIsBilingual))
+                  .and(RESPONSE_CAN_ROUTE_DIRECTLY)
                   .and(not(DismissedPredicate.pastClaimNotificationDeadline)), transitions)
 
             .moveTo(PART_ADMISSION, transitions)
             .onlyWhen(ResponsePredicate.isType(RespondentResponseTypeSpec.PART_ADMISSION)
-                  .and(not(ClaimantPredicate.correspondenceAddressNotRequired))
-                  .and(not(LanguagePredicate.onlyInitialResponseIsBilingual)), transitions)
+                  .and(RESPONSE_CAN_ROUTE_DIRECTLY), transitions)
 
             .moveTo(FULL_ADMISSION, transitions)
             .onlyWhen(ResponsePredicate.isType(RespondentResponseTypeSpec.FULL_ADMISSION)
-                  .and(not(ClaimantPredicate.correspondenceAddressNotRequired))
-                  .and(not(LanguagePredicate.onlyInitialResponseIsBilingual)), transitions)
+                  .and(RESPONSE_CAN_ROUTE_DIRECTLY), transitions)
 
             .moveTo(COUNTER_CLAIM, transitions)
             .onlyWhen(ResponsePredicate.isType(RespondentResponseTypeSpec.COUNTER_CLAIM)
-                  .and(not(ClaimantPredicate.correspondenceAddressNotRequired))
-                  .and(not(LanguagePredicate.onlyInitialResponseIsBilingual)), transitions)
+                  .and(RESPONSE_CAN_ROUTE_DIRECTLY), transitions)
 
             .moveTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED, transitions)
             .onlyWhen(ResponsePredicate.awaitingResponsesFullDefenceReceivedSpec.and(ClaimPredicate.isSpec), transitions)

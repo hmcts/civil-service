@@ -75,8 +75,7 @@ public class FullAdmissionTransitionBuilder extends MidTransitionBuilder {
     }
 
     private Predicate<CaseData> takenOfflineSpecDefendantNocAfterJba() {
-        return defendantNoCOnlineForCase().and(PaymentPredicate.payImmediately)
-            .and(TakenOfflinePredicate.isDefendantNoCOnlineForCaseAfterJBA);
+        return defendantNoCOnlineAfterJba().and(PaymentPredicate.payImmediately);
     }
 
     private static Predicate<CaseData> fullAdmitJudgementAdmission() {

@@ -77,6 +77,7 @@ public class FullDefenceProceedTransitionBuilderTest {
         assertFalse(TakenOfflinePredicate.byStaff.negate()
             .and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)).test(caseData));
         assertTrue(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterSdo).test(caseData));
+        assertTrue(result.get(2).getCondition().test(caseData));
     }
 
     @Test
@@ -89,6 +90,25 @@ public class FullDefenceProceedTransitionBuilderTest {
         assertFalse(TakenOfflinePredicate.byStaff.negate()
             .and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)).test(caseData));
         assertTrue(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterSdoNotSuitable).test(caseData));
+        assertTrue(result.get(2).getCondition().test(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_whenTakenOfflineBySystemAfterSdoDrawn() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_ONE)
+            .build();
+
+        assertTrue(result.get(3).getCondition().test(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_whenTakenOfflineSdoNotDrawnBySystem() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_ONE)
+            .build();
+
+        assertTrue(result.get(4).getCondition().test(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

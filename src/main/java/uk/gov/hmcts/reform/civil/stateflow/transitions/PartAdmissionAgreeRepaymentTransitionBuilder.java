@@ -27,9 +27,6 @@ public class PartAdmissionAgreeRepaymentTransitionBuilder extends MidTransitionB
             .onlyWhen(TakenOfflinePredicate.byStaff, transitions)
 
             .moveTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA, transitions)
-            .onlyWhen(
-                defendantNoCOnlineForCase().and(TakenOfflinePredicate.isDefendantNoCOnlineForCaseAfterJBA),
-                transitions
-            );
+            .onlyWhen(defendantNoCOnlineAfterJba(), transitions);
     }
 }
