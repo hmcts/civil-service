@@ -21,5 +21,5 @@ docker run --rm --name json2xlsx \
   -v ${definition_output_file}:/tmp/ccd-definition.xlsx \
   -e CCD_DEF_CASE_SERVICE_BASE_URL=${CCD_DEF_CASE_SERVICE_BASE_URL:-http://docker.for.mac.localhost:4000} \
   -e CCD_DEF_GEN_APP_SERVICE_BASE_URL=${CCD_DEF_GEN_APP_SERVICE_BASE_URL:-http://docker.for.mac.localhost:4550} \
-  hmctspublic.azurecr.io/ccd/definition-processor:${definition_processor_version} \
+  hmctspublic.azurecr.io/ccd/definition-processor:pr-348-7561002 \
   json2xlsx -D /tmp/ccd-definition -o /tmp/ccd-definition.xlsx ${additionalParameters}
