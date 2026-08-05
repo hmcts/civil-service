@@ -30,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.validation.PostcodeValidator.POSTCODE_REQUIRED_ERROR;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -95,6 +96,20 @@ class ValidateDateOfBirthTest {
     }
 
     @Test
+    void shouldReturnPostcodeRequiredErrorWhenRespondent1CorrespondenceAddressPostcodeIsNull() {
+        Address address = new Address();
+        address.setPostCode(null);
+        caseData.setIsRespondent1(YES);
+        caseData.setSpecAoSRespondentCorrespondenceAddressRequired(NO);
+        caseData.setSpecAoSRespondentCorrespondenceAddressdetails(address);
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateDateOfBirth.execute(callbackParams);
+
+        assertThat(response.getErrors()).containsOnly(POSTCODE_REQUIRED_ERROR);
+    }
+
+    @Test
     void shouldReturnNoErrorsWhenCorrespondenceAddressIsValid() {
         when(callbackParams.getCaseData()).thenReturn(caseData.setIsRespondent1(YES));
 
@@ -146,6 +161,20 @@ class ValidateDateOfBirthTest {
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateDateOfBirth.execute(callbackParams);
 
         assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldReturnPostcodeRequiredErrorWhenRespondent2CorrespondenceAddressPostcodeIsNull() {
+        Address address = new Address();
+        address.setPostCode(null);
+        caseData.setIsRespondent2(YES);
+        caseData.setSpecAoSRespondent2CorrespondenceAddressRequired(NO);
+        caseData.setSpecAoSRespondent2CorrespondenceAddressdetails(address);
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateDateOfBirth.execute(callbackParams);
+
+        assertThat(response.getErrors()).containsOnly(POSTCODE_REQUIRED_ERROR);
     }
 
     @Test
