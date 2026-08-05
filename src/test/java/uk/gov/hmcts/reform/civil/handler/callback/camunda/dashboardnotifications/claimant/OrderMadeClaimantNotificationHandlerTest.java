@@ -561,7 +561,6 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
-
             handler.handle(params);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
