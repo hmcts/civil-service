@@ -1498,6 +1498,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setSameRateInterestSelection(specSameRateSelection);
             caseData.setInterestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE);
             caseData.setTotalClaimAmount(new BigDecimal(1000));
+            when(interestCalculator.getInterestValidationErrors(any(CaseData.class))).thenReturn(List.of());
             when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
             CallbackParams params = callbackParamsOf(caseData, MID, "spec-fee");
             // When

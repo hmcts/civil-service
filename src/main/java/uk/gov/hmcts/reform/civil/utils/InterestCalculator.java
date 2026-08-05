@@ -195,7 +195,8 @@ public class InterestCalculator {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
             return caseData.getSubmittedDate().toLocalDate().format(formatter);
         } else if (caseData.getInterestClaimOptions() == null
-            || InterestClaimOptions.BREAK_DOWN_INTEREST.equals(caseData.getInterestClaimOptions())) {
+            || InterestClaimOptions.BREAK_DOWN_INTEREST.equals(caseData.getInterestClaimOptions())
+            || !getInterestValidationErrors(caseData).isEmpty()) {
             return null;
         } else {
             StringBuilder description = new StringBuilder("Interest will accrue at the daily rate of £");

@@ -372,6 +372,25 @@ class InterestCalculatorTest {
         assertThat(result).isZero();
     }
 
+    @Test
+    void shouldReturnNullDailyInterestBreakdownWhenDifferentRateIsNegative() {
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .claimInterest(YesOrNo.YES)
+            .caseReference(123456789L)
+            .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
+            .sameRateInterestSelection(buildSameRateSelection(
+                SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE,
+                BigDecimal.valueOf(-10),
+                "reason"
+            ))
+            .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
+            .interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
+            .totalClaimAmount(BigDecimal.valueOf(5000))
+            .build();
+
+        assertThat(interestCalculator.getInterestPerDayBreakdown(caseData)).isNull();
+    }
+
     private SameRateInterestSelection buildSameRateSelection(SameRateInterestType type, BigDecimal rate, String reason) {
         SameRateInterestSelection selection = new SameRateInterestSelection();
         selection.setSameRateInterestType(type);
