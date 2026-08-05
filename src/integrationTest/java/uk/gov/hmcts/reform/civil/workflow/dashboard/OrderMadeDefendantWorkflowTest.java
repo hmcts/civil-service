@@ -26,8 +26,7 @@ class OrderMadeDefendantWorkflowTest extends DashboardWorkflowIntegrationTest {
 
     @BeforeEach
     void setup() {
-        when(featureToggleService.isCuiGaNroEnabled()).thenReturn(false);
-        when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
     }
 
     @Test
