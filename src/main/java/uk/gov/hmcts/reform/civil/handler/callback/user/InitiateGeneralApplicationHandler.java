@@ -30,7 +30,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -86,7 +85,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             + "respondent solicitor are assigned to the case.";
     private static final String RESP_NOT_ASSIGNED_ERROR_LIP = "Application cannot be created until the Defendant "
         + "is assigned to the case.";
-    public static final String NOT_IN_EA_REGION = "Sorry this service is not available in the current case management location, please raise an application manually.";
     public static final String NOT_ALLOWED_SETTLE_DISCONTINUE = "Sorry this service is not available, please raise an application manually.";
     private static final String CONFIRMATION_BODY_FREE = "<br/> <p> The court will make a decision"
         + " on this application."
@@ -98,7 +96,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private final UserService userService;
     private final GeneralAppFeesService feesService;
     private final LocationReferenceDataService locationRefDataService;
-    private final FeatureToggleService featureToggleService;
     private final CoreCaseUserService coreCaseUserService;
     private final GeneralAppFeesService generalAppFeesService;
 
@@ -139,13 +136,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         }
         log.info("initiating general application allowed for caseId {}", caseData.getCcdCaseReference());
 
-        if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
-            if (!(featureToggleService.isLocationWhiteListed(caseData.getCaseManagementLocation()
-                                                                                    .getBaseLocation()))
-                    && !(featureToggleService.isCuiGaNroEnabled())) {
-                errors.add(NOT_IN_EA_REGION);
-            }
-        }
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         GAHearingDetails generalAppHearingDetails = new GAHearingDetails();
         generalAppHearingDetails.setHearingPreferredLocation(getLocationsFromList(locationRefDataService
