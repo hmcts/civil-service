@@ -43,7 +43,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -129,9 +128,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     protected UserRoleCaching userRoleCaching;
 
     @Mock
-    protected FeatureToggleService featureToggleService;
-
-    @Mock
     protected CoreCaseUserService coreCaseUserService;
 
     @Mock
@@ -161,7 +157,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         objectMapper.registerModule(new JavaTimeModule());
         handler = new InitiateGeneralApplicationHandler(initiateGeneralAppService, generalApplicationValidator, objectMapper, theUserService,
                                                         feesService, locationRefDataService,
-                                                        featureToggleService, coreCaseUserService, generalAppFeesService);
+                                                        coreCaseUserService, generalAppFeesService);
     }
 
     @Test
@@ -259,9 +255,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
-        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
-        given(featureToggleService.isLocationWhiteListed(any())).willReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isEmpty();
     }
@@ -282,15 +276,13 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION_COSC.name());
-        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
-        given(featureToggleService.isLocationWhiteListed(any())).willReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
-    void shouldThrowError_whenLipVsLrAndClaimantLiPIsBilingual() {
+    void shouldNotThrowError_whenLipVsLrAndClaimantLiPIsBilingual() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v1LiP()
@@ -305,40 +297,13 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
-        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
-        given(featureToggleService.isDefendantNoCOnlineForCase(any())).willReturn(true);
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        assertThat(response.getErrors()).isNotNull();
-    }
-
-    @Test
-    void shouldNotThrowError_whenLipVsLrAndClaimantLiPIsBilingualAndWelshGaToggleEnabled() {
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued1v1LiP()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .caseManagementLocation(createCaseLocationCivil())
-            .respondent1Represented(YES)
-            .specRespondent1Represented(YES)
-            .applicant1Represented(NO)
-            .defendantUserDetails(createDefendantUserDetails())
-            .claimantBilingualLanguagePreference(Language.BOTH.toString())
-            .build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
-        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-        given(featureToggleService.isGaForWelshEnabled()).willReturn(true);
-        given(featureToggleService.isLocationWhiteListed(any())).willReturn(true);
-        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
-        given(featureToggleService.isDefendantNoCOnlineForCase(any())).willReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
-    void shouldThrowError_whenLRVsLiPCourtIsNotWhitelisted() {
+    void shouldNotThrowError_whenLRVsLiPAndRespondentAssigned() {
 
         CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v1LiP()
@@ -350,48 +315,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
-        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-        given(featureToggleService.isLocationWhiteListed(any())).willReturn(false);
-        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
-
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        assertThat(response.getErrors()).isNotNull();
-    }
-
-    @Test
-    void shouldThrowError_whenLRVsLiPAndLiPIsBilingual() {
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued1v1LiP()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .caseManagementLocation(createCaseLocationCivil())
-            .caseDataLip(createBilingualCaseDataLiP())
-            .build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
-        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        assertThat(response.getErrors()).isNotNull();
-    }
-
-    @Test
-    void shouldNotThrowError_whenLRVsLiPAndLiPIsBilingualGaForWelshEnabled() {
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued1v1LiP()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .defendantUserDetails(createDefendantUserDetails())
-            .caseManagementLocation(createCaseLocationCivil())
-            .caseDataLip(createBilingualCaseDataLiP())
-            .build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
-        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-        given(featureToggleService.isGaForWelshEnabled()).willReturn(true);
-        given(featureToggleService.isLocationWhiteListed(any())).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -399,7 +322,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldNotThrowError_whenLRVsLiPAndLiPIsBilingualGaForWelshEnabledForNro() {
+    void shouldNotThrowError_whenLRVsLiPAndLiPIsBilingual() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v1LiP()
@@ -411,10 +334,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
-        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-        given(featureToggleService.isGaForWelshEnabled()).willReturn(true);
-        given(featureToggleService.isLocationWhiteListed(any())).willReturn(false);
-        given(featureToggleService.isCuiGaNroEnabled()).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -436,15 +355,13 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
 
-        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
-        given(featureToggleService.isLocationWhiteListed(any())).willReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
-    void shouldThrowError_whenLRVsLiPAndLipsNotEnabledAndWhiteListed() {
+    void shouldThrowError_whenLRVsLiPAndRespondentNotAssigned() {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v1LiP()
@@ -454,8 +371,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
-        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
-        given(featureToggleService.isLocationWhiteListed(any())).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(false);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isNotNull();
