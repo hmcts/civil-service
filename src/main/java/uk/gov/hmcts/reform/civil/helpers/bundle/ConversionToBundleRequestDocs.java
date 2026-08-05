@@ -39,7 +39,7 @@ public class ConversionToBundleRequestDocs {
     public List<BundlingRequestDocument> covertOtherWitnessEvidenceToBundleRequestDocs(
         Map<String, List<Element<UploadEvidenceWitness>>> witnessStatmentsMap, String displayName, String documentType,
         Party party) {
-        log.debug("Converting other witness evidence to bundle request docs for party {}", party);
+        log.debug("Converting other witness evidence to bundle request docs");
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         removePartyEntries(witnessStatmentsMap, party);
         witnessStatmentsMap.forEach((witnessName, witnessEvidence) ->
@@ -62,7 +62,7 @@ public class ConversionToBundleRequestDocs {
                                                                                   String documentType,
                                                                                   PartyType party,
                                                                                   boolean isWitnessSelf) {
-        log.debug("Converting witness evidence to bundle request docs for file name prefix: {} and party: {}", fileNamePrefix, party);
+        log.debug("Converting witness evidence to bundle request docs for file name prefix: {}", fileNamePrefix);
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         if (witnessEvidence != null) {
             witnessEvidence = filterDocumentsForBundle(witnessEvidence, UploadEvidenceWitness::getWitnessOptionDocument);
@@ -91,7 +91,7 @@ public class ConversionToBundleRequestDocs {
     public List<BundlingRequestDocument> covertEvidenceUploadTypeToBundleRequestDocs(List<Element<UploadEvidenceDocumentType>> evidenceUploadDocList,
                                                                                      String fileNamePrefix, String documentType,
                                                                                      PartyType party) {
-        log.debug("Converting evidence upload type to bundle request docs for file name prefix: {} and party: {}", fileNamePrefix, party);
+        log.debug("Converting evidence upload type to bundle request docs for file name prefix: {}", fileNamePrefix);
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         if (evidenceUploadDocList != null) {
             evidenceUploadDocList = filterDocumentsForBundle(evidenceUploadDocList, UploadEvidenceDocumentType::getDocumentUpload);
