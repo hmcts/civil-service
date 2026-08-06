@@ -25,7 +25,7 @@ class HearingScheduledClaimantWorkflowTest extends DashboardWorkflowIntegrationT
 
     @BeforeEach
     void setup() {
-        when(locationReferenceDataService.getHearingCourtLocations(any()))
+        when(locationReferenceDataService.getHearingCourtLocations(any(), any()))
             .thenReturn(HearingScheduledClaimantFixtures.locations());
     }
 

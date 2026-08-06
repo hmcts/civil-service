@@ -68,6 +68,7 @@ allprojects {
     analyzers.assemblyEnabled = false
     analyzers.retirejs.enabled = false
     analyzers.ossIndex.enabled = false
+    analyzers.nodeAudit.enabled = false
   }
 
   dependencyManagement {
@@ -489,7 +490,7 @@ dependencies {
   implementation "org.springframework.retry:spring-retry"
   implementation "com.github.hmcts.java-logging:logging:8.0.0"
   implementation "com.microsoft.azure:applicationinsights-web:3.7.8"
-  implementation "com.github.hmcts:befta-fw:9.2.7"
+  implementation "com.github.hmcts:befta-fw:9.2.8"
   implementation "commons-lang:commons-lang:2.6"
   implementation "com.github.hmcts:core-case-data-store-client:5.2.0"
   implementation "com.github.hmcts:document-management-client:7.0.1"

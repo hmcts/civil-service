@@ -65,6 +65,8 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
             response.getData().getCaseBundles().get(0).getValue().getFileName(),
             is(equalTo("fileName"))
         );
+        assertThat(response.getData().getCaseBundles().get(0).getValue().getTitle(), is(equalTo("title")));
+        assertThat(response.getData().getCaseBundles().get(0).getValue().getId(), is(equalTo("id")));
     }
 
     private RequestResponsePact buildCreateBundleResponsePact(PactDslWithProvider builder) throws IOException {

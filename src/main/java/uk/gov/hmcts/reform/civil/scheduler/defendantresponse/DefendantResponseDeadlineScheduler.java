@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.civil.service.search.DefendantResponseDeadlineCheckSe
 @ConditionalOnProperty(prefix = "scheduler.defendant-response", name = "enabled", havingValue = "true")
 public class DefendantResponseDeadlineScheduler implements CivilScheduler {
 
-    private static final String SCHEDULER_NAME = "DefendantResponseDeadline";
+    public static final String SCHEDULER_NAME = "DefendantResponseDeadline";
 
     private final DefendantResponseDeadlineCheckSearchService searchService;
     private final ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;

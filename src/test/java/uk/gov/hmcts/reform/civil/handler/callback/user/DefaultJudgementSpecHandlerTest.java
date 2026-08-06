@@ -1508,6 +1508,65 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(responseData.getJoRepaymentSummaryObject()).doesNotContain("Claim interest amount");
             assertInterestIsPopulated(response, 0);
         }
+
+        @Test
+        void shouldGenerateDocumentAndContinueOnline_whenIsCalled1v1AndPreStayStateIsJudgmentRequestedAndJudgmentBufferEnabled() {
+            Flags respondent1Flags = new Flags();
+            respondent1Flags.setPartyName("respondent1name");
+            respondent1Flags.setRoleOnCase("respondent1");
+            Party respondent = new Party();
+            respondent.setIndividualFirstName("Dis");
+            respondent.setIndividualLastName("Guy");
+            respondent.setType(INDIVIDUAL);
+            respondent.setFlags(respondent1Flags);
+
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .respondent1(respondent).build();
+            caseDataBefore.setRespondent1DetailsForClaimDetailsTab(respondent);
+            caseDataBefore.setCaseNameHmctsInternal("Mr. John Rambo v Dis Guy");
+            caseDataBefore.setCaseNamePublic("'John Rambo' v 'Dis Guy'");
+
+            when(interestCalculator.calculateInterest(any()))
+                .thenReturn(BigDecimal.valueOf(0)
+                );
+            when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+            caseData.setPartialPaymentAmount("10");
+            caseData.setTotalClaimAmount(BigDecimal.valueOf(1010));
+            caseData.setPartialPayment(YES);
+            caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
+            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
+            caseLocationCivil.setBaseLocation("0123");
+            caseLocationCivil.setRegion("0321");;
+            caseData.setCaseManagementLocation(caseLocationCivil);
+            DynamicListElement element = new DynamicListElement(null, "John Smith");
+            DynamicList list = new DynamicList();
+            list.setValue(element);
+            caseData.setDefendantDetailsSpec(list);
+            caseData.setPreStayState(CaseState.JUDGMENT_REQUESTED.toString());
+            caseData.setRespondent1Represented(NO);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, caseDataBefore.toMap(mapper));
+
+            when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getBusinessProcess()).isNotNull();
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC.name());
+            assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            // Use Map-based verification for activeJudgment due to complex nested objects
+            assertThat(response.getData()).extracting("activeJudgment").isNotNull();
+            assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("ISSUED");
+            assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo("DEFAULT_JUDGMENT");
+            assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
+            assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("Yes");
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant1Name").isEqualTo("Mr. Sole Trader T/A Sole Trader co");
+            assertThat(response.getData().get("activeJudgment")).extracting("defendant1Address").isNotNull();
+            assertInterestIsPopulated(response, 0);
+        }
     }
 
     @Nested
@@ -1595,6 +1654,29 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     JUDGMENT_GRANTED_HEADER)
                 .confirmationBody(format(body))
                 .build());
+        }
+
+        @Test
+        void shouldReturnJudgementGrantedResponse_whenJudgmentLiveEnabledAndLrVLipAndJudgmentBufferEnabledAndPreStayStateIsJudgmentRequested() {
+            when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setApplicant1(new PartyBuilder().build());
+            caseData.setRespondent1(new PartyBuilder().build());
+            caseData.setRespondent1Represented(NO);
+            caseData.setPreStayState(CaseState.JUDGMENT_REQUESTED.toString());
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String body = "<br /><a href=\"/cases/case-details/1594901956117591#Claim documents\" "
+                + "target=\"_blank\">Download  default judgment</a> "
+                + "%n%n The defendant will be served with the Default Judgment.";
+            assertThat(caseData.isLRvLipOneVOne()).isTrue();
+            assertThat(response).usingRecursiveComparison()
+                .isEqualTo(SubmittedCallbackResponse.builder()
+                               .confirmationHeader(JUDGMENT_GRANTED_HEADER)
+                               .confirmationBody(format(body))
+                               .build());
         }
     }
 
