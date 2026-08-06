@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -28,18 +29,22 @@ public final class ResponseWorkflowFixtures {
     public static CaseData unspecifiedFullDefenceResponse() {
         return CaseDataBuilder.builder()
             .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+            .respondent1Copy(new PartyBuilder().individual().build())
             .build();
     }
 
     public static CaseData unspecifiedFullAdmitResponse() {
         return CaseDataBuilder.builder()
             .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
+            .respondent1Copy(new PartyBuilder().individual().build())
+            .respondent1DQ()
             .build();
     }
 
     public static CaseData unspecified1v2DifferentSolicitorFirstFullDefenceResponse() {
         return CaseDataBuilder.builder()
             .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+            .respondent1Copy(new PartyBuilder().individual().build())
             .respondent1DQ()
             .build()
             .toBuilder()
@@ -51,11 +56,14 @@ public final class ResponseWorkflowFixtures {
     public static CaseData unspecified1v2SameSolicitorFullDefenceResponse() {
         return CaseDataBuilder.builder()
             .atStateNotificationAcknowledged1v2SameSolicitor()
+            .respondent1Copy(new PartyBuilder().individual().build())
+            .respondent2Copy(new PartyBuilder().individual().build())
             .respondent1DQ()
             .build()
             .toBuilder()
             .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
             .respondent2ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+            .respondentResponseIsSame(YesOrNo.YES)
             .respondent1ClaimResponseDocument(defendantResponseDocument())
             .build();
     }
@@ -63,6 +71,7 @@ public final class ResponseWorkflowFixtures {
     public static CaseData specifiedPartAdmitResponse() {
         return CaseDataBuilder.builder()
             .atStateRespondentPartAdmissionSpec()
+            .respondent1Copy(new PartyBuilder().individual().build())
             .respondent1DQ()
             .build();
     }
@@ -70,6 +79,7 @@ public final class ResponseWorkflowFixtures {
     public static CaseData specifiedFullAdmitResponse() {
         return CaseDataBuilder.builder()
             .atStateRespondentFullAdmissionSpec()
+            .respondent1Copy(new PartyBuilder().individual().build())
             .respondent1DQ()
             .build();
     }
@@ -160,6 +170,8 @@ public final class ResponseWorkflowFixtures {
     private static CaseData specified1v2SameSolicitorDefendantResponse(RespondentResponseTypeSpec responseType) {
         return CaseDataBuilder.builder()
             .atStateNotificationAcknowledged1v2SameSolicitor()
+            .respondent1Copy(new PartyBuilder().individual().build())
+            .respondent2Copy(new PartyBuilder().individual().build())
             .respondent1DQ()
             .build()
             .toBuilder()
