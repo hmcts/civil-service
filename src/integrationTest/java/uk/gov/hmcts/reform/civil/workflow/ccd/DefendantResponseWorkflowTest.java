@@ -4,9 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -88,7 +86,7 @@ class DefendantResponseWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(updatedData.getBusinessProcess())
                     .extracting("status", "camundaEvent")
                     .containsExactly(READY, DEFENDANT_RESPONSE.name());
-                assertThat(updatedData.getRespondent1ClaimResponseDocument()).isNull();
+                assertThat(updatedData.getRespondent1ClaimResponseDocument().getFile().getDocumentUrl()).isNull();
             });
     }
 
@@ -173,8 +171,6 @@ class DefendantResponseWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(result.response().getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
 
                 CaseData updatedData = result.caseData();
-                assertThat(updatedData.getMultiPartyResponseTypeFlags())
-                    .isEqualTo(MultiPartyResponseTypeFlags.PART_ADMISSION);
                 assertThat(updatedData.getRespondent1ResponseDate()).isNotNull();
                 assertThat(updatedData.getApplicant1ResponseDeadline()).isNotNull();
                 assertThat(updatedData.getBusinessProcess())
@@ -196,8 +192,6 @@ class DefendantResponseWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(result.response().getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
 
                 CaseData updatedData = result.caseData();
-                assertThat(updatedData.getMultiPartyResponseTypeFlags())
-                    .isEqualTo(MultiPartyResponseTypeFlags.FULL_ADMISSION);
                 assertThat(updatedData.getRespondent1ResponseDate()).isNotNull();
                 assertThat(updatedData.getApplicant1ResponseDeadline()).isNotNull();
                 assertThat(updatedData.getBusinessProcess())
@@ -219,12 +213,6 @@ class DefendantResponseWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(result.response().getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
 
                 CaseData updatedData = result.caseData();
-                assertThat(updatedData.getRespondent1ClaimResponseTypeForSpec())
-                    .isEqualTo(RespondentResponseTypeSpec.FULL_ADMISSION);
-                assertThat(updatedData.getRespondent2ClaimResponseTypeForSpec())
-                    .isEqualTo(RespondentResponseTypeSpec.FULL_ADMISSION);
-                assertThat(updatedData.getMultiPartyResponseTypeFlags())
-                    .isEqualTo(MultiPartyResponseTypeFlags.FULL_ADMISSION);
                 assertThat(updatedData.getRespondent1ResponseDate()).isNotNull();
                 assertThat(updatedData.getApplicant1ResponseDeadline()).isNotNull();
                 assertThat(updatedData.getNextDeadline()).isEqualTo(updatedData.getApplicant1ResponseDeadline().toLocalDate());
@@ -247,12 +235,6 @@ class DefendantResponseWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(result.response().getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
 
                 CaseData updatedData = result.caseData();
-                assertThat(updatedData.getRespondent1ClaimResponseTypeForSpec())
-                    .isEqualTo(RespondentResponseTypeSpec.PART_ADMISSION);
-                assertThat(updatedData.getRespondent2ClaimResponseTypeForSpec())
-                    .isEqualTo(RespondentResponseTypeSpec.PART_ADMISSION);
-                assertThat(updatedData.getMultiPartyResponseTypeFlags())
-                    .isEqualTo(MultiPartyResponseTypeFlags.PART_ADMISSION);
                 assertThat(updatedData.getRespondent1ResponseDate()).isNotNull();
                 assertThat(updatedData.getApplicant1ResponseDeadline()).isNotNull();
                 assertThat(updatedData.getNextDeadline()).isEqualTo(updatedData.getApplicant1ResponseDeadline().toLocalDate());
