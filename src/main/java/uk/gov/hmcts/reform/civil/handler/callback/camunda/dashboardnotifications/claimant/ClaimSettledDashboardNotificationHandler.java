@@ -8,9 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
-import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.List;
 
@@ -22,17 +20,11 @@ public class ClaimSettledDashboardNotificationHandler extends DashboardCallbackH
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_CLAIMANT1);
     public static final String TASK_ID = "CreateClaimSettledDashboardNotificationsForClaimant1";
-    private final DashboardNotificationService dashboardNotificationService;
-    private final TaskListService taskListService;
 
     public ClaimSettledDashboardNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                     DashboardNotificationsParamsMapper mapper,
-                                                    FeatureToggleService featureToggleService,
-                                                    DashboardNotificationService dashboardNotificationService,
-                                                    TaskListService taskListService) {
+                                                    FeatureToggleService featureToggleService) {
         super(dashboardScenariosService, mapper, featureToggleService);
-        this.dashboardNotificationService = dashboardNotificationService;
-        this.taskListService = taskListService;
     }
 
     @Override
@@ -53,29 +45,5 @@ public class ClaimSettledDashboardNotificationHandler extends DashboardCallbackH
     @Override
     public String getScenario(CaseData caseData) {
         return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_EVENT_CLAIMANT.getScenario();
-    }
-
-    @Override
-    protected void beforeRecordScenario(CaseData caseData, String authToken) {
-        final String caseId = String.valueOf(caseData.getCcdCaseReference());
-
-        if (!featureToggleService.isLocationWhiteListed(caseData.getCaseManagementLocation()
-                                                                               .getBaseLocation())
-            && !featureToggleService.isCuiGaNroEnabled()) {
-            inactiveGAItems(caseId);
-        }
-    }
-
-    private void inactiveGAItems(String caseId) {
-        dashboardNotificationService.deleteByReferenceAndCitizenRole(
-            caseId,
-            "CLAIMANT"
-        );
-
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
-            caseId,
-            "CLAIMANT",
-            "Application.View"
-        );
     }
 }
