@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.workflow.helper.CaseDataTemplates;
 
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -30,8 +31,10 @@ public final class CreateClaimFixtures {
     private CreateClaimFixtures() {
     }
 
-    public static CaseData caseData() {
-        return CaseDataTemplates.load(CREATE_CLAIM_START);
+    public static CaseData unspecifiedClaimStart() {
+        return CaseDataTemplates.load(CREATE_CLAIM_START).toBuilder()
+            .caseAccessCategory(UNSPEC_CLAIM)
+            .build();
     }
 
     public static CaseData representedOneVOneClaimDraft() {

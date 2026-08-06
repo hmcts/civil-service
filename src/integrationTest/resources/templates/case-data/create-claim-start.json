@@ -1,5 +1,4 @@
 {
   "ccdCaseReference": 1234567890123457,
-  "ccdState": "AWAITING_RESPONDENT_ACKNOWLEDGEMENT",
-  "CaseAccessCategory": "UNSPEC_CLAIM"
+  "ccdState": "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"
 }

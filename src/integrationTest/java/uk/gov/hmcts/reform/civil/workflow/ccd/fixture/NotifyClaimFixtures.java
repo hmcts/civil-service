@@ -4,6 +4,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -20,6 +21,7 @@ public final class NotifyClaimFixtures {
     public static CaseData issuedRepresentedOneVOneClaim() {
         return ClaimLifecycleFixtures.withIssuedLifecycleDates(CaseDataBuilder.builder()
             .atStateClaimIssued()
+            .caseAccessCategory(UNSPEC_CLAIM)
             .respondent1OrganisationPolicy(ClaimLifecycleFixtures.clearedPolicy(RESPONDENTSOLICITORONE))
             .respondent1OrganisationIDCopy(RESPONDENT_ONE_ORGANISATION)
             .defendant1LIPAtClaimIssued(NO)
@@ -30,6 +32,7 @@ public final class NotifyClaimFixtures {
     public static CaseData issuedTwoSolicitorClaim(String selectedOption) {
         CaseDataBuilder builder = CaseDataBuilder.builder()
             .atStateClaimIssued()
+            .caseAccessCategory(UNSPEC_CLAIM)
             .multiPartyClaimTwoDefendantSolicitors()
             .respondent1OrganisationPolicy(ClaimLifecycleFixtures.clearedPolicy(RESPONDENTSOLICITORONE))
             .respondent2OrganisationPolicy(ClaimLifecycleFixtures.clearedPolicy(RESPONDENTSOLICITORTWO))
@@ -56,6 +59,7 @@ public final class NotifyClaimFixtures {
     public static CaseData issuedMixedRepresentationClaim(CertificateOfService respondentTwoCertificate) {
         return ClaimLifecycleFixtures.withIssuedLifecycleDates(CaseDataBuilder.builder()
             .atStateClaimIssued()
+            .caseAccessCategory(UNSPEC_CLAIM)
             .multiPartyClaimTwoDefendantSolicitors()
             .respondent2Represented(NO)
             .respondent2OrgRegistered(NO)
@@ -72,6 +76,7 @@ public final class NotifyClaimFixtures {
     public static CaseData issuedOneVOneLipClaim(CertificateOfService respondentOneCertificate) {
         return ClaimLifecycleFixtures.withIssuedLifecycleDates(CaseDataBuilder.builder()
             .atStateClaimIssued()
+            .caseAccessCategory(UNSPEC_CLAIM)
             .respondent1Represented(NO)
             .respondent1OrgRegistered(null)
             .respondent1OrganisationPolicy(ClaimLifecycleFixtures.clearedPolicy(RESPONDENTSOLICITORONE))
@@ -87,6 +92,7 @@ public final class NotifyClaimFixtures {
     ) {
         return ClaimLifecycleFixtures.withIssuedLifecycleDates(CaseDataBuilder.builder()
             .atStateClaimIssued()
+            .caseAccessCategory(UNSPEC_CLAIM)
             .multiPartyClaimTwoDefendantsLiP()
             .respondent1OrgRegistered(null)
             .respondent2OrgRegistered(null)

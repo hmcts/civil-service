@@ -99,7 +99,7 @@ class CreateClaimWorkflowTest extends WorkflowIntegrationTest {
 
     @Test
     void shouldExecuteCreateClaimAboutToStartThenStartClaimMidWorkflow() throws Exception {
-        startWorkflow(CreateClaimFixtures.caseData())
+        startWorkflow(CreateClaimFixtures.unspecifiedClaimStart())
             .eventId(CaseEvent.CREATE_CLAIM)
             .aboutToStart()
             .then(result -> assertThat(result.response().getErrors()).isNullOrEmpty())
