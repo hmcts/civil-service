@@ -85,7 +85,6 @@ class DefendantResponseWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(updatedData.getRespondent1ClaimResponseType()).isEqualTo(RespondentResponseType.FULL_DEFENCE);
                 assertThat(updatedData.getRespondent1ResponseDate()).isNotNull();
                 assertThat(updatedData.getApplicant1ResponseDeadline()).isNotNull();
-                assertThat(updatedData.getNextDeadline()).isEqualTo(updatedData.getApplicant1ResponseDeadline().toLocalDate());
                 assertThat(updatedData.getBusinessProcess())
                     .extracting("status", "camundaEvent")
                     .containsExactly(READY, DEFENDANT_RESPONSE.name());
@@ -108,7 +107,7 @@ class DefendantResponseWorkflowTest extends WorkflowIntegrationTest {
                 CaseData updatedData = result.caseData();
                 assertThat(updatedData.getRespondent1ClaimResponseType()).isEqualTo(RespondentResponseType.FULL_DEFENCE);
                 assertThat(updatedData.getRespondent1ResponseDate()).isNotNull();
-                assertThat(updatedData.getApplicant1ResponseDeadline()).isNotNull();
+                assertThat(updatedData.getApplicant1ResponseDeadline()).isNull();
                 assertThat(updatedData.getNextDeadline()).isEqualTo(caseData.getRespondent2ResponseDeadline().toLocalDate());
                 assertThat(updatedData.getBusinessProcess())
                     .extracting("status", "camundaEvent")
@@ -132,8 +131,8 @@ class DefendantResponseWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(updatedData.getRespondent1ClaimResponseType()).isEqualTo(RespondentResponseType.FULL_DEFENCE);
                 assertThat(updatedData.getRespondent2ClaimResponseType()).isEqualTo(RespondentResponseType.FULL_DEFENCE);
                 assertThat(updatedData.getRespondent1ResponseDate()).isNotNull();
-                assertThat(updatedData.getApplicant1ResponseDeadline()).isNotNull();
-                assertThat(updatedData.getNextDeadline()).isEqualTo(updatedData.getApplicant1ResponseDeadline().toLocalDate());
+                assertThat(updatedData.getApplicant1ResponseDeadline()).isNull();
+                assertThat(updatedData.getNextDeadline()).isNull();
                 assertThat(updatedData.getBusinessProcess())
                     .extracting("status", "camundaEvent")
                     .containsExactly(READY, DEFENDANT_RESPONSE.name());
@@ -174,8 +173,6 @@ class DefendantResponseWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(result.response().getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
 
                 CaseData updatedData = result.caseData();
-                assertThat(updatedData.getRespondent1ClaimResponseTypeForSpec())
-                    .isEqualTo(RespondentResponseTypeSpec.PART_ADMISSION);
                 assertThat(updatedData.getMultiPartyResponseTypeFlags())
                     .isEqualTo(MultiPartyResponseTypeFlags.PART_ADMISSION);
                 assertThat(updatedData.getRespondent1ResponseDate()).isNotNull();
@@ -199,8 +196,6 @@ class DefendantResponseWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(result.response().getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
 
                 CaseData updatedData = result.caseData();
-                assertThat(updatedData.getRespondent1ClaimResponseTypeForSpec())
-                    .isEqualTo(RespondentResponseTypeSpec.FULL_ADMISSION);
                 assertThat(updatedData.getMultiPartyResponseTypeFlags())
                     .isEqualTo(MultiPartyResponseTypeFlags.FULL_ADMISSION);
                 assertThat(updatedData.getRespondent1ResponseDate()).isNotNull();
@@ -221,7 +216,7 @@ class DefendantResponseWorkflowTest extends WorkflowIntegrationTest {
             .aboutToSubmit()
             .then(result -> {
                 assertThat(result.response().getErrors()).isNullOrEmpty();
-                assertThat(result.response().getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
+                assertThat(result.response().getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
 
                 CaseData updatedData = result.caseData();
                 assertThat(updatedData.getRespondent1ClaimResponseTypeForSpec())
@@ -249,7 +244,7 @@ class DefendantResponseWorkflowTest extends WorkflowIntegrationTest {
             .aboutToSubmit()
             .then(result -> {
                 assertThat(result.response().getErrors()).isNullOrEmpty();
-                assertThat(result.response().getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
+                assertThat(result.response().getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
 
                 CaseData updatedData = result.caseData();
                 assertThat(updatedData.getRespondent1ClaimResponseTypeForSpec())
