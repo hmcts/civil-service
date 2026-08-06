@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.workflow.ccd;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -9,8 +10,12 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.workflow.WorkflowIntegrationTest;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
@@ -28,6 +33,12 @@ class DefendantResponseWorkflowTest extends WorkflowIntegrationTest {
 
     @MockBean
     private CoreCaseUserService coreCaseUserService;
+
+    @BeforeEach
+    void setUpDefendantResponseWorkflowTest() {
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("user-id").build());
+        when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any())).thenReturn(true);
+    }
 
     @Test
     void shouldSubmitUnspecifiedFullDefenceAndSetClaimantResponseDeadline() throws Exception {

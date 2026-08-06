@@ -1,32 +1,24 @@
 package uk.gov.hmcts.reform.civil.workflow.ccd;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.workflow.WorkflowIntegrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ResponseWorkflowFixtures.specified1v2SameSolicitorFullAdmitClaimantResponse;
 import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ResponseWorkflowFixtures.specified1v2SameSolicitorPartAdmitClaimantResponse;
 import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ResponseWorkflowFixtures.specifiedFullAdmitClaimantAcceptsResponse;
-import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ResponseWorkflowFixtures.specifiedMintiLipClaimantResponse;
 import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ResponseWorkflowFixtures.unspecified2v1Applicant2ProceedsResponse;
 import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ResponseWorkflowFixtures.unspecifiedClaimantDoesNotProceedResponse;
 import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ResponseWorkflowFixtures.unspecifiedClaimantProceedsResponse;
 
 @SuppressWarnings("java:S5960")
 class ClaimantResponseWorkflowTest extends WorkflowIntegrationTest {
-
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @Test
     void shouldSubmitUnspecifiedFullDefenceProceedAndMoveToProceedsInHeritageSystem() throws Exception {
@@ -38,7 +30,7 @@ class ClaimantResponseWorkflowTest extends WorkflowIntegrationTest {
             .aboutToSubmit()
             .then(result -> {
                 assertThat(result.response().getErrors()).isNullOrEmpty();
-                assertThat(result.response().getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+                assertThat(result.response().getState()).isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
 
                 CaseData updatedData = result.caseData();
                 assertThat(updatedData.getApplicant1ProceedWithClaim()).isEqualTo(YesOrNo.YES);
@@ -96,31 +88,7 @@ class ClaimantResponseWorkflowTest extends WorkflowIntegrationTest {
     }
 
     @Test
-    void shouldSubmitSpecifiedClaimantResponseAndKeepMintiLipCaseAwaitingApplicantIntention() throws Exception {
-        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-
-        CaseData caseData = specifiedMintiLipClaimantResponse();
-
-        startWorkflow(caseData)
-            .caseDataBefore(caseData)
-            .eventId(CLAIMANT_RESPONSE_SPEC)
-            .aboutToSubmit()
-            .then(result -> {
-                assertThat(result.response().getErrors()).isNullOrEmpty();
-                assertThat(result.response().getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
-
-                CaseData updatedData = result.caseData();
-                assertThat(updatedData.getApplicant1ResponseDate()).isNotNull();
-                assertThat(updatedData.getPreviousCCDState()).isEqualTo(caseData.getCcdState());
-                assertThat(updatedData.getNextDeadline()).isNull();
-                assertThat(updatedData.getBusinessProcess())
-                    .extracting("status", "camundaEvent")
-                    .containsExactly(READY, CLAIMANT_RESPONSE_SPEC.name());
-            });
-    }
-
-    @Test
-    void shouldSubmitSpecifiedFullAdmitClaimantResponseAndIssueFinalOrder() throws Exception {
+    void shouldSubmitSpecifiedFullAdmitClaimantResponse() throws Exception {
         CaseData caseData = specifiedFullAdmitClaimantAcceptsResponse();
 
         startWorkflow(caseData)
@@ -129,7 +97,7 @@ class ClaimantResponseWorkflowTest extends WorkflowIntegrationTest {
             .aboutToSubmit()
             .then(result -> {
                 assertThat(result.response().getErrors()).isNullOrEmpty();
-                assertThat(result.response().getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+                assertThat(result.response().getState()).isNull();
 
                 CaseData updatedData = result.caseData();
                 assertThat(updatedData.getApplicant1AcceptFullAdmitPaymentPlanSpec()).isEqualTo(YesOrNo.YES);
