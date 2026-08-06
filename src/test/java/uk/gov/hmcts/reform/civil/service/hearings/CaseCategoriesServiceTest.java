@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
@@ -90,6 +91,53 @@ class CaseCategoriesServiceTest {
         );
 
         assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldReturnNull_whenCategorySearchResultDoesNotContainMatchingCategoryKey() {
+        CategorySearchResult categorySearchResult = new CategorySearchResult();
+        categorySearchResult.setCategories(List.of(
+            new Category()
+                .setCategoryKey("caseType")
+                .setKey("AAA7-SMALL_CLAIM")
+        ));
+        when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any()))
+            .thenReturn(Optional.of(categorySearchResult));
+
+        caseData = caseData.toBuilder().allocatedTrack(FAST_CLAIM).build();
+
+        CaseCategoryModel actual = caseCategoriesService.getCaseCategoriesFor(
+            CategoryType.CASE_TYPE,
+            caseData,
+            AUTH
+        );
+
+        assertThat(actual).isNull();
+    }
+
+    @Test
+    void shouldThrowDescriptiveException_whenMultipleMatchingCategoryKeysFound() {
+        CategorySearchResult categorySearchResult = new CategorySearchResult();
+        categorySearchResult.setCategories(List.of(
+            new Category()
+                .setCategoryKey("caseType")
+                .setKey("AAA7-FAST_CLAIM"),
+            new Category()
+                .setCategoryKey("caseType")
+                .setKey("AAA7-FAST_CLAIM")
+        ));
+        when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any()))
+            .thenReturn(Optional.of(categorySearchResult));
+
+        caseData = caseData.toBuilder().allocatedTrack(FAST_CLAIM).build();
+
+        assertThatThrownBy(() -> caseCategoriesService.getCaseCategoriesFor(
+            CategoryType.CASE_TYPE,
+            caseData,
+            AUTH
+        ))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("Expected one category for categoryKey AAA7-FAST_CLAIM but found 2");
     }
 
     @Test
