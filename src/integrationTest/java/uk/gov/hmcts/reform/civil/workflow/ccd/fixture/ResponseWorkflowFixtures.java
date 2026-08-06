@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
+import java.time.LocalDateTime;
+
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
@@ -50,6 +52,7 @@ public final class ResponseWorkflowFixtures {
             .toBuilder()
             .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
             .respondent1ClaimResponseDocument(defendantResponseDocument())
+            .respondent2ResponseDeadline(LocalDateTime.now().plusDays(14))
             .build();
     }
 
