@@ -8,9 +8,15 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.workflow.WorkflowIntegrationTest;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -34,10 +40,27 @@ class DefendantResponseWorkflowTest extends WorkflowIntegrationTest {
     @MockBean
     private CoreCaseUserService coreCaseUserService;
 
+    @MockBean
+    private LocationReferenceDataService locationRefDataService;
+
+    @MockBean
+    private CourtLocationUtils courtLocationUtils;
+
     @BeforeEach
     void setUpDefendantResponseWorkflowTest() {
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("user-id").build());
         when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any())).thenReturn(true);
+
+        LocationRefData courtLocation = new LocationRefData()
+            .setEpimmsId("99999")
+            .setSiteName("Court 99999")
+            .setCourtAddress("1 Court Street")
+            .setPostcode("SW1A 1AA")
+            .setRegionId("4")
+            .setRegion("London");
+        when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString(), anyString()))
+            .thenReturn(List.of(courtLocation));
+        when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class))).thenReturn(courtLocation);
     }
 
     @Test

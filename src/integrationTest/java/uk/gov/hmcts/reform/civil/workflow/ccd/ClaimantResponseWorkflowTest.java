@@ -39,7 +39,7 @@ class ClaimantResponseWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(updatedData.getBusinessProcess())
                     .extracting("status", "camundaEvent")
                     .containsExactly(READY, CLAIMANT_RESPONSE.name());
-                assertThat(updatedData.getApplicant1DefenceResponseDocument()).isNull();
+                assertThat(updatedData.getApplicant1DefenceResponseDocument().getFile().getDocumentUrl()).isNull();
             });
     }
 
