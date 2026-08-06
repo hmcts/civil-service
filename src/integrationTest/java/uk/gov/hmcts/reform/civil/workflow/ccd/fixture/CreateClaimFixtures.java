@@ -123,6 +123,8 @@ public final class CreateClaimFixtures {
     public static CaseData twoLipClaimDraft() {
         return completeDraft(CaseDataBuilder.builder()
             .multiPartyClaimTwoDefendantLips()
+            .defendant1LIPAtClaimIssued(null)
+            .defendant2LIPAtClaimIssued(null)
             .respondent2(new PartyBuilder().individual().build())
             .build());
     }

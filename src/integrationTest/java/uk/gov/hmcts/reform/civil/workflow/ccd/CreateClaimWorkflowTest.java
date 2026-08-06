@@ -333,7 +333,12 @@ class CreateClaimWorkflowTest extends WorkflowIntegrationTest {
 
     @Test
     void shouldCreateTwoLipClaimAndRecordBothPartiesAtIssue() throws Exception {
-        startWorkflow(CreateClaimFixtures.twoLipClaimDraft())
+        CaseData claimDraft = CreateClaimFixtures.twoLipClaimDraft();
+        assertThat(claimDraft.getDefendant1LIPAtClaimIssued()).isNull();
+        assertThat(claimDraft.getDefendant2LIPAtClaimIssued()).isNull();
+        assertThat(claimDraft.getRespondent2().getPartyID()).isNull();
+
+        startWorkflow(claimDraft)
             .eventId(CaseEvent.CREATE_CLAIM)
             .aboutToSubmit()
             .then(result -> {
@@ -342,6 +347,7 @@ class CreateClaimWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(result.response().getErrors()).isNullOrEmpty();
                 assertThat(caseData.getDefendant1LIPAtClaimIssued()).isEqualTo(YES);
                 assertThat(caseData.getDefendant2LIPAtClaimIssued()).isEqualTo(YES);
+                assertThat(caseData.getRespondent2().getPartyID()).isNotBlank().hasSize(16);
                 assertThat(caseData.getRespondent1OrganisationIDCopy()).isNull();
                 assertThat(caseData.getRespondent2OrganisationIDCopy()).isNull();
                 assertState(caseData, CLAIM_SUBMITTED.fullName());
