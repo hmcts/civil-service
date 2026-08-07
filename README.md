@@ -473,6 +473,19 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 | `enabled` | Whether the scheduler is active. | `true` | `CRON_EXPRESSION_DEFENDANT_RESPONSE` |
 | `cronExpression` | When the scheduler runs. | `0 1 16 * * ?` (Daily at 4:01 PM) | `CRON_EXPRESSION_DEFENDANT_RESPONSE` |
 
+### HearingFeeScheduler
+
+The `HearingFeeScheduler` searches for cases where a hearing fee decision is due and triggers the appropriate CCD event to mark the fee as paid, unpaid, or not due.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.judgement-buffer`.
+
+| Setting | Description | Default                               | Environment Variable |
+|---------|-------------|---------------------------------------|----------------------|
+| `enabled` | Whether the scheduler is active. | `false`                               | `SCHEDULER_ENABLED_HEARING_FEE` |
+| `cronExpression` | When the scheduler runs. | `0 0 0 * * ?` (Every day at midnight) | `CRON_EXPRESSION_HEARING_FEE` |
+
 ### EvidenceUpload
 
 The `EvidenceUpload` scheduler finds cases with upcoming evidence upload deadlines and runs the evidence upload notification task for each eligible case.
