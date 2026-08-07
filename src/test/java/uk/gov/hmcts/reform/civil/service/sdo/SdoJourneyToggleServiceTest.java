@@ -32,7 +32,7 @@ class SdoJourneyToggleServiceTest {
     }
 
     @Test
-    void shouldApplyJourneyFlagsBasedOnToggles() {
+    void shouldApplyJourneyFlagsForCarmAndBilingualCase() {
         when(featureToggleService.isCarmEnabled(any(CaseData.class))).thenReturn(true);
         when(featureToggleService.isWelshJourneyEnabled(any(CaseData.class))).thenReturn(true);
 

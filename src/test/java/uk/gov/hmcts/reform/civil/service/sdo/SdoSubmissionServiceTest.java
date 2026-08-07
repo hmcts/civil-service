@@ -51,7 +51,7 @@ class SdoSubmissionServiceTest {
     }
 
     @Test
-    void shouldMoveDocumentToSystemGeneratedWhenEnglishJourney() {
+    void shouldMoveDocumentToSystemGeneratedWhenCaseIsNotBilingual() {
         CaseDocument document = new CaseDocument();
         document.setDocumentName("sdo.pdf");
         List<Element<CaseDocument>> generatedDocs = new ArrayList<>();
@@ -71,7 +71,7 @@ class SdoSubmissionServiceTest {
     }
 
     @Test
-    void shouldMoveDocumentToPreTranslationForWelshJourney() {
+    void shouldMoveDocumentToPreTranslationWhenCaseIsBilingual() {
         CaseDocument document = new CaseDocument();
         document.setDocumentName("sdo.pdf");
         List<Element<CaseDocument>> preTranslationDocs = new ArrayList<>();
