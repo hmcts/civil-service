@@ -91,8 +91,9 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         }
 
         caseData.getBreathing().getLift().setExpectedEnd(LocalDate.now());
-        if (caseData.getBreathing().getEnter().getType() == BreathingSpaceType.STANDARD)
+        if (caseData.getBreathing().getEnter().getType() == BreathingSpaceType.STANDARD) {
             caseData.getBreathing().getLift().setExpectedEnd(caseData.getBreathing().getEnter().getStart().plusDays(60));
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
