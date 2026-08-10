@@ -52,6 +52,9 @@ import static org.mockito.Mockito.when;
     properties = {
         "scheduler.full-admit-pay-immediately-no-payment-from-def.enabled=false",
         "scheduler.defendantResponse.enabled=false",
+        "scheduler.hearing-fee.enabled=false",
+        "scheduler.evidence-upload.enabled=false"
+        "scheduler.defendantResponse.enabled=false",
         "scheduler.bundle-creation.enabled=false",
         "scheduler.hearing-cvp-link.enabled=false",
         "scheduler.polling-event-emitter.enabled=false",
