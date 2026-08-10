@@ -44,6 +44,7 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(CallbackType.ABOUT_TO_START), this::checkCanEnter,
+            callbackKey(CallbackType.ABOUT_TO_START), this::prePopulateEndDate,
             callbackKey(CallbackType.MID, "enter-info"), this::checkEnterInfo,
             callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::updateBusinessProcessToReady,
             callbackKey(CallbackType.SUBMITTED), this::buildSubmittedText
@@ -67,17 +68,32 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         return responseBuilder.build();
     }
 
+    private CallbackResponse prePopulateEndDate(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
+            AboutToStartOrSubmitCallbackResponse.builder();
+
+        caseData.getBreathing().getLift().setExpectedEnd(LocalDate.now());
+        if (caseData.getBreathing().getEnter().getType() == BreathingSpaceType.STANDARD)
+            caseData.getBreathing().getLift().setExpectedEnd(caseData.getBreathing().getEnter().getStart().plusDays(60));
+        return responseBuilder.build();
+    }
+
     private CallbackResponse checkEnterInfo(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        int standardBSMaxDurationDays = 60;
 
         List<String> errors = new ArrayList<>();
         LocalDate startDate = caseData.getBreathing().getEnter().getStart();
 
-        int standardBSMaxDurationDays = 60;
-        if (caseData.getBreathing().getEnter().getType() == BreathingSpaceType.STANDARD
-            && caseData.getBreathing().getLift().getExpectedEnd().isAfter(startDate.plusDays(
+        if (caseData.getBreathing().getEnter().getType() == BreathingSpaceType.STANDARD) {
+            if (caseData.getBreathing().getLift().getExpectedEnd().isAfter(startDate.plusDays(
                 standardBSMaxDurationDays))) {
-            errors.add("Standard breathing space cannot last for longer than 60 days");
+                errors.add("Standard breathing space cannot last for longer than 60 days");
+            } else if (caseData.getBreathing().getLift().getExpectedEnd().isEqual(startDate)) {
+                errors.add("End date must be after " + DateFormatHelper
+                    .formatLocalDate(startDate, DateFormatHelper.DATE));
+            }
         }
 
         if (startDate != null
