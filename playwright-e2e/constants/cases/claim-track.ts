@@ -1,0 +1,8 @@
+enum ClaimTrack {
+  SMALL_CLAIM = 'SMALL_CLAIM',
+  FAST_CLAIM = 'FAST_CLAIM',
+  INTERMEDIATE_CLAIM = 'INTERMEDIATE_CLAIM',
+  MULTI_CLAIM = 'MULTI_CLAIM',
+}
+
+export default ClaimTrack;
