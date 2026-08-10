@@ -1,0 +1,33 @@
+export type WATask = {
+  id?: string;
+  name: string;
+  type: string;
+  assignee?: string;
+  task_title: string;
+  task_state?: string;
+  task_system?: string;
+  security_classification?: string;
+  created_date?: string;
+  due_date?: string;
+  location_name: string;
+  location: string;
+  location_id?: string;
+  execution_type: string;
+  jurisdiction: string;
+  region: string;
+  case_type_id: string;
+  case_category: string;
+  case_name?: string;
+  auto_assigned: boolean;
+  warnings?: boolean;
+  case_management_category?: string;
+  work_type_id: string;
+  work_type_label: string;
+  description: string;
+  role_category: string;
+  minor_priority?: number;
+  major_priority?: number;
+  priority_date?: string;
+};
+
+export default WATask;
