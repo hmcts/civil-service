@@ -44,7 +44,6 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(CallbackType.ABOUT_TO_START), this::checkCanEnter,
-            callbackKey(CallbackType.ABOUT_TO_START), this::prePopulateEndDate,
             callbackKey(CallbackType.MID, "enter-info"), this::checkEnterInfo,
             callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::updateBusinessProcessToReady,
             callbackKey(CallbackType.SUBMITTED), this::buildSubmittedText
@@ -65,17 +64,6 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             ));
         }
 
-        return responseBuilder.build();
-    }
-
-    private CallbackResponse prePopulateEndDate(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
-            AboutToStartOrSubmitCallbackResponse.builder();
-
-        caseData.getBreathing().getLift().setExpectedEnd(LocalDate.now());
-        if (caseData.getBreathing().getEnter().getType() == BreathingSpaceType.STANDARD)
-            caseData.getBreathing().getLift().setExpectedEnd(caseData.getBreathing().getEnter().getStart().plusDays(60));
         return responseBuilder.build();
     }
 
@@ -101,6 +89,10 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             errors.add("End date must be after " + DateFormatHelper
                 .formatLocalDate(startDate, DateFormatHelper.DATE));
         }
+
+        caseData.getBreathing().getLift().setExpectedEnd(LocalDate.now());
+        if (caseData.getBreathing().getEnter().getType() == BreathingSpaceType.STANDARD)
+            caseData.getBreathing().getLift().setExpectedEnd(caseData.getBreathing().getEnter().getStart().plusDays(60));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
