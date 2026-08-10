@@ -147,10 +147,33 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
         }
 
         @Test
-        public void whenEndDateIsSameDateAsStartDate_thenReturnNoError() {
+        public void whenEndDateIsSameDateAsStartDateForStandardBS_thenReturnError() {
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
             BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
             breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceEnterInfo.setType(BreathingSpaceType.STANDARD);
+            breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
+            BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
+            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now());
+            breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setBreathing(breathingSpaceInfo);
+
+            CallbackParams params = new CallbackParams()
+                .caseData(caseData)
+                .type(CallbackType.MID)
+                .pageId("enter-info");
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
+            Assertions.assertFalse(response.getErrors().isEmpty());
+        }
+
+        @Test
+        public void whenEndDateIsSameDateAsStartDateForMentalHealthBS_thenReturnNoError() {
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
+            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceEnterInfo.setType(BreathingSpaceType.MENTAL_HEALTH);
             breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
             BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
             breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now());
