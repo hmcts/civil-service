@@ -12,10 +12,11 @@ import java.util.List;
 public interface LocationReferenceDataApiClient {
 
     @GetMapping(value = "/refdata/location/court-venues")
-    List<LocationRefData> getAllCivilCourtVenues(
+    List<LocationRefData> getAllCivilCourtVenuesByServiceId(
         @RequestHeader("ServiceAuthorization") String serviceAuthorisation,
         @RequestHeader("Authorization") final String authorisation,
         @RequestParam("court_type_id") final String courtTypeId,
-        @RequestParam("location_type") final String locationType
+        @RequestParam("location_type") final String locationType,
+        @RequestParam("service_code") final String serviceId
     );
 }

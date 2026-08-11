@@ -82,9 +82,9 @@ class DirectionOrderGeneratorTest {
                 new LocationRefData().setEpimmsId("3").setExternalShortName("Manchester"));
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
 
-        when(generalAppLocationRefDataService.getCourtLocations(any())).thenReturn(locationRefData);
+        when(generalAppLocationRefDataService.getCourtLocations(any(), any())).thenReturn(locationRefData);
     }
 
     @Test

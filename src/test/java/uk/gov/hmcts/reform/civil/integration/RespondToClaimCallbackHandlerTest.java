@@ -23,8 +23,8 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.RespondToClaimCallbackHandler;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.AssembleDocumentsForDeadlineResponse;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.PopulateRespondentCopyObjects;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.UpdateDataRespondentDeadlineResponse;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.SetApplicantResponseDeadline;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.UpdateDataRespondentDeadlineResponse;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.ValidateRespondentExperts;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.ValidateRespondentWitnesses;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.ValidateUnavailableDates;
@@ -358,7 +358,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocationRefData locationRefData = new LocationRefData();
                 locationRefData.setCourtLocationCode("123");
                 locationRefData.setSiteName("Site name");
-                when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString()))
+                when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString(), anyString()))
                     .thenReturn(Collections.singletonList(locationRefData));
                 when(courtLocationUtils.getLocationsFromList(any()))
                     .thenReturn(fromList(List.of("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124")));
@@ -2275,6 +2275,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
                 .respondent1Copy(new PartyBuilder().individual().build())
                 .respondent2Copy(new PartyBuilder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             //When
@@ -3031,6 +3032,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setRespondent2ClaimResponseType(FULL_DEFENCE);
             caseData.setRespondent2SameLegalRepresentative(YES);
             caseData.setCcdCaseReference(1234L);
+            caseData.setRespondent2(new PartyBuilder().individual().build());
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             //When
@@ -3074,6 +3076,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2ClaimResponseType(FULL_DEFENCE)
                 .respondent2SameLegalRepresentative(YES)
                 .ccdCaseReference(1234L)
+                .respondent2(new PartyBuilder().individual().build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -3238,6 +3241,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
                 .respondent2ClaimResponseType(FULL_DEFENCE)
                 .respondent2SameLegalRepresentative(YES)
+                .respondent2(new PartyBuilder().individual().build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);

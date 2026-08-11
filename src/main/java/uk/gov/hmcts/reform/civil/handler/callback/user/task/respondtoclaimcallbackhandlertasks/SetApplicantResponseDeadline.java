@@ -34,7 +34,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.PopulateRespondentTabDetails.updateDataForClaimDetailsTab;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
@@ -101,7 +100,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
             applicant1Deadline
         );
 
-        if (isRespondent2SameLegalRep(caseData)) {
+        if (caseData.respondent2HasSameLegalRep()) {
             updateDataRespondentDeadlineResponse
                 .updateBothRespondentsResponseSameLegalRep(
                     callbackParams,
@@ -272,11 +271,6 @@ public class SetApplicantResponseDeadline implements CaseTask {
     private boolean isAwaitingAnotherDefendantResponse(CaseData caseData) {
         return caseData.getRespondent1ClaimResponseType() == null
             || caseData.getRespondent2ClaimResponseType() == null;
-    }
-
-    private boolean isRespondent2SameLegalRep(CaseData caseData) {
-        return caseData.getRespondent2SameLegalRepresentative() != null
-            && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
 
     private boolean isSolicitorRepresentingOneOrBothRespondents(CallbackParams callbackParams, CaseRole caseRole) {
