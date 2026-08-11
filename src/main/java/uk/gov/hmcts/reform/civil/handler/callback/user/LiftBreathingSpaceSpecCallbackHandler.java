@@ -89,6 +89,7 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse checkEnterInfo(CallbackParams callbackParams) {
+        objectMapper.findAndRegisterModules();
         CaseData caseData = callbackParams.getCaseData();
         int standardBSMaxDurationDays = 60;
 
