@@ -8,6 +8,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import java.util.HashMap;
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.utils.MaskHelper.maskEmail;
+
 @Slf4j
 public abstract class EmailDTOGenerator implements NotificationData {
 
@@ -22,7 +24,7 @@ public abstract class EmailDTOGenerator implements NotificationData {
         String emailReference = String.format(getReferenceTemplate(),
                                          caseData.getLegacyCaseReference());
         log.info("buildEmailDTO for taskId: {} and email: {} and reference: {}",
-                 taskId, getEmailAddress(caseData), emailReference);
+                 taskId, maskEmail(getEmailAddress(caseData)), emailReference);
         EmailDTO emailDTO = new EmailDTO();
         emailDTO.setTargetEmail(getEmailAddress(caseData));
         emailDTO.setEmailTemplate(getEmailTemplateId(caseData, taskId));
@@ -47,7 +49,6 @@ public abstract class EmailDTOGenerator implements NotificationData {
 
     protected abstract String getEmailTemplateId(CaseData caseData);
 
-    //In some cases, the TaskId is required to determine the appropriate template.
     protected String getEmailTemplateId(CaseData caseData, String taskId) {
         return getEmailTemplateId(caseData);
     }

@@ -56,6 +56,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -119,7 +120,7 @@ class HearingNoticeHmcGeneratorTest {
             .thenReturn(CASE_DOCUMENT);
 
         when(locationRefDataService
-                 .getHearingCourtLocations(BEARER_TOKEN)).thenReturn(List.of(new LocationRefData()
+                 .getHearingCourtLocations(eq(BEARER_TOKEN), anyString())).thenReturn(List.of(new LocationRefData()
                                                                                              .setEpimmsId(EPIMS)
                                                                                              .setExternalShortName("VenueName")
                                                                                              .setWelshExternalShortName("WelshVenueValue")
@@ -756,7 +757,7 @@ class HearingNoticeHmcGeneratorTest {
 
     @Test
     void shouldReturnEnglishExternalShortName_whenWelshShortNameIsMissing() {
-        when(locationRefDataService.getHearingCourtLocations(BEARER_TOKEN)).thenReturn(List.of(new LocationRefData()
+        when(locationRefDataService.getHearingCourtLocations(eq(BEARER_TOKEN), anyString())).thenReturn(List.of(new LocationRefData()
                                                                                                    .setEpimmsId(EPIMS)
                                                                                                    .setExternalShortName("VenueName")
                                                                                                    .setWelshExternalShortName("")

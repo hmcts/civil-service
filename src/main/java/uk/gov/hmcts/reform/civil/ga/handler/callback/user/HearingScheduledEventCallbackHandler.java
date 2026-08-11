@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.utils.CaseServiceUtil;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -67,7 +68,8 @@ public class HearingScheduledEventCallbackHandler extends CallbackHandler implem
         GeneralApplicationCaseData caseDataBuilder = caseData.copy();
 
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        DynamicList dynamicLocationList = getLocationsFromList(locationRefDataService.getCourtLocations(authToken));
+        String serviceId = CaseServiceUtil.getCaseServiceId(caseData);
+        DynamicList dynamicLocationList = getLocationsFromList(locationRefDataService.getCourtLocations(authToken, serviceId));
         if (!caseData.getCcdState().equals(CaseState.ORDER_MADE)
             && Objects.nonNull(caseData.getJudicialListForHearing())
             && Objects.nonNull(caseData.getJudicialListForHearing().getHearingPreferredLocation())

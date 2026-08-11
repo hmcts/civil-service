@@ -2,9 +2,12 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
@@ -43,9 +46,6 @@ class RespondentTemplateForDQGeneratorTest {
 
     @Mock
     private LocationReferenceDataService locationRefDataService;
-
-    @Mock
-    private CaseData caseData;
 
     @Mock
     private DQ dq;
@@ -130,26 +130,28 @@ class RespondentTemplateForDQGeneratorTest {
 
         List<uk.gov.hmcts.reform.civil.model.docmosis.dq.Expert> experts = respondentTemplateForDQGenerator.getExpertsDetails(dq);
 
-        assertEquals("£0.00", experts.get(0).getFormattedCost());
+        assertEquals("£0.00", experts.getFirst().getFormattedCost());
     }
 
-    @Test
-    void shouldReturnRequestedCourtWithNoWhenRequestedCourtIsNull() {
+    @ParameterizedTest
+    @EnumSource(CaseCategory.class)
+    void shouldReturnRequestedCourtWithNoWhenRequestedCourtIsNull(CaseCategory caseCategory) {
         //Given
         Respondent1DQ respondent1DQ = new Respondent1DQ();
         respondent1DQ.setRespondent1DQRequestedCourt(null);
 
         //When
         uk.gov.hmcts.reform.civil.model.dq.RequestedCourt result =
-            respondentTemplateForDQGenerator.getRequestedCourt(respondent1DQ, BEARER_TOKEN);
+            respondentTemplateForDQGenerator.getRequestedCourt(respondent1DQ, BEARER_TOKEN, caseCategory);
 
         //Then
         assertNotNull(result);
         assertEquals(NO, result.getRequestHearingAtSpecificCourt());
     }
 
-    @Test
-    void shouldReturnRequestedCourtWithNoWhenCaseLocationIsNull() {
+    @ParameterizedTest
+    @EnumSource(CaseCategory.class)
+    void shouldReturnRequestedCourtWithNoWhenCaseLocationIsNull(CaseCategory caseCategory) {
         //Given
         uk.gov.hmcts.reform.civil.model.dq.RequestedCourt requestedCourt = new uk.gov.hmcts.reform.civil.model.dq.RequestedCourt();
         requestedCourt.setCaseLocation(null);
@@ -158,7 +160,7 @@ class RespondentTemplateForDQGeneratorTest {
 
         //When
         uk.gov.hmcts.reform.civil.model.dq.RequestedCourt result =
-            respondentTemplateForDQGenerator.getRequestedCourt(respondent1DQ, BEARER_TOKEN);
+            respondentTemplateForDQGenerator.getRequestedCourt(respondent1DQ, BEARER_TOKEN, caseCategory);
 
         //Then
         assertNotNull(result);

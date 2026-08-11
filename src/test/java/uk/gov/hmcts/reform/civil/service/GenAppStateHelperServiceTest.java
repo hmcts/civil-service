@@ -432,9 +432,9 @@ class GenAppStateHelperServiceTest {
 
         @Test
          void updateApplicationLocationDetailsLists() {
-            when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any()))
+            when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any(), any()))
                 .thenReturn(getSampleCourLocationsRefObject());
-            when(locationService.getWorkAllocationLocationDetails(any(), any()))
+            when(locationService.getWorkAllocationLocationDetails(any(), any(), any()))
                 .thenReturn(getSampleCourLocationsRefObject1());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseDataWithDetails(CaseDataBuilder.builder().build(),

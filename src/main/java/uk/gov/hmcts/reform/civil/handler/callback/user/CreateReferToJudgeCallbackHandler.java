@@ -34,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 
 @Service
 @RequiredArgsConstructor
@@ -71,7 +72,8 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
                 .ifPresent(requestedCourt ->
                                locationHelper.getMatching(
                                        locationRefDataService.getCourtLocationsForDefaultJudgments(
-                                           callbackParams.getParams().get(BEARER_TOKEN).toString()),
+                                           callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                                           getCaseServiceId(caseData.getCaseAccessCategory())),
                                        requestedCourt)
                                    .ifPresent(matchingLocation ->
                                                   LocationHelper.updateWithLocation(caseData, matchingLocation)

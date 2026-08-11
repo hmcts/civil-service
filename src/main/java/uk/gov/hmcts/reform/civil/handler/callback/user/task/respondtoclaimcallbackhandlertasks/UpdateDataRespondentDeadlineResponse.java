@@ -27,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 
 @Component
 public class UpdateDataRespondentDeadlineResponse {
@@ -138,7 +139,7 @@ public class UpdateDataRespondentDeadlineResponse {
     }
 
     private void updateRespondent2Date(CaseData caseData, LocalDateTime responseDate) {
-        if (isRespondent2SameLegalRep(caseData)) {
+        if (caseData.respondent2HasSameLegalRep()) {
             if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
                 caseData.setRespondent2ClaimResponseType(caseData.getRespondent1ClaimResponseType());
             }
@@ -218,11 +219,6 @@ public class UpdateDataRespondentDeadlineResponse {
 
     }
 
-    private boolean isRespondent2SameLegalRep(CaseData caseData) {
-        return caseData.getRespondent2SameLegalRepresentative() != null
-            && caseData.getRespondent2SameLegalRepresentative() == YES;
-    }
-
     private boolean isRespondent2NotPresent(CaseData caseData) {
         return caseData.getAddRespondent2() != null
             && caseData.getAddRespondent2() == NO;
@@ -287,6 +283,9 @@ public class UpdateDataRespondentDeadlineResponse {
 
     private List<LocationRefData> getLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(
+            authToken,
+            getCaseServiceId(callbackParams.getCaseData().getCaseAccessCategory())
+        );
     }
 }
