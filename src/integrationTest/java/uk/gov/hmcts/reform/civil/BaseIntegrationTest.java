@@ -50,7 +50,9 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class},
     properties = {
         "scheduler.full-admit-pay-immediately-no-payment-from-def.enabled=false",
-        "scheduler.defendantResponse.enabled=false"
+        "scheduler.defendantResponse.enabled=false",
+        "scheduler.hearing-fee.enabled=false",
+        "scheduler.evidence-upload.enabled=false"
     })
 @AutoConfigureMockMvc
 @SuppressWarnings({"java:S112", "java:S6813", "java:S1874"})

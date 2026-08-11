@@ -210,7 +210,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
                 .map(Party::getPartyName)
                 .orElse("")
                 + Optional.ofNullable(caseData.getRespondent2())
-                .filter(p -> isRespondent2Present(caseData) && isRespondent2SameLegalRep(caseData))
+                .filter(p -> isRespondent2Present(caseData) && caseData.respondent2HasSameLegalRep())
                 .map(p -> AND + p.getPartyName())
                 .orElse("");
             reason = caseData.getReasonForReconsiderationRespondent1();
@@ -305,11 +305,6 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
     private boolean isRespondent2Present(CaseData caseData) {
         return caseData.getAddRespondent2() != null
                 && caseData.getAddRespondent2() == YES;
-    }
-
-    private boolean isRespondent2SameLegalRep(CaseData caseData) {
-        return caseData.getRespondent2SameLegalRepresentative() != null
-                && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
 
     private String formatPartyName(String prefix, Party party1, Party party2) {
