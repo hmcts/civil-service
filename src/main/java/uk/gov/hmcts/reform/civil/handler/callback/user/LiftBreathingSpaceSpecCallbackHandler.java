@@ -89,13 +89,16 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             errors.add("End date must be after " + DateFormatHelper
                 .formatLocalDate(startDate, DateFormatHelper.DATE));
         }
+        assert startDate != null;
+        caseData.getBreathing().getLift().setExpectedEnd(startDate.plusDays(60));
 
         caseData.getBreathing().getLift().setExpectedEnd(LocalDate.now());
         if (caseData.getBreathing().getEnter().getType() == BreathingSpaceType.STANDARD) {
-            caseData.getBreathing().getLift().setExpectedEnd(caseData.getBreathing().getEnter().getStart().plusDays(60));
+            caseData.getBreathing().getLift().setExpectedEnd(startDate.plusDays(60));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }
