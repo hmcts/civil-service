@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -71,12 +70,8 @@ class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerT
 
     @Nested
     class AboutToSubmitCallback {
-        @BeforeEach
-        void setup() {
-        }
-
         @Test
-        void shouldRecordScenarioQmLrIsOnAndIsNonEaCourt_whenInvoked() {
+        void shouldRecordScenarioWithoutInactivatingGaTasks_whenInvoked() {
             CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
             caseLocationCivil.setBaseLocation("test");
             caseLocationCivil.setRegion("test");
@@ -100,48 +95,6 @@ class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerT
             ).build();
 
             handler.handle(params);
-            verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
-                caseData.getCcdCaseReference().toString(),
-                "CLAIMANT");
-            verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
-                caseData.getCcdCaseReference().toString(),
-                "CLAIMANT",
-                "Application.View");
-
-            verify(dashboardScenariosService).recordScenarios(
-                "BEARER_TOKEN",
-                "Scenario.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant",
-                caseData.getCcdCaseReference().toString(),
-                new ScenarioRequestParams(scenarioParams)
-            );
-        }
-
-        @Test
-        void shouldRecordScenarioQmLrIsOnAndisEaCourt_whenInvoked() {
-            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
-            caseLocationCivil.setBaseLocation("test");
-            caseLocationCivil.setRegion("test");
-            CaseDataLiP caseDataLiP = new CaseDataLiP();
-            caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
-            caseDataLiP.setApplicant1ClaimSettledDate(LocalDate.now());
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimSubmittedSmallClaim()
-                .applicant1Represented(YesOrNo.NO)
-                .caseManagementLocation(caseLocationCivil)
-                .caseDataLip(caseDataLiP).build();
-
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-            scenarioParams.put("applicant1ClaimSettledDateEn", caseData.getApplicant1ClaimSettleDate());
-            scenarioParams.put("applicant1ClaimSettledDateCy", caseData.getApplicant1ClaimSettleDate());
-
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(true);
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_CLAIMANT1.name()).build()
-            ).build();
-
-            handler.handle(params);
             verify(dashboardNotificationService, never()).deleteByReferenceAndCitizenRole(
                 caseData.getCcdCaseReference().toString(),
                 "CLAIMANT");
@@ -149,52 +102,6 @@ class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerT
                 caseData.getCcdCaseReference().toString(),
                 "CLAIMANT",
                 "Application.View");
-
-            verify(dashboardScenariosService).recordScenarios(
-                "BEARER_TOKEN",
-                "Scenario.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant",
-                caseData.getCcdCaseReference().toString(),
-                new ScenarioRequestParams(scenarioParams)
-            );
-        }
-
-        @Test
-        void shouldRecordScenarioQmLrIsOnAndIsNonEaCourt_whenInvokedForNro() {
-            CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
-            caseLocationCivil.setBaseLocation("test");
-            caseLocationCivil.setRegion("test");
-            CaseDataLiP caseDataLiP = new CaseDataLiP();
-            caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
-            caseDataLiP.setApplicant1ClaimSettledDate(LocalDate.now());
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimSubmittedSmallClaim()
-                .applicant1Represented(YesOrNo.NO)
-                .caseManagementLocation(caseLocationCivil)
-                .caseDataLip(caseDataLiP).build();
-
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-            scenarioParams.put("applicant1ClaimSettledDateEn", caseData.getApplicant1ClaimSettleDate());
-            scenarioParams.put("applicant1ClaimSettledDateCy", caseData.getApplicant1ClaimSettleDate());
-
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
-            when(featureToggleService.isCuiGaNroEnabled()).thenReturn(true);
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_CLAIMANT1.name())
-                    .build()
-            ).build();
-
-            handler.handle(params);
-            verify(dashboardNotificationService, never()).deleteByReferenceAndCitizenRole(
-                caseData.getCcdCaseReference().toString(),
-                "CLAIMANT"
-            );
-            verify(taskListService, never()).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
-                caseData.getCcdCaseReference().toString(),
-                "CLAIMANT",
-                "Application.View"
-            );
 
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
