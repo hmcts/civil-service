@@ -38,6 +38,8 @@ public final class ResponseWorkflowFixtures {
             .respondent1DQ()
             .build()
             .toBuilder()
+            .addRespondent2(YesOrNo.NO)
+            .respondent1ResponseDeadline(LocalDateTime.now().plusDays(14))
             .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
             .respondent1ClaimResponseDocument(defendantResponseDocument())
             .build();
@@ -50,6 +52,8 @@ public final class ResponseWorkflowFixtures {
             .respondent1DQ()
             .build()
             .toBuilder()
+            .addRespondent2(YesOrNo.NO)
+            .respondent1ResponseDeadline(LocalDateTime.now().plusDays(14))
             .respondent1ClaimResponseType(RespondentResponseType.FULL_ADMISSION)
             .build();
     }
@@ -89,6 +93,8 @@ public final class ResponseWorkflowFixtures {
             .respondent1DQ()
             .build()
             .toBuilder()
+            .addRespondent2(YesOrNo.NO)
+            .respondent1ResponseDeadline(LocalDateTime.now().plusDays(14))
             .caseAccessCategory(SPEC_CLAIM)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .build();
@@ -101,6 +107,8 @@ public final class ResponseWorkflowFixtures {
             .respondent1DQ()
             .build()
             .toBuilder()
+            .addRespondent2(YesOrNo.NO)
+            .respondent1ResponseDeadline(LocalDateTime.now().plusDays(14))
             .caseAccessCategory(SPEC_CLAIM)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .build();
@@ -187,6 +195,8 @@ public final class ResponseWorkflowFixtures {
             .build()
             .toBuilder()
             .caseAccessCategory(SPEC_CLAIM)
+            .respondent1ResponseDeadline(LocalDateTime.now().plusDays(14))
+            .respondent2ResponseDeadline(LocalDateTime.now().plusDays(14))
             .respondent1ClaimResponseTypeForSpec(responseType)
             .respondent2ClaimResponseTypeForSpec(responseType)
             .build();

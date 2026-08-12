@@ -55,8 +55,11 @@ class DefendantResponseWorkflowTest extends WorkflowIntegrationTest {
     @BeforeEach
     void setUpDefendantResponseWorkflowTest() {
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("user-id").build());
+        LocalDateTime applicantResponseDeadline = LocalDateTime.now().plusDays(14);
         when(deadlinesCalculator.calculateApplicantResponseDeadline(any(LocalDateTime.class)))
-            .thenReturn(LocalDateTime.now().plusDays(14));
+            .thenReturn(applicantResponseDeadline);
+        when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(LocalDateTime.class)))
+            .thenReturn(applicantResponseDeadline);
         when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORONE)))
             .thenReturn(true);
         when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
