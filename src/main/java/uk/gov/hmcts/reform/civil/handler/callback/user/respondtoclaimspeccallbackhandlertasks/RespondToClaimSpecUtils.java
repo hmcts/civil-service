@@ -91,12 +91,6 @@ public class RespondToClaimSpecUtils {
         log.info("CaseId {}: Respondent documents addition complete", caseData.getCcdCaseReference());
     }
 
-    public boolean isRespondent2HasSameLegalRep(CaseData caseData) {
-        log.info("Checking if Respondent 2 has the same legal representative for caseId: {}", caseData.getCcdCaseReference());
-        return caseData.getRespondent2SameLegalRepresentative() != null
-                && caseData.getRespondent2SameLegalRepresentative() == YES;
-    }
-
     public List<LocationRefData> getLocationData(CallbackParams callbackParams) {
         log.info("Retrieving court locations for default judgments for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();

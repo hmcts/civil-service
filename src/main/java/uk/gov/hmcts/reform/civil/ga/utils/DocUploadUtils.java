@@ -12,8 +12,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -21,6 +19,7 @@ import java.util.UUID;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.nowInLocalZone;
 
 public class DocUploadUtils {
 
@@ -56,7 +55,7 @@ public class DocUploadUtils {
                     .setDocumentLink(documentLink)
                     .setDocumentName(uploadDocumentByTypeElement.getValue().getDocumentType())
                     .setCreatedBy(role)
-                    .setCreatedDatetime(LocalDateTime.now(ZoneId.of("Europe/London")));
+                    .setCreatedDatetime(nowInLocalZone());
                 return ElementUtils.element(caseDocument);
             })
             .toList();
@@ -79,17 +78,17 @@ public class DocUploadUtils {
         if (role.equals(DocUploadUtils.APPLICANT)) {
             caseDataBuilder.gaAddlDocClaimant(addDocuments(tobeAdded, caseData.getGaAddlDocClaimant()));
             if (updateScheduler) {
-                caseDataBuilder.caseDocumentUploadDate(LocalDateTime.now());
+                caseDataBuilder.caseDocumentUploadDate(nowInLocalZone());
             }
         } else if (role.equals(DocUploadUtils.RESPONDENT_ONE)) {
             caseDataBuilder.gaAddlDocRespondentSol(addDocuments(tobeAdded, caseData.getGaAddlDocRespondentSol()));
             if (updateScheduler) {
-                caseDataBuilder.caseDocumentUploadDateRes(LocalDateTime.now());
+                caseDataBuilder.caseDocumentUploadDateRes(nowInLocalZone());
             }
         } else {
             caseDataBuilder.gaAddlDocRespondentSolTwo(addDocuments(tobeAdded, caseData.getGaAddlDocRespondentSolTwo()));
             if (updateScheduler) {
-                caseDataBuilder.caseDocumentUploadDateRes(LocalDateTime.now());
+                caseDataBuilder.caseDocumentUploadDateRes(nowInLocalZone());
             }
         }
         caseDataBuilder.gaAddlDoc(addDocuments(tobeAdded, caseData.getGaAddlDoc()));
@@ -185,7 +184,7 @@ public class DocUploadUtils {
                     .setDocumentName(documentName)
                     .setDocumentType(documentType)
                     .setCreatedBy(role)
-                    .setCreatedDatetime(LocalDateTime.now(ZoneId.of("Europe/London")));
+                    .setCreatedDatetime(nowInLocalZone());
                 return ElementUtils.element(caseDocument);
             })
             .toList();
