@@ -13,9 +13,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import java.time.LocalDateTime;
 
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 
@@ -30,16 +28,24 @@ public final class ResponseWorkflowFixtures {
 
     public static CaseData unspecifiedFullDefenceResponse() {
         return CaseDataBuilder.builder()
-            .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+            .atStateNotificationAcknowledged()
             .respondent1Copy(new PartyBuilder().individual().build())
+            .respondent1DQ()
+            .build()
+            .toBuilder()
+            .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+            .respondent1ClaimResponseDocument(defendantResponseDocument())
             .build();
     }
 
     public static CaseData unspecifiedFullAdmitResponse() {
         return CaseDataBuilder.builder()
-            .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
+            .atStateNotificationAcknowledged()
             .respondent1Copy(new PartyBuilder().individual().build())
             .respondent1DQ()
+            .build()
+            .toBuilder()
+            .respondent1ClaimResponseType(RespondentResponseType.FULL_ADMISSION)
             .build();
     }
 
@@ -73,17 +79,25 @@ public final class ResponseWorkflowFixtures {
 
     public static CaseData specifiedPartAdmitResponse() {
         return CaseDataBuilder.builder()
-            .atStateRespondentPartAdmissionSpec()
+            .atStateNotificationAcknowledged()
             .respondent1Copy(new PartyBuilder().individual().build())
             .respondent1DQ()
+            .build()
+            .toBuilder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .build();
     }
 
     public static CaseData specifiedFullAdmitResponse() {
         return CaseDataBuilder.builder()
-            .atStateRespondentFullAdmissionSpec()
+            .atStateNotificationAcknowledged()
             .respondent1Copy(new PartyBuilder().individual().build())
             .respondent1DQ()
+            .build()
+            .toBuilder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .build();
     }
 
@@ -111,19 +125,6 @@ public final class ResponseWorkflowFixtures {
         return withTransferredLocation(CaseDataBuilder.builder()
                                            .atStateApplicant2RespondToDefenceAndProceed_2v1()
                                            .build());
-    }
-
-    public static CaseData specifiedMintiLipClaimantResponse() {
-        return CaseDataBuilder.builder()
-            .atStateApplicantProceedAllMediation(ONE_V_ONE)
-            .setMultiTrackClaim()
-            .build()
-            .toBuilder()
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.YES)
-            .responseClaimTrack(MULTI_CLAIM.name())
-            .caseManagementLocation(TRANSFERRED_LOCATION)
-            .build();
     }
 
     public static CaseData specifiedFullAdmitClaimantAcceptsResponse() {

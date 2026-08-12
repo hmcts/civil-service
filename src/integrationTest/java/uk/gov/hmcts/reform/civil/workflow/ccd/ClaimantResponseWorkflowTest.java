@@ -21,7 +21,7 @@ import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ResponseWorkflowFix
 class ClaimantResponseWorkflowTest extends WorkflowIntegrationTest {
 
     @Test
-    void shouldSubmitUnspecifiedFullDefenceProceedAndMoveToProceedsInHeritageSystem() throws Exception {
+    void shouldSubmitUnspecifiedFullDefenceProceedAndMoveToJudicialReferral() throws Exception {
         CaseData caseData = unspecifiedClaimantProceedsResponse();
 
         startWorkflow(caseData)
