@@ -4,18 +4,23 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec.ONCE_ONE_MONTH;
 
 public final class ResponseWorkflowFixtures {
 
@@ -133,6 +138,8 @@ public final class ResponseWorkflowFixtures {
                                            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
                                            .defenceAdmitPartPaymentTimeRouteRequired(
                                                RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+                                           .respondent1RepaymentPlan(repaymentPlan())
+                                           .ccjPaymentDetails(ccjPaymentDetails())
                                            .respondent1DQ()
                                            .build());
     }
@@ -189,5 +196,23 @@ public final class ResponseWorkflowFixtures {
         return new ResponseDocument(DocumentBuilder.builder()
                                         .setDocumentName("defendant-response.pdf")
                                         .build());
+    }
+
+    private static RepaymentPlanLRspec repaymentPlan() {
+        return new RepaymentPlanLRspec()
+            .setPaymentAmount(BigDecimal.valueOf(9000))
+            .setRepaymentFrequency(ONCE_ONE_MONTH)
+            .setFirstRepaymentDate(LocalDate.now().plusDays(14));
+    }
+
+    private static CCJPaymentDetails ccjPaymentDetails() {
+        return new CCJPaymentDetails()
+            .setCcjPaymentPaidSomeOption(YesOrNo.YES)
+            .setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(500))
+            .setCcjJudgmentLipInterest(BigDecimal.valueOf(300))
+            .setCcjJudgmentAmountClaimFee(BigDecimal.ZERO)
+            .setCcjJudgmentAmountClaimAmount(BigDecimal.valueOf(500))
+            .setCcjJudgmentFixedCostAmount(BigDecimal.valueOf(50))
+            .setCcjJudgmentTotalStillOwed(BigDecimal.valueOf(500));
     }
 }

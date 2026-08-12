@@ -1,14 +1,23 @@
 package uk.gov.hmcts.reform.civil.workflow.ccd;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.test.web.servlet.MvcResult;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.workflow.WorkflowIntegrationTest;
+import uk.gov.hmcts.reform.civil.workflow.helper.WorkflowBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ResponseWorkflowFixtures.specified1v2SameSolicitorFullAdmitClaimantResponse;
 import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ResponseWorkflowFixtures.specified1v2SameSolicitorPartAdmitClaimantResponse;
@@ -19,6 +28,8 @@ import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ResponseWorkflowFix
 
 @SuppressWarnings("java:S5960")
 class ClaimantResponseWorkflowTest extends WorkflowIntegrationTest {
+
+    private static final String CALLBACK_VERSION_URL = "/cases/callbacks/version/{version}/{callback-type}";
 
     @Test
     void shouldSubmitUnspecifiedFullDefenceProceedAndMoveToJudicialReferral() throws Exception {
@@ -88,25 +99,23 @@ class ClaimantResponseWorkflowTest extends WorkflowIntegrationTest {
     }
 
     @Test
-    void shouldSubmitSpecifiedFullAdmitClaimantResponse() throws Exception {
+    void shouldSubmitSpecifiedFullAdmitClaimantResponseAndIssueFinalOrder() throws Exception {
         CaseData caseData = specifiedFullAdmitClaimantAcceptsResponse();
 
-        startWorkflow(caseData)
-            .caseDataBefore(caseData)
-            .eventId(CLAIMANT_RESPONSE_SPEC)
-            .aboutToSubmit()
-            .then(result -> {
-                assertThat(result.response().getErrors()).isNullOrEmpty();
-                assertThat(result.response().getState()).isNull();
+        WorkflowBuilder.CallbackResult<CaseData> result = invokeClaimantResponseSpecV2AboutToSubmit(caseData);
 
-                CaseData updatedData = result.caseData();
-                assertThat(updatedData.getApplicant1AcceptFullAdmitPaymentPlanSpec()).isEqualTo(YesOrNo.YES);
-                assertThat(updatedData.getApplicant1ResponseDate()).isNotNull();
-                assertThat(updatedData.getNextDeadline()).isNull();
-                assertThat(updatedData.getBusinessProcess())
-                    .extracting("status", "camundaEvent")
-                    .containsExactly(READY, CLAIMANT_RESPONSE_SPEC.name());
-            });
+        assertThat(result.response().getErrors()).isNullOrEmpty();
+        assertThat(result.response().getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+
+        CaseData updatedData = result.caseData();
+        assertThat(updatedData.getCcdState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED);
+        assertThat(updatedData.getApplicant1AcceptFullAdmitPaymentPlanSpec()).isEqualTo(YesOrNo.YES);
+        assertThat(updatedData.getApplicant1ResponseDate()).isNotNull();
+        assertThat(updatedData.getActiveJudgment()).isNotNull();
+        assertThat(updatedData.getNextDeadline()).isNull();
+        assertThat(updatedData.getBusinessProcess())
+            .extracting("status", "camundaEvent")
+            .containsExactly(READY, JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC.name());
     }
 
     @Test
@@ -155,5 +164,41 @@ class ClaimantResponseWorkflowTest extends WorkflowIntegrationTest {
                     .extracting("status", "camundaEvent")
                     .containsExactly(READY, CLAIMANT_RESPONSE_SPEC.name());
             });
+    }
+
+    private WorkflowBuilder.CallbackResult<CaseData> invokeClaimantResponseSpecV2AboutToSubmit(CaseData caseData)
+        throws Exception {
+        CallbackRequest callbackRequest = CallbackRequest.builder()
+            .eventId(CLAIMANT_RESPONSE_SPEC.name())
+            .caseDetails(toCaseDetails(caseData, CASE_TYPE, CaseData::getCcdCaseReference, this::state))
+            .caseDetailsBefore(toCaseDetails(caseData, CASE_TYPE, CaseData::getCcdCaseReference, this::state))
+            .build();
+
+        MvcResult result = doPost(
+            BEARER_TOKEN,
+            callbackRequest,
+            CALLBACK_VERSION_URL,
+            V_2,
+            CallbackType.ABOUT_TO_SUBMIT.getValue()
+        )
+            .andExpect(status().isOk())
+            .andReturn();
+
+        String body = result.getResponse().getContentAsString();
+        AboutToStartOrSubmitCallbackResponse callbackResponse = objectMapper.readValue(
+            body,
+            AboutToStartOrSubmitCallbackResponse.class
+        );
+
+        return new WorkflowBuilder.CallbackResult<>(
+            callbackResponse,
+            null,
+            toCaseData(callbackResponse, caseData, CaseData.class, CaseData::getCcdCaseReference, this::state),
+            body
+        );
+    }
+
+    private String state(CaseData caseData) {
+        return caseData.getCcdState() != null ? caseData.getCcdState().name() : null;
     }
 }
