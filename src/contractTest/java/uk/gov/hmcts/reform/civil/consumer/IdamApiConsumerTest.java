@@ -24,7 +24,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-@PactTestFor(providerName = "idam-api")
+@PactTestFor(providerName = "Idam_api")
 @MockServerConfig(hostInterface = "localhost", port = "6678")
 @TestPropertySource(properties = {
     "idam.api.url=http://localhost:6678",
