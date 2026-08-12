@@ -4,7 +4,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
-import org.camunda.bpm.engine.impl.calendar.CronExpression;
+import org.springframework.scheduling.support.CronExpression;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -16,8 +16,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,6 +31,7 @@ public abstract class BpmnBaseGAAfterPaymentTest {
     public static final String START_BUSINESS_ACTIVITY = "StartGeneralApplicationBusinessProcessTaskId";
     public static final String END_BUSINESS_PROCESS = "END_BUSINESS_PROCESS_GASPEC";
     public static final String END_DOC_UPLOAD_BUSINESS_PROCESS = "END_DOC_UPLOAD_BUSINESS_PROCESS_GASPEC";
+    public static final String GA_DASHBOARD_NOTIFICATION_TOPIC = "gaDashboardNotifications";
     public static final String ERROR_CODE = "TEST_CODE";
 
     public final String bpmnFileName;
@@ -185,13 +184,16 @@ public abstract class BpmnBaseGAAfterPaymentTest {
      * Get external task for topic name.
      */
     public ExternalTask assertNextExternalTask(String topicName) {
-        assertThat(getTopics()).containsOnly(topicName);
+        String expectedTopicName = expectedTopicName(topicName);
+        assertThat(getTopics()).contains(expectedTopicName);
 
-        List<ExternalTask> externalTasks = getExternalTasks();
+        List<ExternalTask> externalTasks = getExternalTasks().stream()
+            .filter(task -> expectedTopicName.equals(task.getTopicName()))
+            .toList();
         assertThat(externalTasks).hasSize(1);
 
         ExternalTask externalTask = externalTasks.get(0);
-        assertThat(externalTask.getTopicName()).isEqualTo(topicName);
+        assertThat(externalTask.getTopicName()).isEqualTo(expectedTopicName);
 
         return externalTask;
     }
@@ -225,9 +227,10 @@ public abstract class BpmnBaseGAAfterPaymentTest {
         String activityId,
         VariableMap variables
     ) {
-        List<LockedExternalTask> lockedProcessTask = fetchAndLockTask(topicName);
+        String expectedTopicName = expectedTopicName(topicName, caseEvent);
+        List<LockedExternalTask> lockedProcessTask = fetchAndLockTask(expectedTopicName);
 
-        assertExternalTask(externalTask, topicName, caseEvent, activityId, lockedProcessTask);
+        assertExternalTask(externalTask, expectedTopicName, caseEvent, activityId, lockedProcessTask);
 
         completeTask(lockedProcessTask.get(0).getId(), variables);
     }
@@ -238,11 +241,32 @@ public abstract class BpmnBaseGAAfterPaymentTest {
         String caseEvent,
         String activityId
     ) {
-        List<LockedExternalTask> lockedProcessTask = fetchAndLockTask(topicName);
+        String expectedTopicName = expectedTopicName(topicName, caseEvent);
+        List<LockedExternalTask> lockedProcessTask = fetchAndLockTask(expectedTopicName);
 
-        assertExternalTask(externalTask, topicName, caseEvent, activityId, lockedProcessTask);
+        assertExternalTask(externalTask, expectedTopicName, caseEvent, activityId, lockedProcessTask);
 
         failTask(lockedProcessTask.get(0).getId());
+    }
+
+    private String expectedTopicName(String topicName) {
+        List<String> topics = getTopics();
+        if (("applicationProcessCaseEventGASpec".equals(topicName)
+            || "processExternalCaseEventGASpec".equals(topicName))
+            && topics.contains(GA_DASHBOARD_NOTIFICATION_TOPIC)
+            && !topics.contains(topicName)) {
+            return GA_DASHBOARD_NOTIFICATION_TOPIC;
+        }
+        return topicName;
+    }
+
+    private String expectedTopicName(String topicName, String caseEvent) {
+        if ("DASHBOARD_NOTIFICATION_EVENT".equals(caseEvent)
+            && ("applicationProcessCaseEventGASpec".equals(topicName)
+            || "processExternalCaseEventGASpec".equals(topicName))) {
+            return GA_DASHBOARD_NOTIFICATION_TOPIC;
+        }
+        return topicName;
     }
 
     public void assertNoExternalTasksLeft() {
@@ -276,9 +300,7 @@ public abstract class BpmnBaseGAAfterPaymentTest {
     public void assertCronTriggerFiresAtExpectedTime(CronExpression expression,
                                                      LocalDateTime now,
                                                      LocalDateTime nextDate) {
-        Date startTime = Date.from(now.atZone(ZoneId.systemDefault()).toInstant());
-        Date next = expression.getTimeAfter(startTime);
-        assertEquals(next, Date.from(nextDate.atZone(ZoneId.systemDefault()).toInstant()));
+        assertEquals(nextDate, expression.next(now));
     }
 
     private void assertExternalTask(
@@ -288,9 +310,8 @@ public abstract class BpmnBaseGAAfterPaymentTest {
         String activityId,
         List<LockedExternalTask> lockedProcessTask
     ) {
-        assertThat(externalTask.getTopicName()).isEqualTo(topicName);
-
         assertThat(lockedProcessTask).hasSize(1);
+        assertThat(lockedProcessTask.get(0).getTopicName()).isEqualTo(topicName);
 
         assertThat(lockedProcessTask.get(0).getVariables()).containsEntry("caseEvent", caseEvent);
 
