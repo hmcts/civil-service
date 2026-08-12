@@ -7,11 +7,13 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
 public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGenerator extends DefendantEmailDTOGenerator {
 
+    private static final String NOT_TO_PROCEED_REFERENCE_TEMPLATE = "claimant-confirms-not-to-proceed-respondent-notification-%s";
     private final NotificationsProperties notificationsProperties;
 
     protected ClaimantConfirmsNotToProceedLipDefendantEmailDTOGenerator(NotificationsProperties notificationsProperties) {
@@ -33,7 +35,7 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGenerator extends D
 
     @Override
     protected String getReferenceTemplate() {
-        return "claimant-confirms-not-to-proceed-respondent-notification-%s";
+        return NOT_TO_PROCEED_REFERENCE_TEMPLATE;
     }
 
     @Override
@@ -47,5 +49,10 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGenerator extends D
         }
 
         return properties;
+    }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return caseData.isRespondent1LiP() && ( NO.equals(caseData.getApplicant1ProceedWithClaim()) || caseData.isClaimantIntentionSettlePartAdmit()) ? Boolean.TRUE : Boolean.FALSE;
     }
 }

@@ -1,15 +1,19 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.claimantresponsecui.confirmproceed;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
+import uk.gov.hmcts.reform.civil.notification.handlers.TemplateCommonPropertiesHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -28,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.notification.handlers.claimantresponsecu
 class ClaimantConfirmProceedDefendantEmailDTOGeneratorTest {
 
     private static final String REFERENCE_TEMPLATE = "claimant-confirms-to-proceed-respondent-notification-%s";
+    private static final String NOT_PROCEED_REFERENCE_TEMPLATE = "claimant-confirms-not-to-proceed-respondent-notification-%s";
 
     @Mock
     private NotificationsProperties notificationsProperties;
