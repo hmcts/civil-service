@@ -9,11 +9,13 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.workflow.WorkflowIntegrationTest;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,9 +49,14 @@ class DefendantResponseWorkflowTest extends WorkflowIntegrationTest {
     @MockBean
     private CourtLocationUtils courtLocationUtils;
 
+    @MockBean
+    private DeadlinesCalculator deadlinesCalculator;
+
     @BeforeEach
     void setUpDefendantResponseWorkflowTest() {
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("user-id").build());
+        when(deadlinesCalculator.calculateApplicantResponseDeadline(any(LocalDateTime.class)))
+            .thenReturn(LocalDateTime.now().plusDays(14));
         when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORONE)))
             .thenReturn(true);
         when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
