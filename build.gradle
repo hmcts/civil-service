@@ -26,7 +26,8 @@ def versions = [
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
   lombok            : '1.18.38',
-  camunda           : '7.20.0',
+  camunda           : '7.24.0',
+  camundaRestClient : '2026.04.2',
   testcontainers    : '1.21.4',
   pdfbox            : '3.0.7',
   tika              : '3.3.1'
@@ -521,7 +522,8 @@ dependencies {
   implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
   implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv"
   implementation "org.camunda.bpm:camunda-external-task-client:${versions.camunda}"
-  implementation "org.camunda.community.rest:camunda-platform-7-rest-client-spring-boot-starter:${versions.camunda}"
+  implementation "io.holunda.c7:c7-rest-client-spring-boot-starter-provided:${versions.camundaRestClient}"
+  implementation "org.camunda.bpm:camunda-engine:${versions.camunda}"
   implementation "org.camunda.bpm:camunda-engine-rest-core:${versions.camunda}"
   implementation "org.apiguardian:apiguardian-api:1.1.2"
   implementation "jakarta.xml.bind:jakarta.xml.bind-api:4.0.5"
@@ -574,8 +576,6 @@ dependencies {
   testImplementation "org.testcontainers:postgresql:${versions.testcontainers}"
   testImplementation "org.testcontainers:junit-jupiter:${versions.testcontainers}"
   testImplementation "com.h2database:h2:2.4.240"
-  testImplementation "org.camunda.bpm:camunda-engine:${versions.camunda}"
-
   contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.17'
   contractTestImplementation 'au.com.dius.pact.provider:junit5:4.6.17'
   contractTestImplementation 'au.com.dius.pact.provider:junit5spring:4.6.17'
