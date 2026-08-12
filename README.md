@@ -152,6 +152,13 @@ be found in the Azure key store.
 | `LAUNCH_DARKLY_OFFLINE_MODE` | Sets LaunchDarkly to use local values for flags rather than connecting to the service | `true` |
 | `SPRING_PROFILES_ACTIVE` | Sets the active Spring profile | `local` |
 
+Civil Service uses LaunchDarkly Java server SDK 7.x contexts for feature-flag evaluation. The default context has the
+`user` kind and `civil-service` key, with `environment` and `timestamp` attributes; location-aware evaluations also
+include `location`. The SDK client is a singleton Spring bean and is closed during application shutdown. When the SDK
+is offline or LaunchDarkly is unavailable, each evaluation returns the default value supplied by the caller. Local
+development can use the flag files configured in `application-dev.yaml` with offline mode enabled. No proxy or custom
+network timeout overrides are configured, so the SDK defaults apply.
+
 
 #### Create a Docker image
 
