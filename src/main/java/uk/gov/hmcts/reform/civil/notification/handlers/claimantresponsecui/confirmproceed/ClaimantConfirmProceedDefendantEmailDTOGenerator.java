@@ -49,6 +49,9 @@ public class ClaimantConfirmProceedDefendantEmailDTOGenerator extends DefendantE
 
     @Override
     public Boolean getShouldNotify(CaseData caseData) {
-        return caseData.isRespondent1LiP() && !NO.equals(caseData.getApplicant1ProceedWithClaim()) && caseData.isClaimantIntentionNotSettlePartAdmit() ? Boolean.TRUE : Boolean.FALSE;
+        return caseData.isRespondent1LiP()
+            && (!NO.equals(caseData.getApplicant1ProceedWithClaim()) && caseData.isClaimantIntentionNotSettlePartAdmit())
+            ? Boolean.TRUE
+            : Boolean.FALSE;
     }
 }
