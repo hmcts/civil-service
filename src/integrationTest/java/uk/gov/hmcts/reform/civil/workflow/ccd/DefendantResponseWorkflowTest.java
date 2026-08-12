@@ -33,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ResponseWorkflowFix
 import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ResponseWorkflowFixtures.specified1v2SameSolicitorPartAdmitResponse;
 import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ResponseWorkflowFixtures.specifiedPartAdmitResponse;
 import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ResponseWorkflowFixtures.unspecified1v2DifferentSolicitorFirstFullDefenceResponse;
+import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ResponseWorkflowFixtures.unspecified1v2DifferentSolicitorSecondFullDefenceResponse;
 import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ResponseWorkflowFixtures.unspecified1v2SameSolicitorFullDefenceResponse;
 import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ResponseWorkflowFixtures.unspecifiedFullAdmitResponse;
 import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ResponseWorkflowFixtures.unspecifiedFullDefenceResponse;
@@ -117,6 +118,40 @@ class DefendantResponseWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(updatedData.getRespondent1ResponseDate()).isNotNull();
                 assertThat(updatedData.getApplicant1ResponseDeadline()).isNull();
                 assertThat(updatedData.getNextDeadline()).isNull();
+                assertThat(updatedData.getBusinessProcess())
+                    .extracting("status", "camundaEvent")
+                    .containsExactly(READY, DEFENDANT_RESPONSE.name());
+            });
+    }
+
+    @Test
+    void shouldSubmitUnspecified1v2DifferentSolicitorSecondResponseAndMoveToAwaitingApplicantIntention()
+        throws Exception {
+
+        when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORONE)))
+            .thenReturn(false);
+        when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(RESPONDENTSOLICITORTWO)))
+            .thenReturn(true);
+        CaseData caseData = unspecified1v2DifferentSolicitorSecondFullDefenceResponse();
+
+        startWorkflow(caseData)
+            .caseDataBefore(caseData)
+            .eventId(DEFENDANT_RESPONSE)
+            .aboutToSubmit()
+            .then(result -> {
+                assertThat(result.response().getErrors()).isNullOrEmpty();
+                assertThat(result.response().getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
+
+                CaseData updatedData = result.caseData();
+                assertThat(updatedData.getRespondent1ClaimResponseType()).isEqualTo(RespondentResponseType.FULL_DEFENCE);
+                assertThat(updatedData.getRespondent2ClaimResponseType()).isEqualTo(RespondentResponseType.FULL_DEFENCE);
+                assertThat(updatedData.getRespondent1ResponseDate()).isNotNull();
+                assertThat(updatedData.getRespondent2ResponseDate()).isNotNull();
+                assertThat(updatedData.getApplicant1ResponseDeadline()).isNotNull();
+                assertThat(updatedData.getNextDeadline()).isEqualTo(updatedData.getApplicant1ResponseDeadline().toLocalDate());
+                assertThat(updatedData.getRespondent2DocumentGeneration()).isEqualTo("userRespondent2");
+                assertThat(updatedData.getRespondent1ClaimResponseDocument()).isNull();
+                assertThat(updatedData.getRespondent2ClaimResponseDocument()).isNull();
                 assertThat(updatedData.getBusinessProcess())
                     .extracting("status", "camundaEvent")
                     .containsExactly(READY, DEFENDANT_RESPONSE.name());

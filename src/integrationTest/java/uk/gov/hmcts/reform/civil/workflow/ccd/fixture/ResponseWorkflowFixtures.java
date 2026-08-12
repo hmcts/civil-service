@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
@@ -67,6 +68,26 @@ public final class ResponseWorkflowFixtures {
             .toBuilder()
             .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
             .respondent1ClaimResponseDocument(defendantResponseDocument())
+            .respondent2ResponseDeadline(LocalDateTime.now().plusDays(14))
+            .build();
+    }
+
+    public static CaseData unspecified1v2DifferentSolicitorSecondFullDefenceResponse() {
+        return CaseDataBuilder.builder()
+            .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+            .respondent1Copy(new PartyBuilder().individual().build())
+            .respondent2Copy(new PartyBuilder().individual().build())
+            .respondent1DQ()
+            .respondent2DQ()
+            .uiStatementOfTruth(new StatementOfTruth().setName("Jane Smith").setRole("Solicitor"))
+            .build()
+            .toBuilder()
+            .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+            .respondent1ClaimResponseDocument(defendantResponseDocument())
+            .respondent1ResponseDate(LocalDateTime.now().minusDays(1))
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
+            .respondent2ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+            .respondent2ClaimResponseDocument(defendantResponseDocument())
             .respondent2ResponseDeadline(LocalDateTime.now().plusDays(14))
             .build();
     }
