@@ -150,8 +150,8 @@ class DefendantResponseWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(updatedData.getApplicant1ResponseDeadline()).isNotNull();
                 assertThat(updatedData.getNextDeadline()).isEqualTo(updatedData.getApplicant1ResponseDeadline().toLocalDate());
                 assertThat(updatedData.getRespondent2DocumentGeneration()).isEqualTo("userRespondent2");
-                assertThat(updatedData.getRespondent1ClaimResponseDocument()).isNull();
-                assertThat(updatedData.getRespondent2ClaimResponseDocument()).isNull();
+                assertThat(updatedData.getRespondent1ClaimResponseDocument().getFile().getDocumentUrl()).isNull();
+                assertThat(updatedData.getRespondent2ClaimResponseDocument().getFile().getDocumentUrl()).isNull();
                 assertThat(updatedData.getBusinessProcess())
                     .extracting("status", "camundaEvent")
                     .containsExactly(READY, DEFENDANT_RESPONSE.name());
