@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
@@ -118,6 +119,69 @@ class NoCHelperTest {
             .containsEntry(OTHER_SOL_NAME, "App Legal Org")
             .containsEntry(LEGAL_REP_NAME_WITH_SPACE, "New Org")
             .containsEntry(REFERENCE, "1234567890123456");
+    }
+
+    @Test
+    void getFormerSolicitorPartyReferences_shouldRestoreFormerDefendantSolicitorReference() {
+        CaseData caseData = baseCaseData.toBuilder()
+            .respondent2(null)
+            // reference has already been removed from the case by UpdateCaseDetailsAfterNoCHandler
+            .solicitorReferences(new SolicitorReferences()
+                                     .setApplicantSolicitor1Reference("claimant-ref"))
+            .changeOfRepresentation(new ChangeOfRepresentation()
+                                        .setCaseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                                        .setFormerRepresentationReference("defendant-ref"))
+            .build();
+
+        assertThat(noCHelper.getFormerSolicitorPartyReferences(caseData))
+            .isEqualTo("Claimant reference: claimant-ref - Defendant reference: defendant-ref");
+    }
+
+    @Test
+    void getFormerSolicitorPartyReferences_shouldRestoreFormerClaimantSolicitorReference() {
+        CaseData caseData = baseCaseData.toBuilder()
+            .respondent2(null)
+            .solicitorReferences(new SolicitorReferences()
+                                     .setRespondentSolicitor1Reference("defendant-ref"))
+            .changeOfRepresentation(new ChangeOfRepresentation()
+                                        .setCaseRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName())
+                                        .setFormerRepresentationReference("claimant-ref"))
+            .build();
+
+        assertThat(noCHelper.getFormerSolicitorPartyReferences(caseData))
+            .isEqualTo("Claimant reference: claimant-ref - Defendant reference: defendant-ref");
+    }
+
+    @Test
+    void getFormerSolicitorPartyReferences_shouldRestoreFormerDefendant2SolicitorReference() {
+        CaseData caseData = baseCaseData.toBuilder()
+            .respondent2SameLegalRepresentative(YesOrNo.NO)
+            .respondent2Represented(YesOrNo.YES)
+            .solicitorReferences(new SolicitorReferences()
+                                     .setApplicantSolicitor1Reference("claimant-ref")
+                                     .setRespondentSolicitor1Reference("defendant-1-ref"))
+            .changeOfRepresentation(new ChangeOfRepresentation()
+                                        .setCaseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+                                        .setFormerRepresentationReference("defendant-2-ref"))
+            .build();
+
+        assertThat(noCHelper.getFormerSolicitorPartyReferences(caseData))
+            .isEqualTo("Claimant reference: claimant-ref - Defendant 1 reference: defendant-1-ref"
+                           + " - Defendant 2 reference: defendant-2-ref");
+    }
+
+    @Test
+    void getFormerSolicitorPartyReferences_shouldFallBackToCaseReferencesWhenNoFormerReferenceProvided() {
+        CaseData caseData = baseCaseData.toBuilder()
+            .respondent2(null)
+            .solicitorReferences(new SolicitorReferences()
+                                     .setApplicantSolicitor1Reference("claimant-ref"))
+            .changeOfRepresentation(new ChangeOfRepresentation()
+                                        .setCaseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()))
+            .build();
+
+        assertThat(noCHelper.getFormerSolicitorPartyReferences(caseData))
+            .isEqualTo("Claimant reference: claimant-ref - Defendant reference: Not provided");
     }
 
     @Test

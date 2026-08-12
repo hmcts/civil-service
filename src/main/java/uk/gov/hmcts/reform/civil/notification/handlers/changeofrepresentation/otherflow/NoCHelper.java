@@ -5,13 +5,18 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.common.NotificationHelper;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CCD_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
@@ -32,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REFERENCE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 
 @Component
@@ -74,6 +80,47 @@ public class NoCHelper {
             HEARING_FEE, String.valueOf(caseData.getHearingFee().formData()),
             HEARING_DUE_DATE, formatLocalDate(caseData.getHearingDueDate(), DATE)
         );
+    }
+
+    /** Builds the party references for the email telling the former legal representative they have come off record.
+     * Their own reference is removed from the case by UpdateCaseDetailsAfterNoCHandler before the parties are
+     * notified, so it is restored here from the value captured when the NoC decision was applied. Where no
+     * reference was provided the references currently held on the case are used unchanged.
+     *
+     * @param caseData caseData
+     * @return the party references for the email subject
+     */
+    public String getFormerSolicitorPartyReferences(CaseData caseData) {
+        ChangeOfRepresentation changeOfRepresentation = caseData.getChangeOfRepresentation();
+        String formerReference = changeOfRepresentation != null
+            ? changeOfRepresentation.getFormerRepresentationReference() : null;
+
+        if (formerReference == null) {
+            return buildPartiesReferencesEmailSubject(caseData);
+        }
+
+        SolicitorReferences currentReferences = caseData.getSolicitorReferences();
+        SolicitorReferences restoredReferences = new SolicitorReferences();
+        restoredReferences.setApplicantSolicitor1Reference(
+            currentReferences != null ? currentReferences.getApplicantSolicitor1Reference() : null);
+        restoredReferences.setRespondentSolicitor1Reference(
+            currentReferences != null ? currentReferences.getRespondentSolicitor1Reference() : null);
+        restoredReferences.setRespondentSolicitor2Reference(
+            currentReferences != null ? currentReferences.getRespondentSolicitor2Reference() : null);
+
+        String respondentSolicitor2Reference = caseData.getRespondentSolicitor2Reference();
+        String caseRole = changeOfRepresentation.getCaseRole();
+
+        if (APPLICANTSOLICITORONE.getFormattedName().equals(caseRole)) {
+            restoredReferences.setApplicantSolicitor1Reference(formerReference);
+        } else if (RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)) {
+            restoredReferences.setRespondentSolicitor1Reference(formerReference);
+        } else if (RESPONDENTSOLICITORTWO.getFormattedName().equals(caseRole)) {
+            restoredReferences.setRespondentSolicitor2Reference(formerReference);
+            respondentSolicitor2Reference = formerReference;
+        }
+
+        return buildPartiesReferencesEmailSubject(caseData, restoredReferences, respondentSolicitor2Reference);
     }
 
     public String getOrganisationName(String orgId) {
