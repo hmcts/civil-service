@@ -49,7 +49,7 @@ class DefendantResponseWorkflowTest extends WorkflowIntegrationTest {
     @MockBean
     private CourtLocationUtils courtLocationUtils;
 
-    @MockBean
+    @MockBean(name = "deadlinesCalculator")
     private DeadlinesCalculator deadlinesCalculator;
 
     @BeforeEach
