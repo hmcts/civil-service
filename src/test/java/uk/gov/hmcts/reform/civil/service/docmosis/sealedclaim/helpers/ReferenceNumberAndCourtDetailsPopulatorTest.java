@@ -22,10 +22,12 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(SpringExtension.class)
 class ReferenceNumberAndCourtDetailsPopulatorTest {
@@ -175,5 +177,59 @@ class ReferenceNumberAndCourtDetailsPopulatorTest {
         referenceNumberPopulator.populateReferenceNumberDetails(form, caseData, "authorisation");
         assertEquals("12345", form.getReferenceNumber());
         assertNull(form.getHearingCourtLocation());
+    }
+
+    @Test
+    void testPopulateDetails_DoesNotLookupCourtWhenRequestedCourtMissing() {
+        Party applicant1 = new Party();
+        applicant1.setType(Party.Type.INDIVIDUAL);
+        applicant1.setPartyName("Applicant Name");
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        respondent1.setPartyName("Respondent One");
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1(applicant1)
+            .respondent1(respondent1)
+            .respondent1DQ(respondent1DQ)
+            .legacyCaseReference("12345")
+            .build();
+        caseData.setDetailsOfWhyDoesYouDisputeTheClaim("Dispute details");
+
+        SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
+        referenceNumberPopulator.populateReferenceNumberDetails(form, caseData, "authorisation");
+
+        assertEquals("12345", form.getReferenceNumber());
+        assertNull(form.getHearingCourtLocation());
+        verify(locationRefDataService, never()).getCourtLocationsByEpimmsId(any(), any(), any());
+    }
+
+    @Test
+    void testPopulateDetails_DoesNotLookupCourtWhenRequestedCourtCaseLocationMissing() {
+        Party applicant1 = new Party();
+        applicant1.setType(Party.Type.INDIVIDUAL);
+        applicant1.setPartyName("Applicant Name");
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        respondent1.setPartyName("Respondent One");
+        RequestedCourt requestedCourt = new RequestedCourt();
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQRequestedCourt(requestedCourt);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1(applicant1)
+            .respondent1(respondent1)
+            .respondent1DQ(respondent1DQ)
+            .legacyCaseReference("12345")
+            .build();
+        caseData.setDetailsOfWhyDoesYouDisputeTheClaim("Dispute details");
+
+        SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
+        referenceNumberPopulator.populateReferenceNumberDetails(form, caseData, "authorisation");
+
+        assertEquals("12345", form.getReferenceNumber());
+        assertNull(form.getHearingCourtLocation());
+        verify(locationRefDataService, never()).getCourtLocationsByEpimmsId(any(), any(), any());
     }
 }

@@ -447,6 +447,58 @@ Settings for this scheduler can be found in `src/main/resources/application.yaml
 | `enabled` | Whether the scheduler is active. | `false` | `SCHEDULER_ENABLED_JUDGEMENT_BUFFER` |
 | `cronExpression` | When the scheduler runs. | `0 0 2 * * *` (Daily at 2 AM) | `CRON_EXPRESSION_JUDGEMENT_BUFFER` |
 
+### FullAdmitPayImmediatelyNoPaymentFromDefendantScheduler
+
+The `FullAdmitPayImmediatelyNoPaymentFromDefendantScheduler` updates cases with Dashboard notification created successfully event.
+It runs daily at midnight when the Spring scheduler feature flag is enabled.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.full-admit-pay-immediately-no-payment-from-def`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF` |
+| `cronExpression` | When the scheduler runs. | `0 0 0 * * ?` (Daily at 00:00) | `CRON_EXPRESSION_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF` |
+### DefendantResponseDeadlineScheduler
+
+The `DefendantResponseDeadlineScheduler` is used to process cases where a defendant response deadline has been reached.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.defendantResponse`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|--------|----------------------|
+| `enabled` | Whether the scheduler is active. | `true` | `CRON_EXPRESSION_DEFENDANT_RESPONSE` |
+| `cronExpression` | When the scheduler runs. | `0 1 16 * * ?` (Daily at 4:01 PM) | `CRON_EXPRESSION_DEFENDANT_RESPONSE` |
+
+### HearingFeeScheduler
+
+The `HearingFeeScheduler` searches for cases where a hearing fee decision is due and triggers the appropriate CCD event to mark the fee as paid, unpaid, or not due.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.judgement-buffer`.
+
+| Setting | Description | Default                               | Environment Variable |
+|---------|-------------|---------------------------------------|----------------------|
+| `enabled` | Whether the scheduler is active. | `false`                               | `SCHEDULER_ENABLED_HEARING_FEE` |
+| `cronExpression` | When the scheduler runs. | `0 0 0 * * ?` (Every day at midnight) | `CRON_EXPRESSION_HEARING_FEE` |
+
+### EvidenceUpload
+
+The `EvidenceUpload` scheduler finds cases with upcoming evidence upload deadlines and runs the evidence upload notification task for each eligible case.
+
+#### Settings
+
+Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.judgement-buffer`.
+
+| Setting | Description | Default | Environment Variable |
+|---------|-------------|---------|----------------------|
+| `enabled` | Whether the scheduler is active. | `false` | `CRON_EXPRESSION_EVIDENCE_UPLOAD` |
+| `cronExpression` | When the scheduler runs. | `0 30 17 * * ?` (At 17:30:00 every day) | `SCHEDULER_ENABLED_EVIDENCE_UPLOAD` |
+
 #### Global Scheduler Settings
 
 | Setting | Description | Default | Environment Variable |
