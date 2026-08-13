@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.scheduler.takecaseoffline;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -14,7 +13,6 @@ import uk.gov.hmcts.reform.civil.service.search.TakeCaseOfflineSearchService;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty(prefix = "scheduler.take-case-offline", name = "enabled", havingValue = "true")
 public class TakeCaseOfflineScheduler implements CivilScheduler {
 
     public static final String SCHEDULER_NAME = "TakeCaseOffline";

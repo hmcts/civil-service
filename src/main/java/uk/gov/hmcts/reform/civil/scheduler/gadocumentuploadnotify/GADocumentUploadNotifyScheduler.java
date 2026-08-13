@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.scheduler.gadocumentuploadnotify;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -17,7 +16,6 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty(prefix = "scheduler.ga-document-upload-notify", name = "enabled", havingValue = "true")
 public class GADocumentUploadNotifyScheduler implements CivilScheduler {
 
     public static final String SCHEDULER_NAME = "GADocUploadNotifyScheduler";

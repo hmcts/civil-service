@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.scheduler.bundlecreation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -14,7 +13,6 @@ import uk.gov.hmcts.reform.civil.service.search.BundleCreationTriggerService;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty(prefix = "scheduler.bundle-creation", name = "enabled", havingValue = "true")
 public class BundleCreationScheduler implements CivilScheduler {
 
     private static final String SCHEDULER_NAME = "BundleCreation";

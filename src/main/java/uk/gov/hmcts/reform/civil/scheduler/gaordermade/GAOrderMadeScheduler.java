@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.scheduler.gaordermade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -25,7 +24,6 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STAY_TH
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty(prefix = "scheduler.ga-order-made", name = "enabled", havingValue = "true")
 public class GAOrderMadeScheduler implements CivilScheduler {
 
     public static final String SCHEDULER_NAME = "GAOrderMadeScheduler";
