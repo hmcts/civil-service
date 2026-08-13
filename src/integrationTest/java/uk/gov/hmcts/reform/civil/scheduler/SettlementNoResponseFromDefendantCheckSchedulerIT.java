@@ -37,7 +37,6 @@ import org.springframework.test.context.ActiveProfiles;
     },
     properties = {
         "test.id=SettlementNoResponseFromDefendantCheckSchedulerIT",
-        "scheduler.settlement-no-response-from-defendant-check.enabled=true",
         "scheduler.lockAtLeastFor=PT0S"
     }
 )

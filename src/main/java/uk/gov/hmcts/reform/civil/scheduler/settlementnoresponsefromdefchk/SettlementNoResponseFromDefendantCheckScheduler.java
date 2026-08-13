@@ -8,14 +8,12 @@ import uk.gov.hmcts.reform.civil.service.search.SettlementNoResponseFromDefendan
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty(prefix = "scheduler.settlement-no-response-from-defendant-check", name = "enabled", havingValue = "true")
 public class SettlementNoResponseFromDefendantCheckScheduler implements CivilScheduler {
 
     public static final String SCHEDULER_NAME = "SettlementNoResponseFromDefendantCheck";
