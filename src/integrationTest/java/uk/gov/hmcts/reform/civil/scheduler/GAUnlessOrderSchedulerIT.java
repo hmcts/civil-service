@@ -36,7 +36,6 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.UNLESS_
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
     "test.id=GAUnlessOrderSchedulerIT",
-    "scheduler.ga-unless-order.enabled=true",
     "scheduler.lockAtLeastFor=PT0S"
 })
 public class GAUnlessOrderSchedulerIT {

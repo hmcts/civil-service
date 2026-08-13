@@ -31,7 +31,6 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class},
     properties = {
         "test.id=HearingCvpLinkSchedulerIT",
-        "scheduler.hearing-cvp-link.enabled=true",
         "scheduler.lockAtLeastFor=PT0S"
     })
 public class HearingCvpLinkSchedulerIT {

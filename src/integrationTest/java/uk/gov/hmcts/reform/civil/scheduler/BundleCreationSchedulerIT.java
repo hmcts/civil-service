@@ -30,7 +30,6 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=BundleCreationSchedulerIT",
-    "scheduler.bundle-creation.enabled=true",
     "stitch-bundle.wait-time-in-milliseconds=0",
     "scheduler.lockAtLeastFor=PT0S"
 })

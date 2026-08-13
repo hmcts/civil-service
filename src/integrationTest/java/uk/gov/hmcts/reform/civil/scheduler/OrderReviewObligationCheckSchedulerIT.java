@@ -30,14 +30,6 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=OrderReviewObligationCheckSchedulerIT",
-    "scheduler.bundle-creation.enabled=false",
-    "scheduler.hearing-cvp-link.enabled=false",
-    "scheduler.polling-event-emitter.enabled=false",
-    "scheduler.automated-hearing-notice.enabled=false",
-    "scheduler.mediation-file-transfer.enabled=false",
-    "scheduler.take-case-offline.enabled=false",
-    "scheduler.trial-ready-notification.enabled=false",
-    "scheduler.order-review-obligation-check.enabled=true",
     "scheduler.lockAtLeastFor=PT0S"
 })
 public class OrderReviewObligationCheckSchedulerIT {

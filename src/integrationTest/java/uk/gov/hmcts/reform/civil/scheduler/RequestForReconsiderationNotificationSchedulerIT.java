@@ -30,7 +30,6 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=RequestForReconsiderationNotificationSchedulerIT",
-    "scheduler.request-for-reconsideration-notification.enabled=true",
     "scheduler.lockAtLeastFor=PT0S"
 })
 public class RequestForReconsiderationNotificationSchedulerIT {

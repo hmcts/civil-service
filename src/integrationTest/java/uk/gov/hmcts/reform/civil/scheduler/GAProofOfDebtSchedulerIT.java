@@ -30,7 +30,6 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=GAProofOfDebtSchedulerIT",
-    "scheduler.ga-proof-of-debt.enabled=true",
     "scheduler.lockAtLeastFor=PT0S"
 })
 public class GAProofOfDebtSchedulerIT {

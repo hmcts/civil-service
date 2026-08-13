@@ -29,7 +29,6 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
     "test.id=PollingEventEmitterSchedulerIT",
-    "scheduler.polling-event-emitter.enabled=true",
     "scheduler.lockAtLeastFor=PT0S"
 })
 public class PollingEventEmitterSchedulerIT {
