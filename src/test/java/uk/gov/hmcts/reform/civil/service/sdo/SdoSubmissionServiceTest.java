@@ -19,8 +19,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.createsdo.CreateSdoDashboardDate;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
 import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderCaseProgressionService;
 
 import java.math.BigDecimal;
@@ -48,9 +46,7 @@ class SdoSubmissionServiceTest {
     @Mock
     private SdoCaseClassificationService classificationService;
     @Mock
-    private DashboardNotificationHelper dashboardNotificationHelper;
-    @Mock
-    private CreateSdoDashboardDate createSdoDashboardDate;
+    private SdoReconsiderationDeadlineService reconsiderationDeadlineService;
 
     private SdoSubmissionService service;
 
@@ -61,8 +57,7 @@ class SdoSubmissionServiceTest {
             locationService,
             caseProgressionService,
             classificationService,
-            dashboardNotificationHelper,
-            createSdoDashboardDate
+            reconsiderationDeadlineService
         );
     }
 
@@ -215,8 +210,8 @@ class SdoSubmissionServiceTest {
         LocalDateTime deadline = LocalDateTime.of(2026, 8, 20, 16, 0);
         CaseData caseData = eligibleReconsiderationCase();
 
-        when(dashboardNotificationHelper.isEligibleForReconsideration(caseData)).thenReturn(true);
-        when(createSdoDashboardDate.getDateWithoutBankHolidays(any(LocalDateTime.class))).thenReturn(deadline);
+        when(reconsiderationDeadlineService.isEligibleForReconsideration(caseData)).thenReturn(true);
+        when(reconsiderationDeadlineService.calculateReconsiderationDeadline()).thenReturn(deadline);
 
         CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
 
@@ -239,7 +234,7 @@ class SdoSubmissionServiceTest {
         CaseData caseData = eligibleReconsiderationCase();
         caseData.setDecisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO);
 
-        when(dashboardNotificationHelper.isEligibleForReconsideration(caseData)).thenReturn(false);
+        when(reconsiderationDeadlineService.isEligibleForReconsideration(caseData)).thenReturn(false);
 
         CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
 

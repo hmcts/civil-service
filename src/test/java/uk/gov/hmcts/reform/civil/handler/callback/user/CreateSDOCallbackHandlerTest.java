@@ -105,8 +105,6 @@ import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.createsdo.CreateSdoDashboardDate;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
 import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderCaseProgressionService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -134,6 +132,7 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoNihlFieldsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoNihlOrderService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoOrderDetailsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoPrePopulateService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoReconsiderationDeadlineService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsDirectionsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsNarrativeService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsOrderDefaultsService;
@@ -364,10 +363,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     private FeatureToggleService featureToggleService;
 
     @MockBean
-    private DashboardNotificationHelper dashboardNotificationHelper;
-
-    @MockBean
-    private CreateSdoDashboardDate createSdoDashboardDate;
+    private SdoReconsiderationDeadlineService reconsiderationDeadlineService;
 
     @Autowired
     private CreateSDOCallbackHandler handler;

@@ -10,12 +10,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.createsdo.CreateSdoDashboardDate;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
 import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderCaseProgressionService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,8 +30,7 @@ public class SdoSubmissionService {
     private final SdoLocationService sdoLocationService;
     private final DirectionsOrderCaseProgressionService directionsOrderCaseProgressionService;
     private final SdoCaseClassificationService caseClassificationService;
-    private final DashboardNotificationHelper dashboardNotificationHelper;
-    private final CreateSdoDashboardDate createSdoDashboardDate;
+    private final SdoReconsiderationDeadlineService reconsiderationDeadlineService;
 
     public CaseData prepareSubmission(CaseData caseData, String authToken) {
         log.info("Preparing SDO submission payload for caseId {}", caseData.getCcdCaseReference());
@@ -77,10 +73,8 @@ public class SdoSubmissionService {
 
     private void setRequestForReconsiderationDeadline(CaseData caseData) {
         if (caseData.getRequestForReconsiderationDeadline() == null
-            && dashboardNotificationHelper.isEligibleForReconsideration(caseData)) {
-            caseData.setRequestForReconsiderationDeadline(
-                createSdoDashboardDate.getDateWithoutBankHolidays(LocalDateTime.now())
-            );
+            && reconsiderationDeadlineService.isEligibleForReconsideration(caseData)) {
+            caseData.setRequestForReconsiderationDeadline(reconsiderationDeadlineService.calculateReconsiderationDeadline());
         }
     }
 
