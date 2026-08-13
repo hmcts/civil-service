@@ -3,20 +3,18 @@ package uk.gov.hmcts.reform.civil.service.sdo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.createsdo.CreateSdoDashboardDate;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
 import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderCaseProgressionService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +33,8 @@ public class SdoSubmissionService {
     private final SdoLocationService sdoLocationService;
     private final DirectionsOrderCaseProgressionService directionsOrderCaseProgressionService;
     private final SdoCaseClassificationService caseClassificationService;
-    private final WorkingDayIndicator workingDayIndicator;
+    private final DashboardNotificationHelper dashboardNotificationHelper;
+    private final CreateSdoDashboardDate createSdoDashboardDate;
 
     public CaseData prepareSubmission(CaseData caseData, String authToken) {
         log.info("Preparing SDO submission payload for caseId {}", caseData.getCcdCaseReference());
@@ -77,44 +76,12 @@ public class SdoSubmissionService {
     }
 
     private void setRequestForReconsiderationDeadline(CaseData caseData) {
-        if (caseData.getRequestForReconsiderationDeadline() == null && isEligibleForReconsideration(caseData)) {
-            caseData.setRequestForReconsiderationDeadline(getDateWithoutBankHolidays(LocalDateTime.now()));
+        if (caseData.getRequestForReconsiderationDeadline() == null
+            && dashboardNotificationHelper.isEligibleForReconsideration(caseData)) {
+            caseData.setRequestForReconsiderationDeadline(
+                createSdoDashboardDate.getDateWithoutBankHolidays(LocalDateTime.now())
+            );
         }
-    }
-
-    private boolean isEligibleForReconsideration(CaseData caseData) {
-        return (featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(baseLocation(caseData))
-            || featureToggleService.isWelshEnabledForMainCase())
-            && caseData.isSmallClaim()
-            && caseData.getTotalClaimAmount() != null
-            && caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(10000)) <= 0
-            && (caseData.getDecisionOnRequestReconsiderationOptions() == null
-            || !DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(
-                caseData.getDecisionOnRequestReconsiderationOptions()));
-    }
-
-    private String baseLocation(CaseData caseData) {
-        return Optional.ofNullable(caseData.getCaseManagementLocation())
-            .map(uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil::getBaseLocation)
-            .orElse(null);
-    }
-
-    private LocalDateTime getDateWithoutBankHolidays(LocalDateTime fromDateTime) {
-        LocalDate date = fromDateTime.toLocalDate();
-        try {
-            for (int i = 0; i < 7; i++) {
-                if (workingDayIndicator.isPublicHoliday(date)) {
-                    date = date.plusDays(2);
-                } else {
-                    date = date.plusDays(1);
-                }
-            }
-        } catch (Exception e) {
-            log.error("Error when retrieving public days");
-            date = LocalDate.now().plusDays(7);
-        }
-
-        return date.atTime(16, 0, 0);
     }
 
     private void trimMethodLocations(CaseData caseData) {

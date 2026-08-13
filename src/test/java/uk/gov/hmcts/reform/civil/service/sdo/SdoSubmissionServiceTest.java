@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
@@ -20,10 +19,11 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.createsdo.CreateSdoDashboardDate;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
 import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderCaseProgressionService;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,9 @@ class SdoSubmissionServiceTest {
     @Mock
     private SdoCaseClassificationService classificationService;
     @Mock
-    private WorkingDayIndicator workingDayIndicator;
+    private DashboardNotificationHelper dashboardNotificationHelper;
+    @Mock
+    private CreateSdoDashboardDate createSdoDashboardDate;
 
     private SdoSubmissionService service;
 
@@ -59,7 +61,8 @@ class SdoSubmissionServiceTest {
             locationService,
             caseProgressionService,
             classificationService,
-            workingDayIndicator
+            dashboardNotificationHelper,
+            createSdoDashboardDate
         );
     }
 
@@ -209,14 +212,15 @@ class SdoSubmissionServiceTest {
 
     @Test
     void shouldSetRequestForReconsiderationDeadlineForEligibleSdo() {
+        LocalDateTime deadline = LocalDateTime.of(2026, 8, 20, 16, 0);
         CaseData caseData = eligibleReconsiderationCase();
 
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed("20262")).thenReturn(true);
+        when(dashboardNotificationHelper.isEligibleForReconsideration(caseData)).thenReturn(true);
+        when(createSdoDashboardDate.getDateWithoutBankHolidays(any(LocalDateTime.class))).thenReturn(deadline);
 
         CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
 
-        assertThat(result.getRequestForReconsiderationDeadline())
-            .isEqualTo(LocalDate.now().plusDays(7).atTime(16, 0));
+        assertThat(result.getRequestForReconsiderationDeadline()).isEqualTo(deadline);
     }
 
     @Test
@@ -235,7 +239,7 @@ class SdoSubmissionServiceTest {
         CaseData caseData = eligibleReconsiderationCase();
         caseData.setDecisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO);
 
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed("20262")).thenReturn(true);
+        when(dashboardNotificationHelper.isEligibleForReconsideration(caseData)).thenReturn(false);
 
         CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
 
