@@ -73,7 +73,10 @@ scheduler:
     enabled: ${SCHEDULER_ENABLED_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF:false}
   hearing-fee:
     cronExpression: ${CRON_EXPRESSION_HEARING_FEE:0 0 0 * * ?}
-    enabled: ${SCHEDULER_ENABLED_HEARING_FEE:true}
+    enabled: ${SCHEDULER_ENABLED_HEARING_FEE:false}
+  evidence-upload:
+    cronExpression: ${CRON_EXPRESSION_EVIDENCE_UPLOAD:0 30 17 * * ?}
+    enabled: ${SCHEDULER_ENABLED_EVIDENCE_UPLOAD:false}
   default-back-pressure:
     initialDelay: ${DEFAULT_BACK_PRESSURE_INITIAL_DELAY:PT0S}
     maxDelay: ${DEFAULT_BACK_PRESSURE_MAX_DELAY:PT10S}
@@ -704,6 +707,8 @@ feign:
       processInstance:
         url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
       historicProcessInstance:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      history:
         url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
       processDefinition:
         url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
