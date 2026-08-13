@@ -50,7 +50,10 @@ public class GeneralAppFeesService {
 
     private static final String MISCELLANEOUS = "miscellaneous";
     private static final String OTHER = "other";
-    private static final String MISSING_APPLICATION_TYPE = "General application type is required to calculate the fee";
+    private static final String MISSING_CASE_DATA_APPLICATION_TYPE =
+        "General application type is required to calculate the fee";
+    private static final String MISSING_APPLICATION_TYPE_FOR_FEE_CALCULATION =
+        "General application type is required to calculate a fee";
 
     protected static final List<GeneralApplicationTypes> VARY_TYPES
         = List.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT);
@@ -164,14 +167,14 @@ public class GeneralAppFeesService {
 
     private List<GeneralApplicationTypes> getApplicationTypes(GAApplicationType applicationType) {
         if (applicationType == null || CollectionUtils.isEmpty(applicationType.getTypes())) {
-            throw new IllegalArgumentException(MISSING_APPLICATION_TYPE);
+            throw new IllegalArgumentException(MISSING_CASE_DATA_APPLICATION_TYPE);
         }
         return applicationType.getTypes();
     }
 
     private void validateApplicationTypes(List<GeneralApplicationTypes> types) {
         if (CollectionUtils.isEmpty(types)) {
-            throw new IllegalArgumentException(MISSING_APPLICATION_TYPE);
+            throw new IllegalArgumentException(MISSING_APPLICATION_TYPE_FOR_FEE_CALCULATION);
         }
     }
 
@@ -309,7 +312,7 @@ public class GeneralAppFeesService {
 
     private FeeCalculationState initialCalculationState(List<GeneralApplicationTypes> types) {
         if (CollectionUtils.isEmpty(types)) {
-            throw new IllegalArgumentException("General application type is required to calculate a fee");
+            throw new IllegalArgumentException(MISSING_APPLICATION_TYPE_FOR_FEE_CALCULATION);
         }
         return new FeeCalculationState(null, types.size());
     }
