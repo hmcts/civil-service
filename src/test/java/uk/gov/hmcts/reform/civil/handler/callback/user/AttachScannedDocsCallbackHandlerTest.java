@@ -1,12 +1,13 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -27,12 +28,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AttachScannedDocsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private AttachScannedDocsCallbackHandler handler;
-    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        objectMapper = new ObjectMapper();
-        handler = new AttachScannedDocsCallbackHandler(objectMapper);
+        handler = new AttachScannedDocsCallbackHandler();
     }
 
     @Test
@@ -62,10 +61,41 @@ class AttachScannedDocsCallbackHandlerTest extends BaseCallbackHandlerTest {
             ));
 
             CallbackParams params = callbackParamsOf(data, caseData, CallbackType.ABOUT_TO_SUBMIT, CaseState.CASE_ISSUED);
+            params.request(CallbackRequest.builder()
+                               .caseDetails(CaseDetails.builder()
+                                                .id(CASE_ID)
+                                                .caseTypeId("CIVIL")
+                                                .data(data)
+                                                .build())
+                               .build());
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData().get("respondent1ResponseMethod")).isEqualTo("OFFLINE");
+        }
+
+        @Test
+        void shouldNotSetCivilRespondentFieldForNonCivilCaseType() {
+            Map<String, Object> data = new HashMap<>();
+            data.put("scannedDocuments", List.of(
+                Map.of("id", "1", "value", Map.of("subtype", "N9a"))
+            ));
+
+            CaseData caseData = CaseData.builder().ccdCaseReference(1234567890L).build();
+            CallbackParams params = callbackParamsOf(data, caseData, CallbackType.ABOUT_TO_SUBMIT, CaseState.CASE_ISSUED);
+
+            CallbackRequest nonCivilRequest = CallbackRequest.builder()
+                .caseDetails(CaseDetails.builder()
+                                 .id(CASE_ID)
+                                 .caseTypeId("MoneyClaimCase")
+                                 .data(data)
+                                 .build())
+                .build();
+            params.request(nonCivilRequest);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).doesNotContainKey("respondent1ResponseMethod");
         }
 
         @Test
@@ -87,6 +117,13 @@ class AttachScannedDocsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseData.builder().ccdCaseReference(1234567890L).build();
             CallbackParams params = callbackParamsOf(data, caseData, CallbackType.ABOUT_TO_SUBMIT, CaseState.CASE_ISSUED);
+            params.request(CallbackRequest.builder()
+                               .caseDetails(CaseDetails.builder()
+                                                .id(CASE_ID)
+                                                .caseTypeId("CIVIL")
+                                                .data(data)
+                                                .build())
+                               .build());
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -117,6 +154,13 @@ class AttachScannedDocsCallbackHandlerTest extends BaseCallbackHandlerTest {
             ));
 
             CallbackParams params = callbackParamsOf(data, caseData, CallbackType.ABOUT_TO_SUBMIT, CaseState.CASE_ISSUED);
+            params.request(CallbackRequest.builder()
+                               .caseDetails(CaseDetails.builder()
+                                                .id(CASE_ID)
+                                                .caseTypeId("CIVIL")
+                                                .data(data)
+                                                .build())
+                               .build());
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 

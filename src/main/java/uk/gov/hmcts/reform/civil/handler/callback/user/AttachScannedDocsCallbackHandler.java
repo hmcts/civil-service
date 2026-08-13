@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,6 +16,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ATTACH_SCANNED_DOCS;
@@ -44,8 +44,6 @@ public class AttachScannedDocsCallbackHandler extends CallbackHandler {
         "PAPER_RESPONSE_DISPUTES_ALL",
         "PAPER_RESPONSE_COUNTER_CLAIM"
     );
-
-    private final ObjectMapper objectMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -87,8 +85,9 @@ public class AttachScannedDocsCallbackHandler extends CallbackHandler {
                 }
             }
 
-            // Update Civil style respondent fields if present
-            data.put("respondent1ResponseMethod", "OFFLINE");
+            if (isCivilCaseType(callbackParams)) {
+                data.put("respondent1ResponseMethod", "OFFLINE");
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -146,5 +145,11 @@ public class AttachScannedDocsCallbackHandler extends CallbackHandler {
         }
 
         return false;
+    }
+
+    private boolean isCivilCaseType(CallbackParams callbackParams) {
+        return callbackParams.getRequest() != null
+            && callbackParams.getRequest().getCaseDetails() != null
+            && Objects.equals("CIVIL", callbackParams.getRequest().getCaseDetails().getCaseTypeId());
     }
 }
