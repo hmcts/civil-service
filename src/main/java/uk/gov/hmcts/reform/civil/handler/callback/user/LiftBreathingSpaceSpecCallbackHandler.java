@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 
 import java.time.LocalDate;
@@ -63,8 +64,23 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
                 "This claim is not in Breathing Space."
             ));
         }
+        LocalDate startDate = caseData.getBreathing().getEnter().getStart();
 
-        return responseBuilder.build();
+        assert startDate != null;
+        assert caseData.getBreathing().getLift() != null;
+        BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
+        breathingSpaceLiftInfo.setExpectedEnd(startDate);
+        caseData.getBreathing().setLift(breathingSpaceLiftInfo);
+
+        caseData.getBreathing().getLift().setExpectedEnd(LocalDate.now());
+        if (caseData.getBreathing().getEnter().getType() == BreathingSpaceType.STANDARD) {
+            breathingSpaceLiftInfo.setExpectedEnd(startDate.plusDays(60));
+            caseData.getBreathing().setLift(breathingSpaceLiftInfo);
+        }
+
+        return responseBuilder
+            .data(caseData.toMap(objectMapper))
+            .build();
     }
 
     private CallbackResponse checkEnterInfo(CallbackParams callbackParams) {
@@ -89,13 +105,6 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             && startDate.isAfter(caseData.getBreathing().getLift().getExpectedEnd())) {
             errors.add("End date must be after " + DateFormatHelper
                 .formatLocalDate(startDate, DateFormatHelper.DATE));
-        }
-        assert startDate != null;
-        caseData.getBreathing().getLift().setExpectedEnd(startDate.plusDays(60));
-
-        caseData.getBreathing().getLift().setExpectedEnd(LocalDate.now());
-        if (caseData.getBreathing().getEnter().getType() == BreathingSpaceType.STANDARD) {
-            caseData.getBreathing().getLift().setExpectedEnd(startDate.plusDays(60));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
