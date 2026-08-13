@@ -52,7 +52,6 @@ spring:
             client-secret: internal
   flyway:
     enabled: ${REFERENCE_DATABASE_MIGRATION:true}
-    lock-retry-count: -1
     placeholder-replacement: false
     table: schema_version
     baseline-on-migrate: true
