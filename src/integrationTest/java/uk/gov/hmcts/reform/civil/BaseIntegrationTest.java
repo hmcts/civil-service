@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
 import uk.gov.hmcts.reform.auth.checker.core.user.User;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.civil.config.TestIdamConfiguration;
+import uk.gov.hmcts.reform.civil.scheduler.settlementnoresponsefromdefchk.SettlementNoResponseFromDefendantCheckScheduler;
 import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
@@ -83,7 +84,7 @@ public abstract class BaseIntegrationTest {
         .build();
 
     @MockBean
-    protected uk.gov.hmcts.reform.civil.scheduler.settlementnoresponsefromdefchk.SettlementNoResponseFromDefendantCheckScheduler settlementNoResponseFromDefendantCheckScheduler;
+    private SettlementNoResponseFromDefendantCheckScheduler settlementNoResponseFromDefendantCheckScheduler;
 
     @MockBean
     private ServiceAuthorisationApi serviceAuthorisationApi;
