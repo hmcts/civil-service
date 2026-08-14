@@ -44,47 +44,49 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(CallbackType.ABOUT_TO_START), this::checkCanEnter,
+            callbackKey(CallbackType.ABOUT_TO_START), this::aboutToStart,
             callbackKey(CallbackType.MID, "enter-info"), this::checkEnterInfo,
             callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::updateBusinessProcessToReady,
             callbackKey(CallbackType.SUBMITTED), this::buildSubmittedText
         );
     }
 
-    private CallbackResponse checkCanEnter(CallbackParams callbackParams) {
+    private CallbackResponse aboutToStart(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder();
         if (caseData.getBreathing() == null || caseData.getBreathing().getEnter() == null) {
-            responseBuilder.errors(Collections.singletonList(
+            return responseBuilder.errors(Collections.singletonList(
                 "A claim must enter Breathing Space before it can be lifted."
-            ));
+            )).build();
         } else if (caseData.getBreathing().getLift() != null) {
-            responseBuilder.errors(Collections.singletonList(
+            return responseBuilder.errors(Collections.singletonList(
                 "This claim is not in Breathing Space."
-            ));
-        }
-        LocalDate startDate = caseData.getBreathing().getEnter().getStart();
-
-        assert startDate != null;
-        assert caseData.getBreathing().getLift() != null;
-        BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
-        breathingSpaceLiftInfo.setExpectedEnd(startDate);
-        caseData.getBreathing().setLift(breathingSpaceLiftInfo);
-
-        caseData.getBreathing().getLift().setExpectedEnd(LocalDate.now());
-        if (caseData.getBreathing().getEnter().getType() == BreathingSpaceType.STANDARD) {
-            breathingSpaceLiftInfo.setExpectedEnd(startDate.plusDays(60));
-            caseData.getBreathing().setLift(breathingSpaceLiftInfo);
+            )).build();
         }
 
+        prepopulateEndDate(caseData);
+
+        objectMapper.findAndRegisterModules();
         return responseBuilder
             .data(caseData.toMap(objectMapper))
             .build();
     }
 
+    private static void prepopulateEndDate(CaseData caseData) {
+        LocalDate startDate = caseData.getBreathing().getEnter().getStart();
+
+        BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
+        breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now());
+        caseData.getBreathing().setLift(breathingSpaceLiftInfo);
+
+        if (caseData.getBreathing().getEnter().getType() == BreathingSpaceType.STANDARD) {
+            breathingSpaceLiftInfo.setExpectedEnd(startDate.plusDays(60));
+            caseData.getBreathing().setLift(breathingSpaceLiftInfo);
+        }
+    }
+
     private CallbackResponse checkEnterInfo(CallbackParams callbackParams) {
-        objectMapper.findAndRegisterModules();
         CaseData caseData = callbackParams.getCaseData();
         int standardBSMaxDurationDays = 60;
 
@@ -108,7 +110,6 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
             .errors(errors)
             .build();
     }

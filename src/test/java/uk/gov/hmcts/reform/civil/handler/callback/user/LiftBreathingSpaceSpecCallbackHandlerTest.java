@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 
@@ -75,6 +76,48 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
             Assertions.assertFalse(response.getErrors().isEmpty());
+        }
+
+        @Test
+        public void prePopulateEndDateToToday_WhenMentalHealthBSType() {
+            BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
+            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceEnterInfo.setType(BreathingSpaceType.MENTAL_HEALTH);
+
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
+
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setBreathing(breathingSpaceInfo);
+
+            CallbackParams params = new CallbackParams()
+                .caseData(caseData)
+                .type(CallbackType.ABOUT_TO_START);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
+            LocalDate expectedEndDate = LocalDate.now();
+            assertEquals(caseData.getBreathing().getLift().getExpectedEnd(), expectedEndDate);
+        }
+
+        @Test
+        public void prePopulateEndDateToStartDatePlus60_WhenStandardBSType() {
+            BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
+            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceEnterInfo.setType(BreathingSpaceType.STANDARD);
+
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
+
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setBreathing(breathingSpaceInfo);
+
+            CallbackParams params = new CallbackParams()
+                .caseData(caseData)
+                .type(CallbackType.ABOUT_TO_START);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
+            LocalDate expectedEndDate = LocalDate.now().plusDays(60);
+            assertEquals(caseData.getBreathing().getLift().getExpectedEnd(), expectedEndDate);
         }
     }
 
