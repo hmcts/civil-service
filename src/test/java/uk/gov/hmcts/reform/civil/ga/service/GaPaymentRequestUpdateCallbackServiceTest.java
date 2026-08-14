@@ -1,37 +1,46 @@
 package uk.gov.hmcts.reform.civil.ga.service;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
-import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -74,11 +83,30 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     @Mock
     CaseDetailsConverter caseDetailsConverter;
 
+    private ListAppender<ILoggingEvent> listAppender;
+    private Logger logger;
+
+    @BeforeEach
+    void setup() {
+        logger = (Logger) LoggerFactory.getLogger(GaPaymentRequestUpdateCallbackService.class);
+        listAppender = new ListAppender<>();
+        listAppender.start();
+        logger.addAppender(listAppender);
+    }
+
+    @AfterEach
+    void tearDown() {
+        logger.detachAppender(listAppender);
+    }
+
     @Test
     public void shouldStartAndSubmitEventWithCaseDetails() {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YesOrNo.NO).build();
-        caseData = caseData.copy().ccdState(APPLICATION_ADD_PAYMENT).build();
+        caseData = caseData.copy().ccdState(APPLICATION_ADD_PAYMENT)
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setAdditionalPaymentDetails(new PaymentDetails().setStatus(FAILED)))
+            .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
         when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
@@ -100,6 +128,8 @@ class GaPaymentRequestUpdateCallbackServiceTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YesOrNo.NO).build();
         caseData = caseData.copy().ccdState(APPLICATION_ADD_PAYMENT)
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setAdditionalPaymentDetails(new PaymentDetails().setStatus(FAILED)))
             .generalAppParentCaseLink(null).build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
@@ -181,7 +211,7 @@ class GaPaymentRequestUpdateCallbackServiceTest {
         caseData = caseData.copy().ccdState(APPLICATION_ADD_PAYMENT)
             .generalAppPBADetails(new GeneralApplicationPbaDetails()
                                       .setAdditionalPaymentDetails(new PaymentDetails()
-                                                                    .setStatus(SUCCESS)
+                                                                    .setStatus(FAILED)
                                                                     .setCustomerReference(null)
                                                                     .setReference(REFERENCE)
                                                                     .setErrorCode(null)
@@ -219,10 +249,113 @@ class GaPaymentRequestUpdateCallbackServiceTest {
         verify(coreCaseDataService, never()).triggerEvent(any(), any());
     }
 
+    @Test
+    void shouldRecover_whenCaseDataUpdateExceptionThrown() {
+        CaseDataUpdateException ex = new CaseDataUpdateException("Test Error", new RuntimeException());
+        ServiceRequestUpdateDto dto = buildServiceDto(PAID);
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
+
+        paymentRequestUpdateCallbackService.recover(ex, dto, caseData, false);
+
+        assertThat(listAppender.list.stream()
+                       .anyMatch(event -> event.getFormattedMessage()
+                           .contains("Payment status update failed after retries for case 12345. "
+                                         + "Status: Paid, PaymentReference: 123445, HWF: false")))
+            .isTrue();
+        assertThat(listAppender.list.stream()
+                       .anyMatch(event -> event.getLevel().equals(Level.ERROR)))
+            .isTrue();
+    }
+
+    @Test
+    void shouldRecover_whenCaseDataUpdateExceptionThrownAndDtoIsNull() {
+        CaseDataUpdateException ex = new CaseDataUpdateException("Test Error", new RuntimeException());
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
+
+        paymentRequestUpdateCallbackService.recover(ex, null, caseData, false);
+
+        assertThat(listAppender.list.stream()
+                       .anyMatch(event -> event.getFormattedMessage()
+                           .contains("Payment status update failed after retries for case N/A. "
+                                         + "Status: N/A, PaymentReference: N/A, HWF: false")))
+            .isTrue();
+        assertThat(listAppender.list.stream()
+                       .anyMatch(event -> event.getLevel().equals(Level.ERROR)))
+            .isTrue();
+    }
+
+    @Test
+    void shouldNotSubmitUpdate_whenPaymentAlreadyApplied() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
+        caseData.setCcdState(AWAITING_APPLICATION_PAYMENT);
+        caseData.setGeneralAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails()
+                                                             .setStatus(SUCCESS)
+                                                             .setReference(REFERENCE)));
+        CaseDetails freshDetails = buildCaseDetails(caseData);
+
+        when(coreCaseDataService.startGaUpdate(any(), eq(INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT)))
+            .thenReturn(startEventResponse(freshDetails, INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT));
+        when(caseDetailsConverter.toGeneralApplicationCaseData(freshDetails)).thenReturn(caseData);
+
+        paymentRequestUpdateCallbackService.processServiceRequest(buildServiceDto(PAID), caseData, false);
+
+        verify(coreCaseDataService, never()).submitGaUpdate(any(), any());
+    }
+
+    @Test
+    void shouldSubmitUpdate_whenFreshPbaIsNull() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
+        caseData.setCcdState(AWAITING_APPLICATION_PAYMENT);
+        caseData.setGeneralAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails()
+                                                             .setStatus(FAILED)
+                                                             .setReference("123")));
+
+        GeneralApplicationCaseData freshData = caseData.copy();
+        freshData.setGeneralAppPBADetails(null);
+        CaseDetails freshCaseDetails = buildCaseDetails(freshData);
+
+        when(caseDetailsConverter.toGeneralApplicationCaseData(freshCaseDetails)).thenReturn(freshData);
+        when(coreCaseDataService.startGaUpdate(any(), eq(INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT)))
+            .thenReturn(startEventResponse(freshCaseDetails, INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT));
+
+        paymentRequestUpdateCallbackService.processServiceRequest(buildServiceDto(PAID), caseData, false);
+
+        verify(coreCaseDataService, times(1)).submitGaUpdate(any(), any());
+    }
+
+    @Test
+    void shouldHandleInvalidState_returnsNull() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
+        caseData.setCcdState(PENDING_CASE_ISSUED);
+
+        GeneralApplicationCaseData result = paymentRequestUpdateCallbackService.processServiceRequest(buildServiceDto(PAID), caseData, false);
+
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void shouldProcessHwf() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(Long.valueOf(CASE_ID));
+        caseData.setCcdState(AWAITING_APPLICATION_PAYMENT);
+        caseData.setGeneralAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("HWF-REF"));
+        caseData.setGeneralAppPBADetails(new GeneralApplicationPbaDetails());
+
+        GeneralApplicationCaseData result = paymentRequestUpdateCallbackService.processHwf(caseData);
+
+        assertThat(result).isNotNull();
+        verify(coreCaseDataService, never()).startGaUpdate(any(), any());
+    }
+
     private CaseDetails buildCaseDetails(GeneralApplicationCaseData caseData) {
         return CaseDetails.builder()
             .data(objectMapper.convertValue(caseData,
-                    new TypeReference<Map<String, Object>>() {})).id(Long.valueOf(CASE_ID)).build();
+                                           new TypeReference<Map<String, Object>>() {}))
+            .id(Long.valueOf(CASE_ID))
+            .caseTypeId("GENERALAPPLICATION")
+            .build();
     }
 
     private ServiceRequestUpdateDto buildServiceDto(String status) {
@@ -250,7 +383,10 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     public void shouldProceedAfterInitialPaymentIsSuccess() {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().copy().build();
-        caseData = caseData.copy().ccdState(AWAITING_APPLICATION_PAYMENT).build();
+        caseData = caseData.copy().ccdState(AWAITING_APPLICATION_PAYMENT)
+            .generalAppPBADetails(caseData.getGeneralAppPBADetails().copy()
+                                      .setPaymentDetails(new PaymentDetails().setStatus(FAILED)))
+            .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails))
             .thenReturn(caseData);
@@ -285,31 +421,84 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     }
 
     @Test
-    public void shouldProcessHwf() {
-        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
-                .ccdState(AWAITING_APPLICATION_PAYMENT)
-                .ccdCaseReference(1L)
-                .generalAppPBADetails(new GeneralApplicationPbaDetails()
-                        .setFee(new Fee().setCalculatedAmountInPence(BigDecimal.ONE)))
-                .generalAppHelpWithFees(new HelpWithFees()
-                        .setHelpWithFeesReferenceNumber("ref"))
-                .build();
+    public void shouldNotProcessHwf() {
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData();
+        caseData.setCcdState(PENDING_APPLICATION_ISSUED);
+        caseData.setCcdCaseReference(1L);
+        caseData.setGeneralAppPBADetails(new GeneralApplicationPbaDetails());
+        caseData.setGeneralAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("ref"));
+
         GeneralApplicationCaseData updatedCaseData = paymentRequestUpdateCallbackService.processHwf(caseData);
-        verify(coreCaseDataService, never()).startGaUpdate(any(), any());
-        assertThat(updatedCaseData).isNotNull();
+        assertThat(updatedCaseData).isNull();
     }
 
     @Test
-    public void shouldNotProcessHwf() {
-        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
-                .ccdState(PENDING_APPLICATION_ISSUED)
-                .ccdCaseReference(1L)
-                .generalAppPBADetails(new GeneralApplicationPbaDetails()
-                        .setFee(new Fee().setCalculatedAmountInPence(BigDecimal.ONE)))
-                .generalAppHelpWithFees(new HelpWithFees()
-                        .setHelpWithFeesReferenceNumber("ref"))
-                .build();
-        GeneralApplicationCaseData updatedCaseData = paymentRequestUpdateCallbackService.processHwf(caseData);
-        assertThat(updatedCaseData).isNull();
+    void shouldThrowRetryableException_whenStartGaUpdateFails() {
+        final GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
+            .buildPaymentSuccessfulCaseData().copy()
+            .ccdState(APPLICATION_ADD_PAYMENT).build();
+
+        when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any())).thenReturn(CaseState.APPLICATION_ADD_PAYMENT);
+        when(coreCaseDataService.startGaUpdate(any(), any())).thenThrow(new RuntimeException("Lock conflict"));
+
+        ServiceRequestUpdateDto dto = buildServiceDto(PAID);
+        assertThatThrownBy(() -> paymentRequestUpdateCallbackService.processServiceRequest(dto, caseData, false))
+            .isInstanceOf(CaseDataUpdateException.class);
+    }
+
+    @Test
+    public void shouldNotSubmitEvent_WhenInitialPaymentAlreadyApplied() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
+        caseData = caseData.copy()
+            .ccdState(AWAITING_APPLICATION_PAYMENT)
+            .generalAppPBADetails(new GeneralApplicationPbaDetails())
+            .build();
+        CaseDetails caseDetails = buildCaseDetails(caseData);
+
+        // fresh data from CCD already has the payment
+        GeneralApplicationCaseData freshData = caseData.copy()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails()
+                                                             .setStatus(SUCCESS)
+                                                             .setReference(REFERENCE)))
+            .build();
+        CaseDetails freshDetails = buildCaseDetails(freshData);
+
+        when(caseDetailsConverter.toGeneralApplicationCaseData(freshDetails)).thenReturn(freshData);
+        when(coreCaseDataService.startGaUpdate(any(), eq(INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT)))
+            .thenReturn(startEventResponse(freshDetails, INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT));
+
+        paymentRequestUpdateCallbackService.processServiceRequest(buildServiceDto(PAID), caseData, false);
+
+        verify(coreCaseDataService, times(1)).startGaUpdate(any(), any());
+        verify(coreCaseDataService, never()).submitGaUpdate(any(), any());
+    }
+
+    @Test
+    public void shouldNotSubmitEvent_WhenAdditionalPaymentAlreadyApplied() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
+        caseData = caseData.copy()
+            .ccdState(APPLICATION_ADD_PAYMENT)
+            .generalAppPBADetails(new GeneralApplicationPbaDetails())
+            .build();
+        CaseDetails caseDetails = buildCaseDetails(caseData);
+
+        // fresh data from CCD already has the payment
+        GeneralApplicationCaseData freshData = caseData.copy()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setAdditionalPaymentDetails(new PaymentDetails()
+                                                                       .setStatus(SUCCESS)
+                                                                       .setReference(REFERENCE)))
+            .build();
+        CaseDetails freshDetails = buildCaseDetails(freshData);
+
+        when(caseDetailsConverter.toGeneralApplicationCaseData(freshDetails)).thenReturn(freshData);
+        when(coreCaseDataService.startGaUpdate(any(), eq(CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID)))
+            .thenReturn(startEventResponse(freshDetails, CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID));
+
+        paymentRequestUpdateCallbackService.processServiceRequest(buildServiceDto(PAID), caseData, false);
+
+        verify(coreCaseDataService, times(1)).startGaUpdate(any(), any());
+        verify(coreCaseDataService, never()).submitGaUpdate(any(), any());
     }
 }

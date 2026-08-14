@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -48,10 +49,6 @@ import static uk.gov.hmcts.reform.civil.enums.FeeType.HEARING;
 
 public class FeesPaymentControllerTest extends BaseIntegrationTest {
 
-    private static final StartEventResponse START_EVENT_RESPONSE = StartEventResponse.builder()
-        .eventId("eventId")
-        .token("token")
-        .build();
     private static final Long CASE_REFERENCE = 1701090368574910L;
     private static final CaseDetails EXPECTED_CASE_DETAILS = CaseDetails.builder().id(CASE_REFERENCE)
         .data(Map.of(
@@ -61,6 +58,11 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
             "hearingFee",
             new Fee().setCalculatedAmountInPence(new BigDecimal("23200"))
         )).build();
+    private static final StartEventResponse START_EVENT_RESPONSE = StartEventResponse.builder()
+        .eventId("eventId")
+        .token("token")
+        .caseDetails(EXPECTED_CASE_DETAILS)
+        .build();
     private static final String HEARING_PAYMENT_RETURN_URL =
         "http://localhost:3001/hearing-payment-confirmation/" + CASE_REFERENCE;
 
@@ -146,6 +148,40 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
         verify(coreCaseDataService, times(3)).getCase(123L);
         verify(coreCaseDataService, times(3)).startUpdate("123", SERVICE_REQUEST_RECEIVED);
         verify(coreCaseDataService, times(3)).submitUpdate(eq("123"), any(CaseDataContent.class));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"Success"})
+    @SneakyThrows
+    void shouldNotCallSubmitUpdate_WhenPaymentAlreadyApplied(String status) {
+        String paymentReference = "RC-1701-0909-0602-0418";
+        PaymentDto response = buildGovPayCardPaymentStatusResponse(status);
+        when(paymentsClient.getGovPayCardPaymentStatus(paymentReference, BEARER_TOKEN))
+            .thenReturn(response);
+
+        CaseDetails caseDetailsWithPayment = CaseDetails.builder().id(123L)
+            .data(Map.of(
+                "hearingFeePaymentDetails",
+                new PaymentDetails()
+                    .setStatus(uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS)
+                    .setReference(paymentReference)
+            )).build();
+
+        when(coreCaseDataService.getCase(123L)).thenReturn(caseDetailsWithPayment);
+        when(coreCaseDataService.startUpdate("123", SERVICE_REQUEST_RECEIVED))
+            .thenReturn(StartEventResponse.builder()
+                            .eventId("eventId")
+                            .token("token")
+                            .caseDetails(caseDetailsWithPayment)
+                            .build());
+
+        doGet(BEARER_TOKEN, FEES_PAYMENT_STATUS_URL, HEARING.name(), "123", paymentReference)
+            .andExpect(content().json(toJson(expectedResponse(status))))
+            .andExpect(status().isOk());
+
+        verify(coreCaseDataService).getCase(123L);
+        verify(coreCaseDataService).startUpdate("123", SERVICE_REQUEST_RECEIVED);
+        verify(coreCaseDataService, times(0)).submitUpdate(eq("123"), any(CaseDataContent.class));
     }
 
     @Nested
@@ -243,6 +279,41 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
             verify(gaCoreCaseDataService, times(3)).getCase(123L);
             verify(gaCoreCaseDataService, times(3)).startUpdate("123", INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT);
             verify(gaCoreCaseDataService, times(3)).submitUpdate(eq("123"), any(CaseDataContent.class));
+        }
+
+        @ParameterizedTest
+        @CsvSource({"Success"})
+        @SneakyThrows
+        void shouldNotCallSubmitUpdate_WhenPaymentAlreadyApplied(String status) {
+            String paymentReference = "RC-1701-0909-0602-0418";
+            PaymentDto response = buildGovPayCardPaymentStatusResponse(status);
+            when(paymentsClient.getGovPayCardPaymentStatus(paymentReference, BEARER_TOKEN))
+                .thenReturn(response);
+
+            CaseDetails caseDetailsWithPayment = CaseDetails.builder().id(123L)
+                .data(Map.of(
+                    "generalAppPBADetails",
+                    new GAPbaDetails()
+                        .setPaymentDetails(new PaymentDetails()
+                                            .setStatus(uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS)
+                                            .setReference(paymentReference))
+                )).build();
+
+            when(gaCoreCaseDataService.getCase(123L)).thenReturn(caseDetailsWithPayment);
+            when(gaCoreCaseDataService.startUpdate("123", INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT))
+                .thenReturn(StartEventResponse.builder()
+                                .eventId("eventId")
+                                .token("token")
+                                .caseDetails(caseDetailsWithPayment)
+                                .build());
+
+            doGet(BEARER_TOKEN, GA_FEES_PAYMENT_STATUS_URL, "123", paymentReference)
+                .andExpect(content().json(toJson(gaExpectedResponse(status))))
+                .andExpect(status().isOk());
+
+            verify(gaCoreCaseDataService).getCase(123L);
+            verify(gaCoreCaseDataService).startUpdate("123", INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT);
+            verify(gaCoreCaseDataService, times(0)).submitUpdate(eq("123"), any(CaseDataContent.class));
         }
 
         private CardPaymentStatusResponse gaExpectedResponse(String status) {

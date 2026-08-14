@@ -4,11 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -28,23 +32,19 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil.isGeneralAppConsentOrder;
+import static uk.gov.hmcts.reform.civil.utils.PaymentUtils.isPaymentAlreadyApplied;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class GaPaymentRequestUpdateCallbackService {
 
-    public static final String PAID = "Paid";
-
     private final CaseDetailsConverter caseDetailsConverter;
     private final GaCoreCaseDataService coreCaseDataService;
     private final JudicialNotificationService judicialNotificationService;
-    private final GeneralApplicationCreationNotificationService gaNotificationService;
     private final ObjectMapper objectMapper;
     private final Time time;
     private final StateGeneratorService stateGeneratorService;
-
-    private GeneralApplicationCaseData data;
 
     public GeneralApplicationCaseData processHwf(GeneralApplicationCaseData caseData) {
         ServiceRequestUpdateDto serviceRequestUpdateDto = new ServiceRequestUpdateDto()
@@ -56,25 +56,47 @@ public class GaPaymentRequestUpdateCallbackService {
         return processServiceRequest(serviceRequestUpdateDto, caseData, true);
     }
 
+    @Retryable(retryFor = CaseDataUpdateException.class, backoff = @Backoff(delay = 500))
     public GeneralApplicationCaseData processServiceRequest(ServiceRequestUpdateDto serviceRequestUpdateDto,
                                                             GeneralApplicationCaseData caseData,
                                                             boolean hwf) {
-        if (!Objects.isNull(caseData)) {
+        try {
+            if (!Objects.isNull(caseData)) {
 
-            switch (caseData.getCcdState()) {
-                case APPLICATION_ADD_PAYMENT:
-                    return processAndTriggerAdditionalPayment(caseData, serviceRequestUpdateDto, hwf);
-                case AWAITING_APPLICATION_PAYMENT:
-                    return processAndTriggerAwaitingPayment(caseData, serviceRequestUpdateDto, hwf);
-                default:
-                    log.error("This Case id {} is not in a valid state APPLICATION_ADD_PAYMENT,"
-                                    + "AWAITING_APPLICATION_PAYMENT to process payment callback ",
-                            serviceRequestUpdateDto.getCcdCaseNumber());
+                switch (caseData.getCcdState()) {
+                    case APPLICATION_ADD_PAYMENT:
+                        return processAndTriggerAdditionalPayment(caseData, serviceRequestUpdateDto, hwf);
+                    case AWAITING_APPLICATION_PAYMENT:
+                        return processAndTriggerAwaitingPayment(caseData, serviceRequestUpdateDto, hwf);
+                    default:
+                        log.error("This Case id {} is not in a valid state APPLICATION_ADD_PAYMENT,"
+                                      + "AWAITING_APPLICATION_PAYMENT to process payment callback ",
+                                  serviceRequestUpdateDto.getCcdCaseNumber());
+                }
+            } else {
+                log.error("Case id {} not present", serviceRequestUpdateDto.getCcdCaseNumber());
             }
-        } else {
-            log.error("Case id {} not present", serviceRequestUpdateDto.getCcdCaseNumber());
+        } catch (Exception ex) {
+            throw new CaseDataUpdateException(ex.getMessage(), ex);
         }
         return null;
+    }
+
+    @Recover
+    public void recover(CaseDataUpdateException ex, ServiceRequestUpdateDto serviceRequestUpdateDto,
+                        GeneralApplicationCaseData caseData, boolean hwf) {
+        String status = serviceRequestUpdateDto != null ? serviceRequestUpdateDto.getServiceRequestStatus() : "N/A";
+        String paymentReference = (serviceRequestUpdateDto != null && serviceRequestUpdateDto.getPayment() != null)
+            ? serviceRequestUpdateDto.getPayment().getPaymentReference() : "N/A";
+        String caseNumber = serviceRequestUpdateDto != null ? serviceRequestUpdateDto.getCcdCaseNumber() : "N/A";
+
+        log.error(
+            "Payment status update failed after retries for case {}. Status: {}, PaymentReference: {}, HWF: {}",
+            caseNumber,
+            status,
+            paymentReference,
+            hwf,
+            ex);
     }
 
     private GeneralApplicationCaseData processAndTriggerAwaitingPayment(GeneralApplicationCaseData caseData,
@@ -176,22 +198,61 @@ public class GaPaymentRequestUpdateCallbackService {
         return caseData;
     }
 
-    private void createEvent(GeneralApplicationCaseData caseData, CaseEvent eventName, String generalApplicationCaseId) {
+    private void createEvent(GeneralApplicationCaseData updatedStaleCaseData, CaseEvent eventName, String generalApplicationCaseId) {
         StartEventResponse startEventResponse = coreCaseDataService.startGaUpdate(
             generalApplicationCaseId,
             eventName
         );
-        GeneralApplicationCaseData startEventData = caseDetailsConverter.toGeneralApplicationCaseData(startEventResponse.getCaseDetails());
+        GeneralApplicationCaseData freshData = caseDetailsConverter.toGeneralApplicationCaseData(startEventResponse.getCaseDetails());
 
-        BusinessProcess businessProcess = startEventData.getBusinessProcess();
+        PaymentDetails intendedPayment = getPaymentDetails(eventName, updatedStaleCaseData);
+        PaymentDetails freshPayment = getPaymentDetails(eventName, freshData);
+
+        if (isPaymentAlreadyApplied(intendedPayment, freshPayment)) {
+            String reference = freshPayment != null ? freshPayment.getReference() : "N/A";
+            log.info("{} Payment with reference {} already applied for case {}. Skipping submission.",
+                     eventName == INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT ? "Application" : "Additional",
+                     reference, generalApplicationCaseId);
+            return;
+        }
+
+        GeneralApplicationPbaDetails freshPba = ofNullable(freshData.getGeneralAppPBADetails())
+            .map(GeneralApplicationPbaDetails::copy)
+            .orElse(new GeneralApplicationPbaDetails());
+
+        GeneralApplicationPbaDetails stalePba = updatedStaleCaseData.getGeneralAppPBADetails();
+
+        if (eventName == INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT) {
+            freshPba.setPaymentDetails(stalePba.getPaymentDetails());
+        } else if (eventName == MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID) {
+            freshPba.setAdditionalPaymentDetails(stalePba.getAdditionalPaymentDetails());
+        }
+        freshPba.setPaymentSuccessfulDate(stalePba.getPaymentSuccessfulDate());
+
+        freshData.setGeneralAppPBADetails(freshPba);
+        freshData.setCcdState(updatedStaleCaseData.getCcdState());
+
         CaseDataContent caseDataContent = buildCaseDataContent(
             startEventResponse,
-            caseData,
-            businessProcess,
+            freshData,
+            freshData.getBusinessProcess(),
             generalApplicationCaseId,
-            startEventData.getGeneralAppParentCaseLink()
+            freshData.getGeneralAppParentCaseLink()
         );
         coreCaseDataService.submitGaUpdate(generalApplicationCaseId, caseDataContent);
+    }
+
+    private PaymentDetails getPaymentDetails(CaseEvent eventName, GeneralApplicationCaseData caseData) {
+        GeneralApplicationPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
+        if (pbaDetails == null) {
+            return null;
+        }
+        if (eventName == INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT) {
+            return pbaDetails.getPaymentDetails();
+        } else if (eventName == MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID) {
+            return pbaDetails.getAdditionalPaymentDetails();
+        }
+        return null;
     }
 
     private CaseDataContent buildCaseDataContent(StartEventResponse startEventResponse, GeneralApplicationCaseData caseData,
