@@ -96,4 +96,144 @@ class ScannedDocumentMapperTest {
         assertThat(mapper.from(null)).isNull();
         assertThat(mapper.to(null)).isNull();
     }
+
+    @Test
+    void shouldMapScannedDocumentToCCDCollectionElementWithGeneratedIdAndDefaultType() {
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+            .fileName("default-type.pdf")
+            .controlNumber("CTRL-001")
+            .documentType(null)
+            .subtype("UNKNOWN")
+            .build();
+
+        Element<CCDScannedDocument> element = mapper.to(scannedDocument);
+
+        assertThat(element).isNotNull();
+        assertThat(element.getId()).isNotNull();
+        assertThat(element.getValue()).isNotNull();
+        assertThat(element.getValue().getType()).isEqualTo(CCDScannedDocumentType.other);
+        assertThat(element.getValue().getFileName()).isEqualTo("default-type.pdf");
+        assertThat(element.getValue().getControlNumber()).isEqualTo("CTRL-001");
+        assertThat(element.getValue().getSubtype()).isEqualTo("UNKNOWN");
+    }
+
+    @Test
+    void shouldPreserveExistingDocumentUrlWhenMappingToCCDDocument() {
+        UUID id = UUID.randomUUID();
+        Document existingDocument = new Document()
+            .setDocumentUrl("http://dm-store/documents/existing")
+            .setDocumentBinaryUrl("http://dm-store/documents/existing/binary")
+            .setDocumentFileName("existing.pdf");
+
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+            .id(id.toString())
+            .fileName("ignored-file-name.pdf")
+            .documentType(ScannedDocumentType.FORM)
+            .url(existingDocument)
+            .documentManagementUrl(URI.create("http://dm-store/documents/management-url"))
+            .documentManagementBinaryUrl(URI.create("http://dm-store/documents/management-url/binary"))
+            .build();
+
+        Element<CCDScannedDocument> element = mapper.to(scannedDocument);
+
+        assertThat(element).isNotNull();
+        assertThat(element.getId()).isEqualTo(id);
+        assertThat(element.getValue().getUrl()).isSameAs(existingDocument);
+        assertThat(element.getValue().getUrl().getDocumentUrl()).isEqualTo("http://dm-store/documents/existing");
+        assertThat(element.getValue().getUrl().getDocumentBinaryUrl()).isEqualTo("http://dm-store/documents/existing/binary");
+        assertThat(element.getValue().getUrl().getDocumentFileName()).isEqualTo("existing.pdf");
+    }
+
+    @Test
+    void shouldCreateDocumentWhenOnlyDocumentManagementBinaryUrlExists() {
+        UUID id = UUID.randomUUID();
+
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+            .id(id.toString())
+            .fileName("binary-only.pdf")
+            .documentType(ScannedDocumentType.OTHER)
+            .documentManagementBinaryUrl(URI.create("http://dm-store/documents/123/binary"))
+            .build();
+
+        Element<CCDScannedDocument> element = mapper.to(scannedDocument);
+
+        assertThat(element).isNotNull();
+        assertThat(element.getId()).isEqualTo(id);
+        assertThat(element.getValue().getType()).isEqualTo(CCDScannedDocumentType.other);
+        assertThat(element.getValue().getUrl()).isNotNull();
+        assertThat(element.getValue().getUrl().getDocumentUrl()).isNull();
+        assertThat(element.getValue().getUrl().getDocumentBinaryUrl()).isEqualTo("http://dm-store/documents/123/binary");
+        assertThat(element.getValue().getUrl().getDocumentFileName()).isEqualTo("binary-only.pdf");
+    }
+
+    @Test
+    void shouldReturnNullWhenElementValueIsNull() {
+        Element<CCDScannedDocument> element = new Element<>(UUID.randomUUID(), null);
+
+        ScannedDocument result = mapper.from(element);
+
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void shouldMapCCDDocumentWithDefaultsWhenOptionalFieldsAreMissing() {
+        Document document = new Document()
+            .setDocumentUrl("http://dm-store/documents/456")
+            .setDocumentBinaryUrl("http://dm-store/documents/456/binary")
+            .setDocumentFileName("fallback-name.pdf");
+
+        CCDScannedDocument ccdDoc = CCDScannedDocument.builder()
+            .fileName(null)
+            .type(null)
+            .subtype(null)
+            .formSubtype("N180")
+            .deliveryDate(null)
+            .url(document)
+            .build();
+
+        Element<CCDScannedDocument> element = new Element<>(null, ccdDoc);
+
+        LocalDateTime beforeMapping = LocalDateTime.now();
+        ScannedDocument result = mapper.from(element);
+        LocalDateTime afterMapping = LocalDateTime.now();
+
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isNull();
+        assertThat(result.getFileName()).isEqualTo("fallback-name.pdf");
+        assertThat(result.getDocumentType()).isEqualTo(ScannedDocumentType.OTHER);
+        assertThat(result.getSubtype()).isEqualTo("N180");
+        assertThat(result.getFormSubtype()).isEqualTo("N180");
+        assertThat(result.getDeliveryDate()).isBetween(beforeMapping, afterMapping);
+        assertThat(result.getDocumentManagementUrl()).isEqualTo(URI.create("http://dm-store/documents/456"));
+        assertThat(result.getDocumentManagementBinaryUrl()).isEqualTo(URI.create("http://dm-store/documents/456/binary"));
+        assertThat(result.getUrl()).isSameAs(document);
+    }
+
+    @Test
+    void shouldMapCCDDocumentWithoutUrls() {
+        UUID id = UUID.randomUUID();
+        LocalDateTime deliveryDate = LocalDateTime.now();
+
+        CCDScannedDocument ccdDoc = CCDScannedDocument.builder()
+            .fileName("no-url.pdf")
+            .type(CCDScannedDocumentType.other)
+            .subtype("OTHER")
+            .deliveryDate(deliveryDate)
+            .url(null)
+            .build();
+
+        Element<CCDScannedDocument> element = new Element<>(id, ccdDoc);
+
+        ScannedDocument result = mapper.from(element);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(id.toString());
+        assertThat(result.getFileName()).isEqualTo("no-url.pdf");
+        assertThat(result.getDocumentType()).isEqualTo(ScannedDocumentType.OTHER);
+        assertThat(result.getSubtype()).isEqualTo("OTHER");
+        assertThat(result.getDeliveryDate()).isEqualTo(deliveryDate);
+        assertThat(result.getDocumentManagementUrl()).isNull();
+        assertThat(result.getDocumentManagementBinaryUrl()).isNull();
+        assertThat(result.getUrl()).isNull();
+    }
 }

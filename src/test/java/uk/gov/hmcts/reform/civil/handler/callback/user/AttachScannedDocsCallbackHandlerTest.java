@@ -166,5 +166,128 @@ class AttachScannedDocsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData().get("respondent1ResponseMethod")).isNull();
         }
+
+        @Test
+        void shouldSetOfflineWhenPaperResponseDetectedFromRawFormSubtype() {
+            Map<String, Object> data = new HashMap<>();
+            data.put("scannedDocuments", List.of(
+                Map.of("id", "1", "value", Map.of("formSubtype", "N9b"))
+            ));
+
+            CaseData caseData = CaseData.builder().ccdCaseReference(1234567890L).build();
+            CallbackParams params = callbackParamsOf(data, caseData, CallbackType.ABOUT_TO_SUBMIT, CaseState.CASE_ISSUED);
+            params.request(CallbackRequest.builder()
+                               .caseDetails(CaseDetails.builder()
+                                                .id(CASE_ID)
+                                                .caseTypeId("CIVIL")
+                                                .data(data)
+                                                .build())
+                               .build());
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData().get("respondent1ResponseMethod")).isEqualTo("OFFLINE");
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {
+            "PAPER_RESPONSE_FULL_ADMIT",
+            "PAPER_RESPONSE_PART_ADMIT",
+            "PAPER_RESPONSE_STATES_PAID",
+            "PAPER_RESPONSE_MORE_TIME",
+            "PAPER_RESPONSE_DISPUTES_ALL",
+            "PAPER_RESPONSE_COUNTER_CLAIM"
+        })
+        void shouldSetOfflineWhenPaperResponseDetectedFromStaffUploadedDocuments(String documentType) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("staffUploadedDocuments", List.of(
+                Map.of("id", "1", "value", Map.of("documentType", documentType))
+            ));
+
+            CaseData caseData = CaseData.builder().ccdCaseReference(1234567890L).build();
+            CallbackParams params = callbackParamsOf(data, caseData, CallbackType.ABOUT_TO_SUBMIT, CaseState.CASE_ISSUED);
+            params.request(CallbackRequest.builder()
+                               .caseDetails(CaseDetails.builder()
+                                                .id(CASE_ID)
+                                                .caseTypeId("CIVIL")
+                                                .data(data)
+                                                .build())
+                               .build());
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData().get("respondent1ResponseMethod")).isEqualTo("OFFLINE");
+        }
+
+        @Test
+        void shouldNotFailWhenRespondentsListIsEmpty() {
+            Map<String, Object> data = new HashMap<>();
+            data.put("respondents", new ArrayList<>());
+            data.put("scannedDocuments", List.of(
+                Map.of("id", "1", "value", Map.of("subtype", "N9a"))
+            ));
+
+            CaseData caseData = CaseData.builder().ccdCaseReference(1234567890L).build();
+            CallbackParams params = callbackParamsOf(data, caseData, CallbackType.ABOUT_TO_SUBMIT, CaseState.CASE_ISSUED);
+            params.request(CallbackRequest.builder()
+                               .caseDetails(CaseDetails.builder()
+                                                .id(CASE_ID)
+                                                .caseTypeId("CIVIL")
+                                                .data(data)
+                                                .build())
+                               .build());
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData().get("respondent1ResponseMethod")).isEqualTo("OFFLINE");
+            assertThat(response.getData().get("respondents")).isEqualTo(new ArrayList<>());
+        }
+
+        @Test
+        void shouldNotFailWhenRespondentElementHasNoValueMap() {
+            Map<String, Object> respondentElement = new HashMap<>();
+            respondentElement.put("id", "1");
+            respondentElement.put("value", "not-a-map");
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("respondents", new ArrayList<>(List.of(respondentElement)));
+            data.put("scannedDocuments", List.of(
+                Map.of("id", "1", "value", Map.of("subtype", "N9a"))
+            ));
+
+            CaseData caseData = CaseData.builder().ccdCaseReference(1234567890L).build();
+            CallbackParams params = callbackParamsOf(data, caseData, CallbackType.ABOUT_TO_SUBMIT, CaseState.CASE_ISSUED);
+            params.request(CallbackRequest.builder()
+                               .caseDetails(CaseDetails.builder()
+                                                .id(CASE_ID)
+                                                .caseTypeId("CIVIL")
+                                                .data(data)
+                                                .build())
+                               .build());
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData().get("respondent1ResponseMethod")).isEqualTo("OFFLINE");
+
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> respondents = (List<Map<String, Object>>) response.getData().get("respondents");
+            assertThat(respondents.get(0).get("value")).isEqualTo("not-a-map");
+        }
+
+        @Test
+        void shouldReturnEmptyDataWhenRequestIsNullAndCaseDataHasNoScannedDocuments() {
+            CallbackParams params = callbackParamsOf(
+                new HashMap<>(),
+                CaseData.builder().ccdCaseReference(1234567890L).build(),
+                CallbackType.ABOUT_TO_SUBMIT,
+                CaseState.CASE_ISSUED
+            );
+            CallbackRequest request = null;
+            params.request(request);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).isEmpty();
+        }
     }
 }
