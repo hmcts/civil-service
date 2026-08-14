@@ -128,6 +128,20 @@ sourceSets {
   }
 }
 
+tasks.register('preparePatchedMigrations', Copy) {
+  from 'src/main/resources/db/migration'
+  into "${layout.buildDirectory.get().asFile.absolutePath}/tmp/patched-migrations"
+  filter { line ->
+    if (line.contains('CONCURRENTLY')) {
+      return line.replace('CONCURRENTLY', '')
+    }
+    if (line.contains('-- flyway:executeInTransaction=false')) {
+      return ''
+    }
+    return line
+  }
+}
+
 tasks.withType(JavaCompile).configureEach {
   options.compilerArgs << "-Xlint:unchecked" << "-Xlint:-removal" << "-Werror"
 }
@@ -138,6 +152,11 @@ tasks.named('test', Test) {
 
 tasks.withType(Copy).configureEach {
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.withType(Test).configureEach {
+  dependsOn preparePatchedMigrations
+  systemProperty 'spring.flyway.locations', "filesystem:${layout.buildDirectory.get().asFile.absolutePath}/tmp/patched-migrations"
 }
 
 def integration = tasks.register('integration', Test) {
