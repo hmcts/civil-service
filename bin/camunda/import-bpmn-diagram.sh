@@ -10,8 +10,8 @@ if [[ "${env}" == 'prod' ]]; then
   s2sSecret=${S2S_SECRET_PROD}
 fi
 
-serviceToken=$($(realpath $workspace)/bin/shared/idam-lease-service-token.sh civil_service \
-  $(docker run --rm toolbelt/oathtool --totp -b ${s2sSecret}))
+serviceToken=$(IDAM_SERVICE_SECRET="${s2sSecret}" \
+  "$(realpath "$workspace")/bin/shared/idam-lease-service-token.sh" civil_service)
 filepath="$(realpath $workspace)/src/main/resources/camunda"
 
 for file in $(find ${filepath} -name '*.bpmn')
