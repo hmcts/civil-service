@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_HEARING_FEE_P
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
+import static uk.gov.hmcts.reform.civil.utils.PaymentUtils.isPaymentAlreadyApplied;
 
 @Slf4j
 @Service
@@ -132,7 +133,7 @@ public class PaymentStatusRetryService {
 
     private void submitUpdatePaymentEvent(CaseData caseData, Long caseId, FeeType feeType) {
         CaseEvent event = determineEventFromFeeType(caseData, feeType);
-        submitEvent(caseData, caseId, event);
+        submitEvent(caseData, caseId, event, feeType);
     }
 
     CaseEvent determineEventFromFeeType(CaseData caseData, FeeType feeType) {
@@ -153,16 +154,30 @@ public class PaymentStatusRetryService {
         }
     }
 
-    private void submitEvent(CaseData caseData, Long caseId, CaseEvent event) {
+    private void submitEvent(CaseData caseData, Long caseId, CaseEvent event, FeeType feeType) {
         StartEventResponse startEvent = coreCaseDataService.startUpdate(
             String.valueOf(caseId),
             event
         );
 
+        CaseData freshCaseData = caseDetailsConverter.toCaseData(startEvent.getCaseDetails());
+
+        PaymentDetails intendedPayment = getPaymentDetails(feeType, caseData);
+        PaymentDetails freshPayment = getPaymentDetails(feeType, freshCaseData);
+
+        if (isPaymentAlreadyApplied(intendedPayment, freshPayment)) {
+            String reference = freshPayment != null ? freshPayment.getReference() : "N/A";
+            log.info("Payment with reference {} already applied for case {} and fee type {}. Skipping submission.",
+                     reference, caseId, feeType);
+            return;
+        }
+
+        applyPaymentDetails(freshCaseData, feeType, intendedPayment);
+
         CaseDataContent caseDataContent = CaseDataContent.builder()
             .eventToken(startEvent.getToken())
             .event(Event.builder().id(startEvent.getEventId()).build())
-            .data(caseData.toMap(objectMapper))
+            .data(freshCaseData.toMap(objectMapper))
             .build();
 
         coreCaseDataService.submitUpdate(String.valueOf(caseId), caseDataContent);
