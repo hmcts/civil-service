@@ -83,6 +83,9 @@ public abstract class BaseIntegrationTest {
         .build();
 
     @MockBean
+    protected uk.gov.hmcts.reform.civil.scheduler.settlementnoresponsefromdefchk.SettlementNoResponseFromDefendantCheckScheduler settlementNoResponseFromDefendantCheckScheduler;
+
+    @MockBean
     private ServiceAuthorisationApi serviceAuthorisationApi;
     @MockBean (name = "userService")
     protected UserService userService;
