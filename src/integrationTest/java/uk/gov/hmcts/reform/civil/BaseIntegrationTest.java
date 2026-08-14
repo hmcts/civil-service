@@ -26,6 +26,24 @@ import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
 import uk.gov.hmcts.reform.auth.checker.core.user.User;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.civil.config.TestIdamConfiguration;
+import uk.gov.hmcts.reform.civil.scheduler.automatedhearingnotice.AutomatedHearingNoticeScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.bundlecreation.BundleCreationScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.casedismissed.CaseDismissedScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.casedismissed.ClaimDetailsNotificationDeadlineScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.decisionoutcome.DecisionOutcomeScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.gadocumentuploadnotify.GADocumentUploadNotifyScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.gaordermade.GAOrderMadeScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.gaproofofdebt.GAProofOfDebtScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.gaunlessorder.GAUnlessOrderScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.hearingcvplink.HearingCvpLinkScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.managestaywatask.ManageStayWATaskScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.mediationfiletransfer.MediationFileTransferScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.orderreviewobligation.OrderReviewObligationCheckScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.pollingeventemitter.PollingEventEmitterScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.requestforreconsideration.RequestForReconsiderationNotificationScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.takecaseoffline.TakeCaseOfflineScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.trialreadycheck.TrialReadyCheckScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.trialreadynotification.TrialReadyNotificationScheduler;
 import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
@@ -84,6 +102,43 @@ public abstract class BaseIntegrationTest {
         .sub("solicitor@example.com")
         .roles(List.of("caseworker-civil-solicitor"))
         .build();
+
+    @MockBean
+    private AutomatedHearingNoticeScheduler automatedHearingNoticeScheduler;
+    @MockBean
+    private BundleCreationScheduler bundleCreationScheduler;
+    @MockBean
+    private CaseDismissedScheduler caseDismissedScheduler;
+    @MockBean
+    private ClaimDetailsNotificationDeadlineScheduler claimDetailsNotificationDeadlineScheduler;
+    @MockBean
+    private DecisionOutcomeScheduler decisionOutcomeScheduler;
+    @MockBean
+    private GADocumentUploadNotifyScheduler gaDocumentUploadNotifyScheduler;
+    @MockBean
+    private GAOrderMadeScheduler gaOrderMadeScheduler;
+    @MockBean
+    private GAProofOfDebtScheduler gaProofOfDebtScheduler;
+    @MockBean
+    private GAUnlessOrderScheduler gaUnlessOrderScheduler;
+    @MockBean
+    private HearingCvpLinkScheduler hearingCvpLinkScheduler;
+    @MockBean
+    private ManageStayWATaskScheduler manageStayWATaskScheduler;
+    @MockBean
+    private MediationFileTransferScheduler mediationFileTransferScheduler;
+    @MockBean
+    private OrderReviewObligationCheckScheduler orderReviewObligationCheckScheduler;
+    @MockBean
+    private PollingEventEmitterScheduler pollingEventEmitterScheduler;
+    @MockBean
+    private RequestForReconsiderationNotificationScheduler requestForReconsiderationNotificationScheduler;
+    @MockBean
+    private TakeCaseOfflineScheduler takeCaseOfflineScheduler;
+    @MockBean
+    private TrialReadyCheckScheduler trialReadyCheckScheduler;
+    @MockBean
+    private TrialReadyNotificationScheduler trialReadyNotificationScheduler;
 
     @MockBean
     private ServiceAuthorisationApi serviceAuthorisationApi;
