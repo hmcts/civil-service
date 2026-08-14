@@ -122,7 +122,7 @@ class NoCHelperTest {
     }
 
     @Test
-    void getFormerSolicitorPartyReferences_shouldRestoreFormerDefendantSolicitorReference() {
+    void getNoCPartyReferences_shouldRestoreFormerDefendantSolicitorReference() {
         CaseData caseData = baseCaseData.toBuilder()
             .respondent2(null)
             // reference has already been removed from the case by UpdateCaseDetailsAfterNoCHandler
@@ -133,12 +133,12 @@ class NoCHelperTest {
                                         .setFormerRepresentationReference("defendant-ref"))
             .build();
 
-        assertThat(noCHelper.getFormerSolicitorPartyReferences(caseData))
+        assertThat(noCHelper.getNoCPartyReferences(caseData))
             .isEqualTo("Claimant reference: claimant-ref - Defendant reference: defendant-ref");
     }
 
     @Test
-    void getFormerSolicitorPartyReferences_shouldRestoreFormerClaimantSolicitorReference() {
+    void getNoCPartyReferences_shouldRestoreFormerClaimantSolicitorReference() {
         CaseData caseData = baseCaseData.toBuilder()
             .respondent2(null)
             .solicitorReferences(new SolicitorReferences()
@@ -148,12 +148,12 @@ class NoCHelperTest {
                                         .setFormerRepresentationReference("claimant-ref"))
             .build();
 
-        assertThat(noCHelper.getFormerSolicitorPartyReferences(caseData))
+        assertThat(noCHelper.getNoCPartyReferences(caseData))
             .isEqualTo("Claimant reference: claimant-ref - Defendant reference: defendant-ref");
     }
 
     @Test
-    void getFormerSolicitorPartyReferences_shouldRestoreFormerDefendant2SolicitorReference() {
+    void getNoCPartyReferences_shouldRestoreFormerDefendant2SolicitorReference() {
         CaseData caseData = baseCaseData.toBuilder()
             .respondent2SameLegalRepresentative(YesOrNo.NO)
             .respondent2Represented(YesOrNo.YES)
@@ -165,13 +165,13 @@ class NoCHelperTest {
                                         .setFormerRepresentationReference("defendant-2-ref"))
             .build();
 
-        assertThat(noCHelper.getFormerSolicitorPartyReferences(caseData))
+        assertThat(noCHelper.getNoCPartyReferences(caseData))
             .isEqualTo("Claimant reference: claimant-ref - Defendant 1 reference: defendant-1-ref"
                            + " - Defendant 2 reference: defendant-2-ref");
     }
 
     @Test
-    void getFormerSolicitorPartyReferences_shouldFallBackToCaseReferencesWhenNoFormerReferenceProvided() {
+    void getNoCPartyReferences_shouldFallBackToCaseReferencesWhenNoFormerReferenceProvided() {
         CaseData caseData = baseCaseData.toBuilder()
             .respondent2(null)
             .solicitorReferences(new SolicitorReferences()
@@ -180,7 +180,7 @@ class NoCHelperTest {
                                         .setCaseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()))
             .build();
 
-        assertThat(noCHelper.getFormerSolicitorPartyReferences(caseData))
+        assertThat(noCHelper.getNoCPartyReferences(caseData))
             .isEqualTo("Claimant reference: claimant-ref - Defendant reference: Not provided");
     }
 

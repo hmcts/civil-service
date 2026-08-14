@@ -41,7 +41,7 @@ public class NoCFormerSolicitorEmailDTOGenerator extends EmailDTOGenerator {
         properties.putAll(noCHelper.getProperties(caseData, false));
         // the former solicitor's own reference has already been removed from the case by this point,
         // so restore it here to show it back to them in the email subject
-        properties.put(PARTY_REFERENCES, noCHelper.getFormerSolicitorPartyReferences(caseData));
+        properties.put(PARTY_REFERENCES, noCHelper.getNoCPartyReferences(caseData));
         return properties;
     }
 }

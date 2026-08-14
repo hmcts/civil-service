@@ -84,7 +84,7 @@ class NoCFormerSolicitorEmailDTOGeneratorTest {
             );
 
             when(noCHelper.getProperties(caseData, false)).thenReturn(Map.of("key", "value"));
-            when(noCHelper.getFormerSolicitorPartyReferences(caseData)).thenReturn(PARTY_REFERENCES_VALUE);
+            when(noCHelper.getNoCPartyReferences(caseData)).thenReturn(PARTY_REFERENCES_VALUE);
 
             EmailDTO emailDTO = generator.buildEmailDTO(caseData, "taskId");
 
@@ -98,7 +98,7 @@ class NoCFormerSolicitorEmailDTOGeneratorTest {
     @Test
     void shouldAddFormerSolicitorPartyReferences() {
         when(noCHelper.getProperties(caseData, false)).thenReturn(Map.of("key", "value"));
-        when(noCHelper.getFormerSolicitorPartyReferences(caseData)).thenReturn(PARTY_REFERENCES_VALUE);
+        when(noCHelper.getNoCPartyReferences(caseData)).thenReturn(PARTY_REFERENCES_VALUE);
 
         Map<String, String> properties = generator.addCustomProperties(new HashMap<>(), caseData);
 

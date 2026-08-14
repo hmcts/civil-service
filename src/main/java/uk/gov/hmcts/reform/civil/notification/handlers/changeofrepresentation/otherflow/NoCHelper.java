@@ -82,15 +82,15 @@ public class NoCHelper {
         );
     }
 
-    /** Builds the party references for the email telling the former legal representative they have come off record.
-     * Their own reference is removed from the case by UpdateCaseDetailsAfterNoCHandler before the parties are
-     * notified, so it is restored here from the value captured when the NoC decision was applied. Where no
-     * reference was provided the references currently held on the case are used unchanged.
+    /** Builds the party references for the notice of change emails. The outgoing legal representative's reference
+     * is removed from the case by UpdateCaseDetailsAfterNoCHandler before the parties are notified, so it is
+     * restored here from the value captured when the NoC decision was applied. Where no reference was provided
+     * the references currently held on the case are used unchanged.
      *
      * @param caseData caseData
      * @return the party references for the email subject
      */
-    public String getFormerSolicitorPartyReferences(CaseData caseData) {
+    public String getNoCPartyReferences(CaseData caseData) {
         ChangeOfRepresentation changeOfRepresentation = caseData.getChangeOfRepresentation();
         String formerReference = changeOfRepresentation != null
             ? changeOfRepresentation.getFormerRepresentationReference() : null;
