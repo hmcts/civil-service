@@ -55,9 +55,7 @@ spring:
     placeholder-replacement: false
     table: schema_version
     baseline-on-migrate: true
-    lock-retry-count: 500
-    postgresql:
-      advisory-lock: false
+    lock-retry-count: 100
 
 scheduler:
   active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:JudgementBuffer}
@@ -865,11 +863,9 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
     enabled: true
-    baseline-on-migrate: true
+    baselineOnMigrate: true
     placeholder-replacement: false
-    lock-retry-count: 500
-    postgresql:
-      advisory-lock: false
+    lock-retry-count: 100
 
   main:
     lazy-initialization: true
