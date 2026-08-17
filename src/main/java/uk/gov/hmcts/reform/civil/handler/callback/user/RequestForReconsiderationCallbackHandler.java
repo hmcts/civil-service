@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -48,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
@@ -133,13 +135,17 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
 
     private List<String> validateRequestEligibility(CaseData caseData) {
         if (caseData.getTotalClaimAmount().compareTo(MAX_CLAIM_AMOUNT) > 0) {
+            log.info("caseId {} claim amount {} exceeds maximum allowed amount {}",
+                     caseData.getTotalClaimAmount(), MAX_CLAIM_AMOUNT, caseData.getCcdCaseReference());
             return List.of(ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_TEN_THOUSAND);
         }
         if (caseData.getEaCourtLocation() == YES && caseData.getIsReferToJudgeClaim() == YesOrNo.YES) {
+            log.info("caseId {} EA court location and refer-to-judge claim are both set", caseData.getCcdCaseReference());
             return List.of(ERROR_MESSAGE_EVENT_NOT_ALLOWED);
         }
         List<String> errors = new ArrayList<>();
         validateDeadline(caseData, errors);
+        log.info("caseId {} {}", caseData.getCcdCaseReference(), errors);
         return errors;
     }
 
