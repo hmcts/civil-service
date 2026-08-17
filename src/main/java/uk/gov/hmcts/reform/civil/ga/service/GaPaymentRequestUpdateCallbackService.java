@@ -83,19 +83,14 @@ public class GaPaymentRequestUpdateCallbackService {
     }
 
     @Recover
-    public void recover(CaseDataUpdateException ex, ServiceRequestUpdateDto serviceRequestUpdateDto,
-                        GeneralApplicationCaseData caseData, boolean hwf) {
+    public void recover(CaseDataUpdateException ex, ServiceRequestUpdateDto serviceRequestUpdateDto) {
         String status = serviceRequestUpdateDto != null ? serviceRequestUpdateDto.getServiceRequestStatus() : "N/A";
-        String paymentReference = (serviceRequestUpdateDto != null && serviceRequestUpdateDto.getPayment() != null)
-            ? serviceRequestUpdateDto.getPayment().getPaymentReference() : "N/A";
         String caseNumber = serviceRequestUpdateDto != null ? serviceRequestUpdateDto.getCcdCaseNumber() : "N/A";
 
         log.error(
-            "Payment status update failed after retries for case {}. Status: {}, PaymentReference: {}, HWF: {}",
+            "Payment status update failed after retries for case {}. Status: {}",
             caseNumber,
             status,
-            paymentReference,
-            hwf,
             ex);
     }
 

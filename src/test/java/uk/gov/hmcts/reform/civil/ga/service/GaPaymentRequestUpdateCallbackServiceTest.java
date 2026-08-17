@@ -255,12 +255,11 @@ class GaPaymentRequestUpdateCallbackServiceTest {
         ServiceRequestUpdateDto dto = buildServiceDto(PAID);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
 
-        paymentRequestUpdateCallbackService.recover(ex, dto, caseData, false);
+        paymentRequestUpdateCallbackService.recover(ex, dto);
 
         assertThat(listAppender.list.stream()
                        .anyMatch(event -> event.getFormattedMessage()
-                           .contains("Payment status update failed after retries for case 12345. "
-                                         + "Status: Paid, PaymentReference: 123445, HWF: false")))
+                           .contains("Payment status update failed after retries for case 12345. Status: Paid")))
             .isTrue();
         assertThat(listAppender.list.stream()
                        .anyMatch(event -> event.getLevel().equals(Level.ERROR)))
@@ -272,12 +271,11 @@ class GaPaymentRequestUpdateCallbackServiceTest {
         CaseDataUpdateException ex = new CaseDataUpdateException("Test Error", new RuntimeException());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
 
-        paymentRequestUpdateCallbackService.recover(ex, null, caseData, false);
+        paymentRequestUpdateCallbackService.recover(ex, null);
 
         assertThat(listAppender.list.stream()
                        .anyMatch(event -> event.getFormattedMessage()
-                           .contains("Payment status update failed after retries for case N/A. "
-                                         + "Status: N/A, PaymentReference: N/A, HWF: false")))
+                           .contains("Payment status update failed after retries for case N/A. Status: N/A")))
             .isTrue();
         assertThat(listAppender.list.stream()
                        .anyMatch(event -> event.getLevel().equals(Level.ERROR)))
