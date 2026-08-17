@@ -204,13 +204,24 @@ public class GaPaymentRequestUpdateCallbackService {
         PaymentDetails freshPayment = getPaymentDetails(eventName, freshData);
 
         if (isPaymentAlreadyApplied(intendedPayment, freshPayment)) {
-            String reference = freshPayment != null ? freshPayment.getReference() : "N/A";
-            log.info("{} Payment with reference {} already applied for case {}. Skipping submission.",
-                     eventName == INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT ? "Application" : "Additional",
-                     reference, generalApplicationCaseId);
+            log.info("{} Payment already applied for case {}. Skipping submission.",
+                     eventName == INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT ? "Application" : "Additional", generalApplicationCaseId);
             return;
         }
 
+        populateFreshData(updatedStaleCaseData, eventName, freshData);
+
+        CaseDataContent caseDataContent = buildCaseDataContent(
+            startEventResponse,
+            freshData,
+            freshData.getBusinessProcess(),
+            generalApplicationCaseId,
+            freshData.getGeneralAppParentCaseLink()
+        );
+        coreCaseDataService.submitGaUpdate(generalApplicationCaseId, caseDataContent);
+    }
+
+    private static void populateFreshData(GeneralApplicationCaseData updatedStaleCaseData, CaseEvent eventName, GeneralApplicationCaseData freshData) {
         GeneralApplicationPbaDetails freshPba = ofNullable(freshData.getGeneralAppPBADetails())
             .map(GeneralApplicationPbaDetails::copy)
             .orElse(new GeneralApplicationPbaDetails());
@@ -226,15 +237,6 @@ public class GaPaymentRequestUpdateCallbackService {
 
         freshData.setGeneralAppPBADetails(freshPba);
         freshData.setCcdState(updatedStaleCaseData.getCcdState());
-
-        CaseDataContent caseDataContent = buildCaseDataContent(
-            startEventResponse,
-            freshData,
-            freshData.getBusinessProcess(),
-            generalApplicationCaseId,
-            freshData.getGeneralAppParentCaseLink()
-        );
-        coreCaseDataService.submitGaUpdate(generalApplicationCaseId, caseDataContent);
     }
 
     private PaymentDetails getPaymentDetails(CaseEvent eventName, GeneralApplicationCaseData caseData) {
