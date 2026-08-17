@@ -6,8 +6,17 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class MapperUtil {
+
+    private static final String SCANNED_DOCUMENTS = "scannedDocuments";
+    private static final String STAFF_UPLOADED_DOCUMENTS = "staffUploadedDocuments";
+    private static final String VALUE = "value";
+    private static final String SUBTYPE = "subtype";
+    private static final String FORM_SUBTYPE = "formSubtype";
+    private static final String DOCUMENT_TYPE = "documentType";
+
     private static final List<String> PAPER_RESPONSE_SCANNED_TYPES = Arrays.asList(
         "N9a",
         "N9b",
@@ -30,54 +39,62 @@ public class MapperUtil {
     }
 
     public static boolean hasPaperResponse(Map<String, Object> data, CaseData caseData) {
-        // Check scannedDocuments in CaseData if present
-        if (caseData != null && caseData.getScannedDocuments() != null) {
-            boolean hasScannedPaper = caseData.getScannedDocuments().stream()
-                .map(Element::getValue)
-                .filter(doc -> doc != null)
-                .anyMatch(doc -> (doc.getSubtype() != null && PAPER_RESPONSE_SCANNED_TYPES.stream().anyMatch(type -> type.equalsIgnoreCase(doc.getSubtype())))
-                    || (doc.getFormSubtype() != null && PAPER_RESPONSE_SCANNED_TYPES.stream().anyMatch(type -> type.equalsIgnoreCase(doc.getFormSubtype()))));
-            if (hasScannedPaper) {
-                return true;
-            }
+        return hasScannedPaperResponse(caseData)
+            || hasScannedPaperResponse(data)
+            || hasStaffUploadedPaperResponse(data);
+    }
+
+    private static boolean hasScannedPaperResponse(CaseData caseData) {
+        return caseData != null
+            && caseData.getScannedDocuments() != null
+            && caseData.getScannedDocuments().stream()
+            .map(Element::getValue)
+            .filter(Objects::nonNull)
+            .anyMatch(doc -> isPaperResponseScannedType(doc.getSubtype())
+                || isPaperResponseScannedType(doc.getFormSubtype()));
+    }
+
+    private static boolean hasScannedPaperResponse(Map<String, Object> data) {
+        return getCollection(data, SCANNED_DOCUMENTS).stream()
+            .map(MapperUtil::getValueMap)
+            .filter(Objects::nonNull)
+            .anyMatch(doc -> isPaperResponseScannedType(doc.get(SUBTYPE))
+                || isPaperResponseScannedType(doc.get(FORM_SUBTYPE)));
+    }
+
+    private static boolean hasStaffUploadedPaperResponse(Map<String, Object> data) {
+        return getCollection(data, STAFF_UPLOADED_DOCUMENTS).stream()
+            .map(MapperUtil::getValueMap)
+            .filter(Objects::nonNull)
+            .map(doc -> doc.get(DOCUMENT_TYPE))
+            .filter(String.class::isInstance)
+            .map(String.class::cast)
+            .anyMatch(PAPER_RESPONSE_DOC_TYPES::contains);
+    }
+
+    private static boolean isPaperResponseScannedType(Object value) {
+        return value instanceof String scannedType
+            && PAPER_RESPONSE_SCANNED_TYPES.stream()
+            .anyMatch(type -> type.equalsIgnoreCase(scannedType));
+    }
+
+    private static List<Map<String, Object>> getCollection(Map<String, Object> data, String key) {
+        if (data == null || !(data.get(key) instanceof List<?> values)) {
+            return List.of();
         }
 
-        // Check scannedDocuments in raw data map
-        if (data.containsKey("scannedDocuments") && data.get("scannedDocuments") instanceof List) {
-            @SuppressWarnings("unchecked")
-            List<Map<String, Object>> scannedDocs = (List<Map<String, Object>>) data.get("scannedDocuments");
-            for (Map<String, Object> element : scannedDocs) {
-                Object valueObj = element.get("value");
-                if (valueObj instanceof Map) {
-                    @SuppressWarnings("unchecked")
-                    Map<String, Object> doc = (Map<String, Object>) valueObj;
-                    String subtype = (String) doc.get("subtype");
-                    String formSubtype = (String) doc.get("formSubtype");
-                    if ((subtype != null && PAPER_RESPONSE_SCANNED_TYPES.stream().anyMatch(type -> type.equalsIgnoreCase(subtype)))
-                        || (formSubtype != null && PAPER_RESPONSE_SCANNED_TYPES.stream().anyMatch(type -> type.equalsIgnoreCase(formSubtype)))) {
-                        return true;
-                    }
-                }
-            }
-        }
+        return values.stream()
+            .filter(Map.class::isInstance)
+            .map(element -> (Map<String, Object>) element)
+            .toList();
+    }
 
-        // Check staffUploadedDocuments in raw data map
-        if (data.containsKey("staffUploadedDocuments") && data.get("staffUploadedDocuments") instanceof List) {
-            @SuppressWarnings("unchecked")
-            List<Map<String, Object>> staffDocs = (List<Map<String, Object>>) data.get("staffUploadedDocuments");
-            for (Map<String, Object> element : staffDocs) {
-                Object valueObj = element.get("value");
-                if (valueObj instanceof Map) {
-                    @SuppressWarnings("unchecked")
-                    Map<String, Object> doc = (Map<String, Object>) valueObj;
-                    String docType = (String) doc.get("documentType");
-                    if (docType != null && PAPER_RESPONSE_DOC_TYPES.contains(docType)) {
-                        return true;
-                    }
-                }
-            }
+    private static Map<String, Object> getValueMap(Map<String, Object> element) {
+        Object value = element.get(VALUE);
+        if (value instanceof Map<?, ?> valueMap) {
+            return (Map<String, Object>) valueMap;
         }
-        return false;
+        return null;
     }
 
 }
