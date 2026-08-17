@@ -1,0 +1,8 @@
+[ {
+  "ID" : "CourtLocation",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "courtLocation",
+  "ListElementCode" : "labelPreferredCourt",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "READONLY"
+} ]

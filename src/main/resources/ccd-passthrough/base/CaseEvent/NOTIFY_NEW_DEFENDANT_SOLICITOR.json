@@ -1,0 +1,7 @@
+[ {
+  "ID" : "NOTIFY_NEW_DEFENDANT_SOLICITOR",
+  "CallBackURLAboutToSubmitEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+  "RetriesTimeoutAboutToStartEvent" : 0,
+  "RetriesTimeoutURLAboutToSubmitEvent" : 0,
+  "RetriesTimeoutURLSubmittedEvent" : 0
+} ]

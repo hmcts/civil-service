@@ -1,0 +1,12 @@
+[ {
+  "CaseEventID" : "DEFAULT_JUDGEMENT",
+  "CaseFieldID" : "caseManagementLocation",
+  "ListElementCode" : "region",
+  "ElementLabel" : "Region"
+}, {
+  "CaseEventID" : "DEFAULT_JUDGEMENT",
+  "CaseFieldID" : "caseManagementLocation",
+  "ListElementCode" : "baseLocation",
+  "ElementLabel" : "Base Location",
+  "FieldType" : "Text"
+} ]

@@ -1,0 +1,4 @@
+[ {
+  "CaseFieldID" : "decisionOnRequestReconsiderationOptions",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/generate-judge-decision-order"
+} ]

@@ -1,0 +1,6 @@
+[ {
+  "ID" : "CUI_UPLOAD_MEDIATION_DOCUMENTS",
+  "CallBackURLAboutToStartEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-start",
+  "CallBackURLAboutToSubmitEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+  "RetriesTimeoutAboutToStartEvent" : 0
+} ]

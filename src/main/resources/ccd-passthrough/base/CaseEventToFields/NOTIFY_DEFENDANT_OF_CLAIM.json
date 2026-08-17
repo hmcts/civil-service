@@ -1,0 +1,12 @@
+[ {
+  "CaseFieldID" : "respondent2SameLegalRepresentative",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validateNotificationOption"
+}, {
+  "CaseFieldID" : "cosNotifyClaimDefendant1",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validateCosNotifyClaimDef1",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "cosNotifyClaimDefendant2",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validateCosNotifyClaimDef2",
+  "RetriesTimeoutURLMidEvent" : 0
+} ]

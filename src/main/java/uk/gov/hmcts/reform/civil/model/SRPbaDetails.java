@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
 import java.time.LocalDateTime;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
 
 @Setter
 @Data
@@ -18,11 +20,17 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 public class SRPbaDetails {
 
+    @CCD(label = "Claimant solicitor PBA accounts", searchable = false, typeOverride = FieldType.DynamicList)
     private DynamicList applicantsPbaAccounts;
+    @CCD(label = "PBA Reference", searchable = false)
     private String pbaReference;
+    @CCD(label = "Hearing Notice fee", searchable = false)
     private Fee fee;
+    @CCD(label = "Details of PBA payment", searchable = false)
     private PaymentDetails paymentDetails;
+    @CCD(label = "Payment successful date", searchable = false)
     private LocalDateTime paymentSuccessfulDate;
+    @CCD(ignore = true)
     private String serviceReqReference;
 
     @JsonCreator
@@ -40,4 +48,9 @@ public class SRPbaDetails {
         this.serviceReqReference = serviceReqReference;
 
     }
+
+  // ==== ccd-definition-converter: synthesised definition-only fields (retrofit) ====
+  @CCD(label = "Service Request Reference", searchable = false)
+  private String serviceRequestReference;
+  // ==== end synthesised definition-only fields ====
 }

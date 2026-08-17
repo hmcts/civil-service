@@ -1,0 +1,28 @@
+[ {
+  "CaseFieldID" : "defendantDetailsSpec",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/showCertifyStatementSpec"
+}, {
+  "CaseFieldID" : "CPRAcceptance",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/acceptCPRSpec"
+}, {
+  "CaseFieldID" : "CPRAcceptance2Def",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/acceptCPRSpec"
+}, {
+  "CaseFieldID" : "partialPaymentAmount",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/claimPartialPayment"
+}, {
+  "CaseFieldID" : "paymentConfirmationDecisionSpec",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/repaymentBreakdown"
+}, {
+  "CaseFieldID" : "claimFixedCostsOnEntryDJ",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/repaymentBreakdown"
+}, {
+  "CaseFieldID" : "paymentTypeSelection",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/repaymentTotal"
+}, {
+  "CaseFieldID" : "paymentSetDateLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/claimPaymentDate"
+}, {
+  "CaseFieldID" : "repaymentDate",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/repaymentValidate"
+} ]

@@ -6,7 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Value;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(name = "Bundle", generate = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Value
 @NoArgsConstructor(force = true)

@@ -7,12 +7,14 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
 
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
 public class PaymentBySetDate {
 
+    @CCD(label = " ", hint = "For example, 12 11 2023", searchable = false)
     private LocalDate paymentSetDate;
 
     @JsonCreator

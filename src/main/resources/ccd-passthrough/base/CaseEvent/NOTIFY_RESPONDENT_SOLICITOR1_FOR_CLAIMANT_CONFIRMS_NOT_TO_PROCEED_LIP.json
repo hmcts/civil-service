@@ -1,0 +1,4 @@
+[ {
+  "ID" : "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED_LIP",
+  "CallBackURLAboutToSubmitEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit"
+} ]

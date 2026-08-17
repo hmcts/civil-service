@@ -8,12 +8,25 @@ import lombok.Setter;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypesLR;
 
 import java.util.List;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
+import uk.gov.hmcts.reform.civil.model.GeneralApplicationTypesGAspecLR;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(name = "GATypeGAspecLR", generate = true)
 @Setter
 @Data
 @NoArgsConstructor
 public class GAApplicationTypeLR {
 
+    @CCD(
+            label = "  ",
+            hint = "  ",
+            searchable = false,
+            typeOverride = FieldType.MultiSelectList,
+            typeParameterOverride = "GeneralApplicationTypesGAspecLR",
+            typeParameterClass = GeneralApplicationTypesGAspecLR.class
+    )
     private List<GeneralApplicationTypesLR> types;
 
     @JsonCreator

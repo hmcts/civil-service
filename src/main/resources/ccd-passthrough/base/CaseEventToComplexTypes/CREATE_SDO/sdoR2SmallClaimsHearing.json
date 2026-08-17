@@ -1,0 +1,8 @@
+[ {
+  "ID" : "SdoR2SmallClaimsHearing",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2SmallClaimsHearing",
+  "ListElementCode" : "lengthOtherLbl",
+  "FieldDisplayOrder" : 7,
+  "DisplayContext" : "READONLY"
+} ]

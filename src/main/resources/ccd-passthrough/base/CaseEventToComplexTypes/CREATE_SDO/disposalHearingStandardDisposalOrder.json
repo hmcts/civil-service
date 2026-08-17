@@ -1,0 +1,22 @@
+[ {
+  "ID" : "DisposalHearingStandardDisposalOrder",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingStandardDisposalOrder",
+  "ListElementCode" : "label",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "DisposalHearingStandardDisposalOrder",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingStandardDisposalOrder",
+  "ListElementCode" : "input",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "DisposalHearingStandardDisposalOrder",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingStandardDisposalOrder",
+  "ListElementCode" : "line",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "READONLY"
+} ]

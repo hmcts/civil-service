@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.time.LocalDate;
 import java.util.List;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
 
 @Data
 @NoArgsConstructor
@@ -16,7 +17,10 @@ import java.util.List;
 @Accessors(chain = true)
 public class CertOfSC {
 
+    @CCD(label = " ", searchable = false)
     private LocalDate defendantFinalPaymentDate;
+    @CCD(label = " ", searchable = false)
     private DebtPaymentEvidence debtPaymentEvidence;
+    @CCD(label = " ", searchable = false)
     private List<Element<Document>> proofOfDebtDoc;
 }

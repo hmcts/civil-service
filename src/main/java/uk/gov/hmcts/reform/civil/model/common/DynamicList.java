@@ -11,10 +11,12 @@ import java.util.List;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.toList;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
 /**
  * Representation of a CCD Dynamic List which is then converted to a select dropdown list.
  */
+@ComplexType(generate = false)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor(force = true)

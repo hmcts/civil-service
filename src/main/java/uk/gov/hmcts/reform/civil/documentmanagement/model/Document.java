@@ -13,7 +13,9 @@ import lombok.experimental.Accessors;
 import java.time.format.DateTimeFormatter;
 
 import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.nowInLocalZone;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(generate = false)
 @Accessors(chain = true)
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)

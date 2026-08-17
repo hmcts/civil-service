@@ -1,0 +1,15 @@
+[ {
+  "ID" : "Upload",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "servedDocumentFiles",
+  "ListElementCode" : "spreadsheetsLabel",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "Upload",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "servedDocumentFiles",
+  "ListElementCode" : "medicalReportsLabel",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "READONLY"
+} ]

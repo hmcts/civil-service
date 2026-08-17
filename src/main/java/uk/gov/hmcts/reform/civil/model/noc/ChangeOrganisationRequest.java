@@ -13,7 +13,9 @@ import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
 import java.time.LocalDateTime;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(generate = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @NoArgsConstructor

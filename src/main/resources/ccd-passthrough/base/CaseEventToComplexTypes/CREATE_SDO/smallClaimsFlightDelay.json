@@ -1,0 +1,8 @@
+[ {
+  "ID" : "SmallClaimsFlightDelay",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "smallClaimsFlightDelay",
+  "ListElementCode" : "smallClaimsNumberOfWitnessesToggle",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "OPTIONAL"
+} ]

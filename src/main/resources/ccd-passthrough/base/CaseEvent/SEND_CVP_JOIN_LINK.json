@@ -1,0 +1,6 @@
+[ {
+  "ID" : "SEND_CVP_JOIN_LINK",
+  "RetriesTimeoutAboutToStartEvent" : 0,
+  "RetriesTimeoutURLAboutToSubmitEvent" : 0,
+  "RetriesTimeoutURLSubmittedEvent" : 0
+} ]

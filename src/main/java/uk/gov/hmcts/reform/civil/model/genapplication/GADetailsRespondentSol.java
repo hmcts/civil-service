@@ -9,7 +9,9 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
 import java.time.LocalDateTime;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(generate = false)
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)

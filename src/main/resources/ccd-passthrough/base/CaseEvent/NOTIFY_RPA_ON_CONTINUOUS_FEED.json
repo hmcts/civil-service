@@ -1,0 +1,5 @@
+[ {
+  "ID" : "NOTIFY_RPA_ON_CONTINUOUS_FEED",
+  "CallBackURLAboutToSubmitEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+  "RetriesTimeoutURLAboutToSubmitEvent" : 0
+} ]

@@ -1,0 +1,5 @@
+[ {
+  "ID" : "NOTIFY_RESPONDENT1_PART_ADMIT_PAY_IMMEDIATELY_AGREED",
+  "CallBackURLAboutToSubmitEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+  "RetriesTimeoutURLAboutToSubmitEvent" : 0
+} ]

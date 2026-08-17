@@ -10,7 +10,11 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocumentToKeep;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 import java.time.LocalDateTime;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(name = "documentToKeep", generate = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @AllArgsConstructor
@@ -19,9 +23,13 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DocumentToKeep {
 
+    @CCD(label = "Document ID", searchable = false)
     private String documentId;
+    @CCD(label = "Document", searchable = false, typeOverride = FieldType.Document)
     private CaseDocumentToKeep caseDocumentToKeep;
+    @CCD(label = "Uploaded Date", searchable = false)
     private LocalDateTime uploadedDate;
+    @CCD(label = "Is Document System Generated?", searchable = false, typeOverride = FieldType.YesOrNo)
     private YesOrNo systemGenerated;
 
     //Override equals and hashcode to ignore uploadedDate and systemGenerated

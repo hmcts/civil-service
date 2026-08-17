@@ -1,0 +1,11 @@
+[ {
+  "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
+  "CaseFieldID" : "generalAppPBADetails",
+  "ListElementCode" : "generalAppFeeToPayInText",
+  "ShowSummaryContentOption" : "Y"
+}, {
+  "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
+  "CaseFieldID" : "generalAppPBADetails",
+  "ListElementCode" : "generalAppPayInformationText",
+  "ShowSummaryContentOption" : "Y"
+} ]

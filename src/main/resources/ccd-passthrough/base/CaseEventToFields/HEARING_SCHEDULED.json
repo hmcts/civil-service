@@ -1,0 +1,10 @@
+[ {
+  "CaseFieldID" : "hearingNoticeListOther",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/locationName"
+}, {
+  "CaseFieldID" : "dateOfApplication",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/checkPastDate"
+}, {
+  "CaseFieldID" : "hearingTimeHourMinute",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/checkFutureDate"
+} ]

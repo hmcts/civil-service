@@ -1,0 +1,19 @@
+[ {
+  "CaseEventID" : "ORDER_REVIEW_OBLIGATION_CHECK",
+  "CaseFieldID" : "obligationWAFlag",
+  "ListElementCode" : "obligationReason",
+  "FieldShowCondition" : "obligationReason=\"DO_NOT_SHOW_IN_UI\"",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "ORDER_REVIEW_OBLIGATION_CHECK",
+  "CaseFieldID" : "obligationWAFlag",
+  "ListElementCode" : "obligationReasonDisplayValue",
+  "FieldShowCondition" : "obligationReasonDisplayValue=\"DO_NOT_SHOW_IN_UI\"",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "ORDER_REVIEW_OBLIGATION_CHECK",
+  "CaseFieldID" : "obligationWAFlag",
+  "ListElementCode" : "currentDate",
+  "FieldShowCondition" : "currentDate=\"DO_NOT_SHOW_IN_UI\"",
+  "Publish" : "Y"
+} ]

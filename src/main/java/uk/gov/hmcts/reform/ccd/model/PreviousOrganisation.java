@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(generate = false)
 @Data
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)

@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
 
 @Data
 @NoArgsConstructor
@@ -11,8 +13,17 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class TrialClinicalNegligence {
 
+    @CCD(label = " ", searchable = false)
     private String input1;
+    @CCD(label = " ", searchable = false, typeOverride = FieldType.TextArea)
     private String input2;
+    @CCD(label = " ", searchable = false, typeOverride = FieldType.TextArea)
     private String input3;
+    @CCD(label = " ", searchable = false, typeOverride = FieldType.TextArea)
     private String input4;
+
+  // ==== ccd-definition-converter: synthesised definition-only fields (retrofit) ====
+  @CCD(label = " ", searchable = false, typeOverride = FieldType.Label)
+  private String label;
+  // ==== end synthesised definition-only fields ====
 }

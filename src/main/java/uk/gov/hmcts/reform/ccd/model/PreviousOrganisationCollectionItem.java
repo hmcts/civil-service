@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(generate = false)
 @Getter
 @Accessors(chain = true)
 @AllArgsConstructor

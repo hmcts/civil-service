@@ -8,6 +8,8 @@ import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
 
 import java.time.LocalDate;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
 
 @Data
 @NoArgsConstructor
@@ -15,9 +17,16 @@ import java.time.LocalDate;
 @Accessors(chain = true)
 public class DisposalHearingFinalDisposalHearing {
 
+    @CCD(label = " ", searchable = false, typeOverride = FieldType.TextArea)
     private String input;
+    @CCD(label = " ", searchable = false)
     @Future(message = "The date entered must be in the future")
     private LocalDate date;
+    @CCD(label = "The time estimate is", searchable = false)
     private DisposalHearingFinalDisposalHearingTimeEstimate time;
 
+  // ==== ccd-definition-converter: synthesised definition-only fields (retrofit) ====
+  @CCD(label = " ", searchable = false, typeOverride = FieldType.Label)
+  private String label;
+  // ==== end synthesised definition-only fields ====
 }

@@ -1,0 +1,20 @@
+[ {
+  "CaseEventID" : "NOC_REQUEST",
+  "CaseFieldID" : "changeOrganisationRequestField",
+  "ListElementCode" : "ApprovalStatus",
+  "DefaultValue" : "1"
+}, {
+  "ID" : "ChangeOrganisationRequest",
+  "CaseEventID" : "NOC_REQUEST",
+  "CaseFieldID" : "changeOrganisationRequestField",
+  "ListElementCode" : "OrganisationToAdd.OrganisationName",
+  "FieldDisplayOrder" : "2",
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "ChangeOrganisationRequest",
+  "CaseEventID" : "NOC_REQUEST",
+  "CaseFieldID" : "changeOrganisationRequestField",
+  "ListElementCode" : "OrganisationToRemove.OrganisationName",
+  "FieldDisplayOrder" : "4",
+  "DisplayContext" : "OPTIONAL"
+} ]

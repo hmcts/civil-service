@@ -10,19 +10,29 @@ import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.utils.ObjectUtils;
 
 import static uk.gov.hmcts.reform.civil.utils.StringUtils.joinNonNull;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(generate = false)
 @Data
 @JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy.class)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Address {
 
+    @JsonProperty("AddressLine1")
     private String addressLine1;
+    @JsonProperty("AddressLine2")
     private String addressLine2;
+    @JsonProperty("AddressLine3")
     private String addressLine3;
+    @JsonProperty("PostTown")
     private String postTown;
+    @JsonProperty("County")
     private String county;
+    @JsonProperty("Country")
     private String country;
+    @JsonProperty("PostCode")
     private String postCode;
 
     @JsonIgnore

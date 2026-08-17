@@ -2,13 +2,18 @@ package uk.gov.hmcts.reform.civil.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
 
 @Getter
 @RequiredArgsConstructor
 public enum RespondentResponseTypeSpec {
+    @CCD(label = "Defends all of the claim")
     FULL_DEFENCE("Defends all of the claim", "Defend all of the claim"),
+    @CCD(label = "Admits all of the claim")
     FULL_ADMISSION("Admits all of the claim", "Admit all of the claim"),
+    @CCD(label = "Admits part of the claim")
     PART_ADMISSION("Admits part of the claim", "Admit part of the claim"),
+    @CCD(label = "Defends all of the claim and wants to counterclaim")
     COUNTER_CLAIM("Reject all of the claim and wants to counterclaim", "Reject all of the claim and want to counterclaim");
 
     private final String displayedValue;

@@ -1,0 +1,21 @@
+[ {
+  "CaseEventID" : "CONFIRM_ORDER_REVIEW",
+  "CaseFieldID" : "obligationData",
+  "ListElementCode" : "obligationDate",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "CONFIRM_ORDER_REVIEW",
+  "CaseFieldID" : "obligationData",
+  "ListElementCode" : "obligationReason",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "CONFIRM_ORDER_REVIEW",
+  "CaseFieldID" : "obligationData",
+  "ListElementCode" : "otherObligationReason",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "CONFIRM_ORDER_REVIEW",
+  "CaseFieldID" : "obligationData",
+  "ListElementCode" : "obligationAction",
+  "Publish" : "Y"
+} ]

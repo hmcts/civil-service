@@ -4,12 +4,43 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(name = "JudgeDecisionOnReconsiderationSelect", generate = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
 public class UpholdingPreviousOrderReason {
 
+    @CCD(
+            label = "Reason for upholding previous order",
+            hint = "State the reason why previous order is upheld (i.e. previous order doesn't need amending, all information on the claim has been taken into account and directions order drawn are all in order)\n",
+            searchable = false,
+            typeOverride = FieldType.TextArea
+    )
     private String reasonForReconsiderationTxtYes;
+
+  // ==== ccd-definition-converter: synthesised definition-only fields (retrofit) ====
+  @CCD(
+          label = "If you wish to do this you should select \"Make an order\" from dropdown menu on the right of the screen. This will allow you to make a bespoke order in the case.\n",
+          searchable = false,
+          typeOverride = FieldType.Label
+  )
+  private String reasonForReconsiderationLblAmendingTxt;
+  @CCD(label = "### Yes", searchable = false, typeOverride = FieldType.Label)
+  private String reasonForReconsiderationLblYes;
+  @CCD(label = "### No, create a new SDO", searchable = false, typeOverride = FieldType.Label)
+  private String reasonForReconsiderationLblNoTitle;
+  @CCD(
+          label = "If you select this option, a new SDO task for this case is created and appears in \"Available Tasks\" on the main dashboard. You will need to go there to re-select the case to continue.\n",
+          searchable = false,
+          typeOverride = FieldType.Label
+  )
+  private String reasonForReconsiderationLblNoTxt;
+  @CCD(label = "### No, previous order needs amending", searchable = false, typeOverride = FieldType.Label)
+  private String reasonForReconsiderationLblAmendingTitle;
+  // ==== end synthesised definition-only fields ====
 }

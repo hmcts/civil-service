@@ -1,0 +1,22 @@
+[ {
+  "ID" : "DisposalHearingWitnessOfFactDJ",
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "disposalHearingWitnessOfFactDJ",
+  "ListElementCode" : "input5",
+  "FieldDisplayOrder" : 8,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "DisposalHearingWitnessOfFactDJ",
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "disposalHearingWitnessOfFactDJ",
+  "ListElementCode" : "date3",
+  "FieldDisplayOrder" : 9,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "DisposalHearingWitnessOfFactDJ",
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "disposalHearingWitnessOfFactDJ",
+  "ListElementCode" : "input6",
+  "FieldDisplayOrder" : 10,
+  "DisplayContext" : "MANDATORY"
+} ]

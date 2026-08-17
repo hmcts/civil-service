@@ -1,0 +1,5 @@
+[ {
+  "ID" : "TRIGGER_TASK_RECONFIG_GA",
+  "CallBackURLAboutToSubmitEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+  "RetriesTimeoutURLAboutToSubmitEvent" : 0
+} ]

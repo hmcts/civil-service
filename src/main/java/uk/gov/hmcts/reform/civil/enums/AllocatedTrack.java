@@ -7,12 +7,19 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.math.BigDecimal;
 
 import static uk.gov.hmcts.reform.civil.enums.PersonalInjuryType.NOISE_INDUCED_HEARING_LOSS;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(name = "Track", generate = true)
 @Slf4j
 public enum AllocatedTrack {
+    @CCD(label = "Small claim")
     SMALL_CLAIM,
+    @CCD(label = "Fast claim")
     FAST_CLAIM,
+    @CCD(label = "Multi claim")
     MULTI_CLAIM,
+    @CCD(label = "Intermediate claim")
     INTERMEDIATE_CLAIM;
 
     public static AllocatedTrack getAllocatedTrack(BigDecimal statementOfValueInPounds, ClaimType claimType, PersonalInjuryType personalInjuryType,

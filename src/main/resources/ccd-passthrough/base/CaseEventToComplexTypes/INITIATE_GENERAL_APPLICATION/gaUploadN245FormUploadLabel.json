@@ -1,0 +1,11 @@
+[ {
+  "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
+  "CaseFieldID" : "gaUploadN245FormUploadLabel",
+  "ListElementCode" : "generalAppN245Download",
+  "ShowSummaryContentOption" : "N"
+}, {
+  "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
+  "CaseFieldID" : "gaUploadN245FormUploadLabel",
+  "ListElementCode" : "generalAppN245Label",
+  "ShowSummaryContentOption" : "N"
+} ]

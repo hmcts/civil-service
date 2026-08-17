@@ -1,0 +1,5 @@
+[ {
+  "ID" : "UPDATE_NEXT_HEARING_DETAILS",
+  "CallBackURLAboutToSubmitEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+  "RetriesTimeoutURLAboutToSubmitEvent" : 3
+} ]

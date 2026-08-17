@@ -2,11 +2,16 @@ package uk.gov.hmcts.reform.civil.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(name = "HwfInformationProofList", generate = true)
 @Getter
 @RequiredArgsConstructor
 public enum HwFMoreInfoRequiredDocuments {
+    @CCD(label = "Any Other Income")
     ANY_OTHER_INCOME("Any other income", "", "Unrhyw incwm arall", ""),
+    @CCD(label = "Bank Statements")
     BANK_STATEMENTS(
         "Bank statements",
         " Last month’s statements for all of the applicant’s current accounts, and if part of a "
@@ -19,6 +24,7 @@ public enum HwFMoreInfoRequiredDocuments {
             + "ffi i’w thalu, er enghraifft, os yw’r ffi i’w thalu ar 26 Gorffennaf 2021, dylai’r gyfriflen banc fod ar"
             + " gyfer Mehefin 2021."
     ),
+    @CCD(label = "Benefits and Tax Credits")
     BENEFITS_AND_TAX_CREDITS(
         "Benefits and tax credits",
         "A letter or document dated in the last 3 months, of contribution-based Job "
@@ -29,6 +35,7 @@ public enum HwFMoreInfoRequiredDocuments {
             + " Gyfraniadau (JSA), Lwfans Cyflogaeth a Chymorth yn seiliedig ar Gyfraniadau (ESA), Credyd Cynhwysol, "
             + "Budd-dal Plant, Credyd Treth Gwaith neu Gredyd Treth Plant"
     ),
+    @CCD(label = "Child Maintenance")
     CHILD_MAINTENANCE(
         "Child maintenance",
         " Evidence of being in receipt of Child Maintenance, such as a Child Support "
@@ -39,16 +46,21 @@ public enum HwFMoreInfoRequiredDocuments {
             + " gorchymyn llys dan sêl; neu llythyr o gytundeb yn dangos pa mor aml rydych yn cael eich a faint rydych "
             + "yn cael eich talu"
     ),
+    @CCD(label = "Income from Selling Goods")
     INCOME_FROM_SELLING_GOODS("Income from Selling Goods", "", "Incwm o Werthu Nwyddau",
                               ""
     ),
+    @CCD(label = "Pensions")
     PENSIONS("Pensions", "Evidence from Pensions", "Pensiynau",
              "Tystiolaeth o Bensiynau"
     ),
+    @CCD(label = "Prisoner's Income")
     PRISONERS_INCOME("Prisoners income", "", "Incwm carcharor", ""),
+    @CCD(label = "Rental Income")
     RENTAL_INCOME("Rental income", "Evidence from Rental Income", "Incwm o rentu",
                   "Tystiolaeth gan Rentu"
     ),
+    @CCD(label = "Wage Slips")
     WAGE_SLIPS(
         "Wage slips",
         " If you’re employed, a payslip dated in the last 6 weeks, or, if you’re self-employed, your"

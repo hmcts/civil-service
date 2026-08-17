@@ -1,0 +1,8 @@
+[ {
+  "ID" : "Witnesses",
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent1DQWitnessesDetailsSpec",
+  "ListElementCode" : "witnessesToAppear",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+} ]

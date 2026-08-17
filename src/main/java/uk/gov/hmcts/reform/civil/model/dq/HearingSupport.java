@@ -8,7 +8,9 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 
 import java.util.List;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(generate = false)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
