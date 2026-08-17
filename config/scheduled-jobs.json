@@ -9,13 +9,25 @@
     "purpose": "Moves cases awaiting judicial decisions into the decision outcome workflow."
   },
   "Defendant response deadline check scheduler": {
-    "purpose": "Sweeps for defendants whose response deadline elapsed and triggers enforcement."
+    "purpose": "Sweeps for defendants whose response deadline elapsed and triggers enforcement.",
+    "springScheduler": "DefendantResponseDeadline",
+    "topics": [
+      "DEFENDANT_RESPONSE_DEADLINE_CHECK"
+    ]
   },
   "Evidence upload scheduler": {
-    "purpose": "Prompts parties to upload evidence when deadlines are approaching."
+    "purpose": "Prompts parties to upload evidence when deadlines are approaching.",
+    "springScheduler": "EvidenceUpload",
+    "topics": [
+      "EVIDENCE_UPLOAD_CHECK"
+    ]
   },
   "Full admit pay immediately no payment scheduler": {
-    "purpose": "Escalates full-admit cases where an immediate payment was promised but not received."
+    "purpose": "Escalates full-admit cases where an immediate payment was promised but not received.",
+    "springScheduler": "FullAdmitPayImmediatelyNoPaymentFromDefendant",
+    "topics": [
+      "FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_CHECK"
+    ]
   },
   "Proof of debt scheduler": {
     "purpose": "Generates proof-of-debt artefacts for COSC-linked general applications."
@@ -36,7 +48,11 @@
     "purpose": "Issues CVP/remote hearing links on a daily cadence."
   },
   "Hearing fee check scheduler": {
-    "purpose": "Checks for unpaid hearing fees and raises the necessary follow-up tasks."
+    "purpose": "Checks for unpaid hearing fees and raises the necessary follow-up tasks.",
+    "springScheduler": "HearingFee",
+    "topics": [
+      "HEARING_FEE_CHECK"
+    ]
   },
   "Generate CSV and send to MMT scheduler": {
     "purpose": "Produces nightly CSV/JSON exports for the mediation service (MMT)."
@@ -45,13 +61,20 @@
     "purpose": "Maintains WA tasks for stayed cases so that no follow-up is missed."
   },
   "Migrate cases scheduler": {
-    "purpose": "Reserved cron to re-run large case migration batches."
+    "purpose": "Reserved cycle to re-run large case migration batches."
   },
   "Notify claim details scheduler": {
     "purpose": "Dismisses claims when the claim details notification deadline has passed."
   },
   "Incident retry scheduler": {
     "purpose": "Retries failed external incident tasks each night."
+  },
+  "Judgement buffer scheduler": {
+    "purpose": "Processes default judgement requests once the judgement buffer period has expired.",
+    "springScheduler": "JudgementBuffer",
+    "topics": [
+      "JudgementBuffer"
+    ]
   },
   "Order Review Obligation check scheduler": {
     "purpose": "Checks order review obligations and triggers outstanding actions."
@@ -63,13 +86,13 @@
     "purpose": "Ensures reconsideration notifications are sent when conditions are met."
   },
   "Retrigger cases scheduler": {
-    "purpose": "One-off cron to retrigger case updates as part of the 2026 migration plan."
+    "purpose": "Time-bounded cycle to retrigger case updates as part of the 2026 migration plan."
   },
   "Update General application Case management Location": {
-    "purpose": "Future-dated cron to re-sync GA case management locations."
+    "purpose": "Future-dated cycle to re-sync GA case management locations."
   },
   "Update location": {
-    "purpose": "Future-dated cron to re-sync the main case location."
+    "purpose": "Future-dated cycle to re-sync the main case location."
   },
   "Settlement no response from defendant scheduler": {
     "purpose": "Moves settlement agreements forward when the defendant failed to respond."

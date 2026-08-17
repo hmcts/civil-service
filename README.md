@@ -71,7 +71,7 @@ The `Verify email notification documentation` GitHub Action executes the same sc
 
 ## Scheduled jobs
 
-The project defines a set of timer-driven Camunda processes that keep cases moving without manual input. The table below lists each job, the external topic it drives, the cadence (Quartz cron expression, UTC), and the high-level responsibility.
+The project defines a set of timer-driven Camunda and Spring schedulers that keep cases moving without manual input. The table below lists each job, the external topic or scheduler name it drives, the cadence (Quartz cron expression, UTC), and the high-level responsibility.
 
 <!-- SCHEDULED_JOBS_TABLE_START -->
 | Job | Purpose | Camunda topic(s) | Schedule (cron, UTC) | When it runs |
@@ -89,6 +89,7 @@ The project defines a set of timer-driven Camunda processes that keep cases movi
 | Hearing cvp link scheduler | Issues CVP/remote hearing links on a daily cadence. | `HEARING_CVP_LINK` | `0 50 0 * * ?` | Daily at 00:50 |
 | Hearing fee check scheduler | Checks for unpaid hearing fees and raises the necessary follow-up tasks. | `HEARING_FEE_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
 | Incident retry scheduler | Retries failed external incident tasks each night. | `INCIDENT_RETRY_EVENT` | `0 1 23 * * ?` | Daily at 23:01 |
+| Judgement buffer scheduler | Processes default judgement requests once the judgement buffer period has expired. | `JudgementBuffer` | `0 0 2 * * *` | Daily at 02:00 |
 | Manage Stay WA Task Scheduler | Maintains WA tasks for stayed cases so that no follow-up is missed. | `MANAGE_STAY_WA_TASK_SCHEDULER` | `0 20 1 ? * *` | Daily at 01:20 |
 | Migrate cases scheduler | Reserved cycle to re-run large case migration batches. | `MIGRATE_CASES_EVENTS` | `R12/2080-01-01T00:00:00Z/P1M` | Monthly during 2080 at 00:00 UTC |
 | Notify claim and claim dismissed deadline scheduler | Dismisses claims when the claim notification or claim dismissed deadline has passed. | `CLAIM_DISMISSED_DEADLINE` | `0 0 0 * * ?` | Daily at 00:00 |
@@ -108,7 +109,7 @@ The project defines a set of timer-driven Camunda processes that keep cases movi
 | Update location | Future-dated cycle to re-sync the main case location. | `RETRIGGER_UPDATE_LOCATION_EVENTS` | `R12/2046-01-01T00:00:00Z/P1M` | Monthly during 2046 at 00:00 UTC |
 <!-- SCHEDULED_JOBS_TABLE_END -->
 
-Run `python3 bin/update-scheduled-jobs-table.py` whenever a BPMN scheduler is added or updated so the table stays in sync. The script reads every BPMN timer, merges in the human-readable descriptions held in `config/scheduled-jobs.json`, and rewrites the table between the markers above. If you add a new scheduler (or change the purpose of an existing one), update the JSON file first so the generated table has meaningful text. The `Verify scheduled jobs table` GitHub Action reruns this script on `master` and fails if `README.md` would change.
+Run `python3 bin/update-scheduled-jobs-table.py` whenever a BPMN or Spring scheduler is added or updated so the table stays in sync. The script reads every BPMN timer and migrated `CivilScheduler`, merges in the human-readable descriptions held in `config/scheduled-jobs.json`, and rewrites the table between the markers above. If you add a new scheduler (or change the purpose of an existing one), update the JSON file first so the generated table has meaningful text. The `Verify scheduled jobs table` GitHub Action reruns this script on `master` and fails if `README.md` would change.
 
 ## Database schema diagram
 
