@@ -2,7 +2,6 @@
 
 Civil CCD Callback Service.
 
-
 ### Contents:
 
 - [StateFlow diagrams](#stateflow-diagrams)
@@ -18,15 +17,19 @@ Civil CCD Callback Service.
 Visual snapshots of the automated journey logic are generated from the live StateFlow configuration. The diagrams below update automatically via the `Refresh StateFlow diagrams` GitHub Action after any change to the transition builders.
 
 #### Draft to Submission
+
 ![Draft to Submission](docs/draft_flow.svg)
 
 #### Claim Issue & Notification
+
 ![Claim Issue & Notification](docs/issue_flow.svg)
 
 #### Awaiting Defence & Divergence
+
 ![Defence Waiting & Divergence](docs/response_flow.svg)
 
 #### Post-Response Outcomes & Settlement
+
 ![Post-Response Outcomes & Settlement](docs/post_response.svg)
 
 Each image links to an SVG whose source (`docs/*.mmd`) is produced by `python3 scripts/export_stateflow_transitions.py`. If you need the narrative in text form, see `docs/stateflow_transition_catalogue.md` or the structured `docs/stateflow/transition_catalogue.json`.
@@ -37,6 +40,7 @@ Each image links to an SVG whose source (`docs/*.mmd`) is produced by `python3 s
 #### Predicate Business Rules
 
 Generated business rules from flowstate predicates in
+
 - Composed & Atomic predicate rules: [business-rules.md](docs/business-rules.md)
 
 ## Email notification catalogue
@@ -74,38 +78,40 @@ The `Verify email notification documentation` GitHub Action executes the same sc
 The project defines a set of timer-driven Camunda processes that keep cases moving without manual input. The table below lists each job, the external topic it drives, the cadence (Quartz cron expression, UTC), and the high-level responsibility.
 
 <!-- SCHEDULED_JOBS_TABLE_START -->
-| Job | Purpose | Camunda topic(s) | Schedule (cron, UTC) | When it runs |
-| --- | --- | --- | --- | --- |
-| Bundle creation scheduler | Builds bundles for eligible hearings each evening. | `BUNDLE_CREATION_CHECK` | `0 0 21 * * ?` | Daily at 21:00 |
-| Decision outcome scheduler | Moves cases awaiting judicial decisions into the decision outcome workflow. | `MOVE_TO_DECISION_OUTCOME` | `0 40 0 * * ?` | Daily at 00:40 |
-| Defendant response deadline check scheduler | Sweeps for defendants whose response deadline elapsed and triggers enforcement. | `DEFENDANT_RESPONSE_DEADLINE_CHECK` | `0 1 16 * * ?` | Daily at 16:01 |
-| Evidence upload scheduler | Prompts parties to upload evidence when deadlines are approaching. | `EVIDENCE_UPLOAD_CHECK` | `0 30 17 * * ?` | Daily at 17:30 |
-| Full admit pay immediately no payment scheduler | Escalates full-admit cases where an immediate payment was promised but not received. | `FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
-| GA doc upload notify scheduler | Sends notifications when GA supporting documents are uploaded. | `GADocUploadNotifyScheduler` | `0 0 23 * * ?` | Daily at 23:00 |
-| GA order made scheduler | Publishes GA order-made events to downstream services each afternoon. | `GAOrderMadeScheduler` | `0 15 16 ? * *` | Daily at 16:15 |
-| GA response deadline processor | Processes GA response deadlines, judge revisits and respondent checks. | `GAResponseDeadlineProcessor`<br>`GAJudgeRevisitProcessor`<br>`GARespondentResponseCheckScheduler` | `0 15 17 * * ?` | Daily at 17:15 |
-| GA unless order scheduler | Enforces GA Unless Orders once the compliance deadline passes. | `GAUnlessOrderScheduler` | `0 0 16 ? * *` | Daily at 16:00 |
-| Generate CSV and send to MMT scheduler | Produces nightly CSV/JSON exports for the mediation service (MMT). | `GenerateCsvAndSendToMmt`<br>`GenerateJsonAndSendToMmt` | `0 0 1 ? * *` | Daily at 01:00 |
-| Hearing cvp link scheduler | Issues CVP/remote hearing links on a daily cadence. | `HEARING_CVP_LINK` | `0 50 0 * * ?` | Daily at 00:50 |
-| Hearing fee check scheduler | Checks for unpaid hearing fees and raises the necessary follow-up tasks. | `HEARING_FEE_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
-| Incident retry scheduler | Retries failed external incident tasks each night. | `INCIDENT_RETRY_EVENT` | `0 1 23 * * ?` | Daily at 23:01 |
-| Manage Stay WA Task Scheduler | Maintains WA tasks for stayed cases so that no follow-up is missed. | `MANAGE_STAY_WA_TASK_SCHEDULER` | `0 20 1 ? * *` | Daily at 01:20 |
-| Migrate cases scheduler | Reserved cycle to re-run large case migration batches. | `MIGRATE_CASES_EVENTS` | `R12/2080-01-01T00:00:00Z/P1M` | Monthly during 2080 at 00:00 UTC |
-| Notify claim and claim dismissed deadline scheduler | Dismisses claims when the claim notification or claim dismissed deadline has passed. | `CLAIM_DISMISSED_DEADLINE` | `0 0 0 * * ?` | Daily at 00:00 |
-| Notify claim details scheduler | Dismisses claims when the claim details notification deadline has passed. | `CLAIM_DETAILS_NOTIFICATION_DEADLINE` | `0 1 16 * * ?` | Daily at 16:01 |
-| Order Review Obligation check scheduler | Checks order review obligations and triggers outstanding actions. | `ORDER_REVIEW_OBLIGATION_CHECK` | `0 10 1 * * ?` | Daily at 01:10 |
-| Polling event emitter scheduler | Emits polling events across the day so downstream pollers stay in sync. | `POLLING_EVENT_EMITTER` | `0 0 8-20 * * ?` | Hourly at the top of the hour from 08:00–20:00 |
-| Proof of debt scheduler | Generates proof-of-debt artefacts for COSC-linked general applications. | `CoscApplicationProcessor` | `0 0 16 * * ?` | Daily at 16:00 |
-| Request for reconsideration notification check scheduler | Ensures reconsideration notifications are sent when conditions are met. | `REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK` | `0 10 0 * * ?` | Daily at 00:10 |
-| Retrigger cases scheduler | Time-bounded cycle to retrigger case updates as part of the 2026 migration plan. | `RETRIGGER_CASES_EVENTS` | `R12/2026-01-01T00:00:00Z/P1M` | Monthly during 2026 at 00:00 UTC |
-| Settlement no response from defendant scheduler | Moves settlement agreements forward when the defendant failed to respond. | `SETTLEMENT_NO_RESPONSE_FROM_DEFENDANT_CHECK` | `0 0 1 * * ?` | Daily at 01:00 |
-| Spec automated hearing notice scheduler | Builds automated hearing notices for Spec claims twice per day. | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 ? * *` | Twice daily at 00:00 and 12:00 |
-| Take case offline scheduler | Transitions cases that must move off digital rails. | `TAKE_CASE_OFFLINE` | `0 1 16 * * ?` | Daily at 16:01 |
-| Trial ready check scheduler | Verifies trial readiness status for outstanding cases. | `TRIAL_READY_CHECK` | `0 30 0 * * ?` | Daily at 00:30 |
-| Trial ready notification scheduler | Sends notifications when trial readiness has been confirmed. | `TRIAL_READY_NOTIFICATION_CHECK` | `0 20 0 * * ?` | Daily at 00:20 |
-| Unspec automated hearing notice scheduler | Builds automated hearing notices for Unspec claims twice per day. | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 ? * *` | Twice daily at 00:00 and 12:00 |
-| Update General application Case management Location | Future-dated cycle to re-sync GA case management locations. | `RETRIGGER_GA_UPDATE_CMLOCATION_EVENTS` | `R12/2046-01-01T00:00:00Z/P1M` | Monthly during 2046 at 00:00 UTC |
-| Update location | Future-dated cycle to re-sync the main case location. | `RETRIGGER_UPDATE_LOCATION_EVENTS` | `R12/2046-01-01T00:00:00Z/P1M` | Monthly during 2046 at 00:00 UTC |
+
+| Job                                                      | Purpose                                                                              | Camunda topic(s)                                                                                   | Schedule (cron, UTC)           | When it runs                                   |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | ------------------------------ | ---------------------------------------------- |
+| Bundle creation scheduler                                | Builds bundles for eligible hearings each evening.                                   | `BUNDLE_CREATION_CHECK`                                                                            | `0 0 21 * * ?`                 | Daily at 21:00                                 |
+| Decision outcome scheduler                               | Moves cases awaiting judicial decisions into the decision outcome workflow.          | `MOVE_TO_DECISION_OUTCOME`                                                                         | `0 40 0 * * ?`                 | Daily at 00:40                                 |
+| Defendant response deadline check scheduler              | Sweeps for defendants whose response deadline elapsed and triggers enforcement.      | `DEFENDANT_RESPONSE_DEADLINE_CHECK`                                                                | `0 1 16 * * ?`                 | Daily at 16:01                                 |
+| Evidence upload scheduler                                | Prompts parties to upload evidence when deadlines are approaching.                   | `EVIDENCE_UPLOAD_CHECK`                                                                            | `0 30 17 * * ?`                | Daily at 17:30                                 |
+| Full admit pay immediately no payment scheduler          | Escalates full-admit cases where an immediate payment was promised but not received. | `FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_CHECK`                                                      | `0 0 0 * * ?`                  | Daily at 00:00                                 |
+| GA doc upload notify scheduler                           | Sends notifications when GA supporting documents are uploaded.                       | `GADocUploadNotifyScheduler`                                                                       | `0 0 23 * * ?`                 | Daily at 23:00                                 |
+| GA order made scheduler                                  | Publishes GA order-made events to downstream services each afternoon.                | `GAOrderMadeScheduler`                                                                             | `0 15 16 ? * *`                | Daily at 16:15                                 |
+| GA response deadline processor                           | Processes GA response deadlines, judge revisits and respondent checks.               | `GAResponseDeadlineProcessor`<br>`GAJudgeRevisitProcessor`<br>`GARespondentResponseCheckScheduler` | `0 15 17 * * ?`                | Daily at 17:15                                 |
+| GA unless order scheduler                                | Enforces GA Unless Orders once the compliance deadline passes.                       | `GAUnlessOrderScheduler`                                                                           | `0 0 16 ? * *`                 | Daily at 16:00                                 |
+| Generate CSV and send to MMT scheduler                   | Produces nightly CSV/JSON exports for the mediation service (MMT).                   | `GenerateCsvAndSendToMmt`<br>`GenerateJsonAndSendToMmt`                                            | `0 0 1 ? * *`                  | Daily at 01:00                                 |
+| Hearing cvp link scheduler                               | Issues CVP/remote hearing links on a daily cadence.                                  | `HEARING_CVP_LINK`                                                                                 | `0 50 0 * * ?`                 | Daily at 00:50                                 |
+| Hearing fee check scheduler                              | Checks for unpaid hearing fees and raises the necessary follow-up tasks.             | `HEARING_FEE_CHECK`                                                                                | `0 0 0 * * ?`                  | Daily at 00:00                                 |
+| Incident retry scheduler                                 | Retries failed external incident tasks each night.                                   | `INCIDENT_RETRY_EVENT`                                                                             | `0 1 23 * * ?`                 | Daily at 23:01                                 |
+| Manage Stay WA Task Scheduler                            | Maintains WA tasks for stayed cases so that no follow-up is missed.                  | `MANAGE_STAY_WA_TASK_SCHEDULER`                                                                    | `0 20 1 ? * *`                 | Daily at 01:20                                 |
+| Migrate cases scheduler                                  | Reserved cycle to re-run large case migration batches.                               | `MIGRATE_CASES_EVENTS`                                                                             | `R12/2080-01-01T00:00:00Z/P1M` | Monthly during 2080 at 00:00 UTC               |
+| Notify claim and claim dismissed deadline scheduler      | Dismisses claims when the claim notification or claim dismissed deadline has passed. | `CLAIM_DISMISSED_DEADLINE`                                                                         | `0 0 0 * * ?`                  | Daily at 00:00                                 |
+| Notify claim details scheduler                           | Dismisses claims when the claim details notification deadline has passed.            | `CLAIM_DETAILS_NOTIFICATION_DEADLINE`                                                              | `0 1 16 * * ?`                 | Daily at 16:01                                 |
+| Order Review Obligation check scheduler                  | Checks order review obligations and triggers outstanding actions.                    | `ORDER_REVIEW_OBLIGATION_CHECK`                                                                    | `0 10 1 * * ?`                 | Daily at 01:10                                 |
+| Polling event emitter scheduler                          | Emits polling events across the day so downstream pollers stay in sync.              | `POLLING_EVENT_EMITTER`                                                                            | `0 0 8-20 * * ?`               | Hourly at the top of the hour from 08:00–20:00 |
+| Proof of debt scheduler                                  | Generates proof-of-debt artefacts for COSC-linked general applications.              | `CoscApplicationProcessor`                                                                         | `0 0 16 * * ?`                 | Daily at 16:00                                 |
+| Request for reconsideration notification check scheduler | Ensures reconsideration notifications are sent when conditions are met.              | `REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK`                                                   | `0 10 0 * * ?`                 | Daily at 00:10                                 |
+| Retrigger cases scheduler                                | Time-bounded cycle to retrigger case updates as part of the 2026 migration plan.     | `RETRIGGER_CASES_EVENTS`                                                                           | `R12/2026-01-01T00:00:00Z/P1M` | Monthly during 2026 at 00:00 UTC               |
+| Settlement no response from defendant scheduler          | Moves settlement agreements forward when the defendant failed to respond.            | `SETTLEMENT_NO_RESPONSE_FROM_DEFENDANT_CHECK`                                                      | `0 0 1 * * ?`                  | Daily at 01:00                                 |
+| Spec automated hearing notice scheduler                  | Builds automated hearing notices for Spec claims twice per day.                      | `AUTOMATED_HEARING_NOTICE`                                                                         | `0 0 0,12 ? * *`               | Twice daily at 00:00 and 12:00                 |
+| Take case offline scheduler                              | Transitions cases that must move off digital rails.                                  | `TAKE_CASE_OFFLINE`                                                                                | `0 1 16 * * ?`                 | Daily at 16:01                                 |
+| Trial ready check scheduler                              | Verifies trial readiness status for outstanding cases.                               | `TRIAL_READY_CHECK`                                                                                | `0 30 0 * * ?`                 | Daily at 00:30                                 |
+| Trial ready notification scheduler                       | Sends notifications when trial readiness has been confirmed.                         | `TRIAL_READY_NOTIFICATION_CHECK`                                                                   | `0 20 0 * * ?`                 | Daily at 00:20                                 |
+| Unspec automated hearing notice scheduler                | Builds automated hearing notices for Unspec claims twice per day.                    | `AUTOMATED_HEARING_NOTICE`                                                                         | `0 0 0,12 ? * *`               | Twice daily at 00:00 and 12:00                 |
+| Update General application Case management Location      | Future-dated cycle to re-sync GA case management locations.                          | `RETRIGGER_GA_UPDATE_CMLOCATION_EVENTS`                                                            | `R12/2046-01-01T00:00:00Z/P1M` | Monthly during 2046 at 00:00 UTC               |
+| Update location                                          | Future-dated cycle to re-sync the main case location.                                | `RETRIGGER_UPDATE_LOCATION_EVENTS`                                                                 | `R12/2046-01-01T00:00:00Z/P1M` | Monthly during 2046 at 00:00 UTC               |
+
 <!-- SCHEDULED_JOBS_TABLE_END -->
 
 Run `python3 bin/update-scheduled-jobs-table.py` whenever a BPMN scheduler is added or updated so the table stays in sync. The script reads every BPMN timer, merges in the human-readable descriptions held in `config/scheduled-jobs.json`, and rewrites the table between the markers above. If you add a new scheduler (or change the purpose of an existing one), update the JSON file first so the generated table has meaningful text. The `Verify scheduled jobs table` GitHub Action reruns this script on `master` and fails if `README.md` would change.
@@ -144,13 +150,13 @@ To build the project execute the following command:
 You will need the following environment variables setup in your bashrc/zshrc or IntelliJ run configuration. API keys can
 be found in the Azure key store.
 
-| Name | Use | Value |
-| ---- | --- | ----- |
-| `DOCMOSIS_TORNADO_KEY` | [Docmosis](https://www.docmosis.com/) is our document generation service. For development purposes we have been using trial keys which can be obtained [here](https://www.docmosis.com/products/tornado/try.html). **Note:** These expire after a month. | |
-| `GOV_NOTIFY_API_KEY` | [GOV.UK Notify](https://www.notifications.service.gov.uk/) is our notification service for sending emails.  | |
-| `LAUNCH_DARKLY_SDK_KEY` | [LaunchDarkly](https://launchdarkly.com/) is our platform for managing feature toggles. | |
-| `LAUNCH_DARKLY_OFFLINE_MODE` | Sets LaunchDarkly to use local values for flags rather than connecting to the service | `true` |
-| `SPRING_PROFILES_ACTIVE` | Sets the active Spring profile | `local` |
+| Name                         | Use                                                                                                                                                                                                                                                      | Value   |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `DOCMOSIS_TORNADO_KEY`       | [Docmosis](https://www.docmosis.com/) is our document generation service. For development purposes we have been using trial keys which can be obtained [here](https://www.docmosis.com/products/tornado/try.html). **Note:** These expire after a month. |         |
+| `GOV_NOTIFY_API_KEY`         | [GOV.UK Notify](https://www.notifications.service.gov.uk/) is our notification service for sending emails.                                                                                                                                               |         |
+| `LAUNCH_DARKLY_SDK_KEY`      | [LaunchDarkly](https://launchdarkly.com/) is our platform for managing feature toggles.                                                                                                                                                                  |         |
+| `LAUNCH_DARKLY_OFFLINE_MODE` | Sets LaunchDarkly to use local values for flags rather than connecting to the service                                                                                                                                                                    | `true`  |
+| `SPRING_PROFILES_ACTIVE`     | Sets the active Spring profile                                                                                                                                                                                                                           | `local` |
 
 Civil Service uses LaunchDarkly Java server SDK 7.x contexts for feature-flag evaluation. The default context has the
 `user` kind and `civil-service` key, with `environment` and `timestamp` attributes; location-aware evaluations also
@@ -158,7 +164,6 @@ include `location`. The SDK client is a singleton Spring bean and is closed duri
 is offline or LaunchDarkly is unavailable, each evaluation returns the default value supplied by the caller. Local
 development can use the flag files configured in `application-dev.yaml` with offline mode enabled. No proxy or custom
 network timeout overrides are configured, so the SDK defaults apply.
-
 
 #### Create a Docker image
 
@@ -208,9 +213,9 @@ To access Camunda visit url (login and password are both `admin`):
 
 - `https://camunda-civil-service-pr-PR_NUMBER.service.core-compute-preview.internal`
 
-
 ### Functional test labels for targeted testing
-There are a variety of labels that can be added to PRs for the purpose of running sub-groups of functional tests, relevant to specific journeys. All functional test labels begin with the pr_ft_ prefix.
+
+There are a variety of labels that can be added to PRs for the purpose of running sub-groups of functional tests, relevant to specific journeys. All functional test labels begin with the pr*ft* prefix.
 
 Adding a functional test label allows the user to run a greater amount of tests relevant to the journey where changes are being made, and reduces the amount of time taken to run a build.
 
@@ -221,7 +226,6 @@ It is also possible to add two labels to a PR to target multiple journeys. For e
 If no functional test label has been added to a PR, the full set of regression tests (api-nonprod) will be run.
 
 For more details about the functional test labels available, the tests that run under each label, and the guidelines for using them, please refer to this confluence page: https://tools.hmcts.net/confluence/display/ROC/GitHub+Labels+for+Testing
-
 
 ## Contract testing
 
@@ -264,29 +268,33 @@ To publish your contracts:
 ./gradlew pactPublish
 ```
 
-* If connecting to Pactflow, please disable the HMCTS VPN.
+- If connecting to Pactflow, please disable the HMCTS VPN.
 
 ## Adding Git Conventions
 
 ### Include the git conventions.
- * Make sure your git version is at least 2.9 using the `git --version` command
- * Run the following command:
+
+- Make sure your git version is at least 2.9 using the `git --version` command
+- Run the following command:
+
 ```
 git config --local core.hooksPath .git-config/hooks
 ```
+
 Once the above is done, you will be required to follow specific conventions for your commit messages and branch names.
 
 If you violate a convention, the git error message will report clearly the convention you should follow and provide
 additional information where necessary.
 
-*Optional:*
-* Install this plugin in Chrome: https://github.com/refined-github/refined-github
+_Optional:_
+
+- Install this plugin in Chrome: https://github.com/refined-github/refined-github
 
   It will automatically set the title for new PRs according to the first commit message, so you won't have to change it manually.
 
   Note that it will also alter other behaviours in GitHub. Hopefully these will also be improvements to you.
 
-*In case of problems*
+_In case of problems_
 
 1. Get in touch with your Technical Lead so that they can get you unblocked
 2. If the rare eventuality that the above is not possible, you can disable enforcement of conventions using the following command
@@ -296,6 +304,7 @@ additional information where necessary.
    Still, you shouldn't be doing it so make sure you get in touch with a Technical Lead soon afterwards.
 
 ## Gradle Dependency Check - Running Locally
+
 In the local environment, as of 15/12/2023 where dependency check is mandated to use version 9 or above:
 https://github.com/jeremylong/DependencyCheck?tab=readme-ov-file#900-upgrade-notice
 
@@ -303,6 +312,7 @@ Users will now need to generate a NVD API key for themselves in order to run som
 https://nvd.nist.gov/developers/request-an-api-key
 
 Example
+
 ```
 ./gradlew -DdependencyCheck.failBuild=true -Dnvd.api.check.validforhours=24 -Dnvd.api.key=<YOUR_API_KEY_HERE> dependencyCheckAggregate
 ```
@@ -320,20 +330,23 @@ update body with case id and payment reference no
 
 ## Development / Debugging Environment - Preview with Mirrord
 
-  As an alternative for a development environment there is a procedure in place where after running the command
+As an alternative for a development environment there is a procedure in place where after running the command
 below the required services for Civil are created in Preview under the developer's name, so these will be exclusively
 for the named developer use.
 
 While connected to the VPN simply run one of the below commands from your project's (civil-service) folder:
 Note: be sure to have Docker running
+
 ```shell
 ./bin/dev-setup/start-devuser-preview-environment.sh
 ```
+
 You can optionally specify branches for CCD definitions and WA DMN definitions like below or leave them blank to use master.
 
 ```shell
 ./bin/dev-setup/start-devuser-preview-environment.sh ccdBranchName dmnBranchName
 ```
+
 If you want to clean up the environment just run:
 
 ```shell
@@ -379,6 +392,7 @@ For that you should have such file as this:
   }
 }
 ```
+
 ## Point CCD definitions to a specific branch
 
 Add the following label to your GitHub PR.
@@ -409,9 +423,9 @@ The service includes a common framework for implementing scheduled tasks. This f
 1. **Implement a Search Service**: Extend `ElasticSearchService` to define the query for finding cases.
 2. **Implement a Scheduled Task**: Implement `ScheduledTask` (or `Consumer<CaseDetails>`) to define what happens to each case.
 3. **Create the Scheduler Class**:
-    - Implement `CivilScheduler`.
-    - Use `@Scheduled` on the `runScheduledTask` method.
-    - Use `ScheduledTaskRunner.run()` to execute the task.
+   - Implement `CivilScheduler`.
+   - Use `@Scheduled` on the `runScheduledTask` method.
+   - Use `ScheduledTaskRunner.run()` to execute the task.
 4. **Add Configuration**: Add settings to `application.yaml` for enabling the scheduler and defining its cron expression.
 
 ### Spring Scheduler Configuration
@@ -419,12 +433,15 @@ The service includes a common framework for implementing scheduled tasks. This f
 Spring-based schedulers are controlled by both a LaunchDarkly feature flag and an allowlist of active schedulers.
 
 #### Feature Flag
+
 The `spring-scheduler-enabled` flag in LaunchDarkly acts as a global kill-switch for all Spring-managed scheduled tasks. If this flag is disabled, no Spring schedulers will execute, regardless of their individual configuration.
 
 #### Active Schedulers List
+
 To enable specific Spring schedulers, they must be added to the `active-schedulers` list in `application.yaml` or via the `SCHEDULER_ACTIVE_SCHEDULERS` environment variable.
 
 **Configuration in `application.yaml`:**
+
 ```yaml
 scheduler:
   active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:JudgementBuffer,DefendantResponseDeadline}
@@ -432,11 +449,13 @@ scheduler:
 
 **Using Environment Variables:**
 To enable multiple schedulers, provide a comma-separated list:
+
 ```bash
 export SCHEDULER_ACTIVE_SCHEDULERS="JudgementBuffer,DefendantResponseDeadline"
 ```
 
 To disable all Spring schedulers (even if the feature flag is on), set the list to be empty:
+
 ```bash
 export SCHEDULER_ACTIVE_SCHEDULERS=""
 ```
@@ -449,10 +468,10 @@ The `JudgementBufferScheduler` is used to process cases where a default judgemen
 
 Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.judgement-buffer`.
 
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `false` | `SCHEDULER_ENABLED_JUDGEMENT_BUFFER` |
-| `cronExpression` | When the scheduler runs. | `0 0 2 * * *` (Daily at 2 AM) | `CRON_EXPRESSION_JUDGEMENT_BUFFER` |
+| Setting          | Description                      | Default                       | Environment Variable                 |
+| ---------------- | -------------------------------- | ----------------------------- | ------------------------------------ |
+| `enabled`        | Whether the scheduler is active. | `false`                       | `SCHEDULER_ENABLED_JUDGEMENT_BUFFER` |
+| `cronExpression` | When the scheduler runs.         | `0 0 2 * * *` (Daily at 2 AM) | `CRON_EXPRESSION_JUDGEMENT_BUFFER`   |
 
 ### FullAdmitPayImmediatelyNoPaymentFromDefendantScheduler
 
@@ -463,10 +482,11 @@ It runs daily at midnight when the Spring scheduler feature flag is enabled.
 
 Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.full-admit-pay-immediately-no-payment-from-def`.
 
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `true` | `SCHEDULER_ENABLED_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF` |
-| `cronExpression` | When the scheduler runs. | `0 0 0 * * ?` (Daily at 00:00) | `CRON_EXPRESSION_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF` |
+| Setting          | Description                      | Default                        | Environment Variable                                               |
+| ---------------- | -------------------------------- | ------------------------------ | ------------------------------------------------------------------ |
+| `enabled`        | Whether the scheduler is active. | `true`                         | `SCHEDULER_ENABLED_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF` |
+| `cronExpression` | When the scheduler runs.         | `0 0 0 * * ?` (Daily at 00:00) | `CRON_EXPRESSION_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF`   |
+
 ### DefendantResponseDeadlineScheduler
 
 The `DefendantResponseDeadlineScheduler` is used to process cases where a defendant response deadline has been reached.
@@ -475,10 +495,10 @@ The `DefendantResponseDeadlineScheduler` is used to process cases where a defend
 
 Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.defendantResponse`.
 
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|--------|----------------------|
-| `enabled` | Whether the scheduler is active. | `true` | `CRON_EXPRESSION_DEFENDANT_RESPONSE` |
-| `cronExpression` | When the scheduler runs. | `0 1 16 * * ?` (Daily at 4:01 PM) | `CRON_EXPRESSION_DEFENDANT_RESPONSE` |
+| Setting          | Description                      | Default                           | Environment Variable                 |
+| ---------------- | -------------------------------- | --------------------------------- | ------------------------------------ |
+| `enabled`        | Whether the scheduler is active. | `true`                            | `CRON_EXPRESSION_DEFENDANT_RESPONSE` |
+| `cronExpression` | When the scheduler runs.         | `0 1 16 * * ?` (Daily at 4:01 PM) | `CRON_EXPRESSION_DEFENDANT_RESPONSE` |
 
 ### HearingFeeScheduler
 
@@ -488,10 +508,10 @@ The `HearingFeeScheduler` searches for cases where a hearing fee decision is due
 
 Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.judgement-buffer`.
 
-| Setting | Description | Default                               | Environment Variable |
-|---------|-------------|---------------------------------------|----------------------|
-| `enabled` | Whether the scheduler is active. | `false`                               | `SCHEDULER_ENABLED_HEARING_FEE` |
-| `cronExpression` | When the scheduler runs. | `0 0 0 * * ?` (Every day at midnight) | `CRON_EXPRESSION_HEARING_FEE` |
+| Setting          | Description                      | Default                               | Environment Variable            |
+| ---------------- | -------------------------------- | ------------------------------------- | ------------------------------- |
+| `enabled`        | Whether the scheduler is active. | `false`                               | `SCHEDULER_ENABLED_HEARING_FEE` |
+| `cronExpression` | When the scheduler runs.         | `0 0 0 * * ?` (Every day at midnight) | `CRON_EXPRESSION_HEARING_FEE`   |
 
 ### EvidenceUpload
 
@@ -501,17 +521,17 @@ The `EvidenceUpload` scheduler finds cases with upcoming evidence upload deadlin
 
 Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.judgement-buffer`.
 
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `false` | `CRON_EXPRESSION_EVIDENCE_UPLOAD` |
-| `cronExpression` | When the scheduler runs. | `0 30 17 * * ?` (At 17:30:00 every day) | `SCHEDULER_ENABLED_EVIDENCE_UPLOAD` |
+| Setting          | Description                      | Default                                 | Environment Variable                |
+| ---------------- | -------------------------------- | --------------------------------------- | ----------------------------------- |
+| `enabled`        | Whether the scheduler is active. | `false`                                 | `CRON_EXPRESSION_EVIDENCE_UPLOAD`   |
+| `cronExpression` | When the scheduler runs.         | `0 30 17 * * ?` (At 17:30:00 every day) | `SCHEDULER_ENABLED_EVIDENCE_UPLOAD` |
 
 #### Global Scheduler Settings
 
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `lockAtLeastFor` | Minimum time a task lock is held. | `PT1M` | `LOCK_AT_LEAST_FOR` |
-| `lockAtMostFor` | Maximum time a task lock is held. | `PT5M` | `LOCK_AT_MOST_FOR` |
+| Setting          | Description                       | Default | Environment Variable |
+| ---------------- | --------------------------------- | ------- | -------------------- |
+| `lockAtLeastFor` | Minimum time a task lock is held. | `PT1M`  | `LOCK_AT_LEAST_FOR`  |
+| `lockAtMostFor`  | Maximum time a task lock is held. | `PT5M`  | `LOCK_AT_MOST_FOR`   |
 
 ## License
 
