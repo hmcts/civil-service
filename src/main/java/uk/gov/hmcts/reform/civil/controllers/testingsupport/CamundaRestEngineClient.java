@@ -4,19 +4,22 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.community.rest.client.api.ExternalTaskApiClient;
-import org.camunda.community.rest.client.api.HistoricProcessInstanceApiClient;
+import org.camunda.community.rest.client.api.HistoryApiClient;
 import org.camunda.community.rest.client.api.IncidentApiClient;
 import org.camunda.community.rest.client.api.ProcessDefinitionApiClient;
 import org.camunda.community.rest.client.api.ProcessInstanceApiClient;
 import org.camunda.community.rest.client.model.ActivityInstanceDto;
 import org.camunda.community.rest.client.model.HistoricProcessInstanceDto;
+import org.camunda.community.rest.client.model.HistoricProcessInstanceQueryDto;
 import org.camunda.community.rest.client.model.IncidentDto;
 import org.camunda.community.rest.client.model.ProcessInstanceWithVariablesDto;
 import org.camunda.community.rest.client.model.StartProcessInstanceDto;
 import org.camunda.community.rest.client.model.VariableValueDto;
+import org.camunda.community.rest.client.model.VariableQueryParameterDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +35,7 @@ public class CamundaRestEngineClient {
     private final ExternalTaskApiClient externalTaskApiClient;
     private final IncidentApiClient incidentApiClient;
     private final ProcessDefinitionApiClient processDefinitionApiClient;
-    private final HistoricProcessInstanceApiClient historicInstancesClient;
+    private final HistoryApiClient historyApiClient;
 
     public Optional<String> findIncidentByProcessInstanceId(String processInstanceId) {
         return Optional.ofNullable(
@@ -64,57 +67,26 @@ public class CamundaRestEngineClient {
     }
 
     public ResponseEntity<List<HistoricProcessInstanceDto>> getProcessInstances(String processInstanceId, String definitionKey, String variables) {
-        return historicInstancesClient.getHistoricProcessInstances(
-                null,
-                null,
-                null,
-                null,
-                processInstanceId,
-                null,
-                null,
-                definitionKey,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                variables,
-                null,
-                null);
+        HistoricProcessInstanceQueryDto query = new HistoricProcessInstanceQueryDto()
+            .processInstanceId(processInstanceId)
+            .processDefinitionKey(definitionKey)
+            .variables(parseVariables(variables));
+
+        return historyApiClient.queryHistoricProcessInstances(null, null, query);
+    }
+
+    private List<VariableQueryParameterDto> parseVariables(String variables) {
+        if (variables == null || variables.isBlank()) {
+            return null;
+        }
+
+        return Arrays.stream(variables.split(","))
+            .map(expression -> expression.split("_", 3))
+            .map(parts -> new VariableQueryParameterDto()
+                .name(parts[0])
+                .operator(VariableQueryParameterDto.OperatorEnum.fromValue(parts[1]))
+                .value(parts[2]))
+            .toList();
     }
 
 }
