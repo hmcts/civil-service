@@ -128,6 +128,20 @@ sourceSets {
   }
 }
 
+tasks.register('preparePatchedMigrations', Copy) {
+  from 'src/main/resources/db/migration'
+  into "${layout.buildDirectory.get().asFile.absolutePath}/tmp/patched-migrations"
+  filter { line ->
+    if (line.contains('CONCURRENTLY')) {
+      return line.replace('CONCURRENTLY', '')
+    }
+    if (line.contains('-- flyway:executeInTransaction=false')) {
+      return ''
+    }
+    return line
+  }
+}
+
 tasks.withType(JavaCompile).configureEach {
   options.compilerArgs << "-Xlint:unchecked" << "-Xlint:-removal" << "-Werror"
 }
@@ -138,6 +152,11 @@ tasks.named('test', Test) {
 
 tasks.withType(Copy).configureEach {
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.withType(Test).configureEach {
+  dependsOn preparePatchedMigrations
+  systemProperty 'spring.flyway.locations', "filesystem:${layout.buildDirectory.get().asFile.absolutePath}/tmp/patched-migrations"
 }
 
 def integration = tasks.register('integration', Test) {
@@ -491,7 +510,7 @@ dependencies {
   implementation "org.springframework.retry:spring-retry"
   implementation "com.github.hmcts.java-logging:logging:8.0.0"
   implementation "com.microsoft.azure:applicationinsights-web:3.7.8"
-  implementation "com.github.hmcts:befta-fw:9.2.8"
+  implementation "com.github.hmcts:befta-fw:9.2.9"
   implementation "commons-lang:commons-lang:2.6"
   implementation "com.github.hmcts:core-case-data-store-client:5.2.0"
   implementation "com.github.hmcts:document-management-client:7.0.1"
@@ -529,7 +548,7 @@ dependencies {
   implementation "jakarta.xml.bind:jakarta.xml.bind-api:4.0.5"
   implementation "org.glassfish.jaxb:jaxb-runtime:4.0.9"
   implementation "javax.xml.bind:jaxb-api:2.3.1"
-  implementation "com.launchdarkly:launchdarkly-java-server-sdk:6.3.0"
+  implementation "com.launchdarkly:launchdarkly-java-server-sdk:7.15.0"
   implementation "com.azure:azure-core:1.58.1"
   implementation "com.azure:azure-messaging-servicebus:7.17.18"
   implementation "org.apache.pdfbox:pdfbox:${versions.pdfbox}"
