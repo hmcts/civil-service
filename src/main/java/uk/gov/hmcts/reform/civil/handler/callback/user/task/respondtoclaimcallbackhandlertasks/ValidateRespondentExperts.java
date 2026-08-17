@@ -19,7 +19,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 
 @Component
@@ -60,7 +59,7 @@ public class ValidateRespondentExperts implements CaseTask, ExpertsValidator {
     }
 
     private boolean isRespondent2ResponseAndExpertsDifferent(CaseData caseData) {
-        return (isRespondent2HasSameLegalRep(caseData)
+        return (caseData.respondent2HasSameLegalRep()
             && (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO)
             && (caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getRespondent2DQExperts() != null));
     }
@@ -74,10 +73,5 @@ public class ValidateRespondentExperts implements CaseTask, ExpertsValidator {
             userInfo.getUid(),
             caseRole
         );
-    }
-
-    private boolean isRespondent2HasSameLegalRep(CaseData caseData) {
-        return caseData.getRespondent2SameLegalRepresentative() != null
-            && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
 }

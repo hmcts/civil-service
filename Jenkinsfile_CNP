@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@2.4.8")
+@Library("Infrastructure@2.4.9")
 
 import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
@@ -114,8 +114,6 @@ withPipeline(type, product, component) {
   env.DMN_DEFINITION_BRANCH = dmnBranch
   env.WIREMOCK_MAPPINGS_BRANCH = wiremockMappingsBranch
   env.UNASSIGN_CASES = true
-  env.BEFTA_FORCE_IMPORT_RETRY = 'true'
-
   loadVaultSecrets(secrets)
 
   onPR {
