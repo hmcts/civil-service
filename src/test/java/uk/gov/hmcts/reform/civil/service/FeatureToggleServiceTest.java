@@ -49,15 +49,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsAmendBundleEnabledInvoked(Boolean toggleStat) {
-        var caseFlagsKey = "amend-bundle-enabled";
-        givenToggle(caseFlagsKey, toggleStat);
-
-        assertThat(featureToggleService.isAmendBundleEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsBulkClaimInvoked(Boolean toggleStat) {
         var bulkClaimKey = "bulk_claim_enabled";
         givenToggle(bulkClaimKey, toggleStat);
@@ -250,15 +241,6 @@ class FeatureToggleServiceTest {
         when(featureToggleService.isLipQueryManagementEnabled(caseData)).thenReturn(toggleStat);
 
         assertThat(featureToggleService.isPublicQueryManagementEnabled(caseData)).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldCallBoolVariation_whenGaForLipNro(Boolean toggleStat) {
-        var gaCuiNroKey = "cui-ga-nro";
-        givenToggle(gaCuiNroKey, toggleStat);
-
-        assertThat(featureToggleService.isCuiGaNroEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
