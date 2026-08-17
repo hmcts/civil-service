@@ -523,6 +523,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
                 activeJudgment = addActiveJudgement(caseData);
             } else {
                 activeJudgment = djOnlineMapper.addPendingIssueActiveJudgment(caseData);
+                caseData.setTotalInterest(interestCalculator.calculateInterest(caseData));
             }
 
         } else {

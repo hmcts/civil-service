@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
@@ -190,10 +192,11 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 + "in breathing space");
         }
 
-        @Test
-        void shouldNotReturnError_WhenRespondentResponseLanguageIsBilingualAndDeadlinePassed() {
+        @ParameterizedTest
+        @ValueSource(strings = {"WELSH", "BOTH"})
+        void shouldNotReturnError_WhenRespondentResponseLanguageIsWelshOrBothAndDeadlinePassed(String responseLanguage) {
             RespondentLiPResponse respondentLiPResponse  = new RespondentLiPResponse();
-            respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
+            respondentLiPResponse.setRespondent1ResponseLanguage(responseLanguage);
             CaseDataLiP caseDataLiP = new CaseDataLiP();
             caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
