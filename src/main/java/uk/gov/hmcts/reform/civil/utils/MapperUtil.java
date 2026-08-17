@@ -1,12 +1,17 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.scanneddocument.CCDScannedDocument;
+import uk.gov.hmcts.reform.civil.model.scanneddocument.ScannedDocument;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 public class MapperUtil {
 
@@ -38,63 +43,20 @@ public class MapperUtil {
         // Utility class, no instances
     }
 
-    public static boolean hasPaperResponse(Map<String, Object> data, CaseData caseData) {
-        return hasScannedPaperResponse(caseData)
-            || hasScannedPaperResponse(data)
-            || hasStaffUploadedPaperResponse(data);
+    private static final Predicate<ManageDocument> filterStaffUploadedPaperResponseDoc = doc ->
+        PAPER_RESPONSE_DOC_TYPES.stream().anyMatch(type -> type.equals(doc.getDocumentType()));
+
+    private static final Predicate<ScannedDocument> filterCaseDocumentsPaperResponseDoc = doc ->
+        PAPER_RESPONSE_SCANNED_TYPES.stream().anyMatch(type -> type.equalsIgnoreCase(doc.getSubtype()));
+
+
+    public static boolean hasPaperResponse(CaseData caseData) {
+        return StreamUtil.asStream(caseData.getManageDocuments())
+            .map(Element<ManageDocument>::getValue)
+            .anyMatch(filterStaffUploadedPaperResponseDoc)
+            || StreamUtil.asStream(caseData.getScannedDocuments()).map(Element<ScannedDocument>::getValue)
+            .anyMatch(filterCaseDocumentsPaperResponseDoc);
     }
 
-    private static boolean hasScannedPaperResponse(CaseData caseData) {
-        return caseData != null
-            && caseData.getScannedDocuments() != null
-            && caseData.getScannedDocuments().stream()
-            .map(Element::getValue)
-            .filter(Objects::nonNull)
-            .anyMatch(doc -> isPaperResponseScannedType(doc.getSubtype())
-                || isPaperResponseScannedType(doc.getFormSubtype()));
-    }
-
-    private static boolean hasScannedPaperResponse(Map<String, Object> data) {
-        return getCollection(data, SCANNED_DOCUMENTS).stream()
-            .map(MapperUtil::getValueMap)
-            .filter(Objects::nonNull)
-            .anyMatch(doc -> isPaperResponseScannedType(doc.get(SUBTYPE))
-                || isPaperResponseScannedType(doc.get(FORM_SUBTYPE)));
-    }
-
-    private static boolean hasStaffUploadedPaperResponse(Map<String, Object> data) {
-        return getCollection(data, STAFF_UPLOADED_DOCUMENTS).stream()
-            .map(MapperUtil::getValueMap)
-            .filter(Objects::nonNull)
-            .map(doc -> doc.get(DOCUMENT_TYPE))
-            .filter(String.class::isInstance)
-            .map(String.class::cast)
-            .anyMatch(PAPER_RESPONSE_DOC_TYPES::contains);
-    }
-
-    private static boolean isPaperResponseScannedType(Object value) {
-        return value instanceof String scannedType
-            && PAPER_RESPONSE_SCANNED_TYPES.stream()
-            .anyMatch(type -> type.equalsIgnoreCase(scannedType));
-    }
-
-    private static List<Map<String, Object>> getCollection(Map<String, Object> data, String key) {
-        if (data == null || !(data.get(key) instanceof List<?> values)) {
-            return List.of();
-        }
-
-        return values.stream()
-            .filter(Map.class::isInstance)
-            .map(element -> (Map<String, Object>) element)
-            .toList();
-    }
-
-    private static Map<String, Object> getValueMap(Map<String, Object> element) {
-        Object value = element.get(VALUE);
-        if (value instanceof Map<?, ?> valueMap) {
-            return (Map<String, Object>) valueMap;
-        }
-        return null;
-    }
 
 }

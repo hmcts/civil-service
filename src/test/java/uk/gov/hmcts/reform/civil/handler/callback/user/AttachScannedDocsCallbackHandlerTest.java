@@ -1,10 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
+import org.mockito.Spy;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -12,10 +16,12 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.scanneddocument.ScannedDocument;
 import uk.gov.hmcts.reform.civil.model.scanneddocument.ScannedDocumentType;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,14 +30,21 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 class AttachScannedDocsCallbackHandlerTest extends BaseCallbackHandlerTest {
+
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
 
     private AttachScannedDocsCallbackHandler handler;
 
     @BeforeEach
     void setUp() {
-        handler = new AttachScannedDocsCallbackHandler();
+        handler = new AttachScannedDocsCallbackHandler(caseDetailsConverter);
     }
 
     @Test
@@ -93,9 +106,7 @@ class AttachScannedDocsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             params.request(nonCivilRequest);
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).doesNotContainKey("respondent1ResponseMethod");
+            assertThatIllegalArgumentException().isThrownBy(() -> handler.handle(params));
         }
 
         @Test
