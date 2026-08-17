@@ -19,7 +19,6 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Component
@@ -34,7 +33,7 @@ public class DirectionsQuestionnairePreparer {
         MultiPartyScenario scenario = MultiPartyScenario.getMultiPartyScenario(caseData);
         if (shouldPrepareSingleResponse(caseData, scenario)) {
             singleResponseFile(userToken, caseData);
-        } else if (respondent2HasSameLegalRep(caseData)) {
+        } else if (caseData.respondent2HasSameLegalRep()) {
             prepareDQForSameLegalRepScenario(caseData, userToken);
         } else {
             prepareDQForDifferentLegalRepScenario(caseData, userToken);
@@ -243,10 +242,5 @@ public class DirectionsQuestionnairePreparer {
         );
         List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
         preTranslationDocuments.add(element(directionsQuestionnairePretranslation));
-    }
-
-    private boolean respondent2HasSameLegalRep(CaseData caseData) {
-        return caseData.getRespondent2SameLegalRepresentative() != null
-            && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
 }
