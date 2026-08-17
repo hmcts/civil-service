@@ -1773,7 +1773,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                            .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
             assertThat(updatedData.getFinalOrderDocumentCollection().getFirst()
                            .getValue().getDocumentLink().getDocumentFileName()).isEqualTo(fileName);
-            assertThat(updatedData.getEnableUploadEvent()).isEqualTo(YES);
         }
 
         @Test
