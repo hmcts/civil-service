@@ -19,9 +19,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 
 @ExtendWith(MockitoExtension.class)
 class NoCOtherSolicitorOneEmailDTOGeneratorTest {
+
+    private static final String PARTY_REFERENCES_VALUE =
+        "Claimant reference: ClaimantRef - Defendant reference: DefendantRef";
 
     @Mock
     private NotificationsProperties notificationsProperties;
@@ -85,9 +89,21 @@ class NoCOtherSolicitorOneEmailDTOGeneratorTest {
         Map<String, String> additionalProps = Map.of("key", "value");
 
         when(noCHelper.getProperties(caseData, false)).thenReturn(additionalProps);
+        when(noCHelper.getNoCPartyReferences(caseData)).thenReturn(PARTY_REFERENCES_VALUE);
 
         Map<String, String> result = generator.addCustomProperties(initialProps, caseData);
 
         assertEquals("value", result.get("key"));
+    }
+
+    @Test
+    void shouldAddPartyReferencesIncludingTheOutgoingSolicitorReference() {
+        CaseData caseData = mock(CaseData.class);
+        when(noCHelper.getProperties(caseData, false)).thenReturn(Map.of("key", "value"));
+        when(noCHelper.getNoCPartyReferences(caseData)).thenReturn(PARTY_REFERENCES_VALUE);
+
+        Map<String, String> result = generator.addCustomProperties(new HashMap<>(), caseData);
+
+        assertEquals(PARTY_REFERENCES_VALUE, result.get(PARTY_REFERENCES));
     }
 }
