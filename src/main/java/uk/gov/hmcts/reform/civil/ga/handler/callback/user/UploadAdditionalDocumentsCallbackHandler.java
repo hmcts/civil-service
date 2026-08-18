@@ -25,8 +25,9 @@ import uk.gov.hmcts.reform.civil.ga.utils.DocUploadUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
+
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.nowInLocalZone;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -98,7 +99,7 @@ public class UploadAdditionalDocumentsCallbackHandler extends CallbackHandler im
                         .setDocumentLink(byType.getValue().getAdditionalDocument())
                         .setDocumentName(byType.getValue().getDocumentType())
                         .setCreatedBy(role)
-                        .setCreatedDatetime(LocalDateTime.now());
+                        .setCreatedDatetime(nowInLocalZone());
                     return ElementUtils.element(caseDocument);
                 })
                 .collect(Collectors.toList());

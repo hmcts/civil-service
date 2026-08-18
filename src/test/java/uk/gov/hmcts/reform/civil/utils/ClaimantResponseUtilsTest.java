@@ -47,17 +47,18 @@ public class ClaimantResponseUtilsTest {
 
     @Test
     void shouldReturnFinalPaymentDateForDefendant() {
+        LocalDate firstRepaymentDate = LocalDate.of(2024, 1, 1);
         CaseData caseData = CaseDataBuilder.builder()
-            .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.valueOf(100))
-            .issueDate(LocalDate.now())
+            .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.valueOf(25000))
+            .issueDate(firstRepaymentDate)
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
-            .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate.now())
-            .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(PaymentFrequencyClaimantResponseLRspec.ONCE_TWO_WEEKS)
+            .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(firstRepaymentDate)
+            .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(PaymentFrequencyClaimantResponseLRspec.ONCE_ONE_MONTH)
             .totalClaimAmount(BigDecimal.valueOf(1000))
             .build();
 
         LocalDate finalDate = claimantResponseUtils.getClaimantFinalRepaymentDate(caseData);
-        assertThat(finalDate).isNotNull();
+        assertThat(finalDate).isEqualTo(LocalDate.of(2024, 4, 1));
     }
 
     @ParameterizedTest

@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
 import uk.gov.hmcts.reform.auth.checker.core.user.User;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.civil.config.TestIdamConfiguration;
+import uk.gov.hmcts.reform.civil.scheduler.settlementnoresponsefromdefchk.SettlementNoResponseFromDefendantCheckScheduler;
 import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
@@ -47,7 +48,13 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
-@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class})
+@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class},
+    properties = {
+        "scheduler.full-admit-pay-immediately-no-payment-from-def.enabled=false",
+        "scheduler.defendantResponse.enabled=false",
+        "scheduler.hearing-fee.enabled=false",
+        "scheduler.evidence-upload.enabled=false"
+    })
 @AutoConfigureMockMvc
 @SuppressWarnings({"java:S112", "java:S6813", "java:S1874"})
 public abstract class BaseIntegrationTest {
@@ -75,6 +82,9 @@ public abstract class BaseIntegrationTest {
         .sub("solicitor@example.com")
         .roles(List.of("caseworker-civil-solicitor"))
         .build();
+
+    @MockBean
+    private SettlementNoResponseFromDefendantCheckScheduler settlementNoResponseFromDefendantCheckScheduler;
 
     @MockBean
     private ServiceAuthorisationApi serviceAuthorisationApi;
