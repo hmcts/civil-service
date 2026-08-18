@@ -33,8 +33,8 @@ public class InterestCalculator {
     public static final int TO_FULL_PENNIES = 2;
     protected static final BigDecimal EIGHT_PERCENT_INTEREST_RATE = valueOf(8);
     public static final BigDecimal NUMBER_OF_DAYS_IN_YEAR = new BigDecimal(365L);
-    public static final String INTEREST_RATE_MUST_NOT_BE_NEGATIVE = "Interest rate must not be negative";
-    public static final String INTEREST_AMOUNT_MUST_NOT_BE_NEGATIVE = "Interest amount must not be negative";
+    public static final String INTEREST_RATE_MUST_NOT_BE_NEGATIVE = "Enter a positive interest rate";
+    public static final String INTEREST_AMOUNT_MUST_NOT_BE_NEGATIVE = "Enter a positive interest amount";
 
     public BigDecimal calculateInterest(CaseData caseData) {
         return this.calculateInterest(caseData, getToDate(caseData));

@@ -71,7 +71,7 @@ public class FeesControllerTest extends BaseIntegrationTest {
     public void shouldReturnBadRequestWhenInterestRateIsNegative() {
         CaseData caseData = CaseData.builder().build();
         when(interestCalculator.getInterestValidationErrors(any(CaseData.class)))
-            .thenReturn(List.of("Interest rate must not be negative"));
+            .thenReturn(List.of("Enter a positive interest rate"));
         doPost(BEARER_TOKEN, caseData, FEES_CLAIM_CALCULATE_INTEREST_URL, caseData)
             .andExpect(status().isBadRequest());
     }

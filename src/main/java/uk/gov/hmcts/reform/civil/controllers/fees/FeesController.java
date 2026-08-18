@@ -66,7 +66,7 @@ public class FeesController {
     @Operation(summary = "Calculates the claim interest")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "400", description = "Bad Request - interest rate or amount must not be negative"),
+        @ApiResponse(responseCode = "400", description = "Bad Request - enter a positive interest rate or amount"),
         @ApiResponse(responseCode = "401", description = "Not Authorized")})
     public ResponseEntity<BigDecimal> calculateClaimInterest(@RequestBody CaseData caseData) {
         List<String> errors = interestCalculator.getInterestValidationErrors(caseData);
