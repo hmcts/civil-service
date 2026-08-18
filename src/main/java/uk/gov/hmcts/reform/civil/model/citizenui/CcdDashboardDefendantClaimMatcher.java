@@ -327,13 +327,6 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
                 && !isGeneralOrderAfterDecisionForReconsiderationMade();
     }
 
-    @Override
-    public boolean isDecisionForReconsiderationMade() {
-        return caseData.getHearingDate() == null
-            && caseData.getDecisionOnReconsiderationDocumentFromList().isPresent()
-            && !isSDODoneAfterDecisionForReconsiderationMade()
-            && !isGeneralOrderAfterDecisionForReconsiderationMade();
-    }
 
     @Override
     public boolean isClaimantDefaultJudgement() {
