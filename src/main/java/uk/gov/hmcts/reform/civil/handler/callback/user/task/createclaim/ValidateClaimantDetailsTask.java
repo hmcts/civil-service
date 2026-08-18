@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+import static uk.gov.hmcts.reform.civil.validation.PostcodeValidator.POSTCODE_REQUIRED_ERROR;
+
 @Component
 public class ValidateClaimantDetailsTask {
 
@@ -41,12 +43,18 @@ public class ValidateClaimantDetailsTask {
     }
 
     public CallbackResponse validateClaimantDetails(CaseData caseData, String eventId) {
+        return validateClaimantDetails(caseData, eventId, true);
+    }
+
+    public CallbackResponse validateClaimantDetails(CaseData caseData, String eventId, boolean validatePostcode) {
         Party applicant = getApplicant.apply(caseData);
 
         List<String> errors = validateApplicant(applicant);
 
-        if (errors.isEmpty() && eventId != null) {
+        if (validatePostcode && errors.isEmpty() && eventId != null) {
             validatePostcode(applicant, errors);
+        } else if (!validatePostcode) {
+            validatePostcodeRequired(applicant, errors);
         }
 
         return buildCallbackResponse(caseData, errors);
@@ -70,6 +78,14 @@ public class ValidateClaimantDetailsTask {
     private void validatePostcode(Party applicant, List<String> errors) {
         if (applicant.getPrimaryAddress() != null) {
             errors.addAll(postcodeValidator.validate(applicant.getPrimaryAddress().getPostCode()));
+        }
+    }
+
+    private void validatePostcodeRequired(Party applicant, List<String> errors) {
+        if (applicant.getPrimaryAddress() != null
+            && (applicant.getPrimaryAddress().getPostCode() == null
+            || applicant.getPrimaryAddress().getPostCode().isBlank())) {
+            errors.add(POSTCODE_REQUIRED_ERROR);
         }
     }
 
