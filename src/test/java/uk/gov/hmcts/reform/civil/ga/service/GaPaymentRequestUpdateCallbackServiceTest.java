@@ -193,13 +193,14 @@ class GaPaymentRequestUpdateCallbackServiceTest {
                                                                     )
                                       )
             .build();
-        CaseDetails caseDetails = buildCaseDetails(caseData);
 
         doThrow(buildNotificationException())
             .when(judicialNotificationService)
             .sendNotification(caseData, "respondent");
 
-        assertThatThrownBy(() -> paymentRequestUpdateCallbackService.processServiceRequest(buildServiceDto(PAID), caseData, false))
+        ServiceRequestUpdateDto serviceRequestUpdateDto = buildServiceDto(PAID);
+
+        assertThatThrownBy(() -> paymentRequestUpdateCallbackService.processServiceRequest(serviceRequestUpdateDto, caseData, false))
             .isInstanceOf(CaseDataUpdateException.class);
 
         verify(coreCaseDataService, never()).startGaUpdate(any(), any());
@@ -241,7 +242,6 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     public void shouldNotDoProceed_WhenApplicationNotIn_AdditionalPayment_Status() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YesOrNo.NO).build();
         caseData = caseData.copy().ccdState(PENDING_CASE_ISSUED).build();
-        CaseDetails caseDetails = buildCaseDetails(caseData);
 
         paymentRequestUpdateCallbackService.processServiceRequest(buildServiceDto(PAID), caseData, false);
 
@@ -254,7 +254,6 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     void shouldRecover_whenCaseDataUpdateExceptionThrown() {
         CaseDataUpdateException ex = new CaseDataUpdateException("Test Error", new RuntimeException());
         ServiceRequestUpdateDto dto = buildServiceDto(PAID);
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
 
         paymentRequestUpdateCallbackService.recover(ex, dto);
 
@@ -270,7 +269,6 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     @Test
     void shouldRecover_whenCaseDataUpdateExceptionThrownAndDtoIsNull() {
         CaseDataUpdateException ex = new CaseDataUpdateException("Test Error", new RuntimeException());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
 
         paymentRequestUpdateCallbackService.recover(ex, null);
 
@@ -405,7 +403,6 @@ class GaPaymentRequestUpdateCallbackServiceTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().copy().build();
         caseData = caseData.copy().ccdState(AWAITING_RESPONDENT_RESPONSE).build();
-        CaseDetails caseDetails = buildCaseDetails(caseData);
 
         paymentRequestUpdateCallbackService.processServiceRequest(buildServiceDto(PAID), caseData, false);
 
@@ -452,7 +449,6 @@ class GaPaymentRequestUpdateCallbackServiceTest {
             .ccdState(AWAITING_APPLICATION_PAYMENT)
             .generalAppPBADetails(new GeneralApplicationPbaDetails())
             .build();
-        CaseDetails caseDetails = buildCaseDetails(caseData);
 
         // fresh data from CCD already has the payment
         GeneralApplicationCaseData freshData = caseData.copy()
@@ -480,7 +476,6 @@ class GaPaymentRequestUpdateCallbackServiceTest {
             .ccdState(APPLICATION_ADD_PAYMENT)
             .generalAppPBADetails(new GeneralApplicationPbaDetails())
             .build();
-        CaseDetails caseDetails = buildCaseDetails(caseData);
 
         // fresh data from CCD already has the payment
         GeneralApplicationCaseData freshData = caseData.copy()
