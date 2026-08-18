@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.civil.scheduler.requestforreconsideration.RequestForR
 import uk.gov.hmcts.reform.civil.scheduler.takecaseoffline.TakeCaseOfflineScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.trialreadycheck.TrialReadyCheckScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.trialreadynotification.TrialReadyNotificationScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.settlementnoresponsefromdefchk.SettlementNoResponseFromDefendantCheckScheduler;
 import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
@@ -72,8 +73,6 @@ import static org.mockito.Mockito.when;
         "scheduler.defendantResponse.enabled=false",
         "scheduler.hearing-fee.enabled=false",
         "scheduler.evidence-upload.enabled=false",
-        "scheduler.defendantResponse.enabled=false",
-
     })
 @AutoConfigureMockMvc
 @SuppressWarnings({"java:S112", "java:S6813", "java:S1874"})
@@ -139,6 +138,8 @@ public abstract class BaseIntegrationTest {
     private TrialReadyCheckScheduler trialReadyCheckScheduler;
     @MockBean
     private TrialReadyNotificationScheduler trialReadyNotificationScheduler;
+    @MockBean
+    private SettlementNoResponseFromDefendantCheckScheduler settlementNoResponseFromDefendantCheckScheduler;
 
     @MockBean
     private ServiceAuthorisationApi serviceAuthorisationApi;
