@@ -639,6 +639,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  YesOrNo isGaRespondentOneLip;
     private  YesOrNo isGaRespondentTwoLip;
 
+    private  List<Element<ScannedDocument>> scannedDocuments;
+
     private List<DocumentToKeepCollection> documentToKeepCollection;
 
     private RequestedCourtForTabDetails requestedCourtForTabDetailsApp;
