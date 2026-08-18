@@ -178,10 +178,11 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     }
 
     @Test
-    public void shouldNotProceed_WhenAdditionalPaymentExist_WithPaymentFail_AndNotificationServiceIsDown() {
+    public void shouldThrowCaseDataUpdateException_WhenAdditionalPaymentExist_AndNotificationServiceIsDown() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YesOrNo.NO).build();
-        caseData = caseData.copy().ccdState(APPLICATION_ADD_PAYMENT)
+        final GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
+            .judicialOrderMadeWithUncloakApplication(YesOrNo.NO)
+            .build().copy().ccdState(APPLICATION_ADD_PAYMENT)
             .generalAppPBADetails(new GeneralApplicationPbaDetails()
                                       .setAdditionalPaymentDetails(new PaymentDetails()
                                                                     .setStatus(FAILED)
@@ -198,11 +199,11 @@ class GaPaymentRequestUpdateCallbackServiceTest {
             .when(judicialNotificationService)
             .sendNotification(caseData, "respondent");
 
-        paymentRequestUpdateCallbackService.processServiceRequest(buildServiceDto(PAID), caseData, false);
+        assertThatThrownBy(() -> paymentRequestUpdateCallbackService.processServiceRequest(buildServiceDto(PAID), caseData, false))
+            .isInstanceOf(CaseDataUpdateException.class);
 
         verify(coreCaseDataService, never()).startGaUpdate(any(), any());
         verify(coreCaseDataService, never()).submitGaUpdate(any(), any());
-        verify(coreCaseDataService, never()).triggerEvent(any(), any());
     }
 
     @Test
@@ -498,5 +499,22 @@ class GaPaymentRequestUpdateCallbackServiceTest {
 
         verify(coreCaseDataService, times(1)).startGaUpdate(any(), any());
         verify(coreCaseDataService, never()).submitGaUpdate(any(), any());
+    }
+
+    @Test
+    void shouldThrowIllegalArgumentException_whenIllegalArgumentExceptionIsThrown() {
+        final GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
+            .buildPaymentSuccessfulCaseData().copy()
+            .ccdState(APPLICATION_ADD_PAYMENT).build();
+
+        when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any())).thenReturn(CaseState.APPLICATION_ADD_PAYMENT);
+        when(coreCaseDataService.startGaUpdate(any(), any())).thenThrow(new IllegalArgumentException("Invalid argument"));
+
+        ServiceRequestUpdateDto dto = buildServiceDto(PAID);
+        assertThatThrownBy(() -> paymentRequestUpdateCallbackService.processServiceRequest(dto, caseData, false))
+            .isExactlyInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Invalid argument");
+
+        verify(coreCaseDataService, times(1)).startGaUpdate(any(), any());
     }
 }

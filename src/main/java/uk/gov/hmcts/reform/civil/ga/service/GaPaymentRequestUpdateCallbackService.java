@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
-import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
@@ -56,7 +55,7 @@ public class GaPaymentRequestUpdateCallbackService {
         return processServiceRequest(serviceRequestUpdateDto, caseData, true);
     }
 
-    @Retryable(retryFor = CaseDataUpdateException.class, backoff = @Backoff(delay = 500))
+    @Retryable(retryFor = CaseDataUpdateException.class, noRetryFor = IllegalArgumentException.class, backoff = @Backoff(delay = 500))
     public GeneralApplicationCaseData processServiceRequest(ServiceRequestUpdateDto serviceRequestUpdateDto,
                                                             GeneralApplicationCaseData caseData,
                                                             boolean hwf) {
@@ -76,6 +75,8 @@ public class GaPaymentRequestUpdateCallbackService {
             } else {
                 log.error("Case id {} not present", serviceRequestUpdateDto.getCcdCaseNumber());
             }
+        } catch (IllegalArgumentException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new CaseDataUpdateException(ex.getMessage(), ex);
         }
@@ -112,85 +113,70 @@ public class GaPaymentRequestUpdateCallbackService {
                                                     boolean hwf) {
         log.info("Processing the callback for making Additional Payment"
                      + "for the caseId {}", serviceRequestUpdateDto.getCcdCaseNumber());
-        try {
-
-            if (!isGeneralAppConsentOrder(caseData)) {
-                judicialNotificationService.sendNotification(caseData, "respondent");
-            }
-
-            caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData);
-            if (!hwf) {
-                createEvent(caseData, MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID,
-                        serviceRequestUpdateDto.getCcdCaseNumber());
-            }
-            return caseData;
-
-        } catch (NotificationException e) {
-            log.info("processing callback failed at Judicial Notification service, "
-                         + "please update the caseData with ga status "
-                         + "along with the Additional payment details "
-                         + "and trigger MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID event  %s ", e);
+        if (!isGeneralAppConsentOrder(caseData)) {
+            judicialNotificationService.sendNotification(caseData, "respondent");
         }
-        return null;
-    }
 
-    private GeneralApplicationCaseData updateCaseDataWithPaymentDetails(ServiceRequestUpdateDto serviceRequestUpdateDto,
-                                                      GeneralApplicationCaseData caseData) {
-        GeneralApplicationPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
-        String paymentReference = ofNullable(serviceRequestUpdateDto.getPayment())
-            .map(PaymentDto::getCustomerReference)
-            .orElse(pbaDetails.getServiceReqReference());
-
-        PaymentDetails paymentDetails = ofNullable(pbaDetails.getPaymentDetails())
-            .map(PaymentDetails::copy)
-            .orElse(new PaymentDetails())
-            .setStatus(SUCCESS)
-            .setCustomerReference(paymentReference)
-            .setReference(serviceRequestUpdateDto.getPayment().getPaymentReference())
-            .setErrorCode(null)
-            .setErrorMessage(null)
-            ;
-
-        GeneralApplicationPbaDetails updatedPbaDetails = pbaDetails.copy();
-        updatedPbaDetails
-            .setPaymentDetails(paymentDetails)
-            .setPaymentSuccessfulDate(time.now());
-
-        caseData = caseData.copy()
-            .generalAppPBADetails(updatedPbaDetails)
-            .build();
-
+        caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData);
+        if (!hwf) {
+            createEvent(caseData, MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID,
+                        serviceRequestUpdateDto.getCcdCaseNumber());
+        }
         return caseData;
     }
 
-    private GeneralApplicationCaseData updateCaseDataWithStateAndPaymentDetails(ServiceRequestUpdateDto serviceRequestUpdateDto,
-                                                              GeneralApplicationCaseData caseData) {
+    private GeneralApplicationCaseData updateCaseDataWithPaymentDetails(ServiceRequestUpdateDto serviceRequestUpdateDto,
+                                                                        GeneralApplicationCaseData caseData) {
         GeneralApplicationPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
-        String customerReference = ofNullable(serviceRequestUpdateDto.getPayment())
-            .map(PaymentDto::getCustomerReference)
-            .orElse(pbaDetails.getAdditionalPaymentServiceRef());
+        PaymentDetails paymentDetails = buildPaymentDetails(serviceRequestUpdateDto,
+                                                            pbaDetails.getPaymentDetails(),
+                                                            pbaDetails.getServiceReqReference());
 
-        PaymentDetails paymentDetails = ofNullable(pbaDetails.getAdditionalPaymentDetails())
+        GeneralApplicationPbaDetails updatedPbaDetails = pbaDetails.copy()
+            .setPaymentDetails(paymentDetails)
+            .setPaymentSuccessfulDate(time.now());
+
+        return caseData.copy()
+            .generalAppPBADetails(updatedPbaDetails)
+            .build();
+    }
+
+    private GeneralApplicationCaseData updateCaseDataWithStateAndPaymentDetails(ServiceRequestUpdateDto serviceRequestUpdateDto,
+                                                                                GeneralApplicationCaseData caseData) {
+        GeneralApplicationPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
+        PaymentDetails paymentDetails = buildPaymentDetails(serviceRequestUpdateDto,
+                                                            pbaDetails.getAdditionalPaymentDetails(),
+                                                            pbaDetails.getAdditionalPaymentServiceRef());
+
+        GeneralApplicationPbaDetails updatedPbaDetails = pbaDetails.copy()
+            .setAdditionalPaymentDetails(paymentDetails)
+            .setPaymentSuccessfulDate(time.now());
+
+        return caseData.copy()
+            .ccdState(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData))
+            .generalAppPBADetails(updatedPbaDetails)
+            .build();
+    }
+
+    private PaymentDetails buildPaymentDetails(ServiceRequestUpdateDto serviceRequestUpdateDto,
+                                               PaymentDetails existingDetails,
+                                               String fallbackCustomerReference) {
+        PaymentDto payment = serviceRequestUpdateDto.getPayment();
+        String customerReference = ofNullable(payment)
+            .map(PaymentDto::getCustomerReference)
+            .orElse(fallbackCustomerReference);
+        String paymentReference = ofNullable(payment)
+            .map(PaymentDto::getPaymentReference)
+            .orElse(customerReference);
+
+        return ofNullable(existingDetails)
             .map(PaymentDetails::copy)
             .orElse(new PaymentDetails())
             .setStatus(SUCCESS)
             .setCustomerReference(customerReference)
-            .setReference(serviceRequestUpdateDto.getPayment().getPaymentReference())
+            .setReference(paymentReference)
             .setErrorCode(null)
-            .setErrorMessage(null)
-            ;
-
-        GeneralApplicationPbaDetails updatedPbaDetails = pbaDetails.copy();
-        updatedPbaDetails
-            .setAdditionalPaymentDetails(paymentDetails)
-            .setPaymentSuccessfulDate(time.now());
-
-        caseData = caseData.copy()
-            .ccdState(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData))
-            .generalAppPBADetails(updatedPbaDetails)
-            .build();
-
-        return caseData;
+            .setErrorMessage(null);
     }
 
     private void createEvent(GeneralApplicationCaseData updatedStaleCaseData, CaseEvent eventName, String generalApplicationCaseId) {
@@ -236,7 +222,6 @@ public class GaPaymentRequestUpdateCallbackService {
         freshPba.setPaymentSuccessfulDate(stalePba.getPaymentSuccessfulDate());
 
         freshData.setGeneralAppPBADetails(freshPba);
-        freshData.setCcdState(updatedStaleCaseData.getCcdState());
     }
 
     private PaymentDetails getPaymentDetails(CaseEvent eventName, GeneralApplicationCaseData caseData) {
