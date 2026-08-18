@@ -327,7 +327,6 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
                 && !isGeneralOrderAfterDecisionForReconsiderationMade();
     }
 
-
     @Override
     public boolean isClaimantDefaultJudgement() {
         return (
