@@ -201,22 +201,23 @@ def metadata_topics(metadata_entry: dict[str, str]) -> list[str]:
 
 def gather_jobs(metadata: dict[str, dict[str, str]]) -> list[dict[str, str]]:
     jobs_by_name = {job["name"]: job for job in gather_bpmn_jobs()}
-    metadata_by_spring_name = {
-        spring_name: name
-        for name, entry in metadata.items()
-        if (spring_name := metadata_spring_name(entry))
-    }
+    metadata_by_spring_name: dict[str, list[str]] = {}
+    for name, entry in metadata.items():
+        spring_name = metadata_spring_name(entry)
+        if spring_name:
+            metadata_by_spring_name.setdefault(spring_name, []).append(name)
 
     for spring_job in gather_spring_jobs(load_scheduler_cron_defaults()):
-        metadata_name = metadata_by_spring_name.get(spring_job["springScheduler"])
-        if metadata_name:
-            job = jobs_by_name.get(metadata_name, {"name": metadata_name})
-            job["cron"] = spring_job["cron"]
-            job["springScheduler"] = spring_job["springScheduler"]
-            job.setdefault("topics", metadata_topics(metadata[metadata_name]) or spring_job["topics"])
-            if not job["topics"]:
-                job["topics"] = metadata_topics(metadata[metadata_name]) or spring_job["topics"]
-            jobs_by_name[metadata_name] = job
+        metadata_names = metadata_by_spring_name.get(spring_job["springScheduler"], [])
+        if metadata_names:
+            for metadata_name in metadata_names:
+                job = jobs_by_name.get(metadata_name, {"name": metadata_name})
+                job["cron"] = spring_job["cron"]
+                job["springScheduler"] = spring_job["springScheduler"]
+                job.setdefault("topics", metadata_topics(metadata[metadata_name]) or spring_job["topics"])
+                if not job["topics"]:
+                    job["topics"] = metadata_topics(metadata[metadata_name]) or spring_job["topics"]
+                jobs_by_name[metadata_name] = job
         else:
             jobs_by_name[spring_job["name"]] = spring_job
 

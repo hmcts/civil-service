@@ -82,15 +82,15 @@ The project defines a set of timer-driven Camunda and Spring schedulers that kee
 | Evidence upload scheduler | Prompts parties to upload evidence when deadlines are approaching. | `EVIDENCE_UPLOAD_CHECK` | `0 30 17 * * ?` | Daily at 17:30 |
 | Full admit pay immediately no payment scheduler | Escalates full-admit cases where an immediate payment was promised but not received. | `FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
 | GA doc upload notify scheduler | Sends notifications when GA supporting documents are uploaded. | `GADocUploadNotifyScheduler` | `0 0 23 * * ?` | Daily at 23:00 |
-| GA order made scheduler | Publishes GA order-made events to downstream services each afternoon. | `GAOrderMadeScheduler` | `0 15 16 ? * *` | Daily at 16:15 |
+| GA order made scheduler | Publishes GA order-made events to downstream services each afternoon. | `GAOrderMadeScheduler` | `0 15 16 * * ?` | Daily at 16:15 |
 | GA response deadline processor | Processes GA response deadlines, judge revisits and respondent checks. | `GAResponseDeadlineProcessor`<br>`GAJudgeRevisitProcessor`<br>`GARespondentResponseCheckScheduler` | `0 15 17 * * ?` | Daily at 17:15 |
-| GA unless order scheduler | Enforces GA Unless Orders once the compliance deadline passes. | `GAUnlessOrderScheduler` | `0 0 16 ? * *` | Daily at 16:00 |
-| Generate CSV and send to MMT scheduler | Produces nightly CSV/JSON exports for the mediation service (MMT). | `GenerateCsvAndSendToMmt`<br>`GenerateJsonAndSendToMmt` | `0 0 1 ? * *` | Daily at 01:00 |
+| GA unless order scheduler | Enforces GA Unless Orders once the compliance deadline passes. | `GAUnlessOrderScheduler` | `0 0 16 * * ?` | Daily at 16:00 |
+| Generate CSV and send to MMT scheduler | Produces nightly CSV/JSON exports for the mediation service (MMT). | `GenerateCsvAndSendToMmt`<br>`GenerateJsonAndSendToMmt` | `0 0 1 * * ?` | Daily at 01:00 |
 | Hearing cvp link scheduler | Issues CVP/remote hearing links on a daily cadence. | `HEARING_CVP_LINK` | `0 50 0 * * ?` | Daily at 00:50 |
 | Hearing fee check scheduler | Checks for unpaid hearing fees and raises the necessary follow-up tasks. | `HEARING_FEE_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
 | Incident retry scheduler | Retries failed external incident tasks each night. | `INCIDENT_RETRY_EVENT` | `0 1 23 * * ?` | Daily at 23:01 |
 | Judgement buffer scheduler | Processes default judgement requests once the judgement buffer period has expired. | `JudgementBuffer` | `0 0 2 * * *` | Daily at 02:00 |
-| Manage Stay WA Task Scheduler | Maintains WA tasks for stayed cases so that no follow-up is missed. | `MANAGE_STAY_WA_TASK_SCHEDULER` | `0 20 1 ? * *` | Daily at 01:20 |
+| Manage Stay WA Task Scheduler | Maintains WA tasks for stayed cases so that no follow-up is missed. | `MANAGE_STAY_WA_TASK_SCHEDULER` | `0 20 1 * * ?` | Daily at 01:20 |
 | Migrate cases scheduler | Reserved cycle to re-run large case migration batches. | `MIGRATE_CASES_EVENTS` | `R12/2080-01-01T00:00:00Z/P1M` | Monthly during 2080 at 00:00 UTC |
 | Notify claim and claim dismissed deadline scheduler | Dismisses claims when the claim notification or claim dismissed deadline has passed. | `CLAIM_DISMISSED_DEADLINE` | `0 0 0 * * ?` | Daily at 00:00 |
 | Notify claim details scheduler | Dismisses claims when the claim details notification deadline has passed. | `CLAIM_DETAILS_NOTIFICATION_DEADLINE` | `0 1 16 * * ?` | Daily at 16:01 |
@@ -100,11 +100,11 @@ The project defines a set of timer-driven Camunda and Spring schedulers that kee
 | Request for reconsideration notification check scheduler | Ensures reconsideration notifications are sent when conditions are met. | `REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK` | `0 10 0 * * ?` | Daily at 00:10 |
 | Retrigger cases scheduler | Time-bounded cycle to retrigger case updates as part of the 2026 migration plan. | `RETRIGGER_CASES_EVENTS` | `R12/2026-01-01T00:00:00Z/P1M` | Monthly during 2026 at 00:00 UTC |
 | Settlement no response from defendant scheduler | Moves settlement agreements forward when the defendant failed to respond. | `SETTLEMENT_NO_RESPONSE_FROM_DEFENDANT_CHECK` | `0 0 1 * * ?` | Daily at 01:00 |
-| Spec automated hearing notice scheduler | Builds automated hearing notices for Spec claims twice per day. | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 ? * *` | Twice daily at 00:00 and 12:00 |
+| Spec automated hearing notice scheduler | Builds automated hearing notices for Spec claims twice per day. | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 * * ?` | Twice daily at 00:00 and 12:00 |
 | Take case offline scheduler | Transitions cases that must move off digital rails. | `TAKE_CASE_OFFLINE` | `0 1 16 * * ?` | Daily at 16:01 |
 | Trial ready check scheduler | Verifies trial readiness status for outstanding cases. | `TRIAL_READY_CHECK` | `0 30 0 * * ?` | Daily at 00:30 |
 | Trial ready notification scheduler | Sends notifications when trial readiness has been confirmed. | `TRIAL_READY_NOTIFICATION_CHECK` | `0 20 0 * * ?` | Daily at 00:20 |
-| Unspec automated hearing notice scheduler | Builds automated hearing notices for Unspec claims twice per day. | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 ? * *` | Twice daily at 00:00 and 12:00 |
+| Unspec automated hearing notice scheduler | Builds automated hearing notices for Unspec claims twice per day. | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 * * ?` | Twice daily at 00:00 and 12:00 |
 | Update General application Case management Location | Future-dated cycle to re-sync GA case management locations. | `RETRIGGER_GA_UPDATE_CMLOCATION_EVENTS` | `R12/2046-01-01T00:00:00Z/P1M` | Monthly during 2046 at 00:00 UTC |
 | Update location | Future-dated cycle to re-sync the main case location. | `RETRIGGER_UPDATE_LOCATION_EVENTS` | `R12/2046-01-01T00:00:00Z/P1M` | Monthly during 2046 at 00:00 UTC |
 <!-- SCHEDULED_JOBS_TABLE_END -->

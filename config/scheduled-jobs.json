@@ -1,12 +1,24 @@
 {
   "Bundle creation scheduler": {
-    "purpose": "Builds bundles for eligible hearings each evening."
+    "purpose": "Builds bundles for eligible hearings each evening.",
+    "springScheduler": "BundleCreation",
+    "topics": [
+      "BUNDLE_CREATION_CHECK"
+    ]
   },
   "Notify claim and claim dismissed deadline scheduler": {
-    "purpose": "Dismisses claims when the claim notification or claim dismissed deadline has passed."
+    "purpose": "Dismisses claims when the claim notification or claim dismissed deadline has passed.",
+    "springScheduler": "CaseDismissed",
+    "topics": [
+      "CLAIM_DISMISSED_DEADLINE"
+    ]
   },
   "Decision outcome scheduler": {
-    "purpose": "Moves cases awaiting judicial decisions into the decision outcome workflow."
+    "purpose": "Moves cases awaiting judicial decisions into the decision outcome workflow.",
+    "springScheduler": "DecisionOutcome",
+    "topics": [
+      "MOVE_TO_DECISION_OUTCOME"
+    ]
   },
   "Defendant response deadline check scheduler": {
     "purpose": "Sweeps for defendants whose response deadline elapsed and triggers enforcement.",
@@ -30,22 +42,42 @@
     ]
   },
   "Proof of debt scheduler": {
-    "purpose": "Generates proof-of-debt artefacts for COSC-linked general applications."
+    "purpose": "Generates proof-of-debt artefacts for COSC-linked general applications.",
+    "springScheduler": "CoscApplicationProcessor",
+    "topics": [
+      "CoscApplicationProcessor"
+    ]
   },
   "GA doc upload notify scheduler": {
-    "purpose": "Sends notifications when GA supporting documents are uploaded."
+    "purpose": "Sends notifications when GA supporting documents are uploaded.",
+    "springScheduler": "GADocUploadNotifyScheduler",
+    "topics": [
+      "GADocUploadNotifyScheduler"
+    ]
   },
   "GA order made scheduler": {
-    "purpose": "Publishes GA order-made events to downstream services each afternoon."
+    "purpose": "Publishes GA order-made events to downstream services each afternoon.",
+    "springScheduler": "GAOrderMadeScheduler",
+    "topics": [
+      "GAOrderMadeScheduler"
+    ]
   },
   "GA response deadline processor": {
     "purpose": "Processes GA response deadlines, judge revisits and respondent checks."
   },
   "GA unless order scheduler": {
-    "purpose": "Enforces GA Unless Orders once the compliance deadline passes."
+    "purpose": "Enforces GA Unless Orders once the compliance deadline passes.",
+    "springScheduler": "GAUnlessOrderScheduler",
+    "topics": [
+      "GAUnlessOrderScheduler"
+    ]
   },
   "Hearing cvp link scheduler": {
-    "purpose": "Issues CVP/remote hearing links on a daily cadence."
+    "purpose": "Issues CVP/remote hearing links on a daily cadence.",
+    "springScheduler": "HearingCvpLink",
+    "topics": [
+      "HEARING_CVP_LINK"
+    ]
   },
   "Hearing fee check scheduler": {
     "purpose": "Checks for unpaid hearing fees and raises the necessary follow-up tasks.",
@@ -55,16 +87,29 @@
     ]
   },
   "Generate CSV and send to MMT scheduler": {
-    "purpose": "Produces nightly CSV/JSON exports for the mediation service (MMT)."
+    "purpose": "Produces nightly CSV/JSON exports for the mediation service (MMT).",
+    "springScheduler": "GenerateCsvAndSendToMmt",
+    "topics": [
+      "GenerateCsvAndSendToMmt",
+      "GenerateJsonAndSendToMmt"
+    ]
   },
   "Manage Stay WA Task Scheduler": {
-    "purpose": "Maintains WA tasks for stayed cases so that no follow-up is missed."
+    "purpose": "Maintains WA tasks for stayed cases so that no follow-up is missed.",
+    "springScheduler": "ManageStayWATask",
+    "topics": [
+      "MANAGE_STAY_WA_TASK_SCHEDULER"
+    ]
   },
   "Migrate cases scheduler": {
     "purpose": "Reserved cycle to re-run large case migration batches."
   },
   "Notify claim details scheduler": {
-    "purpose": "Dismisses claims when the claim details notification deadline has passed."
+    "purpose": "Dismisses claims when the claim details notification deadline has passed.",
+    "springScheduler": "ClaimDetailsNotificationDeadline",
+    "topics": [
+      "CLAIM_DETAILS_NOTIFICATION_DEADLINE"
+    ]
   },
   "Incident retry scheduler": {
     "purpose": "Retries failed external incident tasks each night."
@@ -77,13 +122,25 @@
     ]
   },
   "Order Review Obligation check scheduler": {
-    "purpose": "Checks order review obligations and triggers outstanding actions."
+    "purpose": "Checks order review obligations and triggers outstanding actions.",
+    "springScheduler": "OrderReviewObligationCheck",
+    "topics": [
+      "ORDER_REVIEW_OBLIGATION_CHECK"
+    ]
   },
   "Polling event emitter scheduler": {
-    "purpose": "Emits polling events across the day so downstream pollers stay in sync."
+    "purpose": "Emits polling events across the day so downstream pollers stay in sync.",
+    "springScheduler": "PollingEventEmitter",
+    "topics": [
+      "POLLING_EVENT_EMITTER"
+    ]
   },
   "Request for reconsideration notification check scheduler": {
-    "purpose": "Ensures reconsideration notifications are sent when conditions are met."
+    "purpose": "Ensures reconsideration notifications are sent when conditions are met.",
+    "springScheduler": "RequestForReconsiderationNotification",
+    "topics": [
+      "REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK"
+    ]
   },
   "Retrigger cases scheduler": {
     "purpose": "Time-bounded cycle to retrigger case updates as part of the 2026 migration plan."
@@ -95,21 +152,45 @@
     "purpose": "Future-dated cycle to re-sync the main case location."
   },
   "Settlement no response from defendant scheduler": {
-    "purpose": "Moves settlement agreements forward when the defendant failed to respond."
+    "purpose": "Moves settlement agreements forward when the defendant failed to respond.",
+    "springScheduler": "SettlementNoResponseFromDefendantCheck",
+    "topics": [
+      "SETTLEMENT_NO_RESPONSE_FROM_DEFENDANT_CHECK"
+    ]
   },
   "Spec automated hearing notice scheduler": {
-    "purpose": "Builds automated hearing notices for Spec claims twice per day."
+    "purpose": "Builds automated hearing notices for Spec claims twice per day.",
+    "springScheduler": "AutomatedHearingNotice",
+    "topics": [
+      "AUTOMATED_HEARING_NOTICE"
+    ]
   },
   "Take case offline scheduler": {
-    "purpose": "Transitions cases that must move off digital rails."
+    "purpose": "Transitions cases that must move off digital rails.",
+    "springScheduler": "TakeCaseOffline",
+    "topics": [
+      "TAKE_CASE_OFFLINE"
+    ]
   },
   "Trial ready check scheduler": {
-    "purpose": "Verifies trial readiness status for outstanding cases."
+    "purpose": "Verifies trial readiness status for outstanding cases.",
+    "springScheduler": "TrialReadyCheck",
+    "topics": [
+      "TRIAL_READY_CHECK"
+    ]
   },
   "Trial ready notification scheduler": {
-    "purpose": "Sends notifications when trial readiness has been confirmed."
+    "purpose": "Sends notifications when trial readiness has been confirmed.",
+    "springScheduler": "TrialReadyNotification",
+    "topics": [
+      "TRIAL_READY_NOTIFICATION_CHECK"
+    ]
   },
   "Unspec automated hearing notice scheduler": {
-    "purpose": "Builds automated hearing notices for Unspec claims twice per day."
+    "purpose": "Builds automated hearing notices for Unspec claims twice per day.",
+    "springScheduler": "AutomatedHearingNotice",
+    "topics": [
+      "AUTOMATED_HEARING_NOTICE"
+    ]
   }
 }
