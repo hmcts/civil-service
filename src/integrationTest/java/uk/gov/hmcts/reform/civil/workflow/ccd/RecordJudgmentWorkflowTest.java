@@ -30,7 +30,7 @@ class RecordJudgmentWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(updated.getJoIsLiveJudgmentExists()).isEqualTo(YesOrNo.YES);
                 assertThat(updated.getActiveJudgment()).isNotNull();
                 assertThat(updated.getActiveJudgment().getState()).isEqualTo(JudgmentState.ISSUED);
-                assertThat(updated.getActiveJudgment().getType()).isEqualTo(JudgmentType.JUDGMENT_BY_COURT);
+                assertThat(updated.getActiveJudgment().getType()).isEqualTo(JudgmentType.JUDGMENT_FOLLOWING_HEARING);
                 assertThat(updated.getActiveJudgment().getPaymentPlan().getType())
                     .isEqualTo(PaymentPlanSelection.PAY_IMMEDIATELY);
                 assertThat(updated.getActiveJudgment().getOrderedAmount()).isEqualTo("100000");

@@ -32,18 +32,14 @@ public final class RequestJudgementByAdmissionFixtures {
             .totalClaimAmount(BigDecimal.valueOf(1000))
             .respondent1Represented(YesOrNo.NO)
             .addRespondent2(YesOrNo.NO)
-            .applicant1(PartyBuilder.builder().individual().build())
-            .respondent1(PartyBuilder.builder().individual().build())
+            .applicant1(new PartyBuilder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
             .defenceAdmitPartPaymentTimeRouteRequired(
                 RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder()
-                    .whenWillThisAmountBePaid(LocalDate.now().minusDays(1))
-                    .build())
-            .ccjPaymentDetails(CCJPaymentDetails.builder()
-                                   .ccjPaymentPaidSomeAmount(BigDecimal.ZERO)
-                                   .build())
-            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(7000)).build())
+                new RespondToClaimAdmitPartLRspec().setWhenWillThisAmountBePaid(LocalDate.now().minusDays(1)))
+            .ccjPaymentDetails(new CCJPaymentDetails().setCcjPaymentPaidSomeAmount(BigDecimal.ZERO))
+            .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(7000)))
             .build();
     }
 
@@ -59,14 +55,12 @@ public final class RequestJudgementByAdmissionFixtures {
             .totalClaimAmount(BigDecimal.valueOf(1000))
             .respondent1Represented(YesOrNo.NO)
             .addRespondent2(YesOrNo.NO)
-            .applicant1(PartyBuilder.builder().individual().build())
-            .respondent1(PartyBuilder.builder().individual().build())
+            .applicant1(new PartyBuilder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
             .defenceAdmitPartPaymentTimeRouteRequired(
                 RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder()
-                    .whenWillThisAmountBePaid(LocalDate.now().plusDays(10))
-                    .build())
+                new RespondToClaimAdmitPartLRspec().setWhenWillThisAmountBePaid(LocalDate.now().plusDays(10)))
             .build();
     }
 }

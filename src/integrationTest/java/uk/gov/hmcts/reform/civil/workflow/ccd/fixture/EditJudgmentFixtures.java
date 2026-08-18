@@ -84,7 +84,7 @@ public final class EditJudgmentFixtures {
     private static JudgmentDetails recordedJudgmentActiveJudgment() {
         return new JudgmentDetails()
             .setState(JudgmentState.ISSUED)
-            .setType(JudgmentType.JUDGMENT_BY_COURT)
+            .setType(JudgmentType.JUDGMENT_FOLLOWING_HEARING)
             .setIssueDate(LocalDate.now().minusDays(10))
             .setIsRegisterWithRTL(YesOrNo.NO)
             .setOrderedAmount("100000")
