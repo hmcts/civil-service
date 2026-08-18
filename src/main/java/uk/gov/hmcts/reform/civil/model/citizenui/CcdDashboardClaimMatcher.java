@@ -216,6 +216,15 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             || sdoTime.get().isAfter(lastNonSdoOrderTime.get()));
     }
 
+    @Override
+    public boolean isDecisionForReconsiderationMade() {
+        return caseData.getHearingDate() == null
+            && (caseData.getDecisionOnReconsiderationDocumentFromList().isPresent()
+            || caseData.getDecisionOnRequestReconsiderationOptions() != null)
+            && !isSDODoneAfterDecisionForReconsiderationMade()
+            && !isGeneralOrderAfterDecisionForReconsiderationMade();
+    }
+
     protected boolean isSDODoneAfterDecisionForReconsiderationMade() {
         return caseData.getDecisionOnRequestReconsiderationOptions() == DecisionOnRequestReconsiderationOptions.CREATE_SDO
             && caseData.getDocumentListByType(caseData.getSystemGeneratedCaseDocuments(), DocumentType.SDO_ORDER).map(List::size).orElse(0) == 2;
