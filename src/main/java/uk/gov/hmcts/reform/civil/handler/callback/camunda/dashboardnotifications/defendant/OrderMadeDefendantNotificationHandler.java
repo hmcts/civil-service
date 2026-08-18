@@ -180,20 +180,10 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
             caseData.getCcdCaseReference().toString(),
             DEFENDANT
         );
-        if (getFeatureToggleService().isLocationWhiteListed(caseData
-                                                                                   .getCaseManagementLocation()
-                                                                                   .getBaseLocation())
-            || getFeatureToggleService().isCuiGaNroEnabled()) {
-            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
-                caseData.getCcdCaseReference().toString(),
-                DEFENDANT,
-                GA
-            );
-        } else {
-            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
-                DEFENDANT
-            );
-        }
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
+            caseData.getCcdCaseReference().toString(),
+            DEFENDANT,
+            GA
+        );
     }
 }
