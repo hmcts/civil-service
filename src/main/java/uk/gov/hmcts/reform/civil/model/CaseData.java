@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
+import uk.gov.hmcts.reform.civil.enums.ResponseMethod;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -347,6 +348,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  String bundleEvent;
     private  YesOrNo fullAdmitNoPaymentSchedulerProcessed;
     private  YesOrNo isOtherRemedyAbandoned;
+
+    private ResponseMethod respondent1ResponseMethod;
+    private ResponseMethod respondent2ResponseMethod;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private  LocalDate otherRemedyAbandonedDate;
