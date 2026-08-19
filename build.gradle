@@ -762,3 +762,27 @@ publishing {
     }
   }
 }
+
+tasks.register('testIdamServiceToken', Exec) {
+  group = 'verification'
+  description = 'Runs safe IDAM service-token shell contract tests'
+  commandLine 'bash', 'bin/shared/test-idam-lease-service-token.sh'
+}
+
+tasks.register('testCamundaImportScripts', Exec) {
+  group = 'verification'
+  description = 'Runs safe central Camunda import shell contract tests'
+  commandLine 'bash', 'bin/shared/test-import-camunda-resources.sh'
+}
+
+tasks.register('validateIdamOtpToolImage', Exec) {
+  group = 'verification'
+  description = 'Pulls and executes the pinned OTP tool image without printing the generated OTP'
+  environment 'IDAM_SERVICE_SECRET', 'JBSWY3DPEHPK3PXP'
+  environment 'IDAM_VALIDATE_OTP_TOOL_ONLY', 'true'
+  commandLine 'bash', 'bin/shared/idam-lease-service-token.sh', 'civil_service'
+}
+
+tasks.named('check') {
+  dependsOn tasks.named('testIdamServiceToken'), tasks.named('testCamundaImportScripts'), tasks.named('validateIdamOtpToolImage')
+}
