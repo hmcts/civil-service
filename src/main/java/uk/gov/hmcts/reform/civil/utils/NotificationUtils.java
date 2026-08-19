@@ -235,12 +235,30 @@ public class NotificationUtils {
     }
 
     public static String buildPartiesReferencesEmailSubject(CaseData caseData) {
-        SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
+        return buildPartiesReferencesEmailSubject(
+            caseData,
+            caseData.getSolicitorReferences(),
+            caseData.getRespondentSolicitor2Reference()
+        );
+    }
+
+    /** Builds the party references shown in an email subject from the supplied references rather than the
+     * ones currently held on the case. Used where a reference has since been removed from the case but still
+     * needs to be shown to the party it belonged to, such as the notice of change former solicitor email.
+     *
+     * @param caseData caseData
+     * @param solicitorReferences the references to build the subject from
+     * @param respondentSolicitor2Reference fallback defendant 2 reference
+     * @return the party references for the email subject
+     */
+    public static String buildPartiesReferencesEmailSubject(CaseData caseData,
+                                                            SolicitorReferences solicitorReferences,
+                                                            String respondentSolicitor2Reference) {
         StringBuilder stringBuilder = new StringBuilder();
 
         boolean addRespondent2Reference = ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData));
 
-        stringBuilder.append(buildClaimantReferenceEmailSubject(caseData));
+        stringBuilder.append(buildClaimantReferenceEmailSubject(solicitorReferences));
 
         if (!stringBuilder.isEmpty()) {
             stringBuilder.append(" - ");
@@ -262,11 +280,11 @@ public class NotificationUtils {
             }
 
             stringBuilder.append("Defendant 2 reference: ");
-            String respondent2Reference = caseData.getSolicitorReferences() != null
-                && caseData.getSolicitorReferences().getRespondentSolicitor2Reference() != null
-                ? caseData.getSolicitorReferences().getRespondentSolicitor2Reference()
-                : caseData.getRespondentSolicitor2Reference() != null
-                ? caseData.getRespondentSolicitor2Reference()
+            String respondent2Reference = solicitorReferences != null
+                && solicitorReferences.getRespondentSolicitor2Reference() != null
+                ? solicitorReferences.getRespondentSolicitor2Reference()
+                : respondentSolicitor2Reference != null
+                ? respondentSolicitor2Reference
                 : REFERENCE_NOT_PROVIDED;
             stringBuilder.append(respondent2Reference);
 
@@ -275,7 +293,10 @@ public class NotificationUtils {
     }
 
     public static String buildClaimantReferenceEmailSubject(CaseData caseData) {
-        SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
+        return buildClaimantReferenceEmailSubject(caseData.getSolicitorReferences());
+    }
+
+    public static String buildClaimantReferenceEmailSubject(SolicitorReferences solicitorReferences) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Claimant reference: ");
 
