@@ -21,13 +21,16 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDGMENT_REQUESTED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_AVAILABLE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_DEADLINE_PASSED_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
 class StayLiftedDefendantDashboardServiceTest {
@@ -111,13 +114,28 @@ class StayLiftedDefendantDashboardServiceTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setPreStayState("All_FINAL_ORDERS_ISSUED");
+        caseData.setPreStayState(All_FINAL_ORDERS_ISSUED.toString());
 
         stayLiftedDefendantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
 
         verifyRecordedScenarios(List.of(
             SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT.getScenario(),
             SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_DEFENDANT.getScenario()
+        ));
+    }
+
+    @Test
+    void shouldRecordScenarios_forJudgmentRequested() {
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setPreStayState(JUDGMENT_REQUESTED.toString());
+
+        stayLiftedDefendantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
+
+        verifyRecordedScenarios(List.of(
+            SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT.getScenario(),
+            SCENARIO_AAA6_DEFENDANT_RESPONSE_DEADLINE_PASSED_DEFENDANT.getScenario()
         ));
     }
 

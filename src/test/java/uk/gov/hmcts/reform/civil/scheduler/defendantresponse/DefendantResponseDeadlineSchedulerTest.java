@@ -5,24 +5,24 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.search.DefendantResponseDeadlineCheckSearchService;
-import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
-import java.util.stream.Stream;
-
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DefendantResponseDeadlineSchedulerTest {
+
+    private static final String SCHEDULER_NAME = "DefendantResponseDeadline";
 
     @Mock
     private DefendantResponseDeadlineCheckSearchService searchService;
 
     @Mock
-    private ScheduledTaskRunner scheduledTaskRunner;
+    private ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
 
     @Mock
     private DefendantResponseDeadlineTask defendantResponseDeadlineTask;
@@ -31,18 +31,13 @@ class DefendantResponseDeadlineSchedulerTest {
     private DefendantResponseDeadlineScheduler scheduler;
 
     @Test
-    void shouldRunTaskRunner_whenDeadlineCheckIsCalled() {
-        ScheduledTaskEventConfiguration expectedConfig = new ScheduledTaskEventConfiguration(scheduler.getName());
-
-        ElasticSearchResult elasticSearchResult = new ElasticSearchResult(Stream.empty(), 0);
-        when(searchService.getElasticSearchResult()).thenReturn(elasticSearchResult);
-
+    void shouldRunScheduledTaskRunner() {
         scheduler.runScheduledTask();
 
         verify(scheduledTaskRunner).run(
-            expectedConfig,
-            elasticSearchResult,
-            defendantResponseDeadlineTask
+            eq(SCHEDULER_NAME),
+            any(),
+            eq(defendantResponseDeadlineTask)
         );
     }
 }

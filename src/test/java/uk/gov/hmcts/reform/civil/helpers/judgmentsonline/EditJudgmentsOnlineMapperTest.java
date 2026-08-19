@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
@@ -39,9 +38,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @ExtendWith(MockitoExtension.class)
 public class EditJudgmentsOnlineMapperTest {
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     private InterestCalculator interestCalculator;
     private JudgementService judgementService;
     private RoboticsAddressMapper addressMapper;
@@ -56,7 +52,7 @@ public class EditJudgmentsOnlineMapperTest {
     @BeforeEach
     public void setUp() {
         interestCalculator = new InterestCalculator();
-        judgementService = new JudgementService(featureToggleService, interestCalculator);
+        judgementService = new JudgementService(interestCalculator);
         addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
         editJudgmentOnlineMapper = new EditJudgmentOnlineMapper(time);
         recordJudgmentMapper = new RecordJudgmentOnlineMapper(time, addressMapper);

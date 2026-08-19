@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import static java.lang.Long.parseLong;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
@@ -32,11 +33,12 @@ public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
     private final ObjectMapper mapper;
 
     public RetriggerCasesEventHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         CoreCaseDataService coreCaseDataService,
         ObjectMapper mapper
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.coreCaseDataService = coreCaseDataService;
         this.mapper = mapper;
     }
@@ -68,9 +70,9 @@ public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
                     eventSummary,
                     eventDescription
                 );
-                log.debug("Retrigger CaseId: {} finished. Case data: {}", caseId, caseData);
+                log.debug("Retrigger CaseId: {} finished", caseId);
             } catch (Exception e) {
-                log.error("ERROR Retrigger CaseId: {}. Case data: {},  {}", caseId, caseData, e.getMessage(), e);
+                log.error("ERROR Retrigger CaseId: {} failed", caseId, e);
             }
         }
         return new ExternalTaskData();
@@ -87,7 +89,7 @@ public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
         try {
             return mapper.readValue(caseDataString, typeRef);
         } catch (Exception e) {
-            log.error("Case data could not be deserialized {}", caseDataString, e);
+            log.error("Case data could not be deserialized", e);
             throw new IllegalArgumentException("Exception deserializing case data", e);
         }
     }

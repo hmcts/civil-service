@@ -40,7 +40,7 @@ class InitiateCoSCApplicationAfterPaymentTest extends BpmnBaseGAAfterPaymentTest
         "true,null,true",
         "true,null,false",
     }, nullValues = "null")
-    void shouldSuccessfullyComplete_whenCalled(Boolean isJudgmentMarkedPaidInFull, Boolean isClaimantLR, Boolean joFlag) {
+    void shouldSuccessfullyComplete_whenCalled(Boolean isJudgmentMarkedPaidInFull, Boolean isClaimantLR, Boolean joLiveFeedActive) {
         //assert process has started
         assertFalse(processInstance.isEnded());
 
@@ -48,7 +48,7 @@ class InitiateCoSCApplicationAfterPaymentTest extends BpmnBaseGAAfterPaymentTest
         assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
 
         Map<String, Object> flowFlagsMap = new HashMap<>();
-        flowFlagsMap.put(IS_JO_LIVE_FEED_ACTIVE, joFlag);
+        flowFlagsMap.put(IS_JO_LIVE_FEED_ACTIVE, joLiveFeedActive);
         VariableMap variables = Variables.createVariables();
         variables.put("flowFlags", flowFlagsMap);
         variables.put("isJudgmentMarkedPaidInFull", isJudgmentMarkedPaidInFull);
@@ -101,7 +101,7 @@ class InitiateCoSCApplicationAfterPaymentTest extends BpmnBaseGAAfterPaymentTest
             );
         }
 
-        if (Boolean.TRUE.equals(joFlag)) {
+        if (Boolean.TRUE.equals(joLiveFeedActive)) {
             ExternalTask notificationTask = assertNextExternalTask(APPLICATION_PROCESS_EVENT_GASPEC);
             assertCompleteExternalTask(
                 notificationTask,

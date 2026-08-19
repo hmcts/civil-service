@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.event.FullAdmitPayImmediatelyNoPaymentFromDefendantEvent;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService;
 
 import java.util.LinkedHashSet;
@@ -26,6 +27,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -34,6 +36,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 import org.mockito.Spy;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(MockitoExtension.class)
 class FullAdmitPayImmediatelyNoPaymentFromDefendantHandlerTest {
@@ -43,6 +46,11 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantHandlerTest {
         "Updating case - Full Admit No Payment Dashboard notification created successfully";
     private static final String EVENT_DESCRIPTION =
         "Updating case - Full Admit No Payment Dashboard notification created successfully";
+
+    private static final String SCHEDULER_NAME = "FullAdmitPayImmediatelyNoPaymentFromDefendant";
+
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @Mock
     private FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService caseSearchService;
@@ -58,12 +66,15 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantHandlerTest {
     @Spy
     private EventProperties eventProperties = configuredEventProperties();
 
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
+
     @InjectMocks
     private FullAdmitPayImmediatelyNoPaymentFromDefendantHandler handler;
 
     @BeforeEach
     void setUp() {
-        when(externalTask.getTopicName()).thenReturn(TOPIC);
+        lenient().when(externalTask.getTopicName()).thenReturn(TOPIC);
     }
 
     @Test
@@ -71,6 +82,8 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantHandlerTest {
         long caseId = 1234567890123456L;
         Set<CaseDetails> cases = Set.of(new CaseDetailsBuilder().id(caseId).build());
         when(caseSearchService.getCases()).thenReturn(cases);
+
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(false);
 
         handler.handleTask(externalTask);
 
@@ -104,6 +117,8 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantHandlerTest {
             return null;
         }).when(coreCaseDataService).triggerEvent(anyLong(), any(), anyMap(), anyString(), anyString());
 
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(false);
+
         handler.handleTask(externalTask);
 
         verify(coreCaseDataService, times(2)).triggerEvent(anyLong(), any(), anyMap(), anyString(), anyString());
@@ -126,6 +141,18 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantHandlerTest {
         handler.handleTask(externalTask);
 
         verifyNoInteractions(coreCaseDataService);
+        verifyNoInteractions(applicationEventPublisher);
+    }
+
+    @Test
+    void shouldReturnImmediatelyWhenSpringSchedulerIsEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
+
+        handler.handleTask(externalTask);
+
+        verify(featureToggleService).isSpringSchedulerEnabled(SCHEDULER_NAME);
+
+        verifyNoInteractions(caseSearchService);
         verifyNoInteractions(applicationEventPublisher);
     }
 

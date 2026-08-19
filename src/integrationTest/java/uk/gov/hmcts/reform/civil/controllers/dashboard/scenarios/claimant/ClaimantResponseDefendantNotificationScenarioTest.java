@@ -123,8 +123,6 @@ public class ClaimantResponseDefendantNotificationScenarioTest extends Dashboard
                                                )
             .build();
 
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created

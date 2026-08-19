@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentAddress;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -317,6 +318,10 @@ public class JudgmentsOnlineHelper {
             .append(formatAddressLine(address.getDefendantAddressLine5()))
             .toString().trim();
         return formattedLine.length() > 0 ? formattedLine.substring(0, formattedLine.length() - 1) : "";
+    }
+
+    public static boolean isJoRequested(CaseData caseData, FeatureToggleService featureToggleService) {
+        return featureToggleService.isJudgmentBufferEnabled() && YesOrNo.YES.equals(caseData.getIsJoRequested());
     }
 
     public static CaseData clearJOCaseData(CaseData caseData) {

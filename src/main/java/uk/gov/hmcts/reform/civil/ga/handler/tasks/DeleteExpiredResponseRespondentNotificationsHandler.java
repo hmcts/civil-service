@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.ga.service.search.DeleteExpiredResponseResponde
 
 import java.util.Set;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
@@ -21,11 +22,12 @@ public class DeleteExpiredResponseRespondentNotificationsHandler extends BaseExt
     private final DeleteExpiredResponseRespondentNotificationSearchService caseSearchService;
 
     public DeleteExpiredResponseRespondentNotificationsHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         ApplicationEventPublisher applicationEventPublisher,
         DeleteExpiredResponseRespondentNotificationSearchService caseSearchService
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.applicationEventPublisher = applicationEventPublisher;
         this.caseSearchService = caseSearchService;
     }

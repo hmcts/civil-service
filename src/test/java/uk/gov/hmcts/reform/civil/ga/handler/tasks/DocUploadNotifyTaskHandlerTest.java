@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.search.GaEvidenceUploadNotificationSearchService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Map;
 import java.util.Set;
@@ -42,6 +44,9 @@ public class DocUploadNotifyTaskHandlerTest {
     @Mock
     private GaCoreCaseDataService coreCaseDataService;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     private DocUploadNotifyTaskHandler handler;
 
     @BeforeEach
@@ -49,15 +54,18 @@ public class DocUploadNotifyTaskHandlerTest {
         EventProperties eventProperties = new EventProperties();
         eventProperties.setRetryCount(3);
         handler = new DocUploadNotifyTaskHandler(
+            new ExternalTaskCompletionService(),
             eventProperties,
             searchService,
             coreCaseDataService,
-            caseDetailsConverter
+            caseDetailsConverter,
+            featureToggleService
         );
     }
 
     @Test
     void shouldNotSendMessageAndTriggerGaEvent_whenZeroCasesFound() {
+        when(featureToggleService.isSpringSchedulerEnabled("GADocUploadNotifyScheduler")).thenReturn(false);
         when(searchService.getApplications()).thenReturn(Set.of());
 
         handler.execute(externalTask, externalTaskService);
@@ -70,6 +78,7 @@ public class DocUploadNotifyTaskHandlerTest {
     @Test
     void shouldEmitBusinessProcessEvent_whenCasesFound() {
         long caseId = 1L;
+        when(featureToggleService.isSpringSchedulerEnabled("GADocUploadNotifyScheduler")).thenReturn(false);
         when(searchService.getApplications())
             .thenReturn(Set.of(CaseDetails.builder().build()));
 
@@ -83,6 +92,17 @@ public class DocUploadNotifyTaskHandlerTest {
             1L, GA_EVIDENCE_UPLOAD_CHECK,
             Map.of()
         );
+        verify(externalTaskService).complete(any(), any());
+    }
+
+    @Test
+    void shouldNotProcessLegacyTaskWhenSpringSchedulerIsEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled("GADocUploadNotifyScheduler")).thenReturn(true);
+
+        handler.execute(externalTask, externalTaskService);
+
+        verifyNoInteractions(searchService);
+        verifyNoInteractions(coreCaseDataService);
         verify(externalTaskService).complete(any(), any());
     }
 

@@ -386,6 +386,9 @@ public class NotificationsProperties {
     private String notifyDefendantLIPClaimantSettleTheClaimTemplate;
 
     @NotEmpty
+    private String notifyDefendantLIPClaimantSettleTheClaimTemplateWelsh;
+
+    @NotEmpty
     private String notifyDefendantLRClaimantSettleTheClaimTemplate;
 
     @NotEmpty

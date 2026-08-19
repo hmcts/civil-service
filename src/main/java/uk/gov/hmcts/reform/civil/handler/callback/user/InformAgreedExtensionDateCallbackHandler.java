@@ -76,6 +76,8 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         "This action cannot currently be performed because it has already been completed";
     public static final String ERROR_DEADLINE_PAST =
         "You can no longer request an \"Inform agreed 28 day extension\" as the deadline has passed.";
+    public static final String ERROR_EXTENSION_DATE_REQUIRED =
+        "Agreed extension date is required before submitting.";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -229,15 +231,16 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
                  solicitorRepresentsOnlyRespondent2(callbackParams), agreedExtension
         );
         if (agreedExtension == null) {
-            throw new IllegalArgumentException("Agreed extension date cannot be null");
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(ERROR_EXTENSION_DATE_REQUIRED))
+                .build();
         }
         LocalDateTime newDeadline = deadlinesCalculator.calculateFirstWorkingDay(agreedExtension)
             .atTime(END_OF_BUSINESS_DAY);
 
         caseData.setIsRespondent1(null);
 
-        if (caseData.getRespondent2SameLegalRepresentative() != null
-            && caseData.getRespondent2SameLegalRepresentative() == YES) {
+        if (caseData.respondent2HasSameLegalRep()) {
 
             caseData.setBusinessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE));
             caseData.setRespondent1TimeExtensionDate(time.now());

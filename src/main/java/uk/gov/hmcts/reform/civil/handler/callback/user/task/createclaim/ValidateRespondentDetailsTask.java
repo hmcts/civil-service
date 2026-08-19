@@ -7,26 +7,26 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.validation.PartyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+
+import static uk.gov.hmcts.reform.civil.validation.PostcodeValidator.POSTCODE_REQUIRED_ERROR;
 
 @Component
 public class ValidateRespondentDetailsTask {
 
     private final PostcodeValidator postcodeValidator;
-    private final FeatureToggleService featureToggleService;
     private final PartyValidator partyValidator;
     private final ObjectMapper objectMapper;
     private Function<CaseData, Party> getRespondent;
 
     @Autowired
-    public ValidateRespondentDetailsTask(PostcodeValidator postcodeValidator, FeatureToggleService featureToggleService, PartyValidator partyValidator, ObjectMapper objectMapper) {
+    public ValidateRespondentDetailsTask(PostcodeValidator postcodeValidator, PartyValidator partyValidator, ObjectMapper objectMapper) {
         this.postcodeValidator = postcodeValidator;
-        this.featureToggleService = featureToggleService;
         this.partyValidator = partyValidator;
         this.objectMapper = objectMapper;
     }
@@ -36,19 +36,33 @@ public class ValidateRespondentDetailsTask {
     }
 
     public CallbackResponse validateRespondentDetails(CaseData caseData) {
+        return validateRespondentDetails(caseData, true);
+    }
+
+    public CallbackResponse validateRespondentDetails(CaseData caseData, boolean validatePostcode) {
         Party respondent = getRespondent.apply(caseData);
 
-        List<String> errors = postcodeValidator.validate(respondent.getPrimaryAddress().getPostCode());
-        if (featureToggleService.isJudgmentOnlineLive()) {
-            if (respondent.getPrimaryAddress() != null) {
-                partyValidator.validateAddress(respondent.getPrimaryAddress(), errors);
-            }
-            partyValidator.validateName(respondent.getPartyName(), errors);
+        List<String> errors = validatePostcode
+            ? postcodeValidator.validate(respondent.getPrimaryAddress().getPostCode())
+            : validatePostcodeRequired(respondent);
+        if (respondent.getPrimaryAddress() != null) {
+            partyValidator.validateAddress(respondent.getPrimaryAddress(), errors);
         }
+        partyValidator.validateName(respondent.getPartyName(), errors);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.isEmpty()
                       ? caseData.toMap(objectMapper) : null)
             .build();
+    }
+
+    private List<String> validatePostcodeRequired(Party respondent) {
+        List<String> errors = new ArrayList<>();
+        if (respondent.getPrimaryAddress() != null
+            && (respondent.getPrimaryAddress().getPostCode() == null
+            || respondent.getPrimaryAddress().getPostCode().isBlank())) {
+            errors.add(POSTCODE_REQUIRED_ERROR);
+        }
+        return errors;
     }
 }

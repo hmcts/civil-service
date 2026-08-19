@@ -58,6 +58,8 @@ properties([
                                             'https://manage-case-assignment-civil-citizen-ui-pr-{PR_NUMBER}.preview.platform.hmcts.net',
                                           ],
       description: 'The URL of case assignment service'),
+    choice(name: 'WA_TASK_MGMT_URL', choices: ['http://wa-task-management-api-aat.service.core-compute-aat.internal', 'http://wa-task-management-api-demo.service.core-compute-demo.internal'],
+       description: 'The URL of wa task management'),
     string(name: 'PLAYWRIGHT_WORKERS', defaultValue: '8',
       description: 'Number of workers for playwright'),
     string(name: 'PLAYWRIGHT_RETRIES', defaultValue: '1',
@@ -68,8 +70,14 @@ properties([
       description: 'Speed playwright performs actions, can be set to \'fast\', \'medium\' or \'slow\''),
     choice(name: 'PLAYWRIGHT_RUN_ACCESSIBILITY_TESTS', choices: ['false', 'true'],
       description: 'Runs accessibility tests for playwright during test execution'),
-    choice(name: 'PLAYWRIGHT_RUN_SETUP', choices: ['true', 'false'],
-      description: 'Runs setup projects before functional test suite'),
+    choice(name: 'PLAYWRIGHT_RUN_CUI_USER_SETUP', choices: ['true', 'false'],
+      description: 'Runs setup projects for creation of citizen users before running functional tests'),
+    choice(name: 'PLAYWRIGHT_RUN_EXUI_USER_DATA_SETUP', choices: ['true', 'false'],
+      description: 'Runs setup projects for caching additional exui user data (userId and accessToken) before running functional tests'),
+    choice(name: 'PLAYWRIGHT_RUN_CUI_USER_DATA_SETUP', choices: ['true', 'false'],
+      description: 'Runs setup projects for caching additional cui user data (userId and accessToken) before running functional tests'),
+    choice(name: 'PLAYWRIGHT_RUN_DATA_SETUP', choices: ['true', 'false'],
+      description: 'Runs setup projects for caching data before running functional tests'),
     string(name: 'WAIT_FOR_TIMEOUT_MS',
       defaultValue: '120000',
       description: 'Functional tests waitForTimeout value'),
@@ -85,7 +93,7 @@ def type = "java"
 def product = "civil"
 def component = "service"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
-def ccdBranch = "nightly-dev"
+def ccdBranch = "master"
 
 static Map<String, Object> secret(String secretName, String envVariable) {
   [$class     : 'AzureKeyVaultSecret',
@@ -196,7 +204,10 @@ withNightlyPipeline(type, product, component) {
   env.PLAYWRIGHT_RETRIES=params.PLAYWRIGHT_RETRIES
   env.PLAYWRIGHT_EXUI_RETRIES=params.PLAYWRIGHT_EXUI_RETRIES
   env.PLAYWRIGHT_RUN_ACCESSIBILITY_TESTS=params.PLAYWRIGHT_RUN_ACCESSIBILITY_TESTS
-  env.PLAYWRIGHT_RUN_SETUP=params.PLAYWRIGHT_RUN_SETUP
+  env.PLAYWRIGHT_RUN_CUI_USER_SETUP=params.PLAYWRIGHT_RUN_CUI_USER_SETUP
+  env.PLAYWRIGHT_RUN_EXUI_USER_DATA_SETUP=params.PLAYWRIGHT_RUN_EXUI_USER_DATA_SETUP
+  env.PLAYWRIGHT_RUN_CUI_USER_DATA_SETUP=params.PLAYWRIGHT_RUN_CUI_USER_DATA_SETUP
+  env.PLAYWRIGHT_RUN_DATA_SETUP=params.PLAYWRIGHT_RUN_DATA_SETUP
   env.PLAYWRIGHT_UNASSIGN_CASES = true
   env.PLAYWRIGHT_TEST_SPEED=params.PLAYWRIGHT_TEST_SPEED
 
@@ -221,6 +232,7 @@ withNightlyPipeline(type, product, component) {
   env.IDAM_API_URL=params.IDAM_API_URL
   env.IDAM_TEST_SUPPORT_API_URL=params.IDAM_TEST_SUPPORT_API_URL
   env.SERVICE_AUTH_PROVIDER_API_BASE_URL = params.SERVICE_AUTH_PROVIDER_API_BASE_URL
+  env.WA_TASK_MGMT_URL = params.WA_TASK_MGMT_URL
   env.CCD_DATA_STORE_URL = ccdDataStoreUrl
   env.CIVIL_SERVICE_URL = civilServiceUrl
   env.WAIT_FOR_TIMEOUT_MS = params.WAIT_FOR_TIMEOUT_MS
@@ -238,7 +250,11 @@ withNightlyPipeline(type, product, component) {
   boolean flowInterrupted = false
   boolean forceGreenBuild = env.FORCE_GREEN_BUILD.toBoolean();
   boolean runPrevFailedAndNotExecutedTestFiles = env.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES.toBoolean();
-  boolean playwrightRunSetup = env.PLAYWRIGHT_RUN_SETUP.toBoolean();
+  boolean playwrightRunSetup =
+    env.PLAYWRIGHT_RUN_DATA_SETUP.toBoolean() ||
+    env.PLAYWRIGHT_RUN_EXUI_USER_DATA_SETUP.toBoolean() ||
+    env.PLAYWRIGHT_RUN_CUI_USER_DATA_SETUP.toBoolean() ||
+    env.PLAYWRIGHT_RUN_CUI_USER_SETUP.toBoolean();
 
   if(!forceGreenBuild) {
     afterAlways('DependencyCheckNightly') {

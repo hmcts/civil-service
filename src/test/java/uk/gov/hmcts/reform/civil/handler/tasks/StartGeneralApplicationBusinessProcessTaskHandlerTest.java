@@ -52,6 +52,7 @@ import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FL
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(MockitoExtension.class)
 class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallbackHandlerTest {
@@ -76,6 +77,9 @@ class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallback
     private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
     @Spy
     private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
 
     @InjectMocks
     private StartGeneralApplicationBusinessProcessTaskHandler handler;

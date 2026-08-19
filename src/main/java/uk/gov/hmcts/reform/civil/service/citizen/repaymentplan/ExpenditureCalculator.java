@@ -8,11 +8,11 @@ import uk.gov.hmcts.reform.civil.model.Respondent1CourtOrderDetails;
 import uk.gov.hmcts.reform.civil.model.Respondent1DebtLRspec;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElementsNullSafe;
 import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPounds;
@@ -34,7 +34,7 @@ public class ExpenditureCalculator {
         List<RecurringExpenseLRspec> expenses = unwrapElementsNullSafe(recurringExpenseElementList);
         return expenses.stream()
             .mapToDouble(expense -> calculatePaymentPerMonth(
-                penniesToPounds(expense.getAmount()).doubleValue(),
+                penniesToPounds(amountOrZero(expense.getAmount())).doubleValue(),
                 expense.getFrequency()
             ))
             .sum();
@@ -42,8 +42,9 @@ public class ExpenditureCalculator {
 
     private double calculateCourtOrders(List<Element<Respondent1CourtOrderDetails>> courtOrderDetailsElementList) {
         List<Respondent1CourtOrderDetails> courtOrderDetails = unwrapElementsNullSafe(courtOrderDetailsElementList);
-        return !courtOrderDetails.isEmpty() ? courtOrderDetails.stream().map(item -> penniesToPounds(item.getMonthlyInstalmentAmount()))
-            .collect(Collectors.summingDouble(BigDecimal::doubleValue)) : 0.0;
+        return !courtOrderDetails.isEmpty() ? courtOrderDetails.stream()
+            .map(item -> penniesToPounds(amountOrZero(item.getMonthlyInstalmentAmount())))
+            .mapToDouble(BigDecimal::doubleValue).sum() : 0.0;
     }
 
     private double calculateTotalMonthlyDebt(Respondent1DebtLRspec respondent1DebtLRspec) {
@@ -61,18 +62,23 @@ public class ExpenditureCalculator {
         List<LoanCardDebtLRspec> cardDebtList = unwrapElementsNullSafe(loanCardDebtDetails);
         return cardDebtList.stream()
             .map(LoanCardDebtLRspec::getMonthlyPayment)
-            .map(debt -> penniesToPounds(debt))
-            .collect(Collectors.summingDouble(BigDecimal::doubleValue));
+            .map(ExpenditureCalculator::amountOrZero)
+            .map(MonetaryConversions::penniesToPounds)
+            .mapToDouble(BigDecimal::doubleValue).sum();
     }
 
     private double calculateDebts(List<Element<DebtLRspec>> debtDetails) {
         List<DebtLRspec> debts = unwrapElementsNullSafe(debtDetails);
         return debts.stream()
             .mapToDouble(debt -> calculatePaymentPerMonth(
-                penniesToPounds(debt.getPaymentAmount()).doubleValue(),
+                penniesToPounds(amountOrZero(debt.getPaymentAmount())).doubleValue(),
                 debt.getPaymentFrequency()
             ))
             .sum();
+    }
+
+    private static BigDecimal amountOrZero(BigDecimal amountInPennies) {
+        return amountInPennies == null ? BigDecimal.ZERO : amountInPennies;
     }
 
 }

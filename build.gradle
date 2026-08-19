@@ -26,7 +26,8 @@ def versions = [
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
   lombok            : '1.18.38',
-  camunda           : '7.20.0',
+  camunda           : '7.24.0',
+  camundaRestClient : '2026.04.2',
   testcontainers    : '1.21.4',
   pdfbox            : '3.0.7',
   tika              : '3.3.1'
@@ -68,6 +69,7 @@ allprojects {
     analyzers.assemblyEnabled = false
     analyzers.retirejs.enabled = false
     analyzers.ossIndex.enabled = false
+    analyzers.nodeAudit.enabled = false
   }
 
   dependencyManagement {
@@ -126,6 +128,20 @@ sourceSets {
   }
 }
 
+tasks.register('preparePatchedMigrations', Copy) {
+  from 'src/main/resources/db/migration'
+  into "${layout.buildDirectory.get().asFile.absolutePath}/tmp/patched-migrations"
+  filter { line ->
+    if (line.contains('CONCURRENTLY')) {
+      return line.replace('CONCURRENTLY', '')
+    }
+    if (line.contains('-- flyway:executeInTransaction=false')) {
+      return ''
+    }
+    return line
+  }
+}
+
 tasks.withType(JavaCompile).configureEach {
   options.compilerArgs << "-Xlint:unchecked" << "-Xlint:-removal" << "-Werror"
 }
@@ -136,6 +152,11 @@ tasks.named('test', Test) {
 
 tasks.withType(Copy).configureEach {
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.withType(Test).configureEach {
+  dependsOn preparePatchedMigrations
+  systemProperty 'spring.flyway.locations', "filesystem:${layout.buildDirectory.get().asFile.absolutePath}/tmp/patched-migrations"
 }
 
 def integration = tasks.register('integration', Test) {
@@ -489,7 +510,7 @@ dependencies {
   implementation "org.springframework.retry:spring-retry"
   implementation "com.github.hmcts.java-logging:logging:8.0.0"
   implementation "com.microsoft.azure:applicationinsights-web:3.7.8"
-  implementation "com.github.hmcts:befta-fw:9.2.7"
+  implementation "com.github.hmcts:befta-fw:9.2.9"
   implementation "commons-lang:commons-lang:2.6"
   implementation "com.github.hmcts:core-case-data-store-client:5.2.0"
   implementation "com.github.hmcts:document-management-client:7.0.1"
@@ -514,19 +535,20 @@ dependencies {
   implementation "org.apache.logging.log4j:log4j-api:2.26.0"
   implementation "org.apache.logging.log4j:log4j-to-slf4j:2.26.0"
   implementation "org.apache.commons:commons-text:1.15.0"
-  implementation "org.elasticsearch:elasticsearch:7.17.29"
+  implementation "org.elasticsearch:elasticsearch:9.2.3"
   implementation "com.networknt:json-schema-validator:1.5.9"
   implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
   implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
   implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv"
   implementation "org.camunda.bpm:camunda-external-task-client:${versions.camunda}"
-  implementation "org.camunda.community.rest:camunda-platform-7-rest-client-spring-boot-starter:${versions.camunda}"
+  implementation "io.holunda.c7:c7-rest-client-spring-boot-starter-provided:${versions.camundaRestClient}"
+  implementation "org.camunda.bpm:camunda-engine:${versions.camunda}"
   implementation "org.camunda.bpm:camunda-engine-rest-core:${versions.camunda}"
   implementation "org.apiguardian:apiguardian-api:1.1.2"
   implementation "jakarta.xml.bind:jakarta.xml.bind-api:4.0.5"
   implementation "org.glassfish.jaxb:jaxb-runtime:4.0.9"
   implementation "javax.xml.bind:jaxb-api:2.3.1"
-  implementation "com.launchdarkly:launchdarkly-java-server-sdk:6.3.0"
+  implementation "com.launchdarkly:launchdarkly-java-server-sdk:7.15.0"
   implementation "com.azure:azure-core:1.58.1"
   implementation "com.azure:azure-messaging-servicebus:7.17.18"
   implementation "org.apache.pdfbox:pdfbox:${versions.pdfbox}"
@@ -573,8 +595,6 @@ dependencies {
   testImplementation "org.testcontainers:postgresql:${versions.testcontainers}"
   testImplementation "org.testcontainers:junit-jupiter:${versions.testcontainers}"
   testImplementation "com.h2database:h2:2.4.240"
-  testImplementation "org.camunda.bpm:camunda-engine:${versions.camunda}"
-
   contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.17'
   contractTestImplementation 'au.com.dius.pact.provider:junit5:4.6.17'
   contractTestImplementation 'au.com.dius.pact.provider:junit5spring:4.6.17'
@@ -741,4 +761,28 @@ publishing {
       }
     }
   }
+}
+
+tasks.register('testIdamServiceToken', Exec) {
+  group = 'verification'
+  description = 'Runs safe IDAM service-token shell contract tests'
+  commandLine 'bash', 'bin/shared/test-idam-lease-service-token.sh'
+}
+
+tasks.register('testCamundaImportScripts', Exec) {
+  group = 'verification'
+  description = 'Runs safe central Camunda import shell contract tests'
+  commandLine 'bash', 'bin/shared/test-import-camunda-resources.sh'
+}
+
+tasks.register('validateIdamOtpToolImage', Exec) {
+  group = 'verification'
+  description = 'Pulls and executes the pinned OTP tool image without printing the generated OTP'
+  environment 'IDAM_SERVICE_SECRET', 'JBSWY3DPEHPK3PXP'
+  environment 'IDAM_VALIDATE_OTP_TOOL_ONLY', 'true'
+  commandLine 'bash', 'bin/shared/idam-lease-service-token.sh', 'civil_service'
+}
+
+tasks.named('check') {
+  dependsOn tasks.named('testIdamServiceToken'), tasks.named('testCamundaImportScripts'), tasks.named('validateIdamOtpToolImage')
 }

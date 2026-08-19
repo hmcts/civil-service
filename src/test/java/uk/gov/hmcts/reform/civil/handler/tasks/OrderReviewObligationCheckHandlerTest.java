@@ -29,12 +29,16 @@ import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import org.mockito.Spy;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(SpringExtension.class)
 class OrderReviewObligationCheckHandlerTest {
+
+    private static final String SCHEDULER_NAME = "OrderReviewObligationCheck";
 
     @Mock
     private OrderReviewObligationSearchService caseSearchService;
@@ -49,6 +53,9 @@ class OrderReviewObligationCheckHandlerTest {
     private CaseDetailsConverter caseDetailsConverter;
     @Spy
     private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
 
     @InjectMocks
     private OrderReviewObligationCheckHandler handler;
@@ -131,6 +138,16 @@ class OrderReviewObligationCheckHandlerTest {
         handler.handleTask(mock(ExternalTask.class));
 
         verify(applicationEventPublisher, never()).publishEvent(any(OrderReviewObligationCheckEvent.class));
+    }
+
+    @Test
+    void handleTask_shouldNotRunCamundaHandlerWhenSpringSchedulerEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
+
+        handler.execute(mockTask, externalTaskService);
+
+        verifyNoInteractions(caseSearchService, applicationEventPublisher);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test

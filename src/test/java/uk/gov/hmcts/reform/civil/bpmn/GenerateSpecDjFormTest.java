@@ -35,8 +35,8 @@ class GenerateSpecDjFormTest extends BpmnBaseTest {
     }
 
     @Test
-    void shouldSuccessfullyComplete_whenJoFlagEnabledAndDashboardDisabled() {
-        VariableMap variables = flowFlags(true, false, false, false);
+    void shouldSuccessfullyComplete_whenDashboardDisabled() {
+        VariableMap variables = flowFlags(false, false, false);
 
         startAndAssertProcess();
         startBusinessProcess(variables);
@@ -47,7 +47,7 @@ class GenerateSpecDjFormTest extends BpmnBaseTest {
 
     @Test
     void shouldSuccessfullyComplete_whenDashboardEnabledAndClaimantRepresented() {
-        VariableMap variables = flowFlags(false, true, false, false);
+        VariableMap variables = flowFlags(true, false, false);
 
         startAndAssertProcess();
         startBusinessProcess(variables);
@@ -77,10 +77,11 @@ class GenerateSpecDjFormTest extends BpmnBaseTest {
 
     @Test
     void shouldSuccessfullyComplete_whenLipVLipAndDashboardEnabled() {
-        VariableMap variables = flowFlags(false, true, true, true);
+        VariableMap variables = flowFlags(true, true, true);
 
         startAndAssertProcess();
         startBusinessProcess(variables);
+        completeDocGeneration(variables);
         completePrimaryNotifications(variables);
 
         ExternalTask claimantDashboard = assertNextExternalTask(PROCESS_CASE_EVENT);
@@ -174,13 +175,11 @@ class GenerateSpecDjFormTest extends BpmnBaseTest {
         assertNoExternalTasksLeft();
     }
 
-    private VariableMap flowFlags(boolean joLiveEnabled,
-                                  boolean dashboardEnabled,
+    private VariableMap flowFlags(boolean dashboardEnabled,
                                   boolean lipCase,
                                   boolean unrepresentedDefendantOne) {
         VariableMap variables = Variables.createVariables();
         variables.putValue(FLOW_FLAGS, Map.of(
-            JO_ONLINE_LIVE_ENABLED, joLiveEnabled,
             DASHBOARD_SERVICE_ENABLED, dashboardEnabled,
             LIP_CASE, lipCase,
             UNREPRESENTED_DEFENDANT_ONE, unrepresentedDefendantOne

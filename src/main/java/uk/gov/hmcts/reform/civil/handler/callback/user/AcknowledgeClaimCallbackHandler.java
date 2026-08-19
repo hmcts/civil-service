@@ -44,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -98,7 +99,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         // Show an error message if the defendant tries to submit a response again ONE_V_TWO_TWO_LEGAL_REP
         if ((solicitorRepresentsOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORONE)
             && caseData.getRespondent1AcknowledgeNotificationDate() != null)
-            || (solicitorRepresentsOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)
+            || (solicitorRepresentsRespondent2Only(callbackParams)
             && caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(ERROR_DEFENDANT_RESPONSE_SUBMITTED))
@@ -113,7 +114,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
                 .build();
         }
 
-        var isRespondent1 = solicitorRepresentsOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO) ? NO : YES;
+        var isRespondent1 = solicitorRepresentsRespondent2Only(callbackParams) ? NO : YES;
         caseData.setSolicitorReferencesCopy(caseData.getSolicitorReferences());
         caseData.setIsRespondent1(isRespondent1);
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -155,7 +156,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             .orElse(null);
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        boolean isRespondent2Solicitor = solicitorRepresentsOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO);
+        boolean isRespondent2Solicitor = solicitorRepresentsRespondent2Only(callbackParams);
 
         // Each scenario owns a different acknowledgement/deadline update path.
         // Keep this switch aligned with getMultiPartyScenario(...) values to avoid partial updates.
@@ -178,7 +179,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        boolean isRespondent1Solicitor = !solicitorRepresentsOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO);
+        boolean isRespondent1Solicitor = !RESPONDENT2_DOCUMENT_GENERATION_USER.equals(caseData.getRespondent2DocumentGeneration());
         LocalDateTime responseDeadline = isRespondent1Solicitor
             ? caseData.getRespondent1ResponseDeadline() : caseData.getRespondent2ResponseDeadline();
 
@@ -208,8 +209,8 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
     private void setRespondent2DocumentGenerationUser(CaseData caseData, UserInfo userInfo) {
         caseData.setRespondent2DocumentGeneration(null);
-        if (!coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
-            && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
+        if (solicitorHasCaseRole(caseData, userInfo, RESPONDENTSOLICITORTWO)
+            && !solicitorHasCaseRole(caseData, userInfo, RESPONDENTSOLICITORONE)) {
             caseData.setRespondent2DocumentGeneration(RESPONDENT2_DOCUMENT_GENERATION_USER);
         }
     }
@@ -285,7 +286,26 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         UserInfo userInfo = getAuthenticatedUserInfo(callbackParams);
         return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
-            && coreCaseUserService.userHasCaseRole(
+            && solicitorHasCaseRole(caseData, userInfo, caseRole);
+    }
+
+    private boolean solicitorRepresentsRespondent2Only(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (getMultiPartyScenario(caseData) != ONE_V_TWO_TWO_LEGAL_REP) {
+            return false;
+        }
+
+        UserInfo userInfo = getAuthenticatedUserInfo(callbackParams);
+        if (userInfo == null) {
+            return false;
+        }
+
+        return solicitorHasCaseRole(caseData, userInfo, RESPONDENTSOLICITORTWO)
+            && !solicitorHasCaseRole(caseData, userInfo, RESPONDENTSOLICITORONE);
+    }
+
+    private boolean solicitorHasCaseRole(CaseData caseData, UserInfo userInfo, CaseRole caseRole) {
+        return coreCaseUserService.userHasCaseRole(
             caseData.getCcdCaseReference().toString(),
             userInfo.getUid(),
             caseRole

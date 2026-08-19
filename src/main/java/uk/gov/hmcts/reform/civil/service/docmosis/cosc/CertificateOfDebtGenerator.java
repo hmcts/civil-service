@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 
 @Slf4j
@@ -106,9 +107,13 @@ public class CertificateOfDebtGenerator implements TemplateDataGenerator<Certifi
         if (caseData.getLocationName() != null) {
             return caseData.getLocationName();
         } else {
-            List<LocationRefData> locationDetails = locationRefDataService.getCourtLocationsByEpimmsId(authorisation, caseData.getCaseManagementLocation().getBaseLocation());
+            List<LocationRefData> locationDetails = locationRefDataService.getCourtLocationsByEpimmsId(
+                authorisation,
+                caseData.getCaseManagementLocation().getBaseLocation(),
+                getCaseServiceId(caseData.getCaseAccessCategory())
+            );
             if (locationDetails != null && !locationDetails.isEmpty()) {
-                return locationDetails.get(0).getCourtName();
+                return locationDetails.getFirst().getCourtName();
             }
         }
         return null;

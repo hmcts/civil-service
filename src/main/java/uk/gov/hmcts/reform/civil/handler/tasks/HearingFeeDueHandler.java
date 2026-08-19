@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.scheduler.hearingfee.HearingFeeScheduler;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
 import java.time.LocalDate;
 import java.util.Set;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
@@ -32,6 +34,7 @@ public class HearingFeeDueHandler extends BaseExternalTaskHandler {
     private final FeatureToggleService featureToggleService;
 
     public HearingFeeDueHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         HearingFeeDueSearchService caseSearchService,
         ApplicationEventPublisher applicationEventPublisher,
@@ -39,7 +42,7 @@ public class HearingFeeDueHandler extends BaseExternalTaskHandler {
         CaseDetailsConverter caseDetailsConverter,
         FeatureToggleService featureToggleService
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.caseSearchService = caseSearchService;
         this.applicationEventPublisher = applicationEventPublisher;
         this.coreCaseDataService = coreCaseDataService;
@@ -49,6 +52,10 @@ public class HearingFeeDueHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
+        if (featureToggleService.isSpringSchedulerEnabled(HearingFeeScheduler.SCHEDULER_NAME)) {
+            return new ExternalTaskData();
+        }
+
         Set<CaseDetails> cases = caseSearchService.getCases();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
@@ -62,6 +69,7 @@ public class HearingFeeDueHandler extends BaseExternalTaskHandler {
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
             }
         });
+
         return new ExternalTaskData();
     }
 

@@ -2,16 +2,17 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.task.ExternalTask;
-import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeSchedulerVars;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingResponse;
@@ -20,40 +21,48 @@ import uk.gov.hmcts.reform.hmc.service.HearingsService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
 @Slf4j
 @Component
 public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
+
+    private static final String SCHEDULER_NAME = "AutomatedHearingNotice";
 
     private final UserService userService;
     private final SystemUpdateUserConfiguration userConfig;
     private final HearingsService hearingsService;
     private final RuntimeService runtimeService;
     private final ObjectMapper mapper;
+    private final FeatureToggleService featureToggleService;
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
     public AutomatedHearingNoticeHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         UserService userService,
         SystemUpdateUserConfiguration userConfig,
         HearingsService hearingsService,
         RuntimeService runtimeService,
         ObjectMapper mapper,
-        ApplicationEventPublisher applicationEventPublisher
+        ApplicationEventPublisher applicationEventPublisher,
+        FeatureToggleService featureToggleService
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.userService = userService;
         this.userConfig = userConfig;
         this.hearingsService = hearingsService;
         this.runtimeService = runtimeService;
         this.mapper = mapper;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.featureToggleService = featureToggleService;
     }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
+        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
+            return new ExternalTaskData();
+        }
 
         HearingNoticeSchedulerVars schedulerVars = mapper.convertValue(externalTask.getAllVariables(), HearingNoticeSchedulerVars.class);
         List<String> dispatchedHearingIds = getDispatchedHearingIds(schedulerVars);
@@ -79,28 +88,6 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
         );
 
         return new ExternalTaskData();
-    }
-
-    @Override
-    public void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService, ExternalTaskData data) {
-        String topicName = externalTask.getTopicName();
-        String processInstanceId = externalTask.getProcessInstanceId();
-
-        log.info("Trying to complete external task '{}' with processInstanceId '{}'",
-                 topicName, processInstanceId);
-        try {
-            externalTaskService.complete(externalTask, getVariableMap(data));
-
-            log.info("External task '{}' finished with processInstanceId '{}'",
-                     topicName, processInstanceId
-            );
-        } catch (NotFoundException e) {
-            log.info("Completing external task '{}' was skipped as process instance '{}' has already completed.",
-                      topicName, processInstanceId);
-        } catch (Exception ex) {
-            log.error("Completing external task '{}' errored  with processInstanceId '{}'",
-                      topicName, processInstanceId, ex);
-        }
     }
 
     private UnNotifiedHearingResponse getUnnotifiedHearings(String serviceId) {

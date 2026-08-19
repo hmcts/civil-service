@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
 import java.util.Map;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
@@ -33,13 +34,14 @@ public class StartBusinessProcessTaskHandler extends BaseExternalTaskHandler {
     private final IStateFlowEngine stateFlowEngine;
 
     public StartBusinessProcessTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         CoreCaseDataService coreCaseDataService,
         CaseDetailsConverter caseDetailsConverter,
         ObjectMapper mapper,
         IStateFlowEngine stateFlowEngine
     ) {
-        super(eventProperties);
+        super(externalTaskCompletionService, eventProperties);
         this.coreCaseDataService = coreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;
         this.mapper = mapper;
@@ -70,7 +72,7 @@ public class StartBusinessProcessTaskHandler extends BaseExternalTaskHandler {
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, caseEvent);
         CaseData data = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
         BusinessProcess businessProcess = data.getBusinessProcess();
-        log.info("business process current status {} and getStatusOrDefault {} for caseId{}",
+        log.info("business process current status {} and getStatusOrDefault {} for caseId{} ",
                  businessProcess.getStatus(), businessProcess.getStatusOrDefault(), caseId);
         switch (businessProcess.getStatusOrDefault()) {
             case READY, DISPATCHED:

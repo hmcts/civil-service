@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.validation.PartyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
@@ -26,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class ValidateRespondentDetailsTaskTest extends BaseCallbackHandlerTest {
@@ -38,17 +37,13 @@ class ValidateRespondentDetailsTaskTest extends BaseCallbackHandlerTest {
     private PostcodeValidator postcodeValidator;
 
     @Mock
-    private FeatureToggleService featureToggleService;
-
-    @Mock
     private PartyValidator partyValidator;
 
     @BeforeEach
     public void setUp() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        validateRespondentDetailsTask = new ValidateRespondentDetailsTask(postcodeValidator, featureToggleService, partyValidator, objectMapper);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        validateRespondentDetailsTask = new ValidateRespondentDetailsTask(postcodeValidator, partyValidator, objectMapper);
     }
 
     @Test
@@ -71,6 +66,46 @@ class ValidateRespondentDetailsTaskTest extends BaseCallbackHandlerTest {
         assertThat(response).isNotNull();
         assertThat(response.getData()).isNotNull();
         assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    void shouldNotValidatePostcode_whenPostcodeValidationIsSkipped() {
+        Party respondent1 = new PartyBuilder().company().build();
+        Address address = new Address();
+        address.setAddressLine1("Address line 1");
+        address.setPostCode("BT1 1SS");
+        respondent1.setPrimaryAddress(address);
+
+        CaseData caseData = CaseDataBuilder.builder().respondent1(respondent1).build();
+        validateRespondentDetailsTask.setGetRespondent(CaseData::getRespondent1);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateRespondentDetailsTask
+            .validateRespondentDetails(caseData, false);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getData()).isNotNull();
+        assertThat(response.getErrors()).isEmpty();
+        verifyNoInteractions(postcodeValidator);
+    }
+
+    @Test
+    void shouldReturnPostcodeRequiredError_whenPostcodeValidationIsSkippedAndPostcodeIsNull() {
+        Party respondent1 = new PartyBuilder().company().build();
+        Address address = new Address();
+        address.setAddressLine1("Address line 1");
+        address.setPostCode(null);
+        respondent1.setPrimaryAddress(address);
+
+        CaseData caseData = CaseDataBuilder.builder().respondent1(respondent1).build();
+        validateRespondentDetailsTask.setGetRespondent(CaseData::getRespondent1);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateRespondentDetailsTask
+            .validateRespondentDetails(caseData, false);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getData()).isNull();
+        assertThat(response.getErrors()).containsOnly("Please enter Postcode");
+        verifyNoInteractions(postcodeValidator);
     }
 
     @Test
