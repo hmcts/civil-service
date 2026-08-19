@@ -41,8 +41,9 @@ class ClearFormerSolicitorInfoAfterNoCHandlerTest extends BaseCallbackHandlerTes
 
     @Test
     void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor1In1v2DiffSolicitorToDiffSolicitor() {
-        // Ensure that the former solicitor email exists before the callback
+        // Ensure that the former solicitor details exist before the callback
         assertNotNull(caseData.getChangeOfRepresentation().getFormerRepresentationEmailAddress());
+        assertNotNull(caseData.getChangeOfRepresentation().getFormerRepresentationReference());
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -51,7 +52,8 @@ class ClearFormerSolicitorInfoAfterNoCHandlerTest extends BaseCallbackHandlerTes
 
         CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
-        // Assert that the former solicitor email is cleared in the updated case data
+        // Assert that the former solicitor details are cleared in the updated case data
         assertNull(updatedCaseData.getChangeOfRepresentation().getFormerRepresentationEmailAddress());
+        assertNull(updatedCaseData.getChangeOfRepresentation().getFormerRepresentationReference());
     }
 }
