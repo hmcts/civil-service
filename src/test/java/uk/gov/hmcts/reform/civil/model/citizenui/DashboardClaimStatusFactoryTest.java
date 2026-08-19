@@ -895,7 +895,6 @@ class DashboardClaimStatusFactoryTest {
 
     @Test
     void shouldReturnDecisionForReconsiderationMade_whenJudgeSelectedCreateSDO() {
-        // Given
         CaseDocument sdoDocument = new CaseDocument()
             .setDocumentType(DocumentType.SDO_ORDER)
             .setCreatedDatetime(LocalDateTime.now().minusDays(1));
@@ -912,10 +911,8 @@ class DashboardClaimStatusFactoryTest {
         List<CaseEventDetail> eventHistory = Collections.emptyList();
         CcdDashboardClaimantClaimMatcher matcher = new CcdDashboardClaimantClaimMatcher(caseData, toggleService, eventHistory);
 
-        // When
         DashboardClaimStatus status = claimStatusFactory.getDashboardClaimStatus(matcher);
 
-        // Then
         assertThat(status).isEqualTo(DashboardClaimStatus.DECISION_FOR_RECONSIDERATION_MADE);
     }
 }
