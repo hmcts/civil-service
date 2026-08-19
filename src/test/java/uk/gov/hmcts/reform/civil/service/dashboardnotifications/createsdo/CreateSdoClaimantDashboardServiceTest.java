@@ -56,8 +56,6 @@ class CreateSdoClaimantDashboardServiceTest {
     private SdoReconsiderationDeadlineService reconsiderationDeadlineService;
     @Mock
     private DashboardTasksHelper dashboardTasksHelper;
-    @Mock
-    private SdoReconsiderationDeadlineService reconsiderationDeadlineService;
 
     @InjectMocks
     private CreateSdoClaimantDashboardService createSdoClaimantDashboardService;

@@ -13,13 +13,10 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderCaseProgressionService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
-import uk.gov.hmcts.reform.civil.service.Time;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
@@ -34,14 +31,12 @@ public class SdoSubmissionService {
     private final DirectionsOrderCaseProgressionService directionsOrderCaseProgressionService;
     private final SdoCaseClassificationService caseClassificationService;
     private final SdoReconsiderationDeadlineService reconsiderationDeadlineService;
-    private final Time time;
 
     public CaseData prepareSubmission(CaseData caseData, String authToken) {
         log.info("Preparing SDO submission payload for caseId {}", caseData.getCcdCaseReference());
         caseData.setBusinessProcess(BusinessProcess.ready(CaseEvent.CREATE_SDO));
         caseData.setHearingNotes(getHearingNotes(caseData));
 
-        initializeReconsiderationDeadline(caseData);
         moveGeneratedDocument(caseData);
         updateClaimsTrack(caseData);
         setRequestForReconsiderationDeadline(caseData);
@@ -51,14 +46,6 @@ public class SdoSubmissionService {
         updateTrialLocations(caseData);
 
         return caseData;
-    }
-
-    private void initializeReconsiderationDeadline(CaseData caseData) {
-        if (isNull(caseData.getRequestForReconsiderationDeadline())
-            && reconsiderationDeadlineService.isEligibleForReconsideration(caseData)) {
-            caseData.setRequestForReconsiderationDeadline(
-                reconsiderationDeadlineService.calculateReconsiderationDeadline(time.now()));
-        }
     }
 
     private void moveGeneratedDocument(CaseData caseData) {
