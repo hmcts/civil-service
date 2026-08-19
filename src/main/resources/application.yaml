@@ -79,7 +79,7 @@ scheduler:
   lockAtMostFor: ${LOCK_AT_MOST_FOR:PT30M}
   defaultLockAtMostFor: ${DEFAULT_LOCK_AT_MOST_FOR:PT30M}
   judgement-buffer:
-    cronExpression: ${CRON_EXPRESSION_JUDGEMENT_BUFFER:0 0 5 * * *}
+    cronExpression: ${CRON_EXPRESSION_JUDGEMENT_BUFFER:0 0 2 * * *}
     enabled: ${SCHEDULER_ENABLED_JUDGEMENT_BUFFER:false}
   defendant-response:
     cronExpression: ${CRON_EXPRESSION_DEFENDANT_RESPONSE:0 1 16 * * ?}
