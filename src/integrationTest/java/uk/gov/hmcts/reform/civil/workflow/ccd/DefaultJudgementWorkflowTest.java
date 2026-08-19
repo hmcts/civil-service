@@ -28,7 +28,7 @@ class DefaultJudgementWorkflowTest extends WorkflowIntegrationTest {
     @MockBean
     private LocationReferenceDataService locationRefDataService;
 
-    @MockBean
+    @MockBean(name = "deadlinesCalculator")
     private DeadlinesCalculator deadlinesCalculator;
 
     @BeforeEach

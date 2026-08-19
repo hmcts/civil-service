@@ -43,20 +43,24 @@ Owns CUI portal interactions:
 
 ## Skipped API Test Triage
 
+Equivalent Codecept/Playwright API scenarios in `civil-ccd-definition` were classified in
+`civil-ccd-definition/e2e/tests/api_tests/JUDGMENT_API_OWNERSHIP.md`.
+
 | Skipped API Scenario | Decision | Rationale |
 |---------------------|----------|-----------|
-| Record Judgment mark paid in full (JO spec 1v1) | Migrated | Service logic covered in JudgmentPaidInFullWorkflowTest |
-| Refer To Judge Defence Received In Time | Migrated | Set-aside handler logic in SetAsideJudgmentWorkflowTest |
-| Record Judgment mark paid 1v2 | Migrated | Same handler, multi-party variant |
-| Case progression + WA tasks (DJ scenarios 05-18) | Retain as E2E | Require Work Allocation service |
+| Spec 1v2 / 2v1 DJ | Reduce | Party variants of `DEFAULT_JUDGEMENT_SPEC`; spec 1v1 kept as smoke |
+| Spec 1v1 set aside after application | Reduce | `SetAsideJudgmentWorkflowTest`; 1v1 DJ+paid+set-aside kept as JO smoke |
+| Spec 1v2 set aside / mark paid | Reduce | Same handlers as 1v1 JO smoke |
+| Record Judgment mark paid in full (JO spec 1v1/1v2) | Remove | `RecordJudgmentWorkflowTest`, `EditJudgmentWorkflowTest`, `JudgmentPaidInFullWorkflowTest` |
+| Refer To Judge Defence Received In Time | Retain skipped | Different event; not migrated |
+| Case progression + WA take-offline skips | Remove | Remain skipped; WA listing / CIV-12451 |
 | DTSCCI-5943 buffer mark paid/settle | Fix bug first | Service logic fixable, then migrate |
-| JBA LiP scenario (citizen-ui) | Partially migrated | Service logic in RequestJudgementByAdmissionWorkflowTest; CUI flow retained |
+| JBA LiP / LR mark paid API | Retain | CUI and claimant-response CCJ are not the LiP admission callback |
 
 ## Remaining E2E/API Smoke Coverage
 
-The following should remain as cross-service smoke tests:
-- DJ -> SDO -> Case Progression (full Camunda journey)
-- Judgment buffer scheduler timing (real ES + scheduler)
-- CJES registration verification (external service)
-- ExUI page form validation (CCD field visibility)
-- WA task lifecycle after judgment events
+- Spec 1v1 DJ (`@civil-service-smoke` + Camunda PR/master)
+- Spec 1v1 DJ + mark paid + set aside (nightly `@api-jo`)
+- Unspec DJ then SDO, WA and case progression
+- LR and LiP judgment by admission then mark paid
+- Other-remedy DJ

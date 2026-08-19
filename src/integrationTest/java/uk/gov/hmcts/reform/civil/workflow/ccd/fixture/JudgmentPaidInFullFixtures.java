@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
-import uk.gov.hmcts.reform.civil.workflow.helper.CaseDataTemplates;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,43 +18,37 @@ import java.time.LocalDateTime;
 
 public final class JudgmentPaidInFullFixtures {
 
-    private static final String CLAIM_ISSUED_TEMPLATE = "claim-issued";
-
     private JudgmentPaidInFullFixtures() {
     }
 
     public static CaseData markPaidInFull() {
-        return CaseDataTemplates.load(CLAIM_ISSUED_TEMPLATE, template -> {
-            CaseDataTemplates.set(template, "ccdState", CaseState.All_FINAL_ORDERS_ISSUED);
-            CaseDataTemplates.set(template, "ccdCaseReference", 1234567890123456L);
-            CaseDataTemplates.set(template, "totalClaimAmount", BigDecimal.valueOf(1000));
-            CaseDataTemplates.set(template, "joIsLiveJudgmentExists", YesOrNo.YES);
-            CaseDataTemplates.set(template, "joDJCreatedDate", LocalDateTime.now().minusDays(20));
-            CaseDataTemplates.set(template, "joJudgmentPaidInFull", paidInFull(LocalDate.now().minusDays(1)));
-            CaseDataTemplates.set(template, "activeJudgment", activeJudgment());
-        });
+        return basePaidInFullCase(LocalDate.now().minusDays(1), LocalDateTime.now().minusDays(20))
+            .build();
     }
 
     public static CaseData markPaidInFullWithFutureDate() {
-        return CaseDataTemplates.load(CLAIM_ISSUED_TEMPLATE, template -> {
-            CaseDataTemplates.set(template, "ccdState", CaseState.All_FINAL_ORDERS_ISSUED);
-            CaseDataTemplates.set(template, "ccdCaseReference", 1234567890123456L);
-            CaseDataTemplates.set(template, "joIsLiveJudgmentExists", YesOrNo.YES);
-            CaseDataTemplates.set(template, "joDJCreatedDate", LocalDateTime.now().minusDays(20));
-            CaseDataTemplates.set(template, "joJudgmentPaidInFull", paidInFull(LocalDate.now().plusDays(5)));
-            CaseDataTemplates.set(template, "activeJudgment", activeJudgment());
-        });
+        return basePaidInFullCase(LocalDate.now().plusDays(5), LocalDateTime.now().minusDays(20))
+            .build();
     }
 
     public static CaseData markPaidInFullBeforeJudgmentDate() {
-        return CaseDataTemplates.load(CLAIM_ISSUED_TEMPLATE, template -> {
-            CaseDataTemplates.set(template, "ccdState", CaseState.All_FINAL_ORDERS_ISSUED);
-            CaseDataTemplates.set(template, "ccdCaseReference", 1234567890123456L);
-            CaseDataTemplates.set(template, "joIsLiveJudgmentExists", YesOrNo.YES);
-            CaseDataTemplates.set(template, "joDJCreatedDate", LocalDateTime.now().minusDays(5));
-            CaseDataTemplates.set(template, "joJudgmentPaidInFull", paidInFull(LocalDate.now().minusDays(10)));
-            CaseDataTemplates.set(template, "activeJudgment", activeJudgment());
-        });
+        return basePaidInFullCase(LocalDate.now().minusDays(10), LocalDateTime.now().minusDays(5))
+            .activeJudgment(activeJudgment(LocalDate.now().minusDays(5)))
+            .build();
+    }
+
+    private static CaseData.CaseDataBuilder<?, ?> basePaidInFullCase(LocalDate paymentDate, LocalDateTime createdDate) {
+        return CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .build()
+            .toBuilder()
+            .ccdCaseReference(1234567890123456L)
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .totalClaimAmount(BigDecimal.valueOf(1000))
+            .joIsLiveJudgmentExists(YesOrNo.YES)
+            .joDJCreatedDate(createdDate)
+            .joJudgmentPaidInFull(paidInFull(paymentDate))
+            .activeJudgment(activeJudgment(createdDate.toLocalDate()));
     }
 
     private static JudgmentPaidInFull paidInFull(LocalDate date) {
@@ -63,17 +57,16 @@ public final class JudgmentPaidInFullFixtures {
         return paidInFull;
     }
 
-    private static JudgmentDetails activeJudgment() {
+    private static JudgmentDetails activeJudgment(LocalDate issueDate) {
         return new JudgmentDetails()
             .setState(JudgmentState.ISSUED)
             .setType(JudgmentType.DEFAULT_JUDGMENT)
-            .setIssueDate(LocalDate.now().minusDays(20))
+            .setIssueDate(issueDate)
             .setIsRegisterWithRTL(YesOrNo.YES)
             .setRtlState(JudgmentRTLStatus.ISSUED.getRtlState())
             .setOrderedAmount("100000")
             .setCosts("10200")
             .setTotalAmount("110200")
-            .setPaymentPlan(new JudgmentPaymentPlan()
-                                .setType(PaymentPlanSelection.PAY_IMMEDIATELY));
+            .setPaymentPlan(new JudgmentPaymentPlan().setType(PaymentPlanSelection.PAY_IMMEDIATELY));
     }
 }

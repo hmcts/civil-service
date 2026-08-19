@@ -33,7 +33,7 @@ class DefaultJudgementSpecWorkflowTest extends WorkflowIntegrationTest {
     @MockBean
     private Time time;
 
-    @MockBean
+    @MockBean(name = "deadlinesCalculator")
     private DeadlinesCalculator deadlinesCalculator;
 
     @BeforeEach

@@ -10,61 +10,51 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
-import uk.gov.hmcts.reform.civil.workflow.helper.CaseDataTemplates;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public final class EditJudgmentFixtures {
 
-    private static final String CLAIM_ISSUED_TEMPLATE = "claim-issued";
-
     private EditJudgmentFixtures() {
     }
 
     public static CaseData editDefaultJudgment() {
-        return CaseDataTemplates.load(CLAIM_ISSUED_TEMPLATE, template -> {
-            CaseDataTemplates.set(template, "ccdState", CaseState.All_FINAL_ORDERS_ISSUED);
-            CaseDataTemplates.set(template, "ccdCaseReference", 1234567890123456L);
-            CaseDataTemplates.set(template, "totalClaimAmount", BigDecimal.valueOf(1000));
-            CaseDataTemplates.set(template, "joIsLiveJudgmentExists", YesOrNo.YES);
-            CaseDataTemplates.set(template, "joOrderMadeDate", LocalDate.now().minusDays(5));
-            CaseDataTemplates.set(template, "joAmountOrdered", "120000");
-            CaseDataTemplates.set(template, "joAmountCostOrdered", "15000");
-            CaseDataTemplates.set(template, "joIsRegisteredWithRTL", YesOrNo.YES);
-            CaseDataTemplates.set(template, "joJudgmentRecordReason", JudgmentRecordedReason.JUDGE_ORDER);
-            CaseDataTemplates.set(template, "joPaymentPlan", new JudgmentPaymentPlan()
-                .setType(PaymentPlanSelection.PAY_IMMEDIATELY));
-            CaseDataTemplates.set(template, "activeJudgment", defaultJudgmentActiveJudgment());
-        });
+        return baseEditCase()
+            .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
+            .activeJudgment(defaultJudgmentActiveJudgment())
+            .build();
     }
 
     public static CaseData editJudgmentDeterminationOfMeans() {
-        return CaseDataTemplates.load(CLAIM_ISSUED_TEMPLATE, template -> {
-            CaseDataTemplates.set(template, "ccdState", CaseState.All_FINAL_ORDERS_ISSUED);
-            CaseDataTemplates.set(template, "ccdCaseReference", 1234567890123456L);
-            CaseDataTemplates.set(template, "totalClaimAmount", BigDecimal.valueOf(1000));
-            CaseDataTemplates.set(template, "joIsLiveJudgmentExists", YesOrNo.YES);
-            CaseDataTemplates.set(template, "joOrderMadeDate", LocalDate.now().minusDays(5));
-            CaseDataTemplates.set(template, "joAmountOrdered", "120000");
-            CaseDataTemplates.set(template, "joAmountCostOrdered", "15000");
-            CaseDataTemplates.set(template, "joIsRegisteredWithRTL", YesOrNo.YES);
-            CaseDataTemplates.set(template, "joJudgmentRecordReason", JudgmentRecordedReason.DETERMINATION_OF_MEANS);
-            CaseDataTemplates.set(template, "joPaymentPlan", new JudgmentPaymentPlan()
-                .setType(PaymentPlanSelection.PAY_IMMEDIATELY));
-            CaseDataTemplates.set(template, "activeJudgment", recordedJudgmentActiveJudgment());
-        });
+        return baseEditCase()
+            .joJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS)
+            .activeJudgment(recordedJudgmentActiveJudgment())
+            .build();
     }
 
     public static CaseData editJudgmentNoActiveJudgment() {
-        return CaseDataTemplates.load(CLAIM_ISSUED_TEMPLATE, template -> {
-            CaseDataTemplates.set(template, "ccdState", CaseState.All_FINAL_ORDERS_ISSUED);
-            CaseDataTemplates.set(template, "ccdCaseReference", 1234567890123456L);
-            CaseDataTemplates.set(template, "joOrderMadeDate", LocalDate.now().minusDays(5));
-            CaseDataTemplates.set(template, "joPaymentPlan", new JudgmentPaymentPlan()
-                .setType(PaymentPlanSelection.PAY_IMMEDIATELY));
-            CaseDataTemplates.set(template, "activeJudgment", null);
-        });
+        return baseEditCase()
+            .joIsLiveJudgmentExists(YesOrNo.NO)
+            .activeJudgment(null)
+            .build();
+    }
+
+    private static CaseData.CaseDataBuilder<?, ?> baseEditCase() {
+        return CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .build()
+            .toBuilder()
+            .ccdCaseReference(1234567890123456L)
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .totalClaimAmount(BigDecimal.valueOf(1000))
+            .joIsLiveJudgmentExists(YesOrNo.YES)
+            .joOrderMadeDate(LocalDate.now().minusDays(5))
+            .joAmountOrdered("120000")
+            .joAmountCostOrdered("15000")
+            .joIsRegisteredWithRTL(YesOrNo.YES)
+            .joPaymentPlan(new JudgmentPaymentPlan().setType(PaymentPlanSelection.PAY_IMMEDIATELY));
     }
 
     private static JudgmentDetails defaultJudgmentActiveJudgment() {
@@ -77,8 +67,7 @@ public final class EditJudgmentFixtures {
             .setOrderedAmount("100000")
             .setCosts("10200")
             .setTotalAmount("110200")
-            .setPaymentPlan(new JudgmentPaymentPlan()
-                                .setType(PaymentPlanSelection.PAY_IMMEDIATELY));
+            .setPaymentPlan(new JudgmentPaymentPlan().setType(PaymentPlanSelection.PAY_IMMEDIATELY));
     }
 
     private static JudgmentDetails recordedJudgmentActiveJudgment() {
@@ -90,7 +79,6 @@ public final class EditJudgmentFixtures {
             .setOrderedAmount("100000")
             .setCosts("10200")
             .setTotalAmount("110200")
-            .setPaymentPlan(new JudgmentPaymentPlan()
-                                .setType(PaymentPlanSelection.PAY_IMMEDIATELY));
+            .setPaymentPlan(new JudgmentPaymentPlan().setType(PaymentPlanSelection.PAY_IMMEDIATELY));
     }
 }

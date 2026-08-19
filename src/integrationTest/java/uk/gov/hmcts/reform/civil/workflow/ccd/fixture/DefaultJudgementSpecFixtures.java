@@ -77,7 +77,8 @@ public final class DefaultJudgementSpecFixtures {
 
     public static CaseData specDjDeadlineNotPassed() {
         return CaseDataBuilder.builder()
-            .atStateClaimIssued1v1UnrepresentedDefendantSpec()
+            .atStateClaimIssued()
+            .setClaimTypeToSpecClaim()
             .build()
             .toBuilder()
             .ccdCaseReference(1234567890123456L)
@@ -92,7 +93,8 @@ public final class DefaultJudgementSpecFixtures {
 
     public static CaseData specDjInBreathingSpace() {
         return CaseDataBuilder.builder()
-            .atStateClaimIssued1v1UnrepresentedDefendantSpec()
+            .atStateClaimIssued()
+            .setClaimTypeToSpecClaim()
             .build()
             .toBuilder()
             .ccdCaseReference(1234567890123456L)
@@ -101,7 +103,8 @@ public final class DefaultJudgementSpecFixtures {
             .totalClaimAmount(BigDecimal.valueOf(1000))
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
             .addRespondent2(YesOrNo.NO)
-            .breathing(new BreathingSpaceInfo().setEnter(new BreathingSpaceEnterInfo()))
+            .breathing(new BreathingSpaceInfo()
+                           .setEnter(new BreathingSpaceEnterInfo().setStart(LocalDate.now().minusDays(10))))
             .build();
     }
 

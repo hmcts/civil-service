@@ -105,16 +105,14 @@ class RecordJudgmentWorkflowTest extends WorkflowIntegrationTest {
             .aboutToStart()
             .then(result -> {
                 assertThat(result.response().getErrors()).isNullOrEmpty();
-
-                CaseData updated = result.caseData();
-                assertThat(updated.getJoOrderMadeDate()).isNull();
-                assertThat(updated.getJoPaymentPlan()).isNull();
-                assertThat(updated.getJoInstalmentDetails()).isNull();
-                assertThat(updated.getJoJudgmentRecordReason()).isNull();
-                assertThat(updated.getJoAmountOrdered()).isNull();
-                assertThat(updated.getJoAmountCostOrdered()).isNull();
-                assertThat(updated.getJoIsRegisteredWithRTL()).isNull();
-                assertThat(updated.getJoIssuedDate()).isNull();
+                assertThat(result.response().getData().get("joOrderMadeDate")).isNull();
+                assertThat(result.response().getData().get("joPaymentPlan")).isNull();
+                assertThat(result.response().getData().get("joInstalmentDetails")).isNull();
+                assertThat(result.response().getData().get("joJudgmentRecordReason")).isNull();
+                assertThat(result.response().getData().get("joAmountOrdered")).isNull();
+                assertThat(result.response().getData().get("joAmountCostOrdered")).isNull();
+                assertThat(result.response().getData().get("joIsRegisteredWithRTL")).isNull();
+                assertThat(result.response().getData().get("joIssuedDate")).isNull();
             });
     }
 
