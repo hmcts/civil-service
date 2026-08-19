@@ -19,6 +19,17 @@ class CommonQueryConstructsTest {
     }
 
     @Test
+    void shouldReturnCorrectMultiStateQuery() {
+        BoolQueryBuilder query = commonQueryConstructs.beState(CaseState.CASE_PROGRESSION, CaseState.HEARING_READINESS);
+        String json = query.toString();
+        assertThat(json).contains("CASE_PROGRESSION");
+        assertThat(json).contains("HEARING_READINESS");
+        assertThat(json).contains("\"state\"");
+        assertThat(json).contains("\"should\"");
+        assertThat(json).contains("\"minimum_should_match\"");
+    }
+
+    @Test
     void shouldReturnCorrectNoOngoingBusinessProcessQuery() {
         BoolQueryBuilder query = commonQueryConstructs.haveNoOngoingBusinessProcess();
         String json = query.toString();
