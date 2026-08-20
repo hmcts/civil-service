@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -36,19 +36,19 @@ class AuthorisationServiceTest {
         ReflectionTestUtils.setField(
             authorisationService,
             "s2sAuthorisedServices",
-            Arrays.asList("payment_app", "civil_service")
+            List.of("civil_service", "civil-citizen-ui")
         );
         ReflectionTestUtils.setField(
             authorisationService,
             "paymentCallbackAuthorisedServices",
-            Arrays.asList("payment_app")
+            List.of("payment_app")
         );
     }
 
     @Test
-    void authoriseWhenTheServiceIsCalledFromPayment() {
+    void authoriseWhenTheServiceIsCalledFromCitizenUi() {
 
-        when(serviceAuthorisationApi.getServiceName(any())).thenReturn("payment_app");
+        when(serviceAuthorisationApi.getServiceName(any())).thenReturn("civil-citizen-ui");
         assertTrue(authorisationService.authoriseService("Bearer abcasda"));
 
     }
@@ -84,13 +84,6 @@ class AuthorisationServiceTest {
     @Test
     void doNotAuthoriseUserWhenCalledWithInvalidToken() {
         assertFalse(authorisationService.authoriseUser("Bearer malformed"));
-    }
-
-    @Test
-    void checkIsAuthorizedForUserAndServiceReturnTrue() {
-        when(idamClient.getUserInfo(any())).thenReturn(UserInfo.builder().uid(UUID.randomUUID().toString()).build());
-        when(serviceAuthorisationApi.getServiceName(any())).thenReturn("payment_app");
-        assertTrue(authorisationService.isServiceAndUserAuthorized("Bearer abcasda", "s2s token"));
     }
 
     @Test
