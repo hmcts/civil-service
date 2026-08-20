@@ -305,7 +305,7 @@ civil:
     username: ${TEST_USERNAME:test@example.com}
     password: ${TEST_PASSWORD:Password12!}
   authorised-services: ${CIVIL_S2S_AUTHORISED_SERVICES:ccd_data,civil_service,civil-citizen-ui}
-  payment-callback-authorised-services: ${CIVIL_PAYMENT_CALLBACK_S2S_AUTHORISED_SERVICES:payment_app}
+  payment-callback-authorised-services: ${CIVIL_PAYMENT_CALLBACK_S2S_AUTHORISED_SERVICES:payment_app,civil_service}
 
 core_case_data:
   api:
