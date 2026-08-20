@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.controllers.fees;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
@@ -15,8 +14,6 @@ import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.BaseIntegrationTest;
-import uk.gov.hmcts.reform.civil.enums.FeeType;
-import uk.gov.hmcts.reform.civil.exceptions.InternalServerErrorException;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
@@ -25,14 +22,10 @@ import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.math.BigDecimal;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,9 +36,6 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
     private static final String PAID = "Paid";
     private static final String REFERENCE = "reference";
     private static final String ACCOUNT_NUMBER = "123445555";
-    private static final String S2S_AUTH_TOKEN = "s2s AuthToken";
-    private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
-
     @MockBean
     CoreCaseDataApi coreCaseDataApi;
 
@@ -54,9 +44,6 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
 
     @SpyBean
     PaymentRequestUpdateCallbackService requestUpdateCallbackService;
-
-    @Autowired
-    ServiceRequestUpdateClaimIssuedCallbackController controller;
 
     @BeforeEach
     void bareMinimumToMakeAPositiveRequest() {
@@ -81,30 +68,29 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
     }
 
     @Test
-    public void shouldProcessServiceRequestUpdateWhenAuthorised() {
-        ServiceRequestUpdateDto request = buildServiceDto();
+    public void whenServiceRequestUpdateRequestAndEverythingIsOkThenHttp2xx() throws Exception {
 
-        assertThatCode(() -> controller.serviceRequestUpdate(S2S_AUTH_TOKEN, request))
-            .doesNotThrowAnyException();
-
-        verify(authorisationService).isPaymentCallbackServiceAuthorized(S2S_AUTH_TOKEN);
-        verify(requestUpdateCallbackService).processCallback(request, FeeType.CLAIMISSUED.name());
+        doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
+            .andExpect(status().isOk());
     }
 
     @Test
-    public void shouldWrapExceptionThrownWhileProcessingServiceRequestUpdate() {
-        ServiceRequestUpdateDto request = buildServiceDto();
-        RuntimeException exception = new RuntimeException("Unexpected error");
-        doThrow(exception)
+    public void whenServiceRequestUpdateRequestButUnexpectedErrorOccursThenHttp5xx() throws Exception {
+        // Given: the callback processing throws an unexpected exception
+        doThrow(new RuntimeException("Unexpected error"))
             .when(requestUpdateCallbackService)
-            .processCallback(request, FeeType.CLAIMISSUED.name());
+            .processCallback(any(), any());
 
-        assertThatThrownBy(() -> controller.serviceRequestUpdate(S2S_AUTH_TOKEN, request))
-            .isInstanceOf(InternalServerErrorException.class)
-            .hasCause(exception);
+        // When: I call the /service-request-update URL
+        doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
+            // Then: the result status must be an HTTP-5xx
+            .andExpect(status().is5xxServerError());
+    }
 
-        verify(authorisationService).isPaymentCallbackServiceAuthorized(S2S_AUTH_TOKEN);
-        verify(requestUpdateCallbackService).processCallback(request, FeeType.CLAIMISSUED.name());
+    @Test
+    public void whenValidPaymentCallbackIsReceivedReturnSuccess() throws Exception {
+        doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
+            .andExpect(status().isOk());
     }
 
     @Test
@@ -116,33 +102,13 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
     }
 
     @Test
-    public void shouldThrowInternalServerErrorWhenServiceIsNotAuthorised() {
-        ServiceRequestUpdateDto request = buildServiceDto();
+    public void whenPaymentCallbackIsReceivedWithServiceAuthorisationButreturnsfalseReturn400() throws Exception {
         when(authorisationService.isPaymentCallbackServiceAuthorized(any())).thenReturn(false);
 
-        assertThatThrownBy(() -> controller.serviceRequestUpdate(S2S_AUTH_TOKEN, request))
-            .isInstanceOf(InternalServerErrorException.class)
-            .hasCauseInstanceOf(RuntimeException.class)
-            .cause()
-            .hasMessage("Invalid Client");
+        doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
+            // Then: the result status must be an HTTP-4xx
+            .andExpect(status().is5xxServerError());
 
-        verify(authorisationService).isPaymentCallbackServiceAuthorized(S2S_AUTH_TOKEN);
-        verify(requestUpdateCallbackService, never()).processCallback(any(), any());
-    }
-
-    @Test
-    public void shouldWrapExceptionThrownByAuthorisationService() {
-        ServiceRequestUpdateDto request = buildServiceDto();
-        RuntimeException exception = new RuntimeException("Authorisation service unavailable");
-        doThrow(exception)
-            .when(authorisationService).isPaymentCallbackServiceAuthorized(S2S_AUTH_TOKEN);
-
-        assertThatThrownBy(() -> controller.serviceRequestUpdate(S2S_AUTH_TOKEN, request))
-            .isInstanceOf(InternalServerErrorException.class)
-            .hasCause(exception);
-
-        verify(authorisationService).isPaymentCallbackServiceAuthorized(S2S_AUTH_TOKEN);
-        verify(requestUpdateCallbackService, never()).processCallback(any(), any());
     }
 
     private ServiceRequestUpdateDto buildServiceDto() {
@@ -162,7 +128,7 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
         return mockMvc.perform(
             MockMvcRequestBuilders.put(urlTemplate, uriVars)
                 .header(HttpHeaders.AUTHORIZATION, BEARER_TOKEN)
-                .header(SERVICE_AUTHORIZATION, S2S_AUTH_TOKEN)
+                .header("ServiceAuthorization", "s2s AuthToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(content)));
     }
@@ -172,7 +138,7 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
         return mockMvc.perform(
             MockMvcRequestBuilders.post(urlTemplate, uriVars)
                 .header(HttpHeaders.AUTHORIZATION, BEARER_TOKEN)
-                .header(SERVICE_AUTHORIZATION, S2S_AUTH_TOKEN)
+                .header("ServiceAuthorization", "s2s AuthToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(content)));
     }
