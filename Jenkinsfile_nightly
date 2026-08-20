@@ -66,6 +66,8 @@ properties([
       description: 'Number of times playwright will retry tests'),
     string(name: 'PLAYWRIGHT_EXUI_RETRIES', defaultValue: '1',
       description: 'Number of times playwright tests will retry exui events'),
+    string(name: 'PLAYWRIGHT_IDAM_RETRIES', defaultValue: '2',
+      description: 'Number of times playwright tests will retry idam events'),
     choice(name: 'PLAYWRIGHT_TEST_SPEED', choices: ['fast', 'medium', 'slow'],
       description: 'Speed playwright performs actions, can be set to \'fast\', \'medium\' or \'slow\''),
     choice(name: 'PLAYWRIGHT_RUN_ACCESSIBILITY_TESTS', choices: ['false', 'true'],
@@ -203,6 +205,7 @@ withNightlyPipeline(type, product, component) {
   env.PLAYWRIGHT_WORKERS=params.PLAYWRIGHT_WORKERS
   env.PLAYWRIGHT_RETRIES=params.PLAYWRIGHT_RETRIES
   env.PLAYWRIGHT_EXUI_RETRIES=params.PLAYWRIGHT_EXUI_RETRIES
+  env.PLAYWRIGHT_IDAM_RETRIES=params.PLAYWRIGHT_IDAM_RETRIES
   env.PLAYWRIGHT_RUN_ACCESSIBILITY_TESTS=params.PLAYWRIGHT_RUN_ACCESSIBILITY_TESTS
   env.PLAYWRIGHT_RUN_CUI_USER_SETUP=params.PLAYWRIGHT_RUN_CUI_USER_SETUP
   env.PLAYWRIGHT_RUN_EXUI_USER_DATA_SETUP=params.PLAYWRIGHT_RUN_EXUI_USER_DATA_SETUP
