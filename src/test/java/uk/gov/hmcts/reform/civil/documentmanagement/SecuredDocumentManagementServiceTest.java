@@ -337,11 +337,35 @@ class SecuredDocumentManagementServiceTest {
 
         @Test
         void shouldThrowInvalidDocumentLink_whenUuidMalformed() {
+            // Long enough to clear the length guard, but the trailing segment is not a UUID, so the
+            // message must describe the malformed id rather than the path length.
             String documentPath = "documents/zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz";
 
-            assertThrows(
+            InvalidDocumentLinkException ex = assertThrows(
                 InvalidDocumentLinkException.class,
                 () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath)
+            );
+
+            assertEquals(
+                format(InvalidDocumentLinkException.MALFORMED_MESSAGE_TEMPLATE, documentPath),
+                ex.getMessage()
+            );
+            assertNotNull(ex.getCause(), "the originating IllegalArgumentException must be preserved");
+        }
+
+        @Test
+        void shouldDescribePathLength_whenSelfHrefShorterThanUuid() {
+            // The other cause of InvalidDocumentLinkException keeps the length-based message.
+            String documentPath = "documents/null";
+
+            InvalidDocumentLinkException ex = assertThrows(
+                InvalidDocumentLinkException.class,
+                () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath)
+            );
+
+            assertEquals(
+                format(InvalidDocumentLinkException.MESSAGE_TEMPLATE, documentPath, DOC_UUID_LENGTH),
+                ex.getMessage()
             );
         }
 
