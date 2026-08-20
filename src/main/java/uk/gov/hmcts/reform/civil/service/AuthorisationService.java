@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,20 +22,28 @@ public class AuthorisationService {
     @Value("${civil.authorised-services}")
     private List<String> s2sAuthorisedServices;
 
+    @Value("${civil.payment-callback-authorised-services}")
+    private List<String> paymentCallbackAuthorisedServices;
+
     private final IdamClient idamClient;
 
+    @Getter
     private UserInfo userInfo;
 
     public Boolean authoriseService(String serviceAuthHeader) {
+        return authoriseService(serviceAuthHeader, s2sAuthorisedServices);
+    }
+
+    private Boolean authoriseService(String serviceAuthHeader, List<String> authorisedServices) {
         String callingService;
         try {
             String bearerJwt = serviceAuthHeader.startsWith("Bearer ") ? serviceAuthHeader : "Bearer " + serviceAuthHeader;
             callingService = serviceAuthorisationApi.getServiceName(bearerJwt);
             log.info("Calling Service... {}", callingService);
-            return (callingService != null && s2sAuthorisedServices.contains(callingService));
+            return (callingService != null && authorisedServices.contains(callingService));
         } catch (Exception ex) {
             //do nothing
-            log.error("S2S token is not authorised" + ex);
+            log.error("S2S token is not authorised", ex);
         }
         return false;
     }
@@ -50,10 +59,6 @@ public class AuthorisationService {
         return false;
     }
 
-    public UserInfo getUserInfo() {
-        return this.userInfo;
-    }
-
     public boolean isServiceAndUserAuthorized(String authorisation, String s2sToken) {
         return Boolean.TRUE.equals(authoriseUser(authorisation))
             && Boolean.TRUE.equals(authoriseService(s2sToken));
@@ -61,5 +66,9 @@ public class AuthorisationService {
 
     public boolean isServiceAuthorized(String s2sToken) {
         return Boolean.TRUE.equals(authoriseService(s2sToken));
+    }
+
+    public boolean isPaymentCallbackServiceAuthorized(String s2sToken) {
+        return authoriseService(s2sToken, paymentCallbackAuthorisedServices);
     }
 }
