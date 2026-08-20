@@ -64,12 +64,22 @@ properties([
       description: 'Number of times playwright will retry tests'),
     string(name: 'PLAYWRIGHT_EXUI_RETRIES', defaultValue: '1',
       description: 'Number of times playwright tests will retry exui events'),
+    string(name: 'PLAYWRIGHT_IDAM_RETRIES', defaultValue: '2',
+      description: 'Number of times playwright tests will retry idam events'),
     choice(name: 'PLAYWRIGHT_TEST_SPEED', choices: ['fast', 'medium', 'slow'],
       description: 'Speed playwright performs actions, can be set to \'fast\', \'medium\' or \'slow\''),
     choice(name: 'PLAYWRIGHT_RUN_ACCESSIBILITY_TESTS', choices: ['false', 'true'],
       description: 'Runs accessibility tests for playwright during test execution'),
-    choice(name: 'PLAYWRIGHT_RUN_SETUP', choices: ['true', 'false'],
-      description: 'Runs setup projects before functional test suite'),
+    choice(name: 'PLAYWRIGHT_RUN_CUI_USER_SETUP', choices: ['true', 'false'],
+      description: 'Runs setup projects for creation of citizen users before running functional tests'),
+    choice(name: 'PLAYWRIGHT_RUN_EXUI_AUTH_SETUP', choices: ['true', 'false'],
+      description: 'Runs setup projects for caching authentication state of exui/citizen users before running functional tests'),
+    choice(name: 'PLAYWRIGHT_RUN_EXUI_USER_DATA_SETUP', choices: ['true', 'false'],
+      description: 'Runs setup projects for caching additional exui user data (userId and accessToken) before running functional tests'),
+    choice(name: 'PLAYWRIGHT_RUN_CUI_USER_DATA_SETUP', choices: ['true', 'false'],
+      description: 'Runs setup projects for caching additional cui user data (userId and accessToken) before running functional tests'),
+    choice(name: 'PLAYWRIGHT_RUN_DATA_SETUP', choices: ['true', 'false'],
+      description: 'Runs setup projects for caching data before running functional tests'),
     string(name: 'WAIT_FOR_TIMEOUT_MS',
       defaultValue: '120000',
       description: 'Functional tests waitForTimeout value'),
@@ -195,8 +205,13 @@ withNightlyPipeline(type, product, component) {
   env.PLAYWRIGHT_WORKERS=params.PLAYWRIGHT_WORKERS
   env.PLAYWRIGHT_RETRIES=params.PLAYWRIGHT_RETRIES
   env.PLAYWRIGHT_EXUI_RETRIES=params.PLAYWRIGHT_EXUI_RETRIES
+  env.PLAYWRIGHT_IDAM_RETRIES=params.PLAYWRIGHT_IDAM_RETRIES
   env.PLAYWRIGHT_RUN_ACCESSIBILITY_TESTS=params.PLAYWRIGHT_RUN_ACCESSIBILITY_TESTS
-  env.PLAYWRIGHT_RUN_SETUP=params.PLAYWRIGHT_RUN_SETUP
+  env.PLAYWRIGHT_RUN_CUI_USER_SETUP=params.PLAYWRIGHT_RUN_CUI_USER_SETUP
+  env.PLAYWRIGHT_RUN_EXUI_AUTH_SETUP=params.PLAYWRIGHT_RUN_EXUI_AUTH_SETUP
+  env.PLAYWRIGHT_RUN_EXUI_USER_DATA_SETUP=params.PLAYWRIGHT_RUN_EXUI_USER_DATA_SETUP
+  env.PLAYWRIGHT_RUN_CUI_USER_DATA_SETUP=params.PLAYWRIGHT_RUN_CUI_USER_DATA_SETUP
+  env.PLAYWRIGHT_RUN_DATA_SETUP=params.PLAYWRIGHT_RUN_DATA_SETUP
   env.PLAYWRIGHT_UNASSIGN_CASES = true
   env.PLAYWRIGHT_TEST_SPEED=params.PLAYWRIGHT_TEST_SPEED
 
