@@ -1,7 +1,7 @@
 #!groovy
 
 properties([
-  pipelineTriggers([cron('H 17 * * 1-5')]),  
+  // pipelineTriggers([cron('H 17 * * 1-5')]),  
   copyArtifactPermission('/HMCTS_a_to_c_Nightly/civil-service/*'),
   parameters([
     choice(name: 'FORCE_GREEN_BUILD', choices: ['false', 'true'],
@@ -93,7 +93,7 @@ def type = "java"
 def product = "civil"
 def component = "service"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
-def ccdBranch = "master"
+def ccdBranch = "nightly-dev"
 
 static Map<String, Object> secret(String secretName, String envVariable) {
   [$class     : 'AzureKeyVaultSecret',
@@ -323,7 +323,7 @@ withNightlyPipeline(type, product, component) {
           }
         }
 
-        enableFortifyScan()
+        // enableFortifyScan()
 
         afterAlways('fortify-scan') {
           steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
