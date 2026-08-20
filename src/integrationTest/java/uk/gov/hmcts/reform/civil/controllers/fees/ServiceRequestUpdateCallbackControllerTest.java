@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.BaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
@@ -24,8 +25,11 @@ import java.math.BigDecimal;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -64,8 +68,14 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
 
     @Test
     public void whenValidPaymentCallbackIsReceivedReturnSuccess() throws Exception {
-        doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
+        ServiceRequestUpdateDto request = buildServiceDto();
+
+        doPut(request, PAYMENT_CALLBACK_URL, "")
             .andExpect(status().isOk());
+
+        verify(authorisationService).isPaymentCallbackServiceAuthorized(S2S_AUTH_TOKEN);
+        verify(requestUpdateCallbackService).processCallback(any(ServiceRequestUpdateDto.class),
+                                                             eq(FeeType.HEARING.name()));
     }
 
     @Test
@@ -77,13 +87,28 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
     }
 
     @Test
-    public void whenPaymentCallbackIsReceivedWithServiceAuthorisationButreturnsfalseReturn400() throws Exception {
+    public void whenPaymentCallbackIsReceivedWithInvalidServiceAuthorisationReturn500() throws Exception {
         when(authorisationService.isPaymentCallbackServiceAuthorized(any())).thenReturn(false);
         mockMvc.perform(
             MockMvcRequestBuilders.put(PAYMENT_CALLBACK_URL, "")
                 .header(SERVICE_AUTHORIZATION, S2S_AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(buildServiceDto()))).andExpect(status().is5xxServerError());
+
+        verify(authorisationService).isPaymentCallbackServiceAuthorized(S2S_AUTH_TOKEN);
+        verify(requestUpdateCallbackService, never()).processCallback(any(), any());
+    }
+
+    @Test
+    public void whenServiceAuthorisationThrowsExceptionReturn500() throws Exception {
+        doThrow(new RuntimeException("Authorisation service unavailable"))
+            .when(authorisationService).isPaymentCallbackServiceAuthorized(S2S_AUTH_TOKEN);
+
+        doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
+            .andExpect(status().is5xxServerError());
+
+        verify(authorisationService).isPaymentCallbackServiceAuthorized(S2S_AUTH_TOKEN);
+        verify(requestUpdateCallbackService, never()).processCallback(any(), any());
     }
 
     @Test
@@ -91,16 +116,6 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
 
         doPost(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
             .andExpect(status().isMethodNotAllowed());
-    }
-
-    @Test
-    public void whenServiceRequestUpdateRequestAndEverythingIsOkThenHttp2xx() throws Exception {
-        // Given: an existing case in CCD
-
-        // When: I call the /service-request-update URL
-        doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
-            // Then: the result status must be an HTTP-2xx
-            .andExpect(status().isOk());
     }
 
     @Test
@@ -114,6 +129,10 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
         doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
             // Then: the result status must be an HTTP-5xx
             .andExpect(status().is5xxServerError());
+
+        verify(authorisationService).isPaymentCallbackServiceAuthorized(S2S_AUTH_TOKEN);
+        verify(requestUpdateCallbackService).processCallback(any(ServiceRequestUpdateDto.class),
+                                                             eq(FeeType.HEARING.name()));
     }
 
     private ServiceRequestUpdateDto buildServiceDto() {
