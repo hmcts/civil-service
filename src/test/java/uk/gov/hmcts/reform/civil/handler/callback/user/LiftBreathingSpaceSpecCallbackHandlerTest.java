@@ -269,6 +269,10 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
                 .extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(LIFT_BREATHING_SPACE_SPEC.name(), "READY");
+
+            assertThat(response.getData())
+                .extracting("breathingSpaceLifted")
+                .isEqualTo("Yes");
         }
     }
 
