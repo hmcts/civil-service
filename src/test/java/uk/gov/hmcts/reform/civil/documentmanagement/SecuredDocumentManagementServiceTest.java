@@ -336,24 +336,24 @@ class SecuredDocumentManagementServiceTest {
         }
 
         @Test
-        void shouldThrowInvalidDocumentReference_whenUuidMalformed() {
+        void shouldThrowInvalidDocumentLink_whenUuidMalformed() {
             String documentPath = "documents/zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz";
 
             assertThrows(
-                InvalidDocumentReferenceException.class,
+                InvalidDocumentLinkException.class,
                 () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath)
             );
         }
 
         @Test
-        void shouldThrowInvalidDocumentReference_whenSelfHrefShorterThanUuid() {
+        void shouldThrowInvalidDocumentLink_whenSelfHrefShorterThanUuid() {
             // EXC-CS-022: a reference shorter than a full document UUID (e.g. documents/null)
             // previously threw StringIndexOutOfBoundsException in getDocumentIdFromSelfHref and was
-            // retried 5x. It is now a classified InvalidDocumentReferenceException, excluded from retry.
+            // retried on every attempt. It is now a classified InvalidDocumentLinkException, excluded from retry.
             String documentPath = "documents/null"; // 14 chars, no trailing document UUID
 
             assertThrows(
-                InvalidDocumentReferenceException.class,
+                InvalidDocumentLinkException.class,
                 () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath)
             );
             verify(caseDocumentClientApi, times(0))
@@ -361,9 +361,9 @@ class SecuredDocumentManagementServiceTest {
         }
 
         @Test
-        void shouldThrowInvalidDocumentReference_whenSelfHrefNull() {
+        void shouldThrowInvalidDocumentLink_whenSelfHrefNull() {
             assertThrows(
-                InvalidDocumentReferenceException.class,
+                InvalidDocumentLinkException.class,
                 () -> documentManagementService.getDocumentMetaData(BEARER_TOKEN, null)
             );
             verify(caseDocumentClientApi, times(0))
@@ -685,6 +685,69 @@ class SecuredDocumentManagementServiceTest {
 
             documentManagementService.deleteDocument(BEARER_TOKEN, documentPath);
             verify(caseDocumentClientApi, times(1)).deleteDocument(anyString(), any(), any(), anyBoolean());
+        }
+    }
+
+    @Nested
+    class InvalidSelfHref {
+
+        @Test
+        void getDocumentMetaData_shortSelfHref_throwsDescriptiveInvalidDocumentLinkException() {
+            String documentPath = "documents/123"; // 13 chars, no trailing document UUID
+
+            InvalidDocumentLinkException ex = assertThrows(
+                InvalidDocumentLinkException.class,
+                () -> documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath)
+            );
+
+            assertEquals(
+                format(InvalidDocumentLinkException.MESSAGE_TEMPLATE, documentPath, DOC_UUID_LENGTH),
+                ex.getMessage()
+            );
+            verify(caseDocumentClientApi, times(0))
+                .getMetadataForDocument(anyString(), anyString(), any());
+        }
+
+        @Test
+        void getDocumentMetaData_nullSelfHref_throwsDescriptiveInvalidDocumentLinkException() {
+            InvalidDocumentLinkException ex = assertThrows(
+                InvalidDocumentLinkException.class,
+                () -> documentManagementService.getDocumentMetaData(BEARER_TOKEN, null)
+            );
+
+            assertEquals(
+                format(InvalidDocumentLinkException.MESSAGE_TEMPLATE, (Object) null, DOC_UUID_LENGTH),
+                ex.getMessage()
+            );
+            verify(caseDocumentClientApi, times(0))
+                .getMetadataForDocument(anyString(), anyString(), any());
+        }
+
+        @Test
+        void getDocumentMetaData_fullUuidSelfHref_extractsIdAndCallsApi() throws JsonProcessingException {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b3";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), eq(documentId)))
+                .thenReturn(mapper.readValue(
+                    ResourceReader.readString("document-management/metadata.success.json"), Document.class));
+
+            Document metaData = documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath);
+
+            assertEquals("TEST_DOCUMENT_1.pdf", metaData.originalDocumentName);
+            verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
+        }
+
+        @Test
+        void deleteDocument_shortSelfHref_throwsInvalidDocumentLinkExceptionWithoutCallingApi() {
+            String documentPath = "documents/123";
+
+            assertThrows(
+                InvalidDocumentLinkException.class,
+                () -> documentManagementService.deleteDocument(BEARER_TOKEN, documentPath)
+            );
+            verify(caseDocumentClientApi, times(0))
+                .deleteDocument(anyString(), any(), any(), anyBoolean());
         }
     }
 

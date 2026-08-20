@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.repaymentplan.ClaimantProposedPlan;
 
@@ -36,14 +37,16 @@ public class RepaymentPlanDecisionCalculator {
                 disposableIncome
             );
             if (repaymentDecisionType.isInFavourOfDefendant()) {
-                LocalDate proposedDefendantRepaymentDate = getProposedDefendantRepaymentDate(
+                Optional<LocalDate> proposedDefendantRepaymentDate = getProposedDefendantRepaymentDate(
                     caseData,
                     claimTotalAmount
                 );
-                return calculateDecisionBasedOnProposedDate(
-                    proposedDefendantRepaymentDate,
-                    claimantProposedPlan.getRepaymentByDate()
-                );
+                return proposedDefendantRepaymentDate
+                    .map(date -> calculateDecisionBasedOnProposedDate(
+                        date,
+                        claimantProposedPlan.getRepaymentByDate()
+                    ))
+                    .orElse(repaymentDecisionType);
             }
             return repaymentDecisionType;
         }
@@ -56,12 +59,15 @@ public class RepaymentPlanDecisionCalculator {
         return RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT;
     }
 
-    private LocalDate getProposedDefendantRepaymentDate(CaseData caseData, BigDecimal claimTotalAmount) {
+    private Optional<LocalDate> getProposedDefendantRepaymentDate(CaseData caseData, BigDecimal claimTotalAmount) {
         RespondentResponsePartAdmissionPaymentTimeLRspec respondentResponseType = caseData.getDefenceAdmitPartPaymentTimeRouteRequired();
         RepaymentPlanLRspec defendantRepaymentPlan = caseData.getRespondent1RepaymentPlan();
-        return respondentResponseType == BY_SET_DATE
-            ? caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() : defendantRepaymentPlan.finalPaymentBy(
-            claimTotalAmount);
+        if (respondentResponseType == BY_SET_DATE) {
+            return Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
+                .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid);
+        }
+        return Optional.ofNullable(defendantRepaymentPlan)
+            .map(repaymentPlan -> repaymentPlan.finalPaymentBy(claimTotalAmount));
     }
 
     private RepaymentDecisionType calculateDecisionBasedOnAmountAndDisposableIncome(double totalAmount, double disposableIncome) {

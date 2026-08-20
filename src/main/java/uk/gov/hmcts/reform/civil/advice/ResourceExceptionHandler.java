@@ -17,7 +17,7 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentAccessException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentNotFoundException;
-import uk.gov.hmcts.reform.civil.documentmanagement.InvalidDocumentReferenceException;
+import uk.gov.hmcts.reform.civil.documentmanagement.InvalidDocumentLinkException;
 import uk.gov.hmcts.reform.civil.model.CallbackErrorResponse;
 import uk.gov.hmcts.reform.civil.exceptions.UpstreamIdamException;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
@@ -162,7 +162,7 @@ public class ResourceExceptionHandler {
     @ExceptionHandler({
         DocumentNotFoundException.class,
         DocumentAccessException.class,
-        InvalidDocumentReferenceException.class
+        InvalidDocumentLinkException.class
     })
     public ResponseEntity<Object> documentManagementError(Exception exception,
                                                           ContentCachingRequestWrapper contentCachingRequestWrapper) {

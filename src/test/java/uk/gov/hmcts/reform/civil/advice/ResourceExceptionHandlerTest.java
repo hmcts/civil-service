@@ -18,7 +18,7 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentAccessException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentNotFoundException;
-import uk.gov.hmcts.reform.civil.documentmanagement.InvalidDocumentReferenceException;
+import uk.gov.hmcts.reform.civil.documentmanagement.InvalidDocumentLinkException;
 import uk.gov.hmcts.reform.civil.model.CallbackErrorResponse;
 import uk.gov.hmcts.reform.civil.exceptions.UpstreamIdamException;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
@@ -263,11 +263,11 @@ public class ResourceExceptionHandlerTest {
     }
 
     @Test
-    void shouldReturnBadRequest_whenInvalidDocumentReferenceExceptionThrown() {
+    void shouldReturnBadRequest_whenInvalidDocumentLinkExceptionThrown() {
         testTemplate(
-            "Invalid document reference",
+            "Invalid document link",
             handler.documentManagementError(
-                new InvalidDocumentReferenceException("documents/null"),
+                new InvalidDocumentLinkException("documents/null"),
                 contentCachingRequestWrapper
             ),
             HttpStatus.BAD_REQUEST

@@ -8,7 +8,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
-import uk.gov.hmcts.reform.civil.documentmanagement.InvalidDocumentReferenceException;
+import uk.gov.hmcts.reform.civil.documentmanagement.InvalidDocumentLinkException;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
@@ -96,15 +96,15 @@ class DocumentDownloadServiceTest {
     }
 
     @Test
-    void shouldThrowInvalidDocumentReference_whenDocumentIdNull() {
-        assertThrows(InvalidDocumentReferenceException.class, () ->
+    void shouldThrowInvalidDocumentLink_whenDocumentIdNull() {
+        assertThrows(InvalidDocumentLinkException.class, () ->
             documentDownloadService.downloadDocument(BEARER_TOKEN, (String) null));
         verifyNoInteractions(documentManagementService);
     }
 
     @Test
-    void shouldThrowInvalidDocumentReference_whenDocumentIdBlank() {
-        assertThrows(InvalidDocumentReferenceException.class, () ->
+    void shouldThrowInvalidDocumentLink_whenDocumentIdBlank() {
+        assertThrows(InvalidDocumentLinkException.class, () ->
             documentDownloadService.downloadDocument(BEARER_TOKEN, "   "));
         verifyNoInteractions(documentManagementService);
     }

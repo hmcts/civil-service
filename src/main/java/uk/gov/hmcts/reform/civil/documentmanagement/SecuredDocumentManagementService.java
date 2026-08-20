@@ -162,7 +162,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
     @Retryable(retryFor = {DocumentDownloadException.class},
         noRetryFor = {DocumentNotFoundException.class, DocumentAccessException.class,
-            InvalidDocumentReferenceException.class},
+            InvalidDocumentLinkException.class},
         maxAttempts = 3,
         backoff = @Backoff(delay = 1000, multiplier = 3))
     @Override
@@ -193,6 +193,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                 .map(ByteArrayResource.class::cast)
                 .map(ByteArrayResource::getByteArray)
                 .orElseThrow(RuntimeException::new);
+        } catch (DocumentDownloadException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw classifyDownloadFailure(documentPath, ex);
         }
@@ -200,7 +202,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
     @Retryable(retryFor = {DocumentDownloadException.class},
         noRetryFor = {DocumentNotFoundException.class, DocumentAccessException.class,
-            InvalidDocumentReferenceException.class},
+            InvalidDocumentLinkException.class},
         maxAttempts = 3,
         backoff = @Backoff(delay = 1000, multiplier = 3))
     @Override
@@ -229,6 +231,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
             return new DownloadedDocumentResponse(responseEntity.getBody(), documentMetadata.originalDocumentName,
                                                   tika.detect(documentMetadata.originalDocumentName));
+        } catch (DocumentDownloadException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw classifyDownloadFailure(documentPath, ex);
         }
@@ -239,6 +243,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         log.info("Deleting document {}", documentPath);
         try {
             caseDocumentClientApi.deleteDocument(authorisation, authTokenGenerator.generate(), getDocumentIdFromSelfHref(documentPath), true);
+        } catch (DocumentDownloadException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw classifyDownloadFailure(documentPath, ex);
         }
@@ -254,6 +260,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                 getDocumentIdFromSelfHref(documentPath)
             );
 
+        } catch (DocumentDownloadException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw classifyDownloadFailure(documentPath, ex);
         }
@@ -269,7 +277,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     private RuntimeException classifyDownloadFailure(String documentPath, Exception ex) {
         if (ex instanceof DocumentNotFoundException
             || ex instanceof DocumentAccessException
-            || ex instanceof InvalidDocumentReferenceException) {
+            || ex instanceof InvalidDocumentLinkException) {
             return (RuntimeException) ex;
         }
         if (ex instanceof DocumentTtlExpiredException documentTtlExpiredException) {
@@ -288,7 +296,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         }
         if (ex instanceof IllegalArgumentException) {
             log.error("Invalid document reference {}", documentPath, ex);
-            return new InvalidDocumentReferenceException(documentPath, ex);
+            return new InvalidDocumentLinkException(documentPath, ex);
         }
         log.error("Failed downloading document {}", documentPath, ex);
         return new DocumentDownloadException(documentPath, ex);
@@ -296,8 +304,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
     private UUID getDocumentIdFromSelfHref(String selfHref) {
         if (selfHref == null || selfHref.length() < DOC_UUID_LENGTH) {
-            log.error("Invalid document reference, cannot extract document id: {}", selfHref);
-            throw new InvalidDocumentReferenceException(selfHref);
+            log.error("Invalid document link, cannot extract document id: {}", selfHref);
+            throw new InvalidDocumentLinkException(selfHref);
         }
         return UUID.fromString(selfHref.substring(selfHref.length() - DOC_UUID_LENGTH));
     }
