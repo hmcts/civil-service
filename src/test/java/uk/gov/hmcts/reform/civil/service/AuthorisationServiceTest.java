@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -20,7 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class AuthorisationServiceTest {
+class AuthorisationServiceTest {
 
     @InjectMocks
     AuthorisationService authorisationService;
@@ -32,68 +32,85 @@ public class AuthorisationServiceTest {
     IdamClient idamClient;
 
     @BeforeEach
-    public void setup() {
-        ReflectionTestUtils.setField(authorisationService, "s2sAuthorisedServices", Arrays.asList("payment_app"));
+    void setup() {
+        ReflectionTestUtils.setField(
+            authorisationService,
+            "s2sAuthorisedServices",
+            List.of("civil_service", "civil-citizen-ui")
+        );
+        ReflectionTestUtils.setField(
+            authorisationService,
+            "paymentCallbackAuthorisedServices",
+            List.of("payment_app")
+        );
     }
 
     @Test
-    public void authoriseWhenTheServiceIsCalledFromPayment() {
+    void authoriseWhenTheServiceIsCalledFromCitizenUi() {
 
-        when(serviceAuthorisationApi.getServiceName(any())).thenReturn("payment_app");
+        when(serviceAuthorisationApi.getServiceName(any())).thenReturn("civil-citizen-ui");
         assertTrue(authorisationService.authoriseService("Bearer abcasda"));
 
     }
 
     @Test
-    public void authoriseWhenTheServiceAuthHeaderIsNull() {
+    void authoriseWhenTheServiceAuthHeaderIsNull() {
         assertFalse(authorisationService.authoriseService(null));
     }
 
     @Test
-    public void doNotAuthoriseWhenTheServiceIsCalledFromUnknownApi() {
+    void doNotAuthoriseWhenTheServiceIsCalledFromUnknownApi() {
         when(serviceAuthorisationApi.getServiceName(any())).thenReturn("unknown_api");
         assertFalse(authorisationService.authoriseService("Bearer abc"));
 
     }
 
     @Test
-    public void throwUnAuthorisedExceptionWhenS2sTokenIsMalformed() {
+    void throwUnAuthorisedExceptionWhenS2sTokenIsMalformed() {
         assertFalse(authorisationService.authoriseService("Bearer malformed"));
     }
 
     @Test
-    public void authoriseUserTheServiceIsCalledWithValidToken() {
+    void authoriseUserTheServiceIsCalledWithValidToken() {
         when(idamClient.getUserInfo(any())).thenReturn(UserInfo.builder().uid(UUID.randomUUID().toString()).build());
         assertTrue(authorisationService.authoriseUser("Bearer abcasda"));
     }
 
     @Test
-    public void authoriseUserTheServiceIsCalledWithNullToken() {
+    void authoriseUserTheServiceIsCalledWithNullToken() {
         assertFalse(authorisationService.authoriseUser(null));
     }
 
     @Test
-    public void doNotAuthoriseUserWhenCalledWithInvalidToken() {
+    void doNotAuthoriseUserWhenCalledWithInvalidToken() {
         assertFalse(authorisationService.authoriseUser("Bearer malformed"));
     }
 
     @Test
-    public void checkIsAuthorizedForUserAndServiceReturnTrue() {
-        when(idamClient.getUserInfo(any())).thenReturn(UserInfo.builder().uid(UUID.randomUUID().toString()).build());
-        when(serviceAuthorisationApi.getServiceName(any())).thenReturn("payment_app");
-        assertTrue(authorisationService.isServiceAndUserAuthorized("Bearer abcasda", "s2s token"));
-    }
-
-    @Test
-    public void checkIsAuthorizedForUserAndServiceReturnFalse() {
+    void checkIsAuthorizedForUserAndServiceReturnFalse() {
         when(idamClient.getUserInfo(any())).thenReturn(UserInfo.builder().uid(UUID.randomUUID().toString()).build());
         when(serviceAuthorisationApi.getServiceName(any())).thenReturn("unknown_api");
         assertFalse(authorisationService.isServiceAndUserAuthorized("Bearer abcasda", "s2s token"));
     }
 
     @Test
-    public void checkIsAuthorizedForServiceReturnFalse() {
+    void checkIsAuthorizedForServiceReturnFalse() {
         when(serviceAuthorisationApi.getServiceName(any())).thenReturn("unknown_api");
         assertFalse(authorisationService.isServiceAuthorized("s2s token"));
+    }
+
+    @Test
+    void authorisePaymentCallbackWhenServiceIsPaymentApp() {
+        when(serviceAuthorisationApi.getServiceName(any())).thenReturn("payment_app");
+
+        assertTrue(authorisationService.isPaymentCallbackServiceAuthorized("s2s token"));
+    }
+
+    @Test
+    void doNotAuthorisePaymentCallbackForServiceOnGeneralAllowlist() {
+        when(serviceAuthorisationApi.getServiceName(any())).thenReturn("civil_service");
+
+        assertTrue(authorisationService.isServiceAuthorized("s2s token"));
+        assertFalse(authorisationService.isPaymentCallbackServiceAuthorized("s2s token"));
     }
 }
