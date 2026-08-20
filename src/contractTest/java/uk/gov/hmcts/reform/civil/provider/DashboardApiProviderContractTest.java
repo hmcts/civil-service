@@ -52,7 +52,8 @@ class DashboardApiProviderContractTest {
     }
 
     @BeforeEach
-    void beforeEach() {
+    @SuppressWarnings("java:S2699")
+    void beforeEach(PactVerificationContext context) {
         String brokerUrl = System.getenv("PACT_BROKER_FULL_URL");
         if (brokerUrl != null && !brokerUrl.isBlank()) {
             System.setProperty("pactbroker.url", brokerUrl);
@@ -70,6 +71,12 @@ class DashboardApiProviderContractTest {
             .setMessageConverters(new MappingJackson2HttpMessageConverter())
             .alwaysDo(result -> result.getResponse().setContentType(APPLICATION_JSON_VALUE))
             .build();
+
+        if (context != null) {
+            MockMvcTestTarget target = new MockMvcTestTarget();
+            target.setMockMvc(mockMvc);
+            context.setTarget(target);
+        }
     }
 
     @AfterEach
@@ -83,9 +90,6 @@ class DashboardApiProviderContractTest {
     @ExtendWith(PactVerificationInvocationContextProvider.class)
     void verifyPactInteractions(PactVerificationContext context) {
         if (context != null) {
-            MockMvcTestTarget target = new MockMvcTestTarget();
-            target.setMockMvc(mockMvc);
-            context.setTarget(target);
             context.verifyInteraction();
         }
     }
