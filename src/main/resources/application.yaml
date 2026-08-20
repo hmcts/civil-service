@@ -73,7 +73,7 @@ spring:
             readTimeout: ${CORE_CASE_EVENT_API_READ_TIMEOUT:25000}
 
 scheduler:
-  active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:JudgementBuffer, AutomatedHearingNotice}
+  active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:JudgementBuffer, AutomatedHearingNotice, RequestForReconsiderationNotification}
   circuitBreakerThreshold: ${CIRCUIT_BREAKER_THRESHOLD:5}
   lockAtLeastFor: ${LOCK_AT_LEAST_FOR:PT1M}
   lockAtMostFor: ${LOCK_AT_MOST_FOR:PT30M}
