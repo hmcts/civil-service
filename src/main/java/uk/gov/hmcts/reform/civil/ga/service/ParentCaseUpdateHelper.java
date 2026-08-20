@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
@@ -64,7 +63,6 @@ public class ParentCaseUpdateHelper {
 
     private final CaseDetailsConverter caseDetailsConverter;
     private final GaCoreCaseDataService coreCaseDataService;
-    private final FeatureToggleService featureToggleService;
     private final ObjectMapper mapper;
 
     private static final Logger log = LoggerFactory.getLogger(ParentCaseUpdateHelper.class);
@@ -365,18 +363,16 @@ public class ParentCaseUpdateHelper {
 
     private void removeApplicationFromTranslationCollection(GeneralApplicationCaseData parentCaseData, Map<String, Object> updateMap,
                                                             String applicationId) {
-        if (featureToggleService.isGaForWelshEnabled()) {
-            List<Element<GeneralApplicationsDetails>> gaDetailsTranslationCollection = ofNullable(
-                parentCaseData.getGaDetailsTranslationCollection()).orElse(newArrayList());
+        List<Element<GeneralApplicationsDetails>> gaDetailsTranslationCollection = ofNullable(
+            parentCaseData.getGaDetailsTranslationCollection()).orElse(newArrayList());
 
-            if (!gaDetailsTranslationCollection.isEmpty()) {
+        if (!gaDetailsTranslationCollection.isEmpty()) {
 
-                gaDetailsTranslationCollection.removeIf(
-                    gaApplication -> applicationFilterCriteria(gaApplication, applicationId)
-                );
-                var data = gaDetailsTranslationCollection.isEmpty() ? " " : gaDetailsTranslationCollection;
-                updateMap.put(GENERAL_APPLICATIONS_DETAILS_FOR_WELSH, data);
-            }
+            gaDetailsTranslationCollection.removeIf(
+                gaApplication -> applicationFilterCriteria(gaApplication, applicationId)
+            );
+            var data = gaDetailsTranslationCollection.isEmpty() ? " " : gaDetailsTranslationCollection;
+            updateMap.put(GENERAL_APPLICATIONS_DETAILS_FOR_WELSH, data);
         }
     }
 

@@ -1,9 +1,12 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications.staycase;
 
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_STAYED_JR_CANCELLED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT;
 
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
@@ -12,19 +15,24 @@ import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 public class StayCaseClaimantDashboardService extends DashboardScenarioService {
 
     private final DashboardNotificationService dashboardNotificationService;
     private final TaskListService taskListService;
+    private final FeatureToggleService featureToggleService;
 
     public StayCaseClaimantDashboardService(DashboardScenariosService dashboardScenariosService,
                                              DashboardNotificationsParamsMapper mapper,
                                              DashboardNotificationService dashboardNotificationService,
-                                             TaskListService taskListService) {
+                                             TaskListService taskListService,
+                                            FeatureToggleService toggleService) {
         super(dashboardScenariosService, mapper);
         this.dashboardNotificationService = dashboardNotificationService;
         this.taskListService = taskListService;
+        this.featureToggleService = toggleService;
     }
 
     public void notifyStayCase(CaseData caseData, String authToken) {
@@ -34,6 +42,13 @@ public class StayCaseClaimantDashboardService extends DashboardScenarioService {
     @Override
     public String getScenario(CaseData caseData) {
         return SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT.getScenario();
+    }
+
+    @Override
+    protected Map<String, Boolean> getScenarios(CaseData caseData) {
+        boolean isPreviouslyJudgmentRequested = featureToggleService.isJudgmentBufferEnabled()
+            && YesOrNo.YES.equals(caseData.getIsJoRequested());
+        return Map.of(SCENARIO_AAA6_CASE_STAYED_JR_CANCELLED_CLAIMANT.getScenario(), isPreviouslyJudgmentRequested);
     }
 
     @Override

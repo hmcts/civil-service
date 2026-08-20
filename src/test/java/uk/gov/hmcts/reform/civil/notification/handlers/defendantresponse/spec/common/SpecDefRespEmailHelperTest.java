@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -18,14 +17,12 @@ import static org.mockito.Mockito.when;
 class SpecDefRespEmailHelperTest {
 
     private NotificationsProperties notificationsProperties;
-    private FeatureToggleService featureToggleService;
     private SpecDefRespEmailHelper helper;
 
     @BeforeEach
     void setUp() {
         notificationsProperties = mock(NotificationsProperties.class);
-        featureToggleService = mock(FeatureToggleService.class);
-        helper = new SpecDefRespEmailHelper(notificationsProperties, featureToggleService);
+        helper = new SpecDefRespEmailHelper(notificationsProperties);
     }
 
     @Test
@@ -36,7 +33,7 @@ class SpecDefRespEmailHelperTest {
             .build();
 
         String expectedTemplate = "immediately-template";
-        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn(expectedTemplate);
+        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA()).thenReturn(expectedTemplate);
 
         String actual = helper.getAppSolTemplate(caseData);
         assertEquals(expectedTemplate, actual);
@@ -152,18 +149,4 @@ class SpecDefRespEmailHelperTest {
         }
     }
 
-    @Test
-    void shouldReturnImmediatelyTemplate_whenFullAdmissionAndImmediatePayment_judgmentOnlineFlagEnabled() {
-        CaseData caseData = CaseData.builder()
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .build();
-
-        String expectedTemplate = "immediately-template-jo";
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA()).thenReturn(expectedTemplate);
-
-        String actual = helper.getAppSolTemplate(caseData);
-        assertEquals(expectedTemplate, actual);
-    }
 }

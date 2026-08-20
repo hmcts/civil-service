@@ -6,6 +6,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.config.properties.mediation.MediationCSVEmailConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -14,6 +15,8 @@ import uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCSVService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCsvServiceFactory;
 import uk.gov.hmcts.reform.civil.service.search.MediationCasesSearchService;
@@ -32,19 +35,25 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
 
     private static final String FILENAME = "ocmc_mediation_data.csv";
 
-    protected GenerateCsvAndTransferTaskHandler(MediationCasesSearchService caseSearchService,
+    protected GenerateCsvAndTransferTaskHandler(ExternalTaskCompletionService externalTaskCompletionService,
+                                                EventProperties eventProperties,
+                                                MediationCasesSearchService caseSearchService,
                                                 CoreCaseDataService coreCaseDataService,
                                                 CaseDetailsConverter caseDetailsConverter,
                                                 SendGridClient sendGridClient,
                                                 MediationCSVEmailConfiguration mediationCSVEmailConfiguration,
                                                 MediationCsvServiceFactory mediationCsvServiceFactory,
-                                                MediationCSVEmailConfiguration mediationCSVEmailConfiguration1) {
+                                                MediationCSVEmailConfiguration mediationCSVEmailConfiguration1,
+                                                FeatureToggleService featureToggleService) {
         super(
+            externalTaskCompletionService,
+            eventProperties,
             caseSearchService,
             coreCaseDataService,
             caseDetailsConverter,
             sendGridClient,
-            mediationCSVEmailConfiguration
+            mediationCSVEmailConfiguration,
+            featureToggleService
         );
         this.mediationCsvServiceFactory = mediationCsvServiceFactory;
         this.localMediationCSVEmailConfiguration = mediationCSVEmailConfiguration1;
@@ -52,6 +61,9 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
+        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
+            return new ExternalTaskData();
+        }
 
         List<CaseDetails> cases = caseSearchService.getInMediationCases(false);
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());

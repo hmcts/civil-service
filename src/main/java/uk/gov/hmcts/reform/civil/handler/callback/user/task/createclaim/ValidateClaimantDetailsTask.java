@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PartyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
@@ -16,13 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+import static uk.gov.hmcts.reform.civil.validation.PostcodeValidator.POSTCODE_REQUIRED_ERROR;
+
 @Component
 public class ValidateClaimantDetailsTask {
 
     private final DateOfBirthValidator dateOfBirthValidator;
     private final PartyValidator partyValidator;
     private final PostcodeValidator postcodeValidator;
-    private final FeatureToggleService featureToggleService;
     private final ObjectMapper objectMapper;
 
     private Function<CaseData, Party> getApplicant;
@@ -31,12 +31,10 @@ public class ValidateClaimantDetailsTask {
     public ValidateClaimantDetailsTask(DateOfBirthValidator dateOfBirthValidator,
                                        PartyValidator partyValidator,
                                        PostcodeValidator postcodeValidator,
-                                       FeatureToggleService featureToggleService,
                                        ObjectMapper objectMapper) {
         this.dateOfBirthValidator = dateOfBirthValidator;
         this.partyValidator = partyValidator;
         this.postcodeValidator = postcodeValidator;
-        this.featureToggleService = featureToggleService;
         this.objectMapper = objectMapper;
     }
 
@@ -45,12 +43,18 @@ public class ValidateClaimantDetailsTask {
     }
 
     public CallbackResponse validateClaimantDetails(CaseData caseData, String eventId) {
+        return validateClaimantDetails(caseData, eventId, true);
+    }
+
+    public CallbackResponse validateClaimantDetails(CaseData caseData, String eventId, boolean validatePostcode) {
         Party applicant = getApplicant.apply(caseData);
 
         List<String> errors = validateApplicant(applicant);
 
-        if (errors.isEmpty() && eventId != null) {
+        if (validatePostcode && errors.isEmpty() && eventId != null) {
             validatePostcode(applicant, errors);
+        } else if (!validatePostcode) {
+            validatePostcodeRequired(applicant, errors);
         }
 
         return buildCallbackResponse(caseData, errors);
@@ -60,9 +64,7 @@ public class ValidateClaimantDetailsTask {
         List<String> errors = new ArrayList<>();
         errors.addAll(dateOfBirthValidator.validate(applicant));
 
-        if (featureToggleService.isJudgmentOnlineLive()) {
-            validateAddressAndName(applicant, errors);
-        }
+        validateAddressAndName(applicant, errors);
         return errors;
     }
 
@@ -76,6 +78,14 @@ public class ValidateClaimantDetailsTask {
     private void validatePostcode(Party applicant, List<String> errors) {
         if (applicant.getPrimaryAddress() != null) {
             errors.addAll(postcodeValidator.validate(applicant.getPrimaryAddress().getPostCode()));
+        }
+    }
+
+    private void validatePostcodeRequired(Party applicant, List<String> errors) {
+        if (applicant.getPrimaryAddress() != null
+            && (applicant.getPrimaryAddress().getPostCode() == null
+            || applicant.getPrimaryAddress().getPostCode().isBlank())) {
+            errors.add(POSTCODE_REQUIRED_ERROR);
         }
     }
 

@@ -105,7 +105,9 @@ import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -302,7 +304,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenIndividualDateOfBirthIsInTheFuture() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(new PartyBuilder().individual()
@@ -321,7 +322,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenSoleTraderDateOfBirthIsInTheFuture() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(new PartyBuilder().individual()
@@ -340,7 +340,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenIndividualDateOfBirthIsInThePast() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(new PartyBuilder().individual()
@@ -359,7 +358,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenSoleTraderDateOfBirthIsInThePast() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .applicant1(new PartyBuilder().individual()
@@ -378,7 +376,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Address address = new Address();
             address.setAddressLine1("Line 1 test again for more than 35 characters");
@@ -405,9 +402,28 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldNotReturnPostcodeError_whenApplicant1AddressIsOutsideEnglandOrWales() {
+            // Given
+            Party party = new PartyBuilder().company().build();
+            party.getPrimaryAddress().setPostCode("BT1 1SS");
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant1(party)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            given(postcodeValidator.validate(any()))
+                .willReturn(List.of("Postcode must be in England or Wales"));
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
         void shouldReturnError_when_address_exceeds_max_length_in_Company_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Address address = new Address();
             address.setAddressLine1("TEST");
@@ -431,7 +447,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_Individual_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Address address = new Address();
             address.setAddressLine1("Address line 1");
@@ -456,7 +471,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_sole_trader_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Address address = new Address();
             address.setAddressLine1("Address line 1");
@@ -481,7 +495,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_org_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Address address = new Address();
             address.setAddressLine1("Address line 1");
@@ -503,9 +516,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotError_when_address_exceeds_max_length_in_org_name_when_flag_in_off() {
+        void shouldNotError_whenApplicant1OrgNameExceedsMaxLengthWithoutAddress() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(false);
 
             Party party = new Party();
             party.setType(Party.Type.ORGANISATION);
@@ -600,7 +612,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Address address = new Address();
             address.setAddressLine1("Line 1 test again for more than 35 characters");
@@ -627,9 +638,28 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldNotReturnPostcodeError_whenApplicant2AddressIsOutsideEnglandOrWales() {
+            // Given
+            Party party = new PartyBuilder().company().build();
+            party.getPrimaryAddress().setPostCode("BT1 1SS");
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant2(party)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            given(postcodeValidator.validate(any()))
+                .willReturn(List.of("Postcode must be in England or Wales"));
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
         void shouldReturnError_when_address_exceeds_max_length_in_Company_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Address address = new Address();
             address.setAddressLine1("TEST");
@@ -653,7 +683,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_Individual_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Address address = new Address();
             address.setAddressLine1("Address line 1");
@@ -678,7 +707,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_sole_trader_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Address address = new Address();
             address.setAddressLine1("Address line 1");
@@ -703,7 +731,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_when_address_exceeds_max_length_in_org_name() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Address address = new Address();
             address.setAddressLine1("Address line 1");
@@ -1300,6 +1327,18 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldReturnCaseDataWithoutInterestPreview_whenTotalClaimAmountIsNull() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "interest-calc");
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(updatedData.getCalculatedInterest()).isNull();
+            verifyNoInteractions(interestCalculator);
+        }
+
+        @Test
         void shouldDefaultInterestUntil_whenInterestFromIsSubmittedDate() {
             // Given
             SameRateInterestSelection sameRateSelection = new SameRateInterestSelection();
@@ -1409,6 +1448,17 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class MidSpecCalculateInterest {
+
+        @Test
+        void shouldReturnCaseDataWithoutInterestPreview_whenTotalClaimAmountIsNull() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "ClaimInterest");
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(updatedData.getCalculatedInterest()).isNull();
+        }
 
         @Test
         void shouldValidateClaimTimelineDate_whenPopulated() {
@@ -1674,7 +1724,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @BeforeEach
             void setup() {
-                when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
             }
 
             @Test
@@ -1697,6 +1746,49 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(response).isNotNull();
                 assertThat(response.getData()).isNotNull();
                 assertEquals(0, response.getErrors().size());
+            }
+
+            @Test
+            void shouldNotReturnPostcodeError_whenRespondent1AddressIsOutsideEnglandOrWales() {
+                // Given
+                Party respondent1 = new PartyBuilder().company().build();
+                respondent1.getPrimaryAddress().setPostCode("BT1 1SS");
+
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setRespondent1(respondent1);
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "respondent1");
+
+                given(postcodeValidator.validate(any()))
+                    .willReturn(List.of("Postcode must be in England or Wales"));
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getErrors()).isEmpty();
+            }
+
+            @Test
+            void shouldReturnPostcodeRequiredError_whenRespondent1PostcodeIsNull() {
+                // Given
+                Party respondent1 = new PartyBuilder().company().build();
+                respondent1.getPrimaryAddress().setPostCode(null);
+
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setRespondent1(respondent1);
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "respondent1");
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getData()).isNull();
+                assertThat(response.getErrors()).containsOnly("Please enter Postcode");
+                verifyNoInteractions(postcodeValidator);
             }
 
             @Test
@@ -1731,7 +1823,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @BeforeEach
             void setup() {
-                when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
             }
 
             @Test
@@ -1754,6 +1845,28 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(response).isNotNull();
                 assertThat(response.getData()).isNotNull();
                 assertEquals(0, response.getErrors().size());
+            }
+
+            @Test
+            void shouldNotReturnPostcodeError_whenRespondent2AddressIsOutsideEnglandOrWales() {
+                // Given
+                Party respondent2 = new PartyBuilder().company().build();
+                respondent2.getPrimaryAddress().setPostCode("BT1 1SS");
+
+                CaseData caseData = CaseDataBuilder.builder().build();
+                caseData.setRespondent2(respondent2);
+
+                CallbackParams params = callbackParamsOf(caseData, MID, "respondent2");
+
+                given(postcodeValidator.validate(any()))
+                    .willReturn(List.of("Postcode must be in England or Wales"));
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getErrors()).isEmpty();
             }
 
             @Test
@@ -2051,7 +2164,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnErrors_whenRespondent1PartyNameNotValid() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Party respondent1 = new Party();
             respondent1.setType(Party.Type.ORGANISATION);
@@ -2074,7 +2186,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnErrors_whenRespondent2PartyNameNotValid() {
             // Given
-            when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
 
             Party respondent2 = new Party();
             respondent2.setType(Party.Type.INDIVIDUAL);
@@ -2359,8 +2470,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             // Then
-            assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("John Rambo v Sole Trader T/A Sole Trader co");
+            assertThat(response.getData())
+                .containsEntry("caseNameHmctsInternal", "John Rambo v Sole Trader T/A Sole Trader co");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -2589,7 +2700,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 List<LocationRefData> locations = new ArrayList<>();
                 locations.add(new LocationRefData().setRegionId("Site Name").setEpimmsId("36791"));
-                given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                given(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString(), anyString()))
                     .willReturn(locations);
             }
 
@@ -2628,7 +2739,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .flightDelay(otherFlightDelayDetails).build();
                 CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
 
-                given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                given(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString(), anyString()))
                     .willReturn(getSampleCourLocationsRefObject());
 
                 // When

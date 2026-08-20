@@ -1,12 +1,14 @@
 package uk.gov.hmcts.reform.civil.service.claimstore;
 
 import feign.FeignException;
+import feign.Request;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.exceptions.RetryableClaimStoreException;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
@@ -21,8 +23,12 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import static feign.Request.HttpMethod.GET;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -49,6 +55,11 @@ public class ClaimStoreServiceTest {
     private static final LocalDate RESPONSE_DEADLINE = LocalDate.of(2021, 1, 1);
     private static final LocalDate CREATE_DATE = LocalDate.of(2023, 1, 22);
     private static final LocalDateTime CREATE_DATETIME = CREATE_DATE.atTime(0, 0);
+    private final FeignException gatewayTimeoutException = new FeignException.GatewayTimeout(
+        "gateway timeout message",
+        Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
+        "gateway timeout response body".getBytes(UTF_8),
+        Map.of());
     private static final List<DashboardClaimInfo> EXPECTED_CLAIM_RESULT
         = Arrays.asList(new DashboardClaimInfo()
                             .setClaimNumber(
@@ -106,6 +117,33 @@ public class ClaimStoreServiceTest {
         given(claimStoreApi.getClaimsForDefendant(any(), any())).willThrow(FeignException.FeignClientException.class);
         List<DashboardClaimInfo> resultClaims = claimStoreService.getClaimsForDefendant("23746486", "1234");
         verify(claimStoreApi).getClaimsForDefendant("23746486", "1234");
+        assertThat(resultClaims).isEmpty();
+    }
+
+    @Test
+    void shouldThrowRetryableClaimStoreExceptionForClaimantWhenGatewayTimeoutThrown() {
+        given(claimStoreApi.getClaimsForClaimant(any(), any())).willThrow(gatewayTimeoutException);
+
+        assertThatThrownBy(() -> claimStoreService.getClaimsForClaimant("23746486", "1234"))
+            .isInstanceOf(RetryableClaimStoreException.class)
+            .hasCause(gatewayTimeoutException);
+    }
+
+    @Test
+    void shouldThrowRetryableClaimStoreExceptionForDefendantWhenGatewayTimeoutThrown() {
+        given(claimStoreApi.getClaimsForDefendant(any(), any())).willThrow(gatewayTimeoutException);
+
+        assertThatThrownBy(() -> claimStoreService.getClaimsForDefendant("23746486", "1234"))
+            .isInstanceOf(RetryableClaimStoreException.class)
+            .hasCause(gatewayTimeoutException);
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenRecoveringRetryableClaimStoreException() {
+        List<DashboardClaimInfo> resultClaims = claimStoreService.recover(
+            new RetryableClaimStoreException("retry exhausted")
+        );
+
         assertThat(resultClaims).isEmpty();
     }
 

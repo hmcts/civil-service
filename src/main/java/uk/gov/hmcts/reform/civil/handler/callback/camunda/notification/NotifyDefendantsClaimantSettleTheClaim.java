@@ -70,7 +70,7 @@ public class NotifyDefendantsClaimantSettleTheClaim extends CallbackHandler impl
             log.info("Sending settle-claim email to defendant LiP");
             notificationService.sendMail(
                 caseData.getRespondent1().getPartyEmail(),
-                notificationsProperties.getNotifyDefendantLIPClaimantSettleTheClaimTemplate(),
+                getDefendantLipEmailTemplate(caseData),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
@@ -108,6 +108,13 @@ public class NotifyDefendantsClaimantSettleTheClaim extends CallbackHandler impl
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
+    }
+
+    private String getDefendantLipEmailTemplate(CaseData caseData) {
+        if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
+            return notificationsProperties.getNotifyDefendantLIPClaimantSettleTheClaimTemplateWelsh();
+        }
+        return notificationsProperties.getNotifyDefendantLIPClaimantSettleTheClaimTemplate();
     }
 
     private String getDefRefNumber(CaseData caseData) {

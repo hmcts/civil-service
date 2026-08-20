@@ -2,20 +2,24 @@ package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.search.GaEvidenceUploadNotificationSearchService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Map;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -40,11 +44,28 @@ public class DocUploadNotifyTaskHandlerTest {
     @Mock
     private GaCoreCaseDataService coreCaseDataService;
 
-    @InjectMocks
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     private DocUploadNotifyTaskHandler handler;
+
+    @BeforeEach
+    void setUp() {
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(3);
+        handler = new DocUploadNotifyTaskHandler(
+            new ExternalTaskCompletionService(),
+            eventProperties,
+            searchService,
+            coreCaseDataService,
+            caseDetailsConverter,
+            featureToggleService
+        );
+    }
 
     @Test
     void shouldNotSendMessageAndTriggerGaEvent_whenZeroCasesFound() {
+        when(featureToggleService.isSpringSchedulerEnabled("GADocUploadNotifyScheduler")).thenReturn(false);
         when(searchService.getApplications()).thenReturn(Set.of());
 
         handler.execute(externalTask, externalTaskService);
@@ -57,6 +78,7 @@ public class DocUploadNotifyTaskHandlerTest {
     @Test
     void shouldEmitBusinessProcessEvent_whenCasesFound() {
         long caseId = 1L;
+        when(featureToggleService.isSpringSchedulerEnabled("GADocUploadNotifyScheduler")).thenReturn(false);
         when(searchService.getApplications())
             .thenReturn(Set.of(CaseDetails.builder().build()));
 
@@ -71,5 +93,21 @@ public class DocUploadNotifyTaskHandlerTest {
             Map.of()
         );
         verify(externalTaskService).complete(any(), any());
+    }
+
+    @Test
+    void shouldNotProcessLegacyTaskWhenSpringSchedulerIsEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled("GADocUploadNotifyScheduler")).thenReturn(true);
+
+        handler.execute(externalTask, externalTaskService);
+
+        verifyNoInteractions(searchService);
+        verifyNoInteractions(coreCaseDataService);
+        verify(externalTaskService).complete(any(), any());
+    }
+
+    @Test
+    void shouldOnlyAttemptOnce() {
+        assertEquals(1, handler.getMaxAttempts());
     }
 }

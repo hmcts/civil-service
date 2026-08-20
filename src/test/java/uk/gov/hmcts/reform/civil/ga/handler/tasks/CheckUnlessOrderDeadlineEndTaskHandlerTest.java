@@ -6,11 +6,11 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -20,6 +20,8 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialMakeAnOrder;
 import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.time.LocalDate;
@@ -28,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -55,7 +58,9 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
     @Mock
     private GaCoreCaseDataService coreCaseDataService;
 
-    @InjectMocks
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     private CheckUnlessOrderDeadlineEndTaskHandler gaUnlessOrderMadeTaskHandler;
 
     @Spy
@@ -82,7 +87,20 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
     private final LocalDate deadLineToday = LocalDate.now();
 
     @BeforeEach
-    void init() {
+    void setUp() {
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(3);
+        gaUnlessOrderMadeTaskHandler = new CheckUnlessOrderDeadlineEndTaskHandler(
+            new ExternalTaskCompletionService(),
+            eventProperties,
+            searchService,
+            coreCaseDataService,
+            caseDetailsConverter,
+            mapper,
+            featureToggleService
+        );
+        lenient().when(featureToggleService.isSpringSchedulerEnabled("GAUnlessOrderScheduler")).thenReturn(false);
+
         caseDetailsWithTodayDeadlineNotProcessed = getCaseDetails(1L, UNLESS_ORDER, deadLineToday,
                                                                   YesOrNo.NO);
         caseDataWithTodayDeadlineNotProcessed = getCaseData(1L, UNLESS_ORDER, deadLineToday,
@@ -116,6 +134,17 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
                                                                             deadLineToday, null);
         caseDataWithTodayDeadLineWithOrderProcessedNull = getCaseData(7L, UNLESS_ORDER,
                                                                       deadLineToday, null);
+    }
+
+    @Test
+    void shouldNotProcessLegacyTaskWhenSpringSchedulerIsEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled("GAUnlessOrderScheduler")).thenReturn(true);
+
+        gaUnlessOrderMadeTaskHandler.execute(externalTask, externalTaskService);
+
+        verifyNoInteractions(searchService);
+        verifyNoInteractions(coreCaseDataService);
+        verify(externalTaskService).complete(any(), any());
     }
 
     @Test

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -20,9 +19,10 @@ import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
 import java.util.Map;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Component
-@RequiredArgsConstructor
 public class StartHearingNoticeBusinessProcessTaskHandler extends BaseExternalTaskHandler {
 
     public static final String BUSINESS_PROCESS = "businessProcess";
@@ -31,12 +31,25 @@ public class StartHearingNoticeBusinessProcessTaskHandler extends BaseExternalTa
     private final ObjectMapper mapper;
     private final IStateFlowEngine stateFlowEngine;
 
-    private VariableMap variables;
+    public StartHearingNoticeBusinessProcessTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        CoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter,
+        ObjectMapper mapper,
+        IStateFlowEngine stateFlowEngine
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.mapper = mapper;
+        this.stateFlowEngine = stateFlowEngine;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         CaseData caseData = startHearingNoticeBusinessProcess(externalTask);
-        variables = Variables.createVariables();
+        VariableMap variables = Variables.createVariables();
         var stateFlow = stateFlowEngine.getStateFlow(caseData);
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
         variables.putValue(FLOW_FLAGS, stateFlow.getFlags());

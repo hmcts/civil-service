@@ -34,6 +34,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -44,7 +45,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
-public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
+class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
     private DefaultJudgementHandler handler;
     private ObjectMapper mapper;
@@ -158,7 +159,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             void shouldReturnLocationList_whenLocationsAreQueried() {
                 List<LocationRefData> locations = new ArrayList<>();
                 locations.add(new LocationRefData().setCourtName("Court Name").setRegion("Region"));
-                when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+                when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString(), anyString())).thenReturn(locations);
                 CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -311,7 +312,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 locations.add(new LocationRefData().setSiteName("Loc").setCourtAddress("1").setPostcode("1")
                                   .setCourtName("Court Name").setRegion("Region").setRegionId("1").setCourtVenueId("000")
                                   .setEpimmsId("123456"));
-                when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+                when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString(), anyString())).thenReturn(locations);
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -344,6 +345,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 List<LocationRefData> locations = new ArrayList<>();
                 locations.add(new LocationRefData().setCourtName("Court Name").setRegionId("2").setEpimmsId("123456"));
                 when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(
+                    any(),
                     any(),
                     any()
                 )).thenReturn(locations);
@@ -509,5 +511,4 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
         assertThat(actualDate).isEqualTo(expectedDate);
     }
 }
-
 

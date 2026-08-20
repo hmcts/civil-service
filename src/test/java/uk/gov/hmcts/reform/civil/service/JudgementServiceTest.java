@@ -34,8 +34,6 @@ class JudgementServiceTest {
 
     @InjectMocks
     private JudgementService judgementService;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setUp() {

@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
@@ -40,6 +41,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -82,6 +84,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.utils.MarkPaidInFullUtil.checkMarkPaidInFull;
+import static uk.gov.hmcts.reform.civil.utils.WaTaskUtil.cancelApplicantWaDocumentUploadTask;
 
 @ExtendWith(MockitoExtension.class)
 class CaseEventTaskHandlerTest {
@@ -104,9 +107,16 @@ class CaseEventTaskHandlerTest {
     private RoboticsEventTextFormatter textFormatter = new RoboticsEventTextFormatter();
     @Captor
     ArgumentCaptor<CaseDataContent> caseDataContentArgumentCaptor;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
+
     @InjectMocks
     private CaseEventTaskHandler caseEventTaskHandler;
     private static final String IS_JUDGMENT_MARKED_PAID_IN_FULL = "isJudgmentMarkedPaidInFull";
+    private static final String IS_WA_TASK_REQUIRE_CANCELLATION = "isApplicantUploadTranslatedDocumentTaskRequiredCancellation";
 
     @Nested
     class NotifyRespondent {
@@ -136,6 +146,7 @@ class CaseEventTaskHandlerTest {
             variables.putValue(FLOW_STATE, "MAIN.DRAFT");
             variables.putValue(FLOW_FLAGS, Map.of());
             variables.putValue(IS_JUDGMENT_MARKED_PAID_IN_FULL, checkMarkPaidInFull(caseData));
+            variables.putValue(IS_WA_TASK_REQUIRE_CANCELLATION, cancelApplicantWaDocumentUploadTask(caseData));
 
             CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
@@ -170,6 +181,7 @@ class CaseEventTaskHandlerTest {
             variables.putValue(FLOW_STATE, "MAIN.DRAFT");
             variables.putValue(FLOW_FLAGS, Map.of());
             variables.putValue(IS_JUDGMENT_MARKED_PAID_IN_FULL, checkMarkPaidInFull(caseData));
+            variables.putValue(IS_WA_TASK_REQUIRE_CANCELLATION, cancelApplicantWaDocumentUploadTask(caseData));
 
             CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
@@ -203,6 +215,7 @@ class CaseEventTaskHandlerTest {
             variables.putValue(FLOW_STATE, "MAIN.DRAFT");
             variables.putValue(FLOW_FLAGS, Map.of());
             variables.putValue(IS_JUDGMENT_MARKED_PAID_IN_FULL, checkMarkPaidInFull(caseData));
+            variables.putValue(IS_WA_TASK_REQUIRE_CANCELLATION, cancelApplicantWaDocumentUploadTask(caseData));
 
             CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
@@ -323,18 +336,17 @@ class CaseEventTaskHandlerTest {
                 eq(errorMessage),
                 anyString(),
                 eq(2),
-                eq(300000L)
+                anyLong()
             );
         }
 
         @Test
-        void shouldCallHandleFailureMethod_whenFeignExceptionFromBusinessLogic() {
+        void shouldCallHandleFailureMethod_whenFeignExceptionFromUnprocessableContent() {
             String errorMessage = "there was an error";
             int status = 422;
             Request.HttpMethod requestType = Request.HttpMethod.POST;
             String exampleUrl = "example url";
 
-            when(mockTask.getRetries()).thenReturn(null);
             when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_EVENT))
                 .thenAnswer(invocation -> {
                     throw FeignException.errorStatus(errorMessage, Response.builder()
@@ -358,8 +370,8 @@ class CaseEventTaskHandlerTest {
                 eq(mockTask),
                 eq(String.format("[%s] during [%s] to [%s] [%s]: []", status, requestType, exampleUrl, errorMessage)),
                 anyString(),
-                eq(2),
-                eq(300000L)
+                eq(0),
+                anyLong()
             );
         }
     }
@@ -396,6 +408,7 @@ class CaseEventTaskHandlerTest {
                 IS_JUDGMENT_MARKED_PAID_IN_FULL,
                 false
             );
+            variables.putValue(IS_WA_TASK_REQUIRE_CANCELLATION, false);
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
             when(mockTask.getTopicName()).thenReturn("test");
             when(mockTask.getActivityId()).thenReturn("activityId");
@@ -419,6 +432,7 @@ class CaseEventTaskHandlerTest {
             verify(coreCaseDataService).startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM);
             verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).complete(mockTask, Map.of(IS_JUDGMENT_MARKED_PAID_IN_FULL, false,
+                IS_WA_TASK_REQUIRE_CANCELLATION, false,
                 FLOW_FLAGS, flags,
                 FLOW_STATE, state.fullName()
             ));
@@ -457,7 +471,7 @@ class CaseEventTaskHandlerTest {
                 IS_JUDGMENT_MARKED_PAID_IN_FULL,
                 false
             );
-
+            variables.putValue(IS_WA_TASK_REQUIRE_CANCELLATION, false);
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(TAKEN_OFFLINE_BY_STAFF.fullName());
             when(mockTask.getTopicName()).thenReturn("test");
             when(mockTask.getActivityId()).thenReturn("activityId");
@@ -483,6 +497,7 @@ class CaseEventTaskHandlerTest {
             verify(coreCaseDataService).startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM);
             verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).complete(mockTask, Map.of(IS_JUDGMENT_MARKED_PAID_IN_FULL, false,
+                IS_WA_TASK_REQUIRE_CANCELLATION, false,
                 FLOW_FLAGS, getFlowFlags(TAKEN_OFFLINE_BY_STAFF),
                 FLOW_STATE, TAKEN_OFFLINE_BY_STAFF.fullName()
             ));
@@ -748,8 +763,7 @@ class CaseEventTaskHandlerTest {
                     CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
                     Event event = caseDataContent.getEvent();
                     assertThat(event.getSummary()).isEqualTo("RPA Reason: Claimant(s) proceeds.");
-                    assertThat(event.getDescription())
-                        .isEqualTo(null);
+                    assertThat(event.getDescription()).isNull();
                 }
             }
 
@@ -956,7 +970,6 @@ class CaseEventTaskHandlerTest {
                              Map.entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                              Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                              Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                             Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                              Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                              Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                              Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
@@ -968,7 +981,6 @@ class CaseEventTaskHandlerTest {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
@@ -982,7 +994,6 @@ class CaseEventTaskHandlerTest {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), true),
@@ -994,7 +1005,6 @@ class CaseEventTaskHandlerTest {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
@@ -1007,7 +1017,6 @@ class CaseEventTaskHandlerTest {
                                      Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                                      Map.entry(FlowFlag.MINTI_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), true),
@@ -1019,7 +1028,6 @@ class CaseEventTaskHandlerTest {
             Map<String, Boolean> expectedFlags = new HashMap<>();
             expectedFlags.put(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false);
             expectedFlags.put(FlowFlag.BULK_CLAIM_ENABLED.name(), false);
-            expectedFlags.put(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false);
             expectedFlags.put(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false);
             expectedFlags.put(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false);
             return expectedFlags;
@@ -1180,5 +1188,11 @@ class CaseEventTaskHandlerTest {
                 anyLong()
             );
         }
+    }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
     }
 }

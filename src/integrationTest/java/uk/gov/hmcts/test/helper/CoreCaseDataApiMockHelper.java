@@ -12,12 +12,13 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_GRANTED_SPEC;
 
 public class CoreCaseDataApiMockHelper {
 
@@ -43,20 +44,45 @@ public class CoreCaseDataApiMockHelper {
         when(authTokenGenerator.generate()).thenReturn(GENERATED_TOKEN);
     }
 
+    public void resetMocks() {
+        reset(coreCaseDataApi, idamClient, authTokenGenerator);
+    }
+
     public void mockElasticSearchResult(SearchResult searchResult) {
         when(coreCaseDataApi.searchCases(eq(ACCESS_TOKEN), eq(GENERATED_TOKEN), eq(CASE_TYPE), any(String.class)))
             .thenReturn(searchResult);
     }
 
-    public void mockStartEvent(String caseIdString, StartEventResponse startEventResponse) {
+    public void mockElasticSearchResultPaginated(SearchResult searchResult, SearchResult... nextSearchResults) {
+        when(coreCaseDataApi.searchCases(eq(ACCESS_TOKEN), eq(GENERATED_TOKEN), eq(CASE_TYPE), any()))
+            .thenReturn(searchResult, nextSearchResults);
+    }
+
+    public void mockGetCase(String caseIdString, CaseDetails caseDetails) {
+        when(coreCaseDataApi.getCase(eq(ACCESS_TOKEN), eq(GENERATED_TOKEN), eq(caseIdString))).thenReturn(caseDetails);
+    }
+
+    public void mockStartEvent(String caseIdString, StartEventResponse startEventResponse, String eventId) {
         when(coreCaseDataApi.startEventForCaseWorker(
-            ACCESS_TOKEN,
-            GENERATED_TOKEN,
-            USER_ID,
-            JURISDICTION,
-            CASE_TYPE,
-            caseIdString,
-            DEFAULT_JUDGEMENT_GRANTED_SPEC.name()
+            eq(ACCESS_TOKEN),
+            eq(GENERATED_TOKEN),
+            eq(USER_ID),
+            eq(JURISDICTION),
+            eq(CASE_TYPE),
+            eq(caseIdString),
+            eq(eventId)
+        )).thenReturn(startEventResponse);
+    }
+
+    public void mockStartEventAnyCase(StartEventResponse startEventResponse, String eventId) {
+        when(coreCaseDataApi.startEventForCaseWorker(
+            eq(ACCESS_TOKEN),
+            eq(GENERATED_TOKEN),
+            eq(USER_ID),
+            eq(JURISDICTION),
+            eq(CASE_TYPE),
+            any(String.class),
+            eq(eventId)
         )).thenReturn(startEventResponse);
     }
 
@@ -73,8 +99,8 @@ public class CoreCaseDataApiMockHelper {
         )).thenReturn(caseDetails);
     }
 
-    public void verifySubmitEvent() {
-        verify(coreCaseDataApi).submitEventForCaseWorker(
+    public void mockSubmitEventAnyCase(CaseDetails caseDetails) {
+        when(coreCaseDataApi.submitEventForCaseWorker(
             eq(ACCESS_TOKEN),
             eq(GENERATED_TOKEN),
             eq(USER_ID),
@@ -83,6 +109,19 @@ public class CoreCaseDataApiMockHelper {
             any(String.class),
             eq(true),
             any(CaseDataContent.class)
+        )).thenReturn(caseDetails);
+    }
+
+    public void verifySubmitEvent(int expectedCount) {
+        verify(coreCaseDataApi, org.mockito.Mockito.times(expectedCount)).submitEventForCaseWorker(
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            anyBoolean(),
+            any()
         );
     }
 }

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -21,9 +20,10 @@ import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
 
 import java.util.Map;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Component
-@RequiredArgsConstructor
 public class GaStartGeneralApplicationBusinessProcessTaskHandler extends BaseExternalTaskHandler {
 
     public static final String BUSINESS_PROCESS = "businessProcess";
@@ -31,6 +31,21 @@ public class GaStartGeneralApplicationBusinessProcessTaskHandler extends BaseExt
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
     private final GaStateFlowEngine stateFlowEngine;
+
+    public GaStartGeneralApplicationBusinessProcessTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        GaCoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter,
+        ObjectMapper mapper,
+        GaStateFlowEngine stateFlowEngine
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.mapper = mapper;
+        this.stateFlowEngine = stateFlowEngine;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {

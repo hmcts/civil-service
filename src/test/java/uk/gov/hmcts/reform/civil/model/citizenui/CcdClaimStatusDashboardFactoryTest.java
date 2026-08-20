@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -203,6 +204,76 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
             claim, featureToggleService, Collections.emptyList()));
         assertThat(status).isEqualTo(DashboardClaimStatus.NO_STATUS);
+    }
+
+    @Test
+    void given_judgmentBufferDisabled_whenClaimantDefaultJudgmentIssued_thenReturnDefaultJudgementStatus() {
+        CaseData claim = getClaimWithDefaultJudgementRequest()
+            .toBuilder()
+            .activeJudgment(defaultJudgmentIssued())
+            .build();
+        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(false);
+
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                claim,
+                featureToggleService,
+                Collections.emptyList()
+            ));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT);
+    }
+
+    @Test
+    void given_judgmentBufferEnabled_whenClaimantDefaultJudgmentNotIssued_thenReturnDefaultJudgementStatus() {
+        CaseData claim = getClaimWithDefaultJudgementRequest();
+        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                claim,
+                featureToggleService,
+                Collections.emptyList()
+            ));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT);
+    }
+
+    @Test
+    void given_judgmentBufferEnabledAndActiveJudgmentIssued_whenCaseNotFinalOrders_thenReturnDefaultJudgementStatus() {
+        CaseData claim = getClaimWithDefaultJudgementRequest()
+            .toBuilder()
+            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
+            .activeJudgment(defaultJudgmentIssued())
+            .build();
+        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                claim,
+                featureToggleService,
+                Collections.emptyList()
+            ));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT);
+    }
+
+    @Test
+    void given_judgmentBufferEnabledAndActiveJudgmentIssued_whenClaimantGetStatus_thenReturnDefaultJudgementEnteredStatus() {
+        CaseData claim = getClaimWithDefaultJudgementRequest()
+            .toBuilder()
+            .activeJudgment(defaultJudgmentIssued())
+            .build();
+        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                claim,
+                featureToggleService,
+                Collections.emptyList()
+            ));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT_GRANTED);
     }
 
     @Test
@@ -568,6 +639,32 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
+    void givenClaimantRejectedPartAdmitRepaymentPlanAndFinalOrderIssued_whenGetStatus_thenReturnOrderMade() {
+        CaseData claim = CaseData.builder()
+            .respondent1(new Party().setType(Party.Type.INDIVIDUAL))
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(
+                RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
+            .ccdState(All_FINAL_ORDERS_ISSUED)
+            .build();
+        List<CaseEventDetail> eventHistory = new ArrayList<>(List.of(CaseEventDetail.builder()
+                                                                         .createdDate(LocalDateTime.now())
+                                                                         .id(CaseEvent.COURT_OFFICER_ORDER.name())
+                                                                         .build()));
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(
+            new CcdDashboardClaimantClaimMatcher(claim, featureToggleService, eventHistory));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.ORDER_MADE);
+
+        DashboardClaimStatus defendantStatus = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(
+            new CcdDashboardDefendantClaimMatcher(claim, featureToggleService, eventHistory));
+
+        assertThat(defendantStatus).isEqualTo(DashboardClaimStatus.ORDER_MADE);
+    }
+
+    @Test
     void givenClaimStatusInProcessHeritageSystem_WhenGetStatus_thenReturnDefendantPartAdmit() {
 
         CaseData claim = CaseData.builder()
@@ -843,6 +940,42 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
+    void givenCaseTakenOfflineFromJudgmentRequested_whenGetClaimantStatus_thenReturnResponseByPost() {
+        CaseData claim = CaseData.builder()
+            .takenOfflineDate(LocalDateTime.now())
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+            .previousCCDState(CaseState.JUDGMENT_REQUESTED)
+            .build();
+
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                claim,
+                featureToggleService,
+                Collections.emptyList()
+            ));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.RESPONSE_BY_POST);
+    }
+
+    @Test
+    void givenCaseTakenOfflineFromJudgmentRequested_whenGetDefendantStatus_thenReturnResponseByPost() {
+        CaseData claim = CaseData.builder()
+            .takenOfflineDate(LocalDateTime.now())
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+            .previousCCDState(CaseState.JUDGMENT_REQUESTED)
+            .build();
+
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+                claim,
+                featureToggleService,
+                Collections.emptyList()
+            ));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.RESPONSE_BY_POST);
+    }
+
+    @Test
     void given_defendantHasNoticeOfChange_whenGetStatus_thenReturnDefendantNoticeOfChangeApply() {
         CaseData claim = CaseData.builder().takenOfflineDate(LocalDateTime.now()).ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .businessProcess(new BusinessProcess()
@@ -879,7 +1012,7 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
-    void given_defaultJudgementStatusIssuedByClaimant_thenReturnDefaultJudgementStatus_WhenJOFlagIsOff() {
+    void givenDefaultJudgementDocumentExistsThenReturnDefaultJudgementStatus() {
         CaseData claim =
             CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
                 .defaultJudgmentDocuments(List.of(
@@ -943,5 +1076,21 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService, Collections.emptyList()));
         assertThat(status).isEqualTo(DashboardClaimStatus.CASE_DISCONTINUED);
+    }
+
+    private CaseData getClaimWithDefaultJudgementRequest() {
+        return CaseData.builder()
+            .ccdState(All_FINAL_ORDERS_ISSUED)
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
+            .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
+            .build();
+    }
+
+    private JudgmentDetails defaultJudgmentIssued() {
+        return new JudgmentDetails()
+            .setType(JudgmentType.DEFAULT_JUDGMENT)
+            .setIssueDate(LocalDate.now())
+            .setState(JudgmentState.ISSUED);
     }
 }

@@ -78,6 +78,18 @@ abstract class ElasticSearchServiceTest {
         assertThat(capturedQueries.get(1)).usingRecursiveComparison().isEqualTo(buildQuery(10));
     }
 
+    @Test
+    void shouldReturnElasticSearchResult_whenGetElasticSearchResultIsCalled() {
+        SearchResult searchResult = buildSearchResultWithTotalCases(1);
+
+        when(coreCaseDataService.searchCases(any())).thenReturn(searchResult);
+
+        var result = searchService.getElasticSearchResult();
+
+        assertThat(result.totalResults()).isEqualTo(1);
+        assertThat(result.caseDetailsStream()).hasSize(1);
+    }
+
     private SearchResult buildSearchResultWithTotalCases(int i) {
         return buildSearchResult(i, List.of(CaseDetails.builder().id(1L).build()));
     }

@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.PermissionGranted;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -149,7 +150,7 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
         }
 
         @Test
-        void shouldUpdateCaseWithoutStateChange_WhenPartDiscontinuanceAndAboutToSubmitIsInvoked() {
+        void shouldDiscontinueCase_WhenPartDiscontinuanceAndAboutToSubmitIsInvoked() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
@@ -161,10 +162,30 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
                 .handle(params);
             //Then
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
-            assertThat(response.getState()).isNull();
+            assertThat(response.getState()).isEqualTo(CaseState.CASE_DISCONTINUED.name());
             assertThat(updatedData.getConfirmOrderGivesPermission()).isEqualTo(ConfirmOrderGivesPermission.YES);
             assertThat(updatedData.getBusinessProcess().getCamundaEvent())
                 .isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
+        }
+
+        @Test
+        void shouldClearJoDataWhenJudgmentBufferEnabledAndPartDiscontinuanceDiscontinuesCase() {
+            when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setCcdState(CaseState.JUDGMENT_REQUESTED);
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
+            caseData.setConfirmOrderGivesPermission(ConfirmOrderGivesPermission.YES);
+            caseData.setJoRepaymentSummaryObject("jo-summary");
+            caseData.setJoState(JudgmentState.REQUESTED);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(response.getState()).isEqualTo(CaseState.CASE_DISCONTINUED.name());
+            assertThat(updatedData.getJoRepaymentSummaryObject()).isNull();
+            assertThat(updatedData.getJoState()).isNull();
         }
 
         @Test
@@ -227,6 +248,26 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             assertThat(response.getState()).isEqualTo(CaseState.CASE_DISCONTINUED.name());
             assertThat(updatedData.getBusinessProcess().getCamundaEvent())
                 .isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
+        }
+
+        @Test
+        void shouldClearJoDataWhenJudgmentBufferEnabledAndFullDiscontinuanceDiscontinuesCase() {
+            when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setCcdState(CaseState.JUDGMENT_REQUESTED);
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
+            caseData.setConfirmOrderGivesPermission(ConfirmOrderGivesPermission.YES);
+            caseData.setJoRepaymentSummaryObject("jo-summary");
+            caseData.setJoState(JudgmentState.REQUESTED);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(response.getState()).isEqualTo(CaseState.CASE_DISCONTINUED.name());
+            assertThat(updatedData.getJoRepaymentSummaryObject()).isNull();
+            assertThat(updatedData.getJoState()).isNull();
         }
 
         @Test

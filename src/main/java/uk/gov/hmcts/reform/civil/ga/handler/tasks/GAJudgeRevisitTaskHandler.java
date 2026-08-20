@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -30,9 +29,10 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_WRITTEN_REPRESE
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeMakeAnOrderOption.GIVE_DIRECTIONS_WITHOUT_HEARING;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeWrittenRepresentationsOptions.CONCURRENT_REPRESENTATIONS;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 @ConditionalOnExpression("${judge.revisit.check.event.emitter.enabled:true}")
 public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
@@ -44,6 +44,23 @@ public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final GaForLipService gaForLipService;
     private final DocUploadDashboardNotificationService dashboardNotificationService;
+
+    public GAJudgeRevisitTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        CaseStateSearchService caseStateSearchService,
+        GaCoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter,
+        GaForLipService gaForLipService,
+        DocUploadDashboardNotificationService dashboardNotificationService
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.caseStateSearchService = caseStateSearchService;
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.gaForLipService = gaForLipService;
+        this.dashboardNotificationService = dashboardNotificationService;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {

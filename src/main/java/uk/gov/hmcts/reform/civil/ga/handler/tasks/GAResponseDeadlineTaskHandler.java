@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -23,9 +22,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_STATE_TO_AWAIT
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPONDENT_RESPONSE_DEADLINE_CHECK;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_RESPONSE;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 @ConditionalOnExpression("${response.deadline.check.event.emitter.enabled:true}")
 public class GAResponseDeadlineTaskHandler extends BaseExternalTaskHandler {
@@ -35,6 +35,19 @@ public class GAResponseDeadlineTaskHandler extends BaseExternalTaskHandler {
     private final GaCoreCaseDataService coreCaseDataService;
 
     private final CaseDetailsConverter caseDetailsConverter;
+
+    public GAResponseDeadlineTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        CaseStateSearchService caseSearchService,
+        GaCoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.caseSearchService = caseSearchService;
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {

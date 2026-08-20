@@ -13,14 +13,13 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.DecisionOutcomeEvent;
-import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.DecisionOutcomeSearchService;
 
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -32,9 +31,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(SpringExtension.class)
 class DecisionOutcomeHandlerTest {
+
+    private static final String SCHEDULER_NAME = "DecisionOutcome";
 
     @Mock
     private ExternalTask mockTask;
@@ -47,6 +51,13 @@ class DecisionOutcomeHandlerTest {
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
+    @Mock
+    private FeatureToggleService featureToggleService;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
 
     @InjectMocks
     private DecisionOutcomeHandler handler;
@@ -81,6 +92,16 @@ class DecisionOutcomeHandlerTest {
     }
 
     @Test
+    void shouldNotRunCamundaHandlerWhenSpringSchedulerEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
+
+        handler.execute(mockTask, externalTaskService);
+
+        verifyNoInteractions(searchService, applicationEventPublisher);
+        verify(externalTaskService).complete(mockTask, null);
+    }
+
+    @Test
     void shouldCallHandleFailureMethod_whenExceptionFromBusinessLogic() {
         String errorMessage = "there was an error";
 
@@ -97,7 +118,7 @@ class DecisionOutcomeHandlerTest {
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(300000L)
+            anyLong()
         );
     }
 
@@ -108,9 +129,7 @@ class DecisionOutcomeHandlerTest {
         doThrow(new NotFoundException(errorMessage, new RestException("", "", 404)))
             .when(externalTaskService).complete(mockTask, null);
 
-        assertThrows(
-            CompleteTaskException.class,
-            () -> handler.execute(mockTask, externalTaskService));
+        handler.execute(mockTask, externalTaskService);
 
         verify(externalTaskService, never()).handleFailure(
             any(ExternalTask.class),
@@ -135,7 +154,7 @@ class DecisionOutcomeHandlerTest {
         String errorMessage = "there was an error";
 
         doThrow(new NullPointerException(errorMessage))
-            .when(applicationEventPublisher).publishEvent(eq(new DecisionOutcomeEvent(caseId)));
+            .when(applicationEventPublisher).publishEvent(new DecisionOutcomeEvent(caseId));
 
         handler.execute(mockTask, externalTaskService);
 
@@ -151,4 +170,11 @@ class DecisionOutcomeHandlerTest {
         verify(applicationEventPublisher).publishEvent(new DecisionOutcomeEvent(caseId));
         verify(applicationEventPublisher).publishEvent(new DecisionOutcomeEvent(otherId));
     }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }

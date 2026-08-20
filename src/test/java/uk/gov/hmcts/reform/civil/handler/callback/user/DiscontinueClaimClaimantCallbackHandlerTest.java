@@ -23,9 +23,11 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PermissionGranted;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 
@@ -50,6 +52,8 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @MockBean
     private CaseDetailsConverter caseDetailsConverter;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -293,10 +297,61 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Test
-        void shouldNotUpdateCaseState_WhenNotFullDiscontinue() {
+        void shouldUpdateCaseState_WhenNoCourtPermissionAndPartDiscontinue() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
             caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getState()).isEqualTo(CaseState.CASE_DISCONTINUED.name());
+        }
+
+        @Test
+        void shouldClearJoDataWhenJudgmentBufferEnabledAndCaseDiscontinued() {
+            given(featureToggleService.isJudgmentBufferEnabled()).willReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setCcdState(CaseState.JUDGMENT_REQUESTED);
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.FULL_DISCONTINUANCE);
+            caseData.setIsDiscontinuingAgainstBothDefendants(SettleDiscontinueYesOrNoList.YES);
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
+            caseData.setJoRepaymentSummaryObject("jo-summary");
+            caseData.setJoState(JudgmentState.REQUESTED);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(response.getState()).isEqualTo(CaseState.CASE_DISCONTINUED.name());
+            assertThat(updatedCaseData.getJoRepaymentSummaryObject()).isNull();
+            assertThat(updatedCaseData.getJoState()).isNull();
+        }
+
+        @Test
+        void shouldClearJoDataWhenJudgmentBufferEnabledAndPartDiscontinueDiscontinuesCase() {
+            given(featureToggleService.isJudgmentBufferEnabled()).willReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setCcdState(CaseState.JUDGMENT_REQUESTED);
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.NO);
+            caseData.setJoRepaymentSummaryObject("jo-summary");
+            caseData.setJoState(JudgmentState.REQUESTED);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(response.getState()).isEqualTo(CaseState.CASE_DISCONTINUED.name());
+            assertThat(updatedCaseData.getJoRepaymentSummaryObject()).isNull();
+            assertThat(updatedCaseData.getJoState()).isNull();
+        }
+
+        @Test
+        void shouldNotUpdateCaseState_WhenCourtPermissionNeededForPartDiscontinue() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setTypeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE);
+            caseData.setCourtPermissionNeeded(SettleDiscontinueYesOrNoList.YES);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

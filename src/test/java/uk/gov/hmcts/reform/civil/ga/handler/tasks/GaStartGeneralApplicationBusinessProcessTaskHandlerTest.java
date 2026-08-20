@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,6 +17,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
@@ -66,7 +67,6 @@ class GaStartGeneralApplicationBusinessProcessTaskHandlerTest {
     private CaseDetailsConverter caseDetailsConverter;
     @Mock
     private GaStateFlowEngine gaStateFlowEngine;
-    @InjectMocks
     private GaStartGeneralApplicationBusinessProcessTaskHandler handler;
     @Spy
     private ObjectMapper objectMapper = ObjectMapperFactory.instance();
@@ -75,6 +75,16 @@ class GaStartGeneralApplicationBusinessProcessTaskHandlerTest {
 
     @BeforeEach
     void init() {
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(3);
+        handler = new GaStartGeneralApplicationBusinessProcessTaskHandler(
+            new ExternalTaskCompletionService(),
+            eventProperties,
+            coreCaseDataService,
+            caseDetailsConverter,
+            objectMapper,
+            gaStateFlowEngine
+        );
         variables.putValue(FLOW_STATE, "MAIN.DRAFT");
         variables.putValue(FLOW_FLAGS, Map.of());
         when(mockTask.getTopicName()).thenReturn("test");

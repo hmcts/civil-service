@@ -11,14 +11,16 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.helpers.settlediscontinue.DiscontinueClaimHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -60,7 +62,7 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
         + "be updated for this claim.\n\n"
         + "Any updates will be sent by post.";
     private final ObjectMapper objectMapper;
-    private final CaseDetailsConverter caseDetailsConverter;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -211,9 +213,15 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
     }
 
     private String updateCaseState(CaseData caseData) {
-        if (DiscontinuanceTypeList.FULL_DISCONTINUANCE.equals(caseData.getTypeOfDiscontinuance())) {
-            boolean isNoCourtPermission = SettleDiscontinueYesOrNoList.NO.equals(caseData.getCourtPermissionNeeded());
-            if (isNoCourtPermission && isCaseDiscontinued(caseData)) {
+        boolean isNoCourtPermission = SettleDiscontinueYesOrNoList.NO.equals(caseData.getCourtPermissionNeeded());
+        if (isNoCourtPermission) {
+            if (DiscontinuanceTypeList.PART_DISCONTINUANCE.equals(caseData.getTypeOfDiscontinuance())
+                || (DiscontinuanceTypeList.FULL_DISCONTINUANCE.equals(caseData.getTypeOfDiscontinuance())
+                && isCaseDiscontinued(caseData))) {
+                if (featureToggleService.isJudgmentBufferEnabled()
+                    && CaseState.JUDGMENT_REQUESTED.equals(caseData.getCcdState())) {
+                    JudgmentsOnlineHelper.clearJOCaseData(caseData);
+                }
                 return CASE_DISCONTINUED.name();
             }
         }

@@ -16,12 +16,18 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.RequestForReconsiderationNotificationDeadlineSearchService;
 
 import java.util.Set;
 
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(SpringExtension.class)
 class RequestForReconsiderationNotificationDeadlineHandlerTest {
@@ -43,6 +49,13 @@ class RequestForReconsiderationNotificationDeadlineHandlerTest {
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
+    @Mock
+    private FeatureToggleService featureToggleService;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
 
     @InjectMocks
     private RequestForReconsiderationNotificationDeadlineHandler handler;
@@ -51,7 +64,21 @@ class RequestForReconsiderationNotificationDeadlineHandlerTest {
     void init() {
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
+        lenient().when(featureToggleService.isSpringSchedulerEnabled("RequestForReconsiderationNotification"))
+            .thenReturn(false);
 
+    }
+
+    @Test
+    void shouldNotProcessLegacyTaskWhenSpringSchedulerIsEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled("RequestForReconsiderationNotification"))
+            .thenReturn(true);
+
+        handler.execute(mockTask, externalTaskService);
+
+        verifyNoInteractions(searchService);
+        verifyNoInteractions(applicationEventPublisher);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test
@@ -69,4 +96,11 @@ class RequestForReconsiderationNotificationDeadlineHandlerTest {
         verify(applicationEventPublisher).publishEvent(new RequestForReconsiderationNotificationDeadlineEvent(caseId));
         verify(externalTaskService).complete(mockTask, null);
     }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }

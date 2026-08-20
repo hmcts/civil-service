@@ -154,7 +154,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
         requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant(callbackParams, caseData);
 
-        if (featureToggleService.isJudgmentOnlineLive() && JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData)) {
+        if (JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData)) {
             JudgmentDetails activeJudgmentDetails = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
             caseData.setActiveJudgment(activeJudgmentDetails);
             caseData.setJoIsLiveJudgmentExists(YES);

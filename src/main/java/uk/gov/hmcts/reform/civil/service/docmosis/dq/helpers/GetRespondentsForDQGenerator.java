@@ -28,12 +28,12 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @RequiredArgsConstructor
 public class GetRespondentsForDQGenerator {
 
-    private static final String organisationName = "Organisation name";
+    private static final String ORGANISATION_NAME = "Organisation name";
     private final RepresentativeService representativeService;
 
     public List<Party> getRespondents(CaseData caseData, String defendantIdentifier) {
 
-        var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : organisationName;
+        var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : ORGANISATION_NAME;
 
         if (isClaimantResponse(caseData)) {
 
@@ -54,15 +54,16 @@ public class GetRespondentsForDQGenerator {
             return respondents;
         }
 
-        if (respondent2HasSameLegalRep(caseData)) {
+        if (caseData.respondent2HasSameLegalRep()) {
             return handleRespondentWithSameLegalRep(caseData, defendantIdentifier, legalRepHeading);
         }
 
-        var respondent = isRespondent2(caseData) ? caseData.getRespondent2() : caseData.getRespondent1();
-        var respondentRepresentative = isRespondent2(caseData)
+        var isResp2 = isRespondent2(caseData);
+        var respondent = isResp2 ? caseData.getRespondent2() : caseData.getRespondent1();
+        var respondentRepresentative = isResp2
             ? representativeService.getRespondent2Representative(caseData)
             : representativeService.getRespondent1Representative(caseData);
-        var litigationFriend = isRespondent2(caseData)
+        var litigationFriend = isResp2
             ? caseData.getRespondent2LitigationFriend()
             : caseData.getRespondent1LitigationFriend();
 
@@ -203,35 +204,14 @@ public class GetRespondentsForDQGenerator {
     }
 
     private List<Party> getPartiesWhenSameLegalRepAndResponse(CaseData caseData, String legalRepHeading) {
-        var respondent1Party = getRespondent1Party(caseData, legalRepHeading);
 
-        var respondent2Party = new Party()
-            .setName(caseData.getRespondent2().getPartyName())
-            .setPrimaryAddress(caseData.getRespondent2().getPrimaryAddress())
-            .setEmailAddress(caseData.getRespondent2().getPartyEmail())
-            .setPhoneNumber(caseData.getRespondent2().getPartyPhone())
-            .setRepresentative(representativeService.getRespondent2Representative(caseData))
-            .setLitigationFriendName(
-                ofNullable(caseData.getRespondent2LitigationFriend())
-                    .map(LitigationFriend::getFullName)
-                    .orElse(""))
-            .setLitigationFriendFirstName(
-                ofNullable(caseData.getRespondent2LitigationFriend())
-                    .map(LitigationFriend::getFirstName)
-                    .orElse(""))
-            .setLitigationFriendLastName(
-                ofNullable(caseData.getRespondent2LitigationFriend())
-                    .map(LitigationFriend::getLastName)
-                    .orElse(""))
-            .setLitigationFriendPhoneNumber(ofNullable(caseData.getRespondent2LitigationFriend())
-                                             .map(LitigationFriend::getPhoneNumber)
-                                             .orElse(""))
-            .setLitigationFriendEmailAddress(ofNullable(caseData.getRespondent2LitigationFriend())
-                                              .map(LitigationFriend::getEmailAddress)
-                                              .orElse(""))
-            .setLegalRepHeading(legalRepHeading);
+        List<Party> parties = new ArrayList<>();
+        parties.add(getRespondent1Party(caseData, legalRepHeading));
+        if (caseData.getRespondent2() != null) {
+            parties.add(getRespondent2Party(caseData, legalRepHeading));
+        }
 
-        return List.of(respondent1Party, respondent2Party);
+        return parties;
     }
 
     private void proceedAgainstRespondent2(CaseData caseData, String legalRepHeading, List<Party> respondents) {
@@ -327,11 +307,6 @@ public class GetRespondentsForDQGenerator {
         return false;
     }
 
-    private boolean respondent2HasSameLegalRep(CaseData caseData) {
-        return caseData.getRespondent2SameLegalRepresentative() != null
-            && caseData.getRespondent2SameLegalRepresentative() == YES;
-    }
-
     private boolean isProceedingAgainstRespondent2(CaseData caseData) {
         return YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
     }
@@ -361,6 +336,34 @@ public class GetRespondentsForDQGenerator {
             .setLitigationFriendEmailAddress(ofNullable(caseData.getRespondent1LitigationFriend())
                                               .map(LitigationFriend::getEmailAddress)
                                               .orElse(""))
+            .setLegalRepHeading(legalRepHeading);
+    }
+
+    private Party getRespondent2Party(CaseData caseData, String legalRepHeading) {
+        return new Party()
+            .setName(caseData.getRespondent2().getPartyName())
+            .setPrimaryAddress(caseData.getRespondent2().getPrimaryAddress())
+            .setEmailAddress(caseData.getRespondent2().getPartyEmail())
+            .setPhoneNumber(caseData.getRespondent2().getPartyPhone())
+            .setRepresentative(representativeService.getRespondent2Representative(caseData))
+            .setLitigationFriendName(
+                ofNullable(caseData.getRespondent2LitigationFriend())
+                    .map(LitigationFriend::getFullName)
+                    .orElse(""))
+            .setLitigationFriendFirstName(
+                ofNullable(caseData.getRespondent2LitigationFriend())
+                    .map(LitigationFriend::getFirstName)
+                    .orElse(""))
+            .setLitigationFriendLastName(
+                ofNullable(caseData.getRespondent2LitigationFriend())
+                    .map(LitigationFriend::getLastName)
+                    .orElse(""))
+            .setLitigationFriendPhoneNumber(ofNullable(caseData.getRespondent2LitigationFriend())
+                                                .map(LitigationFriend::getPhoneNumber)
+                                                .orElse(""))
+            .setLitigationFriendEmailAddress(ofNullable(caseData.getRespondent2LitigationFriend())
+                                                 .map(LitigationFriend::getEmailAddress)
+                                                 .orElse(""))
             .setLegalRepHeading(legalRepHeading);
     }
 }

@@ -6,13 +6,13 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 
 import java.util.Map;
@@ -50,11 +51,20 @@ public class EndGaHwfNotifyProcessTaskHandlerTest {
     @Mock
     private ObjectMapper mapper;
 
-    @InjectMocks
     private EndGaHwfNotifyProcessTaskHandler handler;
 
     @BeforeEach
-    void init() {
+    void setUp() {
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(3);
+        handler = new EndGaHwfNotifyProcessTaskHandler(
+            new ExternalTaskCompletionService(),
+            eventProperties,
+            coreCaseDataService,
+            caseDetailsConverter,
+            mapper
+        );
+
         when(mockExternalTask.getTopicName()).thenReturn("test");
         when(mockExternalTask.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
 

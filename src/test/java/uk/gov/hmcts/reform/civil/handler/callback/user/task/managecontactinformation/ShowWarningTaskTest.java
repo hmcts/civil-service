@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.validation.PartyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
@@ -49,16 +48,13 @@ class ShowWarningTaskTest {
     private PartyValidator partyValidator;
 
     @Mock
-    private FeatureToggleService featureToggleService;
-
-    @Mock
     private PostcodeValidator postcodeValidator;
     private ObjectMapper mapper;
 
     @BeforeEach
     void setup() {
         mapper = new ObjectMapper();
-        handler = new ShowWarningTask(caseDetailsConverter, mapper, partyValidator, featureToggleService, postcodeValidator);
+        handler = new ShowWarningTask(caseDetailsConverter, mapper, partyValidator, postcodeValidator);
         mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
     }
 
@@ -72,6 +68,10 @@ class ShowWarningTaskTest {
         UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
         updateDetailsForm.setPartyChosen(dynamicList);
         Party applicant1 = new PartyBuilder().company().build();
+        Address address = new Address();
+        address.setPostCode("invalid");
+        applicant1.setPrimaryAddress(address);
+        applicant1.setPartyName("Claimant 1");
         Party respondent1 = new PartyBuilder().company().build();
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1(applicant1)
@@ -153,6 +153,8 @@ class ShowWarningTaskTest {
 
         when(caseDetailsConverter.toCaseData(caseDetailsBefore)).thenReturn(oldCaseData);
         when(postcodeValidator.validate(any())).thenReturn(List.of("Invalid postcode"));
+        when(partyValidator.validateAddress(any(Address.class), anyList())).thenAnswer(invocation -> invocation.getArgument(1));
+        when(partyValidator.validateName(any(), anyList())).thenAnswer(invocation -> invocation.getArgument(1));
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse)
             handler.showWarning(caseData, caseDetailsBefore);
@@ -161,8 +163,8 @@ class ShowWarningTaskTest {
     }
 
     @Test
-    void shouldValidateNameWhenFeatureToggleEnabled() {
-        // Given the feature toggle is enabled and name is too long
+    void shouldValidateNameWhenSpecClaim() {
+        // Given a SPEC claim and name is too long
         DynamicListElement dynamicListElement = new DynamicListElement();
         dynamicListElement.setCode(CLAIMANT_ONE_ID);
         DynamicList dynamicList = new DynamicList();
@@ -183,7 +185,6 @@ class ShowWarningTaskTest {
             .applicant1(applicant1)
             .build();
         uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetailsBefore = CaseDetails.builder().build();
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(partyValidator.validateName(caseData.getApplicant1().getPartyName(), List.of())).thenReturn(List.of("Name exceeds maximum length 70"));
         when(caseDetailsConverter.toCaseData(caseDetailsBefore)).thenReturn(oldCaseData);
 
@@ -195,8 +196,8 @@ class ShowWarningTaskTest {
     }
 
     @Test
-    void shouldValidateAddressWhenFeatureToggleEnabled() {
-        // Given the feature toggle is enabled and address is too long
+    void shouldValidateAddressWhenSpecClaim() {
+        // Given a SPEC claim and address is too long
         DynamicListElement dynamicListElement = new DynamicListElement();
         dynamicListElement.setCode(CLAIMANT_ONE_ID);
         DynamicList dynamicList = new DynamicList();
@@ -223,7 +224,6 @@ class ShowWarningTaskTest {
             .applicant1(applicant1)
             .build();
         uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetailsBefore = CaseDetails.builder().build();
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         List<String> errorList = List.of("exceeds maximum length 35");
         when(partyValidator.validateAddress(any(Address.class), anyList())).thenReturn(errorList);
         when(partyValidator.validateName(applicant1.getPartyName(), errorList)).thenReturn(errorList);

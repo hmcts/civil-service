@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -30,7 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,7 +45,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.RAISE_QUERY_LR;
 
 @ExtendWith(MockitoExtension.class)
-public class HearingScheduledNotificationServiceTest {
+class HearingScheduledNotificationServiceTest {
 
     @InjectMocks
     private HearingScheduledNotificationService hearingScheduledNotificationService;
@@ -66,21 +70,22 @@ public class HearingScheduledNotificationServiceTest {
     private static final LocalDate GA_HEARING_DATE_SAMPLE = LocalDate.now().plusDays(10);
     private static final LocalTime GA_HEARING_TIME_SAMPLE = LocalTime.of(15, 30, 0);
     private static final String DUMMY_EMAIL = "hmcts.civil@gmail.com";
+    private static final String LIP_RESPONDENT_EMAIL = "lip.respondent@example.com";
     private static final String PARTY_REFERENCE = "Claimant Reference: Not provided - Defendant Reference: Not provided";
     private static final String CUSTOM_PARTY_REFERENCE = "Claimant Reference: ABC limited - Defendant Reference: Defendant Ltd";
     private Map<String, String> customProp = new HashMap<>();
 
     @BeforeEach
     void setup() {
-        when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-        when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+        lenient().when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+        lenient().when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
                                                              + "\n For all other matters, call 0300 123 7050");
-        when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-        when(configuration.getWelshContact()).thenReturn("E-bost: ymholiadaucymraeg@justice.gov.uk");
-        when(configuration.getSpecContact()).thenReturn("Email: contactocmc@justice.gov.uk");
-        when(configuration.getWelshHmctsSignature()).thenReturn("Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
-        when(configuration.getWelshPhoneContact()).thenReturn("Ffôn: 0300 303 5174");
-        when(configuration.getWelshOpeningHours()).thenReturn("Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
+        lenient().when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+        lenient().when(configuration.getWelshContact()).thenReturn("E-bost: ymholiadaucymraeg@justice.gov.uk");
+        lenient().when(configuration.getSpecContact()).thenReturn("Email: contactocmc@justice.gov.uk");
+        lenient().when(configuration.getWelshHmctsSignature()).thenReturn("Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
+        lenient().when(configuration.getWelshPhoneContact()).thenReturn("Ffôn: 0300 303 5174");
+        lenient().when(configuration.getWelshOpeningHours()).thenReturn("Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
     }
 
     private Map<String, String> getNotificationDataMap(boolean customEmailReference) {
@@ -196,6 +201,94 @@ public class HearingScheduledNotificationServiceTest {
             getNotificationDataMap(false),
             "general-apps-notice-of-hearing-" + CASE_REFERENCE
         );
+    }
+
+    @Test
+    void notificationShouldNotSendToClaimantWhenClaimantSolicitorIsMissing() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
+            .generalAppApplnSolicitor(null)
+            .build();
+
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().ccdState(CaseState.CASE_PROGRESSION).build());
+        when(solicitorEmailValidation
+                 .validateSolicitorEmail(any(), any()))
+            .thenReturn(caseData);
+
+        GeneralApplicationCaseData returnedCaseData = hearingScheduledNotificationService.sendNotificationForClaimant(caseData);
+
+        assertSame(caseData, returnedCaseData);
+        verify(notificationService, never()).sendMail(any(), any(), any(), any());
+    }
+
+    @Test
+    void notificationShouldNotSendToDefendantWhenRespondentSolicitorsMissing() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
+            .generalAppRespondentSolicitors(null)
+            .build();
+
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().ccdState(CaseState.CASE_PROGRESSION).build());
+        when(solicitorEmailValidation
+                 .validateSolicitorEmail(any(), any()))
+            .thenReturn(caseData);
+
+        GeneralApplicationCaseData returnedCaseData = hearingScheduledNotificationService.sendNotificationForDefendant(caseData);
+
+        assertSame(caseData, returnedCaseData);
+        verify(notificationService, never()).sendMail(any(), any(), any(), any());
+    }
+
+    @Test
+    void notificationShouldSendToLipDefendantWhenRespondentSolicitorsMissing() {
+        when(gaForLipService.isLipApp(any())).thenReturn(false);
+        when(gaForLipService.isLipResp(any())).thenReturn(true);
+        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(gaForLipService.getDefendant1Email(any())).thenReturn(LIP_RESPONDENT_EMAIL);
+        when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                  + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+        when(notificationsProperties.getLipGeneralAppRespondentEmailTemplate())
+            .thenReturn("ga-notice-of-hearing-respondent-template-id");
+
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
+            .isGaApplicantLip(NO)
+            .isGaRespondentOneLip(YES)
+            .parentClaimantIsApplicant(YES)
+            .generalAppRespondentSolicitors(null)
+            .defendant2PartyName(null)
+            .build();
+        GeneralApplicationCaseData civilCaseData = new GeneralApplicationCaseData()
+            .defendantUserDetails(new IdamUserDetails().setEmail(LIP_RESPONDENT_EMAIL))
+            .build();
+
+        when(solicitorEmailValidation
+                 .validateSolicitorEmail(any(), any()))
+            .thenReturn(caseData);
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(civilCaseData);
+
+        hearingScheduledNotificationService.sendNotificationForDefendant(caseData);
+
+        verify(notificationService, times(1)).sendMail(
+            LIP_RESPONDENT_EMAIL,
+            "ga-notice-of-hearing-respondent-template-id",
+            getNotificationDataMapLip(NO, YES),
+            "general-apps-notice-of-hearing-" + CASE_REFERENCE
+        );
+    }
+
+    @Test
+    void notificationShouldNotSendToDefendantWhenRespondentSolicitorsEmpty() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
+            .generalAppRespondentSolicitors(List.of())
+            .build();
+
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().ccdState(CaseState.CASE_PROGRESSION).build());
+        when(solicitorEmailValidation
+                 .validateSolicitorEmail(any(), any()))
+            .thenReturn(caseData);
+
+        GeneralApplicationCaseData returnedCaseData = hearingScheduledNotificationService.sendNotificationForDefendant(caseData);
+
+        assertSame(caseData, returnedCaseData);
+        verify(notificationService, never()).sendMail(any(), any(), any(), any());
     }
 
     @Test

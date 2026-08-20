@@ -56,17 +56,93 @@ spring:
     table: schema_version
     baseline-on-migrate: true
 
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connectTimeout: ${HTTP_CONNECT_TIMEOUT:5000}
+            readTimeout: ${HTTP_READ_TIMEOUT:30000}
+          core-case-data-api:
+            readTimeout: ${CORE_CASE_DATA_API_READ_TIMEOUT:25000} # ccd-data-store-api
+          ccd-access-data-store-api:
+            readTimeout: ${CASE_ACCESS_DATA_STORE_API_READ_TIMEOUT:25000} # ccd-data-store-api
+          cmc-claim-store:
+            readTimeout: ${CMC_CLAIM_STORE_API_READ_TIMEOUT:25000}
+          core-case-event-api:
+            readTimeout: ${CORE_CASE_EVENT_API_READ_TIMEOUT:25000}
+
 scheduler:
+  active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:JudgementBuffer}
   circuitBreakerThreshold: ${CIRCUIT_BREAKER_THRESHOLD:5}
   lockAtLeastFor: ${LOCK_AT_LEAST_FOR:PT1M}
-  lockAtMostFor: ${LOCK_AT_MOST_FOR:PT5M}
-  defaultLockAtMostFor: ${DEFAULT_LOCK_AT_MOST_FOR:PT10M}
-  judgementBuffer:
+  lockAtMostFor: ${LOCK_AT_MOST_FOR:PT30M}
+  defaultLockAtMostFor: ${DEFAULT_LOCK_AT_MOST_FOR:PT30M}
+  judgement-buffer:
     cronExpression: ${CRON_EXPRESSION_JUDGEMENT_BUFFER:0 0 2 * * *}
     enabled: ${SCHEDULER_ENABLED_JUDGEMENT_BUFFER:false}
-  defendantResponse:
+  defendant-response:
     cronExpression: ${CRON_EXPRESSION_DEFENDANT_RESPONSE:0 1 16 * * ?}
     enabled: ${SCHEDULER_ENABLED_DEFENDANT_RESPONSE:false}
+  settlement-no-response-from-defendant-check:
+    cronExpression: ${CRON_EXPRESSION_SETTLEMENT_NO_RESPONSE_FROM_DEFENDANT_CHECK:0 0 1 * * ?}
+  full-admit-pay-immediately-no-payment-from-def:
+    cronExpression: ${CRON_EXPRESSION_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF:0 0 0 * * ?}
+    enabled: ${SCHEDULER_ENABLED_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF:false}
+  hearing-fee:
+    cronExpression: ${CRON_EXPRESSION_HEARING_FEE:0 0 0 * * ?}
+    enabled: ${SCHEDULER_ENABLED_HEARING_FEE:false}
+  evidence-upload:
+    cronExpression: ${CRON_EXPRESSION_EVIDENCE_UPLOAD:0 30 17 * * ?}
+    enabled: ${SCHEDULER_ENABLED_EVIDENCE_UPLOAD:false}
+  bundle-creation:
+    cronExpression: ${CRON_EXPRESSION_BUNDLE_CREATION:0 0 21 * * ?}
+  hearing-cvp-link:
+    cronExpression: ${CRON_EXPRESSION_HEARING_CVP_LINK:0 50 0 * * ?}
+  polling-event-emitter:
+    cronExpression: ${CRON_EXPRESSION_POLLING_EVENT_EMITTER:0 0 8-20 * * ?}
+  automated-hearing-notice:
+    cronExpression: ${CRON_EXPRESSION_AUTOMATED_HEARING_NOTICE:0 0 0,12 * * ?}
+    serviceIds: ${AUTOMATED_HEARING_NOTICE_SERVICE_IDS:AAA6,AAA7}
+  mediation-file-transfer:
+    cronExpression: ${CRON_EXPRESSION_MEDIATION_FILE_TRANSFER:0 0 1 * * ?}
+  take-case-offline:
+    cronExpression: ${CRON_EXPRESSION_TAKE_CASE_OFFLINE:0 1 16 * * ?}
+  trial-ready-notification:
+    cronExpression: ${CRON_EXPRESSION_TRIAL_READY_NOTIFICATION:0 20 0 * * ?}
+  trial-ready-check:
+    cronExpression: ${CRON_EXPRESSION_TRIAL_READY_CHECK:0 30 0 * * ?}
+  order-review-obligation-check:
+    cronExpression: ${CRON_EXPRESSION_ORDER_REVIEW_OBLIGATION_CHECK:0 10 1 * * ?}
+  decision-outcome:
+    cronExpression: ${CRON_EXPRESSION_DECISION_OUTCOME:0 40 0 * * ?}
+  case-dismissed:
+    cronExpression: ${CRON_EXPRESSION_CASE_DISMISSED:0 0 0 * * ?}
+  claim-details-notification-deadline:
+    cronExpression: ${CRON_EXPRESSION_CLAIM_DETAILS_NOTIFICATION_DEADLINE:0 1 16 * * ?}
+  ga-document-upload-notify:
+    cronExpression: ${CRON_EXPRESSION_GA_DOCUMENT_UPLOAD_NOTIFY:0 0 23 * * ?}
+  ga-proof-of-debt:
+    cronExpression: ${CRON_EXPRESSION_GA_PROOF_OF_DEBT:0 0 16 * * ?}
+  ga-order-made:
+    cronExpression: ${CRON_EXPRESSION_GA_ORDER_MADE:0 15 16 * * ?}
+  ga-unless-order:
+    cronExpression: ${CRON_EXPRESSION_GA_UNLESS_ORDER:0 0 16 * * ?}
+  request-for-reconsideration-notification:
+    cronExpression: ${CRON_EXPRESSION_REQUEST_FOR_RECONSIDERATION_NOTIFICATION:0 10 0 * * ?}
+  manage-stay-wa-task:
+    cronExpression: ${CRON_EXPRESSION_MANAGE_STAY_WA_TASK:0 20 1 * * ?}
+  default-back-pressure:
+    initialDelay: ${DEFAULT_BACK_PRESSURE_INITIAL_DELAY:PT0S}
+    maxDelay: ${DEFAULT_BACK_PRESSURE_MAX_DELAY:PT10S}
+    delayIncreaseOnFailure: ${DEFAULT_BACK_PRESSURE_DELAY_INCREASE_ON_FAILURE:PT0.5S}
+    delayIncreaseOnSlowCase: ${DEFAULT_BACK_PRESSURE_DELAY_INCREASE_ON_SLOW_CASE:PT0.25S}
+    delayReductionOnSuccess: ${DEFAULT_BACK_PRESSURE_DELAY_REDUCTION_ON_SUCCESS:PT0.1S}
+    slowCaseThreshold: ${DEFAULT_BACK_PRESSURE_SLOW_CASE_THRESHOLD:PT2S}
+
+search:
+  judgement-buffer:
+    pageSize: ${SEARCH_PAGE_SIZE_JUDGEMENT_BUFFER:50}
 
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
@@ -425,6 +501,7 @@ notifications:
   notifyRespondentLiPMediationSuccessfulTemplate: "9acfd1df-cccc-4490-9983-41bd04e53f13"
   notifyRespondentLiPMediationSuccessfulTemplateWelsh: "90541017-49c9-4e05-9195-d146aeea1f99"
   notifyDefendantLIPClaimantSettleTheClaimTemplate: "38cc4b02-90f4-4fae-adf3-6f7d9b80ee51"
+  notifyDefendantLIPClaimantSettleTheClaimTemplateWelsh: "ca8a8101-94fa-4586-82d3-0e172f234260"
   notifyDefendantLRClaimantSettleTheClaimTemplate: "034573ca-fece-4ed5-bdb6-4f39065bf60a"
 
   notifyLipUpdateTemplate: "edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf"
@@ -616,9 +693,9 @@ http:
     connectTimeout: ${HTTP_CONNECT_TIMEOUT:5000}
     requestTimeout: ${HTTP_REQUEST_TIMEOUT:10000}
     readTimeout: ${HTTP_READ_TIMEOUT:30000}
-    maxPerRoute: ${HTTP_MAX_PER_ROUTE:10}
-    maxTotal: ${HTTP_MAX_TOTAL:50}
-    threshold: 15000
+    maxPerRoute: ${HTTP_MAX_PER_ROUTE:20}
+    maxTotal: ${HTTP_MAX_TOTAL:75}
+    threshold: 10000
 
 court-location:
   specified-claim:
@@ -672,8 +749,12 @@ async:
     corePoolSize: ${ASYNC_HANDLER_CORE_POOL_SIZE:25}
     maxPoolSize: ${ASYNC_HANDLER_MAX_POOL_SIZE:50}
     queueCapacity: ${ASYNC_HANDLER_QUEUE_CAPACITY:500}
-    lock-duration: ${ASYNC_HANDLER_LOCK_DURATION:1980000}
-    event-dispatch-delay: ${ASYNC_HANDLER_EVENT_DISPATCH_DELAY:1800}
+  event:
+    lockDuration: ${EVENT_LOCK_DURATION:1980000}
+    responseTimeout: ${EVENT_RESPONSE_TIMEOUT:29500}
+    retryCount: ${EVENT_RETRY_COUNT:3}
+    backoffDelay: ${EVENT_BACKOFF_DELAY:300000}
+    dispatchDelay: ${EVENT_DISPATCH_DELAY:1900}
 
 feign:
   client:
@@ -681,6 +762,8 @@ feign:
       processInstance:
         url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
       historicProcessInstance:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      history:
         url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
       processDefinition:
         url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}

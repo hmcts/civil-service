@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.hmc.model.hearing.ListAssistCaseStatus;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
+import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
@@ -82,37 +83,37 @@ public class HearingNoticeSchedulerEventHandler {
             return;
         }
 
-        PartiesNotifiedResponse notifiedResponse = getLatestPartiesNotifiedResponse(hearingId);
+        PartiesNotifiedResponses partiesNotified = getPartiesNotifiedResponses(hearingId);
+        PartiesNotifiedResponse notifiedResponse = HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
         Integer notifiedVersion = notifiedResponse != null ? notifiedResponse.getRequestVersion() : null;
         LocalDateTime notifiedRxDateTime = notifiedResponse != null ? notifiedResponse.getResponseReceivedDateTime() : null;
         PartiesNotifiedServiceData notifiedServiceData = (notifiedResponse != null && notifiedResponse.getServiceData() != null)
             ? notifiedResponse.getServiceData() : new PartiesNotifiedServiceData();
 
-        boolean hearingDataChanged = HmcDataUtils.hearingDataChanged(notifiedResponse, hearing);
+        boolean requiresNewHearingNotice = HmcDataUtils.requiresNewHearingNotice(notifiedResponse, hearing);
+        boolean alreadyNotified = HmcDataUtils.hasAlreadyNotifiedResponse(
+            partiesNotified, hearingVersion, hearingRxDateTime);
         log.info(
-            "Hearing [{}] requested Version [{}], response RxDate [{}], notified Version [{}], notified RxDate [{}], hearing data changed [{}].",
+            "Hearing [{}] requested Version [{}], response RxDate [{}], notified Version [{}], notified RxDate [{}], "
+                + "requires new hearing notice [{}], already notified [{}].",
             hearingId,
             hearingVersion,
             hearingRxDateTime,
             notifiedVersion,
             notifiedRxDateTime,
-            hearingDataChanged
+            requiresNewHearingNotice,
+            alreadyNotified
         );
 
-        if (!hearingDataChanged) {
-            // HMC already has a record that matches the current schedule of the hearing
-            if (notifiedVersion == null || notifiedVersion < hearingVersion) {
-                try {
-                    log.info("Updating parties notified for unchanged hearing [{}] from version [{}] to [{}].",
-                             hearingId, notifiedVersion, hearingVersion);
-                    // Acknowledge and mark hearing as "processed" for current version
-                    notifyHmc(hearingId, hearing, notifiedServiceData);
-                } catch (Exception ex) {
-                    log.warn("HMC update failed for unchanged hearing [{}] from version [{}] to [{}]. Reason: {}",
-                        hearingId, notifiedVersion, hearingVersion, ex.getMessage()
-                    );
-                }
-            }
+        if (alreadyNotified) {
+            log.info("Skipping hearing id: [{}] already notified for this version [{}]",
+                     hearingId, hearingVersion);
+            return;
+        }
+
+        if (!requiresNewHearingNotice) {
+            acknowledgeUnchangedHearing(
+                hearingId, hearing, hearingVersion, hearingRxDateTime, notifiedServiceData);
             return;
         }
 
@@ -129,23 +130,40 @@ public class HearingNoticeSchedulerEventHandler {
             return;
         }
 
-        if (notifiedRxDateTime != null && hearingRxDateTime != null && !notifiedRxDateTime.isBefore(hearingRxDateTime)) {
-            log.info("Skipping hearing id: [{}] already notified for this version [{}]",
-                     hearingId, hearingVersion);
-            return;
-        }
-
         log.info("Updating parties notified for changed hearing [{}].", hearingId);
         // Acknowledge and mark a hearing as "processed" in HMC without generating a notice
         notifyHmc(hearingId, hearing, notifiedServiceData);
     }
 
-    private static boolean isAllowedState(String state, String caseReferene) {
+    private void acknowledgeUnchangedHearing(String hearingId, HearingGetResponse hearing, int hearingVersion,
+                                             LocalDateTime hearingRxDateTime,
+                                             PartiesNotifiedServiceData notifiedServiceData) {
+        try {
+            log.info(
+                "Updating parties notified for unchanged hearing [{}], version [{}], response RxDate [{}].",
+                hearingId,
+                hearingVersion,
+                hearingRxDateTime
+            );
+            // Acknowledge and mark the current HMC hearing response as "processed".
+            notifyHmc(hearingId, hearing, notifiedServiceData);
+        } catch (Exception ex) {
+            log.warn(
+                "HMC update failed for unchanged hearing [{}], version [{}], response RxDate [{}]. Reason: {}",
+                hearingId,
+                hearingVersion,
+                hearingRxDateTime,
+                ex.getMessage()
+            );
+        }
+    }
+
+    private static boolean isAllowedState(String state, String caseReference) {
         try {
             CaseState caseState = CaseState.valueOf(state);
             return !Arrays.asList(DISALLOWED_CASE_STATES).contains(caseState);
         } catch (IllegalArgumentException e) {
-            log.info("Case state is not a valid one {} ", caseReferene);
+            log.info("Case state is not a valid one {} ", caseReference);
             return false;
         }
     }
@@ -176,9 +194,8 @@ public class HearingNoticeSchedulerEventHandler {
         );
     }
 
-    private PartiesNotifiedResponse getLatestPartiesNotifiedResponse(String hearingId) {
-        var partiesNotified = hearingsService.getPartiesNotifiedResponses(
+    private PartiesNotifiedResponses getPartiesNotifiedResponses(String hearingId) {
+        return hearingsService.getPartiesNotifiedResponses(
             getSystemUpdateUser().getUserToken(), hearingId);
-        return HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
     }
 }

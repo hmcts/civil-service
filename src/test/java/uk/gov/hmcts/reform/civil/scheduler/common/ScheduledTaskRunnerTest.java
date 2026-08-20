@@ -9,14 +9,17 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
-import uk.gov.hmcts.reform.civil.service.search.ElasticSearchService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
-import java.util.LinkedHashSet;
+import java.time.Duration;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Stream;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -24,100 +27,147 @@ import static org.mockito.Mockito.when;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ScheduledTaskRunnerTest {
 
-    @Mock
-    private ElasticSearchService searchService;
+    private static final String SCHEDULER_NAME = "JudgmentBuffer";
 
     @Mock
-    private ScheduledTask scheduledTask;
+    private ScheduledTask<CaseDetails, Long> scheduledTask;
 
     @Mock
     private ScheduledEventTracker scheduledEventTracker;
 
     @Mock
-    private ScheduledTaskProcessor scheduledTaskProcessor;
+    private ScheduledTaskProcessor<CaseDetails, Long> scheduledTaskProcessor;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @InjectMocks
-    private ScheduledTaskRunner scheduledTaskRunner;
+    private ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
+
+    @Test
+    void shouldRunScheduledTask_whenFeatureToggleIsEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
+        CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
+        ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1), 1);
+        ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(List.of(1L), List.of(), false, "", Duration.ZERO);
+
+        when(scheduledTaskProcessor.performProcessing(any(), eq(scheduledTask), eq(searchResult)))
+            .thenReturn(outcome);
+
+        scheduledTaskRunner.run(SCHEDULER_NAME, () -> searchResult, scheduledTask);
+
+        verify(featureToggleService).isSpringSchedulerEnabled(SCHEDULER_NAME);
+        verify(scheduledEventTracker).jobStartedEvent(any(), eq(1));
+    }
+
+    @Test
+    void shouldNotRunScheduledTask_whenFeatureToggleIsDisabled() {
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(false);
+
+        scheduledTaskRunner.run(SCHEDULER_NAME, () -> null, scheduledTask);
+
+        verify(featureToggleService).isSpringSchedulerEnabled(SCHEDULER_NAME);
+        verifyNoInteractions(scheduledTaskProcessor, scheduledEventTracker, scheduledTask);
+    }
 
     @Test
     void shouldAbort_whenCaseRetrievalFails() {
-        ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
-        RuntimeException exception = new RuntimeException("Search failed");
-        when(searchService.getCases()).thenThrow(exception);
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
+        ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
 
-        scheduledTaskRunner.run(eventConfig, searchService::getCases, scheduledTask);
+        scheduledTaskRunner.run(SCHEDULER_NAME, () -> null, scheduledTask);
 
-        verify(scheduledEventTracker).jobAbortedEvent(eq(eventConfig), eq("Search failed"));
+        verify(scheduledEventTracker).jobAbortedEvent(eventConfig, "SearchResult cannot be null");
         verifyNoMoreInteractions(scheduledTask);
     }
 
     @Test
-    void shouldHandleNullCases_whenCaseRetrievalReturnsNull() {
-        ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
-        when(searchService.getCases()).thenReturn(null);
+    void shouldHandleZeroCases_whenTotalResultsIsZero() {
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
+        ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
+        ElasticSearchResult searchResult = new ElasticSearchResult(Stream.empty(), 0);
 
-        scheduledTaskRunner.run(eventConfig, searchService::getCases, scheduledTask);
+        scheduledTaskRunner.run(SCHEDULER_NAME, () -> searchResult, scheduledTask);
 
-        verify(scheduledEventTracker).jobStartedEvent(eq(eventConfig), eq(0));
-        verify(scheduledEventTracker).jobCompletedNoCasesEvent(eq(eventConfig));
-        verifyNoMoreInteractions(scheduledTask);
+        verify(scheduledEventTracker).jobStartedEvent(eventConfig, 0);
+        verify(scheduledEventTracker).jobCompletedNoCasesEvent(eventConfig);
+        verifyNoMoreInteractions(scheduledTaskProcessor);
+    }
+
+    @Test
+    void shouldHandleCases_whenCaseRetrievalIsSuccessful() {
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
+        ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
+        CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
+        ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1), 1);
+        ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(List.of(1L), List.of(), false, "", Duration.ZERO);
+
+        when(scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult))
+            .thenReturn(outcome);
+
+        scheduledTaskRunner.run(SCHEDULER_NAME, () -> searchResult, scheduledTask);
+
+        verify(scheduledEventTracker).jobStartedEvent(eventConfig, 1);
+        verify(scheduledTaskProcessor).performProcessing(eventConfig, scheduledTask, searchResult);
+        verify(scheduledEventTracker).jobCompletedEvent(eventConfig, 1, 1, 0, Duration.ZERO);
     }
 
     @Test
     void shouldRunProcessor_whenCasesPresent() {
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
-        Set<CaseDetails> cases = new LinkedHashSet<>(List.of(case1));
-        when(searchService.getCases()).thenReturn(cases);
+        ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1), 1);
 
-        ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
-        ScheduledTaskOutcome outcome = new ScheduledTaskOutcome(List.of(1L), List.of(), false, "");
+        ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
+        ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(List.of(1L), List.of(), false, "", Duration.ZERO);
 
-        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), eq(cases)))
+        when(scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult))
             .thenReturn(outcome);
 
-        scheduledTaskRunner.run(eventConfig, searchService::getCases, scheduledTask);
+        scheduledTaskRunner.run(SCHEDULER_NAME, () -> searchResult, scheduledTask);
 
-        verify(scheduledEventTracker).jobStartedEvent(eq(eventConfig), eq(1));
-        verify(scheduledTaskProcessor).performProcessing(eq(eventConfig), eq(scheduledTask), eq(cases));
-        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(cases.size()), eq(1), eq(0));
+        verify(scheduledTaskProcessor).performProcessing(eventConfig, scheduledTask, searchResult);
     }
 
     @Test
     void shouldAbortEarly_whenConsecutiveFailuresThresholdReached() {
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         CaseDetails case2 = CaseDetailsBuilder.builder().id(2L).build();
-        CaseDetails case3 = CaseDetailsBuilder.builder().id(3L).build();
-        CaseDetails case4 = CaseDetailsBuilder.builder().id(4L).build();
-        Set<CaseDetails> cases = new LinkedHashSet<>(List.of(case1, case2, case3, case4));
-        when(searchService.getCases()).thenReturn(cases);
+        ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1, case2), 2);
 
-        ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
-        ScheduledTaskOutcome outcome = new ScheduledTaskOutcome(List.of(), List.of(1L, 2L), true, "Error 2");
+        ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
+        ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(
+            List.of(),
+            List.of(1L, 2L),
+            true,
+            "Error 2",
+            Duration.ofMillis(100)
+        );
 
-        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), eq(cases)))
+        when(scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult))
             .thenReturn(outcome);
 
-        scheduledTaskRunner.run(eventConfig, searchService::getCases, scheduledTask);
+        scheduledTaskRunner.run(SCHEDULER_NAME, () -> searchResult, scheduledTask);
 
-        verify(scheduledEventTracker).jobAbortedEvent(eq(eventConfig), eq(cases.size()), eq(0), eq(2), eq("Error 2"));
+        verify(scheduledEventTracker).jobAbortedEvent(eventConfig, 2, 0, 2, "Error 2", Duration.ofMillis(100));
     }
 
     @Test
     void shouldNotAbortEarly_whenFailuresAreNotConsecutive() {
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         CaseDetails case2 = CaseDetailsBuilder.builder().id(2L).build();
-        CaseDetails case3 = CaseDetailsBuilder.builder().id(3L).build();
-        Set<CaseDetails> cases = new LinkedHashSet<>(List.of(case1, case2, case3));
-        when(searchService.getCases()).thenReturn(cases);
+        ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1, case2), 2);
 
-        ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
-        ScheduledTaskOutcome outcome = new ScheduledTaskOutcome(List.of(2L), List.of(1L, 3L), false, "");
+        ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
+        ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(List.of(1L), List.of(2L), false, "", Duration.ZERO);
 
-        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), eq(cases)))
+        when(scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult))
             .thenReturn(outcome);
 
-        scheduledTaskRunner.run(eventConfig, searchService::getCases, scheduledTask);
+        scheduledTaskRunner.run(SCHEDULER_NAME, () -> searchResult, scheduledTask);
 
-        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(cases.size()), eq(1), eq(2));
+        verify(scheduledEventTracker).jobCompletedEvent(eventConfig, 2, 1, 1, Duration.ZERO);
     }
 }

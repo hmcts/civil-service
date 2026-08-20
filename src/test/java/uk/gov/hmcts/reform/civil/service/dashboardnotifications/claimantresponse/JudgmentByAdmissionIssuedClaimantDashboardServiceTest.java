@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -36,8 +35,6 @@ class JudgmentByAdmissionIssuedClaimantDashboardServiceTest {
     private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private JudgmentByAdmissionIssuedClaimantDashboardService service;
@@ -49,7 +46,6 @@ class JudgmentByAdmissionIssuedClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioWhenIndividualJudgmentIssued() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         Party respondent1 = new Party();
         respondent1.setType(Party.Type.INDIVIDUAL);
@@ -76,7 +72,6 @@ class JudgmentByAdmissionIssuedClaimantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioWhenCompanyAcceptedRepaymentPlan() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         Party respondent1 = new Party();
         respondent1.setType(Party.Type.COMPANY);
@@ -100,27 +95,6 @@ class JudgmentByAdmissionIssuedClaimantDashboardServiceTest {
             eq("1234"),
             any(ScenarioRequestParams.class)
         );
-    }
-
-    @Test
-    void shouldNotRecordWhenToggleDisabled() {
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
-
-        Party respondent1 = new Party();
-        respondent1.setType(Party.Type.INDIVIDUAL);
-
-        JudgmentDetails activeJudgment = new JudgmentDetails();
-        activeJudgment.setState(JudgmentState.ISSUED);
-        activeJudgment.setType(JudgmentType.JUDGMENT_BY_ADMISSION);
-
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setApplicant1Represented(YesOrNo.NO);
-        caseData.setRespondent1(respondent1);
-        caseData.setActiveJudgment(activeJudgment);
-
-        service.notifyClaimant(caseData, AUTH_TOKEN);
-
-        verifyNoInteractions(dashboardScenariosService);
     }
 
     @Test

@@ -9,13 +9,14 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -23,7 +24,6 @@ import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDateTime;
@@ -67,10 +68,7 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
     private GaForLipService gaForLipService;
     @Mock
     private ExternalTask mockTask;
-    @InjectMocks
     private WaitCivilDocUpdatedTaskHandler waitCivilDocUpdatedTaskHandler;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     private GeneralApplicationCaseData gaCaseData;
     private GeneralApplicationCaseData civilCaseDataEmpty;
@@ -80,6 +78,16 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
 
     @BeforeEach
     void init() {
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(3);
+        waitCivilDocUpdatedTaskHandler = new WaitCivilDocUpdatedTaskHandler(
+            new ExternalTaskCompletionService(),
+            eventProperties,
+            coreCaseDataService,
+            caseDetailsConverter,
+            gaForLipService,
+            mapper
+        );
         CaseDocument caseDocumentNow = new CaseDocument().setDocumentName("current")
                 .setDocumentLink(new Document().setDocumentUrl("url")
                         .setDocumentFileName("filename").setDocumentHash("hash")
@@ -310,6 +318,19 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
 
         verify(coreCaseDataService).startGaUpdate(CASE_ID, WAIT_GA_DRAFT);
         verify(caseDetailsConverter).toGeneralApplicationCaseData(any());
+        ArgumentCaptor<CaseDataContent> caseDataContentCaptor = ArgumentCaptor.forClass(CaseDataContent.class);
+        verify(coreCaseDataService).submitGaUpdate(eq(CASE_ID), caseDataContentCaptor.capture());
+
+        GeneralApplicationCaseData updatedCaseData = mapper.convertValue(
+            caseDataContentCaptor.getValue().getData(),
+            GeneralApplicationCaseData.class
+        );
+        assertThat(updatedCaseData.getGaDraftDocument())
+            .extracting(element -> element.getValue().getDocumentName())
+            .containsExactly(
+                "Draft_application_2024-12-02 15:27:01.pdf",
+                "Translated_draft_application_2024-12-02 15:45:15.pdf"
+            );
     }
 
     public final CaseDocument pdfDocument = new CaseDocument()

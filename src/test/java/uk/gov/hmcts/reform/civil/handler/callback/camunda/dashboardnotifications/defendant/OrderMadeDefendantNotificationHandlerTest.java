@@ -16,7 +16,6 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -32,6 +31,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoReconsiderationDeadlineService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
@@ -83,7 +83,7 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
     private ObjectMapper objectMapper;
 
     @Mock
-    private WorkingDayIndicator workingDayIndicator;
+    private SdoReconsiderationDeadlineService reconsiderationDeadlineService;
     @Spy
     private SdoCaseClassificationService sdoCaseClassificationService = new SdoCaseClassificationService();
 
@@ -464,13 +464,14 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
             scenarioParams.put("orderDocument", "urlDirectionsOrder");
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
-            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
             caseData.setResponseClaimTrack("SMALL_CLAIM");
             caseData.setTotalClaimAmount(totalClaimAmount);
             caseData.setRespondent1Represented(YesOrNo.NO);
             caseData.setDecisionOnRequestReconsiderationOptions(decisionOnRequestReconsiderationOptions);
+            when(reconsiderationDeadlineService.isEligibleForReconsideration(caseData))
+                .thenReturn(!expectedScenario.startsWith("not "));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT.name())
@@ -507,7 +508,6 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
             caseData.setRespondent1Represented(YesOrNo.NO);
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
-            when(toggleService.isLocationWhiteListed(any())).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
@@ -533,38 +533,9 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
             caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
-            when(toggleService.isLocationWhiteListed(any())).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
-
-            handler.handle(params);
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-
-            // Then
-            verifyDeleteNotificationsAndTaskListUpdates(caseData);
-            verify(dashboardScenariosService).recordScenarios(
-                "BEARER_TOKEN",
-                "Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Defendant",
-                caseData.getCcdCaseReference().toString(),
-                new ScenarioRequestParams(scenarioParams)
-            );
-        }
-
-        @Test
-        void shouldRecordScenarioDefendantFinalOrderFastTrackNotReadyTrial_whenInvokedForNro() {
-            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
-            caseData.setRespondent1Represented(YesOrNo.NO);
-            caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
-            caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
-            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
-            when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
-            when(toggleService.isCuiGaNroEnabled()).thenReturn(true);
-            when(toggleService.isLocationWhiteListed(any())).thenReturn(false);
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                    CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
-                        .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build())
-                .build();
 
             handler.handle(params);
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -614,17 +585,6 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
             caseData.getCcdCaseReference().toString(),
             "DEFENDANT",
             "Applications"
-        );
-    }
-
-    private void verifyDeleteNotificationsAndTaskListUpdatesNotInEa(CaseData caseData) {
-        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
-            caseData.getCcdCaseReference().toString(),
-            "DEFENDANT"
-        );
-        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-            caseData.getCcdCaseReference().toString(),
-            "DEFENDANT"
         );
     }
 }

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.delegate.BpmnError;
@@ -14,7 +13,6 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -29,10 +27,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class WaitCivilDocUpdatedTaskHandler extends BaseExternalTaskHandler {
 
     protected static int maxWait = 10;
@@ -43,7 +42,21 @@ public class WaitCivilDocUpdatedTaskHandler extends BaseExternalTaskHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final GaForLipService gaForLipService;
     private final ObjectMapper mapper;
-    private final FeatureToggleService featureToggleService;
+
+    public WaitCivilDocUpdatedTaskHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        GaCoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter,
+        GaForLipService gaForLipService,
+        ObjectMapper mapper
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.gaForLipService = gaForLipService;
+        this.mapper = mapper;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -109,8 +122,7 @@ public class WaitCivilDocUpdatedTaskHandler extends BaseExternalTaskHandler {
                 }
             }
 
-            if (featureToggleService.isGaForWelshEnabled()
-                && (gaCaseData.isApplicantBilingual() || gaCaseData.isRespondentBilingual())
+            if ((gaCaseData.isApplicantBilingual() || gaCaseData.isRespondentBilingual())
                 && updatedDocuments.size() > 1) {
                 List<Element<CaseDocument>> translatedAppDocument = updatedDocuments.stream()
                     .filter(gaDocElement -> gaDocElement.getValue().getDocumentName()

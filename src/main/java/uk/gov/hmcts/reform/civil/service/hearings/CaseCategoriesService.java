@@ -13,12 +13,12 @@ import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseCategoryModel;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.utils.HmctsServiceIDUtils;
 
+import java.util.List;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.CollectorUtils.toSingleton;
 
 @Service
 @RequiredArgsConstructor
@@ -34,23 +34,52 @@ public class CaseCategoriesService {
 
     public CaseCategoryModel getCaseCategoriesFor(CategoryType categoryType, CaseData caseData, String authToken) {
         String hmctsServiceID = HmctsServiceIDUtils.getHmctsServiceID(caseData, paymentsConfiguration);
+        String allocatedTrack = getClaimTrack(caseData);
+        if (allocatedTrack == null) {
+            log.info(
+                "No claim track found for category search caseNumber={}, hmctsServiceID={}, categoryType={}",
+                caseData.getCcdCaseReference(), hmctsServiceID, categoryType
+            );
+            return null;
+        }
+
+        String categoryKey = String.format(CATEGORY_KEY, hmctsServiceID, allocatedTrack);
+        log.info("Searching for category allocatedTrack={}, categoryKey={}", allocatedTrack, categoryKey);
+
         Optional<CategorySearchResult> caseTypeResult = categoryService.findCategoryByCategoryIdAndServiceId(
             authToken,
             categoryType.getStringValueForQuery(),
             hmctsServiceID
         );
-
-        String allocatedTrack = getClaimTrack(caseData);
-        String categoryKey = String.format(CATEGORY_KEY, hmctsServiceID, allocatedTrack);
-        log.info("Searching for category caseNumber={}, hmctsServiceID={}, allocatedTrack={}, categoryKey={}, categoryType={}",
-                 caseData.getCcdCaseReference(), hmctsServiceID, allocatedTrack, categoryKey, categoryType);
-
         if (caseTypeResult.isPresent()) {
             CategorySearchResult categorySearchResult = caseTypeResult.get();
-            log.info("CategorySearchResult found with {} categories", categorySearchResult.getCategories() == null ? null : categorySearchResult.getCategories().size());
+            log.info(
+                "CategorySearchResult found with {} categories: {}",
+                categorySearchResult.getCategories() == null ? null : categorySearchResult.getCategories().size(),
+                categorySearchResult.getCategories()
+            );
 
-            Category categoryResult = categorySearchResult.getCategories().stream().filter(c -> c.getKey().equals(
-                categoryKey)).collect(toSingleton());
+            List<Category> matchingCategories = Optional.ofNullable(categorySearchResult.getCategories())
+                .orElseGet(List::of)
+                .stream()
+                .filter(c -> c.getKey().equals(categoryKey))
+                .toList();
+            if (matchingCategories.isEmpty()) {
+                log.warn(
+                    "Category not found caseNumber={}, allocatedTrack={}, categoryKey={}, categoryType={}",
+                    caseData.getCcdCaseReference(), allocatedTrack, categoryKey, categoryType
+                );
+                return null;
+            }
+
+            if (matchingCategories.size() > 1) {
+                throw new IllegalStateException(String.format(
+                    "Expected one category for categoryKey %s but found %d",
+                    categoryKey, matchingCategories.size()
+                ));
+            }
+
+            Category categoryResult = matchingCategories.get(0);
             log.info("Category found: parentKey={}, key={}", categoryResult.getParentKey(), categoryResult.getKey());
 
             CaseCategoryModel caseCategoryModel = new CaseCategoryModel();
@@ -59,6 +88,8 @@ public class CaseCategoriesService {
             caseCategoryModel.setCategoryValue(categoryResult.getKey());
             return caseCategoryModel;
         }
+
+        log.info("No Search Result found for category allocatedTrack={}, categoryKey={}", allocatedTrack, categoryKey);
         return null;
     }
 

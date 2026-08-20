@@ -9,10 +9,10 @@ import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDismissedHandler;
 @Component
 public class CaseDismissedExternalTaskListener {
 
-    private static final String TOPIC = "CASE_DISMISSED";
+    private static final String TOPIC = "CLAIM_DISMISSED_DEADLINE";
 
     @Autowired
-    private CaseDismissedExternalTaskListener(ClaimDismissedHandler claimDismissedHandler, ExternalTaskClient client) {
+    CaseDismissedExternalTaskListener(ClaimDismissedHandler claimDismissedHandler, ExternalTaskClient client) {
         TopicSubscriptionBuilder subscriptionBuilder = client.subscribe(TOPIC);
         subscriptionBuilder.handler(claimDismissedHandler).open();
     }

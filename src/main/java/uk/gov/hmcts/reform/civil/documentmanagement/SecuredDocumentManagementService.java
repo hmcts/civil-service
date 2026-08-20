@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.documentmanagement;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
@@ -44,6 +45,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
     protected static final int DOC_UUID_LENGTH = 36;
     protected static final String FILES_NAME = "files";
+    private static final String CDAM_FORBIDDEN_EXCEPTION = "ForbiddenException";
+    private static final String TTL_EXPIRED_MESSAGE = "TTL has expired";
 
     private final DocumentDownloadClientApi documentDownloadClientApi;
     private final AuthTokenGenerator authTokenGenerator;
@@ -158,6 +161,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     }
 
     @Retryable(retryFor = {DocumentDownloadException.class},
+        noRetryFor = {InvalidDocumentLinkException.class},
         maxAttempts = 5,
         backoff = @Backoff(delay = 1000, multiplier = 2))
     @Override
@@ -188,13 +192,22 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                 .map(ByteArrayResource.class::cast)
                 .map(ByteArrayResource::getByteArray)
                 .orElseThrow(RuntimeException::new);
+        } catch (DocumentDownloadException ex) {
+            throw ex;
         } catch (Exception ex) {
+            if (ex instanceof DocumentTtlExpiredException documentTtlExpiredException) {
+                throw documentTtlExpiredException;
+            }
+            if (isDocumentTtlExpired(ex)) {
+                throw new DocumentTtlExpiredException(documentPath, ex);
+            }
             log.error("Failed downloading document {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);
         }
     }
 
     @Retryable(retryFor = {DocumentDownloadException.class},
+        noRetryFor = {InvalidDocumentLinkException.class},
         maxAttempts = 5,
         backoff = @Backoff(delay = 1000, multiplier = 2))
     @Override
@@ -223,7 +236,15 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
             return new DownloadedDocumentResponse(responseEntity.getBody(), documentMetadata.originalDocumentName,
                                                   tika.detect(documentMetadata.originalDocumentName));
+        } catch (DocumentDownloadException ex) {
+            throw ex;
         } catch (Exception ex) {
+            if (ex instanceof DocumentTtlExpiredException documentTtlExpiredException) {
+                throw documentTtlExpiredException;
+            }
+            if (isDocumentTtlExpired(ex)) {
+                throw new DocumentTtlExpiredException(documentPath, ex);
+            }
             log.error("Failed downloading document {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);
         }
@@ -234,6 +255,8 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         log.info("Deleting document {}", documentPath);
         try {
             caseDocumentClientApi.deleteDocument(authorisation, authTokenGenerator.generate(), getDocumentIdFromSelfHref(documentPath), true);
+        } catch (DocumentDownloadException ex) {
+            throw ex;
         } catch (Exception ex) {
             log.error("Failed deleting document {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);
@@ -250,13 +273,28 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                 getDocumentIdFromSelfHref(documentPath)
             );
 
+        } catch (DocumentDownloadException ex) {
+            throw ex;
         } catch (Exception ex) {
+            if (isDocumentTtlExpired(ex)) {
+                throw new DocumentTtlExpiredException(documentPath, ex);
+            }
             log.error("Failed getting metadata for {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);
         }
     }
 
     private UUID getDocumentIdFromSelfHref(String selfHref) {
+        if (selfHref == null || selfHref.length() < DOC_UUID_LENGTH) {
+            log.error("Invalid document link, cannot extract document id: {}", selfHref);
+            throw new InvalidDocumentLinkException(selfHref);
+        }
         return UUID.fromString(selfHref.substring(selfHref.length() - DOC_UUID_LENGTH));
+    }
+
+    private boolean isDocumentTtlExpired(Exception ex) {
+        return ex instanceof FeignException.Forbidden feignException
+            && feignException.contentUTF8().contains(CDAM_FORBIDDEN_EXCEPTION)
+            && feignException.contentUTF8().contains(TTL_EXPIRED_MESSAGE);
     }
 }

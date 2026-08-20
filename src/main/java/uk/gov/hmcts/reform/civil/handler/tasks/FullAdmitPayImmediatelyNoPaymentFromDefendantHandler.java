@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
@@ -10,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.event.FullAdmitPayImmediatelyNoPaymentFromDefendantEvent;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService;
 
 import java.util.HashMap;
@@ -17,9 +17,10 @@ import java.util.Map;
 import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class FullAdmitPayImmediatelyNoPaymentFromDefendantHandler extends BaseExternalTaskHandler {
 
@@ -28,8 +29,31 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantHandler extends BaseEx
 
     private final CoreCaseDataService coreCaseDataService;
 
+    private static final String SCHEDULER_NAME = "FullAdmitPayImmediatelyNoPaymentFromDefendant";
+    private final FeatureToggleService featureToggleService;
+
+    public FullAdmitPayImmediatelyNoPaymentFromDefendantHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService caseSearchService,
+        ApplicationEventPublisher applicationEventPublisher,
+        CoreCaseDataService coreCaseDataService,
+        FeatureToggleService featureToggleService
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.caseSearchService = caseSearchService;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.coreCaseDataService = coreCaseDataService;
+        this.featureToggleService = featureToggleService;
+    }
+
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
+
+        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
+            return new ExternalTaskData();
+        }
+
         Set<CaseDetails> cases = caseSearchService.getCases();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
@@ -61,4 +85,5 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantHandler extends BaseEx
             eventDescription
         );
     }
+
 }

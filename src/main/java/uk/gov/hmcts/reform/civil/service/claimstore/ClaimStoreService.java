@@ -1,8 +1,13 @@
 package uk.gov.hmcts.reform.civil.service.claimstore;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.exceptions.RetryableClaimStoreException;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
@@ -24,22 +29,34 @@ public class ClaimStoreService {
     private final ClaimStoreApi claimStoreApi;
     private final DashboardClaimStatusFactory dashboardClaimStatusFactory;
 
+    @Retryable(retryFor = RetryableClaimStoreException.class, backoff = @Backoff(delay = 500))
     public List<DashboardClaimInfo> getClaimsForClaimant(String authorisation, String claimantId) {
         try {
             return translateCmcClaimToClaimInfo(claimStoreApi.getClaimsForClaimant(authorisation, claimantId));
+        } catch (FeignException.GatewayTimeout | FeignException.BadGateway | FeignException.ServiceUnavailable e) {
+            throw new RetryableClaimStoreException(e.getMessage(), e);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return Collections.emptyList();
         }
     }
 
+    @Retryable(retryFor = RetryableClaimStoreException.class, backoff = @Backoff(delay = 500))
     public List<DashboardClaimInfo> getClaimsForDefendant(String authorisation, String defendantId) {
         try {
             return translateCmcClaimToClaimInfo(claimStoreApi.getClaimsForDefendant(authorisation, defendantId));
+        } catch (FeignException.GatewayTimeout | FeignException.BadGateway | FeignException.ServiceUnavailable e) {
+            throw new RetryableClaimStoreException(e.getMessage(), e);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return Collections.emptyList();
         }
+    }
+
+    @Recover
+    public List<DashboardClaimInfo> recover(RetryableClaimStoreException ex) {
+        log.error(ex.getMessage(), ex);
+        return Collections.emptyList();
     }
 
     public DefendantLinkStatus isOcmcDefendantLinked(String caseReference) {

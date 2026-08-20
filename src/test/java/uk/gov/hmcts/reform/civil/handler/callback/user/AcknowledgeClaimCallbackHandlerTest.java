@@ -212,6 +212,26 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldSetIsRespondent1ToNo_whenRespondent1IsLipAndSolicitorRepresentsRespondent2Only() {
+            stubUserRoles(false, true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_1Lip_1Lr()
+                .respondent1Represented(NO)
+                .respondent2Represented(YES)
+                .respondent2OrgRegistered(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).containsEntry("isRespondent1", "No");
+        }
+
+        @Test
         void shouldNotReturnError_whenRespondent1AcknowledgeDateIsMissing() {
             stubUserRoles(true, false);
             CaseData caseData = CaseDataBuilder.builder()
@@ -637,6 +657,31 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .extracting("nextDeadline").isEqualTo(nextDeadline.toLocalDate().toString());
+        }
+
+        @Test
+        void shouldSetRespondent2AcknowledgementDetails_whenRespondent1IsLipAndSolicitorRepresentsRespondent2Only() {
+            stubCaseRoles(false, true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_1Lip_1Lr()
+                .respondent1Represented(NO)
+                .respondent2Represented(YES)
+                .respondent2OrgRegistered(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .respondent1Copy(new PartyBuilder().individual().build())
+                .respondent2Copy(new PartyBuilder().individual().build())
+                .respondent2ResponseDeadline(LocalDateTime.now())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .containsEntry("respondent2DocumentGeneration", "userRespondent2")
+                .containsEntry("respondent2ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
+                .containsEntry("respondent2AcknowledgeNotificationDate", acknowledgementDate.format(ISO_DATE_TIME));
+            assertThat(response.getData()).doesNotContainKey("respondent1AcknowledgeNotificationDate");
         }
 
         @Test

@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.scheduler.hearingfee.HearingFeeScheduler;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
@@ -37,6 +38,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(SpringExtension.class)
 class HearingFeeDueHandlerTest {
@@ -61,6 +65,11 @@ class HearingFeeDueHandlerTest {
 
     @Mock
     private FeatureToggleService featureToggleService;
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
 
     @InjectMocks
     private HearingFeeDueHandler handler;
@@ -69,7 +78,7 @@ class HearingFeeDueHandlerTest {
     void init() {
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
-
+        when(featureToggleService.isSpringSchedulerEnabled(HearingFeeScheduler.SCHEDULER_NAME)).thenReturn(false);
     }
 
     @Test
@@ -204,7 +213,7 @@ class HearingFeeDueHandlerTest {
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(300000L)
+            anyLong()
         );
     }
 
@@ -242,4 +251,31 @@ class HearingFeeDueHandlerTest {
             anyLong()
         );
     }
+
+    @Test
+    void shouldNotEmitNoHearingFeeDueEvent_whenSpringSchedulerEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled(HearingFeeScheduler.SCHEDULER_NAME)).thenReturn(true);
+
+        long caseId = 1L;
+        CaseData caseData = new CaseDataBuilder().atStateNoHearingFeeDue().build();
+        Map<String, Object> data = Map.of("data", caseData);
+        Set<CaseDetails> caseDetails = Set.of(new CaseDetailsBuilder().id(caseId).data(data).build());
+
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        when(searchService.getCases()).thenReturn(caseDetails);
+        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.iterator().next());
+        when(caseDetailsConverter.toCaseData(caseDetails.iterator().next())).thenReturn(caseData);
+
+        handler.execute(mockTask, externalTaskService);
+
+        verifyNoInteractions(applicationEventPublisher);
+        verify(externalTaskService).complete(mockTask, null);
+    }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }

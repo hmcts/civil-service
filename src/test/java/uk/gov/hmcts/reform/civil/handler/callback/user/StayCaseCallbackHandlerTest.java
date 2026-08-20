@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
@@ -24,10 +25,12 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STAY_CASE;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
 public class StayCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -90,6 +93,28 @@ public class StayCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData()).extracting("hearingDate").isNull();
             assertThat(response.getData()).extracting("hearingDueDate").isNull();
+        }
+
+        @Test
+        void shouldClearJoCaseData_WhenJudgmentBufferEnabledAndJoRequested() {
+            when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
+            caseData.setIsJoRequested(YES);
+            caseData.setJoDefendantName1("Defendant");
+            caseData.setJoState(JudgmentState.REQUESTED);
+            caseData.setHearingDate(LocalDate.now());
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params.getRequest().getCaseDetailsBefore().setState("CASE_PROGRESSION");
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).extracting("joDefendantName1").isNull();
+            assertThat(response.getData()).extracting("joState").isNull();
+            assertThat(response.getData()).extracting("hearingDate").isNull();
         }
 
         @Test

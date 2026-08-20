@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
@@ -18,11 +17,14 @@ import uk.gov.hmcts.reform.civil.service.search.OrderReviewObligationSearchServi
 
 import java.time.LocalDate;
 import java.util.Set;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class OrderReviewObligationCheckHandler extends BaseExternalTaskHandler {
+
+    private static final String SCHEDULER_NAME = "OrderReviewObligationCheck";
 
     private final OrderReviewObligationSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -30,8 +32,29 @@ public class OrderReviewObligationCheckHandler extends BaseExternalTaskHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final FeatureToggleService featureToggleService;
 
+    public OrderReviewObligationCheckHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        OrderReviewObligationSearchService caseSearchService,
+        ApplicationEventPublisher applicationEventPublisher,
+        CoreCaseDataService coreCaseDataService,
+        CaseDetailsConverter caseDetailsConverter,
+        FeatureToggleService featureToggleService
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.caseSearchService = caseSearchService;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.featureToggleService = featureToggleService;
+    }
+
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
+        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
+            return new ExternalTaskData();
+        }
+
         Set<CaseDetails> cases = caseSearchService.getCases();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
@@ -52,4 +75,5 @@ public class OrderReviewObligationCheckHandler extends BaseExternalTaskHandler {
         });
         return new ExternalTaskData();
     }
+
 }

@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.ga.model.GARespondentRepresentative;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -38,6 +37,7 @@ import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.GeneralAppLocationRefDataService;
 import uk.gov.hmcts.reform.civil.ga.utils.DocUploadUtils;
 import uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil;
+import uk.gov.hmcts.reform.civil.utils.CaseServiceUtil;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -82,7 +82,6 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
     private final GeneralAppLocationRefDataService locationRefDataService;
     private final CoreCaseDataService coreCaseDataService;
     private final GaForLipService gaForLipService;
-    private final FeatureToggleService featureToggleService;
     private final DocUploadDashboardNotificationService dashboardNotificationService;
 
     private static final String RESPONSE_MESSAGE = "# You have provided the requested information";
@@ -138,11 +137,12 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
             log.info("General app does not vary judgement type for caseId: {}", caseData.getCcdCaseReference());
         }
 
+        final String serviceId = CaseServiceUtil.getCaseServiceId(caseData);
         caseDataBuilder
             .hearingDetailsResp(
                 new GAHearingDetails()
                     .setHearingPreferredLocation(getLocationsFromList(locationRefDataService
-                                                                       .getCourtLocations(authToken))));
+                                                                       .getCourtLocations(authToken, serviceId))));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(applicationExistsValidation(callbackParams))
@@ -180,7 +180,7 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         // Generate Dashboard Notification for Lip Party
-        if (gaForLipService.isGaForLip(caseData) && !(featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual())) {
+        if (gaForLipService.isGaForLip(caseData) && !caseData.isApplicationBilingual()) {
 
             if (caseData.getParentClaimantIsApplicant().equals(YesOrNo.NO) && caseData.getGeneralAppType().getTypes().contains(
                 GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {

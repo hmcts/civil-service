@@ -16,11 +16,11 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.EvidenceUploadNotificationEvent;
-import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.scheduler.evidenceupload.EvidenceUploadScheduler;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.EvidenceUploadNotificationSearchService;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -33,6 +33,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(SpringExtension.class)
 class EvidenceUploadCheckHandlerTest {
@@ -49,6 +52,15 @@ class EvidenceUploadCheckHandlerTest {
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
+    @Spy
+    private EventProperties eventProperties = configuredEventProperties();
+
+    @Spy
+    private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
+
     @InjectMocks
     private EvidenceUploadCheckHandler handler;
 
@@ -56,6 +68,7 @@ class EvidenceUploadCheckHandlerTest {
     void init() {
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
+        when(featureToggleService.isSpringSchedulerEnabled(EvidenceUploadScheduler.SCHEDULER_NAME)).thenReturn(false);
     }
 
     @Test
@@ -107,7 +120,7 @@ class EvidenceUploadCheckHandlerTest {
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(300000L)
+            anyLong()
         );
     }
 
@@ -120,9 +133,7 @@ class EvidenceUploadCheckHandlerTest {
             .when(externalTaskService).complete(mockTask, null);
 
         // When: handler is called
-        assertThrows(
-            CompleteTaskException.class,
-            () -> handler.execute(mockTask, externalTaskService));
+        handler.execute(mockTask, externalTaskService);
 
         // Then: handle failure should not get called
         verify(externalTaskService, never()).handleFailure(
@@ -168,4 +179,29 @@ class EvidenceUploadCheckHandlerTest {
         verify(applicationEventPublisher).publishEvent(new EvidenceUploadNotificationEvent(caseId));
         verify(applicationEventPublisher).publishEvent(new EvidenceUploadNotificationEvent(otherId));
     }
+
+    @Test
+    void shouldNotEmitEvidenceUploadCheckEvent_WhenSpringSchedulerEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled(EvidenceUploadScheduler.SCHEDULER_NAME)).thenReturn(true);
+        // Given: one case found from search service
+        long caseId = 1L;
+        Map<String, Object> data = Map.of("data", "some data");
+        Set<CaseDetails> caseDetails = Set.of(new CaseDetailsBuilder().id(caseId).data(data).build());
+
+        given(searchService.getCases()).willReturn(caseDetails);
+
+        // When: handler is called
+        handler.execute(mockTask, externalTaskService);
+
+        // Then: task should not be completed
+        verifyNoInteractions(applicationEventPublisher);
+        verify(externalTaskService).complete(mockTask, null);
+    }
+
+    private static EventProperties configuredEventProperties() {
+        EventProperties properties = new EventProperties();
+        properties.setRetryCount(3);
+        return properties;
+    }
+
 }

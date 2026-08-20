@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,6 +19,7 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -47,6 +47,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.math.BigDecimal;
@@ -59,10 +60,12 @@ import java.util.UUID;
 
 import static java.time.LocalDate.EPOCH;
 import static java.util.Collections.singletonList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -112,7 +115,6 @@ public class CreateApplicationTaskHandlerTest {
     @Mock
     private GaStateFlowEngine gaStateFlowEngine;
 
-    @InjectMocks
     private CreateApplicationTaskHandler createApplicationTaskHandler;
 
     @Spy
@@ -120,21 +122,31 @@ public class CreateApplicationTaskHandlerTest {
 
     @BeforeEach
     void init() {
-        when(mockTask.getTopicName()).thenReturn("test");
+        EventProperties eventProperties = new EventProperties();
+        eventProperties.setRetryCount(3);
+        createApplicationTaskHandler = new CreateApplicationTaskHandler(
+            new ExternalTaskCompletionService(),
+            eventProperties,
+            coreCaseDataService,
+            caseDetailsConverter,
+            objectMapper,
+            gaStateFlowEngine
+        );
+        lenient().when(mockTask.getTopicName()).thenReturn("test");
 
         Map<String, Object> variables = Map.of(
             "caseId", CASE_ID,
             "caseEvent", CREATE_GENERAL_APPLICATION_CASE.name()
         );
 
-        when(mockTask.getAllVariables()).thenReturn(variables);
+        lenient().when(mockTask.getAllVariables()).thenReturn(variables);
 
         GaStateFlow stateFlow = mock(GaStateFlow.class);
         State state = mock(State.class);
-        when(state.getName()).thenReturn("MAIN.DRAFT");
-        when(stateFlow.getState()).thenReturn(state);
-        when(stateFlow.getFlags()).thenReturn(Map.of());
-        when(gaStateFlowEngine.evaluate(any(GeneralApplicationCaseData.class))).thenReturn(stateFlow);
+        lenient().when(state.getName()).thenReturn("MAIN.DRAFT");
+        lenient().when(stateFlow.getState()).thenReturn(state);
+        lenient().when(stateFlow.getFlags()).thenReturn(Map.of());
+        lenient().when(gaStateFlowEngine.evaluate(any(GeneralApplicationCaseData.class))).thenReturn(stateFlow);
     }
 
     @Nested
@@ -1029,6 +1041,11 @@ public class CreateApplicationTaskHandlerTest {
             .gaDetailsRespondentSolTwo(gaDetailsRespondentSolTwoList)
             .businessProcess(new BusinessProcess().setStatus(STARTED)
                                  .setProcessInstanceId(PROCESS_INSTANCE_ID)).build();
+    }
+
+    @Test
+    void shouldOnlyAttemptOnce() {
+        assertEquals(1, createApplicationTaskHandler.getMaxAttempts());
     }
 
     private OrganisationPolicy respondentOrganisationPolicy(String organisationId) {

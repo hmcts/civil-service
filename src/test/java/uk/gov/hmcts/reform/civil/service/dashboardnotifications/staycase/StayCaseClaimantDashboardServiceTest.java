@@ -4,11 +4,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_STAYED_JR_CANCELLED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
@@ -37,6 +41,8 @@ class StayCaseClaimantDashboardServiceTest {
     private TaskListService taskListService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private StayCaseClaimantDashboardService service;
@@ -44,6 +50,7 @@ class StayCaseClaimantDashboardServiceTest {
     @BeforeEach
     void setup() {
         when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
+        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(false);
     }
 
     @Test
@@ -63,6 +70,7 @@ class StayCaseClaimantDashboardServiceTest {
             "1234",
             new ScenarioRequestParams(new HashMap<>())
         );
+        verifyNoMoreInteractions(dashboardScenariosService);
     }
 
     @Test
@@ -83,6 +91,7 @@ class StayCaseClaimantDashboardServiceTest {
             eq("5678"),
             eq(new ScenarioRequestParams(new HashMap<>()))
         );
+        verifyNoMoreInteractions(dashboardScenariosService);
     }
 
     @Test
@@ -103,5 +112,49 @@ class StayCaseClaimantDashboardServiceTest {
             eq("5678"),
             eq(new ScenarioRequestParams(new HashMap<>()))
         );
+        verifyNoMoreInteractions(dashboardScenariosService);
+    }
+
+    @Test
+    void shouldRecordPrimaryAndJrCancelledStayScenarios_WhenJudgmentBufferEnabledAndJoRequested() {
+        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().build()
+            .setCcdCaseReference(4321L)
+            .setPreStayState("IN_MEDIATION");
+        caseData.setIsJoRequested(YES);
+
+        service.notifyStayCase(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            AUTH_TOKEN,
+            SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT.getScenario(),
+            "4321",
+            new ScenarioRequestParams(new HashMap<>())
+        );
+        verify(dashboardScenariosService).recordScenarios(
+            AUTH_TOKEN,
+            SCENARIO_AAA6_CASE_STAYED_JR_CANCELLED_CLAIMANT.getScenario(),
+            "4321",
+            new ScenarioRequestParams(new HashMap<>())
+        );
+        verifyNoMoreInteractions(dashboardScenariosService);
+    }
+
+    @Test
+    void shouldNotRecordJrCancelledStayScenario_WhenJudgmentBufferDisabledAndJoRequested() {
+        CaseData caseData = CaseDataBuilder.builder().build()
+            .setCcdCaseReference(4321L)
+            .setPreStayState("IN_MEDIATION");
+        caseData.setIsJoRequested(YES);
+
+        service.notifyStayCase(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            AUTH_TOKEN,
+            SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT.getScenario(),
+            "4321",
+            new ScenarioRequestParams(new HashMap<>())
+        );
+        verifyNoMoreInteractions(dashboardScenariosService);
     }
 }

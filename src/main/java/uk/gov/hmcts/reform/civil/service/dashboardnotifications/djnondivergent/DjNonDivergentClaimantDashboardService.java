@@ -3,13 +3,18 @@ package uk.gov.hmcts.reform.civil.service.dashboardnotifications.djnondivergent;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
+import java.util.Optional;
+
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFISLIP_JUDGMENT_REQUESTED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_GRANTED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType.DEFAULT_JUDGMENT;
 
 @Service
 public class DjNonDivergentClaimantDashboardService extends DashboardScenarioService {
@@ -32,7 +37,19 @@ public class DjNonDivergentClaimantDashboardService extends DashboardScenarioSer
         if (toggleService.isJudgmentBufferEnabled() && CaseState.JUDGMENT_REQUESTED.equals(caseData.getCcdState())) {
             return SCENARIO_AAA6_DEFISLIP_JUDGMENT_REQUESTED_CLAIMANT.getScenario();
         }
-        return SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_CLAIMANT.getScenario();
+        return isDefaultJudgmentGranted(caseData)
+            ? SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_GRANTED_CLAIMANT.getScenario()
+            : SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_CLAIMANT.getScenario();
+    }
+
+    private boolean isDefaultJudgmentGranted(CaseData caseData) {
+        return toggleService.isJudgmentBufferEnabled()
+            && caseData != null
+            && CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getCcdState())
+            && Optional.ofNullable(caseData.getActiveJudgment())
+            .map(activeJudgment -> DEFAULT_JUDGMENT.equals(activeJudgment.getType())
+                && JudgmentState.ISSUED.equals(activeJudgment.getState()))
+            .orElse(false);
     }
 
     @Override

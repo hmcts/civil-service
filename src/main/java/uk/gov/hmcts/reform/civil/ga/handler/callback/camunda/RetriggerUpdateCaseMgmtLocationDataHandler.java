@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.stereotype.Component;
@@ -10,13 +9,23 @@ import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 
 import static java.lang.Long.parseLong;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
 public class RetriggerUpdateCaseMgmtLocationDataHandler extends BaseExternalTaskHandler {
 
     private final GaCoreCaseDataService coreCaseDataService;
+
+    public RetriggerUpdateCaseMgmtLocationDataHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        GaCoreCaseDataService coreCaseDataService
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.coreCaseDataService = coreCaseDataService;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -55,4 +64,5 @@ public class RetriggerUpdateCaseMgmtLocationDataHandler extends BaseExternalTask
         }
         return new ExternalTaskData();
     }
+
 }
