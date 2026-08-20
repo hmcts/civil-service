@@ -26,6 +26,7 @@ import java.util.Map;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
 @RequiredArgsConstructor
@@ -117,6 +118,7 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
     private CallbackResponse updateBusinessProcessToReady(CallbackParams callbackParams) {
         CaseData data = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
         data.setBusinessProcess(BusinessProcess.ready(LIFT_BREATHING_SPACE_SPEC));
+        data.setBreathingSpaceLifted(YES);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(data.toMap(objectMapper))
