@@ -181,4 +181,65 @@ public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGeneratorTest {
         assertThat(updatedProperties).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, partyName);
     }
 
+    @Test
+    void shouldReturnTrueForShouldNotifyWhenRespondentIsLipAndApplicantDoesNotProceedWithClaim() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(NO)
+            .applicant1ProceedWithClaim(NO)
+            .build();
+
+        Boolean shouldNotify = emailDTOGenerator.getShouldNotify(caseData);
+
+        assertThat(shouldNotify).isTrue();
+    }
+
+    @Test
+    void shouldReturnTrueForShouldNotifyWhenRespondentIsLipAndClaimantIntendsToSettlePartAdmit() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(NO)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YES)
+            .build();
+
+        Boolean shouldNotify = emailDTOGenerator.getShouldNotify(caseData);
+
+        assertThat(shouldNotify).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalseForShouldNotifyWhenRespondentIsRepresentedAndApplicantDoesNotProceedWithClaim() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(YES)
+            .applicant1ProceedWithClaim(NO)
+            .build();
+
+        Boolean shouldNotify = emailDTOGenerator.getShouldNotify(caseData);
+
+        assertThat(shouldNotify).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalseForShouldNotifyWhenRespondentIsRepresentedAndClaimantIntendsToSettlePartAdmit() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(YES)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YES)
+            .build();
+
+        Boolean shouldNotify = emailDTOGenerator.getShouldNotify(caseData);
+
+        assertThat(shouldNotify).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalseForShouldNotifyWhenRespondentIsLipButNoNotifyConditionIsMet() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(NO)
+            .applicant1ProceedWithClaim(YES)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+            .build();
+
+        Boolean shouldNotify = emailDTOGenerator.getShouldNotify(caseData);
+
+        assertThat(shouldNotify).isFalse();
+    }
+
 }
