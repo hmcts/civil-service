@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
-import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
+import uk.gov.hmcts.reform.civil.service.search.hearingfee.HearingFeeDuePaginatedSearchService;
 
 @Component
 @RequiredArgsConstructor
@@ -19,7 +19,7 @@ public class HearingFeeScheduler implements CivilScheduler {
 
     public static final String SCHEDULER_NAME = "HearingFee";
 
-    private final HearingFeeDueSearchService searchService;
+    private final HearingFeeDuePaginatedSearchService searchService;
     private final ScheduledTaskRunner<CaseDetails, Long>  scheduledTaskRunner;
     private final HearingFeeSchedulerTask hearingFeeSchedulerTask;
 

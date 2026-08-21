@@ -22,7 +22,9 @@ import uk.gov.hmcts.test.config.CoreCaseDataApiMockHelperConfiguration;
 import uk.gov.hmcts.test.helper.CoreCaseDataApiMockHelper;
 
 import java.util.List;
+import java.util.Map;
 
+import static java.util.stream.IntStream.rangeClosed;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
@@ -34,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_CHECK
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=EvidenceUploadSchedulerIT",
     "scheduler.evidence-upload.enabled=true",
+    "search.evidence-upload.pageSize=50",
     "scheduler.lockAtLeastFor=PT0S"
 })
 public class EvidenceUploadSchedulerIT {
@@ -95,5 +98,37 @@ public class EvidenceUploadSchedulerIT {
         verify(telemetryService).trackEvent(eq("EvidenceUploadJobStarted"), anyMap());
         verify(telemetryService).trackEvent(eq("EvidenceUploadJobCompleted"), anyMap());
         coreCaseDataApiMockHelper.verifySubmitEvent(1);
+    }
+
+    @Test
+    void shouldExecuteEvidenceUploadSchedulerAcrossMultiplePages() {
+        // Given a result set one case larger than a single page
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateJudgmentRequested().id(CASE_ID).build();
+
+        SearchResult page1 = SearchResult.builder().total(51).cases(createCaseDetailsBatch(50)).build();
+        SearchResult page2 = SearchResult.builder().total(51)
+            .cases(List.of(CaseDetailsBuilder.builder().id(51L).data(Map.of()).build())).build();
+
+        coreCaseDataApiMockHelper.mockElasticSearchResultPaginated(page1, page2);
+        coreCaseDataApiMockHelper.mockGetCaseAnyCase(caseDetails);
+        coreCaseDataApiMockHelper.mockStartEventAnyCase(
+            StartEventResponse.builder().eventId(CASE_ID.toString()).caseDetails(caseDetails).build(),
+            EVIDENCE_UPLOAD_CHECK.name()
+        );
+        coreCaseDataApiMockHelper.mockSubmitEventAnyCase(caseDetails);
+
+        // When
+        scheduler.runScheduledTask();
+
+        // Then every case on both pages is processed
+        verify(telemetryService).trackEvent(eq("EvidenceUploadJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("EvidenceUploadJobCompleted"), anyMap());
+        coreCaseDataApiMockHelper.verifySubmitEvent(51);
+    }
+
+    private List<CaseDetails> createCaseDetailsBatch(int size) {
+        return rangeClosed(1, size)
+            .mapToObj(i -> CaseDetailsBuilder.builder().id((long) i).data(Map.of()).build())
+            .toList();
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
-import uk.gov.hmcts.reform.civil.service.search.DefendantResponseDeadlineCheckSearchService;
+import uk.gov.hmcts.reform.civil.service.search.defendantresponse.DefendantResponseDeadlineCheckPaginatedSearchService;
 
 @Component
 @RequiredArgsConstructor
@@ -19,7 +19,7 @@ public class DefendantResponseDeadlineScheduler implements CivilScheduler {
 
     public static final String SCHEDULER_NAME = "DefendantResponseDeadline";
 
-    private final DefendantResponseDeadlineCheckSearchService searchService;
+    private final DefendantResponseDeadlineCheckPaginatedSearchService searchService;
     private final ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
     private final DefendantResponseDeadlineTask defendantResponseDeadlineTask;
 
