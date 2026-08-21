@@ -1,0 +1,36 @@
+[ {
+  "CaseEventID" : "DEFAULT_JUDGEMENT",
+  "CaseFieldID" : "hearingSupportRequirementsDJ",
+  "ListElementCode" : "hearingType",
+  "ElementLabel" : "Choose your preferred type of hearing"
+}, {
+  "CaseEventID" : "DEFAULT_JUDGEMENT",
+  "CaseFieldID" : "hearingSupportRequirementsDJ",
+  "ListElementCode" : "hearingTypeTelephoneHearing",
+  "ElementLabel" : "Who will set up the telephone meeting?",
+  "FieldType" : "Text"
+}, {
+  "CaseEventID" : "DEFAULT_JUDGEMENT",
+  "CaseFieldID" : "hearingSupportRequirementsDJ",
+  "ListElementCode" : "hearingPreferredTelephoneNumber1",
+  "ElementLabel" : "Preferred telephone number",
+  "FieldType" : "PhoneUK",
+  "SecurityClassification" : "Public"
+}, {
+  "CaseEventID" : "DEFAULT_JUDGEMENT",
+  "CaseFieldID" : "hearingSupportRequirementsDJ",
+  "ListElementCode" : "hearingPreferredEmail",
+  "ElementLabel" : "Preferred email",
+  "FieldType" : "Email",
+  "SecurityClassification" : "Public"
+}, {
+  "CaseEventID" : "DEFAULT_JUDGEMENT",
+  "CaseFieldID" : "hearingSupportRequirementsDJ",
+  "ListElementCode" : "hearingUnavailableDates",
+  "ElementLabel" : "Are there any dates when you cannot attend a hearing within the next 3 months?"
+}, {
+  "CaseEventID" : "DEFAULT_JUDGEMENT",
+  "CaseFieldID" : "hearingSupportRequirementsDJ",
+  "ListElementCode" : "hearingSupportQuestion",
+  "Publish" : "Y"
+} ]

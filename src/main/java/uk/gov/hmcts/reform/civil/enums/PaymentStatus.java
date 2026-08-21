@@ -6,9 +6,12 @@ import java.util.Optional;
 import static java.util.Arrays.stream;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
 
 public enum PaymentStatus {
+    @CCD(label = "Success")
     SUCCESS,
+    @CCD(label = "Failed")
     FAILED;
 
     private static final Map<String, PaymentStatus> LOOKUP = stream(values())

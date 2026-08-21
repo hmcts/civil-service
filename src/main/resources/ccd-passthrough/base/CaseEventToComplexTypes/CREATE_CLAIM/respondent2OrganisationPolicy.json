@@ -1,0 +1,14 @@
+[ {
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "respondent2OrganisationPolicy",
+  "ListElementCode" : "OrgPolicyCaseAssignedRole",
+  "FieldShowCondition" : "claimType=\"IMPOSSIBLE_CLAIM_TYPE\"",
+  "DefaultValue" : "[RESPONDENTSOLICITORTWO]"
+}, {
+  "ID" : "SecondSolicitorCreate",
+  "CaseEventID" : "CREATE_CLAIM",
+  "CaseFieldID" : "respondent2OrganisationPolicy",
+  "ListElementCode" : "Organisation.OrganisationName",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "OPTIONAL"
+} ]

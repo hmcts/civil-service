@@ -1,0 +1,8 @@
+[ {
+  "ID" : "Debts",
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "specDefendant1Debts",
+  "ListElementCode" : "hasLoanCardDebtLabel",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "READONLY"
+} ]

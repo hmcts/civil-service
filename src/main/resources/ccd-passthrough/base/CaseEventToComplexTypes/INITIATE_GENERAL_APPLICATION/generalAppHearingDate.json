@@ -1,0 +1,21 @@
+[ {
+  "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
+  "CaseFieldID" : "generalAppHearingDate",
+  "ListElementCode" : "hearingScheduledPreferenceYesNoLabel",
+  "ShowSummaryContentOption" : "Y"
+}, {
+  "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
+  "CaseFieldID" : "generalAppHearingDate",
+  "ListElementCode" : "hearingScheduledPreferenceYesNo",
+  "ShowSummaryContentOption" : "Y"
+}, {
+  "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
+  "CaseFieldID" : "generalAppHearingDate",
+  "ListElementCode" : "hearingScheduledDateLabel",
+  "ShowSummaryContentOption" : "Y"
+}, {
+  "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
+  "CaseFieldID" : "generalAppHearingDate",
+  "ListElementCode" : "hearingScheduledDate",
+  "ShowSummaryContentOption" : "Y"
+} ]

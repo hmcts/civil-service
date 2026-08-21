@@ -1,0 +1,8 @@
+[ {
+  "ID" : "Languages",
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "respondent2DQLanguage",
+  "ListElementCode" : "helpText",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+} ]

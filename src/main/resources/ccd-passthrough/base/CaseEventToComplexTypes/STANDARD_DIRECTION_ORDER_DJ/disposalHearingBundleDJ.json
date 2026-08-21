@@ -1,0 +1,8 @@
+[ {
+  "ID" : "DisposalHearingBundleDJ",
+  "CaseEventID" : "STANDARD_DIRECTION_ORDER_DJ",
+  "CaseFieldID" : "disposalHearingBundleDJ",
+  "ListElementCode" : "text",
+  "FieldDisplayOrder" : 6,
+  "DisplayContext" : "READONLY"
+} ]

@@ -1,0 +1,6 @@
+[ {
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "applicant1DQFixedRecoverableCostsIntermediate",
+  "ListElementCode" : "band",
+  "FieldTypeParameter" : "ComplexityBandIntermediate"
+} ]

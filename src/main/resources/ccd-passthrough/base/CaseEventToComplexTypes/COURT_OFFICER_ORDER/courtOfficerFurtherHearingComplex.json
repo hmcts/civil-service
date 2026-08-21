@@ -1,0 +1,15 @@
+[ {
+  "ID" : "FinalOrderFurtherHearingDatesAvoid",
+  "CaseEventID" : "COURT_OFFICER_ORDER",
+  "CaseFieldID" : "courtOfficerFurtherHearingComplex",
+  "ListElementCode" : "datesToAvoidDateDropdown.datesToAvoidDatesTopText",
+  "FieldDisplayOrder" : 12,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "FinalOrderFurtherHearingDatesAvoid",
+  "CaseEventID" : "COURT_OFFICER_ORDER",
+  "CaseFieldID" : "courtOfficerFurtherHearingComplex",
+  "ListElementCode" : "datesToAvoidDateDropdown.datesToAvoidDatesBottomText",
+  "FieldDisplayOrder" : 14,
+  "DisplayContext" : "MANDATORY"
+} ]

@@ -1,0 +1,13 @@
+[ {
+  "CaseFieldID" : "markPaidForAllClaimants",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "claimantWhoIsSettling",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "lblUpdateCourtMultiple",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "lblUpdateCourtSingle",
+  "RetriesTimeoutURLMidEvent" : 0
+} ]

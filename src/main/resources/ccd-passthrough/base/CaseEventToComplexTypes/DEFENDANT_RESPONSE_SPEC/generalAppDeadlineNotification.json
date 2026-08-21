@@ -1,0 +1,8 @@
+[ {
+  "ID" : "LRSpecCaseDataExtension",
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "generalAppDeadlineNotification",
+  "ListElementCode" : "test789",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+} ]

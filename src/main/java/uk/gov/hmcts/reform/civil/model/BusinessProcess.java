@@ -12,6 +12,8 @@ import java.util.Objects;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
 
 @Data
 @lombok.NoArgsConstructor
@@ -19,11 +21,20 @@ import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 @Accessors(chain = true)
 public class BusinessProcess {
 
+    @CCD(label = "Camunda process instance Id", searchable = false)
     private String processInstanceId;
+    @CCD(
+            label = "Camunda business process status",
+            typeOverride = FieldType.FixedList,
+            typeParameterOverride = "BusinessProcessStatus"
+    )
     private BusinessProcessStatus status;
+    @CCD(label = "Last successfully processed task activity id", searchable = false)
     private String activityId;
+    @CCD(label = "Camunda event name used to trigger business process by sending message", searchable = false)
     private String camundaEvent;
 
+    @CCD(label = "Date Business process Ready", showCondition = "camundaEvent = \"DO_NOT_SHOW\"")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime readyOn;
 

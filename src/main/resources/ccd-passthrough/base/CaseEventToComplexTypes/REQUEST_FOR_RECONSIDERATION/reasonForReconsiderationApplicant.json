@@ -1,0 +1,7 @@
+[ {
+  "CaseEventID" : "REQUEST_FOR_RECONSIDERATION",
+  "CaseFieldID" : "reasonForReconsiderationApplicant",
+  "ListElementCode" : "reasonForReconsiderationTxt",
+  "FieldShowCondition" : "casePartyRequestForReconsideration = \"Applicant\"",
+  "Publish" : "Y"
+} ]

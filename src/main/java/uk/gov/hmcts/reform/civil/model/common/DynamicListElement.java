@@ -6,12 +6,14 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.util.UUID;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
 /**
  * An element of the {@link DynamicList}.
  *
  * <p>There are two properties which map to the relevant items of an option html tag.
  */
+@ComplexType(generate = false)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor(force = true)

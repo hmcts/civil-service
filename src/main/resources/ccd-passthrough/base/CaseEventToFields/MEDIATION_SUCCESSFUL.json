@@ -1,0 +1,7 @@
+[ {
+  "CaseFieldID" : "mediationSettlementAgreedAt",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "mediationAgreement",
+  "RetriesTimeoutURLMidEvent" : 0
+} ]

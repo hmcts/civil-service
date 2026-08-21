@@ -1,0 +1,54 @@
+[ {
+  "CaseFieldID" : "eligibilityQuestions",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/start-claim"
+}, {
+  "CaseFieldID" : "courtLocation",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/populateClaimantSolicitor"
+}, {
+  "CaseFieldID" : "applicant1",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/applicant",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "applicant1LitigationFriendRequired",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/idam-email"
+}, {
+  "CaseFieldID" : "applicantSolicitor1CheckEmail",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-claimant-legal-rep-email"
+}, {
+  "CaseFieldID" : "applicant1OrganisationPolicy",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/appOrgPolicy"
+}, {
+  "CaseFieldID" : "respondent1",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/respondent1"
+}, {
+  "CaseFieldID" : "respondent1OrganisationPolicy",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/repOrgPolicy"
+}, {
+  "CaseFieldID" : "respondentSolicitor1EmailAddress",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-defendant-legal-rep-email"
+}, {
+  "CaseFieldID" : "servedDocumentFiles",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/particulars-of-claim"
+}, {
+  "CaseFieldID" : "claimValue",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/fee"
+}, {
+  "CaseFieldID" : "applicant2",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/applicant2",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "applicant2LitigationFriendRequired",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/idam-email"
+}, {
+  "CaseFieldID" : "respondent2",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/respondent2"
+}, {
+  "CaseFieldID" : "respondent2Represented",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/setRespondent2SameLegalRepresentativeToNo"
+}, {
+  "CaseFieldID" : "respondent2OrganisationPolicy",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/rep2OrgPolicy"
+}, {
+  "CaseFieldID" : "claimStatementOfTruthLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/statement-of-truth"
+} ]

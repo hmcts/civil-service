@@ -1,0 +1,8 @@
+[ {
+  "ID" : "LRSpecCaseDataExtension",
+  "CaseEventID" : "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID" : "specAoSRespondent2CorrespondenceAddressRequired",
+  "ListElementCode" : "test123",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+} ]

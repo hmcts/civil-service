@@ -1,0 +1,10 @@
+[ {
+  "CaseFieldID" : "disclosureLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/createShowCondition"
+}, {
+  "CaseFieldID" : "witnessLabelSmallClaim",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/createShowCondition"
+}, {
+  "CaseFieldID" : "documentUploadLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validateValuesApplicant"
+} ]

@@ -1,0 +1,9 @@
+[ {
+  "ID" : "RequestedCourt",
+  "ListElementCode" : "remoteHearingRequested",
+  "CaseEventID" : "DEFENDANT_RESPONSE",
+  "CaseFieldID" : " respondent1DQRemoteHearing",
+  "EventHintText" : "This will be over telephone or video",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "MANDATORY"
+} ]

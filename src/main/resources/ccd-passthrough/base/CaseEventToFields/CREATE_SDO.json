@@ -1,0 +1,25 @@
+[ {
+  "CaseFieldID" : "drawDirectionsOrderSmallClaims",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/order-details-navigation"
+}, {
+  "CaseFieldID" : "claimsTrack",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/order-details-navigation"
+}, {
+  "CaseFieldID" : "orderType",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/order-details-navigation"
+}, {
+  "CaseFieldID" : "smallClaimsOrderAndHearingDetails",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/generate-sdo-order"
+}, {
+  "CaseFieldID" : "disposalHearingOrderAndHearingDetails",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/generate-sdo-order"
+}, {
+  "CaseFieldID" : "sdoPartiesName",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/generate-sdo-order"
+}, {
+  "CaseFieldID" : "sdoPartiesNameDRH",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/generate-sdo-order"
+}, {
+  "CaseFieldID" : "fastTrackOrderAndHearingDetails",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/generate-sdo-order"
+} ]

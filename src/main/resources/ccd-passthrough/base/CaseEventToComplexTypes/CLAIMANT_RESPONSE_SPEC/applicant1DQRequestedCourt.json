@@ -1,0 +1,33 @@
+[ {
+  "ID" : "RequestedCourtLocationLRspec",
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "applicant1DQRequestedCourt",
+  "ListElementCode" : "responseCourtLocations",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "RequestedCourt",
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "applicant1DQRequestedCourt",
+  "ListElementCode" : "reasonForHearingAtSpecificCourt",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "RequestedCourtLocationLRspec",
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "applicant1DQRequestedCourt",
+  "ListElementCode" : "responseCourtLocations",
+  "EventElementLabel" : "Please select your preferred court hearing location",
+  "EventHintText" : "Where the defendant is an individual or a sole trader, the case will be held at the defendant's preferred court.",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "RequestedCourtLocationLRspec",
+  "CaseEventID" : "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID" : "applicant1DQRequestedCourt",
+  "ListElementCode" : "responseCourtLocations",
+  "EventElementLabel" : "Please select your preferred court hearing location",
+  "EventHintText" : "Where the defendant is an individual or a sole trader, the case will be held at the defendant's preferred court.",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+} ]

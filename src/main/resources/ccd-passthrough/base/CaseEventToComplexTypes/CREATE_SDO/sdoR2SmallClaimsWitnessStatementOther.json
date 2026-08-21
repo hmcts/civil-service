@@ -1,0 +1,120 @@
+[ {
+  "ID" : "SdoR2SmallClaimsWitnessStatements",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2SmallClaimsWitnessStatementOther",
+  "ListElementCode" : "sdoStatementOfWitness",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2SmallClaimsWitnessStatements",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2SmallClaimsWitnessStatementOther",
+  "ListElementCode" : "deadlineDate",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2SmallClaimsWitnessStatements",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2SmallClaimsWitnessStatementOther",
+  "ListElementCode" : "restrictWitnessLbl",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2SmallClaimsWitnessStatements",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2SmallClaimsWitnessStatementOther",
+  "ListElementCode" : "isRestrictWitness",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2SmallClaimsWitnessStatements",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2SmallClaimsWitnessStatementOther",
+  "ListElementCode" : "sdoR2SmallClaimsRestrictWitness",
+  "FieldDisplayOrder" : 5,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2SmallClaimsWitnessStatements",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2SmallClaimsWitnessStatementOther",
+  "ListElementCode" : "restrictPagesLbl",
+  "FieldDisplayOrder" : 6,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2SmallClaimsWitnessStatements",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2SmallClaimsWitnessStatementOther",
+  "ListElementCode" : "isRestrictPages",
+  "FieldDisplayOrder" : 7,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2SmallClaimsWitnessStatements",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2SmallClaimsWitnessStatementOther",
+  "ListElementCode" : "sdoR2SmallClaimsRestrictPages",
+  "FieldDisplayOrder" : 8,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2SmallClaimsWitnessStatements",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2SmallClaimsWitnessStatementOther",
+  "ListElementCode" : "sdoR2SmallClaimsRestrictPages",
+  "FieldDisplayOrder" : 9,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2SmallClaimsWitnessStatements",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2SmallClaimsWitnessStatementOther",
+  "ListElementCode" : "label1",
+  "FieldDisplayOrder" : 10,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2SmallClaimsWitnessStatements",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2SmallClaimsWitnessStatementOther",
+  "ListElementCode" : "text",
+  "FieldDisplayOrder" : 11,
+  "DisplayContext" : "READONLY"
+}, {
+  "ID" : "SdoR2SmallClaimsRestrictPages",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2SmallClaimsWitnessStatementOther",
+  "ListElementCode" : "sdoR2SmallClaimsRestrictPages.witnessShouldNotMoreThanTxt",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2SmallClaimsRestrictPages",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2SmallClaimsWitnessStatementOther",
+  "ListElementCode" : "sdoR2SmallClaimsRestrictPages.noOfPages",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2SmallClaimsRestrictPages",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2SmallClaimsWitnessStatementOther",
+  "ListElementCode" : "sdoR2SmallClaimsRestrictPages.fontDetails",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2SmallClaimsRestrictWitness",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2SmallClaimsWitnessStatementOther",
+  "ListElementCode" : "sdoR2SmallClaimsRestrictWitness.noOfWitnessClaimant",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2SmallClaimsRestrictWitness",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2SmallClaimsWitnessStatementOther",
+  "ListElementCode" : "sdoR2SmallClaimsRestrictWitness.noOfWitnessDefendant",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SdoR2SmallClaimsRestrictWitness",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2SmallClaimsWitnessStatementOther",
+  "ListElementCode" : "sdoR2SmallClaimsRestrictWitness.partyIsCountedAsWitnessTxt",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+} ]

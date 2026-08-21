@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.spec.show;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(name = "ShowResponseOneVOneFlag", generate = true)
 public enum ResponseOneVOneShowTag {
     ONE_V_ONE_FULL_ADMIT,
     ONE_V_ONE_FULL_ADMIT_HAS_PAID,

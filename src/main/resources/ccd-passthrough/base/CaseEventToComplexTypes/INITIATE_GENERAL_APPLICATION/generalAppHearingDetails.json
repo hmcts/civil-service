@@ -1,0 +1,8 @@
+[ {
+  "ID" : "HearingDetails",
+  "CaseEventID" : "INITIATE_GENERAL_APPLICATION",
+  "CaseFieldID" : "generalAppHearingDetails",
+  "ListElementCode" : "HearingPreferredLocationLabel",
+  "FieldDisplayOrder" : 12,
+  "DisplayContext" : "MANDATORY"
+} ]

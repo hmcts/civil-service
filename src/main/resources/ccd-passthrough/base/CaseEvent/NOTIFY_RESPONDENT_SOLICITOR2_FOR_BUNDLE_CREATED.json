@@ -1,0 +1,5 @@
+[ {
+  "ID" : "NOTIFY_RESPONDENT_SOLICITOR2_FOR_BUNDLE_CREATED",
+  "CallBackURLAboutToSubmitEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+  "RetriesTimeoutURLAboutToSubmitEvent" : 0
+} ]

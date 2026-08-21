@@ -1,0 +1,8 @@
+[ {
+  "ID" : "SdoR2FastTrackCreditHireDetails",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2FastTrackCreditHire",
+  "ListElementCode" : "sdoR2FastTrackCreditHireDetails.dateText",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "READONLY"
+} ]

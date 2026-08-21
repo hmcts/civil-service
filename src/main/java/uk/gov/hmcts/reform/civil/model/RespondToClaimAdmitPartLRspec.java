@@ -11,12 +11,15 @@ import uk.gov.hmcts.reform.civil.validation.groups.PaymentDateGroup;
 
 import java.time.LocalDate;
 import jakarta.validation.constraints.FutureOrPresent;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.ccd.sdk.type.FieldType;
 
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
 public class RespondToClaimAdmitPartLRspec implements MappableObject {
 
+    @CCD(label = "Enter the date your client will pay on.", hint = "For example 9 December 2020")
     @FutureOrPresent(message = "Date for when will the amount be paid must be today or in the future.",
         groups = PaymentDateGroup.class)
     private LocalDate whenWillThisAmountBePaid;
@@ -25,4 +28,13 @@ public class RespondToClaimAdmitPartLRspec implements MappableObject {
     public RespondToClaimAdmitPartLRspec(@JsonProperty("whenWillThisAmountBePaid") LocalDate whenWillThisAmountBePaid) {
         this.whenWillThisAmountBePaid = whenWillThisAmountBePaid;
     }
+
+  // ==== ccd-definition-converter: synthesised definition-only fields (retrofit) ====
+  @CCD(
+          label = "The claimant can request a County Court Judgment (CCJ) against your client if the amount is not paid immediately. \n",
+          searchable = false,
+          typeOverride = FieldType.Label
+  )
+  private String whenWillThisAmountBePaidLabel;
+  // ==== end synthesised definition-only fields ====
 }

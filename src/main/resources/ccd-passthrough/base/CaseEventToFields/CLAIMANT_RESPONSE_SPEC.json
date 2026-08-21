@@ -1,0 +1,45 @@
+[ {
+  "CaseFieldID" : "ccjJudgmentFixedCostOptionLabel",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/set-up-ccj-amount-summary"
+}, {
+  "CaseFieldID" : "applicant1ProceedWithClaimSpec2v1",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_2/mid/set-applicant-route-flags"
+}, {
+  "CaseFieldID" : "applicant1RepaymentOptionForDefendantSpec",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/get-payment-date"
+}, {
+  "CaseFieldID" : "ccjPaymentPaidSomeAmount",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/validate-amount-paid"
+}, {
+  "CaseFieldID" : "applicant1PartAdmitIntentionToSettleClaimSpec",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/set-mediation-show-tag"
+}, {
+  "CaseFieldID" : "applicant1RequestedPaymentDateForDefendantSpec",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/validate-respondent-payment-date"
+}, {
+  "CaseFieldID" : "applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/version/V_1/mid/validate-suggest-instalments"
+}, {
+  "CaseFieldID" : "applicant1DQExperts",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/experts"
+}, {
+  "CaseFieldID" : "responseClaimExpertSpecLabel",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "applicant1DQWitnesses",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/witnesses"
+}, {
+  "CaseFieldID" : "applicant1DQHearingLRspec",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "app1MediationContactInfo",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "app1MediationAvailability",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-mediation-unavailable-dates",
+  "RetriesTimeoutURLMidEvent" : 0
+}, {
+  "CaseFieldID" : "uiStatementOfTruth",
+  "CallBackURLMidEvent" : "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/statement-of-truth"
+} ]

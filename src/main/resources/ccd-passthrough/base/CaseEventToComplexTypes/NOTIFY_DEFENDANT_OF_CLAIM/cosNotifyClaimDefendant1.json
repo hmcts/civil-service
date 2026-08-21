@@ -1,0 +1,15 @@
+[ {
+  "ID" : "NotifyClaimCoS",
+  "CaseEventID" : "NOTIFY_DEFENDANT_OF_CLAIM",
+  "CaseFieldID" : "cosNotifyClaimDefendant1",
+  "ListElementCode" : "cosStatementOfTruthLabel",
+  "FieldDisplayOrder" : 10,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "NotifyClaimCoS",
+  "CaseEventID" : "NOTIFY_DEFENDANT_OF_CLAIM",
+  "CaseFieldID" : "cosNotifyClaimDefendant1",
+  "ListElementCode" : "cosUISenderStatementOfTruthLabel",
+  "FieldDisplayOrder" : 13,
+  "DisplayContext" : "MANDATORY"
+} ]

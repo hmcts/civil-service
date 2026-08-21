@@ -4,7 +4,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(name = "ClaimantResponseScenarioFlag", generate = true)
 public enum MultiPartyScenario {
     ONE_V_ONE,
     /**

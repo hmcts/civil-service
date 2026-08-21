@@ -10,20 +10,36 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 
 import java.time.LocalDateTime;
+import uk.gov.hmcts.ccd.sdk.api.CCD;
+import uk.gov.hmcts.reform.civil.model.GAPaymentDetails;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(name = "GAPBADetailsGAspec", generate = true)
 @Setter
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
 public class GAPbaDetails {
 
+    @CCD(label = " ", searchable = false)
     private Fee fee;
+    @CCD(label = "Details of PBA payment", searchable = false, typeParameterClass = GAPaymentDetails.class)
     private PaymentDetails paymentDetails;
+    @CCD(label = "Payment successful date", searchable = false)
     private LocalDateTime paymentSuccessfulDate;
+    @CCD(label = "Application fee to pay", hint = "  ", searchable = false)
     private String generalAppFeeToPayInText;
+    @CCD(
+            label = "You will be able to pay for your application once it has been submitted.",
+            hint = "  ",
+            searchable = false
+    )
     private String generalAppPayInformationText;
+    @CCD(ignore = true)
     private String serviceReqReference;
+    @CCD(ignore = true)
     private String additionalPaymentServiceRef;
+    @CCD(ignore = true)
     private PaymentDetails additionalPaymentDetails;
 
     @JsonCreator

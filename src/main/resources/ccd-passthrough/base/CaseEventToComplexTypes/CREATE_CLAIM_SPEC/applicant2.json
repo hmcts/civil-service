@@ -1,0 +1,151 @@
+[ {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "type",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY",
+  "EventElementLabel" : "Claimant type"
+}, {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "individualTitle",
+  "FieldDisplayOrder" : 2,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "individualFirstName",
+  "FieldDisplayOrder" : 3,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "individualLastName",
+  "FieldDisplayOrder" : 4,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "companyName",
+  "FieldDisplayOrder" : 6,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "organisationName",
+  "FieldDisplayOrder" : 7,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "soleTraderTitle",
+  "FieldDisplayOrder" : 8,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "soleTraderFirstName",
+  "FieldDisplayOrder" : 9,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "soleTraderLastName",
+  "FieldDisplayOrder" : 10,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "soleTraderTradingAs",
+  "FieldDisplayOrder" : 11,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "primaryAddress.AddressLine1",
+  "FieldDisplayOrder" : 13,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "primaryAddress.AddressLine2",
+  "FieldDisplayOrder" : 14,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "primaryAddress.AddressLine3",
+  "FieldDisplayOrder" : 15,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "primaryAddress.PostTown",
+  "FieldDisplayOrder" : 16,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "primaryAddress.County",
+  "FieldDisplayOrder" : 17,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "primaryAddress.Country",
+  "FieldDisplayOrder" : 18,
+  "DisplayContext" : "OPTIONAL"
+}, {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "primaryAddress.PostCode",
+  "FieldDisplayOrder" : 19,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "Claimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "partyEmail",
+  "FieldDisplayOrder" : 20,
+  "DisplayContext" : "OPTIONAL",
+  "FieldShowCondition" : "applicant2.type = \"INDIVIDUAL\" OR applicant2.type = \"SOLE_TRADER\" OR applicant2.type = \"ORGANISATION\" OR applicant2.type = \"COMPANY\""
+}, {
+  "ID" : "Claimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "partyPhone",
+  "FieldDisplayOrder" : 21,
+  "DisplayContext" : "OPTIONAL",
+  "FieldShowCondition" : "applicant2.type = \"INDIVIDUAL\" OR applicant2.type = \"SOLE_TRADER\""
+}, {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "soleTraderDateOfBirth",
+  "FieldDisplayOrder" : 22,
+  "DisplayContext" : "MANDATORY"
+}, {
+  "ID" : "SecondClaimant",
+  "CaseEventID" : "CREATE_CLAIM_SPEC",
+  "CaseFieldID" : "applicant2",
+  "ListElementCode" : "individualDateOfBirth",
+  "FieldDisplayOrder" : 23,
+  "DisplayContext" : "MANDATORY"
+} ]

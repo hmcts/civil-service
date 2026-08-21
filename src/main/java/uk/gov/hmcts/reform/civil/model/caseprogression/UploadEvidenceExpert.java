@@ -9,7 +9,9 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import uk.gov.hmcts.ccd.sdk.api.ComplexType;
 
+@ComplexType(generate = false)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

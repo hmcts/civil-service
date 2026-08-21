@@ -1,0 +1,8 @@
+[ {
+  "ID" : "DisposalHearingHearingTime",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "disposalHearingHearingTime",
+  "ListElementCode" : "label",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "READONLY"
+} ]

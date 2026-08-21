@@ -1,0 +1,8 @@
+[ {
+  "ID" : "SdoR2QuestionsClaimantExpert",
+  "CaseEventID" : "CREATE_SDO",
+  "CaseFieldID" : "sdoR2QuestionsClaimantExpert",
+  "ListElementCode" : "sdoR2RequireApplicationToRely",
+  "FieldDisplayOrder" : 9,
+  "DisplayContext" : "MANDATORY"
+} ]

@@ -1,0 +1,18 @@
+[ {
+  "CaseEventID" : "CLAIMANT_RESPONSE",
+  "CaseFieldID" : "applicant2DQLanguage",
+  "ListElementCode" : "court",
+  "Publish" : "Y"
+}, {
+  "CaseEventID" : "CLAIMANT_RESPONSE",
+  "CaseFieldID" : "applicant2DQLanguage",
+  "ListElementCode" : "documents",
+  "Publish" : "Y"
+}, {
+  "ID" : "Languages",
+  "CaseEventID" : "CLAIMANT_RESPONSE",
+  "CaseFieldID" : "applicant2DQLanguage",
+  "ListElementCode" : "helpText",
+  "FieldDisplayOrder" : 1,
+  "DisplayContext" : "MANDATORY"
+} ]
