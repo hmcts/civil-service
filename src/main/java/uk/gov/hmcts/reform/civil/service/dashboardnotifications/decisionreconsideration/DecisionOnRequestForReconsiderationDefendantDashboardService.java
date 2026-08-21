@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.dashboardnotifications.decisionreconsi
 
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DECISION_REQUEST_FOR_RECONSIDERATION_DEFENDANT;
 
+import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
@@ -23,7 +24,10 @@ public class DecisionOnRequestForReconsiderationDefendantDashboardService extend
 
     @Override
     public String getScenario(CaseData caseData) {
-        return SCENARIO_AAA6_DECISION_REQUEST_FOR_RECONSIDERATION_DEFENDANT.getScenario();
+        if (DecisionOnRequestReconsiderationOptions.YES.equals(caseData.getDecisionOnRequestReconsiderationOptions())) {
+            return SCENARIO_AAA6_DECISION_REQUEST_FOR_RECONSIDERATION_DEFENDANT.getScenario();
+        }
+        return null;
     }
 
     @Override
