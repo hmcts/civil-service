@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -25,6 +28,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
+import static uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService.CIVIL_NATIONAL_BUSINESS_CENTRE;
 
 @SpringBootTest(classes = {
     LocationService.class
@@ -107,23 +111,28 @@ class LocationServiceTest {
         assertThrows(IllegalArgumentException.class, () -> service.getWorkAllocationLocation(caseData, "authToken"));
     }
 
-    @Test
-    void shouldNotThrowException_whenApplicationMadeAfterSDOMainCaseCMLInRefData() {
+    @ParameterizedTest
+    @CsvSource({"xxxxx, false",
+        CIVIL_NATIONAL_BUSINESS_CENTRE + ", true"})
+    void shouldNotThrowException_whenApplicationMadeAfterSDOMainCaseCMLInRefData(String siteName, boolean isCcmccLocation) {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getCaseDataForWorkAllocation(CaseState.CASE_DISCONTINUED, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
                                           respondent2DQ).toBuilder()
             .previousCCDState(null).build();
         when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any(), eq("AAA6")))
-            .thenReturn(getSampleCourLocationsRefObjectPostSdoNotInRefData());
+            .thenReturn(getSampleCourLocationsRefObjectPostSdoNotInRefData(siteName));
 
-        assertEquals(getExpectedGACaseLocation(), service.getWorkAllocationLocation(caseData, "authToken").getLeft());
+        final Pair<uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil, Boolean> location =
+            service.getWorkAllocationLocation(caseData, "authToken");
+        assertEquals(getExpectedGACaseLocation(siteName), location.getLeft());
+        assertEquals(isCcmccLocation, location.getRight());
     }
 
-    protected List<LocationRefData> getSampleCourLocationsRefObjectPostSdoNotInRefData() {
+    protected List<LocationRefData> getSampleCourLocationsRefObjectPostSdoNotInRefData(String siteName) {
         return new ArrayList<>(List.of(
             new LocationRefData()
                 .setEpimmsId("xxxxx")
-                .setSiteName("xxxxx")
+                .setSiteName(siteName)
                 .setCourtAddress("xxxxx")
                 .setPostcode("xxxxx")
                 .setRegionId("xxxxx")
@@ -131,12 +140,12 @@ class LocationServiceTest {
         ));
     }
 
-    protected  uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil getExpectedGACaseLocation() {
+    protected  uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil getExpectedGACaseLocation(String siteName) {
         uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil caseLocationCivil =
             new uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil();
         caseLocationCivil.setRegion("xxxxx");
         caseLocationCivil.setBaseLocation("xxxxx");
-        caseLocationCivil.setSiteName("xxxxx");
+        caseLocationCivil.setSiteName(siteName);
         caseLocationCivil.setAddress("xxxxx");
         caseLocationCivil.setPostcode("xxxxx");
         return caseLocationCivil;
