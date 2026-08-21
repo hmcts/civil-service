@@ -17,7 +17,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.model.CallbackErrorResponse;
-import uk.gov.hmcts.reform.civil.exceptions.CaseAccessDataStoreUnavailableException;
 import uk.gov.hmcts.reform.civil.exceptions.UpstreamIdamException;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
