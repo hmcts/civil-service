@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
@@ -117,9 +116,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
     @Spy
     private AssignCategoryId assignCategoryId = new AssignCategoryId();
-
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @Mock
     private GaForLipService gaForLipService;
@@ -371,7 +367,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .applicantBilingualLanguagePreference(YesOrNo.YES)
                 .build();
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -446,7 +441,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
         @Test
         void shouldCopyHearingOrderDocInTempCollectionIfWelshParty() {
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingOrderApplication(YesOrNo.NO, YesOrNo.NO)
                 .applicantBilingualLanguagePreference(YesOrNo.YES)
                 .isGaApplicantLip(YES)
@@ -497,7 +491,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             handler.handle(params);
@@ -562,7 +555,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -788,7 +780,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .isGaApplicantLip(YesOrNo.YES)
                 .applicantBilingualLanguagePreference(YesOrNo.YES)
                 .build();
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -857,7 +848,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 GeneralApplicationCaseDataBuilder.builder().writtenRepresentationConcurrentApplication().isGaRespondentOneLip(YesOrNo.YES)
                     .respondentBilingualLanguagePreference(YesOrNo.YES)
                     .build();
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -878,7 +868,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 GeneralApplicationCaseDataBuilder.builder().writtenRepresentationSequentialApplication().isGaApplicantLip(YesOrNo.YES)
                     .applicantBilingualLanguagePreference(YesOrNo.YES)
                     .build();
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -899,7 +888,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 GeneralApplicationCaseDataBuilder.builder().writtenRepresentationSequentialApplication().isGaRespondentOneLip(YesOrNo.YES)
                     .respondentBilingualLanguagePreference(YesOrNo.YES)
                     .build();
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -922,8 +910,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .applicantBilingualLanguagePreference(YesOrNo.YES)
                 .build();
-
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -945,8 +931,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .respondentBilingualLanguagePreference(YesOrNo.YES)
                 .build();
-
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -961,33 +945,11 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
         }
 
         @Test
-        void shouldNotPauseGenerateDirectionOrderDocumentForLip() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication()
-                .isGaApplicantLip(YesOrNo.YES)
-                .applicationIsUncloakedOnce(YesOrNo.YES)
-                .isGaRespondentOneLip(YesOrNo.YES)
-                .respondentBilingualLanguagePreference(YesOrNo.YES)
-                .build();
-
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
-            when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
-            when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
-            assertThat(updatedData.getPreTranslationGaDocuments()).isEmpty();
-            assertThat(updatedData.getPreTranslationGaDocumentType()).isNull();
-        }
-
-        @Test
         void shouldGenerateWrittenRepresentationConcurrentDocument_whenAboutToSubmitEventIsCalledForWelshTranslation() {
             GeneralApplicationCaseData caseData =
                 GeneralApplicationCaseDataBuilder.builder().writtenRepresentationConcurrentApplication().isGaApplicantLip(YesOrNo.YES)
                     .applicantBilingualLanguagePreference(YesOrNo.YES)
                     .build();
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1008,7 +970,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 GeneralApplicationCaseDataBuilder.builder().writtenRepresentationConcurrentApplication().isGaRespondentOneLip(YesOrNo.NO)
                     .respondentBilingualLanguagePreference(YesOrNo.YES)
                     .build();
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1022,12 +983,11 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
         }
 
         @Test
-        void shouldGenerateWrittenRepresentationSequentialDocument_whenAboutToSubmitEventIsCalledForRespondentWelshTranslationWhenFlagOff() {
+        void shouldGenerateWrittenRepresentationSequentialDocument_whenAboutToSubmitEventIsCalledForNonLipRespondentWelshPreference() {
             GeneralApplicationCaseData caseData =
                 GeneralApplicationCaseDataBuilder.builder().writtenRepresentationSequentialApplication().isGaRespondentOneLip(YesOrNo.NO)
                     .respondentBilingualLanguagePreference(YesOrNo.YES)
                     .build();
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1049,7 +1009,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .applicantBilingualLanguagePreference(YesOrNo.YES)
                 .build();
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1073,7 +1032,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .judicialDecision(new GAJudicialDecision()
                                       .setDecision(GAJudgeDecisionOption.FREE_FORM_ORDER)).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(freeFormOrderGenerator).generate(any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"));
@@ -1094,7 +1052,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .respondentBilingualLanguagePreference(YesOrNo.YES)
                 .judicialDecision(new GAJudicialDecision()
                                       .setDecision(GAJudgeDecisionOption.FREE_FORM_ORDER)).build();
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1117,7 +1074,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .respondentBilingualLanguagePreference(YesOrNo.NO)
                 .judicialDecision(new GAJudicialDecision()
                                       .setDecision(GAJudgeDecisionOption.FREE_FORM_ORDER)).build();
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1139,7 +1095,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .respondentBilingualLanguagePreference(YesOrNo.YES)
                 .build();
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1163,7 +1118,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .respondentBilingualLanguagePreference(YesOrNo.NO)
                 .build();
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1190,7 +1144,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
             caseData = caseData.copy().judicialDecision(new GAJudicialDecision()
                                                      .setDecision(GAJudgeDecisionOption.REQUEST_MORE_INFO)
                                                      ).build();
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1219,7 +1172,6 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
             caseData = caseData.copy().judicialDecision(new GAJudicialDecision()
                                                                  .setDecision(GAJudgeDecisionOption.REQUEST_MORE_INFO)
                                                                  ).build();
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

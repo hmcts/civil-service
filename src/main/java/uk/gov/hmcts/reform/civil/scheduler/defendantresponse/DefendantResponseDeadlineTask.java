@@ -7,12 +7,16 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.DefaultBackPressureConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTask;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskBackPressureConfiguration;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_DEADLINE_CHECK;
 
 @Component
 @AllArgsConstructor
 @Slf4j
 public class DefendantResponseDeadlineTask implements ScheduledTask<CaseDetails, Long> {
 
+    private final CoreCaseDataService coreCaseDataService;
     private final DefaultBackPressureConfiguration defaultBackPressureConfiguration;
 
     @Override
@@ -22,8 +26,9 @@ public class DefendantResponseDeadlineTask implements ScheduledTask<CaseDetails,
 
     @Override
     public void accept(CaseDetails caseDetails) {
-        log.info("DefendantResponseDeadlineTask::accept case {}", caseDetails.getId());
-        //Add logic to publish event for defendant response deadline
+        Long caseId = caseDetails.getId();
+        log.info("DefendantResponseDeadlineTask::accept case {}", caseId);
+        coreCaseDataService.triggerEvent(caseId, DEFENDANT_RESPONSE_DEADLINE_CHECK);
     }
 
     @Override
