@@ -54,4 +54,25 @@ class UnavailableDateTest {
         assertThat(unavailableDate.getDateAdded()).isEqualTo(LocalDate.of(2026, 8, 20));
         assertThat(unavailableDate.getUnavailableDateType()).isEqualTo(UnavailableDateType.DATE_RANGE);
     }
+
+    @Test
+    void shouldDeserializeTimestampArrayUnavailableDates() throws Exception {
+        String json = """
+            {
+              "date": [2026, 8, 21],
+              "fromDate": [2026, 8, 22],
+              "toDate": [2026, 8, 23],
+              "dateAdded": [2026, 8, 20],
+              "unavailableDateType": "DATE_RANGE"
+            }
+            """;
+
+        UnavailableDate unavailableDate = objectMapper.readValue(json, UnavailableDate.class);
+
+        assertThat(unavailableDate.getDate()).isEqualTo(LocalDate.of(2026, 8, 21));
+        assertThat(unavailableDate.getFromDate()).isEqualTo(LocalDate.of(2026, 8, 22));
+        assertThat(unavailableDate.getToDate()).isEqualTo(LocalDate.of(2026, 8, 23));
+        assertThat(unavailableDate.getDateAdded()).isEqualTo(LocalDate.of(2026, 8, 20));
+        assertThat(unavailableDate.getUnavailableDateType()).isEqualTo(UnavailableDateType.DATE_RANGE);
+    }
 }
