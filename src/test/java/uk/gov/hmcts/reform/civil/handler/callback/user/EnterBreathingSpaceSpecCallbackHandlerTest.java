@@ -186,6 +186,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
         Assertions.assertTrue(response.getData().containsKey("businessProcess"));
+        Assertions.assertEquals("Yes", response.getData().get("breathingSpaceActive"));
     }
 
     @Test

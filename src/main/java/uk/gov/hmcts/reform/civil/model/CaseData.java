@@ -574,6 +574,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonUnwrapped
     private  BreathingSpaceInfo breathing;
+    private YesOrNo breathingSpaceActive;
     private YesOrNo breathingSpaceLifted;
     private  String applicantVRespondentText;
 
