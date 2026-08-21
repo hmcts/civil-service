@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -32,13 +33,18 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICATION_PAYMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
 @ExtendWith(MockitoExtension.class)
 class UpdatePaymentStatusServiceTest {
@@ -164,12 +170,112 @@ class UpdatePaymentStatusServiceTest {
             .setPaymentReference("1234")
             .setStatus("Invalid");
 
-        assertThatThrownBy(() -> updatePaymentStatusService.updatePaymentStatus(String.valueOf(CASE_ID), cardPaymentStatusResponse))
+        String caseId = String.valueOf(CASE_ID);
+        assertThatThrownBy(() -> updatePaymentStatusService.updatePaymentStatus(caseId, cardPaymentStatusResponse))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Invalid payment status: Invalid");
 
         verify(gaCoreCaseDataService, times(1)).getCase(CASE_ID);
         verifyNoMoreInteractions(gaCoreCaseDataService);
+    }
+
+    @Test
+    public void shouldNotSubmitEvent_WhenInitialPaymentAlreadyApplied() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
+        caseData.setCcdState(AWAITING_APPLICATION_PAYMENT);
+        caseData.setGeneralAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails()
+                                                             .setStatus(SUCCESS)
+                                                             .setReference("PAY123")));
+        CaseDetails caseDetails = buildCaseDetails(caseData);
+
+        when(gaCoreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
+
+        // fresh data from CCD already has the payment
+        GeneralApplicationCaseData freshData = caseData.copy();
+        CaseDetails freshDetails = buildCaseDetails(freshData);
+
+        when(gaCoreCaseDataService.startUpdate(any(), any()))
+            .thenReturn(startEventResponse(freshDetails, INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT));
+
+        CardPaymentStatusResponse response = new CardPaymentStatusResponse()
+            .setStatus("SUCCESS")
+            .setPaymentReference("PAY123");
+
+        updatePaymentStatusService.updatePaymentStatus(String.valueOf(CASE_ID), response);
+
+        verify(gaCoreCaseDataService, times(1)).startUpdate(any(), any());
+        verify(gaCoreCaseDataService, never()).submitUpdate(any(), any());
+    }
+
+    @Test
+    public void shouldNotSubmitEvent_WhenAdditionalPaymentAlreadyApplied() {
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData();
+        caseData.setCcdState(CASE_PROGRESSION);
+        caseData.setApplicationFeeAmountInPence(new BigDecimal("10000"));
+        caseData.setGeneralAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setAdditionalPaymentServiceRef("ADD-REF")
+                                      .setAdditionalPaymentDetails(new PaymentDetails()
+                                                                       .setStatus(SUCCESS)
+                                                                       .setReference("PAY456")));
+        CaseDetails caseDetails = buildCaseDetails(caseData);
+
+        when(gaCoreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
+
+        // fresh data from CCD already has the payment
+        GeneralApplicationCaseData freshData = caseData.copy();
+        CaseDetails freshDetails = buildCaseDetails(freshData);
+
+        when(gaCoreCaseDataService.startUpdate(any(), eq(MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID)))
+            .thenReturn(startEventResponse(freshDetails, MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID));
+
+        CardPaymentStatusResponse response = new CardPaymentStatusResponse()
+            .setStatus("SUCCESS")
+            .setPaymentReference("PAY456");
+
+        updatePaymentStatusService.updatePaymentStatus(String.valueOf(CASE_ID), response);
+
+        verify(gaCoreCaseDataService, times(1)).startUpdate(any(), eq(MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID));
+        verify(gaCoreCaseDataService, never()).submitUpdate(any(), any());
+    }
+
+    @Test
+    public void shouldSubmitUpdate_whenFreshPbaIsNull() {
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .ccdState(CASE_PROGRESSION)
+            .generalAppPBADetails(new GeneralApplicationPbaDetails().setPaymentDetails(new PaymentDetails()
+                                                                                           .setStatus(FAILED)))
+            .build();
+        CaseDetails staleCaseDetails = buildCaseDetails(caseData);
+
+        GeneralApplicationCaseData freshData = caseData.copy()
+            .generalAppPBADetails(null)
+            .build();
+        CaseDetails freshCaseDetails = buildCaseDetails(freshData);
+
+        when(gaCoreCaseDataService.getCase(CASE_ID)).thenReturn(staleCaseDetails);
+        when(caseDetailsConverter.toGeneralApplicationCaseData(staleCaseDetails)).thenReturn(caseData);
+        when(caseDetailsConverter.toGeneralApplicationCaseData(freshCaseDetails)).thenReturn(freshData);
+        when(gaCoreCaseDataService.startUpdate(any(), any()))
+            .thenReturn(startEventResponse(freshCaseDetails, INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT));
+        when(gaCoreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
+
+        updatePaymentStatusService.updatePaymentStatus(String.valueOf(CASE_ID), getCardPaymentStatusResponse());
+
+        verify(gaCoreCaseDataService, times(1)).submitUpdate(any(), any());
+    }
+
+    @Test
+    public void shouldThrowCaseDataUpdateException_whenUnexpectedErrorOccurs() {
+        when(gaCoreCaseDataService.getCase(CASE_ID)).thenThrow(new RuntimeException("Lock conflict"));
+
+        String caseId = String.valueOf(CASE_ID);
+        CardPaymentStatusResponse response = getCardPaymentStatusResponse();
+        assertThatThrownBy(() -> updatePaymentStatusService.updatePaymentStatus(caseId, response))
+            .isInstanceOf(CaseDataUpdateException.class)
+            .hasMessage("Lock conflict");
     }
 
     private CaseDetails buildCaseDetails(GeneralApplicationCaseData caseData) {
