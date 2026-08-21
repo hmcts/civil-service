@@ -304,7 +304,7 @@ civil:
   test-user:
     username: ${TEST_USERNAME:test@example.com}
     password: ${TEST_PASSWORD:Password12!}
-  authorised-services: ${CIVIL_S2S_AUTHORISED_SERVICES:payment_app,ccd_data,civil_service,civil-citizen-ui}
+  authorised-services: ${CIVIL_S2S_AUTHORISED_SERVICES:payment_app,ccd_data,civil_service,civil-citizen-ui,bulk_scan_processor,bulk_scan_orchestrator,bulk_scan}
 
 core_case_data:
   api:

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.helpers;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -21,6 +22,7 @@ public class CaseDetailsConverter {
     private static final String CCD_CASE_REFERENCE = "ccdCaseReference";
     private static final String CCD_STATE = "ccdState";
     private final ObjectMapper objectMapper;
+    private static final TypeReference<Map<String, Object>> MAP_TYPE = new TypeReference<>() {};
 
     public CaseDetailsConverter(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
@@ -82,5 +84,9 @@ public class CaseDetailsConverter {
         }
 
         return objectMapper.convertValue(data, GeneralApplication.class);
+    }
+
+    public Map<String, Object> convertToMap(CaseData caseData) {
+        return objectMapper.convertValue(caseData, MAP_TYPE);
     }
 }
