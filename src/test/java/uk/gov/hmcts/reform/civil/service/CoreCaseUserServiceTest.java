@@ -11,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
 import uk.gov.hmcts.reform.ccd.client.CaseAssignmentApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRole;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
@@ -22,6 +21,7 @@ import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.exceptions.CaseAccessDataStoreUnavailableException;
 import uk.gov.hmcts.reform.civil.exceptions.RetryableCaseUserException;
 
 import java.util.Collections;
@@ -34,6 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -60,7 +61,7 @@ class CoreCaseUserServiceTest {
     private CrossAccessUserConfiguration userConfig;
 
     @MockBean
-    private CaseAccessDataStoreApi caseAccessDataStoreApi;
+    private CaseAccessDataStoreService caseAccessDataStoreService;
 
     @MockBean
     private CaseAssignmentApi caseAssignmentApi;
@@ -90,12 +91,12 @@ class CoreCaseUserServiceTest {
         void shouldAssignCaseToUser_WhenSameUserWithRequestedCaseRoleDoesNotExist() {
             CaseAssignedUserRolesResource emptyResource = new CaseAssignedUserRolesResource()
                 .setCaseAssignedUserRoles(List.of());
-            when(caseAccessDataStoreApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+            when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
                 .thenReturn(emptyResource);
 
             service.assignCase(CASE_ID, USER_ID, ORG_ID, CaseRole.APPLICANTSOLICITORONE);
 
-            verify(caseAccessDataStoreApi).addCaseUserRoles(
+            verify(caseAccessDataStoreService).addCaseUserRoles(
                 CAA_USER_AUTH_TOKEN,
                 SERVICE_AUTH_TOKEN,
                 getAddCaseAssignedUserRolesRequest(CaseRole.APPLICANTSOLICITORONE)
@@ -110,12 +111,12 @@ class CoreCaseUserServiceTest {
 
             CaseAssignedUserRolesResource resource = new CaseAssignedUserRolesResource()
                 .setCaseAssignedUserRoles(List.of(caseAssignedUserRole));
-            when(caseAccessDataStoreApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+            when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
                 .thenReturn(resource);
 
             service.assignCase(CASE_ID, USER_ID, ORG_ID, CaseRole.APPLICANTSOLICITORONE);
 
-            verify(caseAccessDataStoreApi, never()).addCaseUserRoles(
+            verify(caseAccessDataStoreService, never()).addCaseUserRoles(
                 CAA_USER_AUTH_TOKEN,
                 SERVICE_AUTH_TOKEN,
                 getAddCaseAssignedUserRolesRequest(CaseRole.RESPONDENTSOLICITORONE)
@@ -131,7 +132,7 @@ class CoreCaseUserServiceTest {
             CaseAssignedUserRolesResource resource = new CaseAssignedUserRolesResource()
                 .setCaseAssignedUserRoles(List.of(existingRole));
 
-            when(caseAccessDataStoreApi.getUserRoles(
+            when(caseAccessDataStoreService.getUserRoles(
                 CAA_USER_AUTH_TOKEN,
                 SERVICE_AUTH_TOKEN,
                 List.of(CASE_ID))
@@ -139,11 +140,29 @@ class CoreCaseUserServiceTest {
 
             service.assignCase(CASE_ID, USER_ID, ORG_ID, CaseRole.APPLICANTSOLICITORONE);
 
-            verify(caseAccessDataStoreApi).addCaseUserRoles(
+            verify(caseAccessDataStoreService).addCaseUserRoles(
                 CAA_USER_AUTH_TOKEN,
                 SERVICE_AUTH_TOKEN,
                 getAddCaseAssignedUserRolesRequest(CaseRole.APPLICANTSOLICITORONE)
             );
+        }
+
+        @Test
+        void shouldThrowRetryableCaseUserException_whenCaseAccessDataStoreUnavailableExceptionThrown() {
+            CaseAccessDataStoreUnavailableException exception = new CaseAccessDataStoreUnavailableException("unavailable", new RuntimeException());
+            when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenThrow(exception);
+
+            assertThatThrownBy(() -> service.assignCase(CASE_ID, USER_ID, ORG_ID, CaseRole.APPLICANTSOLICITORONE))
+                .isInstanceOf(RetryableCaseUserException.class)
+                .hasCause(exception);
+        }
+
+        @Test
+        void shouldLogErrorMessage_whenRecoveringRetryableCaseUserException() {
+            service.recover(new RetryableCaseUserException("retry exhausted"), CASE_ID, USER_ID, ORG_ID, CaseRole.APPLICANTSOLICITORONE);
+
+            verify(caseAccessDataStoreService, never()).addCaseUserRoles(anyString(), anyString(), any());
         }
 
         private AddCaseAssignedUserRolesRequest getAddCaseAssignedUserRolesRequest(CaseRole caseRole) {
@@ -171,12 +190,12 @@ class CoreCaseUserServiceTest {
 
             CaseAssignedUserRolesResource resource = new CaseAssignedUserRolesResource()
                 .setCaseAssignedUserRoles(List.of(caseAssignedUserRole));
-            when(caseAccessDataStoreApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+            when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
                 .thenReturn(resource);
 
             service.removeCreatorRoleCaseAssignment(CASE_ID, USER_ID, ORG_ID);
 
-            verify(caseAccessDataStoreApi).removeCaseUserRoles(
+            verify(caseAccessDataStoreService).removeCaseUserRoles(
                 CAA_USER_AUTH_TOKEN,
                 SERVICE_AUTH_TOKEN,
                 getCaseAssignedUserRolesRequest(CaseRole.CREATOR)
@@ -191,12 +210,12 @@ class CoreCaseUserServiceTest {
 
             CaseAssignedUserRolesResource resource = new CaseAssignedUserRolesResource()
                 .setCaseAssignedUserRoles(List.of(caseAssignedUserRole));
-            when(caseAccessDataStoreApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+            when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
                 .thenReturn(resource);
 
             service.removeCreatorRoleCaseAssignment(CASE_ID, USER_ID, ORG_ID);
 
-            verify(caseAccessDataStoreApi, never()).removeCaseUserRoles(
+            verify(caseAccessDataStoreService, never()).removeCaseUserRoles(
                 CAA_USER_AUTH_TOKEN,
                 SERVICE_AUTH_TOKEN,
                 getCaseAssignedUserRolesRequest(CaseRole.CREATOR)
@@ -211,9 +230,9 @@ class CoreCaseUserServiceTest {
 
             CaseAssignedUserRolesResource resource = new CaseAssignedUserRolesResource()
                 .setCaseAssignedUserRoles(List.of(caseAssignedUserRole));
-            given(caseAccessDataStoreApi.getUserRoles(anyString(), anyString(), anyList())).willReturn(resource);
+            given(caseAccessDataStoreService.getUserRoles(anyString(), anyString(), anyList())).willReturn(resource);
             service.unassignCase(CASE_ID, USER_ID, ORG_ID, CaseRole.DEFENDANT);
-            verify(caseAccessDataStoreApi).removeCaseUserRoles(
+            verify(caseAccessDataStoreService).removeCaseUserRoles(
                 CAA_USER_AUTH_TOKEN,
                 SERVICE_AUTH_TOKEN,
                 getCaseAssignedUserRolesRequest(CaseRole.DEFENDANT)
@@ -224,9 +243,9 @@ class CoreCaseUserServiceTest {
         void shouldNotUnassignCase_WhenUserWithRoleIsNotAssignedToCase() {
             CaseAssignedUserRolesResource emptyResource = new CaseAssignedUserRolesResource()
                 .setCaseAssignedUserRoles(Collections.emptyList());
-            given(caseAccessDataStoreApi.getUserRoles(anyString(), anyString(), anyList())).willReturn(emptyResource);
+            given(caseAccessDataStoreService.getUserRoles(anyString(), anyString(), anyList())).willReturn(emptyResource);
             service.unassignCase(CASE_ID, USER_ID, ORG_ID, CaseRole.DEFENDANT);
-            verify(caseAccessDataStoreApi, never()).removeCaseUserRoles(
+            verify(caseAccessDataStoreService, never()).removeCaseUserRoles(
                 CAA_USER_AUTH_TOKEN,
                 SERVICE_AUTH_TOKEN,
                 getCaseAssignedUserRolesRequest(CaseRole.DEFENDANT)
@@ -262,7 +281,7 @@ class CoreCaseUserServiceTest {
 
             CaseAssignedUserRolesResource caseAssignedUserRolesResource = new CaseAssignedUserRolesResource()
                 .setCaseAssignedUserRoles(List.of(role1, role2));
-            when(caseAccessDataStoreApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+            when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
                 .thenReturn(caseAssignedUserRolesResource);
         }
 
@@ -271,7 +290,7 @@ class CoreCaseUserServiceTest {
             assertThat(service.userHasCaseRole(CASE_ID, USER_ID, CaseRole.RESPONDENTSOLICITORONE)).isTrue();
             assertThat(service.userHasCaseRole(CASE_ID, USER_ID2, CaseRole.RESPONDENTSOLICITORTWO)).isTrue();
 
-            verify(caseAccessDataStoreApi, times(2)).getUserRoles(
+            verify(caseAccessDataStoreService, times(2)).getUserRoles(
                 CAA_USER_AUTH_TOKEN,
                 SERVICE_AUTH_TOKEN,
                 List.of(CASE_ID)
@@ -283,7 +302,7 @@ class CoreCaseUserServiceTest {
             assertThat(service.userHasCaseRole(CASE_ID, USER_ID, CaseRole.RESPONDENTSOLICITORTWO)).isFalse();
             assertThat(service.userHasCaseRole(CASE_ID, USER_ID2, CaseRole.RESPONDENTSOLICITORONE)).isFalse();
 
-            verify(caseAccessDataStoreApi, times(2)).getUserRoles(
+            verify(caseAccessDataStoreService, times(2)).getUserRoles(
                 CAA_USER_AUTH_TOKEN,
                 SERVICE_AUTH_TOKEN,
                 List.of(CASE_ID)
@@ -323,7 +342,7 @@ class CoreCaseUserServiceTest {
 
             CaseAssignedUserRolesResource caseAssignedUserRolesResource = new CaseAssignedUserRolesResource()
                 .setCaseAssignedUserRoles(List.of(role1, role2));
-            when(caseAccessDataStoreApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+            when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
                 .thenReturn(caseAssignedUserRolesResource);
 
             List<String> caseRoles = service.getUserCaseRoles(CASE_ID, USER_ID);
@@ -354,8 +373,45 @@ class CoreCaseUserServiceTest {
         }
 
         @Test
+        void shouldReturnEmptyResource_getUserRoles_whenNotFoundThrown() {
+            when(caseAssignmentApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenThrow(notFoundException);
+
+            var response = service.getUserRoles(CASE_ID);
+
+            assertThat(response.getCaseAssignmentUserRoles()).isEmpty();
+        }
+
+        @Test
+        void shouldThrowRetryableCaseUserException_getUserRoles_whenGatewayTimeoutThrown() {
+            when(caseAssignmentApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenThrow(gatewayTimeoutException);
+
+            assertThatThrownBy(() -> service.getUserRoles(CASE_ID))
+                .isInstanceOf(RetryableCaseUserException.class)
+                .hasCause(gatewayTimeoutException);
+        }
+
+        @Test
+        void shouldThrowRuntimeException_getUserRoles_whenUnexpectedExceptionThrown() {
+            when(caseAssignmentApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenThrow(new RuntimeException("unexpected"));
+
+            assertThatThrownBy(() -> service.getUserRoles(CASE_ID))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("unexpected");
+        }
+
+        @Test
+        void shouldReturnEmptyResource_whenRecoveringRetryableCaseUserException_getUserRoles() {
+            var response = service.recover(new RetryableCaseUserException("retry exhausted"), CASE_ID);
+
+            assertThat(response.getCaseAssignmentUserRoles()).isEmpty();
+        }
+
+        @Test
         void shouldThrowRetryableCaseUserException_whenGatewayTimeoutThrown() {
-            when(caseAccessDataStoreApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+            when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
                 .thenThrow(gatewayTimeoutException);
 
             assertThatThrownBy(() -> service.getUserCaseRoles(CASE_ID, USER_ID))
@@ -364,8 +420,19 @@ class CoreCaseUserServiceTest {
         }
 
         @Test
+        void shouldThrowRetryableCaseUserException_whenCaseAccessDataStoreUnavailableExceptionThrown() {
+            CaseAccessDataStoreUnavailableException exception = new CaseAccessDataStoreUnavailableException("unavailable", new RuntimeException());
+            when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenThrow(exception);
+
+            assertThatThrownBy(() -> service.getUserCaseRoles(CASE_ID, USER_ID))
+                .isInstanceOf(RetryableCaseUserException.class)
+                .hasCause(exception);
+        }
+
+        @Test
         void shouldReturnEmptyList_whenUserRolesNotFound() {
-            when(caseAccessDataStoreApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+            when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
                 .thenThrow(notFoundException);
 
             var userCaseRoles = service.getUserCaseRoles(CASE_ID, USER_ID);
@@ -374,18 +441,18 @@ class CoreCaseUserServiceTest {
         }
 
         @Test
-        void shouldReturnEmptyList_whenUnexpectedExceptionThrown() {
-            when(caseAccessDataStoreApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+        void shouldThrowRuntimeException_whenUnexpectedExceptionThrown() {
+            when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
                 .thenThrow(new RuntimeException("unexpected"));
 
-            var userCaseRoles = service.getUserCaseRoles(CASE_ID, USER_ID);
-
-            assertThat(userCaseRoles).isEmpty();
+            assertThatThrownBy(() -> service.getUserCaseRoles(CASE_ID, USER_ID))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("unexpected");
         }
 
         @Test
         void shouldReturnEmptyList_whenRecoveringRetryableCaseUserException() {
-            var userCaseRoles = service.recover(new RetryableCaseUserException("retry exhausted"));
+            var userCaseRoles = service.recover(new RetryableCaseUserException("retry exhausted"), CASE_ID, USER_ID);
 
             assertThat(userCaseRoles).isEmpty();
         }
