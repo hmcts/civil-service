@@ -16,6 +16,14 @@ public class CommonQueryConstructs {
             .must(matchQuery("state", state.toString()));
     }
 
+    public BoolQueryBuilder beState(CaseState... states) {
+        BoolQueryBuilder stateQuery = boolQuery().minimumShouldMatch(1);
+        for (CaseState state : states) {
+            stateQuery.should(matchQuery("state", state.toString()));
+        }
+        return stateQuery;
+    }
+
     public BoolQueryBuilder haveNoOngoingBusinessProcess() {
         return boolQuery()
             .minimumShouldMatch(1)
