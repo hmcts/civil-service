@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
 @RequiredArgsConstructor
@@ -104,6 +105,7 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             .ifPresent(enter -> enter.setStart(LocalDate.now()));
 
         caseData.setBusinessProcess(BusinessProcess.ready(ENTER_BREATHING_SPACE_SPEC));
+        caseData.setBreathingSpaceActive(YES);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
