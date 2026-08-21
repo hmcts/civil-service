@@ -4,13 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -22,7 +18,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDateTime;
@@ -33,18 +28,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
 
-@ExtendWith(MockitoExtension.class)
 public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @InjectMocks
     private StitchingCompleteCallbackHandler handler;
-
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     private ObjectMapper mapper;
 
@@ -53,7 +42,7 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
         mapper = new ObjectMapper();
         mapper.registerModule(new Jdk8Module());
         mapper.findAndRegisterModules();
-        handler = new StitchingCompleteCallbackHandler(mapper, featureToggleService);
+        handler = new StitchingCompleteCallbackHandler(mapper);
     }
 
     @Test
@@ -91,7 +80,6 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
         CaseData caseData = CaseData.builder().caseBundles(caseBundles)
             .bundleEvent("BUNDLE_CREATED_NOTIFICATION").build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isAmendBundleEnabled()).thenReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isNull();
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -127,7 +115,6 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
     @MethodSource("provideCaseDataForTriggerUpdateBundleCategoryIdTest")
     void shouldUpdateBundleCategoryId(CaseData caseData, YesOrNo expectedBundleError, String expectedBusinessProcessEvent) {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isAmendBundleEnabled()).thenReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isNull();
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
