@@ -520,6 +520,8 @@ notifications:
 
   notifyApplicant1EnteredBreathingSpaceLip: "7e34af74-ec20-476b-aea5-6a6508d3acaf"
   notifyEnteredBreathingSpaceForDefendantLip: "e551a04f-9da1-4654-a7be-2040e02925aa"
+  notifyApplicant1EnteredBreathingSpaceLipWelsh: "9d590339-194c-4bd9-96c4-4f2457218fc6"
+  notifyEnteredBreathingSpaceForDefendantLipWelsh: "98605ac9-f4db-406e-aa47-7b83ffca53af"
 
   notifyLiPApplicantBreathingSpaceLifted: "b6dbc714-210e-475d-a1db-bf5ea28de98b"
   notifyLiPRespondentBreathingSpaceLifted: "4ca3017b-b2fa-4ac0-a867-9bfada50a80c"
