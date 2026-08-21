@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
@@ -98,7 +99,10 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     public boolean hasResponseDeadlineBeenExtended() {
         return caseData.getRespondent1TimeExtensionDate() != null
-            && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+            && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT
+            && (caseData.getRespondent1ResponseDeadline() == null
+                || !caseData.getRespondent1ResponseDeadline()
+                    .isBefore(LocalDate.now().atTime(LocalTime.of(16, 1))));
     }
 
     protected boolean isDefaultJudgmentGrantedForDashboard() {

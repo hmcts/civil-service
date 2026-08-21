@@ -87,9 +87,17 @@ public class ResourceExceptionHandler {
     public ResponseEntity<Object> unprocessableEntity(FeignException.UnprocessableEntity exception,
                                              ContentCachingRequestWrapper contentCachingRequestWrapper) {
 
+        String body = exception.contentUTF8();
+        if (body.isEmpty()) {
+            String errorMessage = "Unprocessable Entity error with message: %s for case %s run by user %s";
+            log.info(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
+                                            getUserId(contentCachingRequestWrapper)));
+            return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
         CallbackErrorResponse errorResponse = new CallbackErrorResponse();
         try {
-            errorResponse = objectMapper.readValue(exception.contentUTF8(), CallbackErrorResponse.class);
+            errorResponse = objectMapper.readValue(body, CallbackErrorResponse.class);
             MDC.put("callbackErrors", errorResponse.toString());
         } catch (Exception parseException) {
             log.info(parseException.getMessage(), parseException);
