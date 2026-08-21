@@ -35,6 +35,48 @@ class UnavailableDateTest {
     }
 
     @Test
+    void shouldTreatBlankAndUnexpectedUnavailableDateValuesAsNull() throws Exception {
+        String json = """
+            {
+              "date": " ",
+              "fromDate": null,
+              "toDate": {"unexpected": "object"},
+              "dateAdded": "",
+              "unavailableDateType": "DATE_RANGE"
+            }
+            """;
+
+        UnavailableDate unavailableDate = objectMapper.readValue(json, UnavailableDate.class);
+
+        assertThat(unavailableDate.getDate()).isNull();
+        assertThat(unavailableDate.getFromDate()).isNull();
+        assertThat(unavailableDate.getToDate()).isNull();
+        assertThat(unavailableDate.getDateAdded()).isNull();
+        assertThat(unavailableDate.getUnavailableDateType()).isEqualTo(UnavailableDateType.DATE_RANGE);
+    }
+
+    @Test
+    void shouldTreatMalformedTimestampArrayUnavailableDatesAsNull() throws Exception {
+        String json = """
+            {
+              "date": [2026, "bad-month", 21],
+              "fromDate": [2026, 8],
+              "toDate": [2026, 13, 40],
+              "dateAdded": [2026, 8, 20, 1],
+              "unavailableDateType": "DATE_RANGE"
+            }
+            """;
+
+        UnavailableDate unavailableDate = objectMapper.readValue(json, UnavailableDate.class);
+
+        assertThat(unavailableDate.getDate()).isNull();
+        assertThat(unavailableDate.getFromDate()).isNull();
+        assertThat(unavailableDate.getToDate()).isNull();
+        assertThat(unavailableDate.getDateAdded()).isNull();
+        assertThat(unavailableDate.getUnavailableDateType()).isEqualTo(UnavailableDateType.DATE_RANGE);
+    }
+
+    @Test
     void shouldDeserializeValidIsoUnavailableDates() throws Exception {
         String json = """
             {

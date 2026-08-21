@@ -24,6 +24,7 @@ public class LenientLocalDateDeserializer extends JsonDeserializer<LocalDate> {
 
         String raw = parser.getValueAsString();
         if (raw == null || raw.isBlank()) {
+            parser.skipChildren();
             return null;
         }
 
@@ -40,7 +41,7 @@ public class LenientLocalDateDeserializer extends JsonDeserializer<LocalDate> {
 
         while (parser.nextToken() != JsonToken.END_ARRAY) {
             if (!parser.currentToken().isNumeric()) {
-                parser.skipChildren();
+                skipRemainingArray(parser);
                 log.warn("Unparseable LocalDate array for field '{}' - treating as null", parser.currentName());
                 return null;
             }
@@ -57,6 +58,12 @@ public class LenientLocalDateDeserializer extends JsonDeserializer<LocalDate> {
         } catch (DateTimeException exception) {
             log.warn("Unparseable LocalDate array '{}' for field '{}' - treating as null", values, parser.currentName());
             return null;
+        }
+    }
+
+    private void skipRemainingArray(JsonParser parser) throws IOException {
+        while (parser.currentToken() != JsonToken.END_ARRAY && parser.nextToken() != JsonToken.END_ARRAY) {
+            parser.skipChildren();
         }
     }
 }
