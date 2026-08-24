@@ -19,7 +19,4 @@ public class BreathingSpaceInfo {
 
     @JsonProperty("breathingSpaceActive")
     private YesOrNo active;
-
-    @JsonProperty("breathingSpaceLifted")
-    private YesOrNo lifted;
 }

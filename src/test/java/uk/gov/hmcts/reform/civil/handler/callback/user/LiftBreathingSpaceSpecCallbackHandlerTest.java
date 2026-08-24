@@ -271,10 +271,6 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
                 .containsOnly(LIFT_BREATHING_SPACE_SPEC.name(), "READY");
 
             assertThat(response.getData())
-                .extracting("breathingSpaceLifted")
-                .isEqualTo("Yes");
-
-            assertThat(response.getData())
                 .extracting("breathingSpaceActive")
                 .isEqualTo("No");
         }

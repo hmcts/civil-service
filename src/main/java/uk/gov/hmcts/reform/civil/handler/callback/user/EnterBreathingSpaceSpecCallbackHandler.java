@@ -107,7 +107,6 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
 
         caseData.setBusinessProcess(BusinessProcess.ready(ENTER_BREATHING_SPACE_SPEC));
         caseData.getBreathing().setActive(YES);
-        caseData.getBreathing().setLifted(NO);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
