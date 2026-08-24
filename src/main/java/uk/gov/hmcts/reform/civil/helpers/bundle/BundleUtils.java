@@ -62,8 +62,10 @@ public class BundleUtils {
         int prefixLength = MAX_DOC_TITLE_LENGTH
             - TRUNCATION_MARKER.length()
             - PRESERVED_DOC_TITLE_SUFFIX_LENGTH;
-        return docName.substring(0, prefixLength)
+        String truncatedName = docName.substring(0, prefixLength)
             + TRUNCATION_MARKER
             + docName.substring(docName.length() - PRESERVED_DOC_TITLE_SUFFIX_LENGTH);
+        log.info("Truncated bundle document name to {}", truncatedName);
+        return truncatedName;
     }
 }
