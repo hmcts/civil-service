@@ -83,8 +83,8 @@ public class CaseAccessDataStoreService {
     }
 
     private CaseAccessDataStoreUnavailableException unavailable(String operation, Throwable throwable) {
-        if (throwable instanceof FeignException.NotFound) {
-            throw (FeignException.NotFound) throwable;
+        if (throwable instanceof FeignException.NotFound notFound) {
+            throw notFound;
         }
 
         if (throwable instanceof CallNotPermittedException) {

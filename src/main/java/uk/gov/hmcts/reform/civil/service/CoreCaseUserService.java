@@ -105,8 +105,8 @@ public class CoreCaseUserService {
 
     @Recover
     public List<String> recover(Exception ex, String caseId, String userId) {
-        if (ex instanceof CaseAccessDataStoreCircuitOpenException) {
-            throw (CaseAccessDataStoreCircuitOpenException) ex;
+        if (ex instanceof CaseAccessDataStoreCircuitOpenException circuitOpenException) {
+            throw circuitOpenException;
         }
         log.error("[CoreCaseUserService] User Case Roles lookup failed. CaseId: {}, UserId: {}",
                   caseId, userId, ex);
@@ -115,8 +115,8 @@ public class CoreCaseUserService {
 
     @Recover
     public void recover(Exception ex, String caseId, String userId, String organisationId, CaseRole caseRole) {
-        if (ex instanceof CaseAccessDataStoreCircuitOpenException) {
-            throw (CaseAccessDataStoreCircuitOpenException) ex;
+        if (ex instanceof CaseAccessDataStoreCircuitOpenException circuitOpenException) {
+            throw circuitOpenException;
         }
         log.error("[CoreCaseUserService] assignCase/unassignCase failed. CaseId: {}, UserId: {}, Role: {}",
                   caseId, userId, caseRole, ex);
@@ -124,8 +124,8 @@ public class CoreCaseUserService {
 
     @Recover
     public void recover(Exception ex, String caseId, String userId, String organisationId) {
-        if (ex instanceof CaseAccessDataStoreCircuitOpenException) {
-            throw (CaseAccessDataStoreCircuitOpenException) ex;
+        if (ex instanceof CaseAccessDataStoreCircuitOpenException circuitOpenException) {
+            throw circuitOpenException;
         }
         log.error("[CoreCaseUserService] removeCreatorRoleCaseAssignment failed. CaseId: {}, UserId: {}",
                   caseId, userId, ex);
@@ -133,8 +133,8 @@ public class CoreCaseUserService {
 
     @Recover
     public CaseAssignmentUserRolesResource recover(Exception ex, String caseId) {
-        if (ex instanceof CaseAccessDataStoreCircuitOpenException) {
-            throw (CaseAccessDataStoreCircuitOpenException) ex;
+        if (ex instanceof CaseAccessDataStoreCircuitOpenException circuitOpenException) {
+            throw circuitOpenException;
         }
         log.error("[CoreCaseUserService] getUserRoles failed. CaseId: {}", caseId, ex);
         return CaseAssignmentUserRolesResource.builder().caseAssignmentUserRoles(Collections.emptyList()).build();
@@ -168,8 +168,8 @@ public class CoreCaseUserService {
             || (e instanceof CaseAccessDataStoreUnavailableException && !(e instanceof CaseAccessDataStoreCircuitOpenException))) {
             return new RetryableCaseUserException(e.getMessage(), e);
         }
-        if (e instanceof RuntimeException) {
-            return (RuntimeException) e;
+        if (e instanceof RuntimeException runtimeException) {
+            return runtimeException;
         }
         return new RuntimeException(e.getMessage(), e);
     }

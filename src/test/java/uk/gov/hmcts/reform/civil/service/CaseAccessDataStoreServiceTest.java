@@ -5,13 +5,11 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.springboot3.circuitbreaker.autoconfigure.CircuitBreakerAutoConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
 import uk.gov.hmcts.reform.ccd.model.AddCaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.ccd.model.AddCaseAssignedUserRolesResponse;
@@ -20,12 +18,14 @@ import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.exceptions.CaseAccessDataStoreCircuitOpenException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseAccessDataStoreUnavailableException;
 
+import java.time.Duration;
 import java.util.List;
 
 import static io.github.resilience4j.circuitbreaker.CircuitBreaker.State.CLOSED;
 import static io.github.resilience4j.circuitbreaker.CircuitBreaker.State.OPEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -35,7 +35,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(
     classes = CaseAccessDataStoreService.class,
     properties = {
@@ -203,11 +202,12 @@ class CaseAccessDataStoreServiceTest {
     @Test
     void shouldRouteToFallbackWithoutCallingFeignClientWhenCircuitBreakerIsOpen() {
         circuitBreakerRegistry.circuitBreaker("caseAccessDataStoreApi").transitionToOpenState();
+        AddCaseAssignedUserRolesRequest caseRoleRequest = new AddCaseAssignedUserRolesRequest();
 
         assertThatThrownBy(() -> caseAccessDataStoreService.addCaseUserRoles(
             AUTHORISATION,
             SERVICE_AUTHORISATION,
-            new AddCaseAssignedUserRolesRequest()
+            caseRoleRequest
         ))
             .isInstanceOf(CaseAccessDataStoreCircuitOpenException.class)
             .hasMessageContaining("CaseAccessDataStoreApi circuit is open for operation: addCaseUserRoles")
@@ -220,7 +220,7 @@ class CaseAccessDataStoreServiceTest {
     void shouldOpenCircuitBreakerOnSlowCalls() {
         when(caseAccessDataStoreApi.removeCaseUserRoles(anyString(), anyString(), any()))
             .thenAnswer(invocation -> {
-                Thread.sleep(50);
+                await().pollDelay(Duration.ofMillis(50)).until(() -> true);
                 return new AddCaseAssignedUserRolesResponse();
             });
 
@@ -242,10 +242,12 @@ class CaseAccessDataStoreServiceTest {
         assertThat(circuitBreakerRegistry.circuitBreaker("caseAccessDataStoreApi").getState())
             .isEqualTo(OPEN);
 
+        CaseAssignedUserRolesRequest caseRoleRequest = new CaseAssignedUserRolesRequest();
+
         assertThatThrownBy(() -> caseAccessDataStoreService.removeCaseUserRoles(
             AUTHORISATION,
             SERVICE_AUTHORISATION,
-            new CaseAssignedUserRolesRequest()
+            caseRoleRequest
         ))
             .isInstanceOf(CaseAccessDataStoreCircuitOpenException.class)
             .hasCauseInstanceOf(CallNotPermittedException.class);
@@ -272,11 +274,12 @@ class CaseAccessDataStoreServiceTest {
     @Test
     void shouldUseFallbackExceptionForRemoveCaseUserRolesWhenCircuitBreakerIsOpen() {
         circuitBreakerRegistry.circuitBreaker("caseAccessDataStoreApi").transitionToOpenState();
+        CaseAssignedUserRolesRequest caseRoleRequest = new CaseAssignedUserRolesRequest();
 
         assertThatThrownBy(() -> caseAccessDataStoreService.removeCaseUserRoles(
             AUTHORISATION,
             SERVICE_AUTHORISATION,
-            new CaseAssignedUserRolesRequest()
+            caseRoleRequest
         ))
             .isInstanceOf(CaseAccessDataStoreCircuitOpenException.class)
             .hasMessageContaining("CaseAccessDataStoreApi circuit is open for operation: removeCaseUserRoles")
