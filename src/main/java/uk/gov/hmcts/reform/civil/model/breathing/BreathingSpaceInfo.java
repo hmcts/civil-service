@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 @Data
 @NoArgsConstructor
@@ -15,4 +16,10 @@ public class BreathingSpaceInfo {
 
     @JsonProperty("liftBreathing")
     private BreathingSpaceLiftInfo lift;
+
+    @JsonProperty("breathingSpaceActive")
+    private YesOrNo active;
+
+    @JsonProperty("breathingSpaceLifted")
+    private YesOrNo lifted;
 }
