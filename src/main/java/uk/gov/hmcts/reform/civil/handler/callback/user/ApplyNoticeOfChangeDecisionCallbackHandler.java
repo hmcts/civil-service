@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
@@ -111,7 +112,9 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
             .setCaseRole(corFieldBeforeDecision.getCaseRoleId().getValue().getCode())
             .setTimestamp(corFieldBeforeDecision.getRequestTimestamp())
             .setFormerRepresentationEmailAddress(
-                getFormerEmail(corFieldBeforeDecision.getCaseRoleId().getValue().getCode(), caseData));
+                getFormerEmail(corFieldBeforeDecision.getCaseRoleId().getValue().getCode(), caseData))
+            .setFormerRepresentationReference(
+                getFormerReference(corFieldBeforeDecision.getCaseRoleId().getValue().getCode(), caseData));
 
         if (corFieldBeforeDecision.getOrganisationToRemove() != null) {
             changeOfRepresentation.setOrganisationToRemoveID(
@@ -215,6 +218,34 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         }
         if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(caseRole)) {
             return caseData.getRespondentSolicitor2EmailAddress();
+        }
+        return null;
+    }
+
+    /** Captures the reference the outgoing legal representative supplied for themselves.
+     * UpdateCaseDetailsAfterNoCHandler nullifies this reference before the parties are notified,
+     * so it has to be kept here in order to be shown in the email telling them they have come off record.
+     *
+     * @param caseRole the case role being replaced
+     * @param caseData caseData
+     * @return the former representative's own reference, or null when they did not provide one
+     */
+    private String getFormerReference(String caseRole, CaseData caseData) {
+        SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
+        if (CaseRole.APPLICANTSOLICITORONE.getFormattedName().equals(caseRole)) {
+            return Optional.ofNullable(solicitorReferences)
+                .map(SolicitorReferences::getApplicantSolicitor1Reference)
+                .orElse(null);
+        }
+        if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)) {
+            return Optional.ofNullable(solicitorReferences)
+                .map(SolicitorReferences::getRespondentSolicitor1Reference)
+                .orElse(null);
+        }
+        if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(caseRole)) {
+            return Optional.ofNullable(solicitorReferences)
+                .map(SolicitorReferences::getRespondentSolicitor2Reference)
+                .orElseGet(caseData::getRespondentSolicitor2Reference);
         }
         return null;
     }
