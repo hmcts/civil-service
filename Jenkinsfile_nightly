@@ -80,6 +80,8 @@ properties([
       description: 'Runs setup projects for caching additional cui user data (userId and accessToken) before running functional tests'),
     choice(name: 'PLAYWRIGHT_RUN_DATA_SETUP', choices: ['true', 'false'],
       description: 'Runs setup projects for caching data before running functional tests'),
+    choice(name: 'PLAYWRIGHT_WA_ENABLED', choices: ['true', 'false'],
+      description: 'Will include work allocation functionality in tests when set to \'true\''),     
     string(name: 'WAIT_FOR_TIMEOUT_MS',
       defaultValue: '120000',
       description: 'Functional tests waitForTimeout value'),
@@ -211,6 +213,7 @@ withNightlyPipeline(type, product, component) {
   env.PLAYWRIGHT_RUN_EXUI_USER_DATA_SETUP=params.PLAYWRIGHT_RUN_EXUI_USER_DATA_SETUP
   env.PLAYWRIGHT_RUN_CUI_USER_DATA_SETUP=params.PLAYWRIGHT_RUN_CUI_USER_DATA_SETUP
   env.PLAYWRIGHT_RUN_DATA_SETUP=params.PLAYWRIGHT_RUN_DATA_SETUP
+  env.PLAYWRIGHT_WA_ENABLED=params.PLAYWRIGHT_WA_ENABLED
   env.PLAYWRIGHT_UNASSIGN_CASES = true
   env.PLAYWRIGHT_TEST_SPEED=params.PLAYWRIGHT_TEST_SPEED
 
