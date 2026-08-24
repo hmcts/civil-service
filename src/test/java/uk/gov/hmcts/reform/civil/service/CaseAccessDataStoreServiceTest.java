@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import feign.FeignException;
+import feign.Request;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.springboot3.circuitbreaker.autoconfigure.CircuitBreakerAutoConfiguration;
@@ -20,7 +22,10 @@ import uk.gov.hmcts.reform.civil.exceptions.CaseAccessDataStoreUnavailableExcept
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 
+import static feign.Request.HttpMethod.GET;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static io.github.resilience4j.circuitbreaker.CircuitBreaker.State.CLOSED;
 import static io.github.resilience4j.circuitbreaker.CircuitBreaker.State.OPEN;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -122,6 +127,63 @@ class CaseAccessDataStoreServiceTest {
 
         assertThat(actualResponse).isEqualTo(expectedResponse);
         verify(caseAccessDataStoreApi).removeCaseUserRoles(AUTHORISATION, SERVICE_AUTHORISATION, request);
+    }
+
+    @Test
+    void shouldRethrowNotFoundException_whenAddCaseUserRolesFailsWithNotFound() {
+        FeignException.NotFound notFound = new FeignException.NotFound(
+            "not found",
+            Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
+            "not found".getBytes(UTF_8),
+            Map.of()
+        );
+        when(caseAccessDataStoreApi.addCaseUserRoles(anyString(), anyString(), any()))
+            .thenThrow(notFound);
+
+        assertThatThrownBy(() -> caseAccessDataStoreService.addCaseUserRoles(
+            AUTHORISATION,
+            SERVICE_AUTHORISATION,
+            new AddCaseAssignedUserRolesRequest()
+        ))
+            .isSameAs(notFound);
+    }
+
+    @Test
+    void shouldRethrowNotFoundException_whenGetUserRolesFailsWithNotFound() {
+        FeignException.NotFound notFound = new FeignException.NotFound(
+            "not found",
+            Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
+            "not found".getBytes(UTF_8),
+            Map.of()
+        );
+        when(caseAccessDataStoreApi.getUserRoles(anyString(), anyString(), anyList()))
+            .thenThrow(notFound);
+
+        assertThatThrownBy(() -> caseAccessDataStoreService.getUserRoles(
+            AUTHORISATION,
+            SERVICE_AUTHORISATION,
+            CASE_IDS
+        ))
+            .isSameAs(notFound);
+    }
+
+    @Test
+    void shouldRethrowNotFoundException_whenRemoveCaseUserRolesFailsWithNotFound() {
+        FeignException.NotFound notFound = new FeignException.NotFound(
+            "not found",
+            Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
+            "not found".getBytes(UTF_8),
+            Map.of()
+        );
+        when(caseAccessDataStoreApi.removeCaseUserRoles(anyString(), anyString(), any()))
+            .thenThrow(notFound);
+
+        assertThatThrownBy(() -> caseAccessDataStoreService.removeCaseUserRoles(
+            AUTHORISATION,
+            SERVICE_AUTHORISATION,
+            new CaseAssignedUserRolesRequest()
+        ))
+            .isSameAs(notFound);
     }
 
     @Test
@@ -253,6 +315,78 @@ class CaseAccessDataStoreServiceTest {
             .hasCauseInstanceOf(CallNotPermittedException.class);
 
         verify(caseAccessDataStoreApi, times(2)).removeCaseUserRoles(anyString(), anyString(), any());
+    }
+
+    @Test
+    void shouldOpenCircuitBreakerOnSlowCallsForAddCaseUserRoles() {
+        when(caseAccessDataStoreApi.addCaseUserRoles(anyString(), anyString(), any()))
+            .thenAnswer(invocation -> {
+                await().pollDelay(Duration.ofMillis(50)).until(() -> true);
+                return new AddCaseAssignedUserRolesResponse();
+            });
+
+        assertThat(circuitBreakerRegistry.circuitBreaker("caseAccessDataStoreApi").getState())
+            .isEqualTo(CLOSED);
+
+        caseAccessDataStoreService.addCaseUserRoles(AUTHORISATION, SERVICE_AUTHORISATION, new AddCaseAssignedUserRolesRequest());
+        caseAccessDataStoreService.addCaseUserRoles(AUTHORISATION, SERVICE_AUTHORISATION, new AddCaseAssignedUserRolesRequest());
+
+        assertThat(circuitBreakerRegistry.circuitBreaker("caseAccessDataStoreApi").getState())
+            .isEqualTo(OPEN);
+    }
+
+    @Test
+    void shouldOpenCircuitBreakerOnSlowCallsForGetUserRoles() {
+        when(caseAccessDataStoreApi.getUserRoles(anyString(), anyString(), anyList()))
+            .thenAnswer(invocation -> {
+                await().pollDelay(Duration.ofMillis(50)).until(() -> true);
+                return new CaseAssignedUserRolesResource();
+            });
+
+        assertThat(circuitBreakerRegistry.circuitBreaker("caseAccessDataStoreApi").getState())
+            .isEqualTo(CLOSED);
+
+        caseAccessDataStoreService.getUserRoles(AUTHORISATION, SERVICE_AUTHORISATION, CASE_IDS);
+        caseAccessDataStoreService.getUserRoles(AUTHORISATION, SERVICE_AUTHORISATION, CASE_IDS);
+
+        assertThat(circuitBreakerRegistry.circuitBreaker("caseAccessDataStoreApi").getState())
+            .isEqualTo(OPEN);
+    }
+
+    @Test
+    void shouldOpenCircuitBreakerOnFailedCallsForAddCaseUserRoles() {
+        when(caseAccessDataStoreApi.addCaseUserRoles(anyString(), anyString(), any()))
+            .thenThrow(new RuntimeException("failed"));
+
+        assertThat(circuitBreakerRegistry.circuitBreaker("caseAccessDataStoreApi").getState())
+            .isEqualTo(CLOSED);
+
+        assertThatThrownBy(() -> caseAccessDataStoreService.addCaseUserRoles(AUTHORISATION, SERVICE_AUTHORISATION, new AddCaseAssignedUserRolesRequest()))
+            .isInstanceOf(CaseAccessDataStoreUnavailableException.class);
+
+        assertThatThrownBy(() -> caseAccessDataStoreService.addCaseUserRoles(AUTHORISATION, SERVICE_AUTHORISATION, new AddCaseAssignedUserRolesRequest()))
+            .isInstanceOf(CaseAccessDataStoreUnavailableException.class);
+
+        assertThat(circuitBreakerRegistry.circuitBreaker("caseAccessDataStoreApi").getState())
+            .isEqualTo(OPEN);
+    }
+
+    @Test
+    void shouldOpenCircuitBreakerOnFailedCallsForRemoveCaseUserRoles() {
+        when(caseAccessDataStoreApi.removeCaseUserRoles(anyString(), anyString(), any()))
+            .thenThrow(new RuntimeException("failed"));
+
+        assertThat(circuitBreakerRegistry.circuitBreaker("caseAccessDataStoreApi").getState())
+            .isEqualTo(CLOSED);
+
+        assertThatThrownBy(() -> caseAccessDataStoreService.removeCaseUserRoles(AUTHORISATION, SERVICE_AUTHORISATION, new CaseAssignedUserRolesRequest()))
+            .isInstanceOf(CaseAccessDataStoreUnavailableException.class);
+
+        assertThatThrownBy(() -> caseAccessDataStoreService.removeCaseUserRoles(AUTHORISATION, SERVICE_AUTHORISATION, new CaseAssignedUserRolesRequest()))
+            .isInstanceOf(CaseAccessDataStoreUnavailableException.class);
+
+        assertThat(circuitBreakerRegistry.circuitBreaker("caseAccessDataStoreApi").getState())
+            .isEqualTo(OPEN);
     }
 
     @Test

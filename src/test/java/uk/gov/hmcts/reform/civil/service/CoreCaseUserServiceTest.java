@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.exceptions.CaseAccessDataStoreCircuitOpenException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseAccessDataStoreUnavailableException;
 import uk.gov.hmcts.reform.civil.exceptions.RetryableCaseUserException;
 
@@ -159,10 +160,42 @@ class CoreCaseUserServiceTest {
         }
 
         @Test
+        void shouldThrowRetryableCaseUserException_whenAssignUserToCaseForRoleFails() {
+            CaseAssignedUserRolesResource emptyResource = new CaseAssignedUserRolesResource()
+                .setCaseAssignedUserRoles(List.of());
+            when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenReturn(emptyResource);
+
+            CaseAccessDataStoreUnavailableException exception = new CaseAccessDataStoreUnavailableException("unavailable", new RuntimeException());
+            when(caseAccessDataStoreService.addCaseUserRoles(anyString(), anyString(), any()))
+                .thenThrow(exception);
+
+            assertThatThrownBy(() -> service.assignCase(CASE_ID, USER_ID, ORG_ID, CaseRole.APPLICANTSOLICITORONE))
+                .isInstanceOf(RetryableCaseUserException.class)
+                .hasCause(exception);
+        }
+
+        @Test
+        void shouldThrowRuntimeException_whenUserServiceThrowsException() {
+            when(userService.getAccessToken(any(), any())).thenThrow(new RuntimeException("token failed"));
+
+            assertThatThrownBy(() -> service.assignCase(CASE_ID, USER_ID, ORG_ID, CaseRole.APPLICANTSOLICITORONE))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("token failed");
+        }
+
+        @Test
         void shouldLogErrorMessage_whenRecoveringRetryableCaseUserException() {
             service.recover(new RetryableCaseUserException("retry exhausted"), CASE_ID, USER_ID, ORG_ID, CaseRole.APPLICANTSOLICITORONE);
 
             verify(caseAccessDataStoreService, never()).addCaseUserRoles(anyString(), anyString(), any());
+        }
+
+        @Test
+        void shouldRethrowCircuitOpenException_whenRecoveringAssignCase() {
+            CaseAccessDataStoreCircuitOpenException exception = new CaseAccessDataStoreCircuitOpenException("open", new RuntimeException());
+            assertThatThrownBy(() -> service.recover(exception, CASE_ID, USER_ID, ORG_ID, CaseRole.APPLICANTSOLICITORONE))
+                .isSameAs(exception);
         }
 
         private AddCaseAssignedUserRolesRequest getAddCaseAssignedUserRolesRequest(CaseRole caseRole) {
@@ -252,6 +285,54 @@ class CoreCaseUserServiceTest {
             );
         }
 
+        @Test
+        void shouldThrowRetryableCaseUserException_whenUnassignCaseAndCaseAccessDataStoreUnavailableExceptionThrown() {
+            CaseAssignedUserRole role = new CaseAssignedUserRole()
+                .setUserId(USER_ID)
+                .setCaseRole(CaseRole.DEFENDANT.getFormattedName());
+            given(caseAccessDataStoreService.getUserRoles(anyString(), anyString(), anyList()))
+                .willReturn(new CaseAssignedUserRolesResource().setCaseAssignedUserRoles(List.of(role)));
+
+            CaseAccessDataStoreUnavailableException exception = new CaseAccessDataStoreUnavailableException("unavailable", new RuntimeException());
+            when(caseAccessDataStoreService.removeCaseUserRoles(anyString(), anyString(), any()))
+                .thenThrow(exception);
+
+            assertThatThrownBy(() -> service.unassignCase(CASE_ID, USER_ID, ORG_ID, CaseRole.DEFENDANT))
+                .isInstanceOf(RetryableCaseUserException.class)
+                .hasCause(exception);
+        }
+
+        @Test
+        void shouldLogErrorMessage_whenRecoveringRemoveCreatorRoleCaseAssignment() {
+            service.recover(new RetryableCaseUserException("retry exhausted"), CASE_ID, USER_ID, ORG_ID);
+
+            verify(caseAccessDataStoreService, never()).removeCaseUserRoles(anyString(), anyString(), any());
+        }
+
+        @Test
+        void shouldRethrowCircuitOpenException_whenRecoveringRemoveCreatorRole() {
+            CaseAccessDataStoreCircuitOpenException exception = new CaseAccessDataStoreCircuitOpenException("open", new RuntimeException());
+            assertThatThrownBy(() -> service.recover(exception, CASE_ID, USER_ID, ORG_ID))
+                .isSameAs(exception);
+        }
+
+        @Test
+        void shouldThrowRetryableCaseUserException_whenRemoveCreatorRoleAndCaseAccessDataStoreUnavailableExceptionThrown() {
+            CaseAssignedUserRole role = new CaseAssignedUserRole()
+                .setUserId(USER_ID)
+                .setCaseRole(CaseRole.CREATOR.getFormattedName());
+            when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenReturn(new CaseAssignedUserRolesResource().setCaseAssignedUserRoles(List.of(role)));
+
+            CaseAccessDataStoreUnavailableException exception = new CaseAccessDataStoreUnavailableException("unavailable", new RuntimeException());
+            when(caseAccessDataStoreService.removeCaseUserRoles(anyString(), anyString(), any()))
+                .thenThrow(exception);
+
+            assertThatThrownBy(() -> service.removeCreatorRoleCaseAssignment(CASE_ID, USER_ID, ORG_ID))
+                .isInstanceOf(RetryableCaseUserException.class)
+                .hasCause(exception);
+        }
+
         private CaseAssignedUserRolesRequest getCaseAssignedUserRolesRequest(CaseRole caseRole) {
             CaseAssignedUserRoleWithOrganisation caseAssignedUserRoleWithOrganisation
                 = new CaseAssignedUserRoleWithOrganisation()
@@ -325,6 +406,18 @@ class CoreCaseUserServiceTest {
             "not found response body".getBytes(UTF_8),
             Map.of());
 
+        private final FeignException badGatewayException = new FeignException.BadGateway(
+            "bad gateway message",
+            Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
+            "bad gateway response body".getBytes(UTF_8),
+            Map.of());
+
+        private final FeignException serviceUnavailableException = new FeignException.ServiceUnavailable(
+            "service unavailable message",
+            Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
+            "service unavailable response body".getBytes(UTF_8),
+            Map.of());
+
         @BeforeEach
         void setup() {
             when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(
@@ -349,6 +442,26 @@ class CoreCaseUserServiceTest {
 
             assertTrue(caseRoles.contains("[RESPONDENTSOLICITORONE]"));
             assertFalse(caseRoles.contains("[RESPONDENTSOLICITORTWO]"));
+        }
+
+        @Test
+        void shouldReturnDistinctCaseRoles_whenMultipleRolesAssignedToUser() {
+            CaseAssignedUserRole role1 = new CaseAssignedUserRole()
+                .setUserId(USER_ID)
+                .setCaseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
+            CaseAssignedUserRole role2 = new CaseAssignedUserRole()
+                .setUserId(USER_ID)
+                .setCaseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
+
+            CaseAssignedUserRolesResource resource = new CaseAssignedUserRolesResource()
+                .setCaseAssignedUserRoles(List.of(role1, role2));
+            when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenReturn(resource);
+
+            List<String> caseRoles = service.getUserCaseRoles(CASE_ID, USER_ID);
+
+            assertThat(caseRoles).hasSize(1);
+            assertThat(caseRoles).contains("[RESPONDENTSOLICITORONE]");
         }
 
         @Test
@@ -393,6 +506,26 @@ class CoreCaseUserServiceTest {
         }
 
         @Test
+        void shouldThrowRetryableCaseUserException_getUserRoles_whenBadGatewayThrown() {
+            when(caseAssignmentApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenThrow(badGatewayException);
+
+            assertThatThrownBy(() -> service.getUserRoles(CASE_ID))
+                .isInstanceOf(RetryableCaseUserException.class)
+                .hasCause(badGatewayException);
+        }
+
+        @Test
+        void shouldThrowRetryableCaseUserException_getUserRoles_whenServiceUnavailableThrown() {
+            when(caseAssignmentApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenThrow(serviceUnavailableException);
+
+            assertThatThrownBy(() -> service.getUserRoles(CASE_ID))
+                .isInstanceOf(RetryableCaseUserException.class)
+                .hasCause(serviceUnavailableException);
+        }
+
+        @Test
         void shouldThrowRuntimeException_getUserRoles_whenUnexpectedExceptionThrown() {
             when(caseAssignmentApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
                 .thenThrow(new RuntimeException("unexpected"));
@@ -407,6 +540,13 @@ class CoreCaseUserServiceTest {
             var response = service.recover(new RetryableCaseUserException("retry exhausted"), CASE_ID);
 
             assertThat(response.getCaseAssignmentUserRoles()).isEmpty();
+        }
+
+        @Test
+        void shouldRethrowCircuitOpenException_whenRecoveringGetUserRoles() {
+            CaseAccessDataStoreCircuitOpenException exception = new CaseAccessDataStoreCircuitOpenException("open", new RuntimeException());
+            assertThatThrownBy(() -> service.recover(exception, CASE_ID))
+                .isSameAs(exception);
         }
 
         @Test
@@ -455,6 +595,37 @@ class CoreCaseUserServiceTest {
             var userCaseRoles = service.recover(new RetryableCaseUserException("retry exhausted"), CASE_ID, USER_ID);
 
             assertThat(userCaseRoles).isEmpty();
+        }
+
+        @Test
+        void shouldRethrowCircuitOpenException_whenRecoveringGetUserCaseRoles() {
+            CaseAccessDataStoreCircuitOpenException exception = new CaseAccessDataStoreCircuitOpenException("open", new RuntimeException());
+            assertThatThrownBy(() -> service.recover(exception, CASE_ID, USER_ID))
+                .isSameAs(exception);
+        }
+
+        @Test
+        void shouldThrowRuntimeException_whenCheckedExceptionSimulated() {
+            Exception checkedException = new Exception("checked");
+            when(caseAccessDataStoreService.getUserRoles(anyString(), anyString(), anyList()))
+                .thenAnswer(inv -> {
+                    throw checkedException;
+                });
+
+            assertThatThrownBy(() -> service.getUserCaseRoles(CASE_ID, USER_ID))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("checked")
+                .hasCause(checkedException);
+        }
+
+        @Test
+        void shouldThrowCaseAccessDataStoreCircuitOpenException_whenCircuitOpenExceptionThrown() {
+            CaseAccessDataStoreCircuitOpenException exception = new CaseAccessDataStoreCircuitOpenException("open", new RuntimeException());
+            when(caseAccessDataStoreService.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenThrow(exception);
+
+            assertThatThrownBy(() -> service.getUserCaseRoles(CASE_ID, USER_ID))
+                .isSameAs(exception);
         }
     }
 }
