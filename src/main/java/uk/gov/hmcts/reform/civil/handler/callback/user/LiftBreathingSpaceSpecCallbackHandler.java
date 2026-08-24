@@ -120,7 +120,6 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         CaseData data = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
         data.setBusinessProcess(BusinessProcess.ready(LIFT_BREATHING_SPACE_SPEC));
         data.getBreathing().setActive(NO);
-        data.getBreathing().setLifted(YES);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(data.toMap(objectMapper))
