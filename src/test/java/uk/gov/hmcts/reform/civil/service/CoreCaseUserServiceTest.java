@@ -460,8 +460,9 @@ class CoreCaseUserServiceTest {
 
             List<String> caseRoles = service.getUserCaseRoles(CASE_ID, USER_ID);
 
-            assertThat(caseRoles).hasSize(1);
-            assertThat(caseRoles).contains("[RESPONDENTSOLICITORONE]");
+            assertThat(caseRoles)
+                .hasSize(1)
+                .contains("[RESPONDENTSOLICITORONE]");
         }
 
         @Test

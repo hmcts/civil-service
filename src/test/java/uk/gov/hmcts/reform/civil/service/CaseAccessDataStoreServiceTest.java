@@ -361,10 +361,11 @@ class CaseAccessDataStoreServiceTest {
         assertThat(circuitBreakerRegistry.circuitBreaker("caseAccessDataStoreApi").getState())
             .isEqualTo(CLOSED);
 
-        assertThatThrownBy(() -> caseAccessDataStoreService.addCaseUserRoles(AUTHORISATION, SERVICE_AUTHORISATION, new AddCaseAssignedUserRolesRequest()))
+        AddCaseAssignedUserRolesRequest caseRoleRequest = new AddCaseAssignedUserRolesRequest();
+        assertThatThrownBy(() -> caseAccessDataStoreService.addCaseUserRoles(AUTHORISATION, SERVICE_AUTHORISATION, caseRoleRequest))
             .isInstanceOf(CaseAccessDataStoreUnavailableException.class);
 
-        assertThatThrownBy(() -> caseAccessDataStoreService.addCaseUserRoles(AUTHORISATION, SERVICE_AUTHORISATION, new AddCaseAssignedUserRolesRequest()))
+        assertThatThrownBy(() -> caseAccessDataStoreService.addCaseUserRoles(AUTHORISATION, SERVICE_AUTHORISATION, caseRoleRequest))
             .isInstanceOf(CaseAccessDataStoreUnavailableException.class);
 
         assertThat(circuitBreakerRegistry.circuitBreaker("caseAccessDataStoreApi").getState())
@@ -379,10 +380,11 @@ class CaseAccessDataStoreServiceTest {
         assertThat(circuitBreakerRegistry.circuitBreaker("caseAccessDataStoreApi").getState())
             .isEqualTo(CLOSED);
 
-        assertThatThrownBy(() -> caseAccessDataStoreService.removeCaseUserRoles(AUTHORISATION, SERVICE_AUTHORISATION, new CaseAssignedUserRolesRequest()))
+        CaseAssignedUserRolesRequest caseRoleRequest = new CaseAssignedUserRolesRequest();
+        assertThatThrownBy(() -> caseAccessDataStoreService.removeCaseUserRoles(AUTHORISATION, SERVICE_AUTHORISATION, caseRoleRequest))
             .isInstanceOf(CaseAccessDataStoreUnavailableException.class);
 
-        assertThatThrownBy(() -> caseAccessDataStoreService.removeCaseUserRoles(AUTHORISATION, SERVICE_AUTHORISATION, new CaseAssignedUserRolesRequest()))
+        assertThatThrownBy(() -> caseAccessDataStoreService.removeCaseUserRoles(AUTHORISATION, SERVICE_AUTHORISATION, caseRoleRequest))
             .isInstanceOf(CaseAccessDataStoreUnavailableException.class);
 
         assertThat(circuitBreakerRegistry.circuitBreaker("caseAccessDataStoreApi").getState())
