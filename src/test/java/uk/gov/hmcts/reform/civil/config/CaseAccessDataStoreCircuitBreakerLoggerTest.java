@@ -48,24 +48,19 @@ class CaseAccessDataStoreCircuitBreakerLoggerTest {
         when(circuitBreakerRegistry.circuitBreaker("caseAccessDataStoreApi")).thenReturn(circuitBreaker);
         when(circuitBreaker.getEventPublisher()).thenReturn(eventPublisher);
 
-        // This registers the listener
         logger.registerEventListener();
 
-        // Capture the consumer passed to onStateTransition
         ArgumentCaptor<io.github.resilience4j.core.EventConsumer<CircuitBreakerOnStateTransitionEvent>> eventConsumerCaptor =
             ArgumentCaptor.forClass(io.github.resilience4j.core.EventConsumer.class);
         verify(eventPublisher).onStateTransition(eventConsumerCaptor.capture());
 
-        // Create a transition event
         CircuitBreakerOnStateTransitionEvent event = new CircuitBreakerOnStateTransitionEvent(
             "caseAccessDataStoreApi",
             CircuitBreaker.StateTransition.CLOSED_TO_OPEN
         );
 
-        // Invoke the consumer
         eventConsumerCaptor.getValue().consumeEvent(event);
 
-        // Verify log
         assertThat(listAppender.list)
             .extracting(ILoggingEvent::getFormattedMessage)
             .containsExactly("Circuit breaker caseAccessDataStoreApi transitioned from CLOSED to OPEN");

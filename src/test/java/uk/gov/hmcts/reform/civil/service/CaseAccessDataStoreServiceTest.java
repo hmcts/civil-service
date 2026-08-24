@@ -1,12 +1,17 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import feign.FeignException;
 import feign.Request;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.springboot3.circuitbreaker.autoconfigure.CircuitBreakerAutoConfiguration;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration;
@@ -73,10 +78,24 @@ class CaseAccessDataStoreServiceTest {
     @MockBean
     private CaseAccessDataStoreApi caseAccessDataStoreApi;
 
+    private ListAppender<ILoggingEvent> listAppender;
+
     @BeforeEach
     void setUp() {
         reset(caseAccessDataStoreApi);
         circuitBreakerRegistry.circuitBreaker("caseAccessDataStoreApi").reset();
+
+        Logger loggerInstance = (Logger) LoggerFactory.getLogger(CaseAccessDataStoreService.class);
+        listAppender = new ListAppender<>();
+        listAppender.start();
+        loggerInstance.addAppender(listAppender);
+    }
+
+    @AfterEach
+    void tearDown() {
+        Logger loggerInstance = (Logger) LoggerFactory.getLogger(CaseAccessDataStoreService.class);
+        loggerInstance.detachAppender(listAppender);
+        listAppender.stop();
     }
 
     @Test
@@ -223,7 +242,9 @@ class CaseAccessDataStoreServiceTest {
             .extracting(Throwable::getCause)
             .isInstanceOf(RuntimeException.class);
 
-        // The log check would be nice, but here we just ensure it doesn't throw NPE in the fallback itself
+        assertThat(listAppender.list)
+            .extracting(ILoggingEvent::getFormattedMessage)
+            .contains("CaseAccessDataStoreApi fallback invoked for operation getUserRoles. Reason: null");
     }
 
     @Test
@@ -259,6 +280,10 @@ class CaseAccessDataStoreServiceTest {
             SERVICE_AUTHORISATION,
             CASE_IDS
         );
+
+        assertThat(listAppender.list)
+            .extracting(ILoggingEvent::getFormattedMessage)
+            .contains("CaseAccessDataStoreApi fallback invoked for operation getUserRoles. Reason: CCD /case-users failure");
     }
 
     @Test
@@ -276,6 +301,10 @@ class CaseAccessDataStoreServiceTest {
             .hasCauseInstanceOf(CallNotPermittedException.class);
 
         verify(caseAccessDataStoreApi, never()).addCaseUserRoles(anyString(), anyString(), any());
+
+        assertThat(listAppender.list)
+            .extracting(ILoggingEvent::getFormattedMessage)
+            .contains("CaseAccessDataStoreApi circuit is OPEN for operation addCaseUserRoles. Failing fast.");
     }
 
     @Test
