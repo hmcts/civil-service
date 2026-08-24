@@ -58,8 +58,11 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
     private static final Organisation ORGANISATION = new Organisation()
         .setName("test org")
         .setContactInformation(List.of(new ContactInformation()));
-    private static final String PAYMENT_REFERENCE = "RC-1700000000000001";
+    private static final String PAYMENT_REFERENCE = "RC-1519-9028-2432-0001";
+    private static final String PAYMENT_REFERENCE_PATH = "${paymentReference}";
+    private static final String PAYMENT_REFERENCE_REGEX = "^RC-\\d{4}-\\d{4}-\\d{4}-\\d{4}$";
     private static final String SERVICE_REQUEST_REFERENCE = "2026-1700000000000001";
+    private static final String SERVICE_REQUEST_REFERENCE_PATH = "${serviceRequestReference}";
     private static final String RETURN_URL = "https://civil-service/return";
     private static final String CALLBACK_URL = "https://civil-service/callback";
     protected static final String ACCOUNT_NUMBER = "PBA0077597";
@@ -110,8 +113,12 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
     @Pact(consumer = "civil_service")
     public RequestResponsePact retrieveCardPayment(PactDslWithProvider builder) {
         return builder
+            .given("A card payment exists", Map.of("paymentReference", PAYMENT_REFERENCE))
             .uponReceiving("a request to retrieve a card payment")
-            .path("/card-payments/" + PAYMENT_REFERENCE)
+            .pathFromProviderState(
+                "/card-payments/" + PAYMENT_REFERENCE_PATH,
+                "/card-payments/" + PAYMENT_REFERENCE
+            )
             .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN, SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN)
             .method(HttpMethod.GET.toString())
             .willRespondWith()
@@ -124,8 +131,12 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
     @Pact(consumer = "civil_service")
     public RequestResponsePact retrieveCardPaymentStatus(PactDslWithProvider builder) {
         return builder
+            .given("A card payment exists", Map.of("paymentReference", PAYMENT_REFERENCE))
             .uponReceiving("a request to retrieve a card payment status")
-            .path("/card-payments/" + PAYMENT_REFERENCE + "/statuses")
+            .pathFromProviderState(
+                "/card-payments/" + PAYMENT_REFERENCE_PATH + "/statuses",
+                "/card-payments/" + PAYMENT_REFERENCE + "/statuses"
+            )
             .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN, SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN)
             .method(HttpMethod.GET.toString())
             .willRespondWith()
@@ -145,7 +156,7 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
             .body(createJsonObject(buildCreateServiceRequest()))
             .willRespondWith()
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .body(newJsonBody(root -> root.stringValue("service_request_reference", SERVICE_REQUEST_REFERENCE)).build())
+            .body(newJsonBody(root -> root.stringType("service_request_reference", SERVICE_REQUEST_REFERENCE)).build())
             .status(HttpStatus.SC_CREATED)
             .toPact();
     }
@@ -153,17 +164,21 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
     @Pact(consumer = "civil_service")
     public RequestResponsePact createPbaPayment(PactDslWithProvider builder) throws IOException {
         return builder
+            .given("A service request exists", Map.of("serviceRequestReference", SERVICE_REQUEST_REFERENCE))
             .uponReceiving("a request to create a PBA payment for a service request")
-            .path("/service-request/" + SERVICE_REQUEST_REFERENCE + "/pba-payments")
+            .pathFromProviderState(
+                "/service-request/" + SERVICE_REQUEST_REFERENCE_PATH + "/pba-payments",
+                "/service-request/" + SERVICE_REQUEST_REFERENCE + "/pba-payments"
+            )
             .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN, SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN)
             .method(HttpMethod.POST.toString())
             .body(createJsonObject(buildPbaServiceRequest()))
             .willRespondWith()
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .body(newJsonBody(root -> root
-                .stringValue("payment_reference", PAYMENT_REFERENCE)
-                .stringValue("status", "Success")
-                .stringValue("date_created", "2026-08-14T10:15:30.000Z")).build())
+                .stringMatcher("payment_reference", PAYMENT_REFERENCE_REGEX, PAYMENT_REFERENCE)
+                .stringType("status", "Success")
+                .stringType("date_created", "2026-08-14T10:15:30.000Z")).build())
             .status(HttpStatus.SC_CREATED)
             .toPact();
     }
@@ -171,19 +186,23 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
     @Pact(consumer = "civil_service")
     public RequestResponsePact createGovPayCardPaymentRequest(PactDslWithProvider builder) throws IOException {
         return builder
+            .given("A service request exists", Map.of("serviceRequestReference", SERVICE_REQUEST_REFERENCE))
             .uponReceiving("a request to create a service request card payment")
-            .path("/service-request/" + SERVICE_REQUEST_REFERENCE + "/card-payments")
+            .pathFromProviderState(
+                "/service-request/" + SERVICE_REQUEST_REFERENCE_PATH + "/card-payments",
+                "/service-request/" + SERVICE_REQUEST_REFERENCE + "/card-payments"
+            )
             .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN, SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN)
             .method(HttpMethod.POST.toString())
             .body(createJsonObject(buildCardPaymentServiceRequest()))
             .willRespondWith()
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .body(newJsonBody(root -> root
-                .stringValue("external_reference", "external-reference")
-                .stringValue("payment_reference", PAYMENT_REFERENCE)
-                .stringValue("status", "Initiated")
-                .stringValue("next_url", "https://payments/next")
-                .stringValue("date_created", "2026-08-14T10:15:30Z")).build())
+                .stringType("external_reference", "external-reference")
+                .stringMatcher("payment_reference", PAYMENT_REFERENCE_REGEX, PAYMENT_REFERENCE)
+                .stringType("status", "Initiated")
+                .stringType("next_url", "https://payments/next")
+                .stringType("date_created", "2026-08-14T10:15:30Z")).build())
             .status(HttpStatus.SC_CREATED)
             .toPact();
     }
@@ -296,8 +315,7 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
 
     static DslPart getDslPart(String status, String paymentStatus, String errorCode, String errorMessage) {
         return newJsonBody((o) -> {
-            o.stringType("reference", "reference")
-                .stringValue("payment_reference", PAYMENT_REFERENCE)
+            o.stringMatcher("reference", PAYMENT_REFERENCE_REGEX, PAYMENT_REFERENCE)
                 .stringType("status", status)
                 .minArrayLike("status_histories", 1, 1,
                     (sh) -> {
@@ -319,8 +337,8 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
 
     private DslPart buildPaymentResponseDsl(String status) {
         return newJsonBody(root -> root
-            .stringValue("reference", "reference")
-            .stringValue("payment_reference", PAYMENT_REFERENCE)
+            .stringType("reference", "reference")
+            .stringMatcher("payment_reference", PAYMENT_REFERENCE_REGEX, PAYMENT_REFERENCE)
             .stringValue("status", status)
             .stringValue("currency", "GBP")
             .numberValue("amount", 100.00)).build();
