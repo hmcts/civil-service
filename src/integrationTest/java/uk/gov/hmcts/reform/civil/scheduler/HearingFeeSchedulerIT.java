@@ -35,7 +35,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_HEARING_FEE_DUE;
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=HearingFeeSchedulerIT",
-    "scheduler.hearing-fee.enabled=true",
     "search.hearing-fee.pageSize=50",
     "scheduler.lockAtLeastFor=PT0S"
 })
