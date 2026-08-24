@@ -178,12 +178,8 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
 
     @Test
     void testAboutToSubmitCallback() {
-        BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
-        enterInfo.setExpectedEnd(LocalDate.now().plusDays(1));
-        BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
-        breathingInfo.setEnter(enterInfo);
         CaseData caseData = CaseData.builder().build();
-        caseData.setBreathing(breathingInfo);
+        caseData.setBreathing(new BreathingSpaceInfo());
 
         CallbackParams params = new CallbackParams()
             .caseData(caseData)
