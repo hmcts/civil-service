@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import feign.FeignException;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.model.AddCaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.ccd.model.AddCaseAssignedUserRolesResponse;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
+import uk.gov.hmcts.reform.civil.exceptions.CaseAccessDataStoreCircuitOpenException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseAccessDataStoreUnavailableException;
 
 import java.util.List;
@@ -50,6 +52,7 @@ public class CaseAccessDataStoreService {
         return caseAccessDataStoreApi.removeCaseUserRoles(authorisation, serviceAuthorization, caseRoleRequest);
     }
 
+    @SuppressWarnings("unused")
     private AddCaseAssignedUserRolesResponse addCaseUserRolesFallback(
         String authorisation,
         String serviceAuthorization,
@@ -59,6 +62,7 @@ public class CaseAccessDataStoreService {
         throw unavailable("addCaseUserRoles", throwable);
     }
 
+    @SuppressWarnings("unused")
     private CaseAssignedUserRolesResource getUserRolesFallback(
         String authorisation,
         String serviceAuthorization,
@@ -68,6 +72,7 @@ public class CaseAccessDataStoreService {
         throw unavailable("getUserRoles", throwable);
     }
 
+    @SuppressWarnings("unused")
     private AddCaseAssignedUserRolesResponse removeCaseUserRolesFallback(
         String authorisation,
         String serviceAuthorization,
@@ -82,8 +87,16 @@ public class CaseAccessDataStoreService {
             throw (FeignException.NotFound) throwable;
         }
 
+        if (throwable instanceof CallNotPermittedException) {
+            log.error("CaseAccessDataStoreApi circuit is OPEN for operation {}. Failing fast.", operation);
+            throw new CaseAccessDataStoreCircuitOpenException(
+                "CaseAccessDataStoreApi circuit is open for operation: " + operation,
+                throwable
+            );
+        }
+
         log.warn(
-            "CaseAccessDataStoreApi fallback invoked for operation {}. Failing fast. Reason: {}",
+            "CaseAccessDataStoreApi fallback invoked for operation {}. Reason: {}",
             operation,
             throwable.getMessage()
         );

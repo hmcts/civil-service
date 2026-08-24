@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.ccd.model.AddCaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.ccd.model.AddCaseAssignedUserRolesResponse;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
+import uk.gov.hmcts.reform.civil.exceptions.CaseAccessDataStoreCircuitOpenException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseAccessDataStoreUnavailableException;
 
 import java.util.List;
@@ -208,8 +209,8 @@ class CaseAccessDataStoreServiceTest {
             SERVICE_AUTHORISATION,
             new AddCaseAssignedUserRolesRequest()
         ))
-            .isInstanceOf(CaseAccessDataStoreUnavailableException.class)
-            .hasMessageContaining("CaseAccessDataStoreApi is unavailable for operation: addCaseUserRoles")
+            .isInstanceOf(CaseAccessDataStoreCircuitOpenException.class)
+            .hasMessageContaining("CaseAccessDataStoreApi circuit is open for operation: addCaseUserRoles")
             .hasCauseInstanceOf(CallNotPermittedException.class);
 
         verify(caseAccessDataStoreApi, never()).addCaseUserRoles(anyString(), anyString(), any());
@@ -246,7 +247,7 @@ class CaseAccessDataStoreServiceTest {
             SERVICE_AUTHORISATION,
             new CaseAssignedUserRolesRequest()
         ))
-            .isInstanceOf(CaseAccessDataStoreUnavailableException.class)
+            .isInstanceOf(CaseAccessDataStoreCircuitOpenException.class)
             .hasCauseInstanceOf(CallNotPermittedException.class);
 
         verify(caseAccessDataStoreApi, times(2)).removeCaseUserRoles(anyString(), anyString(), any());
@@ -261,8 +262,8 @@ class CaseAccessDataStoreServiceTest {
             SERVICE_AUTHORISATION,
             CASE_IDS
         ))
-            .isInstanceOf(CaseAccessDataStoreUnavailableException.class)
-            .hasMessageContaining("CaseAccessDataStoreApi is unavailable for operation: getUserRoles")
+            .isInstanceOf(CaseAccessDataStoreCircuitOpenException.class)
+            .hasMessageContaining("CaseAccessDataStoreApi circuit is open for operation: getUserRoles")
             .hasCauseInstanceOf(CallNotPermittedException.class);
 
         verify(caseAccessDataStoreApi, never()).getUserRoles(anyString(), anyString(), anyList());
@@ -277,8 +278,8 @@ class CaseAccessDataStoreServiceTest {
             SERVICE_AUTHORISATION,
             new CaseAssignedUserRolesRequest()
         ))
-            .isInstanceOf(CaseAccessDataStoreUnavailableException.class)
-            .hasMessageContaining("CaseAccessDataStoreApi is unavailable for operation: removeCaseUserRoles")
+            .isInstanceOf(CaseAccessDataStoreCircuitOpenException.class)
+            .hasMessageContaining("CaseAccessDataStoreApi circuit is open for operation: removeCaseUserRoles")
             .hasCauseInstanceOf(CallNotPermittedException.class);
 
         verify(caseAccessDataStoreApi, never()).removeCaseUserRoles(anyString(), anyString(), any());

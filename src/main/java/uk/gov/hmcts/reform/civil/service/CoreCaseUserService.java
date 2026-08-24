@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.exceptions.CaseAccessDataStoreCircuitOpenException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseAccessDataStoreUnavailableException;
 import uk.gov.hmcts.reform.civil.exceptions.RetryableCaseUserException;
 
@@ -47,12 +48,11 @@ public class CoreCaseUserService {
                 .getCaseAssignedUserRoles().stream()
                 .filter(c -> c.getUserId().equals(userId)).distinct()
                 .map(CaseAssignedUserRole::getCaseRole).toList();
-        } catch (FeignException.GatewayTimeout | FeignException.BadGateway | FeignException.ServiceUnavailable
-                 | CaseAccessDataStoreUnavailableException e) {
-            throw new RetryableCaseUserException(e.getMessage(), e);
         } catch (FeignException.NotFound ex) {
             log.error("User Roles not found", ex);
             return Collections.emptyList();
+        } catch (Exception e) {
+            throw handleException(e);
         }
     }
 
@@ -66,9 +66,8 @@ public class CoreCaseUserService {
             } else {
                 log.info("Case already have the user with {} role", caseRole.getFormattedName());
             }
-        } catch (FeignException.GatewayTimeout | FeignException.BadGateway | FeignException.ServiceUnavailable
-                 | CaseAccessDataStoreUnavailableException e) {
-            throw new RetryableCaseUserException(e.getMessage(), e);
+        } catch (Exception e) {
+            throw handleException(e);
         }
     }
 
@@ -84,9 +83,8 @@ public class CoreCaseUserService {
                     .setOrganisationId(organisationId);
                 removeAccessFromRole(caseAssignedUserRoleWithOrganisation, caaAccessToken);
             }
-        } catch (FeignException.GatewayTimeout | FeignException.BadGateway | FeignException.ServiceUnavailable
-                 | CaseAccessDataStoreUnavailableException e) {
-            throw new RetryableCaseUserException(e.getMessage(), e);
+        } catch (Exception e) {
+            throw handleException(e);
         }
     }
 
@@ -100,34 +98,45 @@ public class CoreCaseUserService {
             } else {
                 log.info("User doesn't have {} role", CaseRole.CREATOR.getFormattedName());
             }
-        } catch (FeignException.GatewayTimeout | FeignException.BadGateway | FeignException.ServiceUnavailable
-                 | CaseAccessDataStoreUnavailableException e) {
-            throw new RetryableCaseUserException(e.getMessage(), e);
+        } catch (Exception e) {
+            throw handleException(e);
         }
     }
 
     @Recover
-    public List<String> recover(RetryableCaseUserException ex, String caseId, String userId) {
-        log.error("[CoreCaseUserService] Retryable User Case Roles lookup failed after retries for CaseId: {}, UserId: {}",
+    public List<String> recover(Exception ex, String caseId, String userId) {
+        if (ex instanceof CaseAccessDataStoreCircuitOpenException) {
+            throw (CaseAccessDataStoreCircuitOpenException) ex;
+        }
+        log.error("[CoreCaseUserService] User Case Roles lookup failed. CaseId: {}, UserId: {}",
                   caseId, userId, ex);
         return Collections.emptyList();
     }
 
     @Recover
-    public void recover(RetryableCaseUserException ex, String caseId, String userId, String organisationId, CaseRole caseRole) {
-        log.error("[CoreCaseUserService] Retryable assignCase/unassignCase failed after retries for CaseId: {}, UserId: {}",
+    public void recover(Exception ex, String caseId, String userId, String organisationId, CaseRole caseRole) {
+        if (ex instanceof CaseAccessDataStoreCircuitOpenException) {
+            throw (CaseAccessDataStoreCircuitOpenException) ex;
+        }
+        log.error("[CoreCaseUserService] assignCase/unassignCase failed. CaseId: {}, UserId: {}, Role: {}",
+                  caseId, userId, caseRole, ex);
+    }
+
+    @Recover
+    public void recover(Exception ex, String caseId, String userId, String organisationId) {
+        if (ex instanceof CaseAccessDataStoreCircuitOpenException) {
+            throw (CaseAccessDataStoreCircuitOpenException) ex;
+        }
+        log.error("[CoreCaseUserService] removeCreatorRoleCaseAssignment failed. CaseId: {}, UserId: {}",
                   caseId, userId, ex);
     }
 
     @Recover
-    public void recover(RetryableCaseUserException ex, String caseId, String userId, String organisationId) {
-        log.error("[CoreCaseUserService] Retryable removeCreatorRoleCaseAssignment failed after retries for CaseId: {}, UserId: {}",
-                  caseId, userId, ex);
-    }
-
-    @Recover
-    public CaseAssignmentUserRolesResource recover(RetryableCaseUserException ex, String caseId) {
-        log.error("[CoreCaseUserService] Retryable getUserRoles failed after retries for CaseId: {}", caseId, ex);
+    public CaseAssignmentUserRolesResource recover(Exception ex, String caseId) {
+        if (ex instanceof CaseAccessDataStoreCircuitOpenException) {
+            throw (CaseAccessDataStoreCircuitOpenException) ex;
+        }
+        log.error("[CoreCaseUserService] getUserRoles failed. CaseId: {}", caseId, ex);
         return CaseAssignmentUserRolesResource.builder().caseAssignmentUserRoles(Collections.emptyList()).build();
     }
 
@@ -144,12 +153,25 @@ public class CoreCaseUserService {
                 authTokenGenerator.generate(),
                 List.of(caseId)
             );
-        } catch (FeignException.GatewayTimeout | FeignException.BadGateway | FeignException.ServiceUnavailable e) {
-            throw new RetryableCaseUserException(e.getMessage(), e);
         } catch (FeignException.NotFound ex) {
             log.error("User Roles not found", ex);
             return CaseAssignmentUserRolesResource.builder().caseAssignmentUserRoles(Collections.emptyList()).build();
+        } catch (Exception e) {
+            throw handleException(e);
         }
+    }
+
+    private RuntimeException handleException(Exception e) {
+        if (e instanceof FeignException.GatewayTimeout
+            || e instanceof FeignException.BadGateway
+            || e instanceof FeignException.ServiceUnavailable
+            || (e instanceof CaseAccessDataStoreUnavailableException && !(e instanceof CaseAccessDataStoreCircuitOpenException))) {
+            return new RetryableCaseUserException(e.getMessage(), e);
+        }
+        if (e instanceof RuntimeException) {
+            return (RuntimeException) e;
+        }
+        return new RuntimeException(e.getMessage(), e);
     }
 
     private String getCaaAccessToken() {
