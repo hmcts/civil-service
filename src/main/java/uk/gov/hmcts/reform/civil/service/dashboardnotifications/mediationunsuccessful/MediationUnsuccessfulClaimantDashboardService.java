@@ -45,12 +45,12 @@ public class MediationUnsuccessfulClaimantDashboardService extends DashboardScen
     public String getScenario(CaseData caseData) {
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
             log.info("Carm enabled");
-            if (isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(caseData)) {
-                log.info("isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne");
-                return SCENARIO_AAA6_CLAIMANT_MEDIATION_WHEN_DEFENDANT_NOT_CONTACTABLE.getScenario();
-            } else if (isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(caseData)) {
+            if (isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(caseData)) {
                 log.info("isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne");
                 return SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_CLAIMANT_NONATTENDANCE.getScenario();
+            } else if (isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(caseData)) {
+                log.info("isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne");
+                return SCENARIO_AAA6_CLAIMANT_MEDIATION_WHEN_DEFENDANT_NOT_CONTACTABLE.getScenario();
             } else {
                 log.info("else");
                 return SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_GENERIC.getScenario();
