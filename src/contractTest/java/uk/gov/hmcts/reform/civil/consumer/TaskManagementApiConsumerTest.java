@@ -91,6 +91,7 @@ public class TaskManagementApiConsumerTest extends BaseContractTest {
 
     private RequestResponsePact buildSearchTaskResponsePact(PactDslWithProvider builder) throws IOException {
         return builder
+            .given("appropriate tasks are returned by criteria")
             .uponReceiving("a new task search request")
             .path(ENDPOINT)
             .method(HttpMethod.POST.toString())
@@ -104,12 +105,14 @@ public class TaskManagementApiConsumerTest extends BaseContractTest {
 
     private RequestResponsePact buildClaimTaskResponsePact(PactDslWithProvider builder) {
         return builder
+            .given("claim a task using taskId")
             .uponReceiving("a new claim task request")
             .path(CLAIM_ENDPOINT)
             .method(HttpMethod.POST.toString())
             .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
+            .body("", "application/json")
             .willRespondWith()
-            .status(HttpStatus.SC_OK)
+            .status(HttpStatus.SC_NO_CONTENT)
             .toPact();
     }
 
