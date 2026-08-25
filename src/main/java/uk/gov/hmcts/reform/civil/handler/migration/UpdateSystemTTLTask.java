@@ -12,18 +12,13 @@ public class UpdateSystemTTLTask extends MigrationTask<ExcelCaseReference> {
     }
 
     @Override
-    protected String getEventSummary() {
-        return "Update case system TTL via migration task";
-    }
-
-    @Override
-    protected String getTaskName() {
-        return "UpdateSystemTTLTask";
-    }
-
-    @Override
     protected String getEventDescription() {
         return "This task updates system TTL on the case";
+    }
+
+    @Override
+    protected String getEventSummary() {
+        return "Update case system TTL via migration task";
     }
 
     @Override
@@ -32,5 +27,10 @@ public class UpdateSystemTTLTask extends MigrationTask<ExcelCaseReference> {
             throw new IllegalArgumentException("CaseData and CaseReference fields must not be null");
         }
         return caseData;
+    }
+
+    @Override
+    protected String getTaskName() {
+        return "UpdateSystemTTLTask";
     }
 }
