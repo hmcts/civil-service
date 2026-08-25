@@ -41,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ClaimLifecycleFixtu
 import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ClaimLifecycleFixtures.CLAIM_REFERENCE;
 import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ClaimLifecycleFixtures.RESPONDENT_ONE_ORGANISATION;
 import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ClaimLifecycleFixtures.RESPONDENT_TWO_ORGANISATION;
+import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.CreateClaimFixtures.PARTICULARS_OF_CLAIM_FILE_NAME;
 
 @SuppressWarnings({"java:S5960", "java:S6813"})
 class CreateClaimWorkflowTest extends WorkflowIntegrationTest {
@@ -136,7 +137,8 @@ class CreateClaimWorkflowTest extends WorkflowIntegrationTest {
                     "legacyCaseReference",
                     "submittedDate",
                     "CaseAccessCategory",
-                    "respondent1OrganisationIDCopy"
+                    "respondent1OrganisationIDCopy",
+                    "servedDocumentFiles"
                 );
                 assertThat(caseData.getBusinessProcess())
                     .extracting("status", "camundaEvent")
@@ -165,6 +167,13 @@ class CreateClaimWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(caseData.getCaseManagementLocation())
                     .extracting("region", "baseLocation")
                     .containsExactly("2", "420219");
+                assertThat(caseData.getServedDocumentFiles().getParticularsOfClaimDocument())
+                    .singleElement()
+                    .satisfies(document -> {
+                        assertThat(document.getValue().getDocumentFileName())
+                            .isEqualTo(PARTICULARS_OF_CLAIM_FILE_NAME);
+                        assertThat(document.getValue().getCategoryID()).isEqualTo("particularsOfClaim");
+                    });
                 assertState(caseData, CLAIM_SUBMITTED.fullName());
             })
             .submitted()

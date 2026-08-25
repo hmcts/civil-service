@@ -1,21 +1,28 @@
 package uk.gov.hmcts.reform.civil.workflow.ccd.fixture;
 
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.workflow.helper.CaseDataTemplates;
+
+import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ClaimLifecycleFixtures.CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ClaimLifecycleFixtures.RESPONDENT_ONE_ORGANISATION;
 import static uk.gov.hmcts.reform.civil.workflow.ccd.fixture.ClaimLifecycleFixtures.RESPONDENT_TWO_ORGANISATION;
 
 public final class CreateClaimFixtures {
+
+    public static final String PARTICULARS_OF_CLAIM_FILE_NAME = "particulars-of-claim.pdf";
 
     private static final String CREATE_CLAIM_START = "create-claim-start";
     private static final Address RESPONDENT_SOLICITOR_SERVICE_ADDRESS = new Address(
@@ -38,14 +45,19 @@ public final class CreateClaimFixtures {
     }
 
     public static CaseData representedOneVOneClaimDraft() {
-        return completeDraft(CaseDataBuilder.builder()
+        CaseData representedClaim = CaseDataBuilder.builder()
             .atStateClaimDraft()
             .respondent1OrganisationPolicy(ClaimLifecycleFixtures.registeredPolicy(
                 RESPONDENT_ONE_ORGANISATION,
                 RESPONDENTSOLICITORONE,
                 "respondent-one-policy"
             ))
-            .build());
+            .build();
+
+        return completeDraft(representedClaim).toBuilder()
+            .uploadParticularsOfClaim(YES)
+            .servedDocumentFiles(particularsOfClaimDocument())
+            .build();
     }
 
     public static CaseData representedTwoVOneClaimDraft() {
@@ -139,5 +151,15 @@ public final class CreateClaimFixtures {
             .claimStarted(YES)
             .uiStatementOfTruth(ClaimLifecycleFixtures.statementOfTruth())
             .build();
+    }
+
+    private static ServedDocumentFiles particularsOfClaimDocument() {
+        Document document = new Document()
+            .setDocumentUrl("http://dm-store/documents/particulars-of-claim")
+            .setDocumentBinaryUrl("http://dm-store/documents/particulars-of-claim/binary")
+            .setDocumentFileName(PARTICULARS_OF_CLAIM_FILE_NAME);
+
+        return new ServedDocumentFiles()
+            .setParticularsOfClaimDocument(List.of(element(document)));
     }
 }
