@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
@@ -94,18 +95,14 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         LocalDate startDate = caseData.getBreathing().getEnter().getStart();
 
-        if (caseData.getBreathing().getEnter().getType() == BreathingSpaceType.STANDARD) {
-            if (caseData.getBreathing().getLift().getExpectedEnd().isAfter(startDate.plusDays(
-                standardBSMaxDurationDays))) {
+        if (caseData.getBreathing().getEnter().getType() == BreathingSpaceType.STANDARD
+            && caseData.getBreathing().getLift().getExpectedEnd().isAfter(startDate.plusDays(standardBSMaxDurationDays))) {
                 errors.add("Standard breathing space cannot last for longer than 60 days");
-            } else if (caseData.getBreathing().getLift().getExpectedEnd().isEqual(startDate)) {
-                errors.add("End date must be after " + DateFormatHelper
-                    .formatLocalDate(startDate, DateFormatHelper.DATE));
-            }
         }
 
         if (startDate != null
-            && startDate.isAfter(caseData.getBreathing().getLift().getExpectedEnd())) {
+            && (startDate.isAfter(caseData.getBreathing().getLift().getExpectedEnd()))
+        || Objects.requireNonNull(startDate).isEqual(caseData.getBreathing().getLift().getExpectedEnd())) {
             errors.add("End date must be after " + DateFormatHelper
                 .formatLocalDate(startDate, DateFormatHelper.DATE));
         }
