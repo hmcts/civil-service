@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentAccessException;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentNotFoundException;
+import uk.gov.hmcts.reform.civil.documentmanagement.InvalidDocumentLinkException;
 import uk.gov.hmcts.reform.civil.model.CallbackErrorResponse;
 import uk.gov.hmcts.reform.civil.exceptions.UpstreamIdamException;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
@@ -162,6 +165,28 @@ public class ResourceExceptionHandler {
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({
+        DocumentNotFoundException.class,
+        DocumentAccessException.class,
+        InvalidDocumentLinkException.class
+    })
+    public ResponseEntity<Object> documentManagementError(Exception exception,
+                                                          ContentCachingRequestWrapper contentCachingRequestWrapper) {
+        log.info(exception.getMessage(), exception);
+        String errorMessage = "Document management error with message: %s for case %s run by user %s";
+        log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
+                                         getUserId(contentCachingRequestWrapper)));
+        HttpStatus status;
+        if (exception instanceof DocumentNotFoundException) {
+            status = HttpStatus.NOT_FOUND;
+        } else if (exception instanceof DocumentAccessException) {
+            status = HttpStatus.FORBIDDEN;
+        } else {
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), status);
     }
 
     @ExceptionHandler(value = NoSuchMethodError.class)
