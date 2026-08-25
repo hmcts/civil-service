@@ -174,6 +174,7 @@ class CreateClaimWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(result.submittedResponse().path("confirmation_body").asText())
                     .contains("Your claim will not be issued until payment is confirmed")
                     .doesNotContain("litigant in person");
+                assertBusinessProcessEmitted(result.caseData(), CREATE_SERVICE_REQUEST_CLAIM);
             });
     }
 

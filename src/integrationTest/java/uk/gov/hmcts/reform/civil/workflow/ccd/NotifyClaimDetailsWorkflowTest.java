@@ -121,6 +121,7 @@ class NotifyClaimDetailsWorkflowTest extends WorkflowIntegrationTest {
                     )
                     .contains("They must respond by")
                     .doesNotContain("proceed offline");
+                assertBusinessProcessEmitted(result.caseData(), NOTIFY_DEFENDANT_OF_CLAIM_DETAILS);
             });
     }
 

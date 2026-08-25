@@ -113,6 +113,7 @@ class NotifyClaimWorkflowTest extends WorkflowIntegrationTest {
                         "The defendant legal representative's organisation has been notified and granted access to this claim."
                     )
                     .doesNotContain("proceed offline");
+                assertBusinessProcessEmitted(result.caseData(), NOTIFY_DEFENDANT_OF_CLAIM);
             });
     }
 

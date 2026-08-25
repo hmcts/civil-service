@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.workflow;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.ArgumentCaptor;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -20,9 +22,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
+import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 
 public abstract class WorkflowIntegrationTest extends BaseIntegrationTest {
 
@@ -48,6 +54,18 @@ public abstract class WorkflowIntegrationTest extends BaseIntegrationTest {
 
     protected WorkflowBuilder<CaseData> startWorkflow(CaseData caseData) {
         return new WorkflowBuilder<>(this::invokeCallback, caseData);
+    }
+
+    protected void assertBusinessProcessEmitted(CaseData expectedCaseData, CaseEvent expectedCamundaEvent) {
+        ArgumentCaptor<CaseData> caseDataCaptor = ArgumentCaptor.forClass(CaseData.class);
+
+        verify(eventEmitterService).emitBusinessProcessCamundaEvent(caseDataCaptor.capture(), eq(false));
+
+        CaseData emittedCaseData = caseDataCaptor.getValue();
+        assertThat(emittedCaseData.getCcdCaseReference()).isEqualTo(expectedCaseData.getCcdCaseReference());
+        assertThat(emittedCaseData.getBusinessProcess())
+            .extracting("status", "camundaEvent")
+            .containsExactly(READY, expectedCamundaEvent.name());
     }
 
     public WorkflowBuilder.CallbackResult<CaseData> invokeCallback(
