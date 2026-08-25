@@ -212,7 +212,7 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
         }
 
         @Test
-        public void whenEndDateIsSameDateAsStartDateForMentalHealthBS_thenReturnNoError() {
+        public void whenEndDateIsSameDateAsStartDateForMentalHealthBS_thenReturnError() {
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
             BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
             breathingSpaceEnterInfo.setStart(LocalDate.now());
@@ -230,7 +230,7 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
                 .pageId("enter-info");
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
-            Assertions.assertTrue(response.getErrors().isEmpty());
+            Assertions.assertFalse(response.getErrors().isEmpty());
         }
 
         @Test
