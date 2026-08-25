@@ -5,7 +5,7 @@ import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulRea
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_UNSUCCESSFUL_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_CLAIMANT_NONATTENDANCE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_GENERIC;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_DEFENDANT_NONATTENDANCE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_MEDIATION_WHEN_DEFENDANT_NOT_CONTACTABLE;
 import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -47,7 +47,7 @@ public class MediationUnsuccessfulClaimantDashboardService extends DashboardScen
             log.info("Carm enabled");
             if (isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(caseData)) {
                 log.info("isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne");
-                return SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_DEFENDANT_NONATTENDANCE.getScenario();
+                return SCENARIO_AAA6_CLAIMANT_MEDIATION_WHEN_DEFENDANT_NOT_CONTACTABLE.getScenario();
             } else if (isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(caseData)) {
                 log.info("isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne");
                 return SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_CLAIMANT_NONATTENDANCE.getScenario();
