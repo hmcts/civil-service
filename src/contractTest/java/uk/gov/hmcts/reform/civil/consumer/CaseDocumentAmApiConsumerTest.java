@@ -34,7 +34,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 
-@PactTestFor(providerName = "ccd_case_document_am_api")
+@PactTestFor(providerName = "case-document-am-api")
 @MockServerConfig(hostInterface = "localhost", port = "6680")
 @TestPropertySource(properties = {
     "case_document_am.url=http://localhost:6680",
@@ -43,7 +43,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SE
 })
 public class CaseDocumentAmApiConsumerTest extends BaseContractTest {
 
-    private static final String DOCUMENT_ID = "24828900-4706-4f88-9fa4-0d8a4e047dc2";
+    private static final String DOCUMENT_ID = "6c3c3906-2b51-468e-8cbb-a4002eded076";
     private static final String FILE_NAME = "0000-claim.pdf";
     private static final byte[] FILE_CONTENT = "test document content".getBytes(StandardCharsets.UTF_8);
     private static final String DOCUMENT_SELF_URL = "http://localhost:6680/cases/documents/" + DOCUMENT_ID;
@@ -84,6 +84,7 @@ public class CaseDocumentAmApiConsumerTest extends BaseContractTest {
     @Pact(consumer = "civil_service")
     public RequestResponsePact downloadDocumentBinary(PactDslWithProvider builder) {
         return builder
+            .given("I have existing document")
             .uponReceiving("a case document binary download request")
             .path("/cases/documents/" + DOCUMENT_ID + "/binary")
             .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN, SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN)
@@ -97,6 +98,7 @@ public class CaseDocumentAmApiConsumerTest extends BaseContractTest {
     @Pact(consumer = "civil_service")
     public RequestResponsePact deleteDocument(PactDslWithProvider builder) {
         return builder
+            .given("I have existing document")
             .uponReceiving("a permanent case document delete request")
             .path("/cases/documents/" + DOCUMENT_ID)
             .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN, SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN)
