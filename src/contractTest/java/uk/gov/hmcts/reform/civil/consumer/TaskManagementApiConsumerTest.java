@@ -27,11 +27,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-@PactTestFor(providerName = "task_management")
 @MockServerConfig(hostInterface = "localhost", port = "6672")
 @TestPropertySource(properties = "task-management.api.url=http://localhost:6672")
 public class TaskManagementApiConsumerTest extends BaseContractTest {
 
+    private static final String TASK_MANAGEMENT_SEARCH_PROVIDER = "wa_task_management_api_search";
+    private static final String TASK_MANAGEMENT_CLAIM_PROVIDER = "wa_task_management_api_claim_task_by_id";
     public static final String TASK_ID = "task-id";
     public static final String TASK_TITLE = "task-title";
     public static final String ENDPOINT = "/task";
@@ -40,20 +41,20 @@ public class TaskManagementApiConsumerTest extends BaseContractTest {
     @Autowired
     private WaTaskManagementApiClient taskManagementClient;
 
-    @Pact(consumer = "civil_service")
+    @Pact(consumer = "civil_service", provider = TASK_MANAGEMENT_SEARCH_PROVIDER)
     public RequestResponsePact postSearchTaskServiceRequest(PactDslWithProvider builder)
         throws JSONException, IOException {
         return buildSearchTaskResponsePact(builder);
     }
 
-    @Pact(consumer = "civil_service")
+    @Pact(consumer = "civil_service", provider = TASK_MANAGEMENT_CLAIM_PROVIDER)
     public RequestResponsePact postClaimTaskServiceRequest(PactDslWithProvider builder)
         throws JSONException, IOException {
         return buildClaimTaskResponsePact(builder);
     }
 
     @Test
-    @PactTestFor(pactMethod = "postSearchTaskServiceRequest")
+    @PactTestFor(providerName = TASK_MANAGEMENT_SEARCH_PROVIDER, pactMethod = "postSearchTaskServiceRequest")
     public void verifySearchTaskSearch() {
         GetTasksResponse response = taskManagementClient.searchWithCriteria(
             SERVICE_AUTH_TOKEN,
@@ -67,7 +68,7 @@ public class TaskManagementApiConsumerTest extends BaseContractTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "postClaimTaskServiceRequest")
+    @PactTestFor(providerName = TASK_MANAGEMENT_CLAIM_PROVIDER, pactMethod = "postClaimTaskServiceRequest")
     public void verifyClaimTask() {
         taskManagementClient.claimTask(
             SERVICE_AUTH_TOKEN,
