@@ -24,7 +24,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-@PactTestFor(providerName = "Idam_api")
 @MockServerConfig(hostInterface = "localhost", port = "6678")
 @TestPropertySource(properties = {
     "idam.api.url=http://localhost:6678",
@@ -35,6 +34,8 @@ import static org.hamcrest.Matchers.is;
 })
 public class IdamApiConsumerTest extends BaseContractTest {
 
+    private static final String IDAM_OIDC_PROVIDER = "idamApi_oidc";
+    private static final String IDAM_USERS_PROVIDER = "idamApi_users";
     private static final String USER_ID = "24828900-4706-4f88-9fa4-0d8a4e047dc2";
     private static final String USER_EMAIL = "civil-system-user@example.com";
     private static final String USER_FORENAME = "Civil";
@@ -53,9 +54,10 @@ public class IdamApiConsumerTest extends BaseContractTest {
     @Autowired
     private IdamClient idamClient;
 
-    @Pact(consumer = "civil_service")
+    @Pact(consumer = "civil_service", provider = IDAM_OIDC_PROVIDER)
     public RequestResponsePact generateOpenIdToken(PactDslWithProvider builder) {
         return builder
+            .given("a token is requested")
             .uponReceiving("a password grant token request")
             .path("/o/token")
             .method(HttpMethod.POST.toString())
@@ -69,9 +71,10 @@ public class IdamApiConsumerTest extends BaseContractTest {
             .toPact();
     }
 
-    @Pact(consumer = "civil_service")
+    @Pact(consumer = "civil_service", provider = IDAM_OIDC_PROVIDER)
     public RequestResponsePact retrieveUserInfo(PactDslWithProvider builder) {
         return builder
+            .given("userinfo is requested")
             .uponReceiving("a userinfo request")
             .path("/o/userinfo")
             .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
@@ -83,9 +86,10 @@ public class IdamApiConsumerTest extends BaseContractTest {
             .toPact();
     }
 
-    @Pact(consumer = "civil_service")
+    @Pact(consumer = "civil_service", provider = IDAM_USERS_PROVIDER)
     public RequestResponsePact retrieveUserDetails(PactDslWithProvider builder) {
         return builder
+            .given("a valid user exists")
             .uponReceiving("a tactical user details request")
             .path("/details")
             .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
@@ -98,7 +102,7 @@ public class IdamApiConsumerTest extends BaseContractTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "generateOpenIdToken")
+    @PactTestFor(providerName = IDAM_OIDC_PROVIDER, pactMethod = "generateOpenIdToken")
     public void verifyGenerateOpenIdToken() {
         String accessToken = idamClient.getAccessToken(USER_EMAIL, PASSWORD);
 
@@ -106,7 +110,7 @@ public class IdamApiConsumerTest extends BaseContractTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "retrieveUserInfo")
+    @PactTestFor(providerName = IDAM_OIDC_PROVIDER, pactMethod = "retrieveUserInfo")
     public void verifyRetrieveUserInfo() {
         UserInfo response = idamClient.getUserInfo(AUTHORIZATION_TOKEN);
 
@@ -115,7 +119,7 @@ public class IdamApiConsumerTest extends BaseContractTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "retrieveUserDetails")
+    @PactTestFor(providerName = IDAM_USERS_PROVIDER, pactMethod = "retrieveUserDetails")
     public void verifyRetrieveUserDetails() {
         UserDetails response = idamClient.getUserDetails(AUTHORIZATION_TOKEN);
 
@@ -139,9 +143,6 @@ public class IdamApiConsumerTest extends BaseContractTest {
         return LambdaDsl.newJsonBody(root -> root
             .stringType("sub", USER_EMAIL)
             .stringType("uid", USER_ID)
-            .stringType("name", "Civil Service")
-            .stringType("given_name", USER_FORENAME)
-            .stringType("family_name", USER_SURNAME)
             .array("roles", roles -> roles.stringType("caseworker-civil"))
         ).build();
     }
