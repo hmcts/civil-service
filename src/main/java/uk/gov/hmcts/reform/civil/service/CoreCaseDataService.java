@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.callback.CmcCaseEvent;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -36,6 +37,7 @@ import java.util.UUID;
 
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CMC_CASE_TYPE;
+import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CMC_JURISDICTION;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
 import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
@@ -128,6 +130,35 @@ public class CoreCaseDataService {
             caseId,
             eventName.name()
         );
+    }
+
+    public StartEventResponse startCMCUpdate(String caseId, CmcCaseEvent eventName) {
+        UserAuthContent systemUpdateUser = getSystemUpdateUser();
+        return coreCaseDataApi.startEventForCaseWorker(
+            systemUpdateUser.getUserToken(),
+            authTokenGenerator.generate(),
+            systemUpdateUser.getUserId(),
+            CMC_JURISDICTION,
+            CMC_CASE_TYPE,
+            caseId,
+            eventName.getEventName()
+        );
+    }
+
+    public CaseData submitCMCUpdate(String caseId, CaseDataContent caseDataContent) {
+        UserAuthContent systemUpdateUser = getSystemUpdateUser();
+
+        CaseDetails caseDetails = coreCaseDataApi.submitEventForCaseWorker(
+            systemUpdateUser.getUserToken(),
+            authTokenGenerator.generate(),
+            systemUpdateUser.getUserId(),
+            CMC_JURISDICTION,
+            CMC_CASE_TYPE,
+            caseId,
+            true,
+            caseDataContent
+        );
+        return caseDetailsConverter.toCaseData(caseDetails);
     }
 
     public CaseData submitUpdate(String caseId, CaseDataContent caseDataContent) {

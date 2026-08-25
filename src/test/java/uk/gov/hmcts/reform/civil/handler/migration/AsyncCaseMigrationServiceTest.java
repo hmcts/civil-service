@@ -14,7 +14,9 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReferenceCsvLoader;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.ExcelCaseReference;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.callback.CmcCaseEvent;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -57,6 +59,51 @@ class AsyncCaseMigrationServiceTest {
             500, // migrationBatchSize
             10 // migrationWaitTime
         );
+    }
+
+    @Test
+    void shouldMigrateCmcCasesUsingMigrateCaseEvent() {
+        @SuppressWarnings("unchecked")
+        MigrationTask<ExcelCaseReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.getEventSummary()).thenReturn("summary");
+        when(migrationTask.getEventDescription()).thenReturn("description");
+
+        CaseDetails caseDetails = CaseDetails.builder().id(1L).state("STATE").build();
+        StartEventResponse startEventResponse = StartEventResponse.builder()
+            .eventId("migrateCase")
+            .token("token123")
+            .caseDetails(caseDetails)
+            .build();
+        when(coreCaseDataService.startCMCUpdate(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.eq(CmcCaseEvent.MIGRATE_CASE)
+        )).thenReturn(startEventResponse);
+
+        CaseData caseData = mock(CaseData.class);
+        CaseData migratedCaseData = mock(CaseData.class);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(migrationTask.migrateCaseData(
+            ArgumentMatchers.eq(caseData),
+            ArgumentMatchers.any(ExcelCaseReference.class)
+        )).thenReturn(migratedCaseData);
+        when(migratedCaseData.toMap(ArgumentMatchers.any())).thenReturn(Map.of("updated", "true"));
+
+        ExcelCaseReference firstReference = excelCaseReference("1111222233334444");
+        ExcelCaseReference secondReference = excelCaseReference("5555666677778888");
+
+        asyncCaseMigrationService.migrateCMCCasesAsync(migrationTask, List.of(firstReference, secondReference));
+
+        verify(coreCaseDataService).startCMCUpdate("1111222233334444", CmcCaseEvent.MIGRATE_CASE);
+        verify(coreCaseDataService).startCMCUpdate("5555666677778888", CmcCaseEvent.MIGRATE_CASE);
+        verify(migrationTask).migrateCaseData(caseData, firstReference);
+        verify(migrationTask).migrateCaseData(caseData, secondReference);
+
+        ArgumentCaptor<CaseDataContent> contentCaptor = ArgumentCaptor.forClass(CaseDataContent.class);
+        verify(coreCaseDataService).submitCMCUpdate(ArgumentMatchers.eq("1111222233334444"), contentCaptor.capture());
+        verify(coreCaseDataService).submitCMCUpdate(ArgumentMatchers.eq("5555666677778888"), contentCaptor.capture());
+        assertEquals("migrateCase", contentCaptor.getAllValues().get(0).getEvent().getId());
+        assertEquals("token123", contentCaptor.getAllValues().get(0).getEventToken());
+        assertEquals(Map.of("updated", "true"), contentCaptor.getAllValues().get(0).getData());
     }
 
     @Test
@@ -347,5 +394,11 @@ class AsyncCaseMigrationServiceTest {
         verify(readOnlyTask).migrateGeneralApplicationCaseData(caseData, gaCaseData, caseReference);
         verify(coreCaseDataService, times(0)).startGeneralApplicationUpdate(ArgumentMatchers.anyString(), ArgumentMatchers.any(CaseEvent.class));
         verify(coreCaseDataService, times(0)).submitGeneralApplicationUpdate(ArgumentMatchers.anyString(), ArgumentMatchers.any(CaseDataContent.class));
+    }
+
+    private ExcelCaseReference excelCaseReference(String caseReference) {
+        ExcelCaseReference reference = new ExcelCaseReference();
+        reference.setCaseReference(caseReference);
+        return reference;
     }
 }

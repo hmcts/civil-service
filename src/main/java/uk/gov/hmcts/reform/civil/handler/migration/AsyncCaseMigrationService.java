@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.callback.CmcCaseEvent;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -48,6 +49,26 @@ public class AsyncCaseMigrationService {
     }
 
     @Async("asyncHandlerExecutor")
+    public <T extends CaseReference> void migrateCMCCasesAsync(
+        MigrationTask<T> task,
+        List<T> caseReferences
+    ) {
+        for (T caseReference : caseReferences) {
+            log.info("Migrating case with ID: {}", caseReference);
+            StartEventResponse startEventResponse = coreCaseDataService.startCMCUpdate(
+                caseReference.getCaseReference(),
+                CmcCaseEvent.MIGRATE_CASE
+            );
+            CaseDetails caseDetails = startEventResponse.getCaseDetails();
+            CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+            caseData = task.migrateCaseData(caseData, caseReference);
+
+            CaseDataContent caseDataContent = buildCaseDataContent(startEventResponse, caseData, task);
+            coreCaseDataService.submitCMCUpdate(caseReference.getCaseReference(), caseDataContent);
+        }
+    }
+
+    @Async("asyncHandlerExecutor")
     public <T extends CaseReference> void migrateCasesAsync(
         MigrationTask<T> task,
         List<T> caseReferences,
@@ -81,8 +102,8 @@ public class AsyncCaseMigrationService {
                     caseData = task.migrateGeneralApplicationCaseData(caseData, gaCaseData, caseReference);
                 } else {
                     startEventResponse = coreCaseDataService.startUpdate(
-                        caseReference.getCaseReference(),
-                        CaseEvent.UPDATE_CASE_DATA
+                            caseReference.getCaseReference(),
+                            CaseEvent.UPDATE_CASE_DATA
                     );
                     CaseDetails caseDetails = startEventResponse.getCaseDetails();
                     caseData = caseDetailsConverter.toCaseData(caseDetails);

@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.callback.CmcCaseEvent;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -74,6 +75,7 @@ class CoreCaseDataServiceTest {
     private static final String USER_AUTH_TOKEN = "Bearer user-xyz";
     private static final String SERVICE_AUTH_TOKEN = "Bearer service-xyz";
     private static final String CASE_TYPE = "CIVIL";
+    private static final String CMC_JURISDICTION = "CMC";
     private static final String CMC_CASE_TYPE = "MoneyClaimCase";
     private static final String GENERAL_APPLICATION_CASE_TYPE = "GENERALAPPLICATION";
     private static final Integer RETURNED_NUMBER_OF_CASES = 10;
@@ -228,6 +230,90 @@ class CoreCaseDataServiceTest {
                 eq(CASE_ID),
                 anyBoolean(),
                 any(CaseDataContent.class)
+            );
+        }
+
+        private StartEventResponse buildStartEventResponse() {
+            return StartEventResponse.builder()
+                .eventId(EVENT_ID)
+                .token(EVENT_TOKEN)
+                .caseDetails(caseDetails)
+                .build();
+        }
+    }
+
+    @Nested
+    class CmcUpdate {
+
+        private static final String EVENT_ID = "migrateCase";
+        private static final String EVENT_TOKEN = "eventToken";
+        private static final String CASE_ID = "1";
+        private static final String USER_ID = "User1";
+        private final CaseDetails caseDetails = CaseDetailsBuilder.builder()
+            .data(new CaseDataBuilder().atStateClaimDraft().build())
+            .build();
+
+        @BeforeEach
+        void setUp() {
+            when(userService.getUserInfo(USER_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword()))
+                .thenReturn(USER_AUTH_TOKEN);
+        }
+
+        @Test
+        void shouldStartCmcUpdateUsingCmcJurisdictionAndCaseType() {
+            when(coreCaseDataApi.startEventForCaseWorker(
+                USER_AUTH_TOKEN,
+                SERVICE_AUTH_TOKEN,
+                USER_ID,
+                CMC_JURISDICTION,
+                CMC_CASE_TYPE,
+                CASE_ID,
+                EVENT_ID
+            )).thenReturn(buildStartEventResponse());
+
+            service.startCMCUpdate(CASE_ID, CmcCaseEvent.MIGRATE_CASE);
+
+            verify(coreCaseDataApi).startEventForCaseWorker(
+                USER_AUTH_TOKEN,
+                SERVICE_AUTH_TOKEN,
+                USER_ID,
+                CMC_JURISDICTION,
+                CMC_CASE_TYPE,
+                CASE_ID,
+                EVENT_ID
+            );
+        }
+
+        @Test
+        void shouldSubmitCmcUpdateUsingCmcJurisdictionAndCaseType() {
+            CaseDataContent caseDataContent = CaseDataContent.builder()
+                .eventToken(EVENT_TOKEN)
+                .event(Event.builder().id(EVENT_ID).build())
+                .data(Map.of())
+                .build();
+            when(coreCaseDataApi.submitEventForCaseWorker(
+                eq(USER_AUTH_TOKEN),
+                eq(SERVICE_AUTH_TOKEN),
+                eq(USER_ID),
+                eq(CMC_JURISDICTION),
+                eq(CMC_CASE_TYPE),
+                eq(CASE_ID),
+                anyBoolean(),
+                eq(caseDataContent)
+            )).thenReturn(caseDetails);
+
+            service.submitCMCUpdate(CASE_ID, caseDataContent);
+
+            verify(coreCaseDataApi).submitEventForCaseWorker(
+                USER_AUTH_TOKEN,
+                SERVICE_AUTH_TOKEN,
+                USER_ID,
+                CMC_JURISDICTION,
+                CMC_CASE_TYPE,
+                CASE_ID,
+                true,
+                caseDataContent
             );
         }
 
