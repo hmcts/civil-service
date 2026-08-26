@@ -26,7 +26,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 
