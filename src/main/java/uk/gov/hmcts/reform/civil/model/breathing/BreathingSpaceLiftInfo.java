@@ -15,5 +15,5 @@ public class BreathingSpaceLiftInfo {
 
     private String event;
 
-    private String eventDescription;
+    private String reasonToLiftBS;
 }
