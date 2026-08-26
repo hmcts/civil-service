@@ -119,11 +119,9 @@ public class TaskManagementApiConsumerTest extends BaseContractTest {
     private DslPart buildSearchTasksResponse() {
         return LambdaDsl.newJsonBody((root) -> {
             root
-                .array("tasks", tasksArray -> {
-                    tasksArray.object(taskObject -> {
-                        taskObject.stringType("id", TASK_ID);
-                        taskObject.stringType("task_title", TASK_TITLE);
-                    });
+                .minArrayLike("tasks", 1, taskObject -> {
+                    taskObject.stringType("id", TASK_ID);
+                    taskObject.stringType("task_title", TASK_TITLE);
                 });
         }).build();
     }
