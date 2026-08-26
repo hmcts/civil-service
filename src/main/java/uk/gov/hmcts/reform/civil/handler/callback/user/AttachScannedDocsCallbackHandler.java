@@ -18,14 +18,14 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ATTACH_SCANNED_DOCS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.attachScannedDocs;
 import static uk.gov.hmcts.reform.civil.utils.MapperUtil.hasPaperResponse;
 
 @Slf4j
 @Service
 public class AttachScannedDocsCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(ATTACH_SCANNED_DOCS);
+    private static final List<CaseEvent> EVENTS = List.of(attachScannedDocs);
     private final CaseDetailsConverter caseDetailsConverter;
 
     @Autowired

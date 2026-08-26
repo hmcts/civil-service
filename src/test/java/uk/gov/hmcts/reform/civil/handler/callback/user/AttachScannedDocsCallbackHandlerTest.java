@@ -43,7 +43,7 @@ class AttachScannedDocsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldReturnCorrectHandledEvents() {
-        assertThat(handler.handledEvents()).containsExactly(uk.gov.hmcts.reform.civil.callback.CaseEvent.ATTACH_SCANNED_DOCS);
+        assertThat(handler.handledEvents()).containsExactly(uk.gov.hmcts.reform.civil.callback.CaseEvent.attachScannedDocs);
     }
 
     @Nested
