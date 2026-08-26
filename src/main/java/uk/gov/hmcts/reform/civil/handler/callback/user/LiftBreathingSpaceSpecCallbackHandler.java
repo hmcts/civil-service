@@ -97,12 +97,12 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
 
         if (caseData.getBreathing().getEnter().getType() == BreathingSpaceType.STANDARD
             && caseData.getBreathing().getLift().getExpectedEnd().isAfter(startDate.plusDays(standardBSMaxDurationDays))) {
-                errors.add("Standard breathing space cannot last for longer than 60 days");
+            errors.add("Standard breathing space cannot last for longer than 60 days");
         }
 
         if (startDate != null
             && (startDate.isAfter(caseData.getBreathing().getLift().getExpectedEnd()))
-        || Objects.requireNonNull(startDate).isEqual(caseData.getBreathing().getLift().getExpectedEnd())) {
+            || Objects.requireNonNull(startDate).isEqual(caseData.getBreathing().getLift().getExpectedEnd())) {
             errors.add("End date must be after " + DateFormatHelper
                 .formatLocalDate(startDate, DateFormatHelper.DATE));
         }
