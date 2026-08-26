@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.civil.service.user;
 
+import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.exceptions.UpstreamUnavailableException;
 import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -14,6 +16,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.never;
@@ -59,6 +62,27 @@ class UserInformationServiceTest {
         assertThrows(CaseNotFoundException.class, () -> userInformationService.getUserCaseRoles(CASE_ID, AUTHORIZATION));
         verify(userService, times(1)).getUserInfo(AUTHORIZATION);
         verify(coreCaseUserService, never()).getUserCaseRoles(anyString(), anyString());
+    }
+
+    @Test
+    public void should_getUserCaseRoles_throw_upstream_unavailable_for_ccd_case_users_failure() {
+        RemoteProcessEngineException cause = new RemoteProcessEngineException("CCD failed", new Throwable());
+
+        when(userService.getUserInfo(AUTHORIZATION)).thenReturn(USER_INFO);
+        when(coreCaseUserService.getUserCaseRoles(CASE_ID, USER_INFO.getUid())).thenThrow(cause);
+
+        UpstreamUnavailableException exception = assertThrows(
+            UpstreamUnavailableException.class,
+            () -> userInformationService.getUserCaseRoles(CASE_ID, AUTHORIZATION)
+        );
+
+        assertEquals("CCD case-users is currently unavailable", exception.getMessage());
+        assertEquals("CCD case-users", exception.getUpstreamService());
+        assertEquals(CASE_ID, exception.getCaseId());
+        assertEquals(USER_INFO.getUid(), exception.getUserId());
+        assertSame(cause, exception.getCause());
+        verify(userService, times(1)).getUserInfo(AUTHORIZATION);
+        verify(coreCaseUserService, times(1)).getUserCaseRoles(CASE_ID, USER_INFO.getUid());
     }
 
     @Test
