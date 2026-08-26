@@ -56,6 +56,22 @@ spring:
     table: schema_version
     baseline-on-migrate: true
 
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connectTimeout: ${HTTP_CONNECT_TIMEOUT:5000}
+            readTimeout: ${HTTP_READ_TIMEOUT:30000}
+          core-case-data-api:
+            readTimeout: ${CORE_CASE_DATA_API_READ_TIMEOUT:25000} # ccd-data-store-api
+          ccd-access-data-store-api:
+            readTimeout: ${CASE_ACCESS_DATA_STORE_API_READ_TIMEOUT:25000} # ccd-data-store-api
+          cmc-claim-store:
+            readTimeout: ${CMC_CLAIM_STORE_API_READ_TIMEOUT:25000}
+          core-case-event-api:
+            readTimeout: ${CORE_CASE_EVENT_API_READ_TIMEOUT:25000}
+
 scheduler:
   active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:JudgementBuffer}
   circuitBreakerThreshold: ${CIRCUIT_BREAKER_THRESHOLD:5}
@@ -68,6 +84,8 @@ scheduler:
   defendant-response:
     cronExpression: ${CRON_EXPRESSION_DEFENDANT_RESPONSE:0 1 16 * * ?}
     enabled: ${SCHEDULER_ENABLED_DEFENDANT_RESPONSE:false}
+  settlement-no-response-from-defendant-check:
+    cronExpression: ${CRON_EXPRESSION_SETTLEMENT_NO_RESPONSE_FROM_DEFENDANT_CHECK:0 0 1 * * ?}
   full-admit-pay-immediately-no-payment-from-def:
     cronExpression: ${CRON_EXPRESSION_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF:0 0 0 * * ?}
     enabled: ${SCHEDULER_ENABLED_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF:false}
@@ -77,6 +95,43 @@ scheduler:
   evidence-upload:
     cronExpression: ${CRON_EXPRESSION_EVIDENCE_UPLOAD:0 30 17 * * ?}
     enabled: ${SCHEDULER_ENABLED_EVIDENCE_UPLOAD:false}
+  bundle-creation:
+    cronExpression: ${CRON_EXPRESSION_BUNDLE_CREATION:0 0 21 * * ?}
+  hearing-cvp-link:
+    cronExpression: ${CRON_EXPRESSION_HEARING_CVP_LINK:0 50 0 * * ?}
+  polling-event-emitter:
+    cronExpression: ${CRON_EXPRESSION_POLLING_EVENT_EMITTER:0 0 8-20 * * ?}
+  automated-hearing-notice:
+    cronExpression: ${CRON_EXPRESSION_AUTOMATED_HEARING_NOTICE:0 0 0,12 * * ?}
+    serviceIds: ${AUTOMATED_HEARING_NOTICE_SERVICE_IDS:AAA6,AAA7}
+  mediation-file-transfer:
+    cronExpression: ${CRON_EXPRESSION_MEDIATION_FILE_TRANSFER:0 0 1 * * ?}
+  take-case-offline:
+    cronExpression: ${CRON_EXPRESSION_TAKE_CASE_OFFLINE:0 1 16 * * ?}
+  trial-ready-notification:
+    cronExpression: ${CRON_EXPRESSION_TRIAL_READY_NOTIFICATION:0 20 0 * * ?}
+  trial-ready-check:
+    cronExpression: ${CRON_EXPRESSION_TRIAL_READY_CHECK:0 30 0 * * ?}
+  order-review-obligation-check:
+    cronExpression: ${CRON_EXPRESSION_ORDER_REVIEW_OBLIGATION_CHECK:0 10 1 * * ?}
+  decision-outcome:
+    cronExpression: ${CRON_EXPRESSION_DECISION_OUTCOME:0 40 0 * * ?}
+  case-dismissed:
+    cronExpression: ${CRON_EXPRESSION_CASE_DISMISSED:0 0 0 * * ?}
+  claim-details-notification-deadline:
+    cronExpression: ${CRON_EXPRESSION_CLAIM_DETAILS_NOTIFICATION_DEADLINE:0 1 16 * * ?}
+  ga-document-upload-notify:
+    cronExpression: ${CRON_EXPRESSION_GA_DOCUMENT_UPLOAD_NOTIFY:0 0 23 * * ?}
+  ga-proof-of-debt:
+    cronExpression: ${CRON_EXPRESSION_GA_PROOF_OF_DEBT:0 0 16 * * ?}
+  ga-order-made:
+    cronExpression: ${CRON_EXPRESSION_GA_ORDER_MADE:0 15 16 * * ?}
+  ga-unless-order:
+    cronExpression: ${CRON_EXPRESSION_GA_UNLESS_ORDER:0 0 16 * * ?}
+  request-for-reconsideration-notification:
+    cronExpression: ${CRON_EXPRESSION_REQUEST_FOR_RECONSIDERATION_NOTIFICATION:0 10 0 * * ?}
+  manage-stay-wa-task:
+    cronExpression: ${CRON_EXPRESSION_MANAGE_STAY_WA_TASK:0 20 1 * * ?}
   default-back-pressure:
     initialDelay: ${DEFAULT_BACK_PRESSURE_INITIAL_DELAY:PT0S}
     maxDelay: ${DEFAULT_BACK_PRESSURE_MAX_DELAY:PT10S}
@@ -719,11 +774,11 @@ feign:
       externalTask:
         url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
       idam-api:
-        loggerLevel: full
+        loggerLevel: basic
       core-case-data-api:
-        loggerLevel: full
+        loggerLevel: basic
       document-management-metadata-download-api:
-        loggerLevel: full
+        loggerLevel: basic
 
 docStore:
   doc:

@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-@PactTestFor(providerName = "idam-s2s-auth")
+@PactTestFor(providerName = "s2s_auth")
 @MockServerConfig(hostInterface = "localhost", port = "6679")
 @TestPropertySource(properties = {
     "idam.s2s-auth.url=http://localhost:6679",
@@ -34,6 +34,7 @@ public class ServiceAuthorisationApiConsumerTest extends BaseContractTest {
     private static final String MICRO_SERVICE = "civil_service";
     private static final String ONE_TIME_PASSWORD = "123456";
     private static final String SERVICE_TOKEN = "eyJhbGciOiJub25lIn0.eyJzdWIiOiJjaXZpbF9zZXJ2aWNlIn0.";
+    private static final String TEXT_PLAIN_CONTENT_TYPE = "text/plain(;charset=.*)?";
 
     @Autowired
     private AuthTokenGenerator authTokenGenerator;
@@ -47,14 +48,15 @@ public class ServiceAuthorisationApiConsumerTest extends BaseContractTest {
     @Pact(consumer = "civil_service")
     public RequestResponsePact generateServiceToken(PactDslWithProvider builder) {
         return builder
+            .given("microservice with valid credentials")
             .uponReceiving("a service token lease request")
             .path("/lease")
             .method(HttpMethod.POST.toString())
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .body(buildServiceTokenRequest())
             .willRespondWith()
-            .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE)
-            .body(SERVICE_TOKEN)
+            .matchHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN_CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE)
+            .bodyMatchingContentType(MediaType.TEXT_PLAIN_VALUE, SERVICE_TOKEN)
             .status(HttpStatus.SC_OK)
             .toPact();
     }
@@ -62,13 +64,14 @@ public class ServiceAuthorisationApiConsumerTest extends BaseContractTest {
     @Pact(consumer = "civil_service")
     public RequestResponsePact getServiceName(PactDslWithProvider builder) {
         return builder
+            .given("microservice with valid token")
             .uponReceiving("a service name details request")
             .path("/details")
             .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
             .method(HttpMethod.GET.toString())
             .willRespondWith()
-            .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE)
-            .body(MICRO_SERVICE)
+            .matchHeader(HttpHeaders.CONTENT_TYPE, TEXT_PLAIN_CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE)
+            .bodyMatchingContentType(MediaType.TEXT_PLAIN_VALUE, MICRO_SERVICE)
             .status(HttpStatus.SC_OK)
             .toPact();
     }
