@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.scheduler.fulladmitpayimmediatelynopayfromdef;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
-import uk.gov.hmcts.reform.civil.service.search.FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService;
+import uk.gov.hmcts.reform.civil.service.search.fulladmitpayimmediatelynopayfromdef.FullAdmitPayImmediatelyNoPaymentFromDefendantPaginatedSearchService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 public class FullAdmitPayImmediatelyNoPaymentFromDefendantScheduler implements CivilScheduler {
 
     public static final String SCHEDULER_NAME = "FullAdmitPayImmediatelyNoPaymentFromDefendant";
-    private final FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService searchService;
+    private final FullAdmitPayImmediatelyNoPaymentFromDefendantPaginatedSearchService searchService;
     private final ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
     private final FullAdmitPayImmediatelyNoPaymentFromDefendantScheduledTask fullAdmitPayImmediatelyNoPaymentFromDefendantScheduledTask;
 
