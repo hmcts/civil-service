@@ -143,6 +143,14 @@ scheduler:
 search:
   judgement-buffer:
     pageSize: ${SEARCH_PAGE_SIZE_JUDGEMENT_BUFFER:50}
+  defendant-response:
+    pageSize: ${SEARCH_PAGE_SIZE_DEFENDANT_RESPONSE:50}
+  evidence-upload:
+    pageSize: ${SEARCH_PAGE_SIZE_EVIDENCE_UPLOAD:50}
+  hearing-fee:
+    pageSize: ${SEARCH_PAGE_SIZE_HEARING_FEE:50}
+  full-admit-pay-immediately-no-payment-from-def:
+    pageSize: ${SEARCH_PAGE_SIZE_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF:50}
 
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
@@ -774,11 +782,11 @@ feign:
       externalTask:
         url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
       idam-api:
-        loggerLevel: full
+        loggerLevel: basic
       core-case-data-api:
-        loggerLevel: full
+        loggerLevel: basic
       document-management-metadata-download-api:
-        loggerLevel: full
+        loggerLevel: basic
 
 docStore:
   doc:
