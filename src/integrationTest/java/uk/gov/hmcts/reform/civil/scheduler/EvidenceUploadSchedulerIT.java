@@ -35,7 +35,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_CHECK
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=EvidenceUploadSchedulerIT",
-    "scheduler.evidence-upload.enabled=true",
     "search.evidence-upload.pageSize=50",
     "scheduler.lockAtLeastFor=PT0S"
 })
