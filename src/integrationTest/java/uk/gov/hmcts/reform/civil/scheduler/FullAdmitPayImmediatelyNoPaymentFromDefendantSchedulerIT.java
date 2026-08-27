@@ -38,7 +38,6 @@ import org.springframework.test.context.ActiveProfiles;
     CoreCaseDataApiMockHelperConfiguration.class
 }, properties = {
     "test.id=FullAdmitPayImmediatelyNoPaymentFromDefendantSchedulerIT",
-    "scheduler.full-admit-pay-immediately-no-payment-from-def.enabled=true",
     "search.full-admit-pay-immediately-no-payment-from-def.pageSize=50",
     "scheduler.lockAtLeastFor=PT0S"
 })

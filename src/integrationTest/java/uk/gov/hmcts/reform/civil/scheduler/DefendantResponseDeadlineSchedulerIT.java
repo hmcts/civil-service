@@ -32,7 +32,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_DE
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=DefendantResponseDeadlineSchedulerIT",
-    "scheduler.defendant-response.enabled=true",
     "search.defendant-response.pageSize=50",
     "scheduler.lockAtLeastFor=PT0S"
 })
