@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.callback.CmcCaseEvent;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -27,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.cmc.model.ClaimEvent;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -132,7 +132,7 @@ public class CoreCaseDataService {
         );
     }
 
-    public StartEventResponse startCMCUpdate(String caseId, CmcCaseEvent eventName) {
+    public StartEventResponse startCMCUpdate(String caseId, ClaimEvent cmcClaimEvent) {
         UserAuthContent systemUpdateUser = getSystemUpdateUser();
         return coreCaseDataApi.startEventForCaseWorker(
             systemUpdateUser.getUserToken(),
@@ -141,14 +141,14 @@ public class CoreCaseDataService {
             CMC_JURISDICTION,
             CMC_CASE_TYPE,
             caseId,
-            eventName.getEventName()
+            cmcClaimEvent.getEventName()
         );
     }
 
-    public CaseData submitCMCUpdate(String caseId, CaseDataContent caseDataContent) {
+    public void submitCMCUpdate(String caseId, CaseDataContent caseDataContent) {
         UserAuthContent systemUpdateUser = getSystemUpdateUser();
 
-        CaseDetails caseDetails = coreCaseDataApi.submitEventForCaseWorker(
+        coreCaseDataApi.submitEventForCaseWorker(
             systemUpdateUser.getUserToken(),
             authTokenGenerator.generate(),
             systemUpdateUser.getUserId(),
@@ -158,7 +158,6 @@ public class CoreCaseDataService {
             true,
             caseDataContent
         );
-        return caseDetailsConverter.toCaseData(caseDetails);
     }
 
     public CaseData submitUpdate(String caseId, CaseDataContent caseDataContent) {

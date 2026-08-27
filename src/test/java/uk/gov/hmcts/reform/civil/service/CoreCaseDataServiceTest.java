@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.callback.CmcCaseEvent;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -29,6 +28,7 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
+import uk.gov.hmcts.reform.cmc.model.ClaimEvent;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -272,7 +272,7 @@ class CoreCaseDataServiceTest {
                 EVENT_ID
             )).thenReturn(buildStartEventResponse());
 
-            service.startCMCUpdate(CASE_ID, CmcCaseEvent.MIGRATE_CASE);
+            service.startCMCUpdate(CASE_ID, ClaimEvent.MIGRATE_CASE);
 
             verify(coreCaseDataApi).startEventForCaseWorker(
                 USER_AUTH_TOKEN,
