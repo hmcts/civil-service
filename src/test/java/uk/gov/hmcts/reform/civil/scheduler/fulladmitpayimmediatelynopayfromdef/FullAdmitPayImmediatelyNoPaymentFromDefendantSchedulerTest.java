@@ -7,7 +7,7 @@ import static org.mockito.Mockito.verify;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
-import uk.gov.hmcts.reform.civil.service.search.FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService;
+import uk.gov.hmcts.reform.civil.service.search.fulladmitpayimmediatelynopayfromdef.FullAdmitPayImmediatelyNoPaymentFromDefendantPaginatedSearchService;
 
 import java.util.function.Supplier;
 
@@ -22,7 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class FullAdmitPayImmediatelyNoPaymentFromDefendantSchedulerTest {
 
     @Mock
-    private FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService searchService;
+    private FullAdmitPayImmediatelyNoPaymentFromDefendantPaginatedSearchService searchService;
 
     @Mock
     private ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;

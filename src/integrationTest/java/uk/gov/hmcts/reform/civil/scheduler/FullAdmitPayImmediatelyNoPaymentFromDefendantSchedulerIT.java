@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.civil.scheduler;
 
+import static java.util.stream.IntStream.rangeClosed;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -20,6 +22,7 @@ import uk.gov.hmcts.test.config.CoreCaseDataApiMockHelperConfiguration;
 import uk.gov.hmcts.test.helper.CoreCaseDataApiMockHelper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +39,7 @@ import org.springframework.test.context.ActiveProfiles;
 }, properties = {
     "test.id=FullAdmitPayImmediatelyNoPaymentFromDefendantSchedulerIT",
     "scheduler.full-admit-pay-immediately-no-payment-from-def.enabled=true",
+    "search.full-admit-pay-immediately-no-payment-from-def.pageSize=50",
     "scheduler.lockAtLeastFor=PT0S"
 })
 class FullAdmitPayImmediatelyNoPaymentFromDefendantSchedulerIT {
@@ -98,5 +102,35 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantSchedulerIT {
             eq("FullAdmitPayImmediatelyNoPaymentFromDefendantJobCompleted"),
             anyMap()
         );
+    }
+
+    @Test
+    void shouldExecuteFullAdmitPayImmediatelyNoPaymentFromDefendantSchedulerAcrossMultiplePages() {
+        // Given a result set one case larger than a single page
+        SearchResult page1 = SearchResult.builder().total(51).cases(createCaseDetailsBatch(50)).build();
+        SearchResult page2 = SearchResult.builder().total(51)
+            .cases(List.of(CaseDetailsBuilder.builder().id(51L).data(Map.of()).build())).build();
+
+        coreCaseDataApiMockHelper.mockElasticSearchResultPaginated(page1, page2);
+
+        // When
+        scheduler.runScheduledTask();
+
+        // Then every case on both pages is processed
+        verify(scheduledTask, times(51)).accept(any(CaseDetails.class));
+        verify(telemetryService).trackEvent(
+            eq("FullAdmitPayImmediatelyNoPaymentFromDefendantJobStarted"),
+            anyMap()
+        );
+        verify(telemetryService).trackEvent(
+            eq("FullAdmitPayImmediatelyNoPaymentFromDefendantJobCompleted"),
+            anyMap()
+        );
+    }
+
+    private List<CaseDetails> createCaseDetailsBatch(int size) {
+        return rangeClosed(1, size)
+            .mapToObj(i -> CaseDetailsBuilder.builder().id((long) i).data(Map.of()).build())
+            .toList();
     }
 }

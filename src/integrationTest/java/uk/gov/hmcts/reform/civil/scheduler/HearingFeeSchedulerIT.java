@@ -19,7 +19,9 @@ import uk.gov.hmcts.test.config.CoreCaseDataApiMockHelperConfiguration;
 import uk.gov.hmcts.test.helper.CoreCaseDataApiMockHelper;
 
 import java.util.List;
+import java.util.Map;
 
+import static java.util.stream.IntStream.rangeClosed;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
@@ -34,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_HEARING_FEE_DUE;
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=HearingFeeSchedulerIT",
     "scheduler.hearing-fee.enabled=true",
+    "search.hearing-fee.pageSize=50",
     "scheduler.lockAtLeastFor=PT0S"
 })
 public class HearingFeeSchedulerIT {
@@ -143,5 +146,38 @@ public class HearingFeeSchedulerIT {
         verify(telemetryService).trackEvent(eq("HearingFeeJobStarted"), anyMap());
         verify(telemetryService).trackEvent(eq("HearingFeeJobCompleted"), anyMap());
         coreCaseDataApiMockHelper.verifySubmitEvent(1);
+    }
+
+    @Test
+    void shouldExecuteHearingFeeSchedulerAcrossMultiplePages() {
+        // Given a result set one case larger than a single page
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateHearingFeeUnpaid().id(CASE_ID).build();
+
+        SearchResult page1 = SearchResult.builder().total(51).cases(createCaseDetailsBatch(50)).build();
+        SearchResult page2 = SearchResult.builder().total(51)
+            .cases(List.of(CaseDetailsBuilder.builder().id(51L).data(Map.of()).build())).build();
+
+        coreCaseDataApiMockHelper.mockElasticSearchResultPaginated(page1, page2);
+        coreCaseDataApiMockHelper.mockGetCaseAnyCase(caseDetails);
+        coreCaseDataApiMockHelper.mockStartEventAnyCase(
+            StartEventResponse.builder().eventId(CASE_ID.toString()).caseDetails(caseDetails).build(),
+            HEARING_FEE_UNPAID.name()
+        );
+        coreCaseDataApiMockHelper.mockSubmitEventAnyCase(caseDetails);
+
+        // When
+        scheduler.runScheduledTask();
+
+        // Then every case on both pages is processed
+        verify(telemetryService).trackEvent(eq("HearingFeeJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("HearingFeeJobCompleted"), anyMap());
+        coreCaseDataApiMockHelper.verifySubmitEvent(51);
+    }
+
+    private List<CaseDetails> createCaseDetailsBatch(int size) {
+        return rangeClosed(1, size)
+            .mapToObj(i -> CaseDetailsBuilder.builder().atStateHearingFeeUnpaid().id((long) i).build())
+            .toList();
     }
 }
