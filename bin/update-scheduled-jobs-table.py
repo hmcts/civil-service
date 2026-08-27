@@ -178,7 +178,7 @@ def gather_spring_jobs(cron_defaults: dict[str, str]) -> list[dict[str, str]]:
             {
                 "name": path.stem,
                 "cron": cron_expr,
-                "topics": [scheduler_name],
+                "topics": [],
                 "springScheduler": scheduler_name,
             }
         )
@@ -228,17 +228,19 @@ def gather_jobs(metadata: dict[str, dict[str, str]]) -> list[dict[str, str]]:
 
 def build_table(jobs: list[dict[str, str]], metadata: dict[str, dict[str, str]]) -> str:
     lines = [
-        "| Job | Purpose | Camunda topic(s) | Schedule (cron, UTC) | When it runs |",
-        "| --- | --- | --- | --- | --- |",
+        "| Job | Purpose | Scheduler Name | Camunda topic(s) | Schedule (cron, UTC) | When it runs |",
+        "| --- | --- | --- | --- | --- | --- |",
     ]
     for job in jobs:
         name = job["name"]
         purpose = metadata.get(name, {}).get("purpose", "TODO: Describe this job.")
-        topics = format_topics(job["topics"])
+        scheduler_name = job.get("springScheduler", "")
+        topics_list = job.get("topics", [])
+        topics = format_topics(topics_list)
         cron_expr = job["cron"]
         when = describe_cron(cron_expr)
         lines.append(
-            f"| {name} | {purpose} | {topics} | `{cron_expr}` | {when} |"
+            f"| {name} | {purpose} | {scheduler_name} | {topics} | `{cron_expr}` | {when} |"
         )
     return "\n".join(lines)
 

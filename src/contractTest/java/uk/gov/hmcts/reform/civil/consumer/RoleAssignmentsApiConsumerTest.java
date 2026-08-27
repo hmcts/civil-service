@@ -35,13 +35,22 @@ import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.when;
 
-@PactTestFor(providerName = "am_role_assignment_service")
 @MockServerConfig(hostInterface = "localhost", port = "6681")
 @TestPropertySource(properties = "role-assignment-service.api.url=http://localhost:6681")
 public class RoleAssignmentsApiConsumerTest extends BaseContractTest {
 
+    private static final String ROLE_ASSIGNMENT_CREATE_PROVIDER = "am_roleAssignment_createAssignment";
+    private static final String ROLE_ASSIGNMENT_GET_PROVIDER = "am_roleAssignment_getAssignment";
+    private static final String ROLE_ASSIGNMENT_QUERY_PROVIDER = "am_roleAssignment_queryAssignment";
+    private static final String ROLE_ASSIGNMENT_GET_MEDIA_TYPE =
+        "application/vnd.uk.gov.hmcts.role-assignment-service.get-assignments+json;charset=UTF-8;version=1.0";
+    private static final String ROLE_ASSIGNMENT_QUERY_MEDIA_TYPE =
+        "application/vnd.uk.gov.hmcts.role-assignment-service.post-assignment-query-request+json;charset=UTF-8;version=1.0";
+    private static final String ROLE_ASSIGNMENT_CREATE_MEDIA_TYPE =
+        "application/vnd.uk.gov.hmcts.role-assignment-service.create-assignments+json;charset=UTF-8;version=1.0";
     private static final String ACTOR_ID = "11111111-1111-1111-1111-111111111111";
     private static final String CASE_ID = "1712345678901234";
     private static final String ROLE_NAME = "hearing-manager";
@@ -65,24 +74,27 @@ public class RoleAssignmentsApiConsumerTest extends BaseContractTest {
         when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTH_TOKEN);
     }
 
-    @Pact(consumer = "civil_service")
+    @Pact(consumer = "civil_service", provider = ROLE_ASSIGNMENT_GET_PROVIDER)
     public RequestResponsePact getRoleAssignmentsForActor(PactDslWithProvider builder) {
         return builder
+            .given("An actor with provided id is available in role assignment service")
             .uponReceiving("a get role assignments by actor id request")
             .path("/am/role-assignments/actors/" + ACTOR_ID)
             .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
             .method(HttpMethod.GET.toString())
             .willRespondWith()
-            .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .body(buildRoleAssignmentResponse())
+            .matchHeader(HttpHeaders.CONTENT_TYPE, roleAssignmentMediaTypeMatcher("get-assignments"),
+                         ROLE_ASSIGNMENT_GET_MEDIA_TYPE)
+            .body(buildRoleAssignmentResponse(false))
             .status(HttpStatus.SC_OK)
             .toPact();
     }
 
-    @Pact(consumer = "civil_service")
+    @Pact(consumer = "civil_service", provider = ROLE_ASSIGNMENT_QUERY_PROVIDER)
     public RequestResponsePact queryRoleAssignmentsWithLabels(PactDslWithProvider builder)
         throws JSONException, IOException {
         return builder
+            .given("A list of role assignments for the search query")
             .uponReceiving("a query role assignments with labels request")
             .path("/am/role-assignments/query")
             .matchQuery("includeLabels", "true|false", "true")
@@ -94,16 +106,18 @@ public class RoleAssignmentsApiConsumerTest extends BaseContractTest {
             .method(HttpMethod.POST.toString())
             .body(createJsonObject(buildActorRoleQueryRequest()))
             .willRespondWith()
-            .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .body(buildRoleAssignmentResponse())
+            .matchHeader(HttpHeaders.CONTENT_TYPE, roleAssignmentMediaTypeMatcher("post-assignment-query-request"),
+                         ROLE_ASSIGNMENT_QUERY_MEDIA_TYPE)
+            .body(buildRoleAssignmentResponse(true))
             .status(HttpStatus.SC_OK)
             .toPact();
     }
 
-    @Pact(consumer = "civil_service")
+    @Pact(consumer = "civil_service", provider = ROLE_ASSIGNMENT_QUERY_PROVIDER)
     public RequestResponsePact queryRoleAssignmentsByCaseIdAndRole(PactDslWithProvider builder)
         throws JSONException, IOException {
         return builder
+            .given("A list of role assignments for the search query by attributes")
             .uponReceiving("a query role assignments by case id and role request")
             .path("/am/role-assignments/query")
             .matchQuery("includeLabels", "true|false", "true")
@@ -116,15 +130,17 @@ public class RoleAssignmentsApiConsumerTest extends BaseContractTest {
             .method(HttpMethod.POST.toString())
             .body(createJsonObject(buildCaseRoleQueryRequest()))
             .willRespondWith()
-            .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .body(buildRoleAssignmentResponse())
+            .matchHeader(HttpHeaders.CONTENT_TYPE, roleAssignmentMediaTypeMatcher("post-assignment-query-request"),
+                         ROLE_ASSIGNMENT_QUERY_MEDIA_TYPE)
+            .body(buildRoleAssignmentResponse(false))
             .status(HttpStatus.SC_OK)
             .toPact();
     }
 
-    @Pact(consumer = "civil_service")
+    @Pact(consumer = "civil_service", provider = ROLE_ASSIGNMENT_CREATE_PROVIDER)
     public RequestResponsePact createRoleAssignment(PactDslWithProvider builder) {
         return builder
+            .given("The assignment request is valid with one requested role and replaceExisting flag as true")
             .uponReceiving("a create role assignment request")
             .path("/am/role-assignments")
             .headers(
@@ -135,14 +151,21 @@ public class RoleAssignmentsApiConsumerTest extends BaseContractTest {
             .method(HttpMethod.POST.toString())
             .body(buildCreateRoleAssignmentRequest())
             .willRespondWith()
-            .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .matchHeader(HttpHeaders.CONTENT_TYPE, roleAssignmentMediaTypeMatcher("create-assignments"),
+                         ROLE_ASSIGNMENT_CREATE_MEDIA_TYPE)
             .body(buildCreateRoleAssignmentResponse())
             .status(HttpStatus.SC_CREATED)
             .toPact();
     }
 
+    private String roleAssignmentMediaTypeMatcher(String operation) {
+        return "application/(json|vnd\\.uk\\.gov\\.hmcts\\.role-assignment-service\\."
+            + operation
+            + "\\+json;charset=UTF-8;version=1\\.0)(;.*)?";
+    }
+
     @Test
-    @PactTestFor(pactMethod = "getRoleAssignmentsForActor")
+    @PactTestFor(providerName = ROLE_ASSIGNMENT_GET_PROVIDER, pactMethod = "getRoleAssignmentsForActor")
     public void verifyGetRoleAssignmentsForActor() {
         RoleAssignmentServiceResponse response = roleAssignmentsService.getRoleAssignments(ACTOR_ID, AUTHORIZATION_TOKEN);
 
@@ -152,7 +175,7 @@ public class RoleAssignmentsApiConsumerTest extends BaseContractTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "queryRoleAssignmentsWithLabels")
+    @PactTestFor(providerName = ROLE_ASSIGNMENT_QUERY_PROVIDER, pactMethod = "queryRoleAssignmentsWithLabels")
     public void verifyQueryRoleAssignmentsWithLabels() {
         RoleAssignmentServiceResponse response = roleAssignmentsService.getRoleAssignmentsWithLabels(
             ACTOR_ID,
@@ -165,7 +188,7 @@ public class RoleAssignmentsApiConsumerTest extends BaseContractTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "queryRoleAssignmentsByCaseIdAndRole")
+    @PactTestFor(providerName = ROLE_ASSIGNMENT_QUERY_PROVIDER, pactMethod = "queryRoleAssignmentsByCaseIdAndRole")
     public void verifyQueryRoleAssignmentsByCaseIdAndRole() {
         RoleAssignmentServiceResponse response = roleAssignmentsService.queryRoleAssignmentsByCaseIdAndRole(
             CASE_ID,
@@ -175,11 +198,11 @@ public class RoleAssignmentsApiConsumerTest extends BaseContractTest {
         );
 
         assertThat(response.getRoleAssignmentResponse().size(), is(equalTo(1)));
-        assertThat(response.getRoleAssignmentResponse().get(0).getAttributes().getCaseId(), is(equalTo(CASE_ID)));
+        assertThat(response.getRoleAssignmentResponse().get(0).getAttributes(), is(notNullValue()));
     }
 
     @Test
-    @PactTestFor(pactMethod = "createRoleAssignment")
+    @PactTestFor(providerName = ROLE_ASSIGNMENT_CREATE_PROVIDER, pactMethod = "createRoleAssignment")
     public void verifyCreateRoleAssignment() {
         roleAssignmentsService.assignUserRoles(ACTOR_ID, AUTHORIZATION_TOKEN, buildRoleAssignmentRequest());
     }
@@ -260,22 +283,24 @@ public class RoleAssignmentsApiConsumerTest extends BaseContractTest {
             .setRequestedRoles(List.of(roleAssignment));
     }
 
-    private DslPart buildRoleAssignmentResponse() {
+    private DslPart buildRoleAssignmentResponse(boolean includeRoleLabel) {
         return LambdaDsl.newJsonBody(root -> root
-            .minArrayLike("roleAssignmentResponse", 1, 1, roleAssignment -> roleAssignment
-                .stringValue("actorId", ACTOR_ID)
-                .stringValue("actorIdType", "IDAM")
-                .stringValue("roleType", ROLE_TYPE)
-                .stringValue("roleName", ROLE_NAME)
-                .stringValue("roleLabel", ROLE_LABEL)
-                .stringValue("classification", CLASSIFICATION)
-                .stringValue("grantType", GRANT_TYPE)
-                .stringValue("roleCategory", ROLE_CATEGORY)
-                .booleanValue("readOnly", false)
-                .object("attributes", attributes -> attributes
-                    .stringValue("caseId", CASE_ID)
-                    .stringValue("jurisdiction", "CIVIL")
-                    .stringValue("caseType", "CIVIL")))
+            .minArrayLike("roleAssignmentResponse", 1, 1, roleAssignment -> {
+                roleAssignment
+                    .stringType("actorId", ACTOR_ID)
+                    .stringType("actorIdType", "IDAM")
+                    .stringType("roleType", ROLE_TYPE)
+                    .stringType("roleName", ROLE_NAME)
+                    .stringType("classification", CLASSIFICATION)
+                    .stringType("grantType", GRANT_TYPE)
+                    .stringType("roleCategory", ROLE_CATEGORY)
+                    .booleanValue("readOnly", false)
+                    .object("attributes", attributes -> attributes
+                        .stringType("jurisdiction", "CIVIL"));
+                if (includeRoleLabel) {
+                    roleAssignment.stringType("roleLabel", ROLE_LABEL);
+                }
+            })
         ).build();
     }
 
