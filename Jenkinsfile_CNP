@@ -195,7 +195,8 @@ withPipeline(type, product, component) {
       echo "Skipping publish functional test results due to label: pr-values:skip-functional-tests"
       return
     }
-    publishFunctionalTestResults()
+    yarnBuilder.yarn('test:generate-report')
+    publishAllureReport('test-results/functional/allure-report', 'Allure Functional Report', 'test-results/functional/allure-history')
   }
 
   before('smoketest:aat') {
@@ -221,7 +222,8 @@ withPipeline(type, product, component) {
   }
 
   afterAlways('functionalTest:aat') {
-    publishFunctionalTestResults()
+    yarnBuilder.yarn('test:generate-report')
+    publishAllureReport('test-results/functional/allure-report', 'Allure Functional Report', 'test-results/functional/allure-history')
   }
 
   before('functionalTest:preview') {
@@ -281,16 +283,16 @@ def archiveSmokeTestResults() {
   archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/smokeTest/**/*'
 }
 
-def publishFunctionalTestResults() {
-  sh 'npx allure generate test-results/functional/allure-results --clean -o test-results/functional/allure-report'
+def publishAllureReport(String reportDir, String reportName, String historyArchiveDir) {
   publishHTML([
-    allowMissing: false,
     alwaysLinkToLastBuild: true,
     keepAll: true,
-    reportDir: 'test-results/functional/allure-report',
+    reportDir: reportDir,
     reportFiles: 'index.html',
-    reportName: 'Non-Prod E2E Allure Report'
+    reportName: reportName
   ])
+  sh "cp -r ./${reportDir}/history/ ./${historyArchiveDir}"
+  archiveArtifacts artifacts: "${historyArchiveDir}/**", fingerprint: true
   archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
 }
 
@@ -298,18 +300,18 @@ def prepareFunctionalTests(boolean runAllFunctionalTests) {
   if (runAllFunctionalTests) {
     env.RUN_ALL_FUNCTIONAL_TESTS = true
   } else {
-    copyPrevFailedAndNotExecutedTestFilesJson()
+    copyPrevTestFilesReport('test-results/functional/testFilesReport.json')
   }
-  copyPreviousAllureHistory()
+  copyPreviousAllureHistory('allure-report/history', 'test-results/functional/allure-results')
 }
 
-def copyPrevFailedAndNotExecutedTestFilesJson() {
+def copyPrevTestFilesReport(String reportFilePath) {
   def buildFound = false
   def buildNumber = currentBuild.previousBuild ? currentBuild.previousBuild.number : 0
   def minBuildNumber = ((buildNumber - 8) > 0) ? buildNumber - 8 : 0
   while (!buildFound && buildNumber > minBuildNumber) {
     try {
-      copyArtifacts projectName: env.JOB_NAME, selector: specific("${buildNumber}"), filter: "test-results/functional/testFilesReport.json"
+      copyArtifacts projectName: env.JOB_NAME, selector: specific("${buildNumber}"), filter: reportFilePath
       buildFound = true
     } catch (Exception error) {
       echo "artifact not found: " + error.toString()
@@ -318,26 +320,17 @@ def copyPrevFailedAndNotExecutedTestFilesJson() {
   }
 }
 
-def copyPreviousAllureHistory() {
+def copyPreviousAllureHistory(historyDir, resultsDir) {
   def buildFound = false
   def buildNumber = currentBuild.previousBuild ? currentBuild.previousBuild.number : 0
   def minBuildNumber = ((buildNumber - 8) > 0) ? buildNumber - 8 : 0
-  def targetDir = "test-results/functional/allure-results/history"
-
   while (!buildFound && buildNumber > minBuildNumber) {
     try {
-      copyArtifacts(
-        projectName: env.JOB_NAME,
-        selector: specific("${buildNumber}"),
-        filter: "test-results/functional/allure-report/history/*",
-        target: targetDir,
-        flatten: true
-      )
-
+      copyArtifacts projectName: env.JOB_NAME, selector: specific("${buildNumber}"), filter: "**/${historyDir}/**", target: "${resultsDir}"
+      sh "mv ${resultsDir}/${historyDir} ${resultsDir}/history"
       buildFound = true
-      echo "Successfully imported Allure history from build ${buildNumber}"
     } catch (Exception error) {
-      echo "Allure history artifact not found in build ${buildNumber}. Trying previous..."
+      echo "artifact not found: " + error.toString()
       buildNumber--
     }
   }

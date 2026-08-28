@@ -10,7 +10,7 @@ fi
 
 
 # Check if RUN_FAILED_AND_PREV_NOT_EXECUTED_TEST_FILES is set to "true"
-if [ "$RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES" != "true" ]; then
+if [ "$RUN_FAILED_TESTS" != "true" ]; then
   yarn playwright install
   yarn test:civil-service-nightly
 else 
@@ -26,7 +26,7 @@ else
   # Check if the JSON array inside testFilesReport.json is empty
   elif [ "$(jq '.failedTestFiles | length' "$TEST_FILES_REPORT")" -eq 0 ]; then
     echo "failedTestFiles in testFilesReport.json contains an empty array."
-    exit 1
+    exit 0
 
   else
     echo "Running failed and not executed functional test files on ${ENVIRONMENT} env"
