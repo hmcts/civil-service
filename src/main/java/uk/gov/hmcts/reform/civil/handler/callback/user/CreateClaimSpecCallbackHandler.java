@@ -436,6 +436,12 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     //calculate interest for specified claim
     private CallbackResponse calculateInterest(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        List<String> interestValidationErrors = interestCalculator.getInterestValidationErrors(caseData);
+        if (!interestValidationErrors.isEmpty()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(interestValidationErrors)
+                .build();
+        }
         BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
         if (totalClaimAmount == null) {
             return AboutToStartOrSubmitCallbackResponse.builder()
