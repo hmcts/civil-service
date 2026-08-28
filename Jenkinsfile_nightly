@@ -107,6 +107,7 @@ static Map<String, Object> secret(String secretName, String envVariable) {
   ]
 }
 
+
 void publishAllureReport(String reportDir, String reportName, String historyArchiveDir) {
   publishHTML([
     allowMissing: true,
@@ -390,5 +391,5 @@ withNightlyPipeline(type, product, component) {
         env.TESTS_FOR_ACCESSIBILITY = false
       }
     }
-  
+  }
 }
