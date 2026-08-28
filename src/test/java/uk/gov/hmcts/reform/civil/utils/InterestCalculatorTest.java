@@ -393,6 +393,9 @@ class InterestCalculatorTest {
             .interestFromSpecificDate(interestFromDate)
             .totalClaimAmount(totalClaimAmount)
             .build();
+    }
+
+    @Test
     void shouldReturnValidationErrorAndZeroInterestWhenDifferentRateIsNegative() {
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .claimInterest(YesOrNo.YES)
