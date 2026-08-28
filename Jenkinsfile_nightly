@@ -352,17 +352,13 @@ withNightlyPipeline(type, product, component) {
       }
     }
 
-<<<<<<< HEAD
-        // enableFortifyScan()
-=======
-    if(!runFailedTests && !forceGreenBuild) {
-      enableFortifyScan()
->>>>>>> DTSCCI-6173
+    // if(!runFailedTests && !forceGreenBuild) {
+    //   enableFortifyScan()
 
-      afterAlways('fortify-scan') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-      }
-    }
+    //   afterAlways('fortify-scan') {
+    //     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+    //   }
+    // }
 
     boolean hasFailedTestFiles = false;
 
