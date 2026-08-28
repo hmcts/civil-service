@@ -224,6 +224,7 @@ withPipeline(type, product, component) {
   afterAlways('functionalTest:aat') {
     yarnBuilder.yarn('test:generate-report')
     publishAllureReport('allure-functional-report', 'Allure Functional Report', 'allure-functional-history')
+  }
 
   before('functionalTest:preview') {
     if(checkForSkipFunctionalTests(env.BRANCH_NAME)) {
