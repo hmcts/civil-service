@@ -28,11 +28,14 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.ORDER_MADE;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STAY_THE_CLAIM;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 @Slf4j
 @Component
 @ConditionalOnExpression("${judge.revisit.stayOrder.event.emitter.enabled:true}")
 public class CheckStayOrderDeadlineEndTaskHandler extends BaseExternalTaskHandler {
+
+    private static final String SCHEDULER_NAME = "GAOrderMadeScheduler";
 
     private final CaseStateSearchService caseSearchService;
 
@@ -40,6 +43,7 @@ public class CheckStayOrderDeadlineEndTaskHandler extends BaseExternalTaskHandle
 
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
+    private final FeatureToggleService featureToggleService;
 
     public CheckStayOrderDeadlineEndTaskHandler(
         ExternalTaskCompletionService externalTaskCompletionService,
@@ -47,17 +51,23 @@ public class CheckStayOrderDeadlineEndTaskHandler extends BaseExternalTaskHandle
         CaseStateSearchService caseSearchService,
         GaCoreCaseDataService coreCaseDataService,
         CaseDetailsConverter caseDetailsConverter,
-        ObjectMapper mapper
+        ObjectMapper mapper,
+        FeatureToggleService featureToggleService
     ) {
         super(externalTaskCompletionService, eventProperties);
         this.caseSearchService = caseSearchService;
         this.coreCaseDataService = coreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;
         this.mapper = mapper;
+        this.featureToggleService = featureToggleService;
     }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
+        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
+            return new ExternalTaskData();
+        }
+
         List<GeneralApplicationCaseData> cases = getOrderMadeCasesThatAreEndingToday();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
