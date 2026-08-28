@@ -22,6 +22,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.utils.InterestCalculator.INTEREST_AMOUNT_MUST_NOT_BE_NEGATIVE;
+import static uk.gov.hmcts.reform.civil.utils.InterestCalculator.INTEREST_RATE_MUST_NOT_BE_NEGATIVE;
 
 @ExtendWith(MockitoExtension.class)
 class InterestCalculatorTest {
@@ -391,6 +393,73 @@ class InterestCalculatorTest {
             .interestFromSpecificDate(interestFromDate)
             .totalClaimAmount(totalClaimAmount)
             .build();
+    void shouldReturnValidationErrorAndZeroInterestWhenDifferentRateIsNegative() {
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .claimInterest(YesOrNo.YES)
+            .caseReference(123456789L)
+            .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
+            .sameRateInterestSelection(buildSameRateSelection(
+                SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE,
+                BigDecimal.valueOf(-10),
+                "reason"
+            ))
+            .interestClaimFrom(InterestClaimFromType.FROM_A_SPECIFIC_DATE)
+            .interestClaimUntil(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)
+            .interestFromSpecificDate(LocalDate.now().minusDays(6))
+            .totalClaimAmount(BigDecimal.valueOf(5000))
+            .build();
+        caseData = caseData.toBuilder().submittedDate(LocalDateTime.now()).build();
+
+        assertThat(interestCalculator.getInterestValidationErrors(caseData))
+            .containsExactly(INTEREST_RATE_MUST_NOT_BE_NEGATIVE);
+        assertThat(interestCalculator.calculateInterest(caseData)).isZero();
+    }
+
+    @Test
+    void shouldReturnValidationErrorAndZeroInterestWhenBreakDownInterestIsNegative() {
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .claimInterest(YesOrNo.YES)
+            .caseReference(123456789L)
+            .interestClaimOptions(InterestClaimOptions.BREAK_DOWN_INTEREST)
+            .breakDownInterestTotal(BigDecimal.valueOf(-100))
+            .build();
+
+        assertThat(interestCalculator.getInterestValidationErrors(caseData))
+            .containsExactly(INTEREST_AMOUNT_MUST_NOT_BE_NEGATIVE);
+        assertThat(interestCalculator.calculateInterest(caseData)).isZero();
+    }
+
+    @Test
+    void shouldReturnZeroInterestRateBulkClaimWhenDailyAmountIsNegative() {
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .claimInterest(YesOrNo.YES)
+            .caseReference(123456789L)
+            .interestFromSpecificDate(LocalDate.now().minusDays(5))
+            .sameRateInterestSelection(buildSameRateSelection(null, BigDecimal.valueOf(-6L), null))
+            .build();
+
+        BigDecimal result = interestCalculator.calculateBulkInterest(caseData);
+
+        assertThat(result).isZero();
+    }
+
+    @Test
+    void shouldReturnNullDailyInterestBreakdownWhenDifferentRateIsNegative() {
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .claimInterest(YesOrNo.YES)
+            .caseReference(123456789L)
+            .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
+            .sameRateInterestSelection(buildSameRateSelection(
+                SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE,
+                BigDecimal.valueOf(-10),
+                "reason"
+            ))
+            .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
+            .interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
+            .totalClaimAmount(BigDecimal.valueOf(5000))
+            .build();
+
+        assertThat(interestCalculator.getInterestPerDayBreakdown(caseData)).isNull();
     }
 
     private SameRateInterestSelection buildSameRateSelection(SameRateInterestType type, BigDecimal rate, String reason) {

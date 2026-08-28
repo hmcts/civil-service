@@ -17,6 +17,8 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static java.math.BigDecimal.ZERO;
@@ -31,6 +33,8 @@ public class InterestCalculator {
     public static final int TO_FULL_PENNIES = 2;
     protected static final BigDecimal EIGHT_PERCENT_INTEREST_RATE = valueOf(8);
     public static final BigDecimal NUMBER_OF_DAYS_IN_YEAR = new BigDecimal(365L);
+    public static final String INTEREST_RATE_MUST_NOT_BE_NEGATIVE = "Enter a positive interest rate";
+    public static final String INTEREST_AMOUNT_MUST_NOT_BE_NEGATIVE = "Enter a positive interest amount";
 
     public BigDecimal calculateInterest(CaseData caseData) {
         return this.calculateInterest(caseData, getToDate(caseData));
@@ -68,7 +72,38 @@ public class InterestCalculator {
         return interestAmount;
     }
 
+    public List<String> getInterestValidationErrors(CaseData caseData) {
+        List<String> errors = new ArrayList<>();
+        if (caseData.getClaimInterest() != YesOrNo.YES) {
+            return errors;
+        }
+        if (InterestClaimOptions.SAME_RATE_INTEREST.equals(caseData.getInterestClaimOptions())) {
+            SameRateInterestSelection sameRateInterestSelection = caseData.getSameRateInterestSelection();
+            if (sameRateInterestSelection != null
+                && SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE
+                .equals(sameRateInterestSelection.getSameRateInterestType())
+                && isNegative(sameRateInterestSelection.getDifferentRate())) {
+                errors.add(INTEREST_RATE_MUST_NOT_BE_NEGATIVE);
+            }
+        } else if (InterestClaimOptions.BREAK_DOWN_INTEREST.equals(caseData.getInterestClaimOptions())
+            && isNegative(caseData.getBreakDownInterestTotal())) {
+            errors.add(INTEREST_AMOUNT_MUST_NOT_BE_NEGATIVE);
+        }
+        return errors;
+    }
+
+    private static boolean isNegative(BigDecimal value) {
+        return value != null && value.signum() < 0;
+    }
+
     private boolean validateInterestCalculationRequestData(CaseData caseData) {
+        if (!getInterestValidationErrors(caseData).isEmpty()) {
+            log.error(
+                "Negative interest rate or amount supplied for case id: {}",
+                caseData.getCcdCaseReference()
+            );
+            return false;
+        }
         if (caseData.getClaimInterest() == YesOrNo.YES) {
             if (InterestClaimOptions.SAME_RATE_INTEREST.equals(caseData.getInterestClaimOptions())) {
                 SameRateInterestSelection sameRateInterestSelection = caseData.getSameRateInterestSelection();
@@ -190,8 +225,15 @@ public class InterestCalculator {
 
     public BigDecimal calculateBulkInterest(CaseData caseData) {
         if (caseData.getClaimInterest() == YesOrNo.YES) {
-            long numberOfDays = getNumberOfDays(caseData.getInterestFromSpecificDate(), LocalDate.now());
             BigDecimal interestDailyAmount = caseData.getSameRateInterestSelection().getDifferentRate();
+            if (isNegative(interestDailyAmount)) {
+                log.error(
+                    "Negative daily interest amount supplied for bulk claim case id: {}",
+                    caseData.getCcdCaseReference()
+                );
+                return ZERO;
+            }
+            long numberOfDays = getNumberOfDays(caseData.getInterestFromSpecificDate(), LocalDate.now());
             return interestDailyAmount.multiply(BigDecimal.valueOf(numberOfDays));
         } else {
             return ZERO;
@@ -204,7 +246,8 @@ public class InterestCalculator {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
             return caseData.getSubmittedDate().toLocalDate().format(formatter);
         } else if (caseData.getInterestClaimOptions() == null
-            || InterestClaimOptions.BREAK_DOWN_INTEREST.equals(caseData.getInterestClaimOptions())) {
+            || InterestClaimOptions.BREAK_DOWN_INTEREST.equals(caseData.getInterestClaimOptions())
+            || !getInterestValidationErrors(caseData).isEmpty()) {
             return null;
         } else {
             StringBuilder description = new StringBuilder("Interest will accrue at the daily rate of £");
