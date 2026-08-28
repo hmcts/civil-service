@@ -324,7 +324,7 @@ withNightlyPipeline(type, product, component) {
             publishAllureReport(
               'playwright-allure-functional-report', 
               'Playwright Allure Functional Report', 
-              'allure-functional-history'
+              'playwright-allure-functional-history'
             )
           }
           archiveArtifacts allowEmptyArchive: true, artifacts: "${env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR}/**/*"
@@ -345,7 +345,7 @@ withNightlyPipeline(type, product, component) {
               publishAllureReport(
                 'playwright-allure-bootstrap-report', 
                 'Playwright Allure Bootstrap Report', 
-                'allure-bootstrap-history'
+                'playwright-allure-bootstrap-history'
               )
             }
           }

@@ -196,7 +196,7 @@ withPipeline(type, product, component) {
       return
     }
     yarnBuilder.yarn('test:generate-report')
-    publishAllureReport('test-results/functional/allure-report', 'Allure Functional Report', 'test-results/functional/allure-history')
+    publishAllureReport('allure-functional-report', 'Allure Functional Report', 'allure-functional-history')
   }
 
   before('smoketest:aat') {
@@ -223,8 +223,7 @@ withPipeline(type, product, component) {
 
   afterAlways('functionalTest:aat') {
     yarnBuilder.yarn('test:generate-report')
-    publishAllureReport('test-results/functional/allure-report', 'Allure Functional Report', 'test-results/functional/allure-history')
-  }
+    publishAllureReport('allure-functional-report', 'Allure Functional Report', 'allure-functional-history')
 
   before('functionalTest:preview') {
     if(checkForSkipFunctionalTests(env.BRANCH_NAME)) {
@@ -293,7 +292,6 @@ def publishAllureReport(String reportDir, String reportName, String historyArchi
   ])
   sh "cp -r ./${reportDir}/history/ ./${historyArchiveDir}"
   archiveArtifacts artifacts: "${historyArchiveDir}/**", fingerprint: true
-  archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
 }
 
 def prepareFunctionalTests(boolean runAllFunctionalTests) {
@@ -302,7 +300,7 @@ def prepareFunctionalTests(boolean runAllFunctionalTests) {
   } else {
     copyPrevTestFilesReport('test-results/functional/testFilesReport.json')
   }
-  copyPreviousAllureHistory('allure-report/history', 'test-results/functional/allure-results')
+  copyPreviousAllureHistory('allure-functional-history', 'allure-functional-results');
 }
 
 def copyPrevTestFilesReport(String reportFilePath) {
