@@ -21,7 +21,7 @@ if [ "$RUN_FAILED_TESTS" = "true" ]; then
     # Run the Playwright setup install and nightly tests for a failed last run.
     export PLAYWRIGHT_FUNCTIONAL=true
     yarn test:playwright:setup:install
-    yarn test:playwright:civil-ccd-nightly:ci --last-failed
+    yarn test:playwright:civil-service-nightly:ci --last-failed
   fi
 else
   # Run the Playwright setup install and nightly tests for a normal run.
