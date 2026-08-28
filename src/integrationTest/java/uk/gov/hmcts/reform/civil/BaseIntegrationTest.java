@@ -31,11 +31,16 @@ import uk.gov.hmcts.reform.civil.scheduler.bundlecreation.BundleCreationSchedule
 import uk.gov.hmcts.reform.civil.scheduler.casedismissed.CaseDismissedScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.casedismissed.ClaimDetailsNotificationDeadlineScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.decisionoutcome.DecisionOutcomeScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.defendantresponse.DefendantResponseDeadlineScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.evidenceupload.EvidenceUploadScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.fulladmitpayimmediatelynopayfromdef.FullAdmitPayImmediatelyNoPaymentFromDefendantScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.gadocumentuploadnotify.GADocumentUploadNotifyScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.gaordermade.GAOrderMadeScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.gaproofofdebt.GAProofOfDebtScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.gaunlessorder.GAUnlessOrderScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.hearingcvplink.HearingCvpLinkScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.hearingfee.HearingFeeScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.judgementbuffer.JudgementBufferScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.managestaywatask.ManageStayWATaskScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.mediationfiletransfer.MediationFileTransferScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.orderreviewobligation.OrderReviewObligationCheckScheduler;
@@ -66,14 +71,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
-@SpringBootTest(
-    classes = {Application.class, TestIdamConfiguration.class},
-    properties = {
-        "scheduler.full-admit-pay-immediately-no-payment-from-def.enabled=false",
-        "scheduler.defendantResponse.enabled=false",
-        "scheduler.hearing-fee.enabled=false",
-        "scheduler.evidence-upload.enabled=false",
-    })
+@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class})
 @AutoConfigureMockMvc
 @SuppressWarnings({"java:S112", "java:S6813", "java:S1874"})
 public abstract class BaseIntegrationTest {
@@ -113,6 +111,12 @@ public abstract class BaseIntegrationTest {
     @MockBean
     private DecisionOutcomeScheduler decisionOutcomeScheduler;
     @MockBean
+    private DefendantResponseDeadlineScheduler defendantResponseDeadlineScheduler;
+    @MockBean
+    private EvidenceUploadScheduler evidenceUploadScheduler;
+    @MockBean
+    private FullAdmitPayImmediatelyNoPaymentFromDefendantScheduler fullAdmitPayImmediatelyNoPaymentFromDefendantScheduler;
+    @MockBean
     private GADocumentUploadNotifyScheduler gaDocumentUploadNotifyScheduler;
     @MockBean
     private GAOrderMadeScheduler gaOrderMadeScheduler;
@@ -122,6 +126,10 @@ public abstract class BaseIntegrationTest {
     private GAUnlessOrderScheduler gaUnlessOrderScheduler;
     @MockBean
     private HearingCvpLinkScheduler hearingCvpLinkScheduler;
+    @MockBean
+    private HearingFeeScheduler hearingFeeScheduler;
+    @MockBean
+    private JudgementBufferScheduler judgementBufferScheduler;
     @MockBean
     private ManageStayWATaskScheduler manageStayWATaskScheduler;
     @MockBean
