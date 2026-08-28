@@ -315,6 +315,8 @@ withNightlyPipeline(type, product, component) {
           }
           if(playwrightSetupPassed) {
             sh './playwright-e2e/scripts/playwright-run-civil-service-nightly-tests.sh'
+          } else {
+            throw new Error('Playwright test setup failed')
           }
         } catch (Exception error) {
           if(error instanceof org.jenkinsci.plugins.workflow.steps.FlowInterruptedException) {
