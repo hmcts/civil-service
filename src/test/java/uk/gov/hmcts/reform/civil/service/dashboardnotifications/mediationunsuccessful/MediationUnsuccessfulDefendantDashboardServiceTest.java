@@ -8,9 +8,9 @@ import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulRea
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_UNSUCCESSFUL_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_CLAIMANT_NONATTENDANCE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_DEFENDANT_NONATTENDANCE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_GENERIC;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_MEDIATION_WHEN_CLAIMANT_NOT_CONTACTABLE;
 
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -101,7 +101,28 @@ class MediationUnsuccessfulDefendantDashboardServiceTest {
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
-            SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_CLAIMANT_NONATTENDANCE.getScenario(),
+            SCENARIO_AAA6_DEFENDANT_MEDIATION_WHEN_CLAIMANT_NOT_CONTACTABLE.getScenario(),
+            "1234",
+            new ScenarioRequestParams(new HashMap<>())
+        );
+    }
+
+    @Test
+    void shouldRecordNonAttendanceScenarioWhenCarmEnabledAndBothClaimantAndDefendantNotContactable() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setCcdCaseReference(1234L);
+        Mediation mediation = new Mediation();
+        mediation.setMediationUnsuccessfulReasonsMultiSelect(
+            List.of(NOT_CONTACTABLE_DEFENDANT_ONE, NOT_CONTACTABLE_CLAIMANT_ONE));
+        caseData.setMediation(mediation);
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+        service.notifyMediationUnsuccessful(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            AUTH_TOKEN,
+            SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_DEFENDANT_NONATTENDANCE.getScenario(),
             "1234",
             new ScenarioRequestParams(new HashMap<>())
         );
