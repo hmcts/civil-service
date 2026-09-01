@@ -16,15 +16,12 @@ public class BreathingSpaceLiftedTest extends BpmnBaseTest {
         = "NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED";
     public static final String NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED
         = "NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED";
-    public static final String NOTIFY_RPA_ON_CONTINUOUS_FEED
-        = "NOTIFY_RPA_ON_CONTINUOUS_FEED";
 
     //ACTIVITY IDs
     public static final String NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID
         = "NotifyApplicantSolicitorBSLifted";
     public static final String NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID
         = "NotifyRespondentSolicitorBSLifted";
-    public static final String NOTIFY_RPA_ON_CONTINUOUS_FEED_ACTIVITY_ID = "NotifyRpaBsLifted";
 
     public BreathingSpaceLiftedTest() {
         super("breathing_space_lifted.bpmn", PROCESS_ID);

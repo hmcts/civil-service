@@ -13,8 +13,8 @@
       <bpmn:extensionElements>
         <camunda:in variables="all"/>
       </bpmn:extensionElements>
+      <bpmn:incoming>sid-ebaab9fd-8f39-4514-8631-df1e3081cbeb</bpmn:incoming>
       <bpmn:outgoing>Flow_0tgwl48</bpmn:outgoing>
-      <incoming>sid-ebaab9fd-8f39-4514-8631-df1e3081cbeb</incoming>
     </bpmn:callActivity>
     <bpmn:callActivity id="Activity_0gt1863" name="Start Business Process" calledElement="StartBusinessProcess">
       <bpmn:extensionElements>
@@ -52,7 +52,7 @@
       <bpmn:incoming>Flow_0b0so42</bpmn:incoming>
       <bpmn:incoming>Flow_17nnxrn</bpmn:incoming>
       <bpmn:outgoing>Flow_0fqn57l</bpmn:outgoing>
-      <outgoing>sid-ebaab9fd-8f39-4514-8631-df1e3081cbeb</outgoing>
+      <bpmn:outgoing>sid-ebaab9fd-8f39-4514-8631-df1e3081cbeb</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:exclusiveGateway id="Gateway_12s3fic">
       <bpmn:incoming>Flow_1efafl8</bpmn:incoming>
@@ -76,11 +76,11 @@
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_17nnxrn" sourceRef="BreathingSpaceEnterNotifyRespondentSolicitor2" targetRef="BreathingSpaceEnterNotifyApplicantSolicitor1"/>
     <bpmn:sequenceFlow id="Flow_1efafl8" sourceRef="BreathingSpaceEnterNotifyRespondentSolicitor1" targetRef="Gateway_12s3fic"/>
+    <bpmn:sequenceFlow id="sid-ebaab9fd-8f39-4514-8631-df1e3081cbeb" sourceRef="BreathingSpaceEnterNotifyApplicantSolicitor1" targetRef="Activity_1cweuly"/>
     <bpmn:textAnnotation id="TextAnnotation_12lq3or">
       <bpmn:text>2 Respondent representatives</bpmn:text>
     </bpmn:textAnnotation>
     <bpmn:association id="Association_0k37ha8" sourceRef="Gateway_12s3fic" targetRef="TextAnnotation_12lq3or"/>
-    <bpmn:sequenceFlow id="sid-ebaab9fd-8f39-4514-8631-df1e3081cbeb" sourceRef="BreathingSpaceEnterNotifyApplicantSolicitor1" targetRef="Activity_1cweuly"/>
   </bpmn:process>
   <bpmn:message id="Message_0ttrrz3" name="ENTER_BREATHING_SPACE_SPEC"/>
   <bpmn:error id="Error_1alq6sw" name="StartBusinessAbort" errorCode="ABORT"/>

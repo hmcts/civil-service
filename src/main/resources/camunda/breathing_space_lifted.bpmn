@@ -50,8 +50,8 @@
         <camunda:in variables="all"/>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1kass09</bpmn:incoming>
-      <bpmn:outgoing>Flow_1kj896s</bpmn:outgoing>
       <bpmn:incoming>Flow_03l3ldx</bpmn:incoming>
+      <bpmn:outgoing>Flow_1kj896s</bpmn:outgoing>
     </bpmn:callActivity>
     <bpmn:sequenceFlow id="Flow_1kj896s" sourceRef="Activity_0g68wbz" targetRef="Event_1g0kcde"/>
     <bpmn:sequenceFlow id="Flow_03l3ldx" sourceRef="NotifyRespondentSolicitorBSLifted" targetRef="Activity_0g68wbz"/>
