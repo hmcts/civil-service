@@ -16,6 +16,8 @@ Repo-level settings:
 
 `CODEOWNERS` globally assigns `*` to `@hmcts/civil`, then has more specific ownerless entries intended to exempt some Renovate-updated files from code-owner review. The workflow exemption only covered `.github/workflows/*.yaml`; this repo also uses `.yml` workflow files, so GitHub Actions Renovate PRs still matched the global `* @hmcts/civil` owner rule.
 
+Sibling repo checks under the local HMCTS checkout showed the same `.yaml`-only workflow exemption in `cmc-claim-store` and `cmc-citizen-frontend`. `civil-citizen-ui` has the same global `* @hmcts/civil` owner rule but no Renovate ownerless exemption block. Those repositories have their own Renovate PRs, so any CODEOWNERS exemption changes need to be raised and merged in each affected repository separately.
+
 ## Current queue check
 
 Checked on 2026-09-01 using GitHub CLI against `hmcts/civil-service`.
@@ -42,11 +44,20 @@ The GitHub branch protection endpoint returned `404` for `master` with the avail
 
 Added `.github/workflows/*.yml` to the ownerless Renovate exemption block in `.github/CODEOWNERS`, matching the existing `.github/workflows/*.yaml` exemption. This should prevent GitHub Actions workflow update PRs from requiring `@hmcts/civil` code-owner approval solely because of the global owner rule.
 
-This does not bypass required status checks, stale branch requirements, or code-owner review for files that remain owned. Dependency PRs touching files such as `build.gradle`, `Dockerfile`, Helm chart metadata and Gradle wrapper properties already had ownerless Renovate exemptions.
+This fix is local to `civil-service`. It does not change CODEOWNERS behaviour in `civil-citizen-ui`, `cmc-claim-store`, or `cmc-citizen-frontend`; separate PRs are needed there if their Renovate PRs are blocked by the same ownership gap.
+
+This does not bypass required status checks, stale branch requirements, or code-owner review for files that remain owned. Dependency PRs touching files such as `build.gradle`, `Dockerfile`, Helm chart metadata and Gradle wrapper properties already had ownerless Renovate exemptions in `civil-service`.
 
 ## Alerting
 
-`.github/workflows/renovate-stalled-alert.yml` runs at 08:30 UTC Monday to Friday and can also be run manually. It queries open Renovate PRs, counts PRs older than the configured threshold, writes the stale queue into the workflow summary, optionally posts to Slack, and fails the workflow when the threshold is exceeded.
+`.github/workflows/renovate-stalled-alert.yml` runs at 08:30 UTC Monday to Friday and can also be run manually. It queries open Renovate PRs across:
+
+- `hmcts/civil-service`
+- `hmcts/civil-citizen-ui`
+- `hmcts/cmc-claim-store`
+- `hmcts/cmc-citizen-frontend`
+
+It counts PRs older than the configured threshold, writes the stale queue into the workflow summary, optionally posts to Slack, and fails the workflow when the threshold is exceeded.
 
 Defaults:
 

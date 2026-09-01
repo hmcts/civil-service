@@ -26,6 +26,11 @@ jobs:
     env:
       DEFAULT_MAX_AGE_DAYS: '3'
       DEFAULT_THRESHOLD: '1'
+      REPOSITORIES: |
+        hmcts/civil-service
+        hmcts/civil-citizen-ui
+        hmcts/cmc-claim-store
+        hmcts/cmc-citizen-frontend
       SLACK_WEBHOOK_URL: ${{ secrets.RENOVATE_ALERT_SLACK_WEBHOOK_URL }}
     steps:
       - name: Find stalled Renovate PRs
@@ -45,6 +50,18 @@ jobs:
             if (!Number.isInteger(threshold) || threshold < 1) {
               throw new Error(`threshold must be a positive integer, got ${process.env.THRESHOLD}`);
             }
+
+            const repositories = process.env.REPOSITORIES
+              .split('\n')
+              .map(repo => repo.trim())
+              .filter(Boolean)
+              .map(repo => {
+                const [owner, name] = repo.split('/');
+                if (!owner || !name) {
+                  throw new Error(`Repository must be in owner/name format, got ${repo}`);
+                }
+                return { owner, name, fullName: repo };
+              });
 
             const query = `
               query($owner: String!, $repo: String!, $cursor: String) {
@@ -95,19 +112,25 @@ jobs:
             const renovateLogins = new Set(['renovate', 'renovate[bot]', 'renovate-bot']);
             const cutoff = new Date(Date.now() - maxAgeDays * 24 * 60 * 60 * 1000);
             const prs = [];
-            let cursor = null;
-            let hasNextPage = true;
 
-            while (hasNextPage) {
-              const result = await github.graphql(query, {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                cursor
-              });
-              const page = result.repository.pullRequests;
-              prs.push(...page.nodes);
-              hasNextPage = page.pageInfo.hasNextPage;
-              cursor = page.pageInfo.endCursor;
+            for (const repository of repositories) {
+              let cursor = null;
+              let hasNextPage = true;
+
+              while (hasNextPage) {
+                const result = await github.graphql(query, {
+                  owner: repository.owner,
+                  repo: repository.name,
+                  cursor
+                });
+                const page = result.repository.pullRequests;
+                prs.push(...page.nodes.map(pr => ({
+                  ...pr,
+                  repository: repository.fullName
+                })));
+                hasNextPage = page.pageInfo.hasNextPage;
+                cursor = page.pageInfo.endCursor;
+              }
             }
 
             const stalled = prs
@@ -143,6 +166,7 @@ jobs:
 
                 return {
                   number: pr.number,
+                  repository: pr.repository,
                   title: pr.title,
                   url: pr.url,
                   ageDays,
@@ -154,13 +178,14 @@ jobs:
             const hasStalledQueue = stalled.length >= threshold;
             const summaryLines = [
               `Open Renovate PRs older than ${maxAgeDays} day(s): ${stalled.length}`,
+              `Repositories: ${repositories.map(repo => repo.fullName).join(', ')}`,
               `Alert threshold: ${threshold}`,
               ''
             ];
 
             if (stalled.length) {
               summaryLines.push(...stalled.map(pr =>
-                `- #${pr.number} (${pr.ageDays}d) ${pr.title}: ${pr.url} - ${pr.blockers}`
+                `- ${pr.repository} #${pr.number} (${pr.ageDays}d) ${pr.title}: ${pr.url} - ${pr.blockers}`
               ));
             } else {
               summaryLines.push('No stalled Renovate PRs found.');
@@ -176,7 +201,7 @@ jobs:
         env:
           ALERT_SUMMARY: ${{ steps.stalled.outputs.summary }}
         run: |
-          jq -n --arg text ":warning: Stalled Renovate queue in hmcts/civil-service"$'\n\n'"${ALERT_SUMMARY}" '{text: $text}' \
+          jq -n --arg text ":warning: Stalled Renovate queue in Civil repositories"$'\n\n'"${ALERT_SUMMARY}" '{text: $text}' \
             | curl --fail --show-error --silent --request POST --header 'Content-type: application/json' --data @- "${SLACK_WEBHOOK_URL}"
 
       - name: Fail when Renovate queue is stalled
