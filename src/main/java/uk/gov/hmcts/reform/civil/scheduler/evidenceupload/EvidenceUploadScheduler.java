@@ -3,23 +3,21 @@ package uk.gov.hmcts.reform.civil.scheduler.evidenceupload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
-import uk.gov.hmcts.reform.civil.service.search.EvidenceUploadNotificationSearchService;
+import uk.gov.hmcts.reform.civil.service.search.evidenceupload.EvidenceUploadNotificationPaginatedSearchService;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-@ConditionalOnProperty(prefix = "scheduler.evidence-upload", name = "enabled", havingValue = "true")
 public class EvidenceUploadScheduler implements CivilScheduler {
 
     public static final String SCHEDULER_NAME = "EvidenceUpload";
 
-    private final EvidenceUploadNotificationSearchService searchService;
+    private final EvidenceUploadNotificationPaginatedSearchService searchService;
     private final ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
     private final EvidenceUploadSchedulerTask evidenceUploadSchedulerTask;
 
