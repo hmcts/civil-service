@@ -31,7 +31,7 @@ public class BreathingSpaceLiftedTest extends BpmnBaseTest {
     }
 
     @Test
-    void shouldSuccessfullyCompleteBreathingSpaceLifted_withRpa() {
+    void shouldSuccessfullyCompleteBreathingSpaceLifted() {
 
         assertFalse(processInstance.isEnded());
         assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
@@ -59,15 +59,6 @@ public class BreathingSpaceLiftedTest extends BpmnBaseTest {
                                    PROCESS_CASE_EVENT,
                                    NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED,
                                    NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID
-        );
-
-        //complete the Robotics notification
-        ExternalTask forRobotics = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            forRobotics,
-            PROCESS_CASE_EVENT,
-            NOTIFY_RPA_ON_CONTINUOUS_FEED,
-            NOTIFY_RPA_ON_CONTINUOUS_FEED_ACTIVITY_ID
         );
 
         ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);

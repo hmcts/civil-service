@@ -45,7 +45,7 @@ class EnterBreathingSpaceSpecTest extends BpmnBaseTest {
             variables
         );
 
-        assertApplicantAndRoboticsNotifications(variables);
+        assertApplicantNotifications(variables);
     }
 
     @Test
@@ -75,7 +75,7 @@ class EnterBreathingSpaceSpecTest extends BpmnBaseTest {
             variables
         );
 
-        assertApplicantAndRoboticsNotifications(variables);
+        assertApplicantNotifications(variables);
     }
 
     @Test
@@ -89,22 +89,13 @@ class EnterBreathingSpaceSpecTest extends BpmnBaseTest {
         assertNoExternalTasksLeft();
     }
 
-    private void assertApplicantAndRoboticsNotifications(VariableMap variables) {
+    private void assertApplicantNotifications(VariableMap variables) {
         ExternalTask applicantNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(
             applicantNotification,
             PROCESS_CASE_EVENT,
             NOTIFY_APPLICANT_SOLICITOR,
             NOTIFY_APPLICANT_SOLICITOR_ACTIVITY_ID,
-            variables
-        );
-
-        ExternalTask roboticsNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            roboticsNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_RPA_ON_CONTINUOUS_FEED,
-            NOTIFY_RPA_ON_CONTINUOUS_FEED_ACTIVITY_ID,
             variables
         );
 
