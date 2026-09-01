@@ -252,7 +252,7 @@ ccd:
           secretRef: "{{ .Values.global.postgresSecret }}"
           key: PASSWORD
           disabled: true
-      disableKeyVaults: true
+      keyVaults: []
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
 
   ccd-definition-store-api:
@@ -274,7 +274,7 @@ ccd:
           secretRef: "{{ .Values.global.postgresSecret }}"
           key: PASSWORD
           disabled: true
-      disableKeyVaults: true
+      keyVaults: []
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
 
   postgresql:
