@@ -30,8 +30,8 @@ jobs:
       - name: Install npm dependencies
         run: npm ci --ignore-scripts
 
-      - name: Install Puppeteer Chrome
-        run: npx puppeteer browsers install chrome
+      - name: Download Puppeteer browser
+        run: node node_modules/puppeteer/install.mjs
 
       - name: Determine changed BPMN files
         id: changed
