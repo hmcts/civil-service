@@ -91,7 +91,7 @@ properties([
   ])
 ])
 
-@Library("Infrastructure@DTSPO-30107-jenkins-agents-2")
+@Library("Infrastructure")
 
 def type = "java"
 def product = "civil"
