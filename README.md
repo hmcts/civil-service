@@ -71,44 +71,45 @@ The `Verify email notification documentation` GitHub Action executes the same sc
 
 ## Scheduled jobs
 
-The project defines a set of timer-driven Camunda processes that keep cases moving without manual input. The table below lists each job, the external topic it drives, the cadence (Quartz cron expression, UTC), and the high-level responsibility.
+The project defines a set of timer-driven Camunda and Spring schedulers that keep cases moving without manual input. The table below lists each job, its Spring scheduler name (if applicable), the external Camunda topic(s) it drives, the cadence (Quartz cron expression, UTC), and the high-level responsibility.
 
 <!-- SCHEDULED_JOBS_TABLE_START -->
-| Job | Purpose | Camunda topic(s) | Schedule (cron, UTC) | When it runs |
-| --- | --- | --- | --- | --- |
-| Bundle creation scheduler | Builds bundles for eligible hearings each evening. | `BUNDLE_CREATION_CHECK` | `0 0 21 * * ?` | Daily at 21:00 |
-| Case dismissed scheduler | Automatically dismisses claims that have missed their deadlines. | `CASE_DISMISSED` | `0 5 16 * * ?` | Daily at 16:05 |
-| Decision outcome scheduler | Moves cases awaiting judicial decisions into the decision outcome workflow. | `MOVE_TO_DECISION_OUTCOME` | `0 0 0 * * ?` | Daily at 00:00 |
-| Defendant response deadline check scheduler | Sweeps for defendants whose response deadline elapsed and triggers enforcement. | `DEFENDANT_RESPONSE_DEADLINE_CHECK` | `0 1 16 * * ?` | Daily at 16:01 |
-| Evidence upload scheduler | Prompts parties to upload evidence when deadlines are approaching. | `EVIDENCE_UPLOAD_CHECK` | `0 30 17 * * ?` | Daily at 17:30 |
-| Full admit pay immediately no payment scheduler | Escalates full-admit cases where an immediate payment was promised but not received. | `FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
-| GA doc upload notify scheduler | Sends notifications when GA supporting documents are uploaded. | `GADocUploadNotifyScheduler` | `0 0 23 * * ?` | Daily at 23:00 |
-| GA order made scheduler | Publishes GA order-made events to downstream services each afternoon. | `GAOrderMadeScheduler` | `0 15 16 ? * * *` | Daily at 16:15 |
-| GA response deadline processor | Processes GA response deadlines, judge revisits and respondent checks. | `GAResponseDeadlineProcessor`<br>`GAJudgeRevisitProcessor`<br>`GARespondentResponseCheckScheduler` | `0 15 17 * * ?` | Daily at 17:15 |
-| GA unless order scheduler | Enforces GA Unless Orders once the compliance deadline passes. | `GAUnlessOrderScheduler` | `0 0 16 ? * * *` | Daily at 16:00 |
-| Generate CSV and send to MMT scheduler | Produces nightly CSV/JSON exports for the mediation service (MMT). | `GenerateCsvAndSendToMmt`<br>`GenerateJsonAndSendToMmt` | `0 0 1 ? * * *` | Daily at 01:00 |
-| Hearing cvp link scheduler | Issues CVP/remote hearing links on a daily cadence. | `HEARING_CVP_LINK` | `0 0 0 ? * * *` | Daily at 00:00 |
-| Hearing fee check scheduler | Checks for unpaid hearing fees and raises the necessary follow-up tasks. | `HEARING_FEE_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
-| Incident retry scheduler | Retries failed external incident tasks each night. | `INCIDENT_RETRY_EVENT` | `0 1 23 * * ?` | Daily at 23:01 |
-| Manage Stay WA Task Scheduler | Maintains WA tasks for stayed cases so that no follow-up is missed. | `MANAGE_STAY_WA_TASK_SCHEDULER` | `0 0 1 ? * * *` | Daily at 01:00 |
-| Migrate cases scheduler | Reserved cron to re-run large case migration batches. | `MIGRATE_CASES_EVENTS` | `0 0 0 1 * ? 2080` | First day of each month until 2080 at 00:00 |
-| Notify claim deadline scheduler | Notifies parties about upcoming claim deadlines, prior to dismissal. | `CASE_DISMISSED` | `0 5 0 * * ?` | Daily at 00:05 |
-| Order Review Obligation check scheduler | Checks order review obligations and triggers outstanding actions. | `ORDER_REVIEW_OBLIGATION_CHECK` | `0 0 1 * * ?` | Daily at 01:00 |
-| Polling event emitter scheduler | Emits polling events across the day so downstream pollers stay in sync. | `POLLING_EVENT_EMITTER` | `0 0 8-20 * * ?` | Hourly at the top of the hour from 08:00–20:00 |
-| Proof of debt scheduler | Generates proof-of-debt artefacts for COSC-linked general applications. | `CoscApplicationProcessor` | `0 0 16 * * ?` | Daily at 16:00 |
-| Request for reconsideration notification check scheduler | Ensures reconsideration notifications are sent when conditions are met. | `REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
-| Retrigger cases scheduler | One-off cron to retrigger case updates as part of the 2026 migration plan. | `RETRIGGER_CASES_EVENTS` | `0 0 0 1 * ? 2026` | First day of each month until 2026 at 00:00 |
-| Settlement no response from defendant scheduler | Moves settlement agreements forward when the defendant failed to respond. | `SETTLEMENT_NO_RESPONSE_FROM_DEFENDANT_CHECK` | `0 0 1 * * ?` | Daily at 01:00 |
-| Spec automated hearing notice scheduler | Builds automated hearing notices for Spec claims twice per day. | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 ? * * *` | Twice daily at 00:00 and 12:00 |
-| Take case offline scheduler | Transitions cases that must move off digital rails. | `TAKE_CASE_OFFLINE` | `0 5 16 * * ?` | Daily at 16:05 |
-| Trial ready check scheduler | Verifies trial readiness status for outstanding cases. | `TRIAL_READY_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
-| Trial ready notification scheduler | Sends notifications when trial readiness has been confirmed. | `TRIAL_READY_NOTIFICATION_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
-| Unspec automated hearing notice scheduler | Builds automated hearing notices for Unspec claims twice per day. | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 ? * * *` | Twice daily at 00:00 and 12:00 |
-| Update General application Case management Location | Future-dated cron to re-sync GA case management locations. | `RETRIGGER_GA_UPDATE_CMLOCATION_EVENTS` | `0 0 0 1 * ? 2046` | First day of each month until 2046 at 00:00 |
-| Update location | Future-dated cron to re-sync the main case location. | `RETRIGGER_UPDATE_LOCATION_EVENTS` | `0 0 0 1 * ? 2046` | First day of each month until 2046 at 00:00 |
+| Job | Purpose | Scheduler Name | Camunda topic(s) | Schedule (cron, UTC) | When it runs |
+| --- | --- | --- | --- | --- | --- |
+| Bundle creation scheduler | Builds bundles for eligible hearings each evening. | BundleCreation | `BUNDLE_CREATION_CHECK` | `0 0 21 * * ?` | Daily at 21:00 |
+| Decision outcome scheduler | Moves cases awaiting judicial decisions into the decision outcome workflow. | DecisionOutcome | `MOVE_TO_DECISION_OUTCOME` | `0 40 0 * * ?` | Daily at 00:40 |
+| Defendant response deadline check scheduler | Sweeps for defendants whose response deadline elapsed and triggers enforcement. | DefendantResponseDeadline | `DEFENDANT_RESPONSE_DEADLINE_CHECK` | `0 1 16 * * ?` | Daily at 16:01 |
+| Evidence upload scheduler | Prompts parties to upload evidence when deadlines are approaching. | EvidenceUpload | `EVIDENCE_UPLOAD_CHECK` | `0 30 17 * * ?` | Daily at 17:30 |
+| Full admit pay immediately no payment scheduler | Escalates full-admit cases where an immediate payment was promised but not received. | FullAdmitPayImmediatelyNoPaymentFromDefendant | `FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
+| GA doc upload notify scheduler | Sends notifications when GA supporting documents are uploaded. | GADocUploadNotifyScheduler | `GADocUploadNotifyScheduler` | `0 0 23 * * ?` | Daily at 23:00 |
+| GA order made scheduler | Publishes GA order-made events to downstream services each afternoon. | GAOrderMadeScheduler | `GAOrderMadeScheduler` | `0 15 16 * * ?` | Daily at 16:15 |
+| GA response deadline processor | Processes GA response deadlines, judge revisits and respondent checks. |  | `GAResponseDeadlineProcessor`<br>`GAJudgeRevisitProcessor`<br>`GARespondentResponseCheckScheduler` | `0 15 17 * * ?` | Daily at 17:15 |
+| GA unless order scheduler | Enforces GA Unless Orders once the compliance deadline passes. | GAUnlessOrderScheduler | `GAUnlessOrderScheduler` | `0 0 16 * * ?` | Daily at 16:00 |
+| Generate CSV and send to MMT scheduler | Produces nightly CSV/JSON exports for the mediation service (MMT). | GenerateCsvAndSendToMmt | `GenerateCsvAndSendToMmt`<br>`GenerateJsonAndSendToMmt` | `0 0 1 * * ?` | Daily at 01:00 |
+| Hearing cvp link scheduler | Issues CVP/remote hearing links on a daily cadence. | HearingCvpLink | `HEARING_CVP_LINK` | `0 50 0 * * ?` | Daily at 00:50 |
+| Hearing fee check scheduler | Checks for unpaid hearing fees and raises the necessary follow-up tasks. | HearingFee | `HEARING_FEE_CHECK` | `0 0 0 * * ?` | Daily at 00:00 |
+| Incident retry scheduler | Retries failed external incident tasks each night. |  | `INCIDENT_RETRY_EVENT` | `0 1 23 * * ?` | Daily at 23:01 |
+| Judgement buffer scheduler | Processes default judgement requests once the judgement buffer period has expired. | JudgementBuffer | `JudgementBuffer` | `0 0 2 * * *` | Daily at 02:00 |
+| Manage Stay WA Task Scheduler | Maintains WA tasks for stayed cases so that no follow-up is missed. | ManageStayWATask | `MANAGE_STAY_WA_TASK_SCHEDULER` | `0 20 1 * * ?` | Daily at 01:20 |
+| Migrate cases scheduler | Reserved cycle to re-run large case migration batches. |  | `MIGRATE_CASES_EVENTS` | `R12/2080-01-01T00:00:00Z/P1M` | Monthly during 2080 at 00:00 UTC |
+| Notify claim and claim dismissed deadline scheduler | Dismisses claims when the claim notification or claim dismissed deadline has passed. | CaseDismissed | `CLAIM_DISMISSED_DEADLINE` | `0 0 0 * * ?` | Daily at 00:00 |
+| Notify claim details scheduler | Dismisses claims when the claim details notification deadline has passed. | ClaimDetailsNotificationDeadline | `CLAIM_DETAILS_NOTIFICATION_DEADLINE` | `0 1 16 * * ?` | Daily at 16:01 |
+| Order Review Obligation check scheduler | Checks order review obligations and triggers outstanding actions. | OrderReviewObligationCheck | `ORDER_REVIEW_OBLIGATION_CHECK` | `0 10 1 * * ?` | Daily at 01:10 |
+| Polling event emitter scheduler | Emits polling events across the day so downstream pollers stay in sync. | PollingEventEmitter | `POLLING_EVENT_EMITTER` | `0 0 8-20 * * ?` | Hourly at the top of the hour from 08:00–20:00 |
+| Proof of debt scheduler | Generates proof-of-debt artefacts for COSC-linked general applications. | CoscApplicationProcessor | `CoscApplicationProcessor` | `0 0 16 * * ?` | Daily at 16:00 |
+| Request for reconsideration notification check scheduler | Ensures reconsideration notifications are sent when conditions are met. | RequestForReconsiderationNotification | `REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK` | `0 10 0 * * ?` | Daily at 00:10 |
+| Retrigger cases scheduler | Time-bounded cycle to retrigger case updates as part of the 2026 migration plan. |  | `RETRIGGER_CASES_EVENTS` | `R12/2026-01-01T00:00:00Z/P1M` | Monthly during 2026 at 00:00 UTC |
+| Settlement no response from defendant scheduler | Moves settlement agreements forward when the defendant failed to respond. | SettlementNoResponseFromDefendantCheck | `SETTLEMENT_NO_RESPONSE_FROM_DEFENDANT_CHECK` | `0 0 1 * * ?` | Daily at 01:00 |
+| Spec automated hearing notice scheduler | Builds automated hearing notices for Spec claims twice per day. | AutomatedHearingNotice | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 * * ?` | Twice daily at 00:00 and 12:00 |
+| Take case offline scheduler | Transitions cases that must move off digital rails. | TakeCaseOffline | `TAKE_CASE_OFFLINE` | `0 1 16 * * ?` | Daily at 16:01 |
+| Trial ready check scheduler | Verifies trial readiness status for outstanding cases. | TrialReadyCheck | `TRIAL_READY_CHECK` | `0 30 0 * * ?` | Daily at 00:30 |
+| Trial ready notification scheduler | Sends notifications when trial readiness has been confirmed. | TrialReadyNotification | `TRIAL_READY_NOTIFICATION_CHECK` | `0 20 0 * * ?` | Daily at 00:20 |
+| Unspec automated hearing notice scheduler | Builds automated hearing notices for Unspec claims twice per day. | AutomatedHearingNotice | `AUTOMATED_HEARING_NOTICE` | `0 0 0,12 * * ?` | Twice daily at 00:00 and 12:00 |
+| Update General application Case management Location | Future-dated cycle to re-sync GA case management locations. |  | `RETRIGGER_GA_UPDATE_CMLOCATION_EVENTS` | `R12/2046-01-01T00:00:00Z/P1M` | Monthly during 2046 at 00:00 UTC |
+| Update location | Future-dated cycle to re-sync the main case location. |  | `RETRIGGER_UPDATE_LOCATION_EVENTS` | `R12/2046-01-01T00:00:00Z/P1M` | Monthly during 2046 at 00:00 UTC |
 <!-- SCHEDULED_JOBS_TABLE_END -->
 
-Run `python3 bin/update-scheduled-jobs-table.py` whenever a BPMN scheduler is added or updated so the table stays in sync. The script reads every BPMN timer, merges in the human-readable descriptions held in `config/scheduled-jobs.json`, and rewrites the table between the markers above. If you add a new scheduler (or change the purpose of an existing one), update the JSON file first so the generated table has meaningful text. The `Verify scheduled jobs table` GitHub Action reruns this script on `master` and fails if `README.md` would change.
+Run `python3 bin/update-scheduled-jobs-table.py` whenever a BPMN or Spring scheduler is added or updated so the table stays in sync. The script reads every BPMN timer and migrated `CivilScheduler`, merges in the human-readable descriptions held in `config/scheduled-jobs.json`, and rewrites the table between the markers above. If you add a new scheduler (or change the purpose of an existing one), update the JSON file first so the generated table has meaningful text. The `Verify scheduled jobs table` GitHub Action reruns this script on `master` and fails if `README.md` would change.
 
 ## Database schema diagram
 
@@ -151,6 +152,13 @@ be found in the Azure key store.
 | `LAUNCH_DARKLY_SDK_KEY` | [LaunchDarkly](https://launchdarkly.com/) is our platform for managing feature toggles. | |
 | `LAUNCH_DARKLY_OFFLINE_MODE` | Sets LaunchDarkly to use local values for flags rather than connecting to the service | `true` |
 | `SPRING_PROFILES_ACTIVE` | Sets the active Spring profile | `local` |
+
+Civil Service uses LaunchDarkly Java server SDK 7.x contexts for feature-flag evaluation. The default context has the
+`user` kind and `civil-service` key, with `environment` and `timestamp` attributes; location-aware evaluations also
+include `location`. The SDK client is a singleton Spring bean and is closed during application shutdown. When the SDK
+is offline or LaunchDarkly is unavailable, each evaluation returns the default value supplied by the caller. Local
+development can use the flag files configured in `application-dev.yaml` with offline mode enabled. No proxy or custom
+network timeout overrides are configured, so the SDK defaults apply.
 
 
 #### Create a Docker image
@@ -388,24 +396,56 @@ role-assignment, etc.). Add this label when you need to test against live AAT se
 
 ## Scheduler Framework
 
-The service includes a common framework for implementing scheduled tasks. This framework provides standard logging, error handling, and case processing logic.
+The service includes a common framework for implementing scheduled tasks. This framework provides standard logging, error handling, back-pressure, and case processing logic.
 
 ### Core Components
 
-- **`CivilScheduler`**: The main interface for scheduler components. Implementations should be annotated with `@Component` and `@Scheduled`.
-- **`ScheduledTask`**: An interface extending `Consumer<CaseDetails>`, representing the logic to be executed for each case found.
-- **`ScheduledTaskRunner`**: A component that coordinates the task execution, including case retrieval via a `Supplier<? extends TaskResult<T>>`.
-- **`ElasticSearchService`**: A base class for services that search for cases to be processed by a scheduler.
+- **`CivilScheduler`**: The main interface for scheduler components. Implementations define a `getName()` and `runScheduledTask()`.
+- **`ScheduledTask<T, I>`**: A generic interface for the logic to be executed for each item found. It extends `Consumer<T>` and requires `getItemId(T item)` to be implemented.
+- **`ScheduledTaskRunner<T, I>`**: A generic Spring component that coordinates task execution, including feature toggle checks, logging, and item processing.
+- **`TaskResult<T>`**: An interface for search results, providing an `itemStream()` and `totalResults()`.
+- **`ListTaskResult<T>`**: A standard implementation of `TaskResult` used for wrapping a simple list of items (e.g., from an API call).
+- **`ElasticSearchService`**: A base class for services that search for cases to be processed by a scheduler via Elasticsearch.
+- **`ElasticSearchPaginatedStreamProvider`**: A component for performing efficient paginated searches using Elasticsearch's `search_after`.
+- **`PaginatedQueryProvider`**: An interface for providing Elasticsearch queries for paginated searches.
+- **`ElasticSearchResult`**: An implementation of `TaskResult` that provides a lazy-loading stream of `CaseDetails` for paginated results.
 
 ### Creating a New Scheduler
 
-1. **Implement a Search Service**: Extend `ElasticSearchService` to define the query for finding cases.
-2. **Implement a Scheduled Task**: Implement `ScheduledTask` (or `Consumer<CaseDetails>`) to define what happens to each case.
+1. **Implement a Search Service**: Define how to find the items to be processed.
+    - **For CCD Case Searches**: Extend `ElasticSearchService` to define the query for finding cases.
+    - **For Other Data Sources**: Create a service that returns a `TaskResult<T>` (typically using `ListTaskResult<T>`) by fetching data from an API, database, or other source.
+2. **Implement a Scheduled Task**:
+    - Implement `ScheduledTask<T, I>` (typically `ScheduledTask<CaseDetails, Long>`).
+    - Implement `accept(T item)` for the processing logic.
+    - Implement `getItemId(T item)` (e.g., `return caseDetails.getId()`).
+    - (Optional) Override `maxCasesPerRun()` or `backPressureConfiguration()`.
 3. **Create the Scheduler Class**:
     - Implement `CivilScheduler`.
-    - Use `@Scheduled` on the `runScheduledTask` method.
-    - Use `ScheduledTaskRunner.run()` to execute the task.
-4. **Add Configuration**: Add settings to `application.yaml` for enabling the scheduler and defining its cron expression.
+    - Use `@Scheduled` and `@SchedulerLock` on the `runScheduledTask` method.
+    - Inject and call `ScheduledTaskRunner.run()`.
+4. **Add Configuration**:
+    - Add a cron expression in `application.yaml`.
+    - Add the scheduler name to the `active-schedulers` list.
+
+### Paginated Search Results
+
+For large datasets, use `ElasticSearchPaginatedStreamProvider` to create a paginated search result. This approach is more efficient than standard pagination as it uses Elasticsearch's `search_after` mechanism and provides a lazy-loading stream.
+
+1. **Implement `PaginatedQueryProvider`**: Define the query for each page.
+    - Use `PageToken` to manage the `search_after` value.
+    - Ensure the query includes a consistent `sort` field (e.g., `reference`).
+2. **Create a Search Service**: Inject `ElasticSearchPaginatedStreamProvider` and call `getPaginatedSearchResult(queryProvider, pageSize)`.
+3. **Lazy-loading Results**: The returned `ElasticSearchResult` provides a stream that fetches subsequent pages only as they are consumed, minimizing memory usage.
+
+Example implementation: `JudgementBufferExpiredSearchService` and `JudgementBufferExpiredQueryProvider`.
+
+### Features & Safety Mechanisms
+
+- **Circuit Breaker**: The runner automatically aborts a job if it encounters consecutive failures (default: 5). This prevents overwhelming downstream services when they are unhealthy.
+- **Back-pressure**: Tasks can apply back-pressure delays between processing items to manage load on external systems. Default settings are managed globally but can be overridden per-task.
+- **Event Tracking**: Standardized events are emitted for job start, completion, failure, and early abortion, providing detailed observability.
+- **LaunchDarkly Control**: The `spring-scheduler-enabled` flag acts as a global kill-switch for all Spring-managed schedulers.
 
 ### Spring Scheduler Configuration
 
@@ -420,7 +460,7 @@ To enable specific Spring schedulers, they must be added to the `active-schedule
 **Configuration in `application.yaml`:**
 ```yaml
 scheduler:
-  active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:JudgementBuffer,DefendantResponseDeadline}
+  active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:JudgementBuffer}
 ```
 
 **Using Environment Variables:**
@@ -434,25 +474,19 @@ To disable all Spring schedulers (even if the feature flag is on), set the list 
 export SCHEDULER_ACTIVE_SCHEDULERS=""
 ```
 
-### JudgementBufferScheduler
-
-The `JudgementBufferScheduler` is used to process cases where a default judgement has been requested and a buffer period has expired.
-
-#### Settings
-
-Settings for this scheduler can be found in `src/main/resources/application.yaml` under `scheduler.judgement-buffer`.
-
-| Setting | Description | Default | Environment Variable |
-|---------|-------------|---------|----------------------|
-| `enabled` | Whether the scheduler is active. | `false` | `SCHEDULER_ENABLED_JUDGEMENT_BUFFER` |
-| `cronExpression` | When the scheduler runs. | `0 0 2 * * *` (Daily at 2 AM) | `CRON_EXPRESSION_JUDGEMENT_BUFFER` |
-
 #### Global Scheduler Settings
 
 | Setting | Description | Default | Environment Variable |
 |---------|-------------|---------|----------------------|
+| `circuitBreakerThreshold` | Number of consecutive failures before aborting. | `5` | `CIRCUIT_BREAKER_THRESHOLD` |
 | `lockAtLeastFor` | Minimum time a task lock is held. | `PT1M` | `LOCK_AT_LEAST_FOR` |
-| `lockAtMostFor` | Maximum time a task lock is held. | `PT5M` | `LOCK_AT_MOST_FOR` |
+| `lockAtMostFor` | Maximum time a task lock is held. | `PT30M` | `LOCK_AT_MOST_FOR` |
+| `default-back-pressure.initialDelay` | Initial delay before processing a case. | `PT0S` | `DEFAULT_BACK_PRESSURE_INITIAL_DELAY` |
+| `default-back-pressure.maxDelay` | Maximum back-pressure delay between cases. | `PT10S` | `DEFAULT_BACK_PRESSURE_MAX_DELAY` |
+| `default-back-pressure.delayIncreaseOnFailure` | Delay added after a failed case. | `PT0.5S` | `DEFAULT_BACK_PRESSURE_DELAY_INCREASE_ON_FAILURE` |
+| `default-back-pressure.delayIncreaseOnSlowCase` | Delay added after a slow case. | `PT0.25S` | `DEFAULT_BACK_PRESSURE_DELAY_INCREASE_ON_SLOW_CASE` |
+| `default-back-pressure.delayReductionOnSuccess` | Delay removed after a successful case. | `PT0.1S` | `DEFAULT_BACK_PRESSURE_DELAY_REDUCTION_ON_SUCCESS` |
+| `default-back-pressure.slowCaseThreshold` | Case processing duration treated as slow. | `PT2S` | `DEFAULT_BACK_PRESSURE_SLOW_CASE_THRESHOLD` |
 
 ## License
 
