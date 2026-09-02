@@ -78,7 +78,8 @@ public class BreathingSpaceLiftedNotificationHandler extends CallbackHandler imp
                 addPropertiesForRespondent(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
-        } else {
+        } else if (!caseData.isApplicant1NotRepresented()
+            && caseData.getApplicantSolicitor1UserDetails() != null) {
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
                 notificationsProperties.getBreathingSpaceLiftedApplicantEmailTemplate(),
