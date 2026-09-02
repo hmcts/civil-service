@@ -31,6 +31,8 @@ jobs:
         hmcts/civil-citizen-ui
         hmcts/cmc-claim-store
         hmcts/cmc-citizen-frontend
+        hmcts/civil-wa-task-configuration
+        hmcts/civil-ccd-definition
       SLACK_WEBHOOK_URL: ${{ secrets.RENOVATE_ALERT_SLACK_WEBHOOK_URL }}
     steps:
       - name: Find stalled Renovate PRs

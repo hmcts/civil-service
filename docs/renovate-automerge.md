@@ -16,7 +16,7 @@ Repo-level settings:
 
 `CODEOWNERS` globally assigns `*` to `@hmcts/civil`, then has more specific ownerless entries intended to exempt some Renovate-updated files from code-owner review. The workflow exemption only covered `.github/workflows/*.yaml`; this repo also uses `.yml` workflow files, so GitHub Actions Renovate PRs still matched the global `* @hmcts/civil` owner rule.
 
-Sibling repo checks under the local HMCTS checkout showed the same `.yaml`-only workflow exemption in `cmc-claim-store` and `cmc-citizen-frontend`. `civil-citizen-ui` has the same global `* @hmcts/civil` owner rule but no Renovate ownerless exemption block. Those repositories have their own Renovate PRs, so any CODEOWNERS exemption changes need to be raised and merged in each affected repository separately.
+Sibling repo checks under the local HMCTS checkout showed the same `.yaml`-only workflow exemption in `cmc-claim-store`, `cmc-citizen-frontend`, and `civil-ccd-definition`. `civil-citizen-ui` and `civil-wa-task-configuration` have the same global `* @hmcts/civil` owner rule but no Renovate ownerless exemption block. Those repositories have their own Renovate PRs, so any CODEOWNERS exemption changes need to be raised and merged in each affected repository separately.
 
 ## Current queue check
 
@@ -56,6 +56,8 @@ This does not bypass required status checks, stale branch requirements, or code-
 - `hmcts/civil-citizen-ui`
 - `hmcts/cmc-claim-store`
 - `hmcts/cmc-citizen-frontend`
+- `hmcts/civil-wa-task-configuration`
+- `hmcts/civil-ccd-definition`
 
 It counts PRs older than the configured threshold, writes the stale queue into the workflow summary, optionally posts to Slack, and fails the workflow when the threshold is exceeded.
 
