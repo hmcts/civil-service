@@ -5,7 +5,7 @@ import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulRea
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_UNSUCCESSFUL_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_CLAIMANT_NONATTENDANCE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_GENERIC;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_DEFENDANT_NONATTENDANCE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_MEDIATION_WHEN_DEFENDANT_NOT_CONTACTABLE;
 import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -16,8 +16,10 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class MediationUnsuccessfulClaimantDashboardService extends DashboardScenarioService {
 
@@ -42,14 +44,19 @@ public class MediationUnsuccessfulClaimantDashboardService extends DashboardScen
     @Override
     public String getScenario(CaseData caseData) {
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
-            if (isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(caseData)) {
-                return SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_DEFENDANT_NONATTENDANCE.getScenario();
-            } else if (isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(caseData)) {
+            log.info("Carm enabled");
+            if (isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(caseData)) {
+                log.info("isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne");
                 return SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_CLAIMANT_NONATTENDANCE.getScenario();
+            } else if (isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(caseData)) {
+                log.info("isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne");
+                return SCENARIO_AAA6_CLAIMANT_MEDIATION_WHEN_DEFENDANT_NOT_CONTACTABLE.getScenario();
             } else {
+                log.info("else");
                 return SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_GENERIC.getScenario();
             }
         }
+        log.info("Carm NOT enabled");
         return SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_UNSUCCESSFUL_CLAIMANT.getScenario();
     }
 
