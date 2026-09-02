@@ -46,27 +46,16 @@
       <bpmn:outgoing>Flow_1gw6mfj</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_0xc0olt" sourceRef="Activity_023yrjd" targetRef="NotifyDefendantClaimantSettleTheClaimNotify" />
-    <bpmn:sequenceFlow id="Flow_1gw6mfj" sourceRef="NotifyDefendantClaimantSettleTheClaimNotify" targetRef="Gateway_0vcpv05" />
-    <bpmn:exclusiveGateway id="Gateway_0vcpv05">
-      <bpmn:incoming>Flow_1gw6mfj</bpmn:incoming>
-      <bpmn:outgoing>Flow_08oh4yc</bpmn:outgoing>
-      <bpmn:outgoing>Flow_1ewv2uu</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1gw6mfj" sourceRef="NotifyDefendantClaimantSettleTheClaimNotify" targetRef="GenerateDashboardNotificationsClaimSettled" />
     <bpmn:serviceTask id="GenerateDashboardNotificationsClaimSettled" name="Dashboard Notifications" camunda:type="external" camunda:topic="dashboardNotifications">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="caseEvent">DASHBOARD_NOTIFICATION_EVENT</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_08oh4yc</bpmn:incoming>
+      <bpmn:incoming>Flow_1gw6mfj</bpmn:incoming>
       <bpmn:outgoing>Flow_063ybh5</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_08oh4yc" name="Dashboard Service Enabled" sourceRef="Gateway_0vcpv05" targetRef="GenerateDashboardNotificationsClaimSettled">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.DASHBOARD_SERVICE_ENABLED &amp;&amp; flowFlags.DASHBOARD_SERVICE_ENABLED}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1ewv2uu" name="Dashboard Service Disabled" sourceRef="Gateway_0vcpv05" targetRef="Activity_1i1bcz2">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${empty flowFlags.DASHBOARD_SERVICE_ENABLED || !flowFlags.DASHBOARD_SERVICE_ENABLED}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_063ybh5" sourceRef="GenerateDashboardNotificationsClaimSettled" targetRef="Activity_1i1bcz2" />
   </bpmn:process>
   <bpmn:message id="Message_1b64xfv" name="LIP_CLAIM_SETTLED" />
