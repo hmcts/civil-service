@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.cmc.model.ClaimEvent;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +46,43 @@ public class AsyncCaseMigrationService {
         this.objectMapper = objectMapper;
         this.migrationBatchSize = migrationBatchSize;
         this.migrationWaitTime = migrationWaitTime;
+    }
+
+    @Async("asyncHandlerExecutor")
+    public <T extends CaseReference> void migrateCMCCasesAsync(
+        MigrationTask<T> task,
+        List<T> caseReferences
+    ) {
+        int count = 0;
+        int batchCount = 1;
+        for (T caseReference : caseReferences) {
+            count++;
+            try {
+                RequestContextHolder.setRequestAttributes(new CustomRequestScopeAttr());
+                if (count == migrationBatchSize) {
+                    log.info("Batch {} limit reached {}, pausing for {} minutes", batchCount, migrationBatchSize, migrationWaitTime);
+                    TimeUnit.MINUTES.sleep(migrationWaitTime);
+                    count = 0;
+                    batchCount++;
+                }
+                log.info("Triggering CMC migration event for case ID: {}", caseReference.getCaseReference());
+                StartEventResponse startEventResponse = coreCaseDataService.startCMCUpdate(
+                    caseReference.getCaseReference(),
+                    ClaimEvent.MIGRATE_CASE
+                );
+                CaseDataContent caseDataContent = buildCmcCaseDataContent(startEventResponse, task);
+                coreCaseDataService.submitCMCUpdate(caseReference.getCaseReference(), caseDataContent);
+                log.info("CMC migration event completed for case ID: {}", caseReference.getCaseReference());
+            } catch (RuntimeException e) {
+                log.error("Error triggering CMC migration event for case ID: {}. Error: {}",
+                          caseReference.getCaseReference(), e.getMessage(), e);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException(e);
+            } finally {
+                RequestContextHolder.resetRequestAttributes();
+            }
+        }
     }
 
     @Async("asyncHandlerExecutor")
@@ -81,8 +119,8 @@ public class AsyncCaseMigrationService {
                     caseData = task.migrateGeneralApplicationCaseData(caseData, gaCaseData, caseReference);
                 } else {
                     startEventResponse = coreCaseDataService.startUpdate(
-                        caseReference.getCaseReference(),
-                        CaseEvent.UPDATE_CASE_DATA
+                            caseReference.getCaseReference(),
+                            CaseEvent.UPDATE_CASE_DATA
                     );
                     CaseDetails caseDetails = startEventResponse.getCaseDetails();
                     caseData = caseDetailsConverter.toCaseData(caseDetails);
@@ -139,6 +177,18 @@ public class AsyncCaseMigrationService {
                 .description(task.getEventDescription())
                 .build())
             .data(updatedData)
+            .build();
+    }
+
+    protected CaseDataContent buildCmcCaseDataContent(StartEventResponse startEventResponse, MigrationTask<?> task) {
+        Map<String, Object> existingData = new HashMap<>(startEventResponse.getCaseDetails().getData());
+        return CaseDataContent.builder()
+            .eventToken(startEventResponse.getToken())
+            .event(Event.builder().id(startEventResponse.getEventId())
+                       .summary(task.getEventSummary())
+                       .description(task.getEventDescription())
+                       .build())
+            .data(existingData)
             .build();
     }
 }
