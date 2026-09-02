@@ -107,6 +107,27 @@ class MediationUnsuccessfulClaimantDashboardServiceTest {
     }
 
     @Test
+    void shouldRecordNonAttendanceScenarioWhenCarmEnabledAndBothClaimantAndDefendantNotContactable() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setCcdCaseReference(1234L);
+        Mediation mediation = new Mediation();
+        mediation.setMediationUnsuccessfulReasonsMultiSelect(
+            List.of(NOT_CONTACTABLE_CLAIMANT_ONE, NOT_CONTACTABLE_DEFENDANT_ONE));
+        caseData.setMediation(mediation);
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+        service.notifyMediationUnsuccessful(caseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            AUTH_TOKEN,
+            SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_CLAIMANT_NONATTENDANCE.getScenario(),
+            "1234",
+            new ScenarioRequestParams(new HashMap<>())
+        );
+    }
+
+    @Test
     void shouldRecordGenericScenarioWhenCarmEnabledAndOtherReason() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setApplicant1Represented(YesOrNo.NO);
