@@ -172,6 +172,43 @@ class UpdatePaymentStatusServiceTest {
         verifyNoMoreInteractions(gaCoreCaseDataService);
     }
 
+    @Test
+    public void shouldLogContextAndChainCauseWhenUpdatePaymentStatusFails() {
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .ccdState(CASE_PROGRESSION)
+            .businessProcess(new BusinessProcess()
+                                 .setStatus(BusinessProcessStatus.READY)
+                                 .setCamundaEvent(BUSINESS_PROCESS))
+            .generalAppPBADetails(new GeneralApplicationPbaDetails().setPaymentDetails(new PaymentDetails()
+                .setCustomerReference("RC-1604-0739-2145-4711")
+            ))
+            .build();
+        CaseDetails caseDetails = buildCaseDetails(caseData);
+        RuntimeException cause = new RuntimeException("CCD submit failed");
+        CardPaymentStatusResponse response = getCardPaymentStatusResponse();
+
+        when(gaCoreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
+        when(gaCoreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
+            caseDetails,
+            INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT
+        ));
+        when(gaCoreCaseDataService.submitUpdate(any(), any())).thenThrow(cause);
+
+        assertThatThrownBy(() -> updatePaymentStatusService.updatePaymentStatus(String.valueOf(CASE_ID), response))
+            .isInstanceOf(CaseDataUpdateException.class)
+            .hasMessage("CCD submit failed")
+            .hasCause(cause);
+
+        assertThat(listAppender.list)
+            .anySatisfy(event -> {
+                assertThat(event.getLevel()).isEqualTo(Level.ERROR);
+                assertThat(event.getFormattedMessage())
+                    .contains("updatePaymentStatus failed for caseReference=1594901956117591 status=SUCCESS");
+                assertThat(event.getThrowableProxy().getMessage()).isEqualTo("CCD submit failed");
+            });
+    }
+
     private CaseDetails buildCaseDetails(GeneralApplicationCaseData caseData) {
         return CaseDetails.builder()
             .data(objectMapper.convertValue(
