@@ -23,7 +23,9 @@ public class ExpiredDraftStoreScheduler implements CivilScheduler {
     private final DraftStoreRepository draftStoreRepository;
 
     @Override
-    public String getName() { return SCHEDULER_NAME;}
+    public String getName() {
+        return SCHEDULER_NAME;
+    }
 
     @Scheduled(cron = "${scheduler.expired-draft-store.cronExpression}")
     @SchedulerLock(
