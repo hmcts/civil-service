@@ -19,4 +19,10 @@ public class EventProperties {
     protected int backoffDelay;
     // desired dispatch delay in milliseconds between task executions
     protected int dispatchDelay;
+    // initial wait in milliseconds the external task client backs off for after an unsuccessful fetchAndLock.
+    protected long clientBackoffInitial;
+    // multiplier applied to the client backoff for each consecutive unsuccessful fetchAndLock.
+    protected float clientBackoffFactor;
+    // maximum wait in milliseconds the external task client backs off for between fetchAndLock attempts.
+    protected long clientBackoffMax;
 }
