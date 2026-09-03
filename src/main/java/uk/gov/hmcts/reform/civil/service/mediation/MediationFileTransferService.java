@@ -14,8 +14,12 @@ import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HexFormat;
 import java.util.List;
+import java.util.Locale;
 
 import static java.util.List.of;
 import static uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment.json;
@@ -28,6 +32,8 @@ public class MediationFileTransferService {
     private static final String SUBJECT = "OCMC Mediation Data";
     private static final String CSV_FILENAME = "ocmc_mediation_data.csv";
     private static final String JSON_FILENAME = "ocmc_mediation_data.json";
+    private static final String CSV_RECIPIENT_CONFIG_KEY = "mediation.emails.recipient";
+    private static final String JSON_RECIPIENT_CONFIG_KEY = "mediation.emails.jsonRecipient";
 
     private final MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
     private final MediationCsvServiceFactory mediationCsvServiceFactory;
@@ -60,13 +66,25 @@ public class MediationFileTransferService {
             return List.of();
         }
 
-        String generateCsvData = generateCSVRow(headers) + csvColContent;
-        InputStreamSource inputSource = new ByteArrayResource(generateCsvData.getBytes(StandardCharsets.UTF_8));
+        byte[] csvContent = (generateCSVRow(headers) + csvColContent).getBytes(StandardCharsets.UTF_8);
+        InputStreamSource inputSource = new ByteArrayResource(csvContent);
+        EmailAttachment attachment = new EmailAttachment(inputSource, "text/csv", CSV_FILENAME);
         EmailData emailData = new EmailData()
-            .setTo(mediationCSVEmailConfiguration.getRecipient())
+            .setTo(requireConfiguredRecipient(
+                mediationCSVEmailConfiguration.getRecipient(),
+                CSV_RECIPIENT_CONFIG_KEY
+            ))
             .setSubject(SUBJECT)
-            .setAttachments(List.of(new EmailAttachment(inputSource, "text/csv", CSV_FILENAME)));
+            .setAttachments(List.of(attachment));
 
+        logMediationEmailSendAttempt(
+            "CSV",
+            CSV_RECIPIENT_CONFIG_KEY,
+            emailData.getTo(),
+            attachment,
+            csvContent.length,
+            successfulCases.size()
+        );
         sendMediationFileEmail(emailData);
         return successfulCases;
     }
@@ -95,11 +113,23 @@ public class MediationFileTransferService {
         }
 
         MediationDTO mediationDTO = convertToMediationDTO(casesList);
+        EmailAttachment attachment = json(mediationDTO.getJsonRawData(), JSON_FILENAME);
         EmailData emailData = new EmailData()
-            .setTo(mediationCSVEmailConfiguration.getJsonRecipient())
+            .setTo(requireConfiguredRecipient(
+                mediationCSVEmailConfiguration.getJsonRecipient(),
+                JSON_RECIPIENT_CONFIG_KEY
+            ))
             .setSubject(SUBJECT)
-            .setAttachments(of(json(mediationDTO.getJsonRawData(), JSON_FILENAME)));
+            .setAttachments(of(attachment));
 
+        logMediationEmailSendAttempt(
+            "JSON",
+            JSON_RECIPIENT_CONFIG_KEY,
+            emailData.getTo(),
+            attachment,
+            mediationDTO.getJsonRawData().length,
+            successfulCases.size()
+        );
         sendMediationFileEmail(emailData);
         return successfulCases;
     }
@@ -140,6 +170,59 @@ public class MediationFileTransferService {
             mediationCSVEmailConfiguration.getSender(),
             data
         );
+    }
+
+    private String requireConfiguredRecipient(String recipient, String configKey) {
+        if (recipient == null || recipient.isBlank()) {
+            throw new IllegalStateException("Missing mediation email recipient config: " + configKey);
+        }
+        return recipient;
+    }
+
+    private void logMediationEmailSendAttempt(
+        String reportType,
+        String recipientConfigKey,
+        String recipient,
+        EmailAttachment attachment,
+        int attachmentBytes,
+        int caseCount
+    ) {
+        log.info(
+            "MMT_MEDIATION_EMAIL_SEND_ATTEMPT subject={} reportType={} recipientConfig={} recipientHash={} "
+                + "recipientDomain={} attachmentName={} attachmentContentType={} attachmentBytes={} caseCount={}",
+            SUBJECT,
+            reportType,
+            recipientConfigKey,
+            recipientHash(recipient),
+            recipientDomain(recipient),
+            attachment.getFilename(),
+            attachment.getContentType(),
+            attachmentBytes,
+            caseCount
+        );
+    }
+
+    private String recipientHash(String recipient) {
+        String normalizedRecipient = normalizeRecipient(recipient);
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            return HexFormat.of().formatHex(digest.digest(normalizedRecipient.getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 is not available", e);
+        }
+    }
+
+    private String recipientDomain(String recipient) {
+        String normalizedRecipient = normalizeRecipient(recipient);
+        int atIndex = normalizedRecipient.lastIndexOf('@');
+        if (atIndex < 0 || atIndex == normalizedRecipient.length() - 1) {
+            return "unknown";
+        }
+        return normalizedRecipient.substring(atIndex + 1);
+    }
+
+    private String normalizeRecipient(String recipient) {
+        return recipient.trim().toLowerCase(Locale.ROOT);
     }
 
     private void trackGenerationFailure(CaseData caseData, String fileName) {
