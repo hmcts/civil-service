@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.mediation;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
+import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import static uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment.json;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MediationFileTransferService {
 
     private static final String SUBJECT = "OCMC Mediation Data";
@@ -30,15 +33,32 @@ public class MediationFileTransferService {
     private final MediationCsvServiceFactory mediationCsvServiceFactory;
     private final MediationJsonService mediationJsonService;
     private final SendGridClient sendGridClient;
+    private final CaseTaskTrackingService caseTaskTrackingService;
 
-    public void sendCsv(List<CaseData> cases) {
+    public List<CaseData> sendCsv(List<CaseData> cases) {
         if (cases.isEmpty()) {
-            return;
+            return List.of();
         }
 
         String[] headers = getCSVHeaders();
         StringBuilder csvColContent = new StringBuilder();
-        cases.forEach(caseData -> csvColContent.append(generateCsvContent(caseData)));
+        List<CaseData> successfulCases = new ArrayList<>();
+        cases.forEach(
+            caseData -> {
+                try {
+                    csvColContent.append(generateCsvContent(caseData));
+                    successfulCases.add(caseData);
+                } catch (Exception e) {
+                    log.error("Generate mediation CSV failed for case with id: '{}'",
+                              caseData.getCcdCaseReference(), e);
+                    trackGenerationFailure(caseData, CSV_FILENAME);
+                }
+            }
+        );
+
+        if (successfulCases.isEmpty()) {
+            return List.of();
+        }
 
         String generateCsvData = generateCSVRow(headers) + csvColContent;
         InputStreamSource inputSource = new ByteArrayResource(generateCsvData.getBytes(StandardCharsets.UTF_8));
@@ -48,16 +68,30 @@ public class MediationFileTransferService {
             .setAttachments(List.of(new EmailAttachment(inputSource, "text/csv", CSV_FILENAME)));
 
         sendMediationFileEmail(emailData);
+        return successfulCases;
     }
 
-    public void sendJson(List<CaseData> cases) {
+    public List<CaseData> sendJson(List<CaseData> cases) {
         if (cases.isEmpty()) {
-            return;
+            return List.of();
         }
 
         List<MediationCase> casesList = new ArrayList<>();
+        List<CaseData> successfulCases = new ArrayList<>();
         for (CaseData caseData : cases) {
-            casesList.add(mediationJsonService.generateJsonContent(caseData));
+            try {
+                MediationCase mediationCase = mediationJsonService.generateJsonContent(caseData);
+                casesList.add(mediationCase);
+                successfulCases.add(caseData);
+            } catch (Exception e) {
+                log.error("Generate mediation JSON failed for case with id: '{}'",
+                          caseData.getCcdCaseReference(), e);
+                trackGenerationFailure(caseData, JSON_FILENAME);
+            }
+        }
+
+        if (successfulCases.isEmpty()) {
+            return List.of();
         }
 
         MediationDTO mediationDTO = convertToMediationDTO(casesList);
@@ -67,6 +101,7 @@ public class MediationFileTransferService {
             .setAttachments(of(json(mediationDTO.getJsonRawData(), JSON_FILENAME)));
 
         sendMediationFileEmail(emailData);
+        return successfulCases;
     }
 
     private String generateCsvContent(CaseData caseData) {
@@ -104,6 +139,15 @@ public class MediationFileTransferService {
         sendGridClient.sendEmail(
             mediationCSVEmailConfiguration.getSender(),
             data
+        );
+    }
+
+    private void trackGenerationFailure(CaseData caseData, String fileName) {
+        caseTaskTrackingService.trackCaseTask(
+            caseData.getCcdCaseReference().toString(),
+            SUBJECT,
+            fileName,
+            null
         );
     }
 }

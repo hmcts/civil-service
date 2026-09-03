@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
+import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -39,6 +40,8 @@ class MediationFileTransferServiceTest {
     private SendGridClient sendGridClient;
     @Mock
     private MediationCSVService mediationCSVService;
+    @Mock
+    private CaseTaskTrackingService caseTaskTrackingService;
 
     @InjectMocks
     private MediationFileTransferService mediationFileTransferService;
@@ -51,8 +54,9 @@ class MediationFileTransferServiceTest {
         when(mediationCSVEmailConfiguration.getRecipient()).thenReturn(CSV_RECIPIENT);
         when(mediationCSVEmailConfiguration.getSender()).thenReturn(SENDER);
 
-        mediationFileTransferService.sendCsv(List.of(caseData));
+        List<CaseData> successfulCases = mediationFileTransferService.sendCsv(List.of(caseData));
 
+        assertThat(successfulCases).containsExactly(caseData);
         EmailData emailData = captureEmailData();
         assertThat(emailData.getTo()).isEqualTo(CSV_RECIPIENT);
         assertThat(emailData.getSubject()).isEqualTo("OCMC Mediation Data");
@@ -77,8 +81,9 @@ class MediationFileTransferServiceTest {
         when(mediationCSVEmailConfiguration.getJsonRecipient()).thenReturn(JSON_RECIPIENT);
         when(mediationCSVEmailConfiguration.getSender()).thenReturn(SENDER);
 
-        mediationFileTransferService.sendJson(List.of(caseData));
+        List<CaseData> successfulCases = mediationFileTransferService.sendJson(List.of(caseData));
 
+        assertThat(successfulCases).containsExactly(caseData);
         EmailData emailData = captureEmailData();
         assertThat(emailData.getTo()).isEqualTo(JSON_RECIPIENT);
         assertThat(emailData.getSubject()).isEqualTo("OCMC Mediation Data");
@@ -91,16 +96,86 @@ class MediationFileTransferServiceTest {
 
     @Test
     void shouldNotSendCsvWhenThereAreNoCases() {
-        mediationFileTransferService.sendCsv(List.of());
+        List<CaseData> successfulCases = mediationFileTransferService.sendCsv(List.of());
 
+        assertThat(successfulCases).isEmpty();
         verifyNoInteractions(sendGridClient, mediationCsvServiceFactory);
     }
 
     @Test
     void shouldNotSendJsonWhenThereAreNoCases() {
-        mediationFileTransferService.sendJson(List.of());
+        List<CaseData> successfulCases = mediationFileTransferService.sendJson(List.of());
 
+        assertThat(successfulCases).isEmpty();
         verifyNoInteractions(sendGridClient, mediationJsonService);
+    }
+
+    @Test
+    void shouldTrackCsvGenerationFailureAndSendSuccessfulCases() {
+        CaseData failedCase = CaseData.builder().ccdCaseReference(1L).build();
+        CaseData successfulCase = CaseData.builder().ccdCaseReference(2L).build();
+        when(mediationCsvServiceFactory.getMediationCSVService(failedCase)).thenReturn(mediationCSVService);
+        when(mediationCsvServiceFactory.getMediationCSVService(successfulCase)).thenReturn(mediationCSVService);
+        when(mediationCSVService.generateCSVContent(failedCase))
+            .thenThrow(new RuntimeException("Unable to generate CSV"));
+        when(mediationCSVService.generateCSVContent(successfulCase)).thenReturn("row-two\r\n");
+        when(mediationCSVEmailConfiguration.getRecipient()).thenReturn(CSV_RECIPIENT);
+        when(mediationCSVEmailConfiguration.getSender()).thenReturn(SENDER);
+
+        List<CaseData> successfulCases = mediationFileTransferService.sendCsv(List.of(failedCase, successfulCase));
+
+        assertThat(successfulCases).containsExactly(successfulCase);
+        verify(caseTaskTrackingService).trackCaseTask("1", "OCMC Mediation Data", "ocmc_mediation_data.csv", null);
+        assertThat(attachmentContent(captureEmailData().getAttachments().getFirst()))
+            .contains("row-two\r\n")
+            .doesNotContain("row-one\r\n");
+    }
+
+    @Test
+    void shouldNotSendCsvWhenAllCaseGenerationFails() {
+        CaseData caseData = CaseData.builder().ccdCaseReference(1L).build();
+        when(mediationCsvServiceFactory.getMediationCSVService(caseData)).thenReturn(mediationCSVService);
+        when(mediationCSVService.generateCSVContent(caseData))
+            .thenThrow(new RuntimeException("Unable to generate CSV"));
+
+        List<CaseData> successfulCases = mediationFileTransferService.sendCsv(List.of(caseData));
+
+        assertThat(successfulCases).isEmpty();
+        verify(caseTaskTrackingService).trackCaseTask("1", "OCMC Mediation Data", "ocmc_mediation_data.csv", null);
+        verifyNoInteractions(sendGridClient);
+    }
+
+    @Test
+    void shouldTrackJsonGenerationFailureAndSendSuccessfulCases() {
+        CaseData failedCase = CaseData.builder().ccdCaseReference(1L).build();
+        CaseData successfulCase = CaseData.builder().ccdCaseReference(2L).build();
+        MediationCase mediationCase = new MediationCase().setCcdCaseNumber(2L);
+        when(mediationJsonService.generateJsonContent(failedCase))
+            .thenThrow(new RuntimeException("Unable to generate JSON"));
+        when(mediationJsonService.generateJsonContent(successfulCase)).thenReturn(mediationCase);
+        when(mediationCSVEmailConfiguration.getJsonRecipient()).thenReturn(JSON_RECIPIENT);
+        when(mediationCSVEmailConfiguration.getSender()).thenReturn(SENDER);
+
+        List<CaseData> successfulCases = mediationFileTransferService.sendJson(List.of(failedCase, successfulCase));
+
+        assertThat(successfulCases).containsExactly(successfulCase);
+        verify(caseTaskTrackingService).trackCaseTask("1", "OCMC Mediation Data", "ocmc_mediation_data.json", null);
+        assertThat(attachmentContent(captureEmailData().getAttachments().getFirst()))
+            .contains("\"ccdCaseNumber\":2")
+            .doesNotContain("\"ccdCaseNumber\":1");
+    }
+
+    @Test
+    void shouldNotSendJsonWhenAllCaseGenerationFails() {
+        CaseData caseData = CaseData.builder().ccdCaseReference(1L).build();
+        when(mediationJsonService.generateJsonContent(caseData))
+            .thenThrow(new RuntimeException("Unable to generate JSON"));
+
+        List<CaseData> successfulCases = mediationFileTransferService.sendJson(List.of(caseData));
+
+        assertThat(successfulCases).isEmpty();
+        verify(caseTaskTrackingService).trackCaseTask("1", "OCMC Mediation Data", "ocmc_mediation_data.json", null);
+        verifyNoInteractions(sendGridClient);
     }
 
     private EmailData captureEmailData() {
