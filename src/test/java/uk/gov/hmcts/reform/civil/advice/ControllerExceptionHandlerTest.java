@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.exceptions.InvalidTokenException;
 import uk.gov.hmcts.reform.civil.exceptions.UpstreamUnavailableException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,5 +39,15 @@ class ControllerExceptionHandlerTest {
         assertEquals(HttpStatus.SERVICE_UNAVAILABLE, response.getStatusCode());
         assertEquals("CCD case-users is currently unavailable", response.getBody());
         assertEquals("10", response.getHeaders().getFirst(RETRY_AFTER));
+    }
+
+    @Test
+    void invalidToken_returnsUnauthorized() {
+        ResponseEntity<Object> response = controllerExceptionHandler.invalidToken(
+            new InvalidTokenException("Invalid S2S token")
+        );
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Invalid S2S token", response.getBody());
     }
 }
