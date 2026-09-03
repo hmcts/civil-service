@@ -134,6 +134,8 @@ scheduler:
     delayIncreaseOnSlowCase: ${DEFAULT_BACK_PRESSURE_DELAY_INCREASE_ON_SLOW_CASE:PT0.25S}
     delayReductionOnSuccess: ${DEFAULT_BACK_PRESSURE_DELAY_REDUCTION_ON_SUCCESS:PT0.1S}
     slowCaseThreshold: ${DEFAULT_BACK_PRESSURE_SLOW_CASE_THRESHOLD:PT2S}
+  expired-draft-store:
+    cronExpression: ${CRON_EXPRESSION_EXPIRED_DRAFT_STORE:0 15 2 * * ?}
 
 search:
   judgement-buffer:
