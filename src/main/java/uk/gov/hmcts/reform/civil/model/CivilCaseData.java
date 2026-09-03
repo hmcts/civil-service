@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.civil.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.Accessors;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -52,8 +52,8 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingSchedulesOfLo
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPPI;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
@@ -79,7 +79,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
-import uk.gov.hmcts.reform.civil.model.sdo.HousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackNotes;
@@ -89,6 +88,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.HousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
@@ -264,8 +264,8 @@ public class CivilCaseData extends BaseCaseData implements MappableObject {
     // sdo ui flags
     private  YesOrNo setSmallClaimsFlag;
     private  YesOrNo setFastTrackFlag;
-    private  String eventDescriptionRTJ;
-    private  String additionalInformationRTJ;
+    private  String eventDescription;
+    private  String additionalInformation;
 
     //default judgement SDO R2 fields for trial
     private SdoDJR2TrialCreditHire sdoDJR2TrialCreditHire;

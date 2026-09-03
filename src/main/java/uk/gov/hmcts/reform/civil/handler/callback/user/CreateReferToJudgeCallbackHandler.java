@@ -5,8 +5,8 @@ import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.callback.CaseEventCallbackResponse;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -81,8 +82,12 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
                 );
         }
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
+        return CaseEventCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
+            .caseEvent(Event.builder()
+                           .summary(caseData.getEventDescription())
+                           .description(caseData.getAdditionalInformation())
+                           .build())
             .build();
     }
 

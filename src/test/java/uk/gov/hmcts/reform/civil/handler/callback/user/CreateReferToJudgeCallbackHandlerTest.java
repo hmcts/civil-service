@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.callback.CaseEventCallbackResponse;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -80,13 +81,17 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldReturnExpectedAboutToSubmitResponse() {
             CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            localCaseData.setEventDescription("Refer to judge");
+            localCaseData.setAdditionalInformation("Additional information");
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
-            AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+            CaseEventCallbackResponse response =
+                (CaseEventCallbackResponse) handler.handle(localParams);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(response).isNotNull();
             assertThat(updatedData.getIsReferToJudgeClaim()).isEqualTo(YesOrNo.YES);
+            assertThat(response.getCaseEvent().getSummary()).isEqualTo("Refer to judge");
+            assertThat(response.getCaseEvent().getDescription()).isEqualTo("Additional information");
         }
 
         @Test
@@ -106,8 +111,8 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
                 .build();
 
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
-            AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+            CaseEventCallbackResponse response =
+                (CaseEventCallbackResponse) handler.handle(localParams);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(response).isNotNull();
@@ -131,8 +136,8 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
                 .build();
 
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
-            AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+            CaseEventCallbackResponse response =
+                (CaseEventCallbackResponse) handler.handle(localParams);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(response).isNotNull();
@@ -148,8 +153,8 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
                 .build();
 
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
-            AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+            CaseEventCallbackResponse response =
+                (CaseEventCallbackResponse) handler.handle(localParams);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(response).isNotNull();
@@ -180,8 +185,8 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
                 .build();
 
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
-            AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+            CaseEventCallbackResponse response =
+                (CaseEventCallbackResponse) handler.handle(localParams);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(response).isNotNull();

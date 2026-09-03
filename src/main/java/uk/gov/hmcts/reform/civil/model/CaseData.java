@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import jakarta.validation.Valid;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -86,7 +87,6 @@ import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
-import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -584,11 +584,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     /**
      * RTJ = Refer To Judge.
      */
-    private  String eventDescriptionRTJ;
+    private  String eventDescription;
     /**
      * RTJ = Refer To Judge.
      */
-    private  String additionalInformationRTJ;
+    private  String additionalInformation;
     /**
      * Refer To Judge(Defence received in time).
      */
