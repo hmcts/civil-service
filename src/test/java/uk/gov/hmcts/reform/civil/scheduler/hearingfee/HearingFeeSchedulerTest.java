@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
-import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
+import uk.gov.hmcts.reform.civil.service.search.hearingfee.HearingFeeDuePaginatedSearchService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 class HearingFeeSchedulerTest {
 
     @Mock
-    private HearingFeeDueSearchService searchService;
+    private HearingFeeDuePaginatedSearchService searchService;
 
     @Mock
     private ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
