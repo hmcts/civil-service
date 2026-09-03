@@ -23,6 +23,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -105,6 +108,11 @@ class RespondToApplicationWorkflowTest extends GAWorkflowIntegrationTest {
                     .containsExactly(BusinessProcessStatus.READY, CaseEvent.RESPOND_TO_APPLICATION.name());
                 assertThat(stateFlowEngine.evaluate(result.caseData()).getStateHistory().getLast().getName())
                     .isEqualTo(GaFlowState.Main.PROCEED_GENERAL_APPLICATION.fullName());
+                assertThat(result.response().getData()).doesNotContainKeys(
+                    "hearingDetailsResp",
+                    "generalAppRespondReason",
+                    "generalAppRespondDocument"
+                );
             })
             .submitted()
             .then(result -> {
@@ -116,5 +124,11 @@ class RespondToApplicationWorkflowTest extends GAWorkflowIntegrationTest {
             });
 
         verifyNoInteractions(dashboardNotificationService);
+        verify(gaEventEmitterService).emitBusinessProcessCamundaGAEvent(
+            argThat(actual -> actual.getCcdCaseReference().equals(GaLifecycleFixtures.CASE_ID)
+                && actual.getBusinessProcess().getStatus() == BusinessProcessStatus.READY
+                && actual.getBusinessProcess().getCamundaEvent().equals(CaseEvent.RESPOND_TO_APPLICATION.name())),
+            eq(false)
+        );
     }
 }

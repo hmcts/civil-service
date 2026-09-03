@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption;
@@ -28,6 +29,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -94,6 +98,10 @@ class MakeDecisionWorkflowTest extends GAWorkflowIntegrationTest {
     void shouldSetTheDecisionBusinessProcessVisibilityStateAndReturnConfirmation() throws Exception {
         GeneralApplicationCaseData caseData = GaLifecycleFixtures.decision(GAJudgeDecisionOption.FREE_FORM_ORDER).copy()
             .businessProcess(null)
+            .judicialMakeOrderDocPreview(new Document()
+                                             .setDocumentUrl("http://dm-store/order-preview")
+                                             .setDocumentBinaryUrl("http://dm-store/order-preview/binary")
+                                             .setDocumentFileName("order-preview.pdf"))
             .build();
 
         startWorkflow(caseData)
@@ -107,6 +115,7 @@ class MakeDecisionWorkflowTest extends GAWorkflowIntegrationTest {
                 assertThat(result.caseData().getApplicationIsCloaked()).isEqualTo(YesOrNo.NO);
                 assertThat(stateFlowEngine.evaluate(result.caseData()).getStateHistory().getLast().getName())
                     .isEqualTo(GaFlowState.Main.ORDER_MADE.fullName());
+                assertThat(result.response().getData()).doesNotContainKey("judicialMakeOrderDocPreview");
             })
             .submitted()
             .then(result -> {
@@ -117,6 +126,12 @@ class MakeDecisionWorkflowTest extends GAWorkflowIntegrationTest {
             });
 
         verifyNoInteractions(assignCaseToRespondentSolHelper);
+        verify(gaEventEmitterService).emitBusinessProcessCamundaGAEvent(
+            argThat(actual -> actual.getCcdCaseReference().equals(GaLifecycleFixtures.CASE_ID)
+                && actual.getBusinessProcess().getStatus() == BusinessProcessStatus.READY
+                && actual.getBusinessProcess().getCamundaEvent().equals(CaseEvent.MAKE_DECISION.name())),
+            eq(false)
+        );
     }
 
     @Test
