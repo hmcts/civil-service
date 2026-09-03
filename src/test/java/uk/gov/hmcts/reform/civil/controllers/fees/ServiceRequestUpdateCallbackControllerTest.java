@@ -55,9 +55,10 @@ class ServiceRequestUpdateCallbackControllerTest {
 
     @Test
     void shouldThrowInvalidTokenException_whenServiceIsNotAuthorised() {
+        ServiceRequestUpdateDto serviceRequestUpdateDto = serviceRequestUpdateDto();
         when(authorisationService.isServiceAuthorized(S2S_TOKEN)).thenReturn(false);
 
-        assertThatThrownBy(() -> controller.serviceRequestUpdate(S2S_TOKEN, serviceRequestUpdateDto()))
+        assertThatThrownBy(() -> controller.serviceRequestUpdate(S2S_TOKEN, serviceRequestUpdateDto))
             .isInstanceOf(InvalidTokenException.class)
             .hasMessage("Invalid S2S token");
 
@@ -66,6 +67,7 @@ class ServiceRequestUpdateCallbackControllerTest {
 
     @Test
     void shouldThrowUpstreamUnavailableException_whenDownstreamIsUnavailable() {
+        ServiceRequestUpdateDto serviceRequestUpdateDto = serviceRequestUpdateDto();
         FeignException gatewayTimeout = new FeignException.GatewayTimeout(
             "Gateway Timeout",
             request(),
@@ -75,18 +77,19 @@ class ServiceRequestUpdateCallbackControllerTest {
         when(authorisationService.isServiceAuthorized(S2S_TOKEN)).thenReturn(true);
         doThrow(gatewayTimeout).when(requestUpdateCallbackService).processCallback(any(), any());
 
-        assertThatThrownBy(() -> controller.serviceRequestUpdate(S2S_TOKEN, serviceRequestUpdateDto()))
+        assertThatThrownBy(() -> controller.serviceRequestUpdate(S2S_TOKEN, serviceRequestUpdateDto))
             .isInstanceOf(UpstreamUnavailableException.class)
             .hasCause(gatewayTimeout);
     }
 
     @Test
     void shouldThrowInternalServerErrorException_whenUnexpectedErrorOccurs() {
+        ServiceRequestUpdateDto serviceRequestUpdateDto = serviceRequestUpdateDto();
         RuntimeException unexpectedError = new RuntimeException("Unexpected error");
         when(authorisationService.isServiceAuthorized(S2S_TOKEN)).thenReturn(true);
         doThrow(unexpectedError).when(requestUpdateCallbackService).processCallback(any(), any());
 
-        assertThatThrownBy(() -> controller.serviceRequestUpdate(S2S_TOKEN, serviceRequestUpdateDto()))
+        assertThatThrownBy(() -> controller.serviceRequestUpdate(S2S_TOKEN, serviceRequestUpdateDto))
             .isInstanceOf(InternalServerErrorException.class)
             .hasCause(unexpectedError);
     }
