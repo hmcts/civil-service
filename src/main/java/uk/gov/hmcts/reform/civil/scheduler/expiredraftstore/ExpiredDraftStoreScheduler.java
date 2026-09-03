@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledEventTracker;
+import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -21,6 +23,7 @@ public class ExpiredDraftStoreScheduler implements CivilScheduler {
 
     private final FeatureToggleService featureToggleService;
     private final DraftStoreRepository draftStoreRepository;
+    private final ScheduledEventTracker eventTracker;
 
     @Override
     public String getName() {
@@ -39,8 +42,19 @@ public class ExpiredDraftStoreScheduler implements CivilScheduler {
         if (!featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
             return;
         }
-        log.info("Running {} scheduler", SCHEDULER_NAME);
-        long deleted = draftStoreRepository.deleteByExpiresAtBefore(OffsetDateTime.now());
-        log.info("{} deleted {} expired draft(s)", SCHEDULER_NAME, deleted);
+        ScheduledTaskEventConfiguration config = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
+        eventTracker.jobStartedEvent(config);
+
+        try {
+            log.info("Running {} scheduler", SCHEDULER_NAME);
+            long deleted = draftStoreRepository.deleteByExpiresAtBefore(OffsetDateTime.now());
+            log.info("{} deleted {} expired draft(s)", SCHEDULER_NAME, deleted);
+
+            eventTracker.jobCompletedBulkEvent(config, (int) deleted);
+        } catch (Exception e) {
+            log.error("Error executing {} scheduler: {}", SCHEDULER_NAME, e.getMessage(), e);
+            eventTracker.jobAbortedEvent(config, e.getMessage());
+            throw e;
+        }
     }
 }
