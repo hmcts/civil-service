@@ -48,8 +48,8 @@ spring:
             issuer-uri: ${idam.web.url}/o
         registration:
           oidc:
-            client-id: internal
-            client-secret: internal
+            client-id: ${IDAM_CLIENT_ID}
+            client-secret: ${CIVIL_CLIENT_SECRET}
   flyway:
     enabled: ${REFERENCE_DATABASE_MIGRATION:true}
     placeholder-replacement: false
@@ -80,21 +80,16 @@ scheduler:
   defaultLockAtMostFor: ${DEFAULT_LOCK_AT_MOST_FOR:PT30M}
   judgement-buffer:
     cronExpression: ${CRON_EXPRESSION_JUDGEMENT_BUFFER:0 0 2 * * *}
-    enabled: ${SCHEDULER_ENABLED_JUDGEMENT_BUFFER:false}
   defendant-response:
     cronExpression: ${CRON_EXPRESSION_DEFENDANT_RESPONSE:0 1 16 * * ?}
-    enabled: ${SCHEDULER_ENABLED_DEFENDANT_RESPONSE:false}
   settlement-no-response-from-defendant-check:
     cronExpression: ${CRON_EXPRESSION_SETTLEMENT_NO_RESPONSE_FROM_DEFENDANT_CHECK:0 0 1 * * ?}
   full-admit-pay-immediately-no-payment-from-def:
     cronExpression: ${CRON_EXPRESSION_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF:0 0 0 * * ?}
-    enabled: ${SCHEDULER_ENABLED_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF:false}
   hearing-fee:
     cronExpression: ${CRON_EXPRESSION_HEARING_FEE:0 0 0 * * ?}
-    enabled: ${SCHEDULER_ENABLED_HEARING_FEE:false}
   evidence-upload:
     cronExpression: ${CRON_EXPRESSION_EVIDENCE_UPLOAD:0 30 17 * * ?}
-    enabled: ${SCHEDULER_ENABLED_EVIDENCE_UPLOAD:false}
   bundle-creation:
     cronExpression: ${CRON_EXPRESSION_BUNDLE_CREATION:0 0 21 * * ?}
   hearing-cvp-link:
@@ -143,6 +138,14 @@ scheduler:
 search:
   judgement-buffer:
     pageSize: ${SEARCH_PAGE_SIZE_JUDGEMENT_BUFFER:50}
+  defendant-response:
+    pageSize: ${SEARCH_PAGE_SIZE_DEFENDANT_RESPONSE:50}
+  evidence-upload:
+    pageSize: ${SEARCH_PAGE_SIZE_EVIDENCE_UPLOAD:50}
+  hearing-fee:
+    pageSize: ${SEARCH_PAGE_SIZE_HEARING_FEE:50}
+  full-admit-pay-immediately-no-payment-from-def:
+    pageSize: ${SEARCH_PAGE_SIZE_FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_FROM_DEF:50}
 
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
