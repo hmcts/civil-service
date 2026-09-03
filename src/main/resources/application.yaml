@@ -48,8 +48,8 @@ spring:
             issuer-uri: ${idam.web.url}/o
         registration:
           oidc:
-            client-id: internal
-            client-secret: internal
+            client-id: ${IDAM_CLIENT_ID}
+            client-secret: ${CIVIL_CLIENT_SECRET}
   flyway:
     enabled: ${REFERENCE_DATABASE_MIGRATION:true}
     placeholder-replacement: false
