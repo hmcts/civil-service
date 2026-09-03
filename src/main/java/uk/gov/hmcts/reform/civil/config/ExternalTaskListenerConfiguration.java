@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.config;
 
 import org.camunda.bpm.client.ExternalTaskClient;
+import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.backoff.ExponentialBackoffStrategy;
 import org.camunda.bpm.client.interceptor.ClientRequestContext;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
@@ -30,13 +31,30 @@ public class ExternalTaskListenerConfiguration {
         this.eventProperties = eventProperties;
     }
 
+    /**
+     * Backoff applied by the external task client between {@code fetchAndLock} attempts.
+     *
+     * <p>Without a real backoff a transient upstream outage - the gateway returning
+     * 502/503/504 error pages that the client cannot parse into an {@code EngineRestExceptionDto} -
+     * becomes a tight, zero-delay retry loop that hammers Camunda and floods the logs with
+     * {@code EngineClientException} (EXC-CS-020). {@link ExponentialBackoffStrategy} resets to a
+     * zero wait as soon as a fetch succeeds, so healthy task pickup latency is unaffected.
+     */
     @Bean
-    public ExternalTaskClient client() {
+    public BackoffStrategy externalTaskBackoffStrategy() {
+        return new ExponentialBackoffStrategy(
+            eventProperties.getClientBackoffInitial(),
+            eventProperties.getClientBackoffFactor(),
+            eventProperties.getClientBackoffMax());
+    }
+
+    @Bean
+    public ExternalTaskClient client(BackoffStrategy externalTaskBackoffStrategy) {
         return ExternalTaskClient.create()
             .addInterceptor(new ServiceAuthProvider())
             .asyncResponseTimeout(eventProperties.getResponseTimeout())
             .maxTasks(1)
-            .backoffStrategy(new ExponentialBackoffStrategy(0, 0, 0))
+            .backoffStrategy(externalTaskBackoffStrategy)
             .lockDuration(eventProperties.getLockDuration()) //wait for some time to finish task before it gets picked by another client
             .baseUrl(baseUrl)
             .build();
