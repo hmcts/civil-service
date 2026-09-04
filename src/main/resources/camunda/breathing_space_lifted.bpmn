@@ -29,45 +29,85 @@
     </bpmn:boundaryEvent>
     <bpmn:sequenceFlow id="Flow_07qelqa" sourceRef="Event_0y09tpb" targetRef="Activity_1d3ska5" />
     <bpmn:sequenceFlow id="Flow_0uk4gkm" sourceRef="Event_0371z1y" targetRef="Event_1o998qy" />
-    <bpmn:sequenceFlow id="Flow_1nq6ydh" sourceRef="Activity_1d3ska5" targetRef="NotifyApplicantSolicitorBSLifted" />
-    <bpmn:serviceTask id="NotifyApplicantSolicitorBSLifted" name="Notify Applicant Solicitor" camunda:type="external" camunda:topic="processCaseEvent">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED</camunda:inputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
+    <bpmn:sequenceFlow id="Flow_1nq6ydh" sourceRef="Activity_1d3ska5" targetRef="Gateway_Defendant1" />
+
+    <bpmn:exclusiveGateway id="Gateway_Defendant1" name="Defendant 1 represented?">
       <bpmn:incoming>Flow_1nq6ydh</bpmn:incoming>
-      <bpmn:outgoing>Flow_0lzk3lu</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:exclusiveGateway id="Gateway_LipDefendantLift" name="LiP Defendant?">
-      <bpmn:incoming>Flow_0lzk3lu</bpmn:incoming>
-      <bpmn:outgoing>Flow_LiftLipToRpa</bpmn:outgoing>
-      <bpmn:outgoing>Flow_LiftToRespondentSolicitor</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Def1_Lip</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Def1_Lr</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_0lzk3lu" sourceRef="NotifyApplicantSolicitorBSLifted" targetRef="Gateway_LipDefendantLift" />
-    <bpmn:sequenceFlow id="Flow_LiftLipToRpa" name="LiP Defendant" sourceRef="Gateway_LipDefendantLift" targetRef="NotifyRpaBsLifted">
+    <bpmn:sequenceFlow id="Flow_Def1_Lip" name="LiP Defendant1" sourceRef="Gateway_Defendant1" targetRef="BreathingSpaceLiftedNotifyLipRespondent1">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.UNREPRESENTED_DEFENDANT_ONE &amp;&amp; flowFlags.UNREPRESENTED_DEFENDANT_ONE}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_LiftToRespondentSolicitor" name="LR Defendant" sourceRef="Gateway_LipDefendantLift" targetRef="NotifyRespondentSolicitorBSLifted">
+    <bpmn:sequenceFlow id="Flow_Def1_Lr" name="LR Defendant1" sourceRef="Gateway_Defendant1" targetRef="NotifyRespondentSolicitorBSLifted">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${empty flowFlags.UNREPRESENTED_DEFENDANT_ONE || (!empty flowFlags.UNREPRESENTED_DEFENDANT_ONE &amp;&amp; !flowFlags.UNREPRESENTED_DEFENDANT_ONE)}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
+
+    <bpmn:serviceTask id="BreathingSpaceLiftedNotifyLipRespondent1" name="Notify LiP respondent 1" camunda:type="external" camunda:topic="processCaseEvent">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="caseEvent">NOTIFY_LIP_RESPONDENT1_BREATHING_SPACE_LIFTED</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Def1_Lip</bpmn:incoming>
+      <bpmn:outgoing>Flow_LipDef1_ToClaimant</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_LipDef1_ToClaimant" sourceRef="BreathingSpaceLiftedNotifyLipRespondent1" targetRef="Gateway_Claimant" />
+
     <bpmn:serviceTask id="NotifyRespondentSolicitorBSLifted" name="Notify Respondent Solicitor" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="caseEvent">NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_LiftToRespondentSolicitor</bpmn:incoming>
-      <bpmn:outgoing>Flow_03l3ldx</bpmn:outgoing>
+      <bpmn:incoming>Flow_Def1_Lr</bpmn:incoming>
+      <bpmn:outgoing>Flow_LrDef1_ToClaimant</bpmn:outgoing>
     </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_LrDef1_ToClaimant" sourceRef="NotifyRespondentSolicitorBSLifted" targetRef="Gateway_Claimant" />
+
+    <bpmn:exclusiveGateway id="Gateway_Claimant" name="Claimant LiP?">
+      <bpmn:incoming>Flow_LipDef1_ToClaimant</bpmn:incoming>
+      <bpmn:incoming>Flow_LrDef1_ToClaimant</bpmn:incoming>
+      <bpmn:outgoing>Flow_Claimant_Lip</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Claimant_Lr</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_Claimant_Lip" name="LiP Claimant" sourceRef="Gateway_Claimant" targetRef="BreathingSpaceLiftedNotifyLipApplicant">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.LIP_CASE &amp;&amp; flowFlags.LIP_CASE}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_Claimant_Lr" name="LR Claimant" sourceRef="Gateway_Claimant" targetRef="NotifyApplicantSolicitorBSLifted">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${empty flowFlags.LIP_CASE || (!empty flowFlags.LIP_CASE &amp;&amp; !flowFlags.LIP_CASE)}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <bpmn:serviceTask id="BreathingSpaceLiftedNotifyLipApplicant" name="Notify LiP applicant" camunda:type="external" camunda:topic="processCaseEvent">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="caseEvent">NOTIFY_LIP_APPLICANT_BREATHING_SPACE_LIFTED</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Claimant_Lip</bpmn:incoming>
+      <bpmn:outgoing>Flow_LipApplicant_ToRpa</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_LipApplicant_ToRpa" sourceRef="BreathingSpaceLiftedNotifyLipApplicant" targetRef="NotifyRpaBsLifted" />
+
+    <bpmn:serviceTask id="NotifyApplicantSolicitorBSLifted" name="Notify Applicant Solicitor" camunda:type="external" camunda:topic="processCaseEvent">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="caseEvent">NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Claimant_Lr</bpmn:incoming>
+      <bpmn:outgoing>Flow_LrApplicant_ToRpa</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_LrApplicant_ToRpa" sourceRef="NotifyApplicantSolicitorBSLifted" targetRef="NotifyRpaBsLifted" />
+
     <bpmn:serviceTask id="NotifyRpaBsLifted" name="Notify RPA on Continuous Feed" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="caseEvent">NOTIFY_RPA_ON_CONTINUOUS_FEED</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_03l3ldx</bpmn:incoming>
-      <bpmn:incoming>Flow_LiftLipToRpa</bpmn:incoming>
+      <bpmn:incoming>Flow_LrApplicant_ToRpa</bpmn:incoming>
+      <bpmn:incoming>Flow_LipApplicant_ToRpa</bpmn:incoming>
       <bpmn:outgoing>Flow_1kass09</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:endEvent id="Event_1g0kcde">
@@ -82,89 +122,118 @@
     </bpmn:callActivity>
     <bpmn:sequenceFlow id="Flow_1kj896s" sourceRef="Activity_0g68wbz" targetRef="Event_1g0kcde" />
     <bpmn:sequenceFlow id="Flow_1kass09" sourceRef="NotifyRpaBsLifted" targetRef="Activity_0g68wbz" />
-    <bpmn:sequenceFlow id="Flow_03l3ldx" sourceRef="NotifyRespondentSolicitorBSLifted" targetRef="NotifyRpaBsLifted" />
   </bpmn:process>
   <bpmn:message id="Message_1bt9nfa" name="LIFT_BREATHING_SPACE_SPEC" />
   <bpmn:message id="Message_1sxevdt" name="LIFT_BREATHING_SPACE_SPEC" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="BREATHING_SPACE_LIFTED">
-      <bpmndi:BPMNEdge id="Flow_1kass09_di" bpmnElement="Flow_1kass09">
-        <di:waypoint x="820" y="230" />
-        <di:waypoint x="850" y="230" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1kj896s_di" bpmnElement="Flow_1kj896s">
-        <di:waypoint x="950" y="230" />
-        <di:waypoint x="992" y="230" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0lzk3lu_di" bpmnElement="Flow_0lzk3lu">
-        <di:waypoint x="500" y="230" />
-        <di:waypoint x="525" y="230" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_LiftToRespondentSolicitor_di" bpmnElement="Flow_LiftToRespondentSolicitor">
-        <di:waypoint x="575" y="230" />
-        <di:waypoint x="600" y="230" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_LiftLipToRpa_di" bpmnElement="Flow_LiftLipToRpa">
-        <di:waypoint x="550" y="205" />
-        <di:waypoint x="550" y="140" />
-        <di:waypoint x="760" y="140" />
-        <di:waypoint x="760" y="190" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1nq6ydh_di" bpmnElement="Flow_1nq6ydh">
-        <di:waypoint x="350" y="230" />
-        <di:waypoint x="400" y="230" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0uk4gkm_di" bpmnElement="Flow_0uk4gkm">
-        <di:waypoint x="300" y="172" />
-        <di:waypoint x="300" y="138" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_07qelqa_di" bpmnElement="Flow_07qelqa">
-        <di:waypoint x="208" y="230" />
-        <di:waypoint x="250" y="230" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_03l3ldx_di" bpmnElement="Flow_03l3ldx">
-        <di:waypoint x="700" y="230" />
-        <di:waypoint x="710" y="230" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_0y09tpb_di" bpmnElement="Event_0y09tpb">
-        <dc:Bounds x="172" y="212" width="36" height="36" />
+        <dc:Bounds x="152" y="212" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="178" y="255" width="24" height="14" />
+          <dc:Bounds x="158" y="255" width="24" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1d3ska5_di" bpmnElement="Activity_1d3ska5">
-        <dc:Bounds x="250" y="190" width="100" height="80" />
+        <dc:Bounds x="230" y="190" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1o998qy_di" bpmnElement="Event_1o998qy">
-        <dc:Bounds x="282" y="102" width="36" height="36" />
+        <dc:Bounds x="262" y="102" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0g2c2ji_di" bpmnElement="NotifyApplicantSolicitorBSLifted">
-        <dc:Bounds x="400" y="190" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_LipDefendantLift_di" bpmnElement="Gateway_LipDefendantLift" isMarkerVisible="true">
-        <dc:Bounds x="525" y="205" width="50" height="50" />
+      <bpmndi:BPMNShape id="Event_0371z1y_di" bpmnElement="Event_0371z1y">
+        <dc:Bounds x="262" y="172" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="513" y="262" width="74" height="14" />
+          <dc:Bounds x="297" y="153" width="26" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Defendant1_di" bpmnElement="Gateway_Defendant1" isMarkerVisible="true">
+        <dc:Bounds x="375" y="205" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="358" y="175" width="85" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0eg1mu3_di" bpmnElement="NotifyRespondentSolicitorBSLifted">
-        <dc:Bounds x="600" y="190" width="100" height="80" />
+        <dc:Bounds x="480" y="190" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1g0kcde_di" bpmnElement="Event_1g0kcde">
-        <dc:Bounds x="992" y="212" width="36" height="36" />
+      <bpmndi:BPMNShape id="Activity_LipDef1_di" bpmnElement="BreathingSpaceLiftedNotifyLipRespondent1">
+        <dc:Bounds x="480" y="350" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0g68wbz_di" bpmnElement="Activity_0g68wbz">
-        <dc:Bounds x="850" y="190" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1yug86e_di" bpmnElement="NotifyRpaBsLifted">
-        <dc:Bounds x="710" y="190" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0371z1y_di" bpmnElement="Event_0371z1y">
-        <dc:Bounds x="282" y="172" width="36" height="36" />
+      <bpmndi:BPMNShape id="Gateway_Claimant_di" bpmnElement="Gateway_Claimant" isMarkerVisible="true">
+        <dc:Bounds x="635" y="205" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="337" y="153" width="26" height="14" />
+          <dc:Bounds x="626" y="175" width="69" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0g2c2ji_di" bpmnElement="NotifyApplicantSolicitorBSLifted">
+        <dc:Bounds x="730" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_LipApplicant_di" bpmnElement="BreathingSpaceLiftedNotifyLipApplicant">
+        <dc:Bounds x="730" y="350" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1yug86e_di" bpmnElement="NotifyRpaBsLifted">
+        <dc:Bounds x="890" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0g68wbz_di" bpmnElement="Activity_0g68wbz">
+        <dc:Bounds x="1050" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1g0kcde_di" bpmnElement="Event_1g0kcde">
+        <dc:Bounds x="1212" y="212" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_07qelqa_di" bpmnElement="Flow_07qelqa">
+        <di:waypoint x="188" y="230" />
+        <di:waypoint x="230" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0uk4gkm_di" bpmnElement="Flow_0uk4gkm">
+        <di:waypoint x="280" y="172" />
+        <di:waypoint x="280" y="138" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1nq6ydh_di" bpmnElement="Flow_1nq6ydh">
+        <di:waypoint x="330" y="230" />
+        <di:waypoint x="375" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Def1_Lr_di" bpmnElement="Flow_Def1_Lr">
+        <di:waypoint x="425" y="230" />
+        <di:waypoint x="480" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Def1_Lip_di" bpmnElement="Flow_Def1_Lip">
+        <di:waypoint x="400" y="255" />
+        <di:waypoint x="400" y="390" />
+        <di:waypoint x="480" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_LrDef1_ToClaimant_di" bpmnElement="Flow_LrDef1_ToClaimant">
+        <di:waypoint x="580" y="230" />
+        <di:waypoint x="635" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_LipDef1_ToClaimant_di" bpmnElement="Flow_LipDef1_ToClaimant">
+        <di:waypoint x="580" y="390" />
+        <di:waypoint x="660" y="390" />
+        <di:waypoint x="660" y="255" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Claimant_Lr_di" bpmnElement="Flow_Claimant_Lr">
+        <di:waypoint x="685" y="230" />
+        <di:waypoint x="730" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Claimant_Lip_di" bpmnElement="Flow_Claimant_Lip">
+        <di:waypoint x="660" y="255" />
+        <di:waypoint x="660" y="390" />
+        <di:waypoint x="730" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_LrApplicant_ToRpa_di" bpmnElement="Flow_LrApplicant_ToRpa">
+        <di:waypoint x="830" y="230" />
+        <di:waypoint x="890" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_LipApplicant_ToRpa_di" bpmnElement="Flow_LipApplicant_ToRpa">
+        <di:waypoint x="830" y="390" />
+        <di:waypoint x="940" y="390" />
+        <di:waypoint x="940" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1kass09_di" bpmnElement="Flow_1kass09">
+        <di:waypoint x="990" y="230" />
+        <di:waypoint x="1050" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1kj896s_di" bpmnElement="Flow_1kj896s">
+        <di:waypoint x="1150" y="230" />
+        <di:waypoint x="1212" y="230" />
+      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>
