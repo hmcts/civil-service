@@ -192,22 +192,17 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
         var caseData = callbackParams.getCaseData();
         ArrayList<String> errors = new ArrayList<>();
+
+        if (caseData.getBreathing() != null && caseData.getBreathing().getActive() == YesOrNo.YES) {
+            errors.add(BREATHING_SPACE);
+        }
+
         if (caseData.isRespondentResponseBilingual()) {
             errors.add(DJ_NOT_VALID_FOR_THIS_LIP_CLAIM);
         } else if (nonNull(caseData.getRespondent1ResponseDeadline())
             && caseData.getRespondent1ResponseDeadline().isAfter(LocalDateTime.now())) {
             String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
             errors.add(format(NOT_VALID_DJ, formattedDeadline));
-        }
-
-        if (caseData.getBreathing() != null && caseData.getBreathing().getEnter() != null) {
-            errors.add(BREATHING_SPACE);
-
-        }
-        if (caseData.getBreathing().getLift() != null && (caseData.getBreathing().getLift()
-            .getExpectedEnd().isBefore(LocalDate.now()) || caseData.getBreathing().getLift()
-            .getExpectedEnd().isEqual(LocalDate.now()))) {
-            errors.remove(BREATHING_SPACE);
         }
 
         List<String> listData = new ArrayList<>();
