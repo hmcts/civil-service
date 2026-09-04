@@ -67,11 +67,9 @@ class MediationFileTransferServiceTest {
             assertThat(attachment.getFilename()).isEqualTo("ocmc_mediation_data.csv");
             assertThat(attachment.getContentType()).isEqualTo("text/csv");
             assertThat(attachmentContent(attachment)).isEqualTo(
-                """
-                    SITE_ID,CASE_TYPE,CHECK_LIST,PARTY_STATUS,CASE_NUMBER,AMOUNT,PARTY_TYPE,\
-                    COMPANY_NAME,CONTACT_NAME,CONTACT_NUMBER,CONTACT_EMAIL,PILOT,CASE_TITLE\r
-                    row-one\r
-                """
+                "SITE_ID,CASE_TYPE,CHECK_LIST,PARTY_STATUS,CASE_NUMBER,AMOUNT,PARTY_TYPE,"
+                    + "COMPANY_NAME,CONTACT_NAME,CONTACT_NUMBER,CONTACT_EMAIL,PILOT,CASE_TITLE\r\n"
+                    + "row-one\r\n"
             );
         });
         assertThat(output)
@@ -83,7 +81,7 @@ class MediationFileTransferServiceTest {
             .contains("recipientDomain=example.com")
             .contains("attachmentName=ocmc_mediation_data.csv")
             .contains("attachmentContentType=text/csv")
-            .contains("attachmentBytes=150")
+            .contains("attachmentBytes=154")
             .contains("caseCount=1")
             .doesNotContain(CSV_RECIPIENT);
     }
