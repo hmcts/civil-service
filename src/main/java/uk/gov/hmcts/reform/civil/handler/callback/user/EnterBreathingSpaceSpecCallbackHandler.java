@@ -13,15 +13,18 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
 @RequiredArgsConstructor
@@ -96,8 +99,13 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
 
     private CallbackResponse prepareSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        Optional.ofNullable(caseData.getBreathing())
+            .map(BreathingSpaceInfo::getEnter)
+            .filter(enter -> enter.getStart() == null)
+            .ifPresent(enter -> enter.setStart(LocalDate.now()));
 
         caseData.setBusinessProcess(BusinessProcess.ready(ENTER_BREATHING_SPACE_SPEC));
+        caseData.getBreathing().setActive(YES);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
