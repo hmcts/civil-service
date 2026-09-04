@@ -148,6 +148,21 @@ class ScheduledEventTrackerTest {
     }
 
     @Test
+    void shouldTrackCaseAbortedEvent() {
+        scheduledEventTracker.caseAbortedEvent(eventConfig, "789", "Ongoing business process");
+
+        verify(telemetryService).trackEvent(
+            eq("TestSchedulerCaseAborted"),
+            eq(Map.of(
+                "schedulerName", "TestScheduler",
+                "caseId", "789",
+                "error", "Ongoing business process",
+                "status", "ABORTED"
+            ))
+        );
+    }
+
+    @Test
     void shouldTrackSimpleJobAbortedEvent() {
         scheduledEventTracker.jobAbortedEvent(eventConfig, "Error reason");
 
