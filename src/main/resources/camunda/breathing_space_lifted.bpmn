@@ -151,12 +151,6 @@
           <dc:Bounds x="358" y="175" width="85" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_LipDefendantLift_di" bpmnElement="Gateway_LipDefendantLift" isMarkerVisible="true">
-        <dc:Bounds x="525" y="205" width="50" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="513" y="262" width="74" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0eg1mu3_di" bpmnElement="NotifyRespondentSolicitorBSLifted">
         <dc:Bounds x="480" y="190" width="100" height="80" />
       </bpmndi:BPMNShape>
