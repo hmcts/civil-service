@@ -86,11 +86,17 @@ public class BreathingSpaceEnterNotificationHandler extends CallbackHandler impl
             templateProperties.put("defendantName", caseData.getRespondent2().getPartyName());
         } else if (CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_ENTER.name()
             .equals(callbackParams.getRequest().getEventId())) {
+            if (caseData.isApplicant1NotRepresented()
+                || caseData.getApplicantSolicitor1UserDetails() == null) {
+                return AboutToStartOrSubmitCallbackResponse.builder().build();
+            }
             templateId = notificationsProperties.getBreathingSpaceEnterApplicantEmailTemplate();
             recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
             String claimantLR = getOrganisationName(
                 caseData.getApplicant1OrganisationPolicy(),
-                caseData.getApplicantSolicitor1ClaimStatementOfTruth()::getName
+                () -> Optional.ofNullable(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
+                    .map(statementOfTruth -> statementOfTruth.getName())
+                    .orElse(null)
             );
             templateProperties.put(NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC, claimantLR);
         } else {
