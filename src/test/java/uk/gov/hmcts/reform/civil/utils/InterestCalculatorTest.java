@@ -6,6 +6,9 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
@@ -319,6 +322,77 @@ class InterestCalculatorTest {
         caseData = caseData.toBuilder().submittedDate(dateTime).build();
         BigDecimal actual = interestCalculator.calculateInterest(caseData);
         assertThat(actual).isEqualTo(BigDecimal.valueOf(0).setScale(2, RoundingMode.UNNECESSARY));
+    }
+
+    @Test
+    void shouldPauseInterestWhenCaseIsInBreathingSpace() {
+        CaseData caseData = sameRateInterestUntilJudgement(LocalDate.now().minusDays(6), BigDecimal.valueOf(5000));
+        caseData = caseData.toBuilder()
+            .breathing(new BreathingSpaceInfo()
+                           .setEnter(new BreathingSpaceEnterInfo().setStart(LocalDate.now().minusDays(3))))
+            .build();
+
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
+
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(2.20).setScale(2, RoundingMode.UNNECESSARY));
+    }
+
+    @Test
+    void shouldResumeInterestAfterBreathingSpaceLifted_excludingPausedDays() {
+        CaseData caseData = sameRateInterestUntilJudgement(LocalDate.now().minusDays(6), BigDecimal.valueOf(5000));
+        caseData = caseData.toBuilder()
+            .breathing(new BreathingSpaceInfo()
+                           .setEnter(new BreathingSpaceEnterInfo().setStart(LocalDate.now().minusDays(4)))
+                           .setLift(new BreathingSpaceLiftInfo().setExpectedEnd(LocalDate.now().minusDays(1))))
+            .build();
+
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
+
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(2.20).setScale(2, RoundingMode.UNNECESSARY));
+    }
+
+    @Test
+    void shouldNotPauseInterestWhenBreathingSpaceEnterStartIsMissing() {
+        CaseData caseData = sameRateInterestUntilJudgement(LocalDate.now().minusDays(6), BigDecimal.valueOf(5000));
+        caseData = caseData.toBuilder()
+            .breathing(new BreathingSpaceInfo()
+                           .setEnter(new BreathingSpaceEnterInfo().setStart(null)))
+            .build();
+
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
+
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(6.60).setScale(2, RoundingMode.UNNECESSARY));
+    }
+
+    @Test
+    void shouldNotChangeBreakdownInterestWhenCaseIsInBreathingSpace() {
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .claimInterest(YesOrNo.YES)
+            .caseReference(123456789L)
+            .interestClaimOptions(InterestClaimOptions.BREAK_DOWN_INTEREST)
+            .breakDownInterestTotal(BigDecimal.valueOf(500))
+            .build();
+        caseData = caseData.toBuilder()
+            .breathing(new BreathingSpaceInfo()
+                           .setEnter(new BreathingSpaceEnterInfo().setStart(LocalDate.now().minusDays(3))))
+            .build();
+
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
+
+        assertThat(actual).isEqualByComparingTo(BigDecimal.valueOf(500));
+    }
+
+    private CaseData sameRateInterestUntilJudgement(LocalDate interestFromDate, BigDecimal totalClaimAmount) {
+        return new CaseDataBuilder().atStateClaimDraft()
+            .claimInterest(YesOrNo.YES)
+            .caseReference(123456789L)
+            .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
+            .sameRateInterestSelection(buildSameRateSelection(SameRateInterestType.SAME_RATE_INTEREST_8_PC, null, null))
+            .interestClaimFrom(InterestClaimFromType.FROM_A_SPECIFIC_DATE)
+            .interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
+            .interestFromSpecificDate(interestFromDate)
+            .totalClaimAmount(totalClaimAmount)
+            .build();
     }
 
     @Test
