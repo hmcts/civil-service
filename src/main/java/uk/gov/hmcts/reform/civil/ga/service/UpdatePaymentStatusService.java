@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDe
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.utils.PaymentUtils;
 
 import java.util.Map;
 
@@ -74,13 +75,49 @@ public class UpdatePaymentStatusService {
             caseEvent
         );
 
+        GeneralApplicationCaseData freshData = caseDetailsConverter.toGeneralApplicationCaseData(startEventResponse.getCaseDetails());
+        PaymentDetails intendedPayment = getPaymentDetails(caseData);
+        PaymentDetails freshPayment = getPaymentDetails(freshData);
+
+        if (PaymentUtils.isPaymentAlreadyApplied(intendedPayment, freshPayment)) {
+            String reference = freshPayment != null ? freshPayment.getReference() : "N/A";
+            log.info("{} Payment with reference {} already applied for GA case {}. Skipping submission.",
+                     caseData.isAdditionalFeeRequested() ? "Additional" : "Application",
+                     reference, caseReference);
+            return;
+        }
+
+        GeneralApplicationPbaDetails freshPba = freshData.getGeneralAppPBADetails() != null
+            ? freshData.getGeneralAppPBADetails().copy()
+            : new GeneralApplicationPbaDetails();
+
+        GeneralApplicationPbaDetails stalePba = caseData.getGeneralAppPBADetails();
+
+        if (caseData.isAdditionalFeeRequested()) {
+            freshPba.setAdditionalPaymentDetails(stalePba.getAdditionalPaymentDetails());
+        } else {
+            freshPba.setPaymentDetails(stalePba.getPaymentDetails());
+        }
+
+        freshData.setGeneralAppPBADetails(freshPba);
+
         CaseDataContent caseDataContent = buildCaseDataContent(
             startEventResponse,
-            caseData
+            freshData
         );
 
         log.info("Submitting case update with new data for caseReference: {}", caseReference);
         gaCoreCaseDataService.submitUpdate(caseReference, caseDataContent);
+    }
+
+    private PaymentDetails getPaymentDetails(GeneralApplicationCaseData caseData) {
+        GeneralApplicationPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
+        if (pbaDetails == null) {
+            return null;
+        }
+        return caseData.isAdditionalFeeRequested()
+            ? pbaDetails.getAdditionalPaymentDetails()
+            : pbaDetails.getPaymentDetails();
     }
 
     private CaseDataContent buildCaseDataContent(StartEventResponse startEventResponse, GeneralApplicationCaseData caseData) {
