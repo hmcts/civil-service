@@ -12,9 +12,10 @@ class InterceptorContextTest {
     void shouldStoreAndRetrieveAttributes() {
         InterceptorContext<String> context = new InterceptorContext<>("testScheduler", "item");
         String attributeValue = "value";
+        AttributeKey<String> key = AttributeKey.of("testAttribute", String.class);
 
-        context.setAttribute("testAttribute", attributeValue);
-        Optional<String> retrievedValue = context.getAttribute("testAttribute", String.class);
+        context.setAttribute(key, attributeValue);
+        Optional<String> retrievedValue = context.getAttribute(key);
 
         assertThat(retrievedValue).isPresent().contains(attributeValue);
     }
@@ -22,8 +23,9 @@ class InterceptorContextTest {
     @Test
     void shouldReturnEmptyOptional_whenAttributeDoesNotExist() {
         InterceptorContext<String> context = new InterceptorContext<>("testScheduler", "item");
+        AttributeKey<String> key = AttributeKey.of("nonExistent", String.class);
 
-        Optional<String> retrievedValue = context.getAttribute("nonExistent", String.class);
+        Optional<String> retrievedValue = context.getAttribute(key);
 
         assertThat(retrievedValue).isEmpty();
     }

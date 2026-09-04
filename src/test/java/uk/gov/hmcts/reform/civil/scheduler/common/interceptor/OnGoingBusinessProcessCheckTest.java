@@ -57,7 +57,7 @@ class OnGoingBusinessProcessCheckTest {
         check.accept(context, chain);
 
         verify(chain).next(context);
-        assertThat(context.getAttribute("CaseData", CaseData.class)).isPresent().contains(caseData);
+        assertThat(context.getAttribute(OnGoingBusinessProcessCheck.CASE_DATA_KEY)).isPresent().contains(caseData);
     }
 
     @Test
