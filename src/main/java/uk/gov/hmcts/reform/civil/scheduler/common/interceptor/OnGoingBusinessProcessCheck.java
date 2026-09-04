@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 @AllArgsConstructor
 public class OnGoingBusinessProcessCheck<T> implements SchedulerInterceptor<T> {
 
+    public static final AttributeKey<CaseData> CASE_DATA_KEY = AttributeKey.of("CaseData", CaseData.class);
+
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
 
@@ -23,11 +25,11 @@ public class OnGoingBusinessProcessCheck<T> implements SchedulerInterceptor<T> {
         }
 
         Long caseId = caseDetails.getId();
-        CaseData caseData = context.getAttribute("CaseData", CaseData.class)
+        CaseData caseData = context.getAttribute(CASE_DATA_KEY)
             .orElseGet(() -> {
                 CaseDetails fullCaseDetails = coreCaseDataService.getCase(caseId);
                 CaseData data = caseDetailsConverter.toCaseData(fullCaseDetails);
-                context.setAttribute("CaseData", data);
+                context.setAttribute(CASE_DATA_KEY, data);
                 return data;
             });
 
