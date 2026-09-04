@@ -47,7 +47,7 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
 
     @BeforeEach
     void bareMinimumToMakeAPositiveRequest() {
-        when(authorisationService.isServiceAuthorized(any())).thenReturn(true);
+        when(authorisationService.isPaymentCallbackServiceAuthorized(any())).thenReturn(true);
         CaseData
             caseData = CaseData.builder().businessProcess(new BusinessProcess().setProcessInstanceId("instance").setCamundaEvent("camunda event")).build();
         CaseDetails caseDetails = CaseDetails.builder().build();
@@ -61,21 +61,21 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
     }
 
     @Test
-    public void whenInvalidTypeOfRequestMade_ReturnMethodNotAllowed() throws Exception {
+    public void whenInvalidTypeOfRequestMadeThenReturnMethodNotAllowed() throws Exception {
 
         doPost(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
             .andExpect(status().isMethodNotAllowed());
     }
 
     @Test
-    public void whenServiceRequestUpdateRequestAndEverythingIsOk_thenHttp2xx() throws Exception {
+    public void whenServiceRequestUpdateRequestAndEverythingIsOkThenHttp2xx() throws Exception {
 
         doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
             .andExpect(status().isOk());
     }
 
     @Test
-    public void whenServiceRequestUpdateRequestButUnexpectedErrorOccurs_thenHttp5xx() throws Exception {
+    public void whenServiceRequestUpdateRequestButUnexpectedErrorOccursThenHttp5xx() throws Exception {
         // Given: the callback processing throws an unexpected exception
         doThrow(new RuntimeException("Unexpected error"))
             .when(requestUpdateCallbackService)
@@ -103,7 +103,7 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
 
     @Test
     public void whenPaymentCallbackIsReceivedWithServiceAuthorisationButreturnsfalseReturn400() throws Exception {
-        when(authorisationService.isServiceAuthorized(any())).thenReturn(false);
+        when(authorisationService.isPaymentCallbackServiceAuthorized(any())).thenReturn(false);
 
         doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
             // Then: the result status must be an HTTP-4xx

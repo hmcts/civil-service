@@ -34,7 +34,7 @@ public class ServiceRequestUpdateClaimIssuedCallbackController {
     public void serviceRequestUpdate(@RequestHeader("ServiceAuthorization") String s2sToken,
                                      @RequestBody ServiceRequestUpdateDto serviceRequestUpdateDto) {
         try {
-            if (authorisationService.isServiceAuthorized(s2sToken)) {
+            if (authorisationService.isPaymentCallbackServiceAuthorized(s2sToken)) {
                 requestUpdateCallbackService.processCallback(serviceRequestUpdateDto, FeeType.CLAIMISSUED.name());
             } else {
                 throw (new RuntimeException("Invalid Client"));

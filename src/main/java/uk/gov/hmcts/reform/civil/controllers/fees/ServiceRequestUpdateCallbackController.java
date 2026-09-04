@@ -37,7 +37,7 @@ public class ServiceRequestUpdateCallbackController {
         @RequestHeader("ServiceAuthorization") String s2sToken,
         @RequestBody ServiceRequestUpdateDto serviceRequestUpdateDto) {
         try {
-            if (authorisationService.isServiceAuthorized(s2sToken)) {
+            if (authorisationService.isPaymentCallbackServiceAuthorized(s2sToken)) {
                 requestUpdateCallbackService.processCallback(serviceRequestUpdateDto, FeeType.HEARING.name());
             } else {
                 throw (new RuntimeException("Invalid Client"));
