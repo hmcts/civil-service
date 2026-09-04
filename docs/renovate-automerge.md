@@ -8,6 +8,7 @@ Repo-level settings:
 
 - `schedule`: after 8am and before 11am every weekday.
 - `automergeSchedule`: after 8am and before 11am every weekday, with most repo package rules overriding to before 4pm every weekday.
+- `rebaseWhen`: `behind-base-branch`, so Renovate refreshes branches that fall behind `master`.
 - `automergeStrategy`: `squash`.
 - `prConcurrentLimit`: `5`.
 - Non-major, Helm, Spring-related, Terraform and Lombok updates set `automerge: true` and `automergeType: pr`.
@@ -43,6 +44,8 @@ The GitHub branch protection endpoint returned `404` for `master` with the avail
 ## Fix
 
 Added `.github/workflows/*.yml` to the ownerless Renovate exemption block in `.github/CODEOWNERS`, matching the existing `.github/workflows/*.yaml` exemption. This should prevent GitHub Actions workflow update PRs from requiring `@hmcts/civil` code-owner approval solely because of the global owner rule.
+
+Updated Renovate `rebaseWhen` from `conflicted` to `behind-base-branch`. This keeps automerge candidates up to date with `master`, avoiding the follow-on blocker where green and approved Renovate PRs remain open because the branch is behind the base branch.
 
 This fix is local to `civil-service`. It does not change CODEOWNERS behaviour in `civil-citizen-ui`, `cmc-claim-store`, or `cmc-citizen-frontend`; separate PRs are needed there if their Renovate PRs are blocked by the same ownership gap.
 
