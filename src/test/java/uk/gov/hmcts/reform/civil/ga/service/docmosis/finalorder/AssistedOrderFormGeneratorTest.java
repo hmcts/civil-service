@@ -943,6 +943,18 @@ class AssistedOrderFormGeneratorTest {
                 .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
                                                         .setListFromDate(LocalDate.now().minusDays(5))
                                                         .setLengthOfNewHearing(LengthOfHearing.OTHER)
+                                                        .setLengthOfHearingOther(new HearingLength().setLengthListOtherDays("0")
+                                                                                  .setLengthListOtherHours("2.5")
+                                                                                  .setLengthListOtherMinutes("0"))
+                                                        .setHearingMethods(GAJudicialHearingType.TELEPHONE))
+                .build();
+            hearingDurationText = generator.getFurtherHearingDuration(caseData);
+            assertThat(hearingDurationText).isEqualTo("2.5 hours");
+
+            caseData = new GeneralApplicationCaseData()
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                        .setListFromDate(LocalDate.now().minusDays(5))
+                                                        .setLengthOfNewHearing(LengthOfHearing.OTHER)
                                                         .setLengthOfHearingOther(new HearingLength().setLengthListOtherDays(
                                                                 5)
                                                                                   .setLengthListOtherHours(0)
