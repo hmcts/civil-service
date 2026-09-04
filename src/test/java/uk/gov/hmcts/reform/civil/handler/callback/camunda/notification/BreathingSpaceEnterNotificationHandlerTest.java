@@ -29,6 +29,7 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CASE_ID;
 
@@ -338,5 +339,70 @@ class BreathingSpaceEnterNotificationHandlerTest {
                     && map.get(NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC).equals(solicitorName)),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
         );
+    }
+
+    @Test
+    void shouldNotifyApplicantWhenStatementOfTruthIsMissing() {
+        String recipient = "recipient";
+        String templateId = "templateId";
+        when(notificationsProperties.getBreathingSpaceEnterApplicantEmailTemplate()).thenReturn(templateId);
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("legacy ref")
+            .ccdCaseReference(CASE_ID)
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(recipient))
+            .build();
+        CallbackParams params = new CallbackParams()
+            .type(CallbackType.ABOUT_TO_SUBMIT)
+            .caseData(caseData)
+            .request(CallbackRequest.builder()
+                         .eventId(CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_ENTER.name())
+                         .build());
+
+        handler.handle(params);
+
+        Mockito.verify(notificationService).sendMail(
+            eq(recipient),
+            eq(templateId),
+            argThat(map -> map.get(NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC) == null),
+            argThat(string -> string.contains(caseData.getLegacyCaseReference()))
+        );
+    }
+
+    @Test
+    void shouldNotNotifyApplicantSolicitorWhenClaimantIsLiP() {
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("legacy ref")
+            .ccdCaseReference(CASE_ID)
+            .applicant1Represented(YesOrNo.NO)
+            .build();
+        CallbackParams params = new CallbackParams()
+            .type(CallbackType.ABOUT_TO_SUBMIT)
+            .caseData(caseData)
+            .request(CallbackRequest.builder()
+                         .eventId(CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_ENTER.name())
+                         .build());
+
+        handler.handle(params);
+
+        verifyNoInteractions(notificationService);
+    }
+
+    @Test
+    void shouldNotNotifyApplicantSolicitorWhenSolicitorDetailsAreMissing() {
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("legacy ref")
+            .ccdCaseReference(CASE_ID)
+            .build();
+        CallbackParams params = new CallbackParams()
+            .type(CallbackType.ABOUT_TO_SUBMIT)
+            .caseData(caseData)
+            .request(CallbackRequest.builder()
+                         .eventId(CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_ENTER.name())
+                         .build());
+
+        handler.handle(params);
+
+        verifyNoInteractions(notificationService);
     }
 }
