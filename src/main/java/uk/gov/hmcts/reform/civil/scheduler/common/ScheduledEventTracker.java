@@ -21,6 +21,7 @@ public class ScheduledEventTracker {
     private static final String ZERO = String.valueOf(0);
     private static final String FAILURE = "FAILURE";
     private static final String SUCCESS = "SUCCESS";
+    private static final String ABORTED = "ABORTED";
     private static final String CASE_ID = "caseId";
     private static final String STATUS = "status";
     private static final String ERROR = "error";
@@ -70,6 +71,17 @@ public class ScheduledEventTracker {
                 STATUS, FAILURE,
                 ERROR, e.getMessage(),
                 ERROR_CATEGORY, errorCategorizer.categorizeError(e)
+            )
+        );
+    }
+
+    public void caseAbortedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, String errorMessage) {
+        telemetryService.trackEvent(
+            eventConfig.getCaseAbortedEvent(), Map.of(
+                SCHEDULER_NAME, eventConfig.getSchedulerName(),
+                CASE_ID, caseId,
+                ERROR, errorMessage,
+                STATUS, ABORTED
             )
         );
     }
