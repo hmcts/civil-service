@@ -10,6 +10,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorChain;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorRegistry;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.TaskAbortedException;
 import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
 import java.time.Duration;
@@ -30,12 +33,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ScheduledTaskProcessorTest {
 
     @Mock
     private ScheduledEventTracker scheduledEventTracker;
+
+    @Mock
+    private InterceptorRegistry interceptorRegistry;
 
     @Mock(answer = Answers.CALLS_REAL_METHODS)
     private ScheduledTask<CaseDetails, Long> scheduledTask;
@@ -48,6 +55,11 @@ class ScheduledTaskProcessorTest {
         lenient().when(scheduledTask.getItemId(any())).thenAnswer(invocation -> {
             CaseDetails caseDetails = invocation.getArgument(0);
             return caseDetails != null ? caseDetails.getId() : null;
+        });
+
+        lenient().when(interceptorRegistry.buildChain(any(), any())).thenAnswer(invocation -> {
+            ScheduledTask<CaseDetails, Long> task = invocation.getArgument(1);
+            return new InterceptorChain<CaseDetails>(List.of(), ctx -> task.accept(ctx.getItem()));
         });
     }
 
@@ -123,7 +135,7 @@ class ScheduledTaskProcessorTest {
 
     @Test
     void shouldApplyDynamicBackPressure_whenFailuresRecover() {
-        CapturingScheduledTaskProcessor processor = new CapturingScheduledTaskProcessor(scheduledEventTracker);
+        CapturingScheduledTaskProcessor processor = new CapturingScheduledTaskProcessor(scheduledEventTracker, interceptorRegistry);
         ReflectionTestUtils.setField(processor, "circuitBreakerThreshold", 5);
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         CaseDetails case2 = CaseDetailsBuilder.builder().id(2L).build();
@@ -163,7 +175,7 @@ class ScheduledTaskProcessorTest {
 
     @Test
     void shouldAbortProcessing_whenInterruptedDuringBackPressureDelay() {
-        InterruptingScheduledTaskProcessor processor = new InterruptingScheduledTaskProcessor(scheduledEventTracker);
+        InterruptingScheduledTaskProcessor processor = new InterruptingScheduledTaskProcessor(scheduledEventTracker, interceptorRegistry);
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         RecordingScheduledTask task = new RecordingScheduledTask(
             Long.MAX_VALUE,
@@ -331,6 +343,56 @@ class ScheduledTaskProcessorTest {
         verify(scheduledEventTracker, never()).caseFailedEvent(any(), eq(2L), any());
     }
 
+    @Test
+    void shouldHandleTaskAbortedException() {
+        ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
+        CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
+        ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1), 1);
+
+        when(interceptorRegistry.buildChain(any(), any())).thenAnswer(invocation ->
+            new InterceptorChain<CaseDetails>(
+                List.of((context, chain) -> {
+                    throw new TaskAbortedException("Ongoing business process");
+                }),
+                ctx -> scheduledTask.accept(ctx.getItem())
+            )
+        );
+
+        ScheduledTaskOutcome<Long> outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
+
+        assertThat(outcome.succeededCases()).isEmpty();
+        assertThat(outcome.failedCases()).isEmpty();
+        assertThat(outcome.abortedEarly()).isFalse();
+
+        verify(scheduledEventTracker).caseAbortedEvent(eventConfig, "1", "Ongoing business process");
+        verify(scheduledTask, never()).accept(any());
+    }
+
+    @Test
+    void shouldHandleSilentAbortion() {
+        ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
+        CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
+        ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1), 1);
+
+        when(interceptorRegistry.buildChain(any(), any())).thenAnswer(invocation ->
+            new InterceptorChain<CaseDetails>(
+                List.of((context, chain) -> {
+                    // Silently aborts by not calling chain.next()
+                }),
+                ctx -> scheduledTask.accept(ctx.getItem())
+            )
+        );
+
+        ScheduledTaskOutcome<Long> outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
+
+        assertThat(outcome.succeededCases()).isEmpty();
+        assertThat(outcome.failedCases()).isEmpty();
+        assertThat(outcome.abortedEarly()).isFalse();
+
+        verify(scheduledEventTracker).caseAbortedEvent(eventConfig, "1", "Silent abortion");
+        verify(scheduledTask, never()).accept(any());
+    }
+
     private static class RecordingScheduledTask implements ScheduledTask<CaseDetails, Long> {
 
         private final long maxCasesPerRun;
@@ -387,8 +449,8 @@ class ScheduledTaskProcessorTest {
 
         private final List<Duration> delays = new ArrayList<>();
 
-        CapturingScheduledTaskProcessor(ScheduledEventTracker eventTracker) {
-            super(eventTracker);
+        CapturingScheduledTaskProcessor(ScheduledEventTracker eventTracker, InterceptorRegistry interceptorRegistry) {
+            super(eventTracker, interceptorRegistry);
         }
 
         @Override
@@ -403,8 +465,8 @@ class ScheduledTaskProcessorTest {
 
     private static class InterruptingScheduledTaskProcessor extends ScheduledTaskProcessor<CaseDetails, Long> {
 
-        InterruptingScheduledTaskProcessor(ScheduledEventTracker eventTracker) {
-            super(eventTracker);
+        InterruptingScheduledTaskProcessor(ScheduledEventTracker eventTracker, InterceptorRegistry interceptorRegistry) {
+            super(eventTracker, interceptorRegistry);
         }
 
         @Override
