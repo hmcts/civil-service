@@ -63,6 +63,22 @@ class ScheduledEventTrackerTest {
     }
 
     @Test
+    void shouldTrackCaseProcessedEventWithMetrics() {
+        Map<String, Long> metrics = Map.of("Interceptor1", 10L);
+        scheduledEventTracker.caseProcessedEvent(eventConfig, "123", metrics);
+
+        verify(telemetryService).trackEvent(
+            eq("TestSchedulerCaseProcessed"),
+            eq(Map.of(
+                "schedulerName", "TestScheduler",
+                "caseId", "123",
+                "status", "SUCCESS",
+                "metric_Interceptor1", "10"
+            ))
+        );
+    }
+
+    @Test
     void shouldTrackCaseFailedEvent() {
         Exception exception = new RuntimeException("Test error");
         when(errorCategorizer.categorizeError(exception)).thenReturn("TestCategory");
@@ -77,6 +93,27 @@ class ScheduledEventTrackerTest {
                 "status", "FAILURE",
                 "error", "Test error",
                 "errorCategory", "TestCategory"
+            ))
+        );
+    }
+
+    @Test
+    void shouldTrackCaseFailedEventWithMetrics() {
+        Exception exception = new RuntimeException("Test error");
+        when(errorCategorizer.categorizeError(exception)).thenReturn("TestCategory");
+        Map<String, Long> metrics = Map.of("Interceptor1", 10L);
+
+        scheduledEventTracker.caseFailedEvent(eventConfig, "456", exception, metrics);
+
+        verify(telemetryService).trackEvent(
+            eq("TestSchedulerCaseFailed"),
+            eq(Map.of(
+                "schedulerName", "TestScheduler",
+                "caseId", "456",
+                "status", "FAILURE",
+                "error", "Test error",
+                "errorCategory", "TestCategory",
+                "metric_Interceptor1", "10"
             ))
         );
     }
@@ -158,6 +195,23 @@ class ScheduledEventTrackerTest {
                 "caseId", "789",
                 "error", "Ongoing business process",
                 "status", "ABORTED"
+            ))
+        );
+    }
+
+    @Test
+    void shouldTrackCaseAbortedEventWithMetrics() {
+        Map<String, Long> metrics = Map.of("Interceptor1", 10L);
+        scheduledEventTracker.caseAbortedEvent(eventConfig, "789", "Ongoing business process", metrics);
+
+        verify(telemetryService).trackEvent(
+            eq("TestSchedulerCaseAborted"),
+            eq(Map.of(
+                "schedulerName", "TestScheduler",
+                "caseId", "789",
+                "error", "Ongoing business process",
+                "status", "ABORTED",
+                "metric_Interceptor1", "10"
             ))
         );
     }

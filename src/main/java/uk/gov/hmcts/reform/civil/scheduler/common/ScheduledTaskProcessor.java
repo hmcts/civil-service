@@ -92,20 +92,21 @@ public class ScheduledTaskProcessor<T, I> {
 
         I itemId = scheduledTask.getItemId(item);
         Instant startedAt = Instant.now();
+        InterceptorContext<T> interceptorContext = new InterceptorContext<>(eventConfig.getSchedulerName(), item);
 
         try {
             InterceptorChain<T> chain = interceptorRegistry.buildChain(eventConfig.getSchedulerName(), scheduledTask);
-            chain.next(new InterceptorContext<>(eventConfig.getSchedulerName(), item));
+            chain.next(interceptorContext);
 
             if (chain.wasTaskExecuted()) {
-                handleSuccess(eventConfig, itemId, startedAt, backPressure, context);
+                handleSuccess(eventConfig, itemId, startedAt, backPressure, context, interceptorContext);
             } else {
-                handleAbortion(eventConfig, itemId, "Silent abortion");
+                handleAbortion(eventConfig, itemId, "Silent abortion", interceptorContext);
             }
         } catch (TaskAbortedException e) {
-            handleAbortion(eventConfig, itemId, e.getReason());
+            handleAbortion(eventConfig, itemId, e.getReason(), interceptorContext);
         } catch (Exception e) {
-            return handleFailure(eventConfig, itemId, e, backPressure, context);
+            return handleFailure(eventConfig, itemId, e, backPressure, context, interceptorContext);
         }
         return true;
     }
@@ -114,29 +115,32 @@ public class ScheduledTaskProcessor<T, I> {
                                I itemId,
                                Instant startedAt,
                                ScheduledTaskBackPressure backPressure,
-                               ProcessingContext context) {
+                               ProcessingContext context,
+                               InterceptorContext<T> interceptorContext) {
         backPressure.afterSuccess(Duration.between(startedAt, Instant.now()));
-        eventTracker.caseProcessedEvent(eventConfig, itemId.toString());
+        eventTracker.caseProcessedEvent(eventConfig, itemId.toString(), interceptorContext.getMetrics());
         context.succeededItems.add(itemId);
         context.consecutiveFailures.set(0);
     }
 
     private void handleAbortion(ScheduledTaskEventConfiguration eventConfig,
                                 I itemId,
-                                String reason) {
+                                String reason,
+                                InterceptorContext<T> interceptorContext) {
         log.info("Scheduled task: {}, ItemId: {}, Aborted: {}",
                  eventConfig.getSchedulerName(), itemId, reason);
-        eventTracker.caseAbortedEvent(eventConfig, itemId.toString(), reason);
+        eventTracker.caseAbortedEvent(eventConfig, itemId.toString(), reason, interceptorContext.getMetrics());
     }
 
     private boolean handleFailure(ScheduledTaskEventConfiguration eventConfig,
                                   I itemId,
                                   Exception e,
                                   ScheduledTaskBackPressure backPressure,
-                                  ProcessingContext context) {
+                                  ProcessingContext context,
+                                  InterceptorContext<T> interceptorContext) {
         backPressure.afterFailure();
         context.failedItems.add(itemId);
-        eventTracker.caseFailedEvent(eventConfig, itemId.toString(), e);
+        eventTracker.caseFailedEvent(eventConfig, itemId.toString(), e, interceptorContext.getMetrics());
         log.error("Error processing item {}: {}", itemId, e.getMessage(), e);
         int failures = context.consecutiveFailures.incrementAndGet();
 

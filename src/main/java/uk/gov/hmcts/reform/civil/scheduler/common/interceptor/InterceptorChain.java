@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.scheduler.common.interceptor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StopWatch;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Manages the execution of a sequence of {@link SchedulerInterceptor}s.
@@ -15,8 +17,10 @@ public class InterceptorChain<T> {
 
     private final List<SchedulerInterceptor<T>> interceptors;
     private final Consumer<InterceptorContext<T>> finalTask;
+    private final Function<String, StopWatch> stopWatchFactory;
     private int index = 0;
     private boolean taskExecuted = false;
+    private long totalDownstreamTimeNanos = 0;
 
     /**
      * Creates a new interceptor chain.
@@ -25,8 +29,22 @@ public class InterceptorChain<T> {
      * @param finalTask    the task to execute at the end of the chain
      */
     public InterceptorChain(List<SchedulerInterceptor<T>> interceptors, Consumer<InterceptorContext<T>> finalTask) {
+        this(interceptors, finalTask, StopWatch::new);
+    }
+
+    /**
+     * Creates a new interceptor chain with a custom StopWatch factory.
+     *
+     * @param interceptors      the list of interceptors to execute
+     * @param finalTask         the task to execute at the end of the chain
+     * @param stopWatchFactory  the factory for StopWatch instances
+     */
+    public InterceptorChain(List<SchedulerInterceptor<T>> interceptors,
+                            Consumer<InterceptorContext<T>> finalTask,
+                            Function<String, StopWatch> stopWatchFactory) {
         this.interceptors = interceptors;
         this.finalTask = finalTask;
+        this.stopWatchFactory = stopWatchFactory;
     }
 
     /**
@@ -40,11 +58,33 @@ public class InterceptorChain<T> {
             if (log.isDebugEnabled()) {
                 log.debug("Executing interceptor: {}", interceptor.getClass().getSimpleName());
             }
-            interceptor.accept(context, this);
+
+            String taskName = interceptor.getClass().getSimpleName();
+            long beforeDownstream = totalDownstreamTimeNanos;
+            StopWatch stopWatch = stopWatchFactory.apply(taskName);
+            stopWatch.start();
+            try {
+                interceptor.accept(context, this);
+            } finally {
+                stopWatch.stop();
+                long durationNanos = stopWatch.getTotalTimeNanos();
+                long exclusiveTimeNanos = durationNanos - (totalDownstreamTimeNanos - beforeDownstream);
+                context.recordMetric(taskName, exclusiveTimeNanos / 1_000_000);
+                totalDownstreamTimeNanos += exclusiveTimeNanos;
+            }
         } else if (index == interceptors.size()) {
             index++;
             taskExecuted = true;
-            finalTask.accept(context);
+            StopWatch stopWatch = stopWatchFactory.apply("FinalTask");
+            stopWatch.start();
+            try {
+                finalTask.accept(context);
+            } finally {
+                stopWatch.stop();
+                long durationNanos = stopWatch.getTotalTimeNanos();
+                context.recordMetric("FinalTask", durationNanos / 1_000_000);
+                totalDownstreamTimeNanos += durationNanos;
+            }
         }
     }
 
