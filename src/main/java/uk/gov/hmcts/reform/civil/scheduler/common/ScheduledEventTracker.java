@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 
 @Component
@@ -21,6 +22,7 @@ public class ScheduledEventTracker {
     private static final String ZERO = String.valueOf(0);
     private static final String FAILURE = "FAILURE";
     private static final String SUCCESS = "SUCCESS";
+    private static final String ABORTED = "ABORTED";
     private static final String CASE_ID = "caseId";
     private static final String STATUS = "status";
     private static final String ERROR = "error";
@@ -48,14 +50,17 @@ public class ScheduledEventTracker {
     }
 
     public void caseProcessedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId) {
-        telemetryService.trackEvent(
-            eventConfig.getCaseProcessedEvent(),
-            Map.of(
-                SCHEDULER_NAME, eventConfig.getSchedulerName(),
-                CASE_ID, caseId,
-                STATUS, SUCCESS
-            )
-        );
+        caseProcessedEvent(eventConfig, caseId, Map.of());
+    }
+
+    public void caseProcessedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, Map<String, Long> metrics) {
+        Map<String, String> properties = new HashMap<>();
+        properties.put(SCHEDULER_NAME, eventConfig.getSchedulerName());
+        properties.put(CASE_ID, caseId);
+        properties.put(STATUS, SUCCESS);
+        metrics.forEach((k, v) -> properties.put("metric_" + k, String.valueOf(v)));
+
+        telemetryService.trackEvent(eventConfig.getCaseProcessedEvent(), properties);
     }
 
     public void caseFailedEvent(ScheduledTaskEventConfiguration eventConfig, Long caseId, Exception e) {
@@ -63,15 +68,34 @@ public class ScheduledEventTracker {
     }
 
     public void caseFailedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, Exception e) {
-        telemetryService.trackEvent(
-            eventConfig.getCaseFailedEvent(), Map.of(
-                SCHEDULER_NAME, eventConfig.getSchedulerName(),
-                CASE_ID, caseId,
-                STATUS, FAILURE,
-                ERROR, e.getMessage(),
-                ERROR_CATEGORY, errorCategorizer.categorizeError(e)
-            )
-        );
+        caseFailedEvent(eventConfig, caseId, e, Map.of());
+    }
+
+    public void caseFailedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, Exception e, Map<String, Long> metrics) {
+        Map<String, String> properties = new HashMap<>();
+        properties.put(SCHEDULER_NAME, eventConfig.getSchedulerName());
+        properties.put(CASE_ID, caseId);
+        properties.put(STATUS, FAILURE);
+        properties.put(ERROR, e.getMessage());
+        properties.put(ERROR_CATEGORY, errorCategorizer.categorizeError(e));
+        metrics.forEach((k, v) -> properties.put("metric_" + k, String.valueOf(v)));
+
+        telemetryService.trackEvent(eventConfig.getCaseFailedEvent(), properties);
+    }
+
+    public void caseAbortedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, String errorMessage) {
+        caseAbortedEvent(eventConfig, caseId, errorMessage, Map.of());
+    }
+
+    public void caseAbortedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, String errorMessage, Map<String, Long> metrics) {
+        Map<String, String> properties = new HashMap<>();
+        properties.put(SCHEDULER_NAME, eventConfig.getSchedulerName());
+        properties.put(CASE_ID, caseId);
+        properties.put(ERROR, errorMessage);
+        properties.put(STATUS, ABORTED);
+        metrics.forEach((k, v) -> properties.put("metric_" + k, String.valueOf(v)));
+
+        telemetryService.trackEvent(eventConfig.getCaseAbortedEvent(), properties);
     }
 
     public void jobCompletedEvent(ScheduledTaskEventConfiguration eventConfig,
