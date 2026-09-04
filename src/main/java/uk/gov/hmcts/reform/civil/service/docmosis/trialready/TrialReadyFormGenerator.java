@@ -38,6 +38,7 @@ public class TrialReadyFormGenerator {
 
     private static final String TASK_ID_APPLICANT = "GenerateTrialReadyFormApplicant";
     private static final String TASK_ID_RESPONDENT1 = "GenerateTrialReadyFormRespondent1";
+    private static final String TASK_ID_RESPONDENT2 = "GenerateTrialReadyFormRespondent2";
 
     public CaseDocument generate(CaseData caseData, String authorisation, String camundaActivity, CaseRole userRole) {
         TrialReadyForm templateData = getTemplateData(caseData, camundaActivity);
@@ -124,18 +125,32 @@ public class TrialReadyFormGenerator {
 
     private TrialReadyForm completeTrialReadyFormWithOptionalFields(
         CaseData caseData, TrialReadyForm trialReadyForm, String camundaActivity) {
-        if (TASK_ID_APPLICANT.equals(camundaActivity)) {
-            return addUserFields(caseData.getTrialReadyApplicant(),
-                                 caseData.getApplicantRevisedHearingRequirements(),
-                                 caseData.getApplicantHearingOtherComments(), trialReadyForm);
-        } else if (TASK_ID_RESPONDENT1.equals(camundaActivity)) {
-            return addUserFields(caseData.getTrialReadyRespondent1(),
-                                 caseData.getRespondent1RevisedHearingRequirements(),
-                                 caseData.getRespondent1HearingOtherComments(), trialReadyForm);
-        } else {
-            return addUserFields(caseData.getTrialReadyRespondent2(),
-                                 caseData.getRespondent2RevisedHearingRequirements(),
-                                 caseData.getRespondent2HearingOtherComments(), trialReadyForm);
+        switch (camundaActivity) {
+            case TASK_ID_APPLICANT -> {
+                return addUserFields(
+                    caseData.getTrialReadyApplicant(),
+                    caseData.getApplicantRevisedHearingRequirements(),
+                    caseData.getApplicantHearingOtherComments(), trialReadyForm
+                );
+            }
+            case TASK_ID_RESPONDENT1 -> {
+                return addUserFields(
+                    caseData.getTrialReadyRespondent1(),
+                    caseData.getRespondent1RevisedHearingRequirements(),
+                    caseData.getRespondent1HearingOtherComments(), trialReadyForm
+                );
+            }
+            case TASK_ID_RESPONDENT2 -> {
+                return addUserFields(
+                    caseData.getTrialReadyRespondent2(),
+                    caseData.getRespondent2RevisedHearingRequirements(),
+                    caseData.getRespondent2HearingOtherComments(), trialReadyForm
+                );
+            }
+            case null, default -> {
+                log.error("Invalid activity id");
+                return trialReadyForm;
+            }
         }
     }
 
@@ -143,13 +158,16 @@ public class TrialReadyFormGenerator {
                                          RevisedHearingRequirements hearingRequirements,
                                          HearingOtherComments hearingOtherComments,
                                          TrialReadyForm trialReadyForm) {
-        return trialReadyForm.setTrialReadyAccepted(trialReadyCheck.equals(YesOrNo.YES))
-            .setTrialReadyDeclined(trialReadyCheck.equals(YesOrNo.NO))
-            .setHearingRequirementsCheck(YesOrNo.YES.equals(
-                hearingRequirements.getRevisedHearingRequirements()) ? "Yes" : "No")
-            .setHearingRequirementsText(YesOrNo.YES.equals(
-                hearingRequirements
-                    .getRevisedHearingRequirements()) ? hearingRequirements.getRevisedHearingComments() : null)
+        boolean hearingRequirementsAccepted =
+            nonNull(hearingRequirements)
+                && YesOrNo.YES.equals(hearingRequirements.getRevisedHearingRequirements());
+
+        return trialReadyForm.setTrialReadyAccepted(YesOrNo.YES.equals(trialReadyCheck))
+            .setTrialReadyDeclined(YesOrNo.NO.equals(trialReadyCheck))
+            .setHearingRequirementsCheck(hearingRequirementsAccepted ? "Yes" : "No")
+            .setHearingRequirementsText(
+                hearingRequirementsAccepted ? hearingRequirements.getRevisedHearingComments() : null
+            )
             .setAdditionalInfo(nonNull(hearingOtherComments) ? hearingOtherComments.getHearingOtherComments() : null);
 
     }
