@@ -46,6 +46,8 @@ public class UpdatePaymentStatusService {
         } catch (IllegalArgumentException ex) {
             throw ex;
         } catch (Exception ex) {
+            String status = cardPaymentStatusResponse != null ? cardPaymentStatusResponse.getStatus() : "N/A";
+            log.error("updatePaymentStatus failed for caseReference={} status={}", caseReference, status, ex);
             throw new CaseDataUpdateException(ex.getMessage(), ex);
         }
     }

@@ -6,6 +6,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -90,6 +91,18 @@ class UpdatePaymentStatusServiceTest {
     }
 
     @Test
+    public void shouldLogNotApplicablePaymentDetailsWhenRecoveringWithNullPaymentResponse() {
+        CaseDataUpdateException ex = new CaseDataUpdateException("Test Error", new RuntimeException());
+
+        updatePaymentStatusService.recover(ex, String.valueOf(CASE_ID), null);
+
+        assertThat(listAppender.list).hasSize(1);
+        assertThat(listAppender.list.getFirst().getLevel()).isEqualTo(Level.ERROR);
+        assertThat(listAppender.list.getFirst().getFormattedMessage())
+            .contains("GA Payment status update failed after retries for case 1594901956117591. Status: N/A, ErrorCode: N/A");
+    }
+
+    @Test
     public void shouldSubmitCitizenApplicationFeePaymentEvent() {
 
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
@@ -170,6 +183,74 @@ class UpdatePaymentStatusServiceTest {
 
         verify(gaCoreCaseDataService, times(1)).getCase(CASE_ID);
         verifyNoMoreInteractions(gaCoreCaseDataService);
+    }
+
+    @Test
+    public void shouldLogContextAndChainCauseWhenUpdatePaymentStatusFails() {
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .ccdState(CASE_PROGRESSION)
+            .businessProcess(new BusinessProcess()
+                                 .setStatus(BusinessProcessStatus.READY)
+                                 .setCamundaEvent(BUSINESS_PROCESS))
+            .generalAppPBADetails(new GeneralApplicationPbaDetails().setPaymentDetails(new PaymentDetails()
+                .setCustomerReference("RC-1604-0739-2145-4711")
+            ))
+            .build();
+        CaseDetails caseDetails = buildCaseDetails(caseData);
+        RuntimeException cause = new RuntimeException("CCD submit failed");
+        CardPaymentStatusResponse response = getCardPaymentStatusResponse();
+
+        when(gaCoreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
+        when(gaCoreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
+            caseDetails,
+            INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT
+        ));
+        when(gaCoreCaseDataService.submitUpdate(any(), any())).thenThrow(cause);
+
+        String caseReference = String.valueOf(CASE_ID);
+        ThrowingCallable updatePaymentStatus = () -> updatePaymentStatusService.updatePaymentStatus(caseReference, response);
+
+        assertThatThrownBy(updatePaymentStatus)
+            .isInstanceOf(CaseDataUpdateException.class)
+            .hasMessage("CCD submit failed")
+            .hasCause(cause);
+
+        assertThat(listAppender.list)
+            .anySatisfy(event -> {
+                assertThat(event.getLevel()).isEqualTo(Level.ERROR);
+                assertThat(event.getFormattedMessage())
+                    .contains("updatePaymentStatus failed for caseReference=1594901956117591 status=SUCCESS");
+                assertThat(event.getThrowableProxy().getMessage()).isEqualTo("CCD submit failed");
+            });
+    }
+
+    @Test
+    public void shouldLogNotApplicableStatusWhenUpdatePaymentStatusFailsWithNullPaymentResponse() {
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .ccdState(CASE_PROGRESSION)
+            .businessProcess(new BusinessProcess()
+                                 .setStatus(BusinessProcessStatus.READY)
+                                 .setCamundaEvent(BUSINESS_PROCESS))
+            .generalAppPBADetails(new GeneralApplicationPbaDetails().setPaymentDetails(new PaymentDetails()
+                .setCustomerReference("RC-1604-0739-2145-4711")
+            ))
+            .build();
+        CaseDetails caseDetails = buildCaseDetails(caseData);
+
+        when(gaCoreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
+
+        String caseReference = String.valueOf(CASE_ID);
+        ThrowingCallable updatePaymentStatus = () -> updatePaymentStatusService.updatePaymentStatus(caseReference, null);
+
+        assertThatThrownBy(updatePaymentStatus)
+            .isInstanceOf(CaseDataUpdateException.class)
+            .hasCauseInstanceOf(NullPointerException.class);
+
+        assertThat(listAppender.list)
+            .anySatisfy(event -> assertThat(event.getFormattedMessage())
+                .contains("updatePaymentStatus failed for caseReference=1594901956117591 status=N/A"));
     }
 
     private CaseDetails buildCaseDetails(GeneralApplicationCaseData caseData) {
