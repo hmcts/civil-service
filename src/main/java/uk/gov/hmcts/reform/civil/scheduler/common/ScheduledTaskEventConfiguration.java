@@ -9,6 +9,7 @@ public class ScheduledTaskEventConfiguration {
     String jobStartedEvent;
     String caseProcessedEvent;
     String caseFailedEvent;
+    String caseAbortedEvent;
     String jobCompletedEvent;
     String jobAbortedEvent;
     String backPressureUpdatedEvent;
@@ -18,6 +19,7 @@ public class ScheduledTaskEventConfiguration {
         this.jobStartedEvent = schedulerName + "JobStarted";
         this.caseProcessedEvent = schedulerName + "CaseProcessed";
         this.caseFailedEvent = schedulerName + "CaseFailed";
+        this.caseAbortedEvent = schedulerName + "CaseAborted";
         this.jobCompletedEvent = schedulerName + "JobCompleted";
         this.jobAbortedEvent = schedulerName + "JobAborted";
         this.backPressureUpdatedEvent = schedulerName + "BackPressureUpdated";
