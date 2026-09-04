@@ -10,16 +10,20 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 
@@ -55,10 +59,27 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
 
         deleteMainCaseDashboardNotifications(caseData);
 
+        // Set settlement date for dashboard notification
+        setSettlementDate(caseData);
+
+        // Trigger BPMN workflow to create dashboard notifications
+        caseData.setBusinessProcess(BusinessProcess.ready(LIP_CLAIM_SETTLED));
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .state(CASE_SETTLED.name())
             .build();
+    }
+
+    private void setSettlementDate(CaseData caseData) {
+        CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
+        if (caseDataLiP == null) {
+            caseDataLiP = new CaseDataLiP();
+            caseData.setCaseDataLiP(caseDataLiP);
+        }
+        if (caseDataLiP.getApplicant1ClaimSettledDate() == null) {
+            caseDataLiP.setApplicant1ClaimSettledDate(LocalDate.now());
+        }
     }
 
     private CallbackResponse inactivateTaskListAndBuildConfirmation(CallbackParams callbackParams) {

@@ -32,9 +32,8 @@ public class ClaimSettledLiPTest extends BpmnBaseTest {
         variables.put(FLOW_FLAGS, Map.of(DASHBOARD_SERVICE_ENABLED, dashboardServiceEnabled));
         startBusinessProcess(variables);
         notifyRespondentClaimantSettleTheClaim(variables);
-        if (dashboardServiceEnabled) {
-            generateDashboardNotifications(variables);
-        }
+        // Dashboard notifications are always generated (gateway removed)
+        generateDashboardNotifications(variables);
         completeBusinessProcess(assertNextExternalTask(END_BUSINESS_PROCESS));
     }
 
