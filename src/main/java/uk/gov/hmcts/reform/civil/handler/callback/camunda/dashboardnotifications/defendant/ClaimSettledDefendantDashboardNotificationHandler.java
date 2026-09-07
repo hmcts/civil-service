@@ -14,7 +14,9 @@ import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_DEFENDANT1;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLE_EVENT_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLE_EVENT_EARLY_STATE_DEFENDANT;
 
 @Service
 public class ClaimSettledDefendantDashboardNotificationHandler extends DashboardCallbackHandler {
@@ -47,6 +49,12 @@ public class ClaimSettledDefendantDashboardNotificationHandler extends Dashboard
 
     @Override
     public String getScenario(CaseData caseData) {
+        // For early state settlements (AWAITING_CASE_DETAILS_NOTIFICATION), use the new template without objection text
+        // Per OCCC-349: No changes should be made to existing notifications for Spec claims
+        if (AWAITING_CASE_DETAILS_NOTIFICATION.equals(caseData.getPreviousCCDState())) {
+            return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLE_EVENT_EARLY_STATE_DEFENDANT.getScenario();
+        }
+        // For all other states, use the existing template with objection text
         return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLE_EVENT_DEFENDANT.getScenario();
     }
 

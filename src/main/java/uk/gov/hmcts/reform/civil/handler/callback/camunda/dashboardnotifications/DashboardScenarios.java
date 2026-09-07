@@ -72,6 +72,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_DEFISLIP_JUDGMENT_REQUESTED_CLAIMANT("Scenario.AAA6.DefIsLip.Judgment.Requested.Claimant"),
     SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT("Scenario.AAA6.DefResponse.FullOrPartAdmit.PayBySetDate.Claimant"),
     SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLE_EVENT_DEFENDANT("Scenario.AAA6.ClaimantIntent.ClaimSettleEvent.Defendant"),
+    SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLE_EVENT_EARLY_STATE_DEFENDANT("Scenario.AAA6.ClaimantIntent.ClaimSettleEvent.EarlyState.Defendant"),
     SCENARIO_AAA6_CLAIMANT_MEDIATION_SUCCESSFUL("Scenario.AAA6.MediationSuccessful.CARM.Claimant"),
     SCENARIO_AAA6_DEFENDANT_MEDIATION_SUCCESSFUL("Scenario.AAA6.MediationSuccessful.CARM.Defendant"),
     SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_GENERIC("Scenario.AAA6.MediationUnsuccessful.NOTClaimant1NonContactable.CARM.Claimant"),
