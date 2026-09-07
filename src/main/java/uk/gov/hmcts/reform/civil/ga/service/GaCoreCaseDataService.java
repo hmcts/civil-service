@@ -15,11 +15,12 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.search.Query;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
+import uk.gov.hmcts.reform.civil.utils.CaseServiceUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -363,16 +364,20 @@ public class GaCoreCaseDataService {
                                                     String eventSummary,
                                                     String eventDescription) {
         StartEventResponse startEventResponse = startUpdate(caseId.toString(), eventName);
+
         HashMap<String, Object> payload = new HashMap<>(startEventResponse.getCaseDetails().getData());
         //set case management location epimsId
+        GeneralApplicationCaseData startEventData = caseDetailsConverter.toGeneralApplicationCaseData(startEventResponse.getCaseDetails());
+        String caseServiceId = CaseServiceUtil.getCaseServiceId(startEventData);
         Object caseManagementLocationObj = payload.get("caseManagementLocation");
         if (caseManagementLocationObj != null) {
             List<LocationRefData> byEpimmsId = locationRefDataService.getCourtLocationsByEpimmsId(
                 getSystemUpdateUserToken(),
-                epimdsId
+                epimdsId,
+                caseServiceId
             );
 
-            LocationRefData locationRefData = byEpimmsId.get(0);
+            LocationRefData locationRefData = byEpimmsId.getFirst();
             CaseLocationCivil newCmLocation = new CaseLocationCivil()
                 .setRegion(region)
                 .setPostcode(locationRefData.getPostcode())

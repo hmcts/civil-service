@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
@@ -27,6 +29,8 @@ import static java.util.Objects.requireNonNull;
 @RequiredArgsConstructor
 public class FeesPaymentService {
 
+    private static final String PAYMENT_NOT_READY_MESSAGE = "Payment is not ready yet, please retry in a moment";
+
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
     private final PinInPostConfiguration pinInPostConfiguration;
@@ -45,7 +49,15 @@ public class FeesPaymentService {
                 ? caseData.getHearingFeePBADetails()
                 : caseData.getClaimIssuedPBADetails();
 
-        requireNonNull(feePaymentDetails, "Fee Payment details cannot be null");
+        if (feePaymentDetails == null) {
+            log.warn(
+                "Payment details are not ready for case {}, fee type {}, case state {}",
+                caseReference,
+                feeType,
+                caseDetails.getState()
+            );
+            throw new ResponseStatusException(HttpStatus.CONFLICT, PAYMENT_NOT_READY_MESSAGE);
+        }
         requireNonNull(feePaymentDetails.getServiceReqReference(), "Fee Payment service request cannot be null");
 
         String returnUrlSubPath = feeType.equals(FeeType.HEARING)

@@ -551,7 +551,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER).build();
             List<LocationRefData> locations = new ArrayList<>();
             locations.add(locationRefDataWithCourtNameRegion());
-            when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
+            when(locationRefDataService.getHearingCourtLocations(any(), any())).thenReturn(locations);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             String advancedDate = LocalDate.now().plusDays(14).toString();
             when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefDataAfterSdo);
@@ -648,7 +648,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER).build();
             List<LocationRefData> locations = new ArrayList<>();
             locations.add(locationRefDataWithCourtNameRegion());
-            when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
+            when(locationRefDataService.getHearingCourtLocations(any(), any())).thenReturn(locations);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefDataAfterSdo);
             // When
@@ -675,7 +675,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // may run again but should not overwrite user's edited penal notice content
             List<LocationRefData> locations = new ArrayList<>();
             locations.add(locationRefDataWithCourtNameRegion());
-            when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
+            when(locationRefDataService.getHearingCourtLocations(any(), any())).thenReturn(locations);
             when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefDataAfterSdo);
             when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class)))
                 .thenReturn(LocalDate.now())
@@ -1109,6 +1109,21 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel("Blank template to be used before a hearing/box work"))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            when(judgeOrderDownloadGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("finalOrderDownloadTemplateDocument").isNotNull();
+            assertThat(response.getData()).extracting("showOrderAfterHearingDatePage").isEqualTo("No");
+        }
+
+        @Test
+        void shouldGenerateTemplateWhenTemplateOptionsAreMissing_onMidEventCallback() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderDownloadTemplateOptions(null)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When
@@ -1908,6 +1923,33 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             finalCaseDocuments.add(element(finalOrder));
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_BEFORE_HEARING.getLabel()))
+                .finalOrderDocumentCollection(finalCaseDocuments)
+                .uploadOrderDocumentFromTemplate(uploadedDocument)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            String fileName = LocalDate.now() + "_directions order.docx";
+            assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
+            assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
+                           .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
+            assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
+                           .getValue().getDocumentLink().getDocumentFileName()).isEqualTo(fileName);
+        }
+
+        @Test
+        void shouldAddTemplateDocumentToCollectionDirectionsOrderWhenTemplateOptionsAreMissing_onAboutToSubmit() {
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                            .forename("Judge")
+                                                                            .surname("Judy")
+                                                                            .roles(Collections.emptyList()).build());
+            // Given
+            List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+            finalCaseDocuments.add(element(finalOrder));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderDownloadTemplateOptions(null)
                 .finalOrderDocumentCollection(finalCaseDocuments)
                 .uploadOrderDocumentFromTemplate(uploadedDocument)
                 .build();

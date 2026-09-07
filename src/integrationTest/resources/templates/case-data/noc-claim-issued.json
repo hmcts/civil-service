@@ -1,0 +1,31 @@
+{
+  "ccdCaseReference": 1234567890123456,
+  "ccdState": "CASE_ISSUED",
+  "CaseAccessCategory": "SPEC_CLAIM",
+  "applicant1OrganisationPolicy": {
+    "Organisation": {
+      "OrganisationID": "QWERTY-A"
+    },
+    "OrgPolicyReference": "APP-SOL-REF",
+    "OrgPolicyCaseAssignedRole": "[APPLICANTSOLICITORONE]"
+  },
+  "respondent1OrganisationPolicy": {
+    "Organisation": {
+      "OrganisationID": "QWERTY-R1"
+    },
+    "OrgPolicyReference": "RES1-SOL-REF",
+    "OrgPolicyCaseAssignedRole": "[RESPONDENTSOLICITORONE]"
+  },
+  "respondent1OrganisationIDCopy": "QWERTY-R1",
+  "respondentSolicitor1EmailAddress": "respondent1solicitor@example.com",
+  "applicantSolicitor1UserDetails": {
+    "email": "applicantsolicitor@example.com",
+    "id": "app-sol-user-id"
+  },
+  "solicitorReferences": {
+    "applicantSolicitor1Reference": "APP-REF-001",
+    "respondentSolicitor1Reference": "RES1-REF-001"
+  },
+  "respondent1Represented": "Yes",
+  "applicant1Represented": "Yes"
+}

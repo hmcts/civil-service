@@ -16,6 +16,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_AVAILABLE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_DEADLINE_PASSED_DEFENDANT;
 
 @Service
 public class StayLiftedDefendantDashboardService extends DashboardScenarioService {
@@ -52,10 +53,15 @@ public class StayLiftedDefendantDashboardService extends DashboardScenarioServic
     private Map<String, Boolean> getScenariosBasedOnPreStayState(CaseData caseData) {
         return switch (CaseState.valueOf(caseData.getPreStayState())) {
             case CASE_PROGRESSION, All_FINAL_ORDERS_ISSUED -> Map.of(
-                getViewDocumentsScenario(caseData).getScenario(), true);
+                getViewDocumentsScenario(caseData).getScenario(), true
+            );
             case HEARING_READINESS, PREPARE_FOR_HEARING_CONDUCT_HEARING, DECISION_OUTCOME -> Map.of(
                 getViewDocumentsScenario(caseData).getScenario(), true,
-                SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT.getScenario(), true);
+                SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT.getScenario(), true
+            );
+            case JUDGMENT_REQUESTED -> Map.of(
+                SCENARIO_AAA6_DEFENDANT_RESPONSE_DEADLINE_PASSED_DEFENDANT.getScenario(), true
+            );
             default -> Map.of();
         };
     }

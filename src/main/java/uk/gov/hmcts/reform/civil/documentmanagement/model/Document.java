@@ -10,8 +10,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.nowInLocalZone;
 
 @Accessors(chain = true)
 @Data
@@ -96,6 +97,6 @@ public class Document {
 
     private static String getFileName(String documentName, String extension) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return String.format(documentName, LocalDateTime.now().format(formatter)) + "." + extension;
+        return String.format(documentName, nowInLocalZone().format(formatter)) + "." + extension;
     }
 }

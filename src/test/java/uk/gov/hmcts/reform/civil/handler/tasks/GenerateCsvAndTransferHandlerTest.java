@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCSVLrvLipService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCsvServiceFactory;
 import uk.gov.hmcts.reform.civil.service.search.MediationCasesSearchService;
@@ -29,6 +30,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 import org.mockito.Spy;
@@ -67,6 +69,9 @@ class GenerateCsvAndTransferHandlerTest {
 
     @Mock
     private MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @Mock
     private MediationCSVLrvLipService mediationCSVLrvLipService;
@@ -115,6 +120,16 @@ class GenerateCsvAndTransferHandlerTest {
         verify(externalTaskService).complete(externalTask, null);
     }
 
+    @Test
+    void shouldNotGenerateCsvWhenSpringSchedulerFeatureToggleIsEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled("GenerateCsvAndSendToMmt")).thenReturn(true);
+
+        inMediationCsvHandler.execute(externalTask, externalTaskService);
+
+        verifyNoInteractions(searchService, mediationCsvServiceFactory, sendGridClient);
+        verify(externalTaskService).complete(externalTask, null);
+    }
+
     private CaseDetails getCaseDetails(Long ccdId, LocalDate claimMovedToMediation) {
 
         return CaseDetails.builder().id(ccdId).data(
@@ -150,4 +165,3 @@ class GenerateCsvAndTransferHandlerTest {
     }
 
 }
-

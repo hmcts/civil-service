@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,16 +22,13 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 class ConversionToBundleRequestDocsTest {
 
     @Mock
     private BundleRequestDocsOrganizer requestDocsOrganizer;
-
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private ConversionToBundleRequestDocs conversionToBundleRequestDocs;
@@ -70,7 +66,6 @@ class ConversionToBundleRequestDocsTest {
 
     @Test
     void shouldPreserveOriginalWitnessIndexWhenFilteringOtherWitnessEvidence() {
-        when(featureToggleService.isAmendBundleEnabled()).thenReturn(true);
         String displayName = "%s %s %s";
         String documentType = "documentType";
 
@@ -217,6 +212,37 @@ class ConversionToBundleRequestDocsTest {
 
         assertNotNull(result);
         assertEquals("document", result.getFirst().getDocumentFileName());
+    }
+
+    @Test
+    void shouldLimitOriginalDocumentFileNamesInBundleRequest() {
+        String longBaseName = "source-document-" + "A".repeat(250) + "-important-suffix";
+        Document longNameDocument = new Document()
+            .setDocumentFileName(longBaseName + ".pdf")
+            .setCategoryID("SomeCategoryID");
+        Document ordinaryDocument = new Document()
+            .setDocumentFileName("ordinary-document.pdf")
+            .setCategoryID("SomeCategoryID");
+        List<Element<UploadEvidenceDocumentType>> uploads = List.of(longNameDocument, ordinaryDocument).stream()
+            .map(document -> new Element<UploadEvidenceDocumentType>().setValue(
+                new UploadEvidenceDocumentType()
+                    .setDocumentIssuedDate(LocalDate.of(2023, 4, 24))
+                    .setDocumentUpload(document)
+            ))
+            .toList();
+
+        List<BundlingRequestDocument> result = conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
+            uploads,
+            "DOC_FILE_NAME",
+            EvidenceUploadType.COSTS.name(),
+            PartyType.CLAIMANT1
+        );
+
+        assertEquals(2, result.size());
+        assertTrue(result.stream().allMatch(document ->
+            document.getDocumentFileName().length() <= BundleUtils.MAX_DOC_TITLE_LENGTH));
+        assertTrue(result.getFirst().getDocumentFileName().endsWith("-important-suffix"));
+        assertEquals("ordinary-document", result.get(1).getDocumentFileName());
     }
 
     @Test

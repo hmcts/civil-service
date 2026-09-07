@@ -80,3 +80,4 @@ variable "job_not_run_threshold" {
   description = "The threshold in hours for the scheduler job not run alert"
   default     = 26
 }
+

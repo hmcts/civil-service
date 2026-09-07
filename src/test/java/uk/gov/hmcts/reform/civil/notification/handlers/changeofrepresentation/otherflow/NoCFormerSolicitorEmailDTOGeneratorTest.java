@@ -14,11 +14,13 @@ import uk.gov.hmcts.reform.civil.notification.handlers.TemplateCommonPropertiesH
 import uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.common.NotificationHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 
 @ExtendWith(MockitoExtension.class)
 class NoCFormerSolicitorEmailDTOGeneratorTest {
@@ -26,6 +28,8 @@ class NoCFormerSolicitorEmailDTOGeneratorTest {
     private static final String FORMER_SOLICITOR_EMAIL = "solicitor@example.com";
     private static final String TEMPLATE_ID = "template-id-123";
     private static final String CASE_REFERENCE = "000DC001";
+    private static final String PARTY_REFERENCES_VALUE =
+        "Claimant reference: claimant-ref - Defendant reference: defendant-ref";
 
     @Mock
     private NotificationsProperties notificationsProperties;
@@ -80,6 +84,7 @@ class NoCFormerSolicitorEmailDTOGeneratorTest {
             );
 
             when(noCHelper.getProperties(caseData, false)).thenReturn(Map.of("key", "value"));
+            when(noCHelper.getNoCPartyReferences(caseData)).thenReturn(PARTY_REFERENCES_VALUE);
 
             EmailDTO emailDTO = generator.buildEmailDTO(caseData, "taskId");
 
@@ -88,5 +93,15 @@ class NoCFormerSolicitorEmailDTOGeneratorTest {
             assertThat(emailDTO.getReference()).isEqualTo("notice-of-change-" + CASE_REFERENCE);
             assertThat(emailDTO.getParameters()).containsEntry("key", "value");
         }
+    }
+
+    @Test
+    void shouldAddFormerSolicitorPartyReferences() {
+        when(noCHelper.getProperties(caseData, false)).thenReturn(Map.of("key", "value"));
+        when(noCHelper.getNoCPartyReferences(caseData)).thenReturn(PARTY_REFERENCES_VALUE);
+
+        Map<String, String> properties = generator.addCustomProperties(new HashMap<>(), caseData);
+
+        assertThat(properties).containsEntry(PARTY_REFERENCES, PARTY_REFERENCES_VALUE);
     }
 }

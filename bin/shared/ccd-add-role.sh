@@ -17,14 +17,21 @@ else
 fi
 
 if [ -z "${SERVICE_TOKEN:-}" ]; then
-  serviceToken=$(${dir}/idam-lease-service-token.sh ccd_gw $(docker run --rm hmctspublic.azurecr.io/imported/toolbelt/oathtool --totp -b ${CCD_API_GATEWAY_S2S_SECRET:-AAAAAAAAAAAAAAAC}))
+  set +x
+  serviceToken=$(IDAM_SERVICE_SECRET="${CCD_API_GATEWAY_S2S_SECRET:-AAAAAAAAAAAAAAAC}" \
+    "${dir}/idam-lease-service-token.sh" ccd_gw)
+  set -x
 else
   serviceToken=${SERVICE_TOKEN}
 fi
 
 echo "Creating CCD role: ${role} using ${CCD_DEFINITION_STORE_API_BASE_URL}"
 
-curl --insecure --fail --show-error --silent -X PUT \
+# Role creation is called ~50x in sequence by add-roles.sh under `set -e`, so a
+# single transient transport error fails the whole build. --retry-all-errors is
+# needed because curl's plain --retry ignores mid-stream failures (92/23/56).
+curl --insecure --fail --show-error --silent \
+  --connect-timeout 10 --max-time 30 --retry 3 --retry-delay 5 --retry-all-errors -X PUT \
   ${CCD_DEFINITION_STORE_API_BASE_URL:-http://localhost:4451}/api/user-role \
   -H "Authorization: Bearer ${userToken}" \
   -H "ServiceAuthorization: Bearer ${serviceToken}" \

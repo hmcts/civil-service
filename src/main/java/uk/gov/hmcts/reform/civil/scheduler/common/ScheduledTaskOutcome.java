@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.civil.scheduler.common;
 
+import java.time.Duration;
 import java.util.List;
 
-public record ScheduledTaskOutcome(
-    List<Long> succeededCases,
-    List<Long> failedCases,
+public record ScheduledTaskOutcome<I>(
+    List<I> succeededCases,
+    List<I> failedCases,
     boolean abortedEarly,
-    String abortReason
+    String abortReason,
+    Duration cumulativeDelay
 ) {}

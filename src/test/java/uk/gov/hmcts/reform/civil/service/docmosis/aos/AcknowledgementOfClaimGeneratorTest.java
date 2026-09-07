@@ -74,6 +74,7 @@ class AcknowledgementOfClaimGeneratorTest {
         .build();
 
     private final Representative representative = new Representative().setOrganisationName("test org");
+    private final Representative respondent2Representative = new Representative().setOrganisationName("respondent 2 org");
 
     @MockBean
     private SecuredDocumentManagementService documentManagementService;
@@ -219,13 +220,6 @@ class AcknowledgementOfClaimGeneratorTest {
                     .setLitigationFriendName(
                         ofNullable(caseData.getRespondent1LitigationFriend())
                             .map(LitigationFriend::getFullName)
-                            .orElse("")), new Party()
-                    .setName(caseData.getRespondent2().getPartyName())
-                    .setPrimaryAddress(caseData.getRespondent2().getPrimaryAddress())
-                    .setRepresentative(representative)
-                    .setLitigationFriendName(
-                        ofNullable(caseData.getRespondent2LitigationFriend())
-                            .map(LitigationFriend::getFullName)
                             .orElse(""))
             )),
             DocmosisTemplateDataUtils.fetchResponseIntentionsDocmosisTemplate(caseData)
@@ -294,6 +288,98 @@ class AcknowledgementOfClaimGeneratorTest {
             .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, ACKNOWLEDGEMENT_OF_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(
             any(AcknowledgementOfClaimForm.class), eq(N11));
+    }
+
+    @Test
+    void shouldPopulateRespondent2Details_whenRespondent1IsLipAndRespondent2Acknowledges() {
+        when(representativeService.getRespondent2Representative(any())).thenReturn(respondent2Representative);
+
+        LocalDateTime respondent1Deadline = LocalDateTime.now().plusDays(10);
+        LocalDateTime respondent2Deadline = LocalDateTime.now().plusDays(14);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .respondent2(new PartyBuilder().individual().build())
+            .addRespondent2(YES)
+            .respondent2SameLegalRepresentative(NO)
+            .respondent1Represented(NO)
+            .respondent2Represented(YES)
+            .respondent1AcknowledgeNotificationDate(LocalDateTime.now())
+            .respondent2AcknowledgeNotificationDate(null)
+            .respondent2DocumentGeneration("userRespondent2")
+            .respondent1ResponseDeadline(respondent1Deadline)
+            .respondent2ResponseDeadline(respondent2Deadline)
+            .respondent2ClaimResponseIntentionType(FULL_DEFENCE)
+            .respondentSolicitor2Reference("5678")
+            .solicitorReferences(new SolicitorReferences()
+                .setApplicantSolicitor1Reference("12345")
+                .setRespondentSolicitor1Reference(null)
+                .setRespondentSolicitor2Reference("5678"))
+            .build();
+
+        AcknowledgementOfClaimForm templateData = generator.getTemplateDataForAcknowldgeClaim(caseData);
+
+        assertThat(templateData.getResponseDeadline()).isEqualTo(respondent2Deadline.toLocalDate());
+        assertThat(templateData.getRespondent()).containsExactly(new Party()
+            .setName(caseData.getRespondent2().getPartyName())
+            .setPrimaryAddress(caseData.getRespondent2().getPrimaryAddress())
+            .setRepresentative(respondent2Representative)
+            .setLitigationFriendName(""));
+        assertThat(templateData.getSolicitorReferences().getRespondentSolicitor2Reference()).isEqualTo("5678");
+        assertThat(templateData.getSolicitorReferences().getRespondentSolicitor1Reference()).isNull();
+        assertThat(templateData.getResponseIntentions()).containsExactly(FULL_DEFENCE.getLabel());
+    }
+
+    @Test
+    void shouldFallBackToRespondent1ResponseIntention_whenLegacyRespondent2AcknowledgementHasNoRespondent2Intention() {
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .respondent2(new PartyBuilder().individual().build())
+            .addRespondent2(YES)
+            .respondent2SameLegalRepresentative(NO)
+            .respondent1Represented(NO)
+            .respondent2Represented(YES)
+            .respondent1AcknowledgeNotificationDate(LocalDateTime.now())
+            .respondent2AcknowledgeNotificationDate(null)
+            .respondent2DocumentGeneration("userRespondent2")
+            .respondent1ClaimResponseIntentionType(FULL_DEFENCE)
+            .respondent2ClaimResponseIntentionType(null)
+            .build();
+
+        AcknowledgementOfClaimForm templateData = generator.getTemplateDataForAcknowldgeClaim(caseData);
+
+        assertThat(templateData.getResponseIntentions()).containsExactly(FULL_DEFENCE.getLabel());
+    }
+
+    @Test
+    void shouldPopulateRespondent1Details_whenRespondent1IsRepresentedAndRespondent2IsLip() {
+        LocalDateTime respondent1Deadline = LocalDateTime.now().plusDays(14);
+        LocalDateTime respondent2Deadline = LocalDateTime.now().plusDays(10);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .respondent2(new PartyBuilder().individual().build())
+            .addRespondent2(YES)
+            .respondent2SameLegalRepresentative(NO)
+            .respondent1Represented(YES)
+            .respondent2Represented(NO)
+            .respondent1AcknowledgeNotificationDate(LocalDateTime.now())
+            .respondent2AcknowledgeNotificationDate(null)
+            .respondent2DocumentGeneration(null)
+            .respondent1ResponseDeadline(respondent1Deadline)
+            .respondent2ResponseDeadline(respondent2Deadline)
+            .respondent1ClaimResponseIntentionType(FULL_DEFENCE)
+            .solicitorReferences(new SolicitorReferences()
+                .setApplicantSolicitor1Reference("12345")
+                .setRespondentSolicitor1Reference("6789"))
+            .build();
+
+        AcknowledgementOfClaimForm templateData = generator.getTemplateDataForAcknowldgeClaim(caseData);
+
+        assertThat(templateData.getResponseDeadline()).isEqualTo(respondent1Deadline.toLocalDate());
+        assertThat(templateData.getRespondent()).containsExactly(new Party()
+            .setName(caseData.getRespondent1().getPartyName())
+            .setPrimaryAddress(caseData.getRespondent1().getPrimaryAddress())
+            .setRepresentative(representative)
+            .setLitigationFriendName(""));
+        assertThat(templateData.getSolicitorReferences().getRespondentSolicitor1Reference()).isEqualTo("6789");
+        assertThat(templateData.getSolicitorReferences().getRespondentSolicitor2Reference()).isNull();
+        assertThat(templateData.getResponseIntentions()).containsExactly(FULL_DEFENCE.getLabel());
     }
 
     @Test

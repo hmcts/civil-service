@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCSVService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCsvServiceFactory;
 import uk.gov.hmcts.reform.civil.service.search.MediationCasesSearchService;
@@ -42,7 +43,8 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
                                                 SendGridClient sendGridClient,
                                                 MediationCSVEmailConfiguration mediationCSVEmailConfiguration,
                                                 MediationCsvServiceFactory mediationCsvServiceFactory,
-                                                MediationCSVEmailConfiguration mediationCSVEmailConfiguration1) {
+                                                MediationCSVEmailConfiguration mediationCSVEmailConfiguration1,
+                                                FeatureToggleService featureToggleService) {
         super(
             externalTaskCompletionService,
             eventProperties,
@@ -50,7 +52,8 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
             coreCaseDataService,
             caseDetailsConverter,
             sendGridClient,
-            mediationCSVEmailConfiguration
+            mediationCSVEmailConfiguration,
+            featureToggleService
         );
         this.mediationCsvServiceFactory = mediationCsvServiceFactory;
         this.localMediationCSVEmailConfiguration = mediationCSVEmailConfiguration1;
@@ -58,6 +61,9 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
+        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
+            return new ExternalTaskData();
+        }
 
         List<CaseDetails> cases = caseSearchService.getInMediationCases(false);
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());

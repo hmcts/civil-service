@@ -265,6 +265,30 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
+        "setDocumentForDisclosure",
+        "setDocumentReferredInStatement",
+        "setDocumentEvidenceForTrial",
+    })
+    void shouldNotReturnError_whenDocumentTypeUploadDateIsNull(String collectionField) {
+        // Given
+        List<Element<UploadEvidenceDocumentType>> documents = List.of(element(new UploadEvidenceDocumentType()));
+
+        CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseDataBefore, collectionField, List.of());
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        invoke(caseData, collectionField, documents);
+        CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
+                                                  PAGE_ID, Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
         "setDocumentIssuedDate,setDocumentForDisclosure, Invalid date: \"Documents for disclosure\""
             + " date entered must not be in the future (1).",
         "setDocumentIssuedDate,setDocumentReferredInStatement, Invalid date: \"Documents referred to in the statement\""
@@ -1443,4 +1467,3 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     }
 
 }
-

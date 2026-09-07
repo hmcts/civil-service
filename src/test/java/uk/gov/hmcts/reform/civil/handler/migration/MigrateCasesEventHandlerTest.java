@@ -10,10 +10,14 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseNoteReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReferenceCsvLoader;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardNotificationTaskCaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardScenarioCaseReference;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.ExcelCaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.ExcelMappable;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.NotificationCaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.NotifyRpaFeedCaseReference;
@@ -32,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -43,6 +48,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class MigrateCasesEventHandlerTest {
 
     @Mock
@@ -122,6 +128,79 @@ class MigrateCasesEventHandlerTest {
         assertNotNull(result);
         verify(asyncCaseMigrationService, times(1))
             .migrateCasesAsync(eq(migrationTask), anyList(), isNull(), eq(false));
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    @Test
+    void shouldHandleTaskWithCaseIdsAndDashboardTaskId() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("taskName")).thenReturn("testTask");
+        when(externalTask.getVariable("caseIds")).thenReturn("123, 456");
+        when(externalTask.getVariable("scenario")).thenReturn(null);
+        when(externalTask.getVariable("dashboardTaskId")).thenReturn("GenerateDashboardNotificationsHearingScheduledHmc");
+        when(externalTask.getVariable("dashboardProcessInstanceId")).thenReturn("process-123");
+        when(externalTask.getVariable("dashboardProcessInstanceIds")).thenReturn(null);
+        when(externalTask.getVariable("dashboardCaseType")).thenReturn("GENERAL_APPLICATION");
+        when(externalTask.getVariable("notificationCamundaProcessIdentifier")).thenReturn(null);
+        when(externalTask.getVariable("caseNoteElementId")).thenReturn(null);
+        when(externalTask.getVariable("notifyEventId")).thenReturn(null);
+        when(externalTask.getVariable("state")).thenReturn(null);
+        when(externalTask.getVariable("isGACase")).thenReturn(null);
+
+        MigrationTask<? extends CaseReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.getType()).thenReturn((Class) DashboardNotificationTaskCaseReference.class);
+        doReturn(Optional.of(migrationTask))
+            .when(migrationTaskFactory)
+            .getMigrationTask("testTask");
+
+        ExternalTaskData result = handler.handleTask(externalTask);
+
+        assertNotNull(result);
+
+        ArgumentCaptor<List> referencesCaptor = ArgumentCaptor.forClass(List.class);
+        verify(asyncCaseMigrationService, times(1))
+            .migrateCasesAsync(eq(migrationTask), referencesCaptor.capture(), isNull(), eq(false));
+
+        List<DashboardNotificationTaskCaseReference> references = referencesCaptor.getValue();
+        assertEquals(2, references.size());
+        assertEquals("123", references.get(0).getCaseReference());
+        assertEquals("456", references.get(1).getCaseReference());
+        assertEquals("GenerateDashboardNotificationsHearingScheduledHmc", references.get(0).getDashboardTaskId());
+        assertEquals("process-123", references.get(0).getDashboardProcessInstanceId());
+        assertEquals("GENERAL_APPLICATION", references.get(0).getDashboardCaseType());
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    @Test
+    void shouldHandleTaskWithCaseIdsAndDashboardProcessInstanceIds() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("taskName")).thenReturn("testTask");
+        when(externalTask.getVariable("caseIds")).thenReturn("123, 456");
+        when(externalTask.getVariable("scenario")).thenReturn(null);
+        when(externalTask.getVariable("dashboardTaskId")).thenReturn("GenerateDashboardNotificationsHearingScheduledHmc");
+        when(externalTask.getVariable("dashboardProcessInstanceId")).thenReturn(null);
+        when(externalTask.getVariable("dashboardProcessInstanceIds")).thenReturn("process-123, process-456");
+        when(externalTask.getVariable("notificationCamundaProcessIdentifier")).thenReturn(null);
+        when(externalTask.getVariable("caseNoteElementId")).thenReturn(null);
+        when(externalTask.getVariable("notifyEventId")).thenReturn(null);
+        when(externalTask.getVariable("state")).thenReturn(null);
+        when(externalTask.getVariable("isGACase")).thenReturn(null);
+
+        MigrationTask<? extends CaseReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.getType()).thenReturn((Class) DashboardNotificationTaskCaseReference.class);
+        doReturn(Optional.of(migrationTask))
+            .when(migrationTaskFactory)
+            .getMigrationTask("testTask");
+
+        handler.handleTask(externalTask);
+
+        ArgumentCaptor<List> referencesCaptor = ArgumentCaptor.forClass(List.class);
+        verify(asyncCaseMigrationService, times(1))
+            .migrateCasesAsync(eq(migrationTask), referencesCaptor.capture(), isNull(), eq(false));
+
+        List<DashboardNotificationTaskCaseReference> references = referencesCaptor.getValue();
+        assertEquals("process-123", references.get(0).getDashboardProcessInstanceId());
+        assertEquals("process-456", references.get(1).getDashboardProcessInstanceId());
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -339,6 +418,46 @@ class MigrateCasesEventHandlerTest {
         assertNotNull(result);
         verify(caseReferenceCsvLoader, times(1)).loadFromExcelBytes(ExcelMappableCaseReference.class, excelBytes);
         verify(asyncCaseMigrationService, times(1)).migrateCasesAsync(migrationTask, mockReferences, null, false);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldHandleCmcTaskWithExcelFile() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("taskName")).thenReturn("UpdateSystemTTLTask");
+        when(externalTask.getVariable("caseIds")).thenReturn("");
+        when(externalTask.getVariable("scenario")).thenReturn(null);
+        when(externalTask.getVariable("notificationCamundaProcessIdentifier")).thenReturn(null);
+        when(externalTask.getVariable("caseNoteElementId")).thenReturn(null);
+        when(externalTask.getVariable("notifyEventId")).thenReturn(null);
+        when(externalTask.getVariable("state")).thenReturn(null);
+        when(externalTask.getVariable("isGACase")).thenReturn(null);
+        when(externalTask.getVariable("isCMCCase")).thenReturn("true");
+
+        byte[] excelBytes = "dummy content".getBytes();
+        FileValue fileValue = mock(FileValue.class);
+        when(fileValue.getValue()).thenReturn(new ByteArrayInputStream(excelBytes));
+        when(externalTask.getVariableTyped("excelFile", false)).thenReturn(fileValue);
+
+        MigrationTask<ExcelCaseReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.getType()).thenReturn(ExcelCaseReference.class);
+        when(migrationTaskFactory.<ExcelCaseReference>getMigrationTask("UpdateSystemTTLTask"))
+            .thenReturn(Optional.of(migrationTask));
+
+        ExcelCaseReference firstReference = new ExcelCaseReference();
+        firstReference.setCaseReference("1111222233334444");
+        ExcelCaseReference secondReference = new ExcelCaseReference();
+        secondReference.setCaseReference("5555666677778888");
+        List<ExcelCaseReference> mockReferences = List.of(firstReference, secondReference);
+        when(caseReferenceCsvLoader.loadFromExcelBytes(ExcelCaseReference.class, excelBytes))
+            .thenReturn(mockReferences);
+
+        ExternalTaskData result = handler.handleTask(externalTask);
+
+        assertNotNull(result);
+        verify(caseReferenceCsvLoader).loadFromExcelBytes(ExcelCaseReference.class, excelBytes);
+        verify(asyncCaseMigrationService).migrateCMCCasesAsync(migrationTask, mockReferences);
+        verify(asyncCaseMigrationService, never()).migrateCasesAsync(any(), anyList(), any(), anyBoolean());
     }
 
     @Test

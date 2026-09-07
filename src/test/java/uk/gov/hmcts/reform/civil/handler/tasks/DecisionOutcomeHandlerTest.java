@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.DecisionOutcomeEvent;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.DecisionOutcomeSearchService;
 
 import java.util.Map;
@@ -37,6 +38,8 @@ import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 @ExtendWith(SpringExtension.class)
 class DecisionOutcomeHandlerTest {
 
+    private static final String SCHEDULER_NAME = "DecisionOutcome";
+
     @Mock
     private ExternalTask mockTask;
 
@@ -48,6 +51,8 @@ class DecisionOutcomeHandlerTest {
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
+    @Mock
+    private FeatureToggleService featureToggleService;
     @Spy
     private EventProperties eventProperties = configuredEventProperties();
 
@@ -84,6 +89,16 @@ class DecisionOutcomeHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verifyNoInteractions(applicationEventPublisher);
+    }
+
+    @Test
+    void shouldNotRunCamundaHandlerWhenSpringSchedulerEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
+
+        handler.execute(mockTask, externalTaskService);
+
+        verifyNoInteractions(searchService, applicationEventPublisher);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test

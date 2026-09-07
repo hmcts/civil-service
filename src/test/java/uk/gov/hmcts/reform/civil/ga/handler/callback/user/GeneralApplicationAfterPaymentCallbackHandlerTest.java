@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.ga.handler.callback.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -14,6 +15,7 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CUSTOMER_REFE
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,20 +46,26 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
+import uk.gov.hmcts.reform.civil.service.GeneralAppsDeadlinesCalculator;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 public class GeneralApplicationAfterPaymentCallbackHandlerTest
         extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Spy private ObjectMapper objectMapper = ObjectMapperFactory.instance();
+    @Spy private ObjectMapper objectMapper = new ObjectMapper()
+        .findAndRegisterModules()
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     @InjectMocks private GeneralApplicationAfterPaymentCallbackHandler handler;
 
     @Mock private GaForLipService gaForLipService;
+
+    @Mock private GeneralAppsDeadlinesCalculator deadlinesCalculator;
 
     private static final String STRING_CONSTANT = "STRING_CONSTANT";
     private static final Long CHILD_CCD_REF = 1646003133062762L;
@@ -86,6 +94,29 @@ public class GeneralApplicationAfterPaymentCallbackHandlerTest
                 objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
         assertThat(responseCaseData.getBusinessProcess().getCamundaEvent())
                 .isEqualTo(INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT.name());
+    }
+
+    @Test
+    void shouldResetRespondentResponseDeadlineAfterSuccessfulPayment() {
+        LocalDateTime oldDeadline = LocalDateTime.of(2026, Month.MARCH, 30, 16, 0);
+        LocalDateTime expectedDeadline = LocalDateTime.of(2026, Month.APRIL, 20, 16, 0);
+        GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(NO, YES)
+            .copy()
+            .generalAppNotificationDeadlineDate(oldDeadline)
+            .respondentResponseDeadlineChecked(YES)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(false);
+        when(deadlinesCalculator.calculateApplicantResponseDeadlineWithWeekendCheck(any(LocalDateTime.class), anyInt()))
+            .thenReturn(expectedDeadline);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        GeneralApplicationCaseData responseCaseData =
+            objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
+        assertThat(responseCaseData.getGeneralAppNotificationDeadlineDate()).isEqualTo(expectedDeadline);
+        assertThat(responseCaseData.getRespondentResponseDeadlineChecked()).isEqualTo(NO);
     }
 
     @Test

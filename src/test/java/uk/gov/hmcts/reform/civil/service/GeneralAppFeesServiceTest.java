@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -316,6 +316,21 @@ class GeneralAppFeesServiceTest {
 
     @Nested
     class FeeForGA {
+
+        @Test
+        void shouldThrowClearException_whenApplicationTypeIsMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .generalAppType(null)
+                .build();
+
+            IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> generalAppFeesService.getFeeForGA(caseData)
+            );
+
+            assertThat(exception).hasMessage("General application type is required to calculate the fee");
+            verifyNoInteractions(feesApiClient);
+        }
 
         @ParameterizedTest
         @CsvSource({

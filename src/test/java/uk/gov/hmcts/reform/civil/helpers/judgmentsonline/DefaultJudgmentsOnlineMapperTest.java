@@ -57,6 +57,7 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals(JudgmentState.ISSUED, activeJudgment.getState());
         assertEquals("100990", activeJudgment.getOrderedAmount());
         assertEquals("0", activeJudgment.getCosts());
+        assertEquals("0", activeJudgment.getClaimFeeAmount());
         assertEquals("100990", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
         assertEquals(JudgmentRTLStatus.ISSUED.getRtlState(), activeJudgment.getRtlState());
@@ -80,6 +81,7 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals(JudgmentState.REQUESTED, activeJudgment.getState());
         assertEquals("100990", activeJudgment.getOrderedAmount());
         assertEquals("0", activeJudgment.getCosts());
+        assertEquals("0", activeJudgment.getClaimFeeAmount());
         assertEquals("100990", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.NO, activeJudgment.getIsRegisterWithRTL());
         assertEquals(LocalDate.now(), activeJudgment.getIssueDate());
@@ -119,6 +121,7 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals(JudgmentState.ISSUED, activeJudgment.getState());
         assertEquals("100990", activeJudgment.getOrderedAmount());
         assertEquals("0", activeJudgment.getCosts());
+        assertEquals("0", activeJudgment.getClaimFeeAmount());
         assertEquals("100990", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
         assertEquals(LocalDate.now(), activeJudgment.getIssueDate());
@@ -156,6 +159,7 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals(JudgmentState.ISSUED, activeJudgment.getState());
         assertEquals("100990", activeJudgment.getOrderedAmount());
         assertEquals("0", activeJudgment.getCosts());
+        assertEquals("0", activeJudgment.getClaimFeeAmount());
         assertEquals("100990", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
         assertEquals(LocalDate.now(), activeJudgment.getIssueDate());

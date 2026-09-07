@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -11,6 +10,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
@@ -35,7 +36,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION_LIP;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler {
@@ -67,9 +67,13 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     private CallbackResponse applyNoticeOfChangeDecision(CallbackParams callbackParams) {
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
         ChangeOrganisationRequest changeOrganisationRequest = callbackParams.getCaseData().getChangeOrganisationRequestField();
-        if (changeOrganisationRequest == null) {
-            log.info("Change organisation request is null, skipping NoC decision application");
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        if (changeOrganisationRequest == null
+            || changeOrganisationRequest.getCaseRoleId() == null
+            || changeOrganisationRequest.getCaseRoleId().getValue() == null) {
+            throw new CallbackException(
+                "ChangeOrganisationRequest is missing or invalid - NoC decision cannot be applied (case "
+                    + callbackParams.getCaseData().getCcdCaseReference() + ")"
+            );
         }
         // Keep the original CoR payload before NoC decision mutates/nullifies parts of the request.
         CaseData preDecisionData = objectMapper.convertValue(caseDetails.getData(), CaseData.class);
@@ -108,7 +112,9 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
             .setCaseRole(corFieldBeforeDecision.getCaseRoleId().getValue().getCode())
             .setTimestamp(corFieldBeforeDecision.getRequestTimestamp())
             .setFormerRepresentationEmailAddress(
-                getFormerEmail(corFieldBeforeDecision.getCaseRoleId().getValue().getCode(), caseData));
+                getFormerEmail(corFieldBeforeDecision.getCaseRoleId().getValue().getCode(), caseData))
+            .setFormerRepresentationReference(
+                getFormerReference(corFieldBeforeDecision.getCaseRoleId().getValue().getCode(), caseData));
 
         if (corFieldBeforeDecision.getOrganisationToRemove() != null) {
             changeOfRepresentation.setOrganisationToRemoveID(
@@ -191,6 +197,9 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     }
 
     private void clearAddLegalRepDeadlineForRole(CaseData caseData, String caseRole) {
+        if (caseData == null) {
+            throw new CallbackException("No case data returned when applying the NoC decision");
+        }
         if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)) {
             caseData.setAddLegalRepDeadlineRes1(null);
         } else if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(caseRole)) {
@@ -209,6 +218,34 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         }
         if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(caseRole)) {
             return caseData.getRespondentSolicitor2EmailAddress();
+        }
+        return null;
+    }
+
+    /** Captures the reference the outgoing legal representative supplied for themselves.
+     * UpdateCaseDetailsAfterNoCHandler nullifies this reference before the parties are notified,
+     * so it has to be kept here in order to be shown in the email telling them they have come off record.
+     *
+     * @param caseRole the case role being replaced
+     * @param caseData caseData
+     * @return the former representative's own reference, or null when they did not provide one
+     */
+    private String getFormerReference(String caseRole, CaseData caseData) {
+        SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
+        if (CaseRole.APPLICANTSOLICITORONE.getFormattedName().equals(caseRole)) {
+            return Optional.ofNullable(solicitorReferences)
+                .map(SolicitorReferences::getApplicantSolicitor1Reference)
+                .orElse(null);
+        }
+        if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)) {
+            return Optional.ofNullable(solicitorReferences)
+                .map(SolicitorReferences::getRespondentSolicitor1Reference)
+                .orElse(null);
+        }
+        if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(caseRole)) {
+            return Optional.ofNullable(solicitorReferences)
+                .map(SolicitorReferences::getRespondentSolicitor2Reference)
+                .orElseGet(caseData::getRespondentSolicitor2Reference);
         }
         return null;
     }

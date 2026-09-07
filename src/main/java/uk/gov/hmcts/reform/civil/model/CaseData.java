@@ -731,6 +731,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean respondent2HasSameLegalRep() {
+        return getRespondent2() != null && (getRespondent2SameLegalRepresentative() != null
+            && getRespondent2SameLegalRepresentative() == YES);
+    }
+
+    @JsonIgnore
     public boolean respondent1PaidInFull() {
         return respondent1ClaimResponsePaymentAdmissionForSpec
             == RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT;

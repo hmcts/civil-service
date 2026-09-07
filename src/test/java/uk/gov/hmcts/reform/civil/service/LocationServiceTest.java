@@ -21,6 +21,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
@@ -71,7 +72,7 @@ class LocationServiceTest {
             .getCaseDataForWorkAllocation(CaseState.JUDICIAL_REFERRAL, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
                                           respondent2DQ
             );
-        when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any())).thenReturn(new ArrayList<>(List.of()));
+        when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any(), any())).thenReturn(new ArrayList<>(List.of()));
 
         assertThrows(IllegalArgumentException.class, () -> service.getWorkAllocationLocation(caseData, "authToken"));
     }
@@ -82,7 +83,7 @@ class LocationServiceTest {
             .getCaseDataForWorkAllocation(CaseState.JUDICIAL_REFERRAL, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
                                           respondent2DQ
             );
-        when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any())).thenReturn(new ArrayList<>(List.of()));
+        when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any(), any())).thenReturn(new ArrayList<>(List.of()));
 
         assertThrows(IllegalArgumentException.class, () -> service.getWorkAllocationLocation(caseData, "authToken"));
     }
@@ -93,7 +94,7 @@ class LocationServiceTest {
             .getCaseDataForWorkAllocation(CaseState.CASE_DISCONTINUED, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
                                           respondent2DQ).toBuilder()
             .previousCCDState(null).build();
-        when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any())).thenReturn(new ArrayList<>(List.of()));
+        when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any(), any())).thenReturn(new ArrayList<>(List.of()));
 
         assertThrows(IllegalArgumentException.class, () -> service.getWorkAllocationLocation(caseData, "authToken"));
     }
@@ -101,7 +102,7 @@ class LocationServiceTest {
     @Test
     void shouldThrowException_whenApplicationMadeAfterSDOMainCaseCMLNotInCaseData() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any())).thenReturn(new ArrayList<>(List.of()));
+        when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any(), any())).thenReturn(new ArrayList<>(List.of()));
 
         assertThrows(IllegalArgumentException.class, () -> service.getWorkAllocationLocation(caseData, "authToken"));
     }
@@ -112,7 +113,8 @@ class LocationServiceTest {
             .getCaseDataForWorkAllocation(CaseState.CASE_DISCONTINUED, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
                                           respondent2DQ).toBuilder()
             .previousCCDState(null).build();
-        when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any())).thenReturn(getSampleCourLocationsRefObjectPostSdoNotInRefData());
+        when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any(), eq("AAA6")))
+            .thenReturn(getSampleCourLocationsRefObjectPostSdoNotInRefData());
 
         assertEquals(getExpectedGACaseLocation(), service.getWorkAllocationLocation(caseData, "authToken").getLeft());
     }

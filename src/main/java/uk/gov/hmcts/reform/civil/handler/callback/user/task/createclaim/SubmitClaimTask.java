@@ -63,6 +63,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferencesSpec;
 import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
@@ -124,7 +125,7 @@ public class SubmitClaimTask {
         caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         List<LocationRefData> locations = (locationRefDataService
-            .getCourtLocationsByEpimmsId(authorisationToken, epimmsId));
+            .getCourtLocationsByEpimmsId(authorisationToken, epimmsId, getCaseServiceId(caseData.getCaseAccessCategory())));
 
         Optional.ofNullable(locations)
             .orElseGet(Collections::emptyList).stream().findFirst()
@@ -234,7 +235,7 @@ public class SubmitClaimTask {
             flightDelayDetails1.setFlightNumber(flightDelayDetails.getFlightNumber());
             flightDelayDetails1.setScheduledDate(flightDelayDetails.getScheduledDate());
             String selectedAirlineCode = flightDelayDetails.getAirlineList().getValue().getCode();
-            flightDelayDetails1.setFlightCourtLocation(getAirlineCaseLocation(selectedAirlineCode, authorisationToken));
+            flightDelayDetails1.setFlightCourtLocation(getAirlineCaseLocation(selectedAirlineCode, authorisationToken, caseData));
             caseData.setFlightDelayDetails(flightDelayDetails1);
         }
 
@@ -255,6 +256,7 @@ public class SubmitClaimTask {
         UserDetails userDetails = userService.getUserDetails(authToken);
         IdamUserDetails idam = new IdamUserDetails();
         idam.setId(userDetails.getId());
+        idam.setEmail(userDetails.getEmail());
         CorrectEmail applicantSolicitor1CheckEmail = caseData.getApplicantSolicitor1CheckEmail();
 
         if (applicantSolicitor1CheckEmail != null && applicantSolicitor1CheckEmail.isCorrect()) {
@@ -262,7 +264,9 @@ public class SubmitClaimTask {
             caseData.setApplicantSolicitor1UserDetails(idam);
         } else {
             IdamUserDetails applicantSolicitor1UserDetails = caseData.getApplicantSolicitor1UserDetails();
-            idam.setEmail(applicantSolicitor1UserDetails.getEmail());
+            if (applicantSolicitor1UserDetails != null && applicantSolicitor1UserDetails.getEmail() != null) {
+                idam.setEmail(applicantSolicitor1UserDetails.getEmail());
+            }
             caseData.setApplicantSolicitor1UserDetails(idam);
         }
 
@@ -305,12 +309,12 @@ public class SubmitClaimTask {
             .orElse(emptyList());
     }
 
-    private CaseLocationCivil getAirlineCaseLocation(String airline, String authToken) {
+    private CaseLocationCivil getAirlineCaseLocation(String airline, String authToken, CaseData caseData) {
         if (airline.equals("OTHER")) {
             return null;
         }
         String locationEpimmsId = airlineEpimsService.getEpimsIdForAirline(airline);
-        List<LocationRefData> locations = fetchLocationData(authToken);
+        List<LocationRefData> locations = fetchLocationData(authToken, caseData);
         var matchedLocations = locations.stream().filter(loc -> loc.getEpimmsId().equals(locationEpimmsId)).toList();
         if (matchedLocations.isEmpty()) {
             throw new CallbackException(String.format(LOCATION_NOT_FOUND_MESSAGE, locationEpimmsId));
@@ -322,7 +326,8 @@ public class SubmitClaimTask {
         }
     }
 
-    private List<LocationRefData> fetchLocationData(String authToken) {
-        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
+    private List<LocationRefData> fetchLocationData(String authToken, CaseData caseData) {
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken,
+                                                                           getCaseServiceId(caseData.getCaseAccessCategory()));
     }
 }

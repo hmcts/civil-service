@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
+import uk.gov.hmcts.reform.civil.model.docmosis.manualdetermination.ClaimantLipManualDeterminationForm;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
@@ -118,5 +119,31 @@ class ClaimantLipManualDeterminationFormGeneratorTest {
 
         verify(documentManagementService)
                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION, bytes, LIP_MANUAL_DETERMINATION));
+    }
+
+    @Test
+    void shouldConvertRegularPaymentAmountFromPenniesInTemplateData() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .legacyCaseReference(REFERENCE_NUMBER)
+            .issueDate(LocalDate.now())
+            .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
+            .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.valueOf(12345))
+            .totalClaimAmount(BigDecimal.valueOf(1000))
+            .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(PaymentFrequencyClaimantResponseLRspec.ONCE_ONE_MONTH)
+            .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate.now())
+            .build();
+
+        ClaimantLipManualDeterminationForm templateData = generator.getTemplateData(caseData);
+
+        assertThat(templateData.getRegularPaymentAmount()).isEqualByComparingTo("123.45");
+    }
+
+    @Test
+    void shouldLeaveRegularPaymentAmountNull_whenNoInstallmentAmountProvided() {
+        CaseData caseData = CaseData.builder().build();
+
+        ClaimantLipManualDeterminationForm templateData = generator.getTemplateData(caseData);
+
+        assertThat(templateData.getRegularPaymentAmount()).isNull();
     }
 }

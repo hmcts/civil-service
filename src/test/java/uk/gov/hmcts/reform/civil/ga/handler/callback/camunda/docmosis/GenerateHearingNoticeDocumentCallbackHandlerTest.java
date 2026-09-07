@@ -34,7 +34,6 @@ import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
@@ -53,8 +52,6 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest
 
     @Spy private AssignCategoryId assignCategoryId = new AssignCategoryId();
 
-    @Mock private FeatureToggleService featureToggleService;
-
     @Test
     void shouldReturnCorrectActivityId_whenRequested() {
         assertThat(handler.camundaActivityId(new CallbackParams()))
@@ -62,13 +59,12 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest
     }
 
     @Test
-    void shouldGenerateHearingNoticeDocument_whenAndWelseToggleEnabledAboutToSubmitEventIsCalled() {
+    void shouldGenerateHearingNoticeDocumentForBilingualApplication_whenAboutToSubmitEventIsCalled() {
         CaseDocument caseDocument =
                 new CaseDocument().setDocumentLink(new Document().setDocumentUrl("doc"));
 
         when(hearingFormGenerator.generate(any(), any())).thenReturn(caseDocument);
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData =
                 GeneralApplicationCaseDataBuilder.builder()
                         .generalOrderApplication()
@@ -92,7 +88,6 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest
 
         when(hearingFormGenerator.generate(any(), any())).thenReturn(caseDocument);
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
         GeneralApplicationCaseData caseData =
                 GeneralApplicationCaseDataBuilder.builder().generalOrderApplication().build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -140,7 +135,6 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest
         when(hearingFormGenerator.generate(any(), any())).thenReturn(caseDocument);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(true);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
         when(hearingFormGenerator.generate(any(), any(), any(), any())).thenReturn(caseDocument);
 
         GeneralApplicationCaseData caseData =
@@ -170,7 +164,6 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest
         when(hearingFormGenerator.generate(any(), any())).thenReturn(caseDocument);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(true);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
 
         GeneralApplicationCaseData caseData =
                 GeneralApplicationCaseDataBuilder.builder()

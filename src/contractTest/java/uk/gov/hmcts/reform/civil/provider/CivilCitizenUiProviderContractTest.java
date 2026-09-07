@@ -24,16 +24,29 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.controllers.cases.CasesController;
+import uk.gov.hmcts.reform.civil.controllers.fees.FeesController;
 import uk.gov.hmcts.reform.civil.controllers.fees.FeesPaymentController;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.ga.service.GaFeesPaymentService;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
+import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeesPaymentService;
+import uk.gov.hmcts.reform.civil.service.FeesService;
+import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
+import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
+import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
+import uk.gov.hmcts.reform.civil.service.user.UserInformationService;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.Map;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -48,6 +61,7 @@ class CivilCitizenUiProviderContractTest {
     private static final String AUTH_HEADER = "Bearer some-access-token";
     private static final String CASE_REFERENCE = "1234567890123456";
     private static final String PAYMENT_REFERENCE = "RC-1701-0909-0602-0418";
+    private static final String CUI_CASE_REFERENCE = "1111222233334444";
 
     private MockMvc mockMvc;
 
@@ -55,6 +69,16 @@ class CivilCitizenUiProviderContractTest {
     private FeesPaymentService feesPaymentService;
     @Mock
     private GaFeesPaymentService gaFeesPaymentService;
+    @Mock
+    private FeesService feesService;
+    @Mock
+    private GeneralAppFeesService generalAppFeesService;
+    @Mock
+    private CoreCaseDataService coreCaseDataService;
+    @Mock
+    private CaseEventService caseEventService;
+    @Mock
+    private UserInformationService userInformationService;
     private AutoCloseable mocks;
 
     @PactBrokerConsumerVersionSelectors
@@ -72,9 +96,21 @@ class CivilCitizenUiProviderContractTest {
             System.setProperty("pactbroker.url", brokerUrl);
         }
         mocks = MockitoAnnotations.openMocks(this);
-        FeesPaymentController controller = new FeesPaymentController(feesPaymentService, gaFeesPaymentService);
+        FeesPaymentController paymentController = new FeesPaymentController(feesPaymentService, gaFeesPaymentService);
+        FeesController feesController = new FeesController(
+            feesService, generalAppFeesService, mock(uk.gov.hmcts.reform.civil.utils.InterestCalculator.class));
+        CasesController casesController = new CasesController(
+            mock(uk.gov.hmcts.reform.civil.service.RoleAssignmentsService.class), coreCaseDataService,
+            mock(uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService.class),
+            mock(uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService.class), caseEventService,
+            mock(uk.gov.hmcts.reform.civil.ga.service.events.GaCaseEventService.class),
+            mock(uk.gov.hmcts.reform.civil.service.search.CaseSdtRequestSearchService.class),
+            mock(uk.gov.hmcts.reform.civil.service.bulkclaims.CaseworkerCaseEventService.class),
+            mock(uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService.class),
+            mock(uk.gov.hmcts.reform.civil.validation.PostcodeValidator.class), userInformationService,
+            mock(uk.gov.hmcts.reform.civil.service.citizen.repaymentplan.RepaymentPlanDecisionService.class));
         MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter(buildObjectMapper());
-        mockMvc = MockMvcBuilders.standaloneSetup(controller)
+        mockMvc = MockMvcBuilders.standaloneSetup(paymentController, feesController, casesController)
             .setMessageConverters(messageConverter)
             .alwaysDo(result -> result.getResponse().setContentType(APPLICATION_JSON_VALUE))
             .build();
@@ -162,6 +198,31 @@ class CivilCitizenUiProviderContractTest {
                 .setPaymentFor("claimissued")
                 .setPaymentAmount(new BigDecimal("200"))
         );
+    }
+
+    @State("A claim issue fee is available for a claim amount of 1000")
+    void claimIssueFeeExists() {
+        when(feesService.getFeeDataByTotalClaimAmount(new BigDecimal("1000")))
+            .thenReturn(new Fee(new BigDecimal("11500"), "FEE0209", "1"));
+    }
+
+    @State("Draft case 1111222233334444 can be submitted by the CUI user")
+    void draftCaseCanBeSubmitted() {
+        EventSubmissionParams expected = new EventSubmissionParams()
+            .setAuthorisation(AUTH_HEADER)
+            .setCaseId(CUI_CASE_REFERENCE)
+            .setUserId("cui-user-id")
+            .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+            .setUpdates(Map.of());
+        when(caseEventService.submitEvent(expected)).thenReturn(contractCase());
+    }
+
+    private CaseDetails contractCase() {
+        return CaseDetails.builder()
+            .id(Long.valueOf(CUI_CASE_REFERENCE))
+            .state("PENDING_CASE_ISSUED")
+            .data(Map.of("legacyCaseReference", "000MC001"))
+            .build();
     }
 
     private ObjectMapper buildObjectMapper() {

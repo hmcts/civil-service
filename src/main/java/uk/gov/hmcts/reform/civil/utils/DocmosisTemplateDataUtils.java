@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -24,6 +25,7 @@ public class DocmosisTemplateDataUtils {
 
     public static final int CASE_NAME_LENGTH_TO_FIT_IN_DOCS = 37;
     public static final String REFERENCE_NOT_PROVIDED = "Not Provided";
+    public static final String RESPONDENT2_DOCUMENT_GENERATION_USER = "userRespondent2";
     //TODO Need to confirm the case name logic
     public static final Function<CaseData, String> toCaseName = caseData -> {
         String caseName = fetchApplicantName(caseData) + " vs " + fetchRespondentName(caseData);
@@ -111,9 +113,7 @@ public class DocmosisTemplateDataUtils {
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            //case where respondent 2 acknowledges first
-            if ((caseData.getRespondent1AcknowledgeNotificationDate() == null)
-                && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
+            if (isRespondent2Acknowledgement(caseData)) {
                 if (null == caseData.getRespondentSolicitor2Reference()) {
                     return new SolicitorReferences()
                         .setRespondentSolicitor2Reference(REFERENCE_NOT_PROVIDED)
@@ -124,42 +124,10 @@ public class DocmosisTemplateDataUtils {
                 }
                 return new SolicitorReferences()
                     .setRespondentSolicitor2Reference(caseData.getRespondentSolicitor2Reference())
-                    .setApplicantSolicitor1Reference(
-                        ofNullable(caseData.getSolicitorReferences())
-                            .map(SolicitorReferences::getApplicantSolicitor1Reference)
-                            .orElse(REFERENCE_NOT_PROVIDED));
-
-            } else if ((caseData.getRespondent1AcknowledgeNotificationDate() != null)//case where both respondents acklg
-                && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
-                //case where resp 1 acknowledges first
-                if (caseData.getRespondent2AcknowledgeNotificationDate()
-                    .isAfter(caseData.getRespondent1AcknowledgeNotificationDate())) {
-                    if (null == caseData.getRespondentSolicitor2Reference()) {
-                        return new SolicitorReferences()
-                            .setRespondentSolicitor2Reference(REFERENCE_NOT_PROVIDED)
-                            .setApplicantSolicitor1Reference(
-                                ofNullable(caseData.getSolicitorReferences())
-                                    .map(SolicitorReferences::getApplicantSolicitor1Reference)
-                                    .orElse(REFERENCE_NOT_PROVIDED));
-                    }
-                    return new SolicitorReferences()
-                        .setRespondentSolicitor2Reference(caseData.getRespondentSolicitor2Reference())
                         .setApplicantSolicitor1Reference(
                             ofNullable(caseData.getSolicitorReferences())
                                 .map(SolicitorReferences::getApplicantSolicitor1Reference)
                                 .orElse(REFERENCE_NOT_PROVIDED));
-
-                } else { //case where resp 2 acknowledges first
-                    return new SolicitorReferences()
-                        .setRespondentSolicitor1Reference(
-                            ofNullable(caseData.getSolicitorReferences())
-                                .map(SolicitorReferences::getRespondentSolicitor1Reference)
-                                .orElse(REFERENCE_NOT_PROVIDED))
-                        .setApplicantSolicitor1Reference(
-                            ofNullable(caseData.getSolicitorReferences())
-                                .map(SolicitorReferences::getApplicantSolicitor1Reference)
-                                .orElse(REFERENCE_NOT_PROVIDED));
-                }
             } else { //case where respondent 1 acknowledges first
                 return new SolicitorReferences()
                     .setRespondentSolicitor1Reference(
@@ -190,41 +158,57 @@ public class DocmosisTemplateDataUtils {
 
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
-                if ((caseData.getRespondent1AcknowledgeNotificationDate() == null)
-                    && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
-                    //case where respondent 2 acknowledges first
-                    responseIntentions.add(caseData.getRespondent2ClaimResponseIntentionType().getLabel());
-                } else if ((caseData.getRespondent1AcknowledgeNotificationDate() != null)
-                    && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
-                    if (caseData.getRespondent2AcknowledgeNotificationDate()
-                        .isAfter(caseData.getRespondent1AcknowledgeNotificationDate())) {
-                        //case where respondent 2 acknowledges 2nd
-                        responseIntentions.add(caseData.getRespondent2ClaimResponseIntentionType().getLabel());
-                    } else {
-                        //case where respondent 1 acknowledges 2nd
-                        responseIntentions.add(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
-                    }
-                } else { //case where respondent 1 acknowledges first
-                    responseIntentions.add(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
-                }
+                responseIntentions.add(isRespondent2Acknowledgement(caseData)
+                                           ? labelOrEmpty(ofNullable(caseData.getRespondent2ClaimResponseIntentionType())
+                                                              .orElse(caseData.getRespondent1ClaimResponseIntentionType()))
+                                           : labelOrEmpty(caseData.getRespondent1ClaimResponseIntentionType()));
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
                 responseIntentions.add("Defendant 1 :"
-                                           + caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+                                           + labelOrEmpty(caseData.getRespondent1ClaimResponseIntentionType()));
                 responseIntentions.add("Defendant 2 :"
-                                           + caseData.getRespondent2ClaimResponseIntentionType().getLabel());
+                                           + labelOrEmpty(caseData.getRespondent2ClaimResponseIntentionType()));
                 break;
             case TWO_V_ONE:
                 responseIntentions.add("Against Claimant 1: "
-                                           + caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+                                           + labelOrEmpty(caseData.getRespondent1ClaimResponseIntentionType()));
                 responseIntentions.add("Against Claimant 2: "
-                                           + caseData.getRespondent1ClaimResponseIntentionTypeApplicant2().getLabel());
+                                           + labelOrEmpty(caseData.getRespondent1ClaimResponseIntentionTypeApplicant2()));
                 break;
             default:
-                responseIntentions.add(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+                responseIntentions.add(labelOrEmpty(caseData.getRespondent1ClaimResponseIntentionType()));
                 return responseIntentions;
         }
         return responseIntentions;
+    }
+
+    private static String labelOrEmpty(ResponseIntention responseIntention) {
+        return ofNullable(responseIntention)
+            .map(ResponseIntention::getLabel)
+            .orElse("");
+    }
+
+    public static boolean isRespondent2Acknowledgement(CaseData caseData) {
+        if (RESPONDENT2_DOCUMENT_GENERATION_USER.equals(caseData.getRespondent2DocumentGeneration())) {
+            return true;
+        }
+
+        if (getMultiPartyScenario(caseData) != ONE_V_TWO_TWO_LEGAL_REP) {
+            return false;
+        }
+
+        if (caseData.getRespondent1AcknowledgeNotificationDate() == null
+            && caseData.getRespondent2AcknowledgeNotificationDate() != null) {
+            return true;
+        }
+
+        if (caseData.getRespondent1AcknowledgeNotificationDate() != null
+            && caseData.getRespondent2AcknowledgeNotificationDate() != null) {
+            return caseData.getRespondent2AcknowledgeNotificationDate()
+                .isAfter(caseData.getRespondent1AcknowledgeNotificationDate());
+        }
+
+        return false;
     }
 
     public static String formatCcdCaseReference(CaseData caseData) {

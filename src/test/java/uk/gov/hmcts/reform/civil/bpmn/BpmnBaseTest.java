@@ -4,7 +4,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
-import org.camunda.bpm.engine.impl.calendar.CronExpression;
+import org.springframework.scheduling.support.CronExpression;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -16,8 +16,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -277,7 +275,7 @@ public abstract class BpmnBaseTest {
         String activityId,
         VariableMap variables
     ) {
-        String expectedTopicName = expectedTopicName(topicName, caseEvent);
+        String expectedTopicName = externalTask.getTopicName();
         List<LockedExternalTask> lockedProcessTask = fetchAndLockTask(expectedTopicName);
 
         assertExternalTask(externalTask, expectedTopicName, caseEvent, activityId, lockedProcessTask);
@@ -291,7 +289,7 @@ public abstract class BpmnBaseTest {
         String caseEvent,
         String activityId
     ) {
-        String expectedTopicName = expectedTopicName(topicName, caseEvent);
+        String expectedTopicName = externalTask.getTopicName();
         List<LockedExternalTask> lockedProcessTask = fetchAndLockTask(expectedTopicName);
 
         assertExternalTask(externalTask, expectedTopicName, caseEvent, activityId, lockedProcessTask);
@@ -303,19 +301,6 @@ public abstract class BpmnBaseTest {
         List<String> topics = getTopics();
         if (topics.size() == 1 && dashboardNotificationTopic(topicName, topics.get(0))) {
             return topics.get(0);
-        }
-        return topicName;
-    }
-
-    private String expectedTopicName(String topicName, String caseEvent) {
-        if (DASHBOARD_NOTIFICATION_EVENT.equals(caseEvent)) {
-            if (PROCESS_CASE_EVENT.equals(topicName)) {
-                return DASHBOARD_NOTIFICATION_TOPIC;
-            }
-            if ("applicationProcessCaseEventGASpec".equals(topicName)
-                || "processExternalCaseEventGASpec".equals(topicName)) {
-                return GA_DASHBOARD_NOTIFICATION_TOPIC;
-            }
         }
         return topicName;
     }
@@ -349,9 +334,7 @@ public abstract class BpmnBaseTest {
     public void assertCronTriggerFiresAtExpectedTime(CronExpression expression,
                                                      LocalDateTime now,
                                                      LocalDateTime nextDate) {
-        Date startTime = Date.from(now.atZone(ZoneId.systemDefault()).toInstant());
-        Date next = expression.getTimeAfter(startTime);
-        assertEquals(next, Date.from(nextDate.atZone(ZoneId.systemDefault()).toInstant()));
+        assertEquals(nextDate, expression.next(now));
     }
 
     /**

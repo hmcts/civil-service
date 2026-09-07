@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDe
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
@@ -42,6 +43,7 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements.LANGUAGE_INTERPRETER;
 import static uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements.OTHER_SUPPORT;
 import static uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements.SIGN_INTERPRETER;
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.nowInLocalZone;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.GENERAL_APPLICATION_DRAFT;
 
 @Slf4j
@@ -221,7 +223,9 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
             return YesOrNo.YES;
         }
 
-        return caseData.getGeneralAppInformOtherParty().getIsWithNotice();
+        return Optional.ofNullable(caseData.getGeneralAppInformOtherParty())
+            .map(GAInformOtherParty::getIsWithNotice)
+            .orElse(null);
     }
 
     private Boolean validateCasePastDueDate(GeneralApplicationCaseData caseData) {
@@ -379,7 +383,7 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
 
     private String getFileName(DocmosisTemplates docmosisTemplate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return String.format(docmosisTemplate.getDocumentTitle(), LocalDateTime.now().format(formatter));
+        return String.format(docmosisTemplate.getDocumentTitle(), nowInLocalZone().format(formatter));
     }
 
     private DocmosisTemplates getDocmosisTemplate() {

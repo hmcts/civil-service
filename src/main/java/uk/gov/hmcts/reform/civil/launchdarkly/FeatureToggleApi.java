@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.launchdarkly;
 
-import com.launchdarkly.sdk.LDUser;
+import com.launchdarkly.sdk.ContextBuilder;
+import com.launchdarkly.sdk.LDContext;
+import com.launchdarkly.sdk.LDValue;
 import com.launchdarkly.sdk.server.interfaces.LDClientInterface;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,25 +26,25 @@ public class FeatureToggleApi {
     }
 
     public boolean isFeatureEnabled(String feature) {
-        return internalClient.boolVariation(feature, createLDUser().build(), false);
+        return internalClient.boolVariation(feature, createLDContext().build(), false);
     }
 
     public boolean isFeatureEnabled(String feature, boolean defaultValue) {
-        return internalClient.boolVariation(feature, createLDUser().build(), defaultValue);
+        return internalClient.boolVariation(feature, createLDContext().build(), defaultValue);
     }
 
-    public boolean isFeatureEnabled(String feature, LDUser user) {
-        return internalClient.boolVariation(feature, user, false);
+    public boolean isFeatureEnabled(String feature, LDContext context) {
+        return internalClient.boolVariation(feature, context, false);
     }
 
-    public boolean isFeatureEnabled(String feature, LDUser user, boolean defaultValue) {
-        return internalClient.boolVariation(feature, user, defaultValue);
+    public boolean isFeatureEnabled(String feature, LDContext context, boolean defaultValue) {
+        return internalClient.boolVariation(feature, context, defaultValue);
     }
 
-    public LDUser.Builder createLDUser() {
-        return new LDUser.Builder("civil-service")
-            .custom("timestamp", String.valueOf(System.currentTimeMillis()))
-            .custom("environment", environment);
+    public ContextBuilder createLDContext() {
+        return LDContext.builder("civil-service")
+            .set("timestamp", String.valueOf(System.currentTimeMillis()))
+            .set("environment", environment);
     }
 
     private void close() {
@@ -54,10 +56,14 @@ public class FeatureToggleApi {
     }
 
     public boolean isFeatureEnabledForLocation(String feature, String location, boolean defaultValue) {
-        return internalClient.boolVariation(feature, createLDUser().custom("location", location).build(), defaultValue);
+        return internalClient.boolVariation(feature, createLDContext().set("location", location).build(), defaultValue);
     }
 
     public boolean isFeatureEnabledForDate(String feature, Long date, boolean defaultValue) {
-        return internalClient.boolVariation(feature, createLDUser().custom("timestamp", date).build(), defaultValue);
+        return internalClient.boolVariation(
+            feature,
+            createLDContext().set("timestamp", LDValue.of(date)).build(),
+            defaultValue
+        );
     }
 }

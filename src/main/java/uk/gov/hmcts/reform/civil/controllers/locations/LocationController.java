@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -40,8 +41,9 @@ public class LocationController {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized")})
     public ResponseEntity<List<DynamicListElement>> getCourtLocations(
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+        @RequestParam(defaultValue = "AAA6") String serviceId) {
         return new ResponseEntity<>(courtLocationUtils.getLocationsFromList(
-            locationRefDataService.getCourtLocationsForDefaultJudgments(authorization)).getListItems(), HttpStatus.OK);
+            locationRefDataService.getCourtLocationsForDefaultJudgments(authorization, serviceId)).getListItems(), HttpStatus.OK);
     }
 }

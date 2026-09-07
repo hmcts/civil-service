@@ -93,7 +93,7 @@ class UpdateGaLocationCallbackHandlerTest extends GeneralApplicationBaseCallback
                             .data(getParentCaseDataAfterUpdateFromCivilService(NO, YES))
                             .id(1645779506193000L)
                             .build();
-            when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any()))
+            when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any(), any()))
                     .thenReturn(getSampleCourLocationsRefObject());
             when(coreCaseDataService.getCase(PARENT_CCD_REF)).thenReturn(parentCaseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(parentCaseDetails))
@@ -153,7 +153,7 @@ class UpdateGaLocationCallbackHandlerTest extends GeneralApplicationBaseCallback
                             .data(getParentCaseDataAfterUpdateFromCivilService(NO, YES))
                             .id(1645779506193000L)
                             .build();
-            when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any()))
+            when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any(), any()))
                     .thenReturn(getSampleCourLocationsRefObject());
             when(coreCaseDataService.getCase(PARENT_CCD_REF)).thenReturn(parentCaseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(parentCaseDetails))

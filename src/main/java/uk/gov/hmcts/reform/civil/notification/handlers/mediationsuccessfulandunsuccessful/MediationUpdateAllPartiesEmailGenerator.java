@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulanduns
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmdisabled.CarmDisabledClaimantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmdisabled.CarmDisabledDefendantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmdisabled.CarmDisabledRespSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmdisabled.CarmDisabledRespSolTwoEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmenabled.CarmAppSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmenabled.CarmClaimantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmenabled.CarmDefendantEmailDTOGenerator;
@@ -34,6 +35,7 @@ public class MediationUpdateAllPartiesEmailGenerator implements PartiesEmailGene
 
     private final CarmDisabledAppSolOneEmailDTOGenerator carmDisabledAppSolOneEmailDTOGenerator;
     private final CarmDisabledRespSolOneEmailDTOGenerator carmDisabledRespSolOneEmailDTOGenerator;
+    private final CarmDisabledRespSolTwoEmailDTOGenerator carmDisabledRespSolTwoEmailDTOGenerator;
     private final CarmDisabledClaimantEmailDTOGenerator carmDisabledClaimantEmailDTOGenerator;
     private final CarmDisabledDefendantEmailDTOGenerator carmDisabledDefendantEmailDTOGenerator;
 
@@ -51,6 +53,7 @@ public class MediationUpdateAllPartiesEmailGenerator implements PartiesEmailGene
         } else {
             addIfPartyNeedsNotification(caseData, carmDisabledAppSolOneEmailDTOGenerator, partiesToEmail, taskId);
             addIfPartyNeedsNotification(caseData, carmDisabledRespSolOneEmailDTOGenerator, partiesToEmail, taskId);
+            addIfPartyNeedsNotification(caseData, carmDisabledRespSolTwoEmailDTOGenerator, partiesToEmail, taskId);
             addIfPartyNeedsNotification(caseData, carmDisabledClaimantEmailDTOGenerator, partiesToEmail, taskId);
             addIfPartyNeedsNotification(caseData, carmDisabledDefendantEmailDTOGenerator, partiesToEmail, taskId);
         }

@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.crd.model.Category;
+import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -17,8 +20,6 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
-import uk.gov.hmcts.reform.civil.crd.model.Category;
-import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -66,7 +67,7 @@ class SdoHearingPreparationServiceTest {
         requestedCourt.setCaseLocation(new CaseLocationCivil().setBaseLocation("NEW"));
         when(locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData))
             .thenReturn(Optional.of(requestedCourt));
-        when(sdoLocationService.fetchCourtLocationsByEpimmsId(AUTH, "NEW"))
+        when(sdoLocationService.fetchCourtLocationsByEpimmsId(AUTH, "NEW", "AAA6"))
             .thenReturn(List.of(locationRefData()));
 
         Optional<RequestedCourt> result = service.updateCaseManagementLocationIfLegalAdvisorSdo(caseData, AUTH);
@@ -86,7 +87,7 @@ class SdoHearingPreparationServiceTest {
         requestedCourt.setCaseLocation(new CaseLocationCivil().setBaseLocation("NEW"));
         when(locationHelper.getCaseManagementLocationWhenLegalAdvisorSdo(caseData))
             .thenReturn(Optional.of(requestedCourt));
-        when(sdoLocationService.fetchCourtLocationsByEpimmsId(AUTH, "NEW"))
+        when(sdoLocationService.fetchCourtLocationsByEpimmsId(AUTH, "NEW", "AAA6"))
             .thenReturn(null);
 
         Optional<RequestedCourt> result = service.updateCaseManagementLocationIfLegalAdvisorSdo(caseData, AUTH);
@@ -111,6 +112,20 @@ class SdoHearingPreparationServiceTest {
 
     @Test
     void shouldReturnFilteredHearingMethodList() {
+        CategorySearchResult searchResult = getCategorySearchResult();
+        when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), anyString(), anyString()))
+            .thenReturn(Optional.of(searchResult));
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        DynamicList list = service.getDynamicHearingMethodList(callbackParams(), caseData);
+
+        assertThat(list.getListItems())
+            .extracting(DynamicListElement::getLabel)
+            .containsExactly(HearingMethod.IN_PERSON.getLabel(), HearingMethod.TELEPHONE.getLabel());
+    }
+
+    private static @NonNull CategorySearchResult getCategorySearchResult() {
         Category inPerson = new Category();
         inPerson.setCategoryKey("HearingChannel");
         inPerson.setKey("INTER");
@@ -128,16 +143,7 @@ class SdoHearingPreparationServiceTest {
         notInAttendance.setActiveFlag("Y");
         CategorySearchResult searchResult = new CategorySearchResult();
         searchResult.setCategories(List.of(inPerson, telephone, notInAttendance));
-        when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), anyString(), anyString()))
-            .thenReturn(Optional.of(searchResult));
-
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
-        DynamicList list = service.getDynamicHearingMethodList(callbackParams(), caseData);
-
-        assertThat(list.getListItems())
-            .extracting(DynamicListElement::getLabel)
-            .containsExactly(HearingMethod.IN_PERSON.getLabel(), HearingMethod.TELEPHONE.getLabel());
+        return searchResult;
     }
 
     @Test
@@ -172,7 +178,7 @@ class SdoHearingPreparationServiceTest {
         LocationRefData locationRefData = new LocationRefData();
         locationRefData.setEpimmsId("123");
         locationRefData.setSiteName("Site");
-        when(sdoLocationService.fetchHearingLocations(AUTH)).thenReturn(List.of(locationRefData));
+        when(sdoLocationService.fetchHearingLocations(AUTH, "AAA7")).thenReturn(List.of(locationRefData));
         when(sdoLocationService.buildLocationList(any(), anyBoolean(), anyList())).thenReturn(locationList);
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -180,7 +186,7 @@ class SdoHearingPreparationServiceTest {
 
         assertThat(refs).hasSize(1);
         assertThat(caseData.getDisposalHearingMethodInPerson()).isEqualTo(locationList);
-        verify(sdoLocationService).fetchHearingLocations(AUTH);
+        verify(sdoLocationService).fetchHearingLocations(AUTH, "AAA7");
     }
 
     private CallbackParams callbackParams() {

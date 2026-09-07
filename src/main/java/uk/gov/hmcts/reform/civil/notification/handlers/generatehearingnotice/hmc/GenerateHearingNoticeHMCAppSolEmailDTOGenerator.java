@@ -62,10 +62,17 @@ public class GenerateHearingNoticeHMCAppSolEmailDTOGenerator extends AppSolOneEm
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        Fee fee = calculateAndApplyFee(hearingFeesService, caseData, caseData.getAssignedTrack());
+        String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
         LocalDateTime hearingStartDateTime = camundaService
-                .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingStartDateTime();
+                .getProcessVariables(processInstanceId).getHearingStartDateTime();
 
+        if (hearingStartDateTime == null) {
+            throw new IllegalStateException(
+                "Missing hearingStartDateTime process variable for process instance " + processInstanceId
+            );
+        }
+
+        Fee fee = calculateAndApplyFee(hearingFeesService, caseData, caseData.getAssignedTrack());
         LocalDate hearingDate = hearingStartDateTime.toLocalDate();
         LocalTime hearingTime = hearingStartDateTime.toLocalTime();
 

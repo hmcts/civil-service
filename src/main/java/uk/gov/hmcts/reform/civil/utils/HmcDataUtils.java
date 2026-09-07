@@ -212,7 +212,7 @@ public class HmcDataUtils {
      *              "30 June 2023 at 14:00 for 2 hours"
      */
     public static String getHearingDaysText(HearingGetResponse hearing, Boolean inWelsh) {
-        return org.apache.commons.lang.StringUtils.join(getHearingDaysTextList(hearing, inWelsh), "\n");
+        return org.apache.commons.lang3.StringUtils.join(getHearingDaysTextList(hearing, inWelsh), "\n");
     }
 
     /**
@@ -406,7 +406,7 @@ public class HmcDataUtils {
     }
 
     private static String concatenateNames(List<String> names) {
-        return nonNull(names) && !names.isEmpty() ? org.apache.commons.lang.StringUtils.join(names, "\n") : null;
+        return nonNull(names) && !names.isEmpty() ? org.apache.commons.lang3.StringUtils.join(names, "\n") : null;
     }
 
     public static String getInPersonAttendeeNames(HearingGetResponse hearing) {
@@ -435,8 +435,9 @@ public class HmcDataUtils {
 
     @Nullable
     public static LocationRefData getLocationRefData(String hearingId, String venueId,
-                                                     String bearerToken, LocationReferenceDataService locationRefDataService) {
-        List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(bearerToken);
+                                                     String bearerToken, String serviceId,
+                                                     LocationReferenceDataService locationRefDataService) {
+        List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(bearerToken, serviceId);
         var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(venueId)).toList();
         if (!matchedLocations.isEmpty()) {
             return matchedLocations.getFirst();

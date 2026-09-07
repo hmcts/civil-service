@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.utils;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeMakeAnOrderOption;

@@ -25,6 +25,7 @@
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0hc82e2</bpmn:incoming>
       <bpmn:incoming>Flow_0mzdxwg</bpmn:incoming>
+      <bpmn:incoming>Flow_DIVERGENT_GENERATE_DQ</bpmn:incoming>
       <bpmn:outgoing>Flow_0ucxas6</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:callActivity id="Activity_0gt1863" name="Start Business Process" calledElement="StartBusinessProcess">
@@ -49,6 +50,7 @@
       <bpmn:incoming>Flow_19mft34</bpmn:incoming>
       <bpmn:outgoing>Flow_FULL_DEFENCE_NOT_PROCEED</bpmn:outgoing>
       <bpmn:outgoing>Flow_FULL_DEFENCE_PROCEED</bpmn:outgoing>
+      <bpmn:outgoing>Flow_FULL_DEFENCE_PROCEED_OFFLINE</bpmn:outgoing>
       <bpmn:outgoing>Flow_1sqruq3</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_FULL_DEFENCE_NOT_PROCEED" name="Applicant confirms not to proceed" sourceRef="Gateway_PROCEED_OR_NOT_PROCEED" targetRef="ProceedOfflineForResponseToDefence">
@@ -57,6 +59,19 @@
     <bpmn:sequenceFlow id="Flow_FULL_DEFENCE_PROCEED" name="Applicant confirms to proceed" sourceRef="Gateway_PROCEED_OR_NOT_PROCEED" targetRef="JudicialReferral">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.FULL_DEFENCE_PROCEED" &amp;&amp; empty flowFlags.IS_MULTI_TRACK &amp;&amp; !empty flowFlags.SDO_ENABLED &amp;&amp; flowFlags.SDO_ENABLED}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_FULL_DEFENCE_PROCEED_OFFLINE" name="Divergent claimant response, claim taken offline" sourceRef="Gateway_PROCEED_OR_NOT_PROCEED" targetRef="ProceedOfflineForDivergentResponseToDefence">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.FULL_DEFENCE_PROCEED" &amp;&amp; empty flowFlags.IS_MULTI_TRACK &amp;&amp; (empty flowFlags.SDO_ENABLED || !flowFlags.SDO_ENABLED)}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="ProceedOfflineForDivergentResponseToDefence" name="Proceed offline (Divergent response to defence)" camunda:type="external" camunda:topic="processCaseEvent">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="caseEvent">PROCEEDS_IN_HERITAGE_SYSTEM</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_FULL_DEFENCE_PROCEED_OFFLINE</bpmn:incoming>
+      <bpmn:outgoing>Flow_0divga1</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0divga1" sourceRef="ProceedOfflineForDivergentResponseToDefence" targetRef="UpdateGeneralApplicationStatus" />
     <bpmn:serviceTask id="ProceedOfflineForResponseToDefence" name="Proceed offline (Response to defence)" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -82,7 +97,7 @@
           <camunda:inputParameter name="caseEvent">NOTIFY_EVENT</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_16dgwpu</bpmn:incoming>
+      <bpmn:incoming>Flow_NOT_PROCEED_NOTIFY</bpmn:incoming>
       <bpmn:outgoing>Flow_1gnykhx</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="JudicialReferral" name="Proceed to judicial referral (Response to defence)" camunda:type="external" camunda:topic="processCaseEvent">
@@ -113,6 +128,7 @@
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1okhsp4</bpmn:incoming>
+      <bpmn:incoming>Flow_0divga1</bpmn:incoming>
       <bpmn:outgoing>Flow_0pl9ize</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="UpdateClaimWithApplicationStatus" name="Update Claim with General Application Status" camunda:type="external" camunda:topic="processCaseEvent">
@@ -125,7 +141,16 @@
       <bpmn:outgoing>Flow_16dgwpu</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_0pl9ize" sourceRef="UpdateGeneralApplicationStatus" targetRef="UpdateClaimWithApplicationStatus" />
-    <bpmn:sequenceFlow id="Flow_16dgwpu" sourceRef="UpdateClaimWithApplicationStatus" targetRef="ClaimantResponseConfirmsNotToProceedNotify" />
+    <bpmn:sequenceFlow id="Flow_16dgwpu" sourceRef="UpdateClaimWithApplicationStatus" targetRef="Gateway_OFFLINE_NOTIFY" />
+    <bpmn:exclusiveGateway id="Gateway_OFFLINE_NOTIFY" default="Flow_DIVERGENT_GENERATE_DQ">
+      <bpmn:incoming>Flow_16dgwpu</bpmn:incoming>
+      <bpmn:outgoing>Flow_NOT_PROCEED_NOTIFY</bpmn:outgoing>
+      <bpmn:outgoing>Flow_DIVERGENT_GENERATE_DQ</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_NOT_PROCEED_NOTIFY" name="Applicant confirms not to proceed" sourceRef="Gateway_OFFLINE_NOTIFY" targetRef="ClaimantResponseConfirmsNotToProceedNotify">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.FULL_DEFENCE_NOT_PROCEED"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_DIVERGENT_GENERATE_DQ" name="Divergent claimant response" sourceRef="Gateway_OFFLINE_NOTIFY" targetRef="ClaimantResponseGenerateDirectionsQuestionnaire" />
     <bpmn:sequenceFlow id="Flow_1v0mmcy" sourceRef="JudicialReferral" targetRef="TriggerAndUpdateGenAppLocation" />
     <bpmn:serviceTask id="TriggerAndUpdateGenAppLocation" name="Trigger and Update General Application Location" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
@@ -145,16 +170,21 @@
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1w9msw7</bpmn:incoming>
       <bpmn:incoming>Flow_1gnykhx</bpmn:incoming>
+      <bpmn:incoming>Flow_DIVERGENT_RPA_OFFLINE</bpmn:incoming>
       <bpmn:outgoing>Flow_17evp7q</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_17evp7q" sourceRef="NotifyRoboticsOnCaseHandedOffline" targetRef="Activity_1cweuly" />
     <bpmn:exclusiveGateway id="Gateway_0aseqi2">
       <bpmn:incoming>Flow_1omrvfy</bpmn:incoming>
       <bpmn:outgoing>Flow_1h1gnhq</bpmn:outgoing>
+      <bpmn:outgoing>Flow_DIVERGENT_RPA_OFFLINE</bpmn:outgoing>
       <bpmn:outgoing>Flow_19roh9l</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_1h1gnhq" sourceRef="Gateway_0aseqi2" targetRef="NotifyRoboticsOnContinuousFeed">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${empty flowFlags.IS_MULTI_TRACK}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${empty flowFlags.IS_MULTI_TRACK &amp;&amp; !empty flowFlags.SDO_ENABLED &amp;&amp; flowFlags.SDO_ENABLED}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_DIVERGENT_RPA_OFFLINE" name="Claim taken offline" sourceRef="Gateway_0aseqi2" targetRef="NotifyRoboticsOnCaseHandedOffline">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${empty flowFlags.IS_MULTI_TRACK &amp;&amp; (empty flowFlags.SDO_ENABLED || !flowFlags.SDO_ENABLED)}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:serviceTask id="ProceedOfflineForResponseToDefenceMultitrack" name="Proceed offline (Response to defence)" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
@@ -166,7 +196,7 @@
       <bpmn:outgoing>Flow_0mzdxwg</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_0mzdxwg" sourceRef="ProceedOfflineForResponseToDefenceMultitrack" targetRef="ClaimantResponseGenerateDirectionsQuestionnaire" />
-    <bpmn:exclusiveGateway id="Gateway_0vyo2fr">
+    <bpmn:exclusiveGateway id="Gateway_0vyo2fr" default="Flow_03zkicc">
       <bpmn:incoming>Flow_1sqruq3</bpmn:incoming>
       <bpmn:outgoing>Flow_03zkicc</bpmn:outgoing>
       <bpmn:outgoing>Flow_0929kvp</bpmn:outgoing>
@@ -174,13 +204,11 @@
     <bpmn:sequenceFlow id="Flow_1sqruq3" name="Multi track claim" sourceRef="Gateway_PROCEED_OR_NOT_PROCEED" targetRef="Gateway_0vyo2fr">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.FULL_DEFENCE_PROCEED" &amp;&amp; !empty flowFlags.IS_MULTI_TRACK}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_03zkicc" name="Minti not enabled&#10;&#10;" sourceRef="Gateway_0vyo2fr" targetRef="ProceedOfflineForResponseToDefenceMultitrack">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.MINTI_ENABLED &amp;&amp; !flowFlags.MINTI_ENABLED}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_03zkicc" name="Minti not enabled, or claim taken offline&#10;&#10;" sourceRef="Gateway_0vyo2fr" targetRef="ProceedOfflineForResponseToDefenceMultitrack" />
     <bpmn:sequenceFlow id="Flow_0929kvp" name="Minti enabled" sourceRef="Gateway_0vyo2fr" targetRef="JudicialReferral">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.MINTI_ENABLED &amp;&amp; flowFlags.MINTI_ENABLED}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.MINTI_ENABLED &amp;&amp; flowFlags.MINTI_ENABLED &amp;&amp; !empty flowFlags.SDO_ENABLED &amp;&amp; flowFlags.SDO_ENABLED}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:exclusiveGateway id="Gateway_0uziwiq">
+    <bpmn:exclusiveGateway id="Gateway_0uziwiq" default="Flow_1w9msw7">
       <bpmn:incoming>Flow_19roh9l</bpmn:incoming>
       <bpmn:outgoing>Flow_1w9msw7</bpmn:outgoing>
       <bpmn:outgoing>Flow_0ruzefo</bpmn:outgoing>
@@ -188,11 +216,9 @@
     <bpmn:sequenceFlow id="Flow_19roh9l" name="Multi track claim" sourceRef="Gateway_0aseqi2" targetRef="Gateway_0uziwiq">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.IS_MULTI_TRACK}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1w9msw7" name="Minti not enabled" sourceRef="Gateway_0uziwiq" targetRef="NotifyRoboticsOnCaseHandedOffline">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.MINTI_ENABLED &amp;&amp; !flowFlags.MINTI_ENABLED}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1w9msw7" name="Minti not enabled, or claim taken offline" sourceRef="Gateway_0uziwiq" targetRef="NotifyRoboticsOnCaseHandedOffline" />
     <bpmn:sequenceFlow id="Flow_0ruzefo" name="Minti enabled" sourceRef="Gateway_0uziwiq" targetRef="NotifyRoboticsOnContinuousFeed">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.MINTI_ENABLED &amp;&amp; flowFlags.MINTI_ENABLED}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.MINTI_ENABLED &amp;&amp; flowFlags.MINTI_ENABLED &amp;&amp; !empty flowFlags.SDO_ENABLED &amp;&amp; flowFlags.SDO_ENABLED}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_1gnykhx" sourceRef="ClaimantResponseConfirmsNotToProceedNotify" targetRef="NotifyRoboticsOnCaseHandedOffline" />
     <bpmn:sequenceFlow id="Flow_0ucxas6" sourceRef="ClaimantResponseGenerateDirectionsQuestionnaire" targetRef="ClaimantConfirmsToProceedNotify" />
@@ -219,6 +245,12 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_028lxzs_di" bpmnElement="ProceedOfflineForResponseToDefence">
         <dc:Bounds x="760" y="370" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ProceedOfflineForDivergentResponseToDefence_di" bpmnElement="ProceedOfflineForDivergentResponseToDefence">
+        <dc:Bounds x="760" y="540" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_OFFLINE_NOTIFY_di" bpmnElement="Gateway_OFFLINE_NOTIFY" isMarkerVisible="true">
+        <dc:Bounds x="1175" y="490" width="50" height="50" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1xj9809" bpmnElement="JudicialReferral">
         <dc:Bounds x="520" y="180" width="100" height="80" />
@@ -320,8 +352,47 @@
         <di:waypoint x="1060" y="410" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_16dgwpu_di" bpmnElement="Flow_16dgwpu">
-        <di:waypoint x="1160" y="410" />
-        <di:waypoint x="1200" y="410" />
+        <di:waypoint x="1110" y="450" />
+        <di:waypoint x="1110" y="515" />
+        <di:waypoint x="1175" y="515" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_FULL_DEFENCE_PROCEED_OFFLINE_di" bpmnElement="Flow_FULL_DEFENCE_PROCEED_OFFLINE">
+        <di:waypoint x="460" y="435" />
+        <di:waypoint x="460" y="580" />
+        <di:waypoint x="760" y="580" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="512" y="546" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0divga1_di" bpmnElement="Flow_0divga1">
+        <di:waypoint x="860" y="580" />
+        <di:waypoint x="970" y="580" />
+        <di:waypoint x="970" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_NOT_PROCEED_NOTIFY_di" bpmnElement="Flow_NOT_PROCEED_NOTIFY">
+        <di:waypoint x="1225" y="515" />
+        <di:waypoint x="1250" y="515" />
+        <di:waypoint x="1250" y="440" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1258" y="461" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DIVERGENT_GENERATE_DQ_di" bpmnElement="Flow_DIVERGENT_GENERATE_DQ">
+        <di:waypoint x="1200" y="490" />
+        <di:waypoint x="1200" y="300" />
+        <di:waypoint x="920" y="300" />
+        <di:waypoint x="920" y="260" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1010" y="273" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DIVERGENT_RPA_OFFLINE_di" bpmnElement="Flow_DIVERGENT_RPA_OFFLINE">
+        <di:waypoint x="1505" y="220" />
+        <di:waypoint x="1470" y="220" />
+        <di:waypoint x="1470" y="360" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1400" y="273" width="66" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1v0mmcy_di" bpmnElement="Flow_1v0mmcy">
         <di:waypoint x="620" y="220" />

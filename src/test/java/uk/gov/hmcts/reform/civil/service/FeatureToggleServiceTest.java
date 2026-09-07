@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,7 +36,7 @@ class FeatureToggleServiceTest {
 
     @BeforeEach
     void setUp() {
-        featureToggleService = new FeatureToggleService(featureToggleApi);
+        featureToggleService = new FeatureToggleService(featureToggleApi, List.of("JudgementBuffer", "DefendantResponseDeadline"));
     }
 
     @ParameterizedTest
@@ -48,29 +49,11 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsAmendBundleEnabledInvoked(Boolean toggleStat) {
-        var caseFlagsKey = "amend-bundle-enabled";
-        givenToggle(caseFlagsKey, toggleStat);
-
-        assertThat(featureToggleService.isAmendBundleEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsBulkClaimInvoked(Boolean toggleStat) {
         var bulkClaimKey = "bulk_claim_enabled";
         givenToggle(bulkClaimKey, toggleStat);
 
         assertThat(featureToggleService.isBulkClaimEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenEnableRPAEmailsInvoked(Boolean toggleStat) {
-        var enableRPAEmailsKey = "enable-rpa-emails";
-        givenToggle(enableRPAEmailsKey, toggleStat);
-
-        assertThat(featureToggleService.isRPAEmailEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
@@ -262,15 +245,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldCallBoolVariation_whenGaForLipNro(Boolean toggleStat) {
-        var gaCuiNroKey = "cui-ga-nro";
-        givenToggle(gaCuiNroKey, toggleStat);
-
-        assertThat(featureToggleService.isCuiGaNroEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsOtherRemedyEnabled(Boolean toggleStat) {
         var otherRemedyKey = "other-remedy-enabled";
         givenToggle(otherRemedyKey, toggleStat);
@@ -290,5 +264,27 @@ class FeatureToggleServiceTest {
     void shouldCallBoolVariation_whenJudgmentBufferEnabled(Boolean toggleStat) {
         givenToggle("judgment-buffer", toggleStat);
         assertThat(featureToggleService.isJudgmentBufferEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenSpringSchedulerEnabled(Boolean toggleStat) {
+        givenToggle("spring-scheduler-enabled", toggleStat);
+        assertThat(featureToggleService.isSpringSchedulerEnabled("JudgementBuffer")).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isSpringSchedulerEnabled("DefendantResponseDeadline")).isEqualTo(toggleStat);
+    }
+
+    @Test
+    void shouldReturnFalse_whenActiveSchedulersIsEmpty() {
+        FeatureToggleService emptyService = new FeatureToggleService(featureToggleApi, List.of());
+        givenToggle("spring-scheduler-enabled", true);
+        assertThat(emptyService.isSpringSchedulerEnabled("JudgementBufferScheduledTask")).isFalse();
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenHmctsAccessMigrationEnabled(Boolean toggleStat) {
+        givenToggle("hmcts-access-migration", toggleStat);
+        assertThat(featureToggleService.isHmctsAccessMigrationEnabled()).isEqualTo(toggleStat);
     }
 }

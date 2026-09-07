@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,9 +67,10 @@ class DefaultJudgmentOnlineMapperPendingIssueTest {
         assertEquals(LocalDate.now(), activeJudgment.getRequestDate());
         assertEquals(JudgmentType.DEFAULT_JUDGMENT, activeJudgment.getType());
         assertEquals(YesOrNo.NO, activeJudgment.getIsRegisterWithRTL());
-        assertEquals("100990", activeJudgment.getOrderedAmount());
-        assertEquals("0", activeJudgment.getCosts());
-        assertEquals("100990", activeJudgment.getTotalAmount());
+        assertNull(activeJudgment.getOrderedAmount());
+        assertNull(activeJudgment.getCosts());
+        assertNull(activeJudgment.getClaimFeeAmount());
+        assertNull(activeJudgment.getTotalAmount());
         assertEquals(PaymentPlanSelection.PAY_IN_INSTALMENTS, activeJudgment.getPaymentPlan().getType());
         assertEquals(PaymentFrequency.WEEKLY, activeJudgment.getInstalmentDetails().getPaymentFrequency());
         assertEquals("100", activeJudgment.getInstalmentDetails().getAmount());

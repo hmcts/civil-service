@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.ga.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 
 import java.util.List;
@@ -30,14 +29,11 @@ public class DeleteApplicationPaymentDashboardNotificationHandler extends Callba
     private static final String PAYMENT_NOTIFICATION = "Notice.AAA6.GeneralApps.ApplicationFeeRequired.Applicant";
 
     private static final List<CaseEvent> EVENTS = List.of(DELETE_APPLICATION_PAYMENT_DASHBOARD_NOTIFICATION);
-    private final FeatureToggleService featureToggleService;
     private final GaForLipService gaForLipService;
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return  featureToggleService.isGaForWelshEnabled()
-            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::deletePaymentDashboardNotification)
-            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::deletePaymentDashboardNotification);
     }
 
     @Override

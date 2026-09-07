@@ -5,7 +5,6 @@ import com.google.common.base.Strings;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.OrderCallbackHandler;
@@ -13,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoReconsiderationDeadlineService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -44,7 +44,6 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
 
     private static final String CLAIMANT = "CLAIMANT";
     private final ObjectMapper objectMapper;
-    protected final WorkingDayIndicator localWorkingDayIndicator;
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT,
                                                           CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT,
                                                           CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
@@ -57,13 +56,12 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
     public OrderMadeClaimantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                 DashboardNotificationsParamsMapper mapper,
                                                 FeatureToggleService featureToggleService, ObjectMapper objectMapper,
-                                                WorkingDayIndicator workingDayIndicator,
+                                                SdoReconsiderationDeadlineService reconsiderationDeadlineService,
                                                 DashboardNotificationService dashboardNotificationService,
                                                 TaskListService taskListService,
                                                 SdoCaseClassificationService sdoCaseClassificationService) {
-        super(dashboardScenariosService, mapper, featureToggleService, workingDayIndicator);
+        super(dashboardScenariosService, mapper, featureToggleService, reconsiderationDeadlineService);
         this.objectMapper = objectMapper;
-        this.localWorkingDayIndicator = workingDayIndicator;
         this.dashboardNotificationService = dashboardNotificationService;
         this.taskListService = taskListService;
         this.sdoCaseClassificationService = sdoCaseClassificationService;
@@ -196,20 +194,10 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
             caseData.getCcdCaseReference().toString(),
             CLAIMANT
         );
-        if (getFeatureToggleService().isLocationWhiteListed(caseData
-                                                                                   .getCaseManagementLocation()
-                                                                                   .getBaseLocation())
-            || getFeatureToggleService().isCuiGaNroEnabled()) {
-            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
-                caseData.getCcdCaseReference().toString(),
-                CLAIMANT,
-                GA
-            );
-        } else {
-            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
-                CLAIMANT
-            );
-        }
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
+            caseData.getCcdCaseReference().toString(),
+            CLAIMANT,
+            GA
+        );
     }
 }

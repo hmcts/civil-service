@@ -3,13 +3,9 @@ package uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
@@ -24,13 +20,11 @@ import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
@@ -183,98 +177,6 @@ class DashboardNotificationHelperTest {
     }
 
     @Nested
-    class IsEligibleForReconsiderationTests {
-
-        private static Stream<Arguments> provideCsvSourceTrueCases() {
-            return Stream.of(
-                Arguments.of("SMALL_CLAIM", BigDecimal.valueOf(500), null),
-                Arguments.of("SMALL_CLAIM", BigDecimal.valueOf(10000), null),
-                Arguments.of("SMALL_CLAIM", BigDecimal.valueOf(10000), DecisionOnRequestReconsiderationOptions.YES),
-                Arguments.of("SMALL_CLAIM", BigDecimal.valueOf(10000), null)
-            );
-        }
-
-        private static Stream<Arguments> provideCsvSourceFalseCases() {
-            return Stream.of(
-                Arguments.of("SMALL_CLAIM", BigDecimal.valueOf(1000), CREATE_SDO),
-                Arguments.of("SMALL_CLAIM", BigDecimal.valueOf(10000), CREATE_SDO),
-                Arguments.of("SMALL_CLAIM", BigDecimal.valueOf(10001), null),
-                Arguments.of("FAST_CLAIM", BigDecimal.valueOf(1000), null)
-            );
-        }
-
-        @ParameterizedTest
-        @MethodSource("provideCsvSourceTrueCases")
-        void shouldReturnTrue_ForGiven_whenFeatureToggleTrue(String responseClaimTrack,
-                                                             BigDecimal totalClaimAmount,
-                                                             DecisionOnRequestReconsiderationOptions option) {
-            CaseData caseData = new CaseDataBuilder()
-                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION))
-                .build();
-            caseData.setResponseClaimTrack(responseClaimTrack);
-            caseData.setTotalClaimAmount(totalClaimAmount);
-            caseData.setDecisionOnRequestReconsiderationOptions(option);
-
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(true);
-
-            assertTrue(dashboardDecisionHelper.isEligibleForReconsideration(caseData));
-        }
-
-        @ParameterizedTest
-        @MethodSource("provideCsvSourceTrueCases")
-        void shouldReturnTrue_ForGiven_whenWelshEnabledForMainCase(String responseClaimTrack,
-                                                                   BigDecimal totalClaimAmount,
-                                                                   DecisionOnRequestReconsiderationOptions option) {
-            CaseData caseData = new CaseDataBuilder()
-                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION))
-                .build();
-            caseData.setResponseClaimTrack(responseClaimTrack);
-            caseData.setTotalClaimAmount(totalClaimAmount);
-            caseData.setDecisionOnRequestReconsiderationOptions(option);
-
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(false);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-
-            assertTrue(dashboardDecisionHelper.isEligibleForReconsideration(caseData));
-        }
-
-        @ParameterizedTest
-        @MethodSource("provideCsvSourceTrueCases")
-        void shouldReturnFalse_ForGiven_whenFeatureTogglesAreFalse(String responseClaimTrack,
-                                                                   BigDecimal totalClaimAmount,
-                                                                   DecisionOnRequestReconsiderationOptions option) {
-            CaseData caseData = new CaseDataBuilder()
-                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION))
-                .build();
-            caseData.setResponseClaimTrack(responseClaimTrack);
-            caseData.setTotalClaimAmount(totalClaimAmount);
-            caseData.setDecisionOnRequestReconsiderationOptions(option);
-
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(false);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-
-            assertFalse(dashboardDecisionHelper.isEligibleForReconsideration(caseData));
-        }
-
-        @ParameterizedTest
-        @MethodSource("provideCsvSourceFalseCases")
-        void shouldReturnFalse_ForGiven_whenFeatureToggleTrue(String responseClaimTrack,
-                                                              BigDecimal totalClaimAmount,
-                                                              DecisionOnRequestReconsiderationOptions option) {
-            CaseData caseData = new CaseDataBuilder()
-                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION))
-                .build();
-            caseData.setResponseClaimTrack(responseClaimTrack);
-            caseData.setTotalClaimAmount(totalClaimAmount);
-            caseData.setDecisionOnRequestReconsiderationOptions(option);
-
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(true);
-
-            assertFalse(dashboardDecisionHelper.isEligibleForReconsideration(caseData));
-        }
-    }
-
-    @Nested
     class HasTrackChangedTests {
 
         @Test
@@ -366,7 +268,41 @@ class DashboardNotificationHelperTest {
     }
 
     @Nested
-    class IsOrderMadeFastTrackTrialNotRespondedTests {
+    class IsOrderMadeFastTrackTrialNotRespondedDefendantTests {
+
+        @Test
+        void shouldReturnTrue_whenFastTrackAndTrialReadyRespondent1IsNull() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setTrialReadyRespondent1(null);
+
+            when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);
+
+            assertTrue(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedDefendant(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenNotFastTrackAndTrialReadyRespondent1IsNull() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setTrialReadyRespondent1(null);
+
+            when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(false);
+
+            assertFalse(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedDefendant(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenFastTrackAndTrialReadyRespondent1IsSet() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setTrialReadyRespondent1(YES);
+
+            when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);
+
+            assertFalse(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedDefendant(caseData));
+        }
+    }
+
+    @Nested
+    class IsOrderMadeFastTrackTrialNotRespondedClaimantTests {
 
         @Test
         void shouldReturnTrue_whenFastTrackAndTrialReadyApplicantIsNull() {
@@ -375,7 +311,7 @@ class DashboardNotificationHelperTest {
 
             when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);
 
-            assertTrue(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData));
+            assertTrue(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedClaimant(caseData));
         }
 
         @Test
@@ -385,7 +321,7 @@ class DashboardNotificationHelperTest {
 
             when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(false);
 
-            assertFalse(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData));
+            assertFalse(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedClaimant(caseData));
         }
 
         @Test
@@ -395,7 +331,7 @@ class DashboardNotificationHelperTest {
 
             when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);
 
-            assertFalse(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData));
+            assertFalse(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedClaimant(caseData));
         }
     }
 }

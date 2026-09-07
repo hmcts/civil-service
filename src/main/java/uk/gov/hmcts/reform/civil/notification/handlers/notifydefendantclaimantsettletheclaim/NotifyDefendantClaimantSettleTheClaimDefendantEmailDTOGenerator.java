@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.notifydefendantclaimantsettletheclaim;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.DefendantEmailDTOGenerator;
@@ -25,6 +25,9 @@ public class NotifyDefendantClaimantSettleTheClaimDefendantEmailDTOGenerator ext
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
+        if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
+            return notificationsProperties.getNotifyDefendantLIPClaimantSettleTheClaimTemplateWelsh();
+        }
         return notificationsProperties.getNotifyDefendantLIPClaimantSettleTheClaimTemplate();
     }
 

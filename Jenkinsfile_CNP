@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure")
+@Library("Infrastructure@2.4.9")
 
 import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
@@ -66,15 +66,18 @@ def secrets = [
     secret('idam-noc-approver-password', 'IDAM_NOC_APPROVER_PASSWORD'),
     secret('aac-manage-case-s2s-secret', 'MANAGE_CASE_S2S_KEY'),
     secret('notify-mca-api-key-secret', 'NOTIFY_MCA_API_KEY')
-  ],
-  'civil-prod': [
-    secret('microservicekey-civil-service', 'S2S_SECRET_PROD')
-  ],
+  ]
 ]
 
 def secretsOtherenv = [
   'civil-${env}': [
     secret('microservicekey-civil-service', 'S2S_SECRET'),
+  ]
+]
+
+def secretsProd = [
+  'civil-prod': [
+    secret('microservicekey-civil-service', 'S2S_SECRET_PROD')
   ]
 ]
 
@@ -98,6 +101,7 @@ withPipeline(type, product, component) {
   disableLegacyDeployment()
   enableAksStagingDeployment()
   syncBranchesWithMaster(branchesToSync)
+  def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
   env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
   env.EM_CCD_ORCHESTRATOR_URL = 'http://em-ccd-orchestrator-aat.service.core-compute-aat.internal'
@@ -111,8 +115,6 @@ withPipeline(type, product, component) {
   env.DMN_DEFINITION_BRANCH = dmnBranch
   env.WIREMOCK_MAPPINGS_BRANCH = wiremockMappingsBranch
   env.UNASSIGN_CASES = true
-  env.BEFTA_FORCE_IMPORT_RETRY = 'true'
-
   loadVaultSecrets(secrets)
 
   onPR {
@@ -162,9 +164,14 @@ withPipeline(type, product, component) {
   }
 
   afterSuccess('checkout') {
-    def subscription = 'nonprod'
     if (env.ENVIRONMENT in ['ithc', 'demo', 'perftest']) {
-      withSubscription(subscription) {
+      def subscriptions = [
+        demo    : env.DEMO_SUBSCRIPTION_NAME ?: 'nonprod',
+        perftest: env.PERFTEST_SUBSCRIPTION_NAME ?: 'qa',
+        ithc    : env.ITHC_SUBSCRIPTION_NAME ?: 'qa'
+      ]
+
+      withSubscription(subscriptions[env.ENVIRONMENT], product, env.ENVIRONMENT) {
         withTeamSecrets(pipelineConf, env.ENVIRONMENT) {
           uploadBpmnDiagrams(env.ENVIRONMENT)
         }
@@ -189,7 +196,9 @@ withPipeline(type, product, component) {
       echo "Skipping publish functional test results due to label: pr-values:skip-functional-tests"
       return
     }
-    publishFunctionalTestResults()
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
+    yarnBuilder.yarn('test:generate-report')
+    publishAllureReport('allure-functional-report', 'Allure Functional Report', 'allure-functional-history')
   }
 
   before('smoketest:aat') {
@@ -203,11 +212,21 @@ withPipeline(type, product, component) {
   afterSuccess('functionalTest:aat') {
     createBpmnGithubRelease()
     uploadBpmnDiagrams('aat')
-    uploadBpmnDiagrams('prod')
+  }
+
+  afterSuccess('buildinfra:prod') {
+    withAzureKeyvault(
+      azureKeyVaultSecrets: secretsProd['civil-prod'],
+      keyVaultURLOverride: 'https://civil-prod.vault.azure.net/'
+    ) {
+      uploadBpmnDiagrams('prod')
+    }
   }
 
   afterAlways('functionalTest:aat') {
-    publishFunctionalTestResults()
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
+    yarnBuilder.yarn('test:generate-report')
+    publishAllureReport('allure-functional-report', 'Allure Functional Report', 'allure-functional-history')
   }
 
   before('functionalTest:preview') {
@@ -267,35 +286,34 @@ def archiveSmokeTestResults() {
   archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/smokeTest/**/*'
 }
 
-def publishFunctionalTestResults() {
-  sh 'npx allure generate test-results/functional/allure-results --clean -o test-results/functional/allure-report'
+def publishAllureReport(String reportDir, String reportName, String historyArchiveDir) {
   publishHTML([
-    allowMissing: false,
     alwaysLinkToLastBuild: true,
     keepAll: true,
-    reportDir: 'test-results/functional/allure-report',
+    reportDir: reportDir,
     reportFiles: 'index.html',
-    reportName: 'Non-Prod E2E Allure Report'
+    reportName: reportName
   ])
-  archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
+  sh "cp -r ./${reportDir}/history/ ./${historyArchiveDir}"
+  archiveArtifacts artifacts: "${historyArchiveDir}/**", fingerprint: true
 }
 
 def prepareFunctionalTests(boolean runAllFunctionalTests) {
   if (runAllFunctionalTests) {
     env.RUN_ALL_FUNCTIONAL_TESTS = true
   } else {
-    copyPrevFailedAndNotExecutedTestFilesJson()
+    copyPrevTestFilesReport('test-results/functional/testFilesReport.json')
   }
-  copyPreviousAllureHistory()
+  copyPreviousAllureHistory('allure-functional-history', 'allure-functional-results');
 }
 
-def copyPrevFailedAndNotExecutedTestFilesJson() {
+def copyPrevTestFilesReport(String reportFilePath) {
   def buildFound = false
   def buildNumber = currentBuild.previousBuild ? currentBuild.previousBuild.number : 0
   def minBuildNumber = ((buildNumber - 8) > 0) ? buildNumber - 8 : 0
   while (!buildFound && buildNumber > minBuildNumber) {
     try {
-      copyArtifacts projectName: env.JOB_NAME, selector: specific("${buildNumber}"), filter: "test-results/functional/testFilesReport.json"
+      copyArtifacts projectName: env.JOB_NAME, selector: specific("${buildNumber}"), filter: reportFilePath
       buildFound = true
     } catch (Exception error) {
       echo "artifact not found: " + error.toString()
@@ -304,26 +322,23 @@ def copyPrevFailedAndNotExecutedTestFilesJson() {
   }
 }
 
-def copyPreviousAllureHistory() {
+def copyPreviousAllureHistory(historyDir, resultsDir) {
   def buildFound = false
   def buildNumber = currentBuild.previousBuild ? currentBuild.previousBuild.number : 0
   def minBuildNumber = ((buildNumber - 8) > 0) ? buildNumber - 8 : 0
-  def targetDir = "test-results/functional/allure-results/history"
 
   while (!buildFound && buildNumber > minBuildNumber) {
     try {
       copyArtifacts(
         projectName: env.JOB_NAME,
         selector: specific("${buildNumber}"),
-        filter: "test-results/functional/allure-report/history/*",
-        target: targetDir,
-        flatten: true
+        filter: "**/${historyDir}/**",
+        target: resultsDir
       )
-
+      sh "mv ${resultsDir}/${historyDir} ${resultsDir}/history"
       buildFound = true
-      echo "Successfully imported Allure history from build ${buildNumber}"
     } catch (Exception error) {
-      echo "Allure history artifact not found in build ${buildNumber}. Trying previous..."
+      echo "artifact not found: " + error.toString()
       buildNumber--
     }
   }

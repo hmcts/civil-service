@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardNotificationDispatcher;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -21,6 +20,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationTransactionalService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
 import static java.util.Optional.ofNullable;
@@ -38,7 +38,7 @@ public class DashboardNotificationTaskHandler extends BaseExternalTaskHandler {
     private final ObjectMapper mapper;
     private final IStateFlowEngine stateFlowEngine;
     private final GaStateFlowEngine gaStateFlowEngine;
-    private final DashboardNotificationDispatcher dashboardNotificationDispatcher;
+    private final DashboardNotificationTransactionalService dashboardNotificationTransactionalService;
     private final SystemUpdateUserConfiguration userConfig;
     private final UserService userService;
 
@@ -51,7 +51,7 @@ public class DashboardNotificationTaskHandler extends BaseExternalTaskHandler {
         ObjectMapper mapper,
         IStateFlowEngine stateFlowEngine,
         GaStateFlowEngine gaStateFlowEngine,
-        DashboardNotificationDispatcher dashboardNotificationDispatcher,
+        DashboardNotificationTransactionalService dashboardNotificationTransactionalService,
         SystemUpdateUserConfiguration userConfig,
         UserService userService
     ) {
@@ -62,7 +62,7 @@ public class DashboardNotificationTaskHandler extends BaseExternalTaskHandler {
         this.mapper = mapper;
         this.stateFlowEngine = stateFlowEngine;
         this.gaStateFlowEngine = gaStateFlowEngine;
-        this.dashboardNotificationDispatcher = dashboardNotificationDispatcher;
+        this.dashboardNotificationTransactionalService = dashboardNotificationTransactionalService;
         this.userConfig = userConfig;
         this.userService = userService;
     }
@@ -87,7 +87,7 @@ public class DashboardNotificationTaskHandler extends BaseExternalTaskHandler {
             .build();
 
         log.info("Dispatch dashboard notifications for caseId {} activityId {}", caseId, externalTask.getActivityId());
-        dashboardNotificationDispatcher.dispatch(
+        dashboardNotificationTransactionalService.dispatch(
             externalTask.getActivityId(),
             DashboardTaskContext.civil(dashboardCaseData, systemUpdateUserToken())
         );
@@ -100,7 +100,7 @@ public class DashboardNotificationTaskHandler extends BaseExternalTaskHandler {
         caseData.businessProcess(dashboardBusinessProcess(caseData.getBusinessProcess(), externalTask));
 
         log.info("Dispatch GA dashboard notifications for caseId {} activityId {}", caseId, externalTask.getActivityId());
-        dashboardNotificationDispatcher.dispatch(
+        dashboardNotificationTransactionalService.dispatch(
             externalTask.getActivityId(),
             DashboardTaskContext.generalApplication(caseData, systemUpdateUserToken())
         );

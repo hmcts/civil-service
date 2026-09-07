@@ -47,7 +47,7 @@ class FinalOrderClaimantDashboardServiceTest {
         caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
 
-        when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData)).thenReturn(true);
+        when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedClaimant(caseData)).thenReturn(true);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
 
         finalOrderClaimantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
@@ -59,7 +59,7 @@ class FinalOrderClaimantDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             new ScenarioRequestParams(scenarioParams)
         );
-        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData);
     }
 
     @Test
@@ -70,7 +70,7 @@ class FinalOrderClaimantDashboardServiceTest {
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         caseData.setTrialReadyApplicant(YesOrNo.YES);
 
-        when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData)).thenReturn(false);
+        when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedClaimant(caseData)).thenReturn(false);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
 
         finalOrderClaimantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
@@ -82,7 +82,7 @@ class FinalOrderClaimantDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             new ScenarioRequestParams(scenarioParams)
         );
-        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData);
     }
 
     @Test
@@ -92,12 +92,12 @@ class FinalOrderClaimantDashboardServiceTest {
         caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
 
-        when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData)).thenReturn(true);
+        when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedClaimant(caseData)).thenReturn(true);
 
         finalOrderClaimantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
-        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData);
     }
 
     @Test
@@ -107,12 +107,12 @@ class FinalOrderClaimantDashboardServiceTest {
         caseData.setClaimsTrack(ClaimsTrack.FAST_TRACK);
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
 
-        when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData)).thenReturn(true);
+        when(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotRespondedClaimant(caseData)).thenReturn(true);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(false);
 
         finalOrderClaimantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
-        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData);
     }
 }

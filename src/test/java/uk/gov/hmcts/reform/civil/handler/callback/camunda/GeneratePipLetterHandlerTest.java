@@ -9,15 +9,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
-import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -41,9 +42,6 @@ class GeneratePipLetterHandlerTest {
     @Mock
     private BulkPrintService bulkPrintService;
 
-    @Mock
-    private Time time;
-
     @InjectMocks
     private GeneratePipLetterHandler generatePipLetter;
 
@@ -62,7 +60,6 @@ class GeneratePipLetterHandlerTest {
 
     @Test
     void shouldGenerateAndPrintLetterSuccessfully() {
-        when(time.now()).thenReturn(LocalDateTime.now());
         when(pipLetterGenerator.downloadLetter(any(CaseData.class), any(String.class), anyList()))
                 .thenReturn(new byte[]{1, 2, 3, 4});
 
@@ -89,5 +86,56 @@ class GeneratePipLetterHandlerTest {
                 List.of()
         );
         assertThat(response.getState()).isEqualTo("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
+    }
+
+    @Test
+    void shouldRetainCurrentStateWhenLipClaimantChangesLanguagePreferenceToEnglish() {
+        when(pipLetterGenerator.downloadLetter(any(CaseData.class), any(String.class), anyList()))
+            .thenReturn(new byte[]{1, 2, 3, 4});
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("12345")
+            .ccdCaseReference(12345L)
+            .ccdState(CaseState.CASE_ISSUED)
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1(new Party().setPartyName("Test Respondent").setType(Party.Type.COMPANY))
+            .claimantBilingualLanguagePreference(PreferredLanguage.ENGLISH.name())
+            .changeLanguagePreference(new ChangeLanguagePreference(null, PreferredLanguage.ENGLISH))
+            .build();
+        CallbackParams params = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "test-token"))
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) generatePipLetter.handle(params);
+
+        assertThat(response.getState()).isEqualTo(CaseState.CASE_ISSUED.name());
+    }
+
+    @Test
+    void shouldRetainCurrentStateForBilingualLipClaim() {
+        when(pipLetterGenerator.downloadLetter(any(CaseData.class), any(String.class), anyList()))
+            .thenReturn(new byte[]{1, 2, 3, 4});
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("12345")
+            .ccdCaseReference(12345L)
+            .ccdState(CaseState.CASE_ISSUED)
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1(new Party().setPartyName("Test Respondent").setType(Party.Type.COMPANY))
+            .claimantBilingualLanguagePreference(PreferredLanguage.WELSH.name())
+            .build();
+        CallbackParams params = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "test-token"))
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) generatePipLetter.handle(params);
+
+        assertThat(response.getState()).isEqualTo(CaseState.CASE_ISSUED.name());
     }
 }

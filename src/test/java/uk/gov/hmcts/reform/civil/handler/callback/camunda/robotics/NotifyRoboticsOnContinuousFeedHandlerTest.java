@@ -106,7 +106,6 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
         @Test
         void shouldNotifyRobotics_whenNoSchemaErrors() {
             // Given
-            when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -122,7 +121,6 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
         @Test
         void shouldNotifyRoboticsSpecClaim_whenNoSchemaErrors() {
             // Given
-            when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentAdmitPartOfClaimFastTrack()
                 .build();
@@ -138,19 +136,6 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
             );
         }
 
-        @Test
-        void shouldNotNotifyRobotics_whenRpaToggleOff() {
-            // Given
-            when(featureToggleService.isRPAEmailEnabled()).thenReturn(false);
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            // When
-            handler.handle(params);
-
-            // Then
-            verifyNoInteractions(roboticsNotificationService);
-        }
     }
 
     @Nested
@@ -158,7 +143,6 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
 
         @Test
         void shouldThrowJsonSchemaValidationException_whenSchemaErrors() {
-            when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
             when(validationService.validate(anyString())).thenReturn(Set.of(new ValidationMessage.Builder().build()));
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();

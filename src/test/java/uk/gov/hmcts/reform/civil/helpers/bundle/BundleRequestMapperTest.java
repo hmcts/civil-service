@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.helpers.bundle;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleTestUtil.assertBundleCreateRequestIsValid;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleTestUtil.assertCostsBudgets;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleTestUtil.assertDirectionsQuestionnaires;
@@ -34,7 +34,6 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 
@@ -48,9 +47,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class BundleRequestMapperTest {
 
     @Mock
-    private FeatureToggleService featureToggleService;
-
-    @Mock
     private FilenameGenerator filenameGenerator;
 
     private BundleRequestMapper bundleRequestMapper;
@@ -59,7 +55,7 @@ class BundleRequestMapperTest {
     void setUp() {
         BundleRequestDocsOrganizer docsOrganizer = new BundleRequestDocsOrganizer();
         ConversionToBundleRequestDocs conversionDocs =
-            new ConversionToBundleRequestDocs(featureToggleService, docsOrganizer);
+            new ConversionToBundleRequestDocs(docsOrganizer);
         BundleDocumentsRetrieval documentsRetrieval =
             new BundleDocumentsRetrieval(conversionDocs, docsOrganizer);
         SystemGeneratedDocMapper sysGenDocMapper = new SystemGeneratedDocMapper();
@@ -81,8 +77,7 @@ class BundleRequestMapperTest {
     @Test
     void shouldMapCaseDataToBundleCreateRequest() {
         // Given
-        CaseData caseData = getCaseData();
-        mockFeatureToggles(false);
+        CaseData caseData = getCaseDataNoCategoryId();
 
         // When
         BundleCreateRequest result = mapCaseData(caseData);
@@ -101,42 +96,24 @@ class BundleRequestMapperTest {
     }
 
     @Test
-    void shouldMapCaseDataWithAmendBundleEnabled() {
+    void shouldFilterDocumentsWithoutCategoryIdWhenMappingBundleDocuments() {
         // Given
-        CaseData caseData = getCaseDataNoCategoryId();
-        mockFeatureToggles(true);
+        CaseData caseData = getCaseData();
 
         // When
         BundleCreateRequest result = mapCaseData(caseData);
 
         // Then
         assertBundleCreateRequestIsValid(result);
-        assertTrialDocumentFileNames(result);
-        assertStatementsOfCaseDocuments(result);
-        assertDirectionsQuestionnairesWithCategoryIds(result);
-        assertOrdersDocuments(result);
-        assertWitnessStatements(result);
-        assertExpertEvidences(result);
-        assertJointStatementOfExperts(result);
-        assertDisclosedDocuments(result);
-        assertCostsBudgets(result);
+        assertThat(result.getCaseDetails().getCaseData().getClaimant1WitnessStatements())
+            .extracting(element -> element.getValue().getDocumentFileName())
+            .contains("Email referred to in the statement of witness 12/12/2022")
+            .doesNotContain("CL 1 - Statement 10/02/2023");
     }
 
     @Test
     void shouldHandleCaseDataWithNoCategoryId() {
         CaseData caseData = getCaseDataWithNoId();
-        given(featureToggleService.isAmendBundleEnabled()).willReturn(false);
-
-        BundleCreateRequest result = mapCaseData(caseData);
-
-        assertBundleCreateRequestIsValid(result);
-        assertDirectionsQuestionnaires(result);
-    }
-
-    @Test
-    void shouldHandleCaseDataWithNoCategoryIdAndAmendEnabled() {
-        CaseData caseData = getCaseDataWithNoId();
-        given(featureToggleService.isAmendBundleEnabled()).willReturn(true);
 
         BundleCreateRequest result = mapCaseData(caseData);
 
@@ -175,10 +152,6 @@ class BundleRequestMapperTest {
 
         assertFalse(result.getCaseDetails().getCaseData().isHasApplicant2());
         assertFalse(result.getCaseDetails().getCaseData().isHasRespondant2());
-    }
-
-    private void mockFeatureToggles(boolean amendBundleEnabled) {
-        given(featureToggleService.isAmendBundleEnabled()).willReturn(amendBundleEnabled);
     }
 
     private BundleCreateRequest mapCaseData(CaseData caseData) {

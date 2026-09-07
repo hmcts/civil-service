@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.utils.CaseServiceUtil;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -259,7 +260,8 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
         }
 
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        DynamicList dynamicLocationList = getLocationsFromList(locationRefDataService.getCourtLocations(authToken));
+        final String serviceId = CaseServiceUtil.getCaseServiceId(caseData);
+        DynamicList dynamicLocationList = getLocationsFromList(locationRefDataService.getCourtLocations(authToken, serviceId));
         caseDataBuilder.assistedOrderFurtherHearingDetails(
             new AssistedOrderFurtherHearingDetails()
                 .setHearingLocationList(populateHearingLocation(caseData))

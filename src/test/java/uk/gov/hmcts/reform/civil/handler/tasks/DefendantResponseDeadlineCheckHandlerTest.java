@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.DefendantResponseDeadlineCheckEvent;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.DefendantResponseDeadlineCheckSearchService;
 
 import java.util.Map;
@@ -30,6 +31,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.scheduler.defendantresponse.DefendantResponseDeadlineScheduler.SCHEDULER_NAME;
+
 import org.mockito.Spy;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
@@ -48,6 +51,10 @@ class DefendantResponseDeadlineCheckHandlerTest {
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @Spy
     private EventProperties eventProperties = configuredEventProperties();
 
@@ -69,6 +76,7 @@ class DefendantResponseDeadlineCheckHandlerTest {
         Map<String, Object> data = Map.of("data", "some data");
         Set<CaseDetails> caseDetails = Set.of(new CaseDetailsBuilder().id(caseId).data(data).build());
 
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(false);
         when(searchService.getCases()).thenReturn(caseDetails);
 
         handler.execute(mockTask, externalTaskService);
@@ -81,6 +89,15 @@ class DefendantResponseDeadlineCheckHandlerTest {
     void shouldNotEmitRespondentResponseDeadlineCheckEvent_WhenNoCasesFound() {
         when(searchService.getCases()).thenReturn(Set.of());
 
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(false);
+        handler.execute(mockTask, externalTaskService);
+
+        verifyNoInteractions(applicationEventPublisher);
+    }
+
+    @Test
+    void shouldNotEmitRespondentResponseDeadlineCheckEvent_WhenSchedulerIsEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         handler.execute(mockTask, externalTaskService);
 
         verifyNoInteractions(applicationEventPublisher);
@@ -90,6 +107,7 @@ class DefendantResponseDeadlineCheckHandlerTest {
     void shouldCallHandleFailureMethod_whenExceptionFromBusinessLogic() {
         String errorMessage = "there was an error";
 
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(false);
         when(mockTask.getRetries()).thenReturn(null);
         when(searchService.getCases()).thenAnswer(invocation -> {
             throw new Exception(errorMessage);
@@ -111,6 +129,7 @@ class DefendantResponseDeadlineCheckHandlerTest {
     void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
         String errorMessage = "there was an error";
 
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(false);
         doThrow(new NotFoundException(errorMessage, new RestException("", "", 500)))
             .when(externalTaskService).complete(mockTask, null);
 
@@ -134,6 +153,7 @@ class DefendantResponseDeadlineCheckHandlerTest {
             new CaseDetailsBuilder().id(caseId).data(data).build(),
             new CaseDetailsBuilder().id(otherId).data(data).build());
 
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(false);
         when(searchService.getCases()).thenReturn(caseDetails);
 
         String errorMessage = "there was an error";

@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
 import java.util.HashMap;
@@ -55,8 +54,6 @@ class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandler
 
     @Mock
     private GenAppStateHelperService helperService;
-    @Mock
-    private FeatureToggleService featureToggleService;
     private ObjectMapper mapper;
 
     @Nested
@@ -66,9 +63,7 @@ class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandler
         public void before() {
             mapper = new ObjectMapper();
             mapper.registerModule(new JavaTimeModule());
-            handler = new TriggerGenAppLocationUpdateCallbackHandler(helperService, featureToggleService, mapper);
-
-            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(true);
+            handler = new TriggerGenAppLocationUpdateCallbackHandler(helperService, mapper);
         }
 
         @Test
@@ -135,7 +130,6 @@ class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandler
                     true, true,
                     getOriginalStatusOfGeneralApplication()
                 );
-            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -162,7 +156,6 @@ class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandler
                     true, true,
                     getOriginalStatusOfGeneralApplication()
                 );
-            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -172,37 +165,6 @@ class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandler
                 .build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getErrors()).isNull();
-            verify(helperService, times(1)).updateApplicationLocationDetailsInClaim(any(), any());
-            verify(helperService, times(1)).triggerEvent(caseData, TRIGGER_LOCATION_UPDATE);
-            verify(helperService, times(1)).triggerEvent(caseData, TRIGGER_LOCATION_UPDATE);
-            verifyNoMoreInteractions(helperService);
-        }
-
-        @Test
-        void shouldSetTheEaFlagToTriggerTheWATask_TakeCaseOffline() {
-            List<Element<GeneralApplication>> gaApplications = wrapElements(
-                new GeneralApplication()
-                    .setCaseLink(new CaseLink("54326781"))
-                    .setGeneralAppType(new GAApplicationType().setTypes(singletonList(SUMMARY_JUDGEMENT))));
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-                .caseDataLip(new CaseDataLiP().setApplicant1SettleClaim(YesOrNo.YES))
-                .respondent1Represented(YesOrNo.NO).build();
-            caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("000000").setRegion("2"))
-                .setGeneralApplications(gaApplications);
-            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
-            when(featureToggleService.isCuiGaNroEnabled()).thenReturn(false);
-            when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
-            CallbackParams params = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, caseData)
-                .request(CallbackRequest.builder()
-                             .eventId(TRIGGER_UPDATE_GA_LOCATION.name())
-                             .build())
-                .build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-
-            assertThat(updatedData.getGaEaCourtLocation().equals(YesOrNo.YES)).isTrue();
             assertThat(response.getErrors()).isNull();
             verify(helperService, times(1)).updateApplicationLocationDetailsInClaim(any(), any());
             verify(helperService, times(1)).triggerEvent(caseData, TRIGGER_LOCATION_UPDATE);
@@ -221,8 +183,6 @@ class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandler
                 .respondent1Represented(YesOrNo.NO).build();
             caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("000000").setRegion("2"))
                 .setGeneralApplications(gaApplications);
-            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
-            when(featureToggleService.isCuiGaNroEnabled()).thenReturn(true);
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -274,7 +234,6 @@ class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandler
                 new CaseLocationCivil().setBaseLocation("00000")
                     .setRegion("2")).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNull();

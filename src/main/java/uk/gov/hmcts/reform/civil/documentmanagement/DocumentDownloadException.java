@@ -7,4 +7,8 @@ public class DocumentDownloadException extends RuntimeException {
     public DocumentDownloadException(String fileName, Throwable t) {
         super(String.format(MESSAGE_TEMPLATE, fileName), t);
     }
+
+    protected DocumentDownloadException(String message) {
+        super(message);
+    }
 }

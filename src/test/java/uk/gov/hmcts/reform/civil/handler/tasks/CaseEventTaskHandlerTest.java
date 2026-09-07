@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
@@ -40,6 +41,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -82,8 +84,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.utils.MarkPaidInFullUtil.checkMarkPaidInFull;
-import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
-import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import static uk.gov.hmcts.reform.civil.utils.WaTaskUtil.cancelApplicantWaDocumentUploadTask;
 
 @ExtendWith(MockitoExtension.class)
 class CaseEventTaskHandlerTest {
@@ -115,6 +116,7 @@ class CaseEventTaskHandlerTest {
     @InjectMocks
     private CaseEventTaskHandler caseEventTaskHandler;
     private static final String IS_JUDGMENT_MARKED_PAID_IN_FULL = "isJudgmentMarkedPaidInFull";
+    private static final String IS_WA_TASK_REQUIRE_CANCELLATION = "isApplicantUploadTranslatedDocumentTaskRequiredCancellation";
 
     @Nested
     class NotifyRespondent {
@@ -144,6 +146,7 @@ class CaseEventTaskHandlerTest {
             variables.putValue(FLOW_STATE, "MAIN.DRAFT");
             variables.putValue(FLOW_FLAGS, Map.of());
             variables.putValue(IS_JUDGMENT_MARKED_PAID_IN_FULL, checkMarkPaidInFull(caseData));
+            variables.putValue(IS_WA_TASK_REQUIRE_CANCELLATION, cancelApplicantWaDocumentUploadTask(caseData));
 
             CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
@@ -178,6 +181,7 @@ class CaseEventTaskHandlerTest {
             variables.putValue(FLOW_STATE, "MAIN.DRAFT");
             variables.putValue(FLOW_FLAGS, Map.of());
             variables.putValue(IS_JUDGMENT_MARKED_PAID_IN_FULL, checkMarkPaidInFull(caseData));
+            variables.putValue(IS_WA_TASK_REQUIRE_CANCELLATION, cancelApplicantWaDocumentUploadTask(caseData));
 
             CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
@@ -211,6 +215,7 @@ class CaseEventTaskHandlerTest {
             variables.putValue(FLOW_STATE, "MAIN.DRAFT");
             variables.putValue(FLOW_FLAGS, Map.of());
             variables.putValue(IS_JUDGMENT_MARKED_PAID_IN_FULL, checkMarkPaidInFull(caseData));
+            variables.putValue(IS_WA_TASK_REQUIRE_CANCELLATION, cancelApplicantWaDocumentUploadTask(caseData));
 
             CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
@@ -403,6 +408,7 @@ class CaseEventTaskHandlerTest {
                 IS_JUDGMENT_MARKED_PAID_IN_FULL,
                 false
             );
+            variables.putValue(IS_WA_TASK_REQUIRE_CANCELLATION, false);
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
             when(mockTask.getTopicName()).thenReturn("test");
             when(mockTask.getActivityId()).thenReturn("activityId");
@@ -426,6 +432,7 @@ class CaseEventTaskHandlerTest {
             verify(coreCaseDataService).startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM);
             verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).complete(mockTask, Map.of(IS_JUDGMENT_MARKED_PAID_IN_FULL, false,
+                IS_WA_TASK_REQUIRE_CANCELLATION, false,
                 FLOW_FLAGS, flags,
                 FLOW_STATE, state.fullName()
             ));
@@ -464,7 +471,7 @@ class CaseEventTaskHandlerTest {
                 IS_JUDGMENT_MARKED_PAID_IN_FULL,
                 false
             );
-
+            variables.putValue(IS_WA_TASK_REQUIRE_CANCELLATION, false);
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(TAKEN_OFFLINE_BY_STAFF.fullName());
             when(mockTask.getTopicName()).thenReturn("test");
             when(mockTask.getActivityId()).thenReturn("activityId");
@@ -490,6 +497,7 @@ class CaseEventTaskHandlerTest {
             verify(coreCaseDataService).startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM);
             verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).complete(mockTask, Map.of(IS_JUDGMENT_MARKED_PAID_IN_FULL, false,
+                IS_WA_TASK_REQUIRE_CANCELLATION, false,
                 FLOW_FLAGS, getFlowFlags(TAKEN_OFFLINE_BY_STAFF),
                 FLOW_STATE, TAKEN_OFFLINE_BY_STAFF.fullName()
             ));
@@ -755,8 +763,7 @@ class CaseEventTaskHandlerTest {
                     CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
                     Event event = caseDataContent.getEvent();
                     assertThat(event.getSummary()).isEqualTo("RPA Reason: Claimant(s) proceeds.");
-                    assertThat(event.getDescription())
-                        .isEqualTo(null);
+                    assertThat(event.getDescription()).isNull();
                 }
             }
 
@@ -1188,5 +1195,4 @@ class CaseEventTaskHandlerTest {
         properties.setRetryCount(3);
         return properties;
     }
-
 }

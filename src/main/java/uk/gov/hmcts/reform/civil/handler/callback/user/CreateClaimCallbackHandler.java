@@ -86,6 +86,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
 import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
@@ -137,7 +138,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final AssignCategoryId assignCategoryId;
     private final CaseFlagsInitialiser caseFlagInitialiser;
     private final ToggleConfiguration toggleConfiguration;
-    private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
+    private static final String CASE_DOC_LOCATION = "/cases/case-details/%s#CaseDocuments";
     private final PartyValidator partyValidator;
 
     @Value("${court-location.unspecified-claim.region-id}")
@@ -178,7 +179,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private CallbackResponse startClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        List<LocationRefData> locations = fetchLocationData(authToken);
+        List<LocationRefData> locations = fetchLocationData(authToken, getCaseServiceId(caseData.getCaseAccessCategory()));
 
         CourtLocation courtLocation = new CourtLocation();
         courtLocation.setApplicantPreferredCourtLocationList(courtLocationUtils.getLocationsFromList(locations));
@@ -204,14 +205,14 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .data(caseData.toMap(objectMapper)).build();
     }
 
-    private List<LocationRefData> fetchLocationData(String authToken) {
-        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
+    private List<LocationRefData> fetchLocationData(String authToken, String serviceId) {
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken, serviceId);
     }
 
     private CallbackResponse validateApplicant1Details(CallbackParams callbackParams) {
         Party applicant = callbackParams.getCaseData().getApplicant1();
         List<String> errors = dateOfBirthValidator.validate(applicant);
-        validatePartyDetails(applicant, errors);;
+        validatePartyDetails(applicant, errors);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -445,7 +446,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData caseData = callbackParams.getCaseData();
         List<String> validationErrors = validateCourtChoice(caseData);
 
-        if (validationErrors.size() > 0) {
+        if (!validationErrors.isEmpty()) {
             return AboutToStartOrSubmitCallbackResponse.builder().errors(validationErrors).build();
         }
 
@@ -660,28 +661,19 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             || caseData.getRespondent2OrgRegistered() == NO);
     }
 
-    private boolean areAnyRespondentsLitigantInPerson(CaseData caseData) {
-        return caseData.getRespondent1Represented() == NO
-            ||  isSecondRespondentLitigantInPerson(caseData);
-    }
-
-    private boolean isSecondRespondentLitigantInPerson(CaseData caseData) {
-        return (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
-    }
-
     private String getBody(CaseData caseData) {
         return areRespondentsRepresentedAndRegistered(caseData)
             ? getConfirmationSummary(caseData)
             : format(CONFIRMATION_BODY_LIP_COS,
                        format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()),
-                       format(caseDocLocation, caseData.getCcdCaseReference()),
+                       format(CASE_DOC_LOCATION, caseData.getCcdCaseReference()),
                        claimUrlsConfiguration.getResponsePackLink())
                 + exitSurveyContentService.applicantSurvey();
     }
 
     private String getConfirmationSummary(CaseData caseData) {
         return format(CONFIRMATION_SUMMARY,
-                      format(caseDocLocation, caseData.getCcdCaseReference()))
+                      format(CASE_DOC_LOCATION, caseData.getCcdCaseReference()))
                       + exitSurveyContentService.applicantSurvey();
     }
 
@@ -702,7 +694,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         DynamicList courtLocations = caseData.getCourtLocation().getApplicantPreferredCourtLocationList();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
-            fetchLocationData(authToken), courtLocations);
+            fetchLocationData(authToken, getCaseServiceId(caseData.getCaseAccessCategory())), courtLocations);
         if (nonNull(courtLocation)) {
             CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
             caseLocationCivil.setBaseLocation(epimmsId);
@@ -717,7 +709,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             caseData.setCourtLocation(courtLocation1);
 
             List<LocationRefData> locations = locationRefDataService
-                .getCourtLocationsByEpimmsId(authToken, epimmsId);
+                .getCourtLocationsByEpimmsId(authToken, epimmsId, getCaseServiceId(caseData.getCaseAccessCategory()));
             Optional.ofNullable(locations)
                 .orElseGet(Collections::emptyList).stream().findFirst()
                 .ifPresent(locationRefData -> caseData.setLocationName(locationRefData.getSiteName()));

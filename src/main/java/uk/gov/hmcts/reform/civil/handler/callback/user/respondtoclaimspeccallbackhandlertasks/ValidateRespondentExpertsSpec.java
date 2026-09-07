@@ -66,7 +66,7 @@ public class ValidateRespondentExpertsSpec implements CaseTask, ExpertsValidator
 
     private boolean hasSameLegalRep(CaseData caseData) {
         log.debug("Checking if Respondent 2 has the same legal representative for caseId: {}", caseData.getCcdCaseReference());
-        return respondToClaimSpecUtils.isRespondent2HasSameLegalRep(caseData);
+        return caseData.respondent2HasSameLegalRep();
     }
 
     private boolean isResponseDifferent(CaseData caseData) {

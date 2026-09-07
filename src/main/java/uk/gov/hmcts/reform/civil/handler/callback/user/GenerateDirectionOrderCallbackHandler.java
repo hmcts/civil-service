@@ -53,6 +53,8 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
+
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.nowInLocalZone;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -97,6 +99,7 @@ import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDateType.DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDateType.SINGLE_DATE;
 import static uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDownloadGenerator.BLANK_TEMPLATE_TO_BE_USED_AFTER_A_HEARING;
+import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -272,7 +275,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse generateTemplate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (!BLANK_TEMPLATE_TO_BE_USED_AFTER_A_HEARING.equals(caseData.getFinalOrderDownloadTemplateOptions().getValue().getLabel())) {
+        if (!BLANK_TEMPLATE_TO_BE_USED_AFTER_A_HEARING.equals(getFinalOrderDownloadTemplateOptionLabel(caseData))) {
             CaseDocument documentDownload = judgeOrderDownloadGenerator.generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
             caseData.setFinalOrderDownloadTemplateDocument(documentDownload);
             caseData.setShowOrderAfterHearingDatePage(NO);
@@ -331,7 +334,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         if (ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())) {
             String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
             List<LocationRefData> locations = (locationRefDataService
-                .getHearingCourtLocations(authToken));
+                .getHearingCourtLocations(authToken, getCaseServiceId(caseData.getCaseAccessCategory())));
             populateFields(caseData, locations, authToken);
         } else  {
             populateFreeFormFields(caseData);
@@ -847,7 +850,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         updatedFileName
             .append(document.getCreatedDatetime().toLocalDate().toString());
         if (caseData.getFinalOrderSelection() == null) {
-            if (BLANK_TEMPLATE_AFTER_HEARING.getLabel().equals(caseData.getFinalOrderDownloadTemplateOptions().getValue().getLabel())) {
+            if (BLANK_TEMPLATE_AFTER_HEARING.getLabel().equals(getFinalOrderDownloadTemplateOptionLabel(caseData))) {
                 updatedFileName.append("_order");
             } else {
                 updatedFileName.append("_directions order");
@@ -859,9 +862,16 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         return updatedFileName.append(".").append(ext).toString();
     }
 
+    private String getFinalOrderDownloadTemplateOptionLabel(CaseData caseData) {
+        return Optional.ofNullable(caseData.getFinalOrderDownloadTemplateOptions())
+            .map(DynamicList::getValue)
+            .map(DynamicListElement::getLabel)
+            .orElse("");
+    }
+
     private List<String> validateOrderAfterHearingDates(CaseData caseData) {
         List<String> errors = new ArrayList<>();
-        LocalDate now = LocalDate.now();
+        LocalDate now = nowInLocalZone().toLocalDate();
         OrderAfterHearingDate orderAfterHearingDate = caseData.getOrderAfterHearingDate();
         OrderAfterHearingDateType dateType = orderAfterHearingDate.getDateType();
 

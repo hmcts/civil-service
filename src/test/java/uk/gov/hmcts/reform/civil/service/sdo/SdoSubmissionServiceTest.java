@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -20,6 +21,8 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderCaseProgressionService;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,12 +45,20 @@ class SdoSubmissionServiceTest {
     private DirectionsOrderCaseProgressionService caseProgressionService;
     @Mock
     private SdoCaseClassificationService classificationService;
+    @Mock
+    private SdoReconsiderationDeadlineService reconsiderationDeadlineService;
 
     private SdoSubmissionService service;
 
     @BeforeEach
     void setUp() {
-        service = new SdoSubmissionService(featureToggleService, locationService, caseProgressionService, classificationService);
+        service = new SdoSubmissionService(
+            featureToggleService,
+            locationService,
+            caseProgressionService,
+            classificationService,
+            reconsiderationDeadlineService
+        );
     }
 
     @Test
@@ -194,11 +205,56 @@ class SdoSubmissionServiceTest {
         verify(caseProgressionService).applyCaseProgressionRouting(caseData, AUTH_TOKEN, false, true);
     }
 
+    @Test
+    void shouldSetRequestForReconsiderationDeadlineForEligibleSdo() {
+        LocalDateTime deadline = LocalDateTime.of(2026, 8, 20, 16, 0);
+        CaseData caseData = eligibleReconsiderationCase();
+
+        when(reconsiderationDeadlineService.isEligibleForReconsideration(caseData)).thenReturn(true);
+        when(reconsiderationDeadlineService.calculateReconsiderationDeadline()).thenReturn(deadline);
+
+        CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
+
+        assertThat(result.getRequestForReconsiderationDeadline()).isEqualTo(deadline);
+    }
+
+    @Test
+    void shouldNotOverrideExistingRequestForReconsiderationDeadline() {
+        LocalDateTime existingDeadline = LocalDateTime.of(2026, 8, 20, 16, 0);
+        CaseData caseData = eligibleReconsiderationCase();
+        caseData.setRequestForReconsiderationDeadline(existingDeadline);
+
+        CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
+
+        assertThat(result.getRequestForReconsiderationDeadline()).isEqualTo(existingDeadline);
+    }
+
+    @Test
+    void shouldNotSetRequestForReconsiderationDeadlineWhenDecisionCreatesSdo() {
+        CaseData caseData = eligibleReconsiderationCase();
+        caseData.setDecisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO);
+
+        when(reconsiderationDeadlineService.isEligibleForReconsideration(caseData)).thenReturn(false);
+
+        CaseData result = service.prepareSubmission(caseData, AUTH_TOKEN);
+
+        assertThat(result.getRequestForReconsiderationDeadline()).isNull();
+    }
+
     private void mockEaCourtMutation(CaseData caseData, YesOrNo value) {
         doAnswer(invocation -> {
             caseData.setEaCourtLocation(value);
             return null;
         }).when(caseProgressionService).applyCaseProgressionRouting(caseData, AUTH_TOKEN, false, true);
+    }
+
+    private CaseData eligibleReconsiderationCase() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("20262"));
+        caseData.setResponseClaimTrack("SMALL_CLAIM");
+        caseData.setTotalClaimAmount(BigDecimal.valueOf(100));
+        return caseData;
     }
 
 }

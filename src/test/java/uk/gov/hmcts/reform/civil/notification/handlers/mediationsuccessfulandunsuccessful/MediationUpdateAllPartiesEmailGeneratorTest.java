@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulanduns
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmdisabled.CarmDisabledClaimantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmdisabled.CarmDisabledDefendantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmdisabled.CarmDisabledRespSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmdisabled.CarmDisabledRespSolTwoEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmenabled.CarmAppSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmenabled.CarmClaimantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmenabled.CarmDefendantEmailDTOGenerator;
@@ -44,6 +45,8 @@ class MediationUpdateAllPartiesEmailGeneratorTest {
     private CarmDisabledAppSolOneEmailDTOGenerator carmDisabledAppSolOneEmailDTOGenerator;
     @Mock
     private CarmDisabledRespSolOneEmailDTOGenerator carmDisabledRespSolOneEmailDTOGenerator;
+    @Mock
+    private CarmDisabledRespSolTwoEmailDTOGenerator carmDisabledRespSolTwoEmailDTOGenerator;
     @Mock
     private CarmDisabledClaimantEmailDTOGenerator carmDisabledClaimantEmailDTOGenerator;
     @Mock
@@ -99,6 +102,10 @@ class MediationUpdateAllPartiesEmailGeneratorTest {
         when(carmDisabledRespSolOneEmailDTOGenerator.buildEmailDTO(caseData, taskId))
             .thenReturn(new EmailDTO("test@example.com", "DisabledRespSolOne", null, "ref-id"));
 
+        when(carmDisabledRespSolTwoEmailDTOGenerator.getShouldNotify(caseData)).thenReturn(true);
+        when(carmDisabledRespSolTwoEmailDTOGenerator.buildEmailDTO(caseData, taskId))
+            .thenReturn(new EmailDTO("test@example.com", "DisabledRespSolTwo", null, "ref-id"));
+
         when(carmDisabledClaimantEmailDTOGenerator.getShouldNotify(caseData)).thenReturn(true);
         when(carmDisabledClaimantEmailDTOGenerator.buildEmailDTO(caseData, taskId))
             .thenReturn(new EmailDTO("test@example.com", "DisabledClaimant", null, "ref-id"));
@@ -111,9 +118,11 @@ class MediationUpdateAllPartiesEmailGeneratorTest {
 
         Set<EmailDTO> emails = generator.getPartiesToNotify(caseData, taskId);
 
-        assertThat(emails).hasSize(4);
+        assertThat(emails).hasSize(5);
         verify(carmDisabledDefendantEmailDTOGenerator).getShouldNotify(caseData);
         verify(carmDisabledDefendantEmailDTOGenerator).buildEmailDTO(caseData, taskId);
+        verify(carmDisabledRespSolTwoEmailDTOGenerator).getShouldNotify(caseData);
+        verify(carmDisabledRespSolTwoEmailDTOGenerator).buildEmailDTO(caseData, taskId);
     }
 
     @Test

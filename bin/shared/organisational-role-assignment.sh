@@ -23,8 +23,8 @@ BASEDIR=$(dirname "$0")
 
 USER_TOKEN=$($BASEDIR/idam-user-token.sh $USERNAME $PASSWORD)
 USER_ID=$($BASEDIR/idam-user-id.sh $USER_TOKEN)
-SERVICE_TOKEN=$($BASEDIR/idam-lease-service-token.sh civil_service \
-                $(docker run --rm hmctspublic.azurecr.io/imported/toolbelt/oathtool --totp -b ${S2S_SECRET:-AABBCCDDEEFFGGHH}))
+SERVICE_TOKEN=$(IDAM_SERVICE_SECRET="${S2S_SECRET:-AABBCCDDEEFFGGHH}" \
+  "$BASEDIR/idam-lease-service-token.sh" civil_service)
 
 echo "\n\nCreating role assignment: \n User: ${USER_ID}\n Role name: ${ROLE_NAME}\n ROLE_CLASSIFICATION: ${ROLE_CLASSIFICATION}\n"
 echo "\n\nROLE ASSIGNMENT URL: \n Url: ${ROLE_ASSIGNMENT_URL}\n"

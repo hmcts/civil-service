@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 
+@Slf4j
 @Accessors(chain = true)
 @Data
 @NoArgsConstructor
@@ -27,6 +29,10 @@ public class RepaymentPlanLRspec {
     @JsonIgnore
     public LocalDate finalPaymentBy(BigDecimal totalAmount) {
         if (firstRepaymentDate != null && paymentAmount != null && repaymentFrequency != null) {
+            if (BigDecimal.ZERO.compareTo(paymentAmount) >= 0) {
+                log.error("Payment amount is zero or less, cannot calculate final payment date");
+                return null;
+            }
             long installmentsAfterFirst = totalAmount.divide(MonetaryConversions.penniesToPounds(paymentAmount), 0, RoundingMode.CEILING)
                 .longValue() - 1;
             switch (repaymentFrequency) {

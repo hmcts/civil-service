@@ -30,6 +30,8 @@ class ClaimantResponseTest extends BpmnBaseTest {
 
     public static final String PROCEED_OFFLINE_FOR_RESPONSE_TO_DEFENCE_ACTIVITY_ID_MULTITRACK
         = "ProceedOfflineForResponseToDefenceMultitrack";
+    public static final String PROCEED_OFFLINE_FOR_DIVERGENT_RESPONSE_TO_DEFENCE_ACTIVITY_ID
+        = "ProceedOfflineForDivergentResponseToDefence";
     public static final String TRIGGER_APPLICATION_PROCEEDS_IN_HERITAGE = "TRIGGER_APPLICATION_PROCEEDS_IN_HERITAGE";
     private static final String APPLICATION_PROCEEDS_IN_HERITAGE_ACTIVITY_ID = "UpdateGeneralApplicationStatus";
     public static final String APPLICATION_OFFLINE_UPDATE_CLAIM = "APPLICATION_OFFLINE_UPDATE_CLAIM";
@@ -266,6 +268,174 @@ class ClaimantResponseTest extends BpmnBaseTest {
         );
 
         //complete the Robotics notification
+        ExternalTask forRobotics = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            forRobotics,
+            PROCESS_CASE_EVENT,
+            NOTIFY_RPA_ON_CASE_HANDED_OFFLINE,
+            NOTIFY_RPA_ON_CASE_HANDED_OFFLINE_ACTIVITY_ID,
+            variables
+        );
+
+        //end business process
+        ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);
+        completeBusinessProcess(endBusinessProcess);
+
+        assertNoExternalTasksLeft();
+    }
+
+    // 2v1 / 1v2 claim where the claimants give divergent responses, so the claim is taken offline (DTSCCI-5026)
+    @Test
+    void shouldTakeClaimOfflineAndNotifyRpa_WhenClaimantResponseIsDivergent() {
+        //assert process has started
+        assertFalse(processInstance.isEnded());
+
+        //assert message start event
+        assertThat(getProcessDefinitionByMessage("CLAIMANT_RESPONSE").getKey())
+            .isEqualTo("CLAIMANT_RESPONSE_PROCESS_ID");
+
+        VariableMap variables = Variables.createVariables();
+        variables.putValue("flowState", "MAIN.FULL_DEFENCE_PROCEED");
+        variables.put(FLOW_FLAGS, Map.of(
+            ONE_RESPONDENT_REPRESENTATIVE, false,
+            TWO_RESPONDENT_REPRESENTATIVES, true,
+            "SDO_ENABLED", false
+        ));
+
+        //complete the start business process
+        ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
+        assertCompleteExternalTask(
+            startBusiness,
+            START_BUSINESS_TOPIC,
+            START_BUSINESS_EVENT,
+            START_BUSINESS_ACTIVITY,
+            variables
+        );
+
+        //complete the take offline event
+        ExternalTask takeOffline = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            takeOffline,
+            PROCESS_CASE_EVENT,
+            PROCEED_OFFLINE_EVENT,
+            PROCEED_OFFLINE_FOR_DIVERGENT_RESPONSE_TO_DEFENCE_ACTIVITY_ID,
+            variables
+        );
+
+        //Update General Application Status
+        ExternalTask updateApplicationStatus = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            updateApplicationStatus,
+            PROCESS_CASE_EVENT,
+            TRIGGER_APPLICATION_PROCEEDS_IN_HERITAGE,
+            APPLICATION_PROCEEDS_IN_HERITAGE_ACTIVITY_ID
+        );
+
+        //Update Claim Details with General Application Status
+        ExternalTask updateClaimWithApplicationStatus = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            updateClaimWithApplicationStatus,
+            PROCESS_CASE_EVENT,
+            APPLICATION_OFFLINE_UPDATE_CLAIM,
+            APPLICATION_OFFLINE_UPDATE_CLAIM_ACTIVITY_ID
+        );
+
+        //complete the document generation
+        ExternalTask documentGeneration = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            documentGeneration,
+            PROCESS_CASE_EVENT,
+            GENERATE_DIRECTIONS_QUESTIONNAIRE,
+            GENERATE_DIRECTIONS_QUESTIONNAIRE_ACTIVITY_ID,
+            variables
+        );
+
+        //complete the notification to parties
+        ExternalTask notifyParties = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            notifyParties,
+            PROCESS_CASE_EVENT,
+            "NOTIFY_EVENT",
+            "ClaimantConfirmsToProceedNotify"
+        );
+
+        //complete the Robotics notification, so the offline claim is handed over to caseman
+        ExternalTask forRobotics = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            forRobotics,
+            PROCESS_CASE_EVENT,
+            NOTIFY_RPA_ON_CASE_HANDED_OFFLINE,
+            NOTIFY_RPA_ON_CASE_HANDED_OFFLINE_ACTIVITY_ID,
+            variables
+        );
+
+        //end business process
+        ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);
+        completeBusinessProcess(endBusinessProcess);
+
+        assertNoExternalTasksLeft();
+    }
+
+    // multi track claim with minti enabled where the claimants give divergent responses (DTSCCI-5026)
+    @Test
+    void shouldTakeClaimOfflineAndNotifyRpa_WhenClaimantResponseIsDivergentOnMultiTrackWithMintiEnabled() {
+        //assert process has started
+        assertFalse(processInstance.isEnded());
+
+        //assert message start event
+        assertThat(getProcessDefinitionByMessage("CLAIMANT_RESPONSE").getKey())
+            .isEqualTo("CLAIMANT_RESPONSE_PROCESS_ID");
+
+        VariableMap variables = Variables.createVariables();
+        variables.putValue("flowState", "MAIN.FULL_DEFENCE_PROCEED");
+        variables.put(FLOW_FLAGS, Map.of(
+            ONE_RESPONDENT_REPRESENTATIVE, false,
+            TWO_RESPONDENT_REPRESENTATIVES, true,
+            "SDO_ENABLED", false,
+            IS_MULTI_TRACK, true,
+            MINTI_ENABLED, true
+        ));
+
+        //complete the start business process
+        ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
+        assertCompleteExternalTask(
+            startBusiness,
+            START_BUSINESS_TOPIC,
+            START_BUSINESS_EVENT,
+            START_BUSINESS_ACTIVITY,
+            variables
+        );
+
+        //complete the take offline event
+        ExternalTask takeOffline = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            takeOffline,
+            PROCESS_CASE_EVENT,
+            PROCEED_OFFLINE_EVENT,
+            PROCEED_OFFLINE_FOR_RESPONSE_TO_DEFENCE_ACTIVITY_ID_MULTITRACK,
+            variables
+        );
+
+        //complete the document generation
+        ExternalTask documentGeneration = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            documentGeneration,
+            PROCESS_CASE_EVENT,
+            GENERATE_DIRECTIONS_QUESTIONNAIRE,
+            GENERATE_DIRECTIONS_QUESTIONNAIRE_ACTIVITY_ID,
+            variables
+        );
+
+        //complete the notification to parties
+        ExternalTask notifyParties = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            notifyParties,
+            PROCESS_CASE_EVENT,
+            "NOTIFY_EVENT",
+            "ClaimantConfirmsToProceedNotify"
+        );
+
+        //complete the Robotics notification, so the offline claim is handed over to caseman
         ExternalTask forRobotics = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(
             forRobotics,

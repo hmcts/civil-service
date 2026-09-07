@@ -49,14 +49,15 @@ public class ClaimantResponseUtils {
     }
 
     public LocalDate getClaimantFinalRepaymentDate(CaseData caseData) {
-        BigDecimal paymentAmount = caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
+        BigDecimal paymentAmountInPennies = caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
         LocalDate firstRepaymentDate = caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec();
         PaymentFrequencyClaimantResponseLRspec repaymentFrequency = caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec();
 
         BigDecimal claimantTotalAmount = caseData.getTotalClaimAmount();
-        if (isNull(firstRepaymentDate) || isNull(paymentAmount) || isNull(repaymentFrequency)) {
+        if (isNull(firstRepaymentDate) || isNull(paymentAmountInPennies) || isNull(repaymentFrequency)) {
             return null;
         }
+        BigDecimal paymentAmount = MonetaryConversions.penniesToPounds(paymentAmountInPennies);
         long numberOfInstallmentsAfterFirst = getNumberOfInstallmentsAfterFirst(claimantTotalAmount, paymentAmount);
 
         return switch (repaymentFrequency) {

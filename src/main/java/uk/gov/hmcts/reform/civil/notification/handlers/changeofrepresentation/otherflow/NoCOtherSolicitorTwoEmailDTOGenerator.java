@@ -41,6 +41,9 @@ public class NoCOtherSolicitorTwoEmailDTOGenerator extends EmailDTOGenerator {
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         properties.putAll(noCHelper.getProperties(caseData, true));
+        // the outgoing solicitor's reference has already been removed from the case by this point,
+        // so restore it here to keep the email subject consistent with the earlier emails on the claim
+        properties.put(PARTY_REFERENCES, noCHelper.getNoCPartyReferences(caseData));
         return properties;
     }
 }

@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.bundle.BundleCreationService;
 
 import java.util.List;
@@ -37,20 +36,12 @@ public class AmendRestitchBundleCallbackHandler extends CallbackHandler {
     private final BundleCreationService bundleCreationService;
     private final BundleCreationTriggerEventHandler bundleCreationEventHandler;
 
-    private final FeatureToggleService featureToggleService;
-
     @Override
     protected Map<String, Callback> callbacks() {
-        return featureToggleService.isAmendBundleEnabled()
-            ? Map.of(
+        return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(ABOUT_TO_SUBMIT), this::amendRestitchBundle,
             callbackKey(SUBMITTED), this::buildConfirmation
-            )
-            : Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
-            callbackKey(SUBMITTED), this::emptyCallbackResponse
         );
     }
 
