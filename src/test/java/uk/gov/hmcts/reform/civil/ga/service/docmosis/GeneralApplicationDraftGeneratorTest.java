@@ -275,6 +275,33 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
     }
 
     @Test
+    void shouldGenerateTemplateDataWhenInformOtherPartyIsMissing() {
+        List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
+        GASolicitorDetailsGAspec respondent1 =
+                new GASolicitorDetailsGAspec()
+                        .setId("id")
+                        .setEmail(DUMMY_EMAIL)
+                        .setOrganisationIdentifier("org2");
+
+        respondentSols.add(element(respondent1));
+        GeneralApplicationCaseData caseData =
+                getCase(respondentSols, NO)
+                        .copy()
+                        .generalAppInformOtherParty(null)
+                        .applicationIsCloaked(YES)
+                        .build();
+
+        when(listGeneratorService.claimantsName(caseData)).thenReturn("Test Claimant1 Name");
+        when(listGeneratorService.defendantsName(caseData)).thenReturn("Test Defendant1 Name");
+        CaseDetails parentCaseDetails = CaseDetails.builder().data(Map.of()).build();
+        when(coreCaseDataService.getCase(PARENT_CCD_REF)).thenReturn(parentCaseDetails);
+
+        var templateData = generalApplicationDraftGenerator.getTemplateData(caseData);
+
+        assertThat(templateData.getIsWithNotice()).isNull();
+    }
+
+    @Test
     void shouldGenerateDocumentWithApplicantAndRespondentsResponse_1v2_test() {
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
         GASolicitorDetailsGAspec respondent1 =
