@@ -110,7 +110,7 @@ class ScheduledTaskRunnerTest {
 
         verify(scheduledEventTracker).jobStartedEvent(eventConfig, 1);
         verify(scheduledTaskProcessor).performProcessing(eq(eventConfig), eq(scheduledTask), eq(searchResult), anyList());
-        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(1), eq(1), eq(0), eq(Duration.ZERO), any(), any(), any());
+        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), any(ScheduledJobReport.class));
     }
 
     @Test
@@ -152,7 +152,7 @@ class ScheduledTaskRunnerTest {
 
         scheduledTaskRunner.run(SCHEDULER_NAME, () -> searchResult, scheduledTask);
 
-        verify(scheduledEventTracker).jobAbortedEvent(eq(eventConfig), eq(2), eq(0), eq(2), eq("Error 2"), eq(Duration.ofMillis(100)), any(), any(), any());
+        verify(scheduledEventTracker).jobAbortedEvent(eq(eventConfig), any(ScheduledJobReport.class));
     }
 
     @Test
@@ -170,7 +170,7 @@ class ScheduledTaskRunnerTest {
 
         scheduledTaskRunner.run(SCHEDULER_NAME, () -> searchResult, scheduledTask);
 
-        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(2), eq(1), eq(1), eq(Duration.ZERO), any(), any(), any());
+        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), any(ScheduledJobReport.class));
     }
 
     @Test
@@ -193,8 +193,8 @@ class ScheduledTaskRunnerTest {
         scheduledTaskRunner.run(config);
 
         verify(featureToggleService).isSpringSchedulerEnabled(SCHEDULER_NAME);
-        verify(scheduledEventTracker).jobStartedEvent(eq(eventConfig), eq(1));
+        verify(scheduledEventTracker).jobStartedEvent(eventConfig, 1);
         verify(scheduledTaskProcessor).performProcessing(eq(eventConfig), eq(scheduledTask), eq(searchResult), anyList());
-        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(1), eq(1), eq(0), eq(Duration.ZERO), any(), any(), any());
+        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), any(ScheduledJobReport.class));
     }
 }
