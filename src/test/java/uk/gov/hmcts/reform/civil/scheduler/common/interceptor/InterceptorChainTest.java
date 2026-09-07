@@ -127,9 +127,7 @@ class InterceptorChainTest {
         );
         chain.next(context);
 
-        assertThat(context.getMetrics()).containsKey("Interceptor1");
-        assertThat(context.getMetrics().get("Interceptor1")).isEqualTo(40);
-        assertThat(context.getMetrics()).containsKey("FinalTask");
-        assertThat(context.getMetrics().get("FinalTask")).isEqualTo(20);
+        assertThat(context.getMetrics()).containsEntry("Interceptor1", 40L);
+        assertThat(context.getMetrics()).containsEntry("FinalTask", 20L);
     }
 }
