@@ -14,11 +14,13 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReferenceCsvLoader;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.ExcelCaseReference;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.cmc.model.ClaimEvent;
 
 import java.util.List;
 import java.util.Map;
@@ -27,6 +29,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,6 +60,44 @@ class AsyncCaseMigrationServiceTest {
             500, // migrationBatchSize
             10 // migrationWaitTime
         );
+    }
+
+    @Test
+    void shouldTriggerCmcMigrateCaseEventWithoutChangingData() {
+        @SuppressWarnings("unchecked")
+        MigrationTask<ExcelCaseReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.getEventSummary()).thenReturn("summary");
+        when(migrationTask.getEventDescription()).thenReturn("description");
+
+        Map<String, Object> existingData = Map.of("existing", "value");
+        CaseDetails caseDetails = CaseDetails.builder().id(1L).state("STATE").data(existingData).build();
+        StartEventResponse startEventResponse = StartEventResponse.builder()
+            .eventId("migrateCase")
+            .token("token123")
+            .caseDetails(caseDetails)
+            .build();
+        when(coreCaseDataService.startCMCUpdate(
+            ArgumentMatchers.anyString(),
+            ArgumentMatchers.eq(ClaimEvent.MIGRATE_CASE)
+        )).thenReturn(startEventResponse);
+
+        ExcelCaseReference firstReference = excelCaseReference("1111222233334444");
+        ExcelCaseReference secondReference = excelCaseReference("5555666677778888");
+
+        asyncCaseMigrationService.migrateCMCCasesAsync(migrationTask, List.of(firstReference, secondReference));
+
+        verify(coreCaseDataService).startCMCUpdate("1111222233334444", ClaimEvent.MIGRATE_CASE);
+        verify(coreCaseDataService).startCMCUpdate("5555666677778888", ClaimEvent.MIGRATE_CASE);
+        verify(migrationTask, never()).migrateCaseData(ArgumentMatchers.any(), ArgumentMatchers.any());
+
+        ArgumentCaptor<CaseDataContent> contentCaptor = ArgumentCaptor.forClass(CaseDataContent.class);
+        verify(coreCaseDataService).submitCMCUpdate(ArgumentMatchers.eq("1111222233334444"), contentCaptor.capture());
+        verify(coreCaseDataService).submitCMCUpdate(ArgumentMatchers.eq("5555666677778888"), contentCaptor.capture());
+        assertEquals("migrateCase", contentCaptor.getAllValues().get(0).getEvent().getId());
+        assertEquals("token123", contentCaptor.getAllValues().get(0).getEventToken());
+        assertEquals("summary", contentCaptor.getAllValues().get(0).getEvent().getSummary());
+        assertEquals("description", contentCaptor.getAllValues().get(0).getEvent().getDescription());
+        assertEquals(existingData, contentCaptor.getAllValues().get(0).getData());
     }
 
     @Test
@@ -347,5 +388,11 @@ class AsyncCaseMigrationServiceTest {
         verify(readOnlyTask).migrateGeneralApplicationCaseData(caseData, gaCaseData, caseReference);
         verify(coreCaseDataService, times(0)).startGeneralApplicationUpdate(ArgumentMatchers.anyString(), ArgumentMatchers.any(CaseEvent.class));
         verify(coreCaseDataService, times(0)).submitGeneralApplicationUpdate(ArgumentMatchers.anyString(), ArgumentMatchers.any(CaseDataContent.class));
+    }
+
+    private ExcelCaseReference excelCaseReference(String caseReference) {
+        ExcelCaseReference reference = new ExcelCaseReference();
+        reference.setCaseReference(caseReference);
+        return reference;
     }
 }
