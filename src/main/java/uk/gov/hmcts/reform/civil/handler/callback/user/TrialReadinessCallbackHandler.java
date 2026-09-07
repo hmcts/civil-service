@@ -136,7 +136,7 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
             } else {
                 caseData.setBusinessProcess(BusinessProcess.ready(GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT1));
             }
-        } else {
+        } else if (isRespondentSolicitorTwo(userRoles)) {
             if (caseData.getTrialReadyRespondent2() == YesOrNo.YES) {
                 caseData.setBusinessProcess(BusinessProcess.ready(RESPONDENT2_TRIAL_READY_NOTIFY_OTHERS));
             } else {
