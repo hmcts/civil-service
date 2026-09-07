@@ -16,7 +16,9 @@ public class ScheduledEventTracker {
     private static final String TOTAL_CASES = "totalCases";
     private static final String SUCCEEDED_CASES = "succeededCases";
     private static final String FAILED_CASES = "failedCases";
+    private static final String ABORTED_CASES = "abortedCases";
     private static final String ABORT_REASON = "abortReason";
+    private static final String JOB_ABORT_REASON = "jobAbortReason";
     private static final String CUMULATIVE_DELAY = "cumulativeDelay";
     private static final String SEARCH_DURATION = "searchDuration";
     private static final String PROCESSING_DURATION = "processingDuration";
@@ -95,7 +97,7 @@ public class ScheduledEventTracker {
         Map<String, String> properties = new HashMap<>();
         properties.put(SCHEDULER_NAME, eventConfig.getSchedulerName());
         properties.put(CASE_ID, caseId);
-        properties.put(ERROR, errorMessage);
+        properties.put(ABORT_REASON, errorMessage);
         properties.put(STATUS, ABORTED);
         metrics.forEach((key, value) -> properties.put(METRIC_PREFIX + key, String.valueOf(value)));
 
@@ -110,6 +112,7 @@ public class ScheduledEventTracker {
                 TOTAL_CASES, String.valueOf(report.totalCases()),
                 SUCCEEDED_CASES, String.valueOf(report.succeededCases()),
                 FAILED_CASES, String.valueOf(report.failedCases()),
+                ABORTED_CASES, String.valueOf(report.abortedCases()),
                 CUMULATIVE_DELAY, String.valueOf(report.cumulativeDelay().toMillis()),
                 SEARCH_DURATION, String.valueOf(report.searchDuration().toMillis()),
                 PROCESSING_DURATION, String.valueOf(report.processingDuration().toMillis()),
@@ -126,6 +129,7 @@ public class ScheduledEventTracker {
                 TOTAL_CASES, ZERO,
                 SUCCEEDED_CASES, ZERO,
                 FAILED_CASES, ZERO,
+                ABORTED_CASES, ZERO,
                 CUMULATIVE_DELAY, ZERO,
                 SEARCH_DURATION, String.valueOf(searchDuration.toMillis()),
                 PROCESSING_DURATION, ZERO,
@@ -142,7 +146,8 @@ public class ScheduledEventTracker {
                 TOTAL_CASES, String.valueOf(report.totalCases()),
                 SUCCEEDED_CASES, String.valueOf(report.succeededCases()),
                 FAILED_CASES, String.valueOf(report.failedCases()),
-                ABORT_REASON, report.abortReason() != null ? report.abortReason() : UNKNOWN,
+                ABORTED_CASES, String.valueOf(report.abortedCases()),
+                JOB_ABORT_REASON, report.jobAbortReason() != null ? report.jobAbortReason() : UNKNOWN,
                 CUMULATIVE_DELAY, String.valueOf(report.cumulativeDelay().toMillis()),
                 SEARCH_DURATION, String.valueOf(report.searchDuration().toMillis()),
                 PROCESSING_DURATION, String.valueOf(report.processingDuration().toMillis()),
@@ -159,7 +164,8 @@ public class ScheduledEventTracker {
                 TOTAL_CASES, ZERO,
                 SUCCEEDED_CASES, ZERO,
                 FAILED_CASES, ZERO,
-                ABORT_REASON, reason != null ? reason : UNKNOWN,
+                ABORTED_CASES, ZERO,
+                JOB_ABORT_REASON, reason != null ? reason : UNKNOWN,
                 CUMULATIVE_DELAY, ZERO,
                 SEARCH_DURATION, String.valueOf(searchDuration.toMillis()),
                 PROCESSING_DURATION, ZERO,
