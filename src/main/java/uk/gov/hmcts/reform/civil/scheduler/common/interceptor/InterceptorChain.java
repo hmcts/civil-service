@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 /**
  * Manages the execution of a sequence of {@link SchedulerInterceptor}s.
- * This class is stateful per execution and should be instantiated via {@link InterceptorRegistry}.
+ * This class is stateful per execution and should be instantiated via {@link InterceptorChainFactory}.
  *
  * @param <T> the type of item being processed
  */

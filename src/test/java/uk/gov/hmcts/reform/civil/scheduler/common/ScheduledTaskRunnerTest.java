@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -51,7 +52,7 @@ class ScheduledTaskRunnerTest {
         ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1), 1);
         ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(List.of(1L), List.of(), false, "", Duration.ZERO);
 
-        when(scheduledTaskProcessor.performProcessing(any(), eq(scheduledTask), eq(searchResult)))
+        when(scheduledTaskProcessor.performProcessing(any(), eq(scheduledTask), eq(searchResult), anyList()))
             .thenReturn(outcome);
 
         scheduledTaskRunner.run(SCHEDULER_NAME, () -> searchResult, scheduledTask);
@@ -102,13 +103,13 @@ class ScheduledTaskRunnerTest {
         ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1), 1);
         ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(List.of(1L), List.of(), false, "", Duration.ZERO);
 
-        when(scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult))
+        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), eq(searchResult), anyList()))
             .thenReturn(outcome);
 
         scheduledTaskRunner.run(SCHEDULER_NAME, () -> searchResult, scheduledTask);
 
         verify(scheduledEventTracker).jobStartedEvent(eventConfig, 1);
-        verify(scheduledTaskProcessor).performProcessing(eventConfig, scheduledTask, searchResult);
+        verify(scheduledTaskProcessor).performProcessing(eq(eventConfig), eq(scheduledTask), eq(searchResult), anyList());
         verify(scheduledEventTracker).jobCompletedEvent(eventConfig, 1, 1, 0, Duration.ZERO);
     }
 
@@ -121,12 +122,12 @@ class ScheduledTaskRunnerTest {
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
         ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(List.of(1L), List.of(), false, "", Duration.ZERO);
 
-        when(scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult))
+        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), eq(searchResult), anyList()))
             .thenReturn(outcome);
 
         scheduledTaskRunner.run(SCHEDULER_NAME, () -> searchResult, scheduledTask);
 
-        verify(scheduledTaskProcessor).performProcessing(eventConfig, scheduledTask, searchResult);
+        verify(scheduledTaskProcessor).performProcessing(eq(eventConfig), eq(scheduledTask), eq(searchResult), anyList());
     }
 
     @Test
@@ -145,7 +146,7 @@ class ScheduledTaskRunnerTest {
             Duration.ofMillis(100)
         );
 
-        when(scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult))
+        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), eq(searchResult), anyList()))
             .thenReturn(outcome);
 
         scheduledTaskRunner.run(SCHEDULER_NAME, () -> searchResult, scheduledTask);
@@ -163,11 +164,36 @@ class ScheduledTaskRunnerTest {
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
         ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(List.of(1L), List.of(2L), false, "", Duration.ZERO);
 
-        when(scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult))
+        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), eq(searchResult), anyList()))
             .thenReturn(outcome);
 
         scheduledTaskRunner.run(SCHEDULER_NAME, () -> searchResult, scheduledTask);
 
         verify(scheduledEventTracker).jobCompletedEvent(eventConfig, 2, 1, 1, Duration.ZERO);
+    }
+
+    @Test
+    void shouldRunScheduledTask_whenUsingConfigurationObject() {
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
+        CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
+        ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1), 1);
+        ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(List.of(1L), List.of(), false, "", Duration.ZERO);
+
+        ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
+        when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), eq(searchResult), anyList()))
+            .thenReturn(outcome);
+
+        ScheduledTaskConfiguration<CaseDetails, Long> config = ScheduledTaskConfiguration.<CaseDetails, Long>builder()
+            .schedulerName(SCHEDULER_NAME)
+            .searchResultSupplier(() -> searchResult)
+            .scheduledTask(scheduledTask)
+            .build();
+
+        scheduledTaskRunner.run(config);
+
+        verify(featureToggleService).isSpringSchedulerEnabled(SCHEDULER_NAME);
+        verify(scheduledEventTracker).jobStartedEvent(eq(eventConfig), eq(1));
+        verify(scheduledTaskProcessor).performProcessing(eq(eventConfig), eq(scheduledTask), eq(searchResult), anyList());
+        verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), eq(1), eq(1), eq(0), eq(Duration.ZERO));
     }
 }

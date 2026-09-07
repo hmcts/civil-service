@@ -3,8 +3,10 @@ package uk.gov.hmcts.reform.civil.scheduler.common;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.SchedulerInterceptor;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -30,10 +32,25 @@ public class ScheduledTaskRunner<T, I> {
     public void run(String schedulerName,
                     Supplier<? extends TaskResult<T>> searchResultSupplier,
                     ScheduledTask<T, I> scheduledTask) {
-        if (featureToggleService.isSpringSchedulerEnabled(schedulerName)) {
-            log.info("Running {} scheduler", schedulerName);
-            TaskResult<T> searchResult = searchResultSupplier.get();
-            execute(new ScheduledTaskEventConfiguration(schedulerName), searchResult, scheduledTask);
+        run(ScheduledTaskConfiguration.<T, I>builder()
+            .schedulerName(schedulerName)
+            .searchResultSupplier(searchResultSupplier)
+            .scheduledTask(scheduledTask)
+            .build());
+    }
+
+    /**
+     * Executes the scheduled task using the provided configuration object.
+     * This is the preferred method for running scheduled tasks as it provides
+     * a cleaner and more descriptive API.
+     *
+     * @param config the configuration for the scheduled task
+     */
+    public void run(ScheduledTaskConfiguration<T, I> config) {
+        if (featureToggleService.isSpringSchedulerEnabled(config.getSchedulerName())) {
+            log.info("Running {} scheduler", config.getSchedulerName());
+            TaskResult<T> searchResult = config.getSearchResultSupplier().get();
+            execute(new ScheduledTaskEventConfiguration(config.getSchedulerName()), searchResult, config.getScheduledTask(), config.getInterceptors());
         }
     }
 
@@ -44,10 +61,12 @@ public class ScheduledTaskRunner<T, I> {
      * @param eventConfig   the event configuration
      * @param searchResult  the result of the search
      * @param scheduledTask the task to be performed on each item
+     * @param interceptors  the list of interceptors to apply
      */
     private void execute(ScheduledTaskEventConfiguration eventConfig,
                          TaskResult<T> searchResult,
-                         ScheduledTask<T, I> scheduledTask) {
+                         ScheduledTask<T, I> scheduledTask,
+                         List<SchedulerInterceptor<T>> interceptors) {
 
         if (searchResult == null) {
             eventTracker.jobAbortedEvent(eventConfig, "SearchResult cannot be null");
@@ -65,7 +84,7 @@ public class ScheduledTaskRunner<T, I> {
             return;
         }
 
-        processItems(eventConfig, scheduledTask, searchResult);
+        processItems(eventConfig, scheduledTask, searchResult, interceptors);
     }
 
     /**
@@ -75,10 +94,12 @@ public class ScheduledTaskRunner<T, I> {
      * @param eventConfig   the event configuration
      * @param scheduledTask the task to be performed on each item
      * @param searchResult  the result of the search containing the stream of items
+     * @param interceptors  the list of interceptors to apply
      */
     private void processItems(ScheduledTaskEventConfiguration eventConfig,
                                     ScheduledTask<T, I> scheduledTask,
-                                    TaskResult<T> searchResult) {
+                                    TaskResult<T> searchResult,
+                                    List<SchedulerInterceptor<T>> interceptors) {
         int totalCases = searchResult.totalResults();
         eventTracker.jobStartedEvent(eventConfig, totalCases);
         log.info("Running scheduled task: {}, totalCases: {}", eventConfig.getSchedulerName(), totalCases);
@@ -86,7 +107,8 @@ public class ScheduledTaskRunner<T, I> {
         ScheduledTaskOutcome<I> outcome = scheduledTaskProcessor.performProcessing(
             eventConfig,
             scheduledTask,
-            searchResult
+            searchResult,
+            interceptors
         );
 
         if (outcome.abortedEarly()) {

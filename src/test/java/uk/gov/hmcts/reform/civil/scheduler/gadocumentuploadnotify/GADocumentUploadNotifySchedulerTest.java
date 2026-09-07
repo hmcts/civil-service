@@ -10,8 +10,7 @@ import uk.gov.hmcts.reform.civil.ga.service.search.GaEvidenceUploadNotificationS
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,10 +30,9 @@ class GADocumentUploadNotifySchedulerTest {
         scheduler.runScheduledTask();
 
         assertThat(scheduler.getName()).isEqualTo(GADocumentUploadNotifyScheduler.SCHEDULER_NAME);
-        verify(scheduledTaskRunner).run(
-            eq(GADocumentUploadNotifyScheduler.SCHEDULER_NAME),
-            any(),
-            eq(gaDocumentUploadNotifyScheduledTask)
-        );
+        verify(scheduledTaskRunner).run(argThat(config ->
+            GADocumentUploadNotifyScheduler.SCHEDULER_NAME.equals(config.getSchedulerName())
+                && gaDocumentUploadNotifyScheduledTask.equals(config.getScheduledTask())
+        ));
     }
 }

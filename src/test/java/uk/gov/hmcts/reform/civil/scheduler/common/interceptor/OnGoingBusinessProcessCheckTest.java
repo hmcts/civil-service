@@ -8,7 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.scheduler.casedismissed.CaseDismissedScheduler;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,11 +74,5 @@ class OnGoingBusinessProcessCheckTest {
         TaskAbortedException exception = assertThrows(TaskAbortedException.class, () -> check.accept(context, chain));
         assertThat(exception.getReason()).isEqualTo("Ongoing business process");
         verify(chain, never()).next(context);
-    }
-
-    @Test
-    void shouldSupportCaseDismissedScheduler() {
-        assertThat(check.supports(CaseDismissedScheduler.SCHEDULER_NAME)).isTrue();
-        assertThat(check.supports("otherScheduler")).isFalse();
     }
 }
