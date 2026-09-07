@@ -32,6 +32,7 @@ public class ScheduledEventTracker {
     private static final String ERROR_CATEGORY = "errorCategory";
     private static final String PREVIOUS_DELAY = "previousDelay";
     private static final String CURRENT_DELAY = "currentDelay";
+    private static final String METRIC_PREFIX = "metric_";
 
     private final ErrorCategorizer errorCategorizer;
     private final TelemetryService telemetryService;
@@ -61,7 +62,7 @@ public class ScheduledEventTracker {
         properties.put(SCHEDULER_NAME, eventConfig.getSchedulerName());
         properties.put(CASE_ID, caseId);
         properties.put(STATUS, SUCCESS);
-        metrics.forEach((k, v) -> properties.put("metric_" + k, String.valueOf(v)));
+        metrics.forEach((key, value) -> properties.put(METRIC_PREFIX + key, String.valueOf(value)));
 
         telemetryService.trackEvent(eventConfig.getCaseProcessedEvent(), properties);
     }
@@ -81,7 +82,7 @@ public class ScheduledEventTracker {
         properties.put(STATUS, FAILURE);
         properties.put(ERROR, e.getMessage());
         properties.put(ERROR_CATEGORY, errorCategorizer.categorizeError(e));
-        metrics.forEach((k, v) -> properties.put("metric_" + k, String.valueOf(v)));
+        metrics.forEach((key, value) -> properties.put(METRIC_PREFIX + key, String.valueOf(value)));
 
         telemetryService.trackEvent(eventConfig.getCaseFailedEvent(), properties);
     }
@@ -96,30 +97,23 @@ public class ScheduledEventTracker {
         properties.put(CASE_ID, caseId);
         properties.put(ERROR, errorMessage);
         properties.put(STATUS, ABORTED);
-        metrics.forEach((k, v) -> properties.put("metric_" + k, String.valueOf(v)));
+        metrics.forEach((key, value) -> properties.put(METRIC_PREFIX + key, String.valueOf(value)));
 
         telemetryService.trackEvent(eventConfig.getCaseAbortedEvent(), properties);
     }
 
-    public void jobCompletedEvent(ScheduledTaskEventConfiguration eventConfig,
-                                  int totalCases,
-                                  int succeededCases,
-                                  int failedCases,
-                                  Duration cumulativeDelay,
-                                  Duration searchDuration,
-                                  Duration processingDuration,
-                                  Duration totalDuration) {
+    public void jobCompletedEvent(ScheduledTaskEventConfiguration eventConfig, ScheduledJobReport report) {
         telemetryService.trackEvent(
             eventConfig.getJobCompletedEvent(),
             Map.of(
                 SCHEDULER_NAME, eventConfig.getSchedulerName(),
-                TOTAL_CASES, String.valueOf(totalCases),
-                SUCCEEDED_CASES, String.valueOf(succeededCases),
-                FAILED_CASES, String.valueOf(failedCases),
-                CUMULATIVE_DELAY, String.valueOf(cumulativeDelay.toMillis()),
-                SEARCH_DURATION, String.valueOf(searchDuration.toMillis()),
-                PROCESSING_DURATION, String.valueOf(processingDuration.toMillis()),
-                TOTAL_DURATION, String.valueOf(totalDuration.toMillis())
+                TOTAL_CASES, String.valueOf(report.totalCases()),
+                SUCCEEDED_CASES, String.valueOf(report.succeededCases()),
+                FAILED_CASES, String.valueOf(report.failedCases()),
+                CUMULATIVE_DELAY, String.valueOf(report.cumulativeDelay().toMillis()),
+                SEARCH_DURATION, String.valueOf(report.searchDuration().toMillis()),
+                PROCESSING_DURATION, String.valueOf(report.processingDuration().toMillis()),
+                TOTAL_DURATION, String.valueOf(report.totalDuration().toMillis())
             )
         );
     }
@@ -140,27 +134,19 @@ public class ScheduledEventTracker {
         );
     }
 
-    public void jobAbortedEvent(ScheduledTaskEventConfiguration eventConfig,
-                                int totalCases,
-                                int succeededCases,
-                                int failedCases,
-                                String reason,
-                                Duration cumulativeDelay,
-                                Duration searchDuration,
-                                Duration processingDuration,
-                                Duration totalDuration) {
+    public void jobAbortedEvent(ScheduledTaskEventConfiguration eventConfig, ScheduledJobReport report) {
         telemetryService.trackEvent(
             eventConfig.getJobAbortedEvent(),
             Map.of(
                 SCHEDULER_NAME, eventConfig.getSchedulerName(),
-                TOTAL_CASES, String.valueOf(totalCases),
-                SUCCEEDED_CASES, String.valueOf(succeededCases),
-                FAILED_CASES, String.valueOf(failedCases),
-                ABORT_REASON, reason != null ? reason : UNKNOWN,
-                CUMULATIVE_DELAY, String.valueOf(cumulativeDelay.toMillis()),
-                SEARCH_DURATION, String.valueOf(searchDuration.toMillis()),
-                PROCESSING_DURATION, String.valueOf(processingDuration.toMillis()),
-                TOTAL_DURATION, String.valueOf(totalDuration.toMillis())
+                TOTAL_CASES, String.valueOf(report.totalCases()),
+                SUCCEEDED_CASES, String.valueOf(report.succeededCases()),
+                FAILED_CASES, String.valueOf(report.failedCases()),
+                ABORT_REASON, report.abortReason() != null ? report.abortReason() : UNKNOWN,
+                CUMULATIVE_DELAY, String.valueOf(report.cumulativeDelay().toMillis()),
+                SEARCH_DURATION, String.valueOf(report.searchDuration().toMillis()),
+                PROCESSING_DURATION, String.valueOf(report.processingDuration().toMillis()),
+                TOTAL_DURATION, String.valueOf(report.totalDuration().toMillis())
             )
         );
     }

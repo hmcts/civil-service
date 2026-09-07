@@ -125,14 +125,16 @@ public class ScheduledTaskRunner<T, I> {
         if (outcome.abortedEarly()) {
             eventTracker.jobAbortedEvent(
                 eventConfig,
-                totalCases,
-                outcome.succeededCases().size(),
-                outcome.failedCases().size(),
-                outcome.abortReason(),
-                outcome.cumulativeDelay(),
-                searchDuration,
-                outcome.processingDuration(),
-                totalDuration
+                ScheduledJobReport.builder()
+                    .totalCases(totalCases)
+                    .succeededCases(outcome.succeededCases().size())
+                    .failedCases(outcome.failedCases().size())
+                    .abortReason(outcome.abortReason())
+                    .cumulativeDelay(outcome.cumulativeDelay())
+                    .searchDuration(searchDuration)
+                    .processingDuration(outcome.processingDuration())
+                    .totalDuration(totalDuration)
+                    .build()
             );
             log.info(
                 "Scheduled task aborted: {}, totalCases: {}, succeededCases: {}, failedCases: {}, abortReason: {}, cumulativeDelay: {}, " +
@@ -150,13 +152,15 @@ public class ScheduledTaskRunner<T, I> {
         } else {
             eventTracker.jobCompletedEvent(
                 eventConfig,
-                totalCases,
-                outcome.succeededCases().size(),
-                outcome.failedCases().size(),
-                outcome.cumulativeDelay(),
-                searchDuration,
-                outcome.processingDuration(),
-                totalDuration
+                ScheduledJobReport.builder()
+                    .totalCases(totalCases)
+                    .succeededCases(outcome.succeededCases().size())
+                    .failedCases(outcome.failedCases().size())
+                    .cumulativeDelay(outcome.cumulativeDelay())
+                    .searchDuration(searchDuration)
+                    .processingDuration(outcome.processingDuration())
+                    .totalDuration(totalDuration)
+                    .build()
             );
             log.info(
                 "Scheduled task completed: {}, totalCases: {}, succeededCases: {}, failedCases: {}, cumulativeDelay: {}, " +
