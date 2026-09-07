@@ -1,0 +1,213 @@
+name: Renovate stalled queue alert
+
+on:
+  schedule:
+    - cron: '30 8 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      max_age_days:
+        description: 'Alert on open Renovate PRs at least this many days old'
+        required: false
+        default: '3'
+      threshold:
+        description: 'Minimum stale PR count required to alert'
+        required: false
+        default: '1'
+
+permissions:
+  checks: read
+  contents: read
+  pull-requests: read
+  statuses: read
+
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    env:
+      DEFAULT_MAX_AGE_DAYS: '3'
+      DEFAULT_THRESHOLD: '1'
+      REPOSITORIES: |
+        hmcts/civil-service
+        hmcts/civil-citizen-ui
+        hmcts/cmc-claim-store
+        hmcts/cmc-citizen-frontend
+        hmcts/civil-wa-task-configuration
+        hmcts/civil-ccd-definition
+      SLACK_WEBHOOK_URL: ${{ secrets.RENOVATE_ALERT_SLACK_WEBHOOK_URL }}
+    steps:
+      - name: Find stalled Renovate PRs
+        id: stalled
+        uses: actions/github-script@v8
+        env:
+          MAX_AGE_DAYS: ${{ inputs.max_age_days || '3' }}
+          THRESHOLD: ${{ inputs.threshold || '1' }}
+        with:
+          script: |
+            const maxAgeDays = Number(process.env.MAX_AGE_DAYS || process.env.DEFAULT_MAX_AGE_DAYS);
+            const threshold = Number(process.env.THRESHOLD || process.env.DEFAULT_THRESHOLD);
+
+            if (!Number.isInteger(maxAgeDays) || maxAgeDays < 1) {
+              throw new Error(`max_age_days must be a positive integer, got ${process.env.MAX_AGE_DAYS}`);
+            }
+            if (!Number.isInteger(threshold) || threshold < 1) {
+              throw new Error(`threshold must be a positive integer, got ${process.env.THRESHOLD}`);
+            }
+
+            const repositories = process.env.REPOSITORIES
+              .split('\n')
+              .map(repo => repo.trim())
+              .filter(Boolean)
+              .map(repo => {
+                const [owner, name] = repo.split('/');
+                if (!owner || !name) {
+                  throw new Error(`Repository must be in owner/name format, got ${repo}`);
+                }
+                return { owner, name, fullName: repo };
+              });
+
+            const query = `
+              query($owner: String!, $repo: String!, $cursor: String) {
+                repository(owner: $owner, name: $repo) {
+                  pullRequests(first: 100, after: $cursor, states: OPEN, orderBy: {field: CREATED_AT, direction: ASC}) {
+                    pageInfo {
+                      hasNextPage
+                      endCursor
+                    }
+                    nodes {
+                      number
+                      title
+                      url
+                      createdAt
+                      updatedAt
+                      isDraft
+                      mergeStateStatus
+                      reviewDecision
+                      author {
+                        login
+                      }
+                      labels(first: 20) {
+                        nodes {
+                          name
+                        }
+                      }
+                      statusCheckRollup {
+                        contexts(first: 50) {
+                          nodes {
+                            __typename
+                            ... on CheckRun {
+                              name
+                              conclusion
+                              status
+                            }
+                            ... on StatusContext {
+                              context
+                              state
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }`;
+
+            const renovateLogins = new Set(['renovate', 'renovate[bot]', 'renovate-bot']);
+            const cutoff = new Date(Date.now() - maxAgeDays * 24 * 60 * 60 * 1000);
+            const prs = [];
+
+            for (const repository of repositories) {
+              let cursor = null;
+              let hasNextPage = true;
+
+              while (hasNextPage) {
+                const result = await github.graphql(query, {
+                  owner: repository.owner,
+                  repo: repository.name,
+                  cursor
+                });
+                const page = result.repository.pullRequests;
+                prs.push(...page.nodes.map(pr => ({
+                  ...pr,
+                  repository: repository.fullName
+                })));
+                hasNextPage = page.pageInfo.hasNextPage;
+                cursor = page.pageInfo.endCursor;
+              }
+            }
+
+            const stalled = prs
+              .filter(pr => renovateLogins.has(pr.author?.login))
+              .filter(pr => new Date(pr.createdAt) <= cutoff)
+              .map(pr => {
+                const failed = [];
+                const pending = [];
+                for (const check of pr.statusCheckRollup?.contexts?.nodes || []) {
+                  if (check.__typename === 'CheckRun') {
+                    if (['FAILURE', 'TIMED_OUT', 'CANCELLED', 'ACTION_REQUIRED'].includes(check.conclusion)) {
+                      failed.push(check.name);
+                    } else if (check.status !== 'COMPLETED') {
+                      pending.push(check.name);
+                    }
+                  }
+                  if (check.__typename === 'StatusContext') {
+                    if (['FAILURE', 'ERROR'].includes(check.state)) {
+                      failed.push(check.context);
+                    } else if (check.state === 'PENDING') {
+                      pending.push(check.context);
+                    }
+                  }
+                }
+
+                const ageDays = Math.floor((Date.now() - new Date(pr.createdAt).getTime()) / (24 * 60 * 60 * 1000));
+                const blockers = [];
+                if (pr.isDraft) blockers.push('draft');
+                if (pr.reviewDecision && pr.reviewDecision !== 'APPROVED') blockers.push(pr.reviewDecision.toLowerCase().replace(/_/g, ' '));
+                if (pr.mergeStateStatus) blockers.push(`merge state ${pr.mergeStateStatus.toLowerCase()}`);
+                if (failed.length) blockers.push(`failed: ${failed.slice(0, 3).join(', ')}`);
+                if (pending.length) blockers.push(`pending: ${pending.slice(0, 3).join(', ')}`);
+
+                return {
+                  number: pr.number,
+                  repository: pr.repository,
+                  title: pr.title,
+                  url: pr.url,
+                  ageDays,
+                  updatedAt: pr.updatedAt,
+                  blockers: blockers.length ? blockers.join('; ') : 'no blocker reported by GitHub'
+                };
+              });
+
+            const hasStalledQueue = stalled.length >= threshold;
+            const summaryLines = [
+              `Open Renovate PRs older than ${maxAgeDays} day(s): ${stalled.length}`,
+              `Repositories: ${repositories.map(repo => repo.fullName).join(', ')}`,
+              `Alert threshold: ${threshold}`,
+              ''
+            ];
+
+            if (stalled.length) {
+              summaryLines.push(...stalled.map(pr =>
+                `- ${pr.repository} #${pr.number} (${pr.ageDays}d) ${pr.title}: ${pr.url} - ${pr.blockers}`
+              ));
+            } else {
+              summaryLines.push('No stalled Renovate PRs found.');
+            }
+
+            const summary = summaryLines.join('\n');
+            await core.summary.addRaw(summary).write();
+            core.setOutput('has_stalled_queue', String(hasStalledQueue));
+            core.setOutput('summary', summary);
+
+      - name: Notify Slack
+        if: steps.stalled.outputs.has_stalled_queue == 'true' && env.SLACK_WEBHOOK_URL != ''
+        env:
+          ALERT_SUMMARY: ${{ steps.stalled.outputs.summary }}
+        run: |
+          jq -n --arg text ":warning: Stalled Renovate queue in Civil repositories"$'\n\n'"${ALERT_SUMMARY}" '{text: $text}' \
+            | curl --fail --show-error --silent --request POST --header 'Content-type: application/json' --data @- "${SLACK_WEBHOOK_URL}"
+
+      - name: Fail when Renovate queue is stalled
+        if: steps.stalled.outputs.has_stalled_queue == 'true'
+        run: |
+          echo "Stalled Renovate queue detected. See the workflow summary for the affected PRs." >&2
+          exit 1

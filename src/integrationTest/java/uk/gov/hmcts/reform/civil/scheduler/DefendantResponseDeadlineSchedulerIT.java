@@ -19,7 +19,9 @@ import uk.gov.hmcts.test.helper.CoreCaseDataApiMockHelper;
 import uk.gov.hmcts.test.config.CoreCaseDataApiMockHelperConfiguration;
 
 import java.util.List;
+import java.util.Map;
 
+import static java.util.stream.IntStream.rangeClosed;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
@@ -30,7 +32,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_DE
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=DefendantResponseDeadlineSchedulerIT",
-    "scheduler.defendant-response.enabled=true",
+    "search.defendant-response.pageSize=50",
     "scheduler.lockAtLeastFor=PT0S"
 })
 public class DefendantResponseDeadlineSchedulerIT {
@@ -84,5 +86,36 @@ public class DefendantResponseDeadlineSchedulerIT {
         verify(telemetryService).trackEvent(eq("DefendantResponseDeadlineCaseProcessed"), anyMap());
         verify(telemetryService).trackEvent(eq("DefendantResponseDeadlineJobCompleted"), anyMap());
         coreCaseDataApiMockHelper.verifySubmitEvent(1);
+    }
+
+    @Test
+    void shouldExecuteDefendantResponseDeadlineSchedulerAcrossMultiplePages() {
+        // Given a result set one case larger than a single page
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateJudgmentRequested().id(CASE_ID).build();
+
+        SearchResult page1 = SearchResult.builder().total(51).cases(createCaseDetailsBatch(50)).build();
+        SearchResult page2 = SearchResult.builder().total(51)
+            .cases(List.of(CaseDetailsBuilder.builder().id(51L).data(Map.of()).build())).build();
+
+        coreCaseDataApiMockHelper.mockElasticSearchResultPaginated(page1, page2);
+        coreCaseDataApiMockHelper.mockStartEventAnyCase(
+            StartEventResponse.builder().eventId(CASE_ID.toString()).caseDetails(caseDetails).build(),
+            DEFENDANT_RESPONSE_DEADLINE_CHECK.name()
+        );
+        coreCaseDataApiMockHelper.mockSubmitEventAnyCase(caseDetails);
+
+        // When
+        scheduler.runScheduledTask();
+
+        // Then every case on both pages is processed
+        verify(telemetryService).trackEvent(eq("DefendantResponseDeadlineJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("DefendantResponseDeadlineJobCompleted"), anyMap());
+        coreCaseDataApiMockHelper.verifySubmitEvent(51);
+    }
+
+    private List<CaseDetails> createCaseDetailsBatch(int size) {
+        return rangeClosed(1, size)
+            .mapToObj(i -> CaseDetailsBuilder.builder().id((long) i).data(Map.of()).build())
+            .toList();
     }
 }
