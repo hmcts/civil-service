@@ -65,6 +65,7 @@ public class ScheduledTaskProcessor<T, I> {
             .sequential()
             .limit(maxCasesPerRun(scheduledTask));
 
+        Instant startProcessing = Instant.now();
         try {
             boolean completed = sequentialStream.allMatch(item -> processItem(
                 eventConfig,
@@ -80,7 +81,8 @@ public class ScheduledTaskProcessor<T, I> {
                 context.failedItems,
                 !completed,
                 context.abortReason.get(),
-                Duration.ofMillis(context.cumulativeDelayMillis.get())
+                Duration.ofMillis(context.cumulativeDelayMillis.get()),
+                Duration.between(startProcessing, Instant.now())
             );
         } catch (ScheduledTaskInterruptedException e) {
             context.abortReason.set(e.getMessage());
@@ -89,7 +91,8 @@ public class ScheduledTaskProcessor<T, I> {
                 context.failedItems,
                 true,
                 context.abortReason.get(),
-                Duration.ofMillis(context.cumulativeDelayMillis.get())
+                Duration.ofMillis(context.cumulativeDelayMillis.get()),
+                Duration.between(startProcessing, Instant.now())
             );
         }
     }
@@ -103,7 +106,6 @@ public class ScheduledTaskProcessor<T, I> {
         applyBackPressure(backPressure, context);
 
         I itemId = scheduledTask.getItemId(item);
-        Instant startedAt = Instant.now();
         InterceptorContext<T> interceptorContext = new InterceptorContext<>(eventConfig.getSchedulerName(), item);
 
         try {
@@ -111,7 +113,8 @@ public class ScheduledTaskProcessor<T, I> {
             chain.next(interceptorContext);
 
             if (chain.wasTaskExecuted()) {
-                handleSuccess(eventConfig, itemId, startedAt, backPressure, context, interceptorContext);
+                Duration duration = Duration.ofNanos(chain.getTotalTimeNanos());
+                handleSuccess(eventConfig, itemId, duration, backPressure, context, interceptorContext);
             } else {
                 handleAbortion(eventConfig, itemId, "Silent abortion", interceptorContext);
             }
@@ -125,11 +128,11 @@ public class ScheduledTaskProcessor<T, I> {
 
     private void handleSuccess(ScheduledTaskEventConfiguration eventConfig,
                                I itemId,
-                               Instant startedAt,
+                               Duration duration,
                                ScheduledTaskBackPressure backPressure,
                                ProcessingContext context,
                                InterceptorContext<T> interceptorContext) {
-        backPressure.afterSuccess(Duration.between(startedAt, Instant.now()));
+        backPressure.afterSuccess(duration);
         eventTracker.caseProcessedEvent(eventConfig, itemId.toString(), interceptorContext.getMetrics());
         context.succeededItems.add(itemId);
         context.consecutiveFailures.set(0);

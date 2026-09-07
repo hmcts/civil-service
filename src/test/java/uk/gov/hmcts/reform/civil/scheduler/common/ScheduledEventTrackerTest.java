@@ -120,7 +120,13 @@ class ScheduledEventTrackerTest {
 
     @Test
     void shouldTrackJobCompletedEvent() {
-        scheduledEventTracker.jobCompletedEvent(eventConfig, 3, 2, 1, Duration.ofMillis(500));
+        scheduledEventTracker.jobCompletedEvent(
+            eventConfig, 3, 2, 1,
+            Duration.ofMillis(500),
+            Duration.ofMillis(100),
+            Duration.ofMillis(400),
+            Duration.ofMillis(500)
+        );
 
         verify(telemetryService).trackEvent(
             eq("TestSchedulerJobCompleted"),
@@ -129,14 +135,23 @@ class ScheduledEventTrackerTest {
                 "totalCases", "3",
                 "succeededCases", "2",
                 "failedCases", "1",
-                "cumulativeDelay", "500"
+                "cumulativeDelay", "500",
+                "searchDuration", "100",
+                "processingDuration", "400",
+                "totalDuration", "500"
             ))
         );
     }
 
     @Test
     void shouldTrackJobAbortedEvent() {
-        scheduledEventTracker.jobAbortedEvent(eventConfig, 2, 0, 2, "Aborted due to too many errors", Duration.ofMillis(100));
+        scheduledEventTracker.jobAbortedEvent(
+            eventConfig, 2, 0, 2, "Aborted due to too many errors",
+            Duration.ofMillis(100),
+            Duration.ofMillis(50),
+            Duration.ofMillis(150),
+            Duration.ofMillis(200)
+        );
 
         verify(telemetryService).trackEvent(
             eq("TestSchedulerJobAborted"),
@@ -146,14 +161,20 @@ class ScheduledEventTrackerTest {
                 "succeededCases", "0",
                 "failedCases", "2",
                 "abortReason", "Aborted due to too many errors",
-                "cumulativeDelay", "100"
+                "cumulativeDelay", "100",
+                "searchDuration", "50",
+                "processingDuration", "150",
+                "totalDuration", "200"
             ))
         );
     }
 
     @Test
     void shouldTrackJobAbortedEventWithUnknownReason_whenReasonIsNull() {
-        scheduledEventTracker.jobAbortedEvent(eventConfig, 0, 0, 0, null, Duration.ZERO);
+        scheduledEventTracker.jobAbortedEvent(
+            eventConfig, 0, 0, 0, null,
+            Duration.ZERO, Duration.ZERO, Duration.ZERO, Duration.ZERO
+        );
 
         verify(telemetryService).trackEvent(
             eq("TestSchedulerJobAborted"),
@@ -163,14 +184,17 @@ class ScheduledEventTrackerTest {
                 "succeededCases", "0",
                 "failedCases", "0",
                 "abortReason", "Unknown",
-                "cumulativeDelay", "0"
+                "cumulativeDelay", "0",
+                "searchDuration", "0",
+                "processingDuration", "0",
+                "totalDuration", "0"
             ))
         );
     }
 
     @Test
     void shouldTrackJobCompletedNoCasesEvent() {
-        scheduledEventTracker.jobCompletedNoCasesEvent(eventConfig);
+        scheduledEventTracker.jobCompletedNoCasesEvent(eventConfig, Duration.ofMillis(100));
 
         verify(telemetryService).trackEvent(
             eq("TestSchedulerJobCompleted"),
@@ -179,7 +203,10 @@ class ScheduledEventTrackerTest {
                 "totalCases", "0",
                 "succeededCases", "0",
                 "failedCases", "0",
-                "cumulativeDelay", "0"
+                "cumulativeDelay", "0",
+                "searchDuration", "100",
+                "processingDuration", "0",
+                "totalDuration", "100"
             ))
         );
     }
@@ -218,7 +245,7 @@ class ScheduledEventTrackerTest {
 
     @Test
     void shouldTrackSimpleJobAbortedEvent() {
-        scheduledEventTracker.jobAbortedEvent(eventConfig, "Error reason");
+        scheduledEventTracker.jobAbortedEvent(eventConfig, "Error reason", Duration.ofMillis(100));
 
         verify(telemetryService).trackEvent(
             eq("TestSchedulerJobAborted"),
@@ -228,14 +255,17 @@ class ScheduledEventTrackerTest {
                 "succeededCases", "0",
                 "failedCases", "0",
                 "abortReason", "Error reason",
-                "cumulativeDelay", "0"
+                "cumulativeDelay", "0",
+                "searchDuration", "100",
+                "processingDuration", "0",
+                "totalDuration", "100"
             ))
         );
     }
 
     @Test
     void shouldTrackSimpleJobAbortedEventWithUnknownReason_whenReasonIsNull() {
-        scheduledEventTracker.jobAbortedEvent(eventConfig, null);
+        scheduledEventTracker.jobAbortedEvent(eventConfig, null, Duration.ZERO);
 
         verify(telemetryService).trackEvent(
             eq("TestSchedulerJobAborted"),
@@ -245,7 +275,10 @@ class ScheduledEventTrackerTest {
                 "succeededCases", "0",
                 "failedCases", "0",
                 "abortReason", "Unknown",
-                "cumulativeDelay", "0"
+                "cumulativeDelay", "0",
+                "searchDuration", "0",
+                "processingDuration", "0",
+                "totalDuration", "0"
             ))
         );
     }
