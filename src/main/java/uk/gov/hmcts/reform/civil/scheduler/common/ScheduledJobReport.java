@@ -8,11 +8,12 @@ public record ScheduledJobReport(
     int totalCases,
     int succeededCases,
     int failedCases,
+    int abortedCases,
     Duration cumulativeDelay,
     Duration searchDuration,
     Duration processingDuration,
     Duration totalDuration,
-    String abortReason
+    String jobAbortReason
 ) {
     public ScheduledJobReport {
         if (cumulativeDelay == null) {
