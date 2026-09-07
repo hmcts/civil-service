@@ -52,6 +52,7 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(TRIAL_READINESS);
     private static final String TOO_LATE = "Trial arrangements had to be confirmed more than 3 weeks before the trial.";
     private static final String NO_SMALL_CLAIMS = "This event is not available for small claims cases.";
+    static final String NO_ROLE = "Unable to determine user role.";
     public static final String READY_HEADER = "## You have said this case is ready for trial or hearing";
     public static final String READY_BODY = "### What happens next \n\n"
         + "You can view your and other party's trial arrangements in documents in the case details.\n\n "
@@ -114,6 +115,10 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
             errors.add(format(NO_SMALL_CLAIMS));
         }
 
+        if (userRoles.isEmpty()) {
+            errors.add(NO_ROLE);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.isEmpty() ? caseData.toMap(objectMapper) : null)
@@ -123,6 +128,16 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
     private CallbackResponse setBusinessProcess(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         List<String> userRoles = getUserRoles(callbackParams);
+
+        if (userRoles.isEmpty()) {
+            ArrayList<String> errors = new ArrayList<>();
+            errors.add(NO_ROLE);
+
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .data(caseData.toMap(objectMapper))
+                .build();
+        }
 
         if (isApplicantSolicitor(userRoles) || isLIPClaimant(userRoles)) {
             if (caseData.getTrialReadyApplicant() == YesOrNo.YES) {
