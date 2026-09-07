@@ -5,7 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.SchedulerInterceptor;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -49,8 +50,10 @@ public class ScheduledTaskRunner<T, I> {
     public void run(ScheduledTaskConfiguration<T, I> config) {
         if (featureToggleService.isSpringSchedulerEnabled(config.getSchedulerName())) {
             log.info("Running {} scheduler", config.getSchedulerName());
+            Instant start = Instant.now();
             TaskResult<T> searchResult = config.getSearchResultSupplier().get();
-            execute(new ScheduledTaskEventConfiguration(config.getSchedulerName()), searchResult, config.getScheduledTask(), config.getInterceptors());
+            Duration searchDuration = Duration.between(start, Instant.now());
+            execute(new ScheduledTaskEventConfiguration(config.getSchedulerName()), searchResult, config.getScheduledTask(), config.getInterceptors(), searchDuration, start);
         }
     }
 
@@ -58,18 +61,22 @@ public class ScheduledTaskRunner<T, I> {
      * Executes the scheduled task for items found in the search result.
      * Handles null search results and empty search results by logging and tracking events appropriately.
      *
-     * @param eventConfig   the event configuration
-     * @param searchResult  the result of the search
-     * @param scheduledTask the task to be performed on each item
-     * @param interceptors  the list of interceptors to apply
+     * @param eventConfig    the event configuration
+     * @param searchResult   the result of the search
+     * @param scheduledTask  the task to be performed on each item
+     * @param interceptors   the list of interceptors to apply
+     * @param searchDuration the duration of the search
+     * @param start          the start time of the job
      */
     private void execute(ScheduledTaskEventConfiguration eventConfig,
                          TaskResult<T> searchResult,
                          ScheduledTask<T, I> scheduledTask,
-                         List<SchedulerInterceptor<T>> interceptors) {
+                         List<SchedulerInterceptor<T>> interceptors,
+                         Duration searchDuration,
+                         Instant start) {
 
         if (searchResult == null) {
-            eventTracker.jobAbortedEvent(eventConfig, "SearchResult cannot be null");
+            eventTracker.jobAbortedEvent(eventConfig, "SearchResult cannot be null", searchDuration);
             log.error(
                 "Scheduled task aborted due to SearchResult being null: {}",
                 eventConfig.getSchedulerName()
@@ -79,12 +86,12 @@ public class ScheduledTaskRunner<T, I> {
 
         if (searchResult.isEmpty()) {
             eventTracker.jobStartedEvent(eventConfig, 0);
-            eventTracker.jobCompletedNoCasesEvent(eventConfig);
+            eventTracker.jobCompletedNoCasesEvent(eventConfig, searchDuration);
             log.info("Scheduled task completed: {}, totalCases: 0", eventConfig.getSchedulerName());
             return;
         }
 
-        processItems(eventConfig, scheduledTask, searchResult, interceptors);
+        processItems(eventConfig, scheduledTask, searchResult, interceptors, searchDuration, start);
     }
 
     /**
@@ -97,9 +104,11 @@ public class ScheduledTaskRunner<T, I> {
      * @param interceptors  the list of interceptors to apply
      */
     private void processItems(ScheduledTaskEventConfiguration eventConfig,
-                                    ScheduledTask<T, I> scheduledTask,
-                                    TaskResult<T> searchResult,
-                                    List<SchedulerInterceptor<T>> interceptors) {
+                              ScheduledTask<T, I> scheduledTask,
+                              TaskResult<T> searchResult,
+                              List<SchedulerInterceptor<T>> interceptors,
+                              Duration searchDuration,
+                              Instant start) {
         int totalCases = searchResult.totalResults();
         eventTracker.jobStartedEvent(eventConfig, totalCases);
         log.info("Running scheduled task: {}, totalCases: {}", eventConfig.getSchedulerName(), totalCases);
@@ -111,6 +120,8 @@ public class ScheduledTaskRunner<T, I> {
             interceptors
         );
 
+        Duration totalDuration = Duration.between(start, Instant.now());
+
         if (outcome.abortedEarly()) {
             eventTracker.jobAbortedEvent(
                 eventConfig,
@@ -118,16 +129,23 @@ public class ScheduledTaskRunner<T, I> {
                 outcome.succeededCases().size(),
                 outcome.failedCases().size(),
                 outcome.abortReason(),
-                outcome.cumulativeDelay()
+                outcome.cumulativeDelay(),
+                searchDuration,
+                outcome.processingDuration(),
+                totalDuration
             );
             log.info(
-                "Scheduled task aborted: {}, totalCases: {}, succeededCases: {}, failedCases: {}, abortReason: {}, cumulativeDelay: {}",
+                "Scheduled task aborted: {}, totalCases: {}, succeededCases: {}, failedCases: {}, abortReason: {}, cumulativeDelay: {}, " +
+                    "searchDuration: {}ms, processingDuration: {}ms, totalDuration: {}ms",
                 eventConfig.getSchedulerName(),
                 totalCases,
                 outcome.succeededCases().size(),
                 outcome.failedCases().size(),
                 outcome.abortReason(),
-                outcome.cumulativeDelay()
+                outcome.cumulativeDelay().toMillis(),
+                searchDuration.toMillis(),
+                outcome.processingDuration().toMillis(),
+                totalDuration.toMillis()
             );
         } else {
             eventTracker.jobCompletedEvent(
@@ -135,15 +153,22 @@ public class ScheduledTaskRunner<T, I> {
                 totalCases,
                 outcome.succeededCases().size(),
                 outcome.failedCases().size(),
-                outcome.cumulativeDelay()
+                outcome.cumulativeDelay(),
+                searchDuration,
+                outcome.processingDuration(),
+                totalDuration
             );
             log.info(
-                "Scheduled task completed: {}, totalCases: {}, succeededCases: {}, failedCases: {}, cumulativeDelay: {}",
+                "Scheduled task completed: {}, totalCases: {}, succeededCases: {}, failedCases: {}, cumulativeDelay: {}, " +
+                    "searchDuration: {}ms, processingDuration: {}ms, totalDuration: {}ms",
                 eventConfig.getSchedulerName(),
                 totalCases,
                 outcome.succeededCases().size(),
                 outcome.failedCases().size(),
-                outcome.cumulativeDelay()
+                outcome.cumulativeDelay().toMillis(),
+                searchDuration.toMillis(),
+                outcome.processingDuration().toMillis(),
+                totalDuration.toMillis()
             );
         }
     }

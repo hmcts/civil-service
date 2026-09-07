@@ -8,5 +8,6 @@ public record ScheduledTaskOutcome<I>(
     List<I> failedCases,
     boolean abortedEarly,
     String abortReason,
-    Duration cumulativeDelay
+    Duration cumulativeDelay,
+    Duration processingDuration
 ) {}
