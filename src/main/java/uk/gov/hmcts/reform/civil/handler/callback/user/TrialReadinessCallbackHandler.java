@@ -174,7 +174,11 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
         String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String ccdCaseRef = callbackParams.getCaseData().getCcdCaseReference().toString();
         UserInfo userInfo = userService.getUserInfo(bearerToken);
-        return coreCaseUserService.getUserCaseRoles(ccdCaseRef, userInfo.getUid());
+        final List<String> userCaseRoles = coreCaseUserService.getUserCaseRoles(ccdCaseRef, userInfo.getUid());
+        if (userCaseRoles.isEmpty()) {
+            log.error("User roles are empty for user {} and case {}", userInfo.getUid(), ccdCaseRef);
+        }
+        return userCaseRoles;
     }
 
     @Override
