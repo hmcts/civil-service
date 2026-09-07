@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.cmc.model.ClaimEvent;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -36,6 +37,7 @@ import java.util.UUID;
 
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CMC_CASE_TYPE;
+import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CMC_JURISDICTION;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
 import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
@@ -127,6 +129,34 @@ public class CoreCaseDataService {
             CASE_TYPE,
             caseId,
             eventName.name()
+        );
+    }
+
+    public StartEventResponse startCMCUpdate(String caseId, ClaimEvent cmcClaimEvent) {
+        UserAuthContent systemUpdateUser = getSystemUpdateUser();
+        return coreCaseDataApi.startEventForCaseWorker(
+            systemUpdateUser.getUserToken(),
+            authTokenGenerator.generate(),
+            systemUpdateUser.getUserId(),
+            CMC_JURISDICTION,
+            CMC_CASE_TYPE,
+            caseId,
+            cmcClaimEvent.getEventName()
+        );
+    }
+
+    public void submitCMCUpdate(String caseId, CaseDataContent caseDataContent) {
+        UserAuthContent systemUpdateUser = getSystemUpdateUser();
+
+        coreCaseDataApi.submitEventForCaseWorker(
+            systemUpdateUser.getUserToken(),
+            authTokenGenerator.generate(),
+            systemUpdateUser.getUserId(),
+            CMC_JURISDICTION,
+            CMC_CASE_TYPE,
+            caseId,
+            true,
+            caseDataContent
         );
     }
 
