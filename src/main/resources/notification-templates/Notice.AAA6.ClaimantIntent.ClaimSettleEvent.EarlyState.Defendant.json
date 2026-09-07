@@ -1,0 +1,8 @@
+{
+  "name": "Notice.AAA6.ClaimantIntent.ClaimSettleEvent.EarlyState.Defendant",
+  "role": "DEFENDANT",
+  "titleEn": "The claim is settled",
+  "titleCy": "Mae'r hawliad wedi'i setlo",
+  "descriptionEn": "<p class=\"govuk-body\">The claimant has confirmed that this case was settled on ${applicant1ClaimSettledDateEn}.</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Mae'r hawlydd wedi cadarnhau bod yr achos hwn wedi'i setlo ar ${applicant1ClaimSettledDateCy}.</p>"
+}
