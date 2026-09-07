@@ -15,6 +15,8 @@ import java.util.function.Function;
 @Slf4j
 public class InterceptorChain<T> {
 
+    private static final long NANOS_PER_MILLISECOND = 1_000_000L;
+
     private final List<SchedulerInterceptor<T>> interceptors;
     private final Consumer<InterceptorContext<T>> finalTask;
     private final Function<String, StopWatch> stopWatchFactory;
@@ -69,7 +71,7 @@ public class InterceptorChain<T> {
                 stopWatch.stop();
                 long durationNanos = stopWatch.getTotalTimeNanos();
                 long exclusiveTimeNanos = durationNanos - (totalDownstreamTimeNanos - beforeDownstream);
-                context.recordMetric(taskName, exclusiveTimeNanos / 1_000_000);
+                context.recordMetric(taskName, exclusiveTimeNanos / NANOS_PER_MILLISECOND);
                 totalDownstreamTimeNanos += exclusiveTimeNanos;
             }
         } else if (index == interceptors.size()) {
@@ -82,7 +84,7 @@ public class InterceptorChain<T> {
             } finally {
                 stopWatch.stop();
                 long durationNanos = stopWatch.getTotalTimeNanos();
-                context.recordMetric("FinalTask", durationNanos / 1_000_000);
+                context.recordMetric("FinalTask", durationNanos / NANOS_PER_MILLISECOND);
                 totalDownstreamTimeNanos += durationNanos;
             }
         }
@@ -95,5 +97,14 @@ public class InterceptorChain<T> {
      */
     public boolean wasTaskExecuted() {
         return taskExecuted;
+    }
+
+    /**
+     * Returns the total time taken by all interceptors and the final task in the chain.
+     *
+     * @return the total time in nanoseconds
+     */
+    public long getTotalTimeNanos() {
+        return totalDownstreamTimeNanos;
     }
 }
