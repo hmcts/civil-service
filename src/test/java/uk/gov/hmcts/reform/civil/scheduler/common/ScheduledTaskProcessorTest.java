@@ -83,6 +83,7 @@ class ScheduledTaskProcessorTest {
         assertThat(outcome).isNotNull();
         assertThat(outcome.succeededCases().size()).isEqualTo(3);
         assertThat(outcome.failedCases().size()).isEqualTo(0);
+        assertThat(outcome.abortedCases()).isEmpty();
 
         verify(scheduledTask).accept(case1);
         verify(scheduledTask).accept(case2);
@@ -207,7 +208,7 @@ class ScheduledTaskProcessorTest {
             );
 
             assertThat(outcome.abortedEarly()).isTrue();
-            assertThat(outcome.abortReason()).isEqualTo(
+            assertThat(outcome.jobAbortReason()).isEqualTo(
                 "Scheduled task interrupted while applying backpressure"
             );
             assertThat(outcome.succeededCases()).isEmpty();
@@ -242,7 +243,7 @@ class ScheduledTaskProcessorTest {
         ScheduledTaskOutcome<Long> outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
 
         assertThat(outcome.abortedEarly()).isTrue();
-        assertThat(outcome.abortReason()).isEqualTo("Error 2");
+        assertThat(outcome.jobAbortReason()).isEqualTo("Error 2");
         assertThat(outcome.succeededCases()).isEmpty();
         assertThat(outcome.failedCases()).containsExactly(1L, 2L);
 
@@ -298,7 +299,7 @@ class ScheduledTaskProcessorTest {
         ScheduledTaskOutcome<Long> outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
 
         assertThat(outcome.abortedEarly()).isTrue();
-        assertThat(outcome.abortReason()).isEqualTo("RuntimeException");
+        assertThat(outcome.jobAbortReason()).isEqualTo("RuntimeException");
         assertThat(outcome.failedCases()).containsExactly(1L);
     }
 
@@ -373,6 +374,7 @@ class ScheduledTaskProcessorTest {
 
         assertThat(outcome.succeededCases()).isEmpty();
         assertThat(outcome.failedCases()).isEmpty();
+        assertThat(outcome.abortedCases()).containsExactly(1L);
         assertThat(outcome.abortedEarly()).isFalse();
 
         verify(scheduledEventTracker).caseAbortedEvent(eq(eventConfig), eq("1"), eq("Ongoing business process"), anyMap());
@@ -398,6 +400,7 @@ class ScheduledTaskProcessorTest {
 
         assertThat(outcome.succeededCases()).isEmpty();
         assertThat(outcome.failedCases()).isEmpty();
+        assertThat(outcome.abortedCases()).containsExactly(1L);
         assertThat(outcome.abortedEarly()).isFalse();
 
         verify(scheduledEventTracker).caseAbortedEvent(eq(eventConfig), eq("1"), eq("Silent abortion"), anyMap());

@@ -129,7 +129,8 @@ public class ScheduledTaskRunner<T, I> {
                     .totalCases(totalCases)
                     .succeededCases(outcome.succeededCases().size())
                     .failedCases(outcome.failedCases().size())
-                    .abortReason(outcome.abortReason())
+                    .abortedCases(outcome.abortedCases().size())
+                    .jobAbortReason(outcome.jobAbortReason())
                     .cumulativeDelay(outcome.cumulativeDelay())
                     .searchDuration(searchDuration)
                     .processingDuration(outcome.processingDuration())
@@ -137,13 +138,14 @@ public class ScheduledTaskRunner<T, I> {
                     .build()
             );
             log.info(
-                "Scheduled task aborted: {}, totalCases: {}, succeededCases: {}, failedCases: {}, abortReason: {}, cumulativeDelay: {}, " +
+                "Scheduled task aborted: {}, totalCases: {}, succeededCases: {}, failedCases: {}, abortedCases: {}, jobAbortReason: {}, cumulativeDelay: {}, " +
                     "searchDuration: {}ms, processingDuration: {}ms, totalDuration: {}ms",
                 eventConfig.getSchedulerName(),
                 totalCases,
                 outcome.succeededCases().size(),
                 outcome.failedCases().size(),
-                outcome.abortReason(),
+                outcome.abortedCases().size(),
+                outcome.jobAbortReason(),
                 outcome.cumulativeDelay().toMillis(),
                 searchDuration.toMillis(),
                 outcome.processingDuration().toMillis(),
@@ -156,6 +158,7 @@ public class ScheduledTaskRunner<T, I> {
                     .totalCases(totalCases)
                     .succeededCases(outcome.succeededCases().size())
                     .failedCases(outcome.failedCases().size())
+                    .abortedCases(outcome.abortedCases().size())
                     .cumulativeDelay(outcome.cumulativeDelay())
                     .searchDuration(searchDuration)
                     .processingDuration(outcome.processingDuration())
@@ -163,12 +166,13 @@ public class ScheduledTaskRunner<T, I> {
                     .build()
             );
             log.info(
-                "Scheduled task completed: {}, totalCases: {}, succeededCases: {}, failedCases: {}, cumulativeDelay: {}, " +
+                "Scheduled task completed: {}, totalCases: {}, succeededCases: {}, failedCases: {}, abortedCases: {}, cumulativeDelay: {}, " +
                     "searchDuration: {}ms, processingDuration: {}ms, totalDuration: {}ms",
                 eventConfig.getSchedulerName(),
                 totalCases,
                 outcome.succeededCases().size(),
                 outcome.failedCases().size(),
+                outcome.abortedCases().size(),
                 outcome.cumulativeDelay().toMillis(),
                 searchDuration.toMillis(),
                 outcome.processingDuration().toMillis(),

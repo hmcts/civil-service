@@ -50,7 +50,7 @@ class ScheduledTaskRunnerTest {
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1), 1);
-        ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(List.of(1L), List.of(), false, "", Duration.ZERO, Duration.ZERO);
+        ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(List.of(1L), List.of(), List.of(), false, "", Duration.ZERO, Duration.ZERO);
 
         when(scheduledTaskProcessor.performProcessing(any(), eq(scheduledTask), eq(searchResult), anyList()))
             .thenReturn(outcome);
@@ -101,7 +101,7 @@ class ScheduledTaskRunnerTest {
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1), 1);
-        ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(List.of(1L), List.of(), false, "", Duration.ZERO, Duration.ZERO);
+        ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(List.of(1L), List.of(), List.of(), false, "", Duration.ZERO, Duration.ZERO);
 
         when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), eq(searchResult), anyList()))
             .thenReturn(outcome);
@@ -120,7 +120,7 @@ class ScheduledTaskRunnerTest {
         ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1), 1);
 
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
-        ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(List.of(1L), List.of(), false, "", Duration.ZERO, Duration.ZERO);
+        ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(List.of(1L), List.of(), List.of(), false, "", Duration.ZERO, Duration.ZERO);
 
         when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), eq(searchResult), anyList()))
             .thenReturn(outcome);
@@ -141,6 +141,7 @@ class ScheduledTaskRunnerTest {
         ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(
             List.of(),
             List.of(1L, 2L),
+            List.of(),
             true,
             "Error 2",
             Duration.ofMillis(100),
@@ -163,7 +164,7 @@ class ScheduledTaskRunnerTest {
         ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1, case2), 2);
 
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
-        ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(List.of(1L), List.of(2L), false, "", Duration.ZERO, Duration.ZERO);
+        ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(List.of(1L), List.of(2L), List.of(), false, "", Duration.ZERO, Duration.ZERO);
 
         when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), eq(searchResult), anyList()))
             .thenReturn(outcome);
@@ -178,7 +179,7 @@ class ScheduledTaskRunnerTest {
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1), 1);
-        ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(List.of(1L), List.of(), false, "", Duration.ZERO, Duration.ZERO);
+        ScheduledTaskOutcome<Long> outcome = new ScheduledTaskOutcome<>(List.of(1L), List.of(), List.of(), false, "", Duration.ZERO, Duration.ZERO);
 
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
         when(scheduledTaskProcessor.performProcessing(eq(eventConfig), eq(scheduledTask), eq(searchResult), anyList()))

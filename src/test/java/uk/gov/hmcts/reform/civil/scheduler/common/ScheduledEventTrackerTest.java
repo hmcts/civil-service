@@ -125,6 +125,7 @@ class ScheduledEventTrackerTest {
                 .totalCases(3)
                 .succeededCases(2)
                 .failedCases(1)
+                .abortedCases(0)
                 .cumulativeDelay(Duration.ofMillis(500))
                 .searchDuration(Duration.ofMillis(100))
                 .processingDuration(Duration.ofMillis(400))
@@ -139,6 +140,7 @@ class ScheduledEventTrackerTest {
                 "totalCases", "3",
                 "succeededCases", "2",
                 "failedCases", "1",
+                "abortedCases", "0",
                 "cumulativeDelay", "500",
                 "searchDuration", "100",
                 "processingDuration", "400",
@@ -155,7 +157,8 @@ class ScheduledEventTrackerTest {
                 .totalCases(2)
                 .succeededCases(0)
                 .failedCases(2)
-                .abortReason("Aborted due to too many errors")
+                .abortedCases(0)
+                .jobAbortReason("Aborted due to too many errors")
                 .cumulativeDelay(Duration.ofMillis(100))
                 .searchDuration(Duration.ofMillis(50))
                 .processingDuration(Duration.ofMillis(150))
@@ -170,7 +173,8 @@ class ScheduledEventTrackerTest {
                 "totalCases", "2",
                 "succeededCases", "0",
                 "failedCases", "2",
-                "abortReason", "Aborted due to too many errors",
+                "abortedCases", "0",
+                "jobAbortReason", "Aborted due to too many errors",
                 "cumulativeDelay", "100",
                 "searchDuration", "50",
                 "processingDuration", "150",
@@ -187,7 +191,8 @@ class ScheduledEventTrackerTest {
                 .totalCases(0)
                 .succeededCases(0)
                 .failedCases(0)
-                .abortReason(null)
+                .abortedCases(0)
+                .jobAbortReason(null)
                 .cumulativeDelay(Duration.ZERO)
                 .searchDuration(Duration.ZERO)
                 .processingDuration(Duration.ZERO)
@@ -202,7 +207,8 @@ class ScheduledEventTrackerTest {
                 "totalCases", "0",
                 "succeededCases", "0",
                 "failedCases", "0",
-                "abortReason", "Unknown",
+                "abortedCases", "0",
+                "jobAbortReason", "Unknown",
                 "cumulativeDelay", "0",
                 "searchDuration", "0",
                 "processingDuration", "0",
@@ -222,6 +228,7 @@ class ScheduledEventTrackerTest {
                 "totalCases", "0",
                 "succeededCases", "0",
                 "failedCases", "0",
+                "abortedCases", "0",
                 "cumulativeDelay", "0",
                 "searchDuration", "100",
                 "processingDuration", "0",
@@ -239,7 +246,7 @@ class ScheduledEventTrackerTest {
             Map.of(
                 "schedulerName", "TestScheduler",
                 "caseId", "789",
-                "error", "Ongoing business process",
+                "abortReason", "Ongoing business process",
                 "status", "ABORTED"
             )
         );
@@ -255,7 +262,7 @@ class ScheduledEventTrackerTest {
             Map.of(
                 "schedulerName", "TestScheduler",
                 "caseId", "789",
-                "error", "Ongoing business process",
+                "abortReason", "Ongoing business process",
                 "status", "ABORTED",
                 "metric_Interceptor1", "10"
             )
@@ -273,7 +280,8 @@ class ScheduledEventTrackerTest {
                 "totalCases", "0",
                 "succeededCases", "0",
                 "failedCases", "0",
-                "abortReason", "Error reason",
+                "abortedCases", "0",
+                "jobAbortReason", "Error reason",
                 "cumulativeDelay", "0",
                 "searchDuration", "100",
                 "processingDuration", "0",
@@ -293,7 +301,8 @@ class ScheduledEventTrackerTest {
                 "totalCases", "0",
                 "succeededCases", "0",
                 "failedCases", "0",
-                "abortReason", "Unknown",
+                "abortedCases", "0",
+                "jobAbortReason", "Unknown",
                 "cumulativeDelay", "0",
                 "searchDuration", "0",
                 "processingDuration", "0",
