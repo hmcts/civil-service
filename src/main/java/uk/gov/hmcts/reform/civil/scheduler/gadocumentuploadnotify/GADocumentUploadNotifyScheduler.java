@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.ga.service.search.GaEvidenceUploadNotificationSearchService;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.common.ListTaskResult;
+import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 
 import java.util.List;
@@ -35,13 +36,13 @@ public class GADocumentUploadNotifyScheduler implements CivilScheduler {
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
     @Override
     public void runScheduledTask() {
-        scheduledTaskRunner.run(
-            SCHEDULER_NAME,
-            () -> {
+        scheduledTaskRunner.run(ScheduledTaskConfiguration.<CaseDetails, Long>builder()
+            .schedulerName(SCHEDULER_NAME)
+            .searchResultSupplier(() -> {
                 List<CaseDetails> applications = searchService.getApplications().stream().toList();
                 return new ListTaskResult<>(applications, applications.size());
-            },
-            gaDocumentUploadNotifyScheduledTask
-        );
+            })
+            .scheduledTask(gaDocumentUploadNotifyScheduledTask)
+            .build());
     }
 }

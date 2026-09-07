@@ -7,8 +7,12 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.OnGoingBusinessProcessCheck;
 import uk.gov.hmcts.reform.civil.service.search.CaseDismissedSearchService;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -20,6 +24,7 @@ public class CaseDismissedScheduler implements CivilScheduler {
     private final CaseDismissedSearchService searchService;
     private final ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
     private final CaseDismissedScheduledTask caseDismissedScheduledTask;
+    private final OnGoingBusinessProcessCheck<CaseDetails> onGoingBusinessProcessCheck;
 
     @Override
     public String getName() {
@@ -32,10 +37,11 @@ public class CaseDismissedScheduler implements CivilScheduler {
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
     @Override
     public void runScheduledTask() {
-        scheduledTaskRunner.run(
-            SCHEDULER_NAME,
-            searchService::getElasticSearchResult,
-            caseDismissedScheduledTask
-        );
+        scheduledTaskRunner.run(ScheduledTaskConfiguration.<CaseDetails, Long>builder()
+            .schedulerName(SCHEDULER_NAME)
+            .searchResultSupplier(searchService::getElasticSearchResult)
+            .scheduledTask(caseDismissedScheduledTask)
+            .interceptors(List.of(onGoingBusinessProcessCheck))
+            .build());
     }
 }

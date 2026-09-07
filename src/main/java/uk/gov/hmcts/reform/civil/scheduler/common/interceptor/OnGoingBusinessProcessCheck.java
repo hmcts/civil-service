@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.scheduler.casedismissed.CaseDismissedScheduler;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 @Component
@@ -39,11 +38,6 @@ public class OnGoingBusinessProcessCheck<T> implements SchedulerInterceptor<T> {
         }
 
         throw new TaskAbortedException("Ongoing business process");
-    }
-
-    @Override
-    public boolean supports(String schedulerName) {
-        return schedulerName.equals(CaseDismissedScheduler.SCHEDULER_NAME);
     }
 
     @Override

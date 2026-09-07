@@ -21,16 +21,6 @@ public interface SchedulerInterceptor<T> extends Ordered {
     void accept(InterceptorContext<T> context, InterceptorChain<T> chain);
 
     /**
-     * Determines if this interceptor supports the given scheduler.
-     *
-     * @param schedulerName the name of the scheduler
-     * @return true if this interceptor should be included in the chain for the given scheduler
-     */
-    default boolean supports(String schedulerName) {
-        return false;
-    }
-
-    /**
      * Returns the order value of this interceptor.
      *
      * <p>Interceptors are executed in ascending order of their priority value.
