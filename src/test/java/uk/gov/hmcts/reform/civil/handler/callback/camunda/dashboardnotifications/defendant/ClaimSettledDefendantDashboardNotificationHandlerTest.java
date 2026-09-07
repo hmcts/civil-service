@@ -33,7 +33,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_DEFENDANT1;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLE_EVENT_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLE_EVENT_EARLY_STATE_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
 class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -149,6 +152,56 @@ class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseCallback
                 caseData.getCcdCaseReference().toString(),
                 new ScenarioRequestParams(scenarioParams)
             );
+        }
+
+        @Test
+        void shouldUseEarlyStateScenario_whenPreviousStateIsAwaitingCaseDetailsNotification() {
+            // Given: Case settled from AWAITING_CASE_DETAILS_NOTIFICATION state
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmittedSmallClaim()
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation("test").setRegion("test"))
+                .caseDataLip(new CaseDataLiP()
+                    .setApplicant1SettleClaim(YesOrNo.YES)
+                    .setApplicant1ClaimSettledDate(LocalDate.now()))
+                .build();
+            caseData.setPreviousCCDState(AWAITING_CASE_DETAILS_NOTIFICATION);
+
+            // Then: Should use early state scenario
+            String scenario = handler.getScenario(caseData);
+            assertThat(scenario).isEqualTo(SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLE_EVENT_EARLY_STATE_DEFENDANT.getScenario());
+        }
+
+        @Test
+        void shouldUseDefaultScenario_whenPreviousStateIsNotEarlyState() {
+            // Given: Case settled from non-early state
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmittedSmallClaim()
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation("test").setRegion("test"))
+                .caseDataLip(new CaseDataLiP()
+                    .setApplicant1SettleClaim(YesOrNo.YES)
+                    .setApplicant1ClaimSettledDate(LocalDate.now()))
+                .build();
+            caseData.setPreviousCCDState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+
+            // Then: Should use default scenario with objection text
+            String scenario = handler.getScenario(caseData);
+            assertThat(scenario).isEqualTo(SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLE_EVENT_DEFENDANT.getScenario());
+        }
+
+        @Test
+        void shouldUseDefaultScenario_whenPreviousStateIsNull() {
+            // Given: Case with no previous state (edge case)
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmittedSmallClaim()
+                .caseManagementLocation(new CaseLocationCivil().setBaseLocation("test").setRegion("test"))
+                .caseDataLip(new CaseDataLiP()
+                    .setApplicant1SettleClaim(YesOrNo.YES)
+                    .setApplicant1ClaimSettledDate(LocalDate.now()))
+                .build();
+
+            // Then: Should use default scenario
+            String scenario = handler.getScenario(caseData);
+            assertThat(scenario).isEqualTo(SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLE_EVENT_DEFENDANT.getScenario());
         }
 
     }
