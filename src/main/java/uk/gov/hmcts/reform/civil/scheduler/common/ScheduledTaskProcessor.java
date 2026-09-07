@@ -6,7 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorChain;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorContext;
-import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorRegistry;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorChainFactory;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.SchedulerInterceptor;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.TaskAbortedException;
 
 import java.time.Duration;
@@ -25,7 +26,7 @@ import java.util.stream.Stream;
 public class ScheduledTaskProcessor<T, I> {
 
     private final ScheduledEventTracker eventTracker;
-    private final InterceptorRegistry interceptorRegistry;
+    private final InterceptorChainFactory interceptorChainFactory;
 
     @Value("${scheduler.circuitBreakerThreshold:5}")
     private int circuitBreakerThreshold;
@@ -43,6 +44,13 @@ public class ScheduledTaskProcessor<T, I> {
     public ScheduledTaskOutcome<I> performProcessing(ScheduledTaskEventConfiguration eventConfig,
                                                      ScheduledTask<T, I> scheduledTask,
                                                      TaskResult<T> searchResult) {
+        return performProcessing(eventConfig, scheduledTask, searchResult, new ArrayList<>());
+    }
+
+    public ScheduledTaskOutcome<I> performProcessing(ScheduledTaskEventConfiguration eventConfig,
+                                                     ScheduledTask<T, I> scheduledTask,
+                                                     TaskResult<T> searchResult,
+                                                     List<SchedulerInterceptor<T>> interceptors) {
         ProcessingContext context = new ProcessingContext();
         ScheduledTaskBackPressure backPressure = new ScheduledTaskBackPressure(
             eventConfig.getSchedulerName(),
@@ -50,6 +58,8 @@ public class ScheduledTaskProcessor<T, I> {
             eventTracker,
             eventConfig
         );
+
+        List<SchedulerInterceptor<T>> sortedInterceptors = interceptorChainFactory.sortInterceptors(interceptors);
 
         Stream<T> sequentialStream = searchResult.itemStream()
             .sequential()
@@ -59,6 +69,7 @@ public class ScheduledTaskProcessor<T, I> {
             boolean completed = sequentialStream.allMatch(item -> processItem(
                 eventConfig,
                 scheduledTask,
+                sortedInterceptors,
                 item,
                 backPressure,
                 context
@@ -85,6 +96,7 @@ public class ScheduledTaskProcessor<T, I> {
 
     private boolean processItem(ScheduledTaskEventConfiguration eventConfig,
                                 ScheduledTask<T, I> scheduledTask,
+                                List<SchedulerInterceptor<T>> sortedInterceptors,
                                 T item,
                                 ScheduledTaskBackPressure backPressure,
                                 ProcessingContext context) {
@@ -95,7 +107,7 @@ public class ScheduledTaskProcessor<T, I> {
         InterceptorContext<T> interceptorContext = new InterceptorContext<>(eventConfig.getSchedulerName(), item);
 
         try {
-            InterceptorChain<T> chain = interceptorRegistry.buildChain(eventConfig.getSchedulerName(), scheduledTask);
+            InterceptorChain<T> chain = interceptorChainFactory.buildChain(scheduledTask, sortedInterceptors);
             chain.next(interceptorContext);
 
             if (chain.wasTaskExecuted()) {

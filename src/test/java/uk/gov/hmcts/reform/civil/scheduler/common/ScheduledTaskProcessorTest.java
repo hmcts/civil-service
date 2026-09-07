@@ -11,7 +11,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorChain;
-import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorRegistry;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorChainFactory;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.TaskAbortedException;
 import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -44,7 +45,7 @@ class ScheduledTaskProcessorTest {
     private ScheduledEventTracker scheduledEventTracker;
 
     @Mock
-    private InterceptorRegistry interceptorRegistry;
+    private InterceptorChainFactory interceptorChainFactory;
 
     @Mock(answer = Answers.CALLS_REAL_METHODS)
     private ScheduledTask<CaseDetails, Long> scheduledTask;
@@ -59,8 +60,10 @@ class ScheduledTaskProcessorTest {
             return caseDetails != null ? caseDetails.getId() : null;
         });
 
-        lenient().when(interceptorRegistry.buildChain(any(), any())).thenAnswer(invocation -> {
-            ScheduledTask<CaseDetails, Long> task = invocation.getArgument(1);
+        lenient().when(interceptorChainFactory.sortInterceptors(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        lenient().when(interceptorChainFactory.buildChain(any(), any())).thenAnswer(invocation -> {
+            ScheduledTask<CaseDetails, Long> task = invocation.getArgument(0);
             return new InterceptorChain<CaseDetails>(List.of(), ctx -> task.accept(ctx.getItem()));
         });
     }
@@ -137,7 +140,9 @@ class ScheduledTaskProcessorTest {
 
     @Test
     void shouldApplyDynamicBackPressure_whenFailuresRecover() {
-        CapturingScheduledTaskProcessor processor = new CapturingScheduledTaskProcessor(scheduledEventTracker, interceptorRegistry);
+        CapturingScheduledTaskProcessor processor = new CapturingScheduledTaskProcessor(scheduledEventTracker,
+                                                                                        interceptorChainFactory
+        );
         ReflectionTestUtils.setField(processor, "circuitBreakerThreshold", 5);
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         CaseDetails case2 = CaseDetailsBuilder.builder().id(2L).build();
@@ -177,7 +182,9 @@ class ScheduledTaskProcessorTest {
 
     @Test
     void shouldAbortProcessing_whenInterruptedDuringBackPressureDelay() {
-        InterruptingScheduledTaskProcessor processor = new InterruptingScheduledTaskProcessor(scheduledEventTracker, interceptorRegistry);
+        InterruptingScheduledTaskProcessor processor = new InterruptingScheduledTaskProcessor(scheduledEventTracker,
+                                                                                              interceptorChainFactory
+        );
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         RecordingScheduledTask task = new RecordingScheduledTask(
             Long.MAX_VALUE,
@@ -353,7 +360,7 @@ class ScheduledTaskProcessorTest {
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1), 1);
 
-        when(interceptorRegistry.buildChain(any(), any())).thenAnswer(invocation ->
+        when(interceptorChainFactory.buildChain(any(), any())).thenAnswer(invocation ->
             new InterceptorChain<CaseDetails>(
                 List.of((context, chain) -> {
                     throw new TaskAbortedException("Ongoing business process");
@@ -378,7 +385,7 @@ class ScheduledTaskProcessorTest {
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1), 1);
 
-        when(interceptorRegistry.buildChain(any(), any())).thenAnswer(invocation ->
+        when(interceptorChainFactory.buildChain(any(), any())).thenAnswer(invocation ->
             new InterceptorChain<CaseDetails>(
                 List.of((context, chain) -> {
                     // Silently aborts by not calling chain.next()
@@ -453,8 +460,8 @@ class ScheduledTaskProcessorTest {
 
         private final List<Duration> delays = new ArrayList<>();
 
-        CapturingScheduledTaskProcessor(ScheduledEventTracker eventTracker, InterceptorRegistry interceptorRegistry) {
-            super(eventTracker, interceptorRegistry);
+        CapturingScheduledTaskProcessor(ScheduledEventTracker eventTracker, InterceptorChainFactory interceptorChainFactory) {
+            super(eventTracker, interceptorChainFactory);
         }
 
         @Override
@@ -469,8 +476,8 @@ class ScheduledTaskProcessorTest {
 
     private static class InterruptingScheduledTaskProcessor extends ScheduledTaskProcessor<CaseDetails, Long> {
 
-        InterruptingScheduledTaskProcessor(ScheduledEventTracker eventTracker, InterceptorRegistry interceptorRegistry) {
-            super(eventTracker, interceptorRegistry);
+        InterruptingScheduledTaskProcessor(ScheduledEventTracker eventTracker, InterceptorChainFactory interceptorChainFactory) {
+            super(eventTracker, interceptorChainFactory);
         }
 
         @Override
