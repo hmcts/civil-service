@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.controllers.fees;
 
+import feign.FeignException;
+import feign.Request;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,7 @@ import uk.gov.hmcts.reform.civil.service.PaymentRequestUpdateCallbackService;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -102,13 +105,27 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
     }
 
     @Test
-    public void whenPaymentCallbackIsReceivedWithServiceAuthorisationButreturnsfalseReturn400() throws Exception {
+    public void whenPaymentCallbackIsReceivedWithServiceAuthorisationButReturnsFalseReturn401() throws Exception {
         when(authorisationService.isServiceAuthorized(any())).thenReturn(false);
 
         doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
-            // Then: the result status must be an HTTP-4xx
-            .andExpect(status().is5xxServerError());
+            .andExpect(status().isUnauthorized());
 
+    }
+
+    @Test
+    public void whenServiceRequestUpdateRequestButDownstreamGatewayTimeoutOccurs_thenHttp503() throws Exception {
+        doThrow(new FeignException.GatewayTimeout(
+            "Gateway Timeout",
+            request(),
+            new byte[]{},
+            Map.of()
+        ))
+            .when(requestUpdateCallbackService)
+            .processCallback(any(), any());
+
+        doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
+            .andExpect(status().isServiceUnavailable());
     }
 
     private ServiceRequestUpdateDto buildServiceDto() {
@@ -121,6 +138,10 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
                 .caseReference(REFERENCE)
                 .accountNumber(ACCOUNT_NUMBER)
                 .build());
+    }
+
+    private Request request() {
+        return Request.create(Request.HttpMethod.GET, "url", Map.of(), null, null, null);
     }
 
     @SneakyThrows

@@ -27,7 +27,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
-@PactTestFor(providerName = "judicial_ref_data")
+@PactTestFor(providerName = "referenceData_judicialv2")
 @MockServerConfig(hostInterface = "localhost", port = "6683")
 @TestPropertySource(properties = {
     "genApp.jrd.url=http://localhost:6683",
@@ -35,8 +35,9 @@ import static org.mockito.Mockito.when;
 })
 public class JudicialRefDataApiConsumerTest extends BaseContractTest {
 
+    private static final String JRD_V2_MEDIA_TYPE = "application/vnd.jrd.api+json;Version=2.0";
     private static final String SEARCH_STRING = "Smith";
-    private static final String PERSONAL_CODE = "1234567";
+    private static final String PERSONAL_CODE = "1234";
 
     @Autowired
     private JudicialRefDataService judicialRefDataService;
@@ -52,6 +53,7 @@ public class JudicialRefDataApiConsumerTest extends BaseContractTest {
     @Pact(consumer = "civil_service")
     public RequestResponsePact searchJudicialUsers(PactDslWithProvider builder) {
         return builder
+            .given("return judicial user profiles")
             .uponReceiving("a judicial ref data user search request")
             .path("/refdata/judicial/users/search")
             .headers(
@@ -68,7 +70,11 @@ public class JudicialRefDataApiConsumerTest extends BaseContractTest {
                 }
                 """.formatted(SEARCH_STRING))
             .willRespondWith()
-            .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .matchHeader(
+                HttpHeaders.CONTENT_TYPE,
+                "application/(json|vnd\\.jrd\\.api\\+json;Version=2\\.0)(;.*)?",
+                JRD_V2_MEDIA_TYPE
+            )
             .body(buildJudicialUsersResponse())
             .status(HttpStatus.SC_OK)
             .toPact();
@@ -85,15 +91,14 @@ public class JudicialRefDataApiConsumerTest extends BaseContractTest {
 
     private DslPart buildJudicialUsersResponse() {
         return newJsonArray(root -> root.object(judge -> judge
-            .stringValue("post_nominals", "DJ")
-            .stringValue("known_as", "Jane")
-            .stringValue("surname", "Smith")
-            .stringValue("full_name", "District Judge Jane Smith")
-            .stringValue("ejudiciary_email", "jane.smith@judiciary.uk")
-            .stringValue("sidam_id", "11111111-1111-1111-1111-111111111111")
-            .stringValue("personal_code", PERSONAL_CODE)
-            .stringValue("is_judge", "Y")
-            .stringValue("is_panel_member", "N")
-            .stringValue("is_magistrate", "N"))).build();
+            .stringType("title", "Family Judge")
+            .stringType("knownAs", "testKnownAs")
+            .stringType("surname", "surname")
+            .stringType("fullName", "testFullName")
+            .stringType("emailId", "test@test.com")
+            .stringType("idamId", "44362987-3fe4-43b3-b59e-91c46b6b1fd4")
+            .stringType("personalCode", PERSONAL_CODE)
+            .stringType("postNominals", "testPostNominals")
+            .stringType("initials", "I N"))).build();
     }
 }

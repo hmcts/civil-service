@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
-@PactTestFor(providerName = "rd_commondata_api")
+@PactTestFor(providerName = "referenceData_commondata")
 @MockServerConfig(hostInterface = "localhost", port = "6682")
 @TestPropertySource(properties = "rd_commondata.api.url=http://localhost:6682")
 public class CommonRefDataApiConsumerTest extends BaseContractTest {
@@ -47,6 +47,7 @@ public class CommonRefDataApiConsumerTest extends BaseContractTest {
     @Pact(consumer = "civil_service")
     public RequestResponsePact getListOfValuesCategory(PactDslWithProvider builder) {
         return builder
+            .given("ListOfCategories Details Exist")
             .uponReceiving("a common ref data list of values category request")
             .path("/refdata/commondata/lov/categories/" + CATEGORY_ID)
             .headers(SERVICE_AUTHORIZATION_HEADER, SERVICE_AUTH_TOKEN, AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
@@ -77,8 +78,7 @@ public class CommonRefDataApiConsumerTest extends BaseContractTest {
             .stringValue("key", "INTER")
             .numberValue("lov_order", 1)
             .stringValue("value_en", "In person")
-            .stringValue("value_cy", "Wyneb yn wyneb")
-            .minArrayLike("child_nodes", 0, 0, child -> {
-            }))).build();
+            .nullValue("value_cy")
+            .nullValue("child_nodes"))).build();
     }
 }

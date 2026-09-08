@@ -62,6 +62,11 @@ public class CoreCaseDataApiMockHelper {
         when(coreCaseDataApi.getCase(eq(ACCESS_TOKEN), eq(GENERATED_TOKEN), eq(caseIdString))).thenReturn(caseDetails);
     }
 
+    public void mockGetCaseAnyCase(CaseDetails caseDetails) {
+        when(coreCaseDataApi.getCase(eq(ACCESS_TOKEN), eq(GENERATED_TOKEN), any(String.class)))
+            .thenReturn(caseDetails);
+    }
+
     public void mockStartEvent(String caseIdString, StartEventResponse startEventResponse, String eventId) {
         when(coreCaseDataApi.startEventForCaseWorker(
             eq(ACCESS_TOKEN),

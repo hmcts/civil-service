@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.cjes.JudgmentDetailsCJES;
     FeignClientProperties.FeignClientConfiguration.class)
 public interface CjesApiClient {
 
-    @PostMapping(path = "/judgment}", consumes = "application/json")
+    @PostMapping(path = "/judgment", consumes = "application/json")
         ResponseEntity<Void> sendJudgmentDetailsCJES(
         @RequestBody JudgmentDetailsCJES judgmentDetailsCJES
     );

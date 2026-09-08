@@ -61,7 +61,7 @@ public class SendLetterApiConsumerTest extends BaseContractTest {
             .willRespondWith()
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .body(buildSendLetterResponse())
-            .status(HttpStatus.SC_CREATED)
+            .status(HttpStatus.SC_OK)
             .uponReceiving("a bulk print letter status request")
             .path("/letters/" + LETTER_ID)
             .matchQuery("include-additional-info", "false", "false")

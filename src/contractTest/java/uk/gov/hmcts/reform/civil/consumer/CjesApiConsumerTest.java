@@ -32,11 +32,11 @@ public class CjesApiConsumerTest extends BaseContractTest {
     public RequestResponsePact sendJudgment(PactDslWithProvider builder) throws Exception {
         return builder
             .uponReceiving("a CJES judgment registration request")
-            .path("/judgment%7D")
+            .path("/judgment")
             .method(HttpMethod.POST.toString())
             .body(createJsonObject(buildJudgmentDetails()))
             .willRespondWith()
-            .status(HttpStatus.SC_OK)
+            .status(HttpStatus.SC_CREATED)
             .toPact();
     }
 

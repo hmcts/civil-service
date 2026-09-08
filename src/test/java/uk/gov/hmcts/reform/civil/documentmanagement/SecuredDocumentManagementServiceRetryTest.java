@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
  * applied, so the sibling test can only assert at the method level and cannot prove the
  * {@code noRetryFor} classification actually short-circuits the five attempts.
  *
- * <p>Pre-fix this fails (the wrapped {@link DocumentDownloadException} is retried 5x, so
+ * <p>Pre-fix this fails (the wrapped {@link DocumentDownloadException} is retried on every attempt, so
  * {@code getUserInfo} is invoked five times and the test also incurs the full ~15s backoff);
  * post-fix the {@link InvalidDocumentLinkException} is excluded from retry and it is attempted once.
  */
@@ -86,7 +86,7 @@ class SecuredDocumentManagementServiceRetryTest {
             () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, shortSelfHref));
 
         // getUserInfo runs once at the top of every attempt, so it is a reliable per-attempt counter:
-        // exactly one invocation proves the bad-input error short-circuited the retry (not 5 attempts).
+        // exactly one invocation proves the bad-input error short-circuited the retry (not the full retry budget).
         verify(userService, times(1)).getUserInfo(BEARER_TOKEN);
         // the guard trips before any CDAM call, so neither document client is ever touched.
         verifyNoInteractions(caseDocumentClientApi, documentDownloadClient);
