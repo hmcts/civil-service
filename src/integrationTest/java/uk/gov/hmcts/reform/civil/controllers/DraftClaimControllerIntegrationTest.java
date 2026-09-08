@@ -105,7 +105,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
 
         assertThat(draftInDb.getPayload()).extracting("step").isEqualTo("claimant-details");
         assertThat(draftInDb.getUserId()).isEqualTo(USER_ID);
-        assertThat(draftInDb.getExpiresAt()).isEqualTo(draftInDb.getCreatedAt().plusDays(180));
+        assertThat(draftInDb.getExpiresAt()).isEqualTo(DRAFT_TYPE.calculateExpiry(draftInDb.getCreatedAt()));
     }
 
     @Test
@@ -149,7 +149,6 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
         OffsetDateTime now = OffsetDateTime.now();
         DraftStoreEntity duplicateDraft = draftClaim(
             UUID.randomUUID(),
-            USER_ID,
             now,
             DRAFT_TYPE.calculateExpiry(now),
             "duplicate"
@@ -222,21 +221,21 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void shouldSetExpiryTo180DaysAfterDraftCreationWhenDraftIsCreated() {
+    void shouldSetExpiryTo30DaysAfterDraftCreationWhenDraftIsCreated() {
         DraftStoreEntity draftInDB = draftStoreRepository.findById(draftId)
             .orElseThrow(() -> new AssertionError("Draft claim should exist in DB"));
 
-        assertThat(draftInDB.getExpiresAt()).isEqualTo(DRAFT_TYPE.calculateExpiry(draftInDB.getCreatedAt()));
+        assertThat(DRAFT_TYPE.getRetentionDays()).isEqualTo(30);
+        assertThat(draftInDB.getExpiresAt()).isEqualTo(draftInDB.getCreatedAt().plusDays(30));
     }
 
     @Test
     void shouldReturnNotFoundWhenDraftIsExpired() throws Exception {
         draftStoreRepository.deleteById(draftId);
-        OffsetDateTime expiredDate = OffsetDateTime.now().minusDays(181);
+        OffsetDateTime expiredDate = OffsetDateTime.now().minusDays(DRAFT_TYPE.getRetentionDays() + 1);
 
         draftStoreRepository.save(draftClaim(
             draftId,
-            USER_ID,
             expiredDate,
             OffsetDateTime.now().minusDays(1),
             "expired-test"
@@ -252,10 +251,9 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void shouldReturnNotFoundWhenUpdatingExpiredDraft() throws Exception {
         draftStoreRepository.deleteById(draftId);
-        OffsetDateTime expiredDate = OffsetDateTime.now().minusDays(181);
+        OffsetDateTime expiredDate = OffsetDateTime.now().minusDays(DRAFT_TYPE.getRetentionDays() + 1);
         draftStoreRepository.save(draftClaim(
             draftId,
-            USER_ID,
             expiredDate,
             DRAFT_TYPE.calculateExpiry(expiredDate),
             "expired-test"
@@ -279,10 +277,9 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void shouldReplaceExpiredDraftWhenCreatingDraftClaim() throws Exception {
         draftStoreRepository.deleteById(draftId);
-        OffsetDateTime expiredDate = OffsetDateTime.now().minusDays(181);
+        OffsetDateTime expiredDate = OffsetDateTime.now().minusDays(DRAFT_TYPE.getRetentionDays() + 1);
         draftStoreRepository.save(draftClaim(
             draftId,
-            USER_ID,
             expiredDate,
             DRAFT_TYPE.calculateExpiry(expiredDate),
             "expired-test"
@@ -378,13 +375,12 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     private DraftStoreEntity draftClaim(UUID id,
-                                        String userId,
                                         OffsetDateTime createdAt,
                                         OffsetDateTime expiresAt,
                                         String step) {
         return new DraftStoreEntity(
             id,
-            userId,
+            USER_ID,
             "1234",
             DRAFT_TYPE.getId(),
             new HashMap<>(Map.of("step", step)),
