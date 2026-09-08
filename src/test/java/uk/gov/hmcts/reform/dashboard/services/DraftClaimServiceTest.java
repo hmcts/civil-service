@@ -82,7 +82,7 @@ class DraftClaimServiceTest {
 
         @Test
         void shouldReplaceDraftWhenExistingDraftIsExpired() {
-            OffsetDateTime createdAt = OffsetDateTime.now().minusDays(181);
+            OffsetDateTime createdAt = OffsetDateTime.now().minusDays(DRAFT_TYPE.getRetentionDays() + 1);
             DraftStoreEntity expiredDraft = draft(createdAt, DRAFT_TYPE.calculateExpiry(createdAt));
             OffsetDateTime replacementCreatedAt = OffsetDateTime.now();
             DraftStoreEntity replacementDraft = draft(

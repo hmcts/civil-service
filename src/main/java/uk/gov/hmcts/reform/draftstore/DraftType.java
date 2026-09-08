@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 @RequiredArgsConstructor
 public enum DraftType {
 
-    DRAFT_CLAIM(1, 180),
+    DRAFT_CLAIM(1, 30),
     UNDEFINED_DRAFT(2, 30);
 
     private final int id;
