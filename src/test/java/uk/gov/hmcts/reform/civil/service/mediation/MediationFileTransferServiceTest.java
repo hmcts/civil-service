@@ -1,15 +1,18 @@
 package uk.gov.hmcts.reform.civil.service.mediation;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.system.CapturedOutput;
-import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.core.io.ByteArrayResource;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.civil.config.properties.mediation.MediationCSVEmailConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment;
@@ -22,14 +25,12 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.parallel.Resources.SYSTEM_OUT;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-@ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
-@ResourceLock(SYSTEM_OUT)
+@ExtendWith(MockitoExtension.class)
 class MediationFileTransferServiceTest {
 
     private static final String SENDER = "sender@example.com";
@@ -52,8 +53,24 @@ class MediationFileTransferServiceTest {
     @InjectMocks
     private MediationFileTransferService mediationFileTransferService;
 
+    private ListAppender<ILoggingEvent> listAppender;
+    private Logger logger;
+
+    @BeforeEach
+    void setUp() {
+        logger = (Logger) LoggerFactory.getLogger(MediationFileTransferService.class);
+        listAppender = new ListAppender<>();
+        listAppender.start();
+        logger.addAppender(listAppender);
+    }
+
+    @AfterEach
+    void tearDown() {
+        logger.detachAppender(listAppender);
+    }
+
     @Test
-    void shouldSendCsvAttachmentForCases(CapturedOutput output) {
+    void shouldSendCsvAttachmentForCases() {
         CaseData caseData = CaseData.builder().ccdCaseReference(1L).build();
         when(mediationCsvServiceFactory.getMediationCSVService(caseData)).thenReturn(mediationCSVService);
         when(mediationCSVService.generateCSVContent(caseData)).thenReturn("row-one\r\n");
@@ -75,7 +92,7 @@ class MediationFileTransferServiceTest {
                     + "row-one\r\n"
             );
         });
-        assertThat(output)
+        assertThat(loggedMessages())
             .contains("MMT_MEDIATION_EMAIL_SEND_ATTEMPT")
             .contains("subject=OCMC Mediation Data")
             .contains("reportType=CSV")
@@ -90,7 +107,7 @@ class MediationFileTransferServiceTest {
     }
 
     @Test
-    void shouldSendJsonAttachmentForCases(CapturedOutput output) {
+    void shouldSendJsonAttachmentForCases() {
         CaseData caseData = CaseData.builder().ccdCaseReference(1L).build();
         MediationCase mediationCase = new MediationCase().setCcdCaseNumber(1L);
         when(mediationJsonService.generateJsonContent(caseData)).thenReturn(mediationCase);
@@ -108,7 +125,7 @@ class MediationFileTransferServiceTest {
             assertThat(attachment.getContentType()).isEqualTo("application/json");
             assertThat(attachmentContent(attachment)).contains("\"ccdCaseNumber\":1");
         });
-        assertThat(output)
+        assertThat(loggedMessages())
             .contains("MMT_MEDIATION_EMAIL_SEND_ATTEMPT")
             .contains("subject=OCMC Mediation Data")
             .contains("reportType=JSON")
@@ -241,5 +258,11 @@ class MediationFileTransferServiceTest {
     private String attachmentContent(EmailAttachment attachment) {
         ByteArrayResource data = (ByteArrayResource) attachment.getData();
         return new String(data.getByteArray(), StandardCharsets.UTF_8);
+    }
+
+    private String loggedMessages() {
+        return listAppender.list.stream()
+            .map(ILoggingEvent::getFormattedMessage)
+            .reduce("", (messages, message) -> messages + "\n" + message);
     }
 }
