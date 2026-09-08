@@ -56,7 +56,6 @@ public class CoreCaseUserService {
         }
     }
 
-
     @Retryable(retryFor = RetryableCaseUserException.class, backoff = @Backoff(delay = 500, multiplier = 2))
     public void assignCase(String caseId, String userId, String organisationId, CaseRole caseRole) {
         try {
