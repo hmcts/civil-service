@@ -110,6 +110,7 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
         breathingSpace.setType(breathingSpaceEnterInfo.getType());
         breathingSpace.setEndDate(breathingSpaceEnterInfo.getExpectedEnd());
         log.info("RoboticsCaseDataSpec RPABreathingSpace UNSPEC={}", breathingSpace.toString());
+        log.info("RoboticsCaseDataSpec RPABreathingSpace LIFT UNSPEC={}", caseData.getBreathing().getLift());
         return breathingSpace;
     }
 

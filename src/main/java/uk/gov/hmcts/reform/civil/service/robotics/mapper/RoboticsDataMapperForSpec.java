@@ -103,6 +103,7 @@ public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
         breathingSpace.setType(breathingSpaceEnterInfo.getType());
         breathingSpace.setEndDate(breathingSpaceEnterInfo.getExpectedEnd());
         log.info("RoboticsCaseDataSpec RPABreathingSpace SPEC={}", breathingSpace.toString());
+        log.info("RoboticsCaseDataSpec RPABreathingSpace LIFT SPEC={}", caseData.getBreathing().getLift());
         return breathingSpace;
     }
 
