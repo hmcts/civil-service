@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -29,6 +29,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,12 +43,22 @@ class HearingsServiceRetryTest {
     @EnableRetry(proxyTargetClass = true)
     @Configuration
     static class TestRetryConfig {
+
+        @Bean
+        HearingsApi hearingNoticeApi() {
+            return mock(HearingsApi.class);
+        }
+
+        @Bean
+        AuthTokenGenerator authTokenGenerator() {
+            return mock(AuthTokenGenerator.class);
+        }
     }
 
-    @MockBean
+    @Autowired
     private HearingsApi hearingNoticeApi;
 
-    @MockBean
+    @Autowired
     private AuthTokenGenerator authTokenGenerator;
 
     @Autowired
@@ -63,6 +74,7 @@ class HearingsServiceRetryTest {
 
     @BeforeEach
     void setUp() {
+        reset(hearingNoticeApi, authTokenGenerator);
         when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
         when(timeoutException.getMessage()).thenReturn("timeout message");
     }
@@ -219,6 +231,10 @@ class HearingsServiceRetryTest {
 
     @Test
     void shouldRetryUpdatePartiesNotifiedResponsesServerErrorsBeforeRecovering() {
+        LocalDateTime receivedAt = LocalDateTime.of(2023, 5, 1, 15, 0);
+        uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified partiesNotified =
+            new uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified();
+
         when(hearingNoticeApi.updatePartiesNotifiedRequest(
             eq(USER_TOKEN),
             eq(SERVICE_TOKEN),
@@ -234,8 +250,8 @@ class HearingsServiceRetryTest {
             USER_TOKEN,
             HEARING_ID,
             1,
-            LocalDateTime.of(2023, 5, 1, 15, 0),
-            new uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified()));
+            receivedAt,
+            partiesNotified));
 
         verify(hearingNoticeApi, times(3)).updatePartiesNotifiedRequest(
             eq(USER_TOKEN),
@@ -250,6 +266,10 @@ class HearingsServiceRetryTest {
 
     @Test
     void shouldRetryUpdatePartiesNotifiedResponsesTimeoutsBeforeRecovering() {
+        LocalDateTime receivedAt = LocalDateTime.of(2023, 5, 1, 15, 0);
+        uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified partiesNotified =
+            new uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified();
+
         when(hearingNoticeApi.updatePartiesNotifiedRequest(
             eq(USER_TOKEN),
             eq(SERVICE_TOKEN),
@@ -265,8 +285,8 @@ class HearingsServiceRetryTest {
             USER_TOKEN,
             HEARING_ID,
             1,
-            LocalDateTime.of(2023, 5, 1, 15, 0),
-            new uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified()));
+            receivedAt,
+            partiesNotified));
 
         verify(hearingNoticeApi, times(3)).updatePartiesNotifiedRequest(
             eq(USER_TOKEN),
@@ -281,6 +301,9 @@ class HearingsServiceRetryTest {
 
     @Test
     void shouldRetryUnNotifiedHearingResponsesServerErrorsBeforeRecovering() {
+        LocalDateTime from = LocalDateTime.of(2023, 5, 1, 15, 0);
+        LocalDateTime to = LocalDateTime.of(2023, 5, 6, 15, 0);
+
         when(hearingNoticeApi.getUnNotifiedHearingRequest(
             eq(USER_TOKEN),
             eq(SERVICE_TOKEN),
@@ -294,8 +317,8 @@ class HearingsServiceRetryTest {
         assertThrows(HmcException.class, () -> hearingNoticeService.getUnNotifiedHearingResponses(
             USER_TOKEN,
             "hmcts-service-code",
-            LocalDateTime.of(2023, 5, 1, 15, 0),
-            LocalDateTime.of(2023, 5, 6, 15, 0)));
+            from,
+            to));
 
         verify(hearingNoticeApi, times(3)).getUnNotifiedHearingRequest(
             eq(USER_TOKEN),
@@ -309,6 +332,9 @@ class HearingsServiceRetryTest {
 
     @Test
     void shouldRetryUnNotifiedHearingResponsesTimeoutsBeforeRecovering() {
+        LocalDateTime from = LocalDateTime.of(2023, 5, 1, 15, 0);
+        LocalDateTime to = LocalDateTime.of(2023, 5, 6, 15, 0);
+
         when(hearingNoticeApi.getUnNotifiedHearingRequest(
             eq(USER_TOKEN),
             eq(SERVICE_TOKEN),
@@ -322,8 +348,8 @@ class HearingsServiceRetryTest {
         assertThrows(HmcException.class, () -> hearingNoticeService.getUnNotifiedHearingResponses(
             USER_TOKEN,
             "hmcts-service-code",
-            LocalDateTime.of(2023, 5, 1, 15, 0),
-            LocalDateTime.of(2023, 5, 6, 15, 0)));
+            from,
+            to));
 
         verify(hearingNoticeApi, times(3)).getUnNotifiedHearingRequest(
             eq(USER_TOKEN),
