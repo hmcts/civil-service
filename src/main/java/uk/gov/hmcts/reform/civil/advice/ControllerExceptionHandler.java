@@ -17,6 +17,7 @@ import org.springframework.web.context.request.WebRequest;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.exceptions.InvalidTokenException;
 import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
 import uk.gov.hmcts.reform.civil.exceptions.UpstreamUnavailableException;
 import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
@@ -57,6 +58,12 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         HttpHeaders headers = new HttpHeaders();
         headers.add(RETRY_AFTER, "10");
         return new ResponseEntity<>(upstreamUnavailableException.getMessage(), headers, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<Object> invalidToken(InvalidTokenException invalidTokenException) {
+        log.error("Invalid token error with message: {}", invalidTokenException.getMessage());
+        return new ResponseEntity<>(invalidTokenException.getMessage(), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(SearchServiceCaseNotFoundException.class)

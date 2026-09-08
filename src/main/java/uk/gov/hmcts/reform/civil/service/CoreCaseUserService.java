@@ -48,12 +48,22 @@ public class CoreCaseUserService {
                 .getCaseAssignedUserRoles().stream()
                 .filter(c -> c.getUserId().equals(userId)).distinct()
                 .map(CaseAssignedUserRole::getCaseRole).toList();
+        } catch (FeignException.GatewayTimeout | FeignException.BadGateway | FeignException.ServiceUnavailable e) {
+            log.error("Retryable FeignException caseId: {} userId: {}", caseId, userId);
+            throw new RetryableCaseUserException(e.getMessage(), e);
         } catch (FeignException.NotFound ex) {
-            log.error("User Roles not found", ex);
+            log.error("User roles not found for caseId: {} userId: {}", caseId, userId, ex);
             return Collections.emptyList();
-        } catch (Exception e) {
-            throw handleException(e);
+        } catch (Exception ex) {
+            log.error("[CoreCaseUserService] Unexpected error occurred for caseId: {} userId: {}", caseId, userId, ex);
+            return Collections.emptyList();
         }
+    }
+
+    @Recover
+    public List<String> recover(RetryableCaseUserException ex) {
+        log.error("[CoreCaseUserService] Retryable User Case Roles lookup failed after retries", ex);
+        return Collections.emptyList();
     }
 
     @Retryable(retryFor = RetryableCaseUserException.class, backoff = @Backoff(delay = 500, multiplier = 2))
