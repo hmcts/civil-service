@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class TTL {
+
     @JsonProperty("SystemTTL")
     private LocalDate systemTTL;
     @JsonProperty("OverrideTTL")
