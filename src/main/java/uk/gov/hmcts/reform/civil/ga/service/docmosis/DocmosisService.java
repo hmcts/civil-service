@@ -34,7 +34,9 @@ public class DocmosisService {
         } else {
             courtLocations = generalAppLocationRefDataService.getCourtLocations(authorisation, serviceId);
         }
-        assert courtLocations != null;
+        if (courtLocations == null) {
+            throw new IllegalArgumentException("Court locations could not be retrieved for service: " + serviceId);
+        }
         var caseLocation = caseData.getCaseManagementLocation();
         var matchingLocations =
             courtLocations
