@@ -761,6 +761,7 @@ async:
     clientBackoffInitial: ${EVENT_CLIENT_BACKOFF_INITIAL:500}
     clientBackoffFactor: ${EVENT_CLIENT_BACKOFF_FACTOR:2}
     clientBackoffMax: ${EVENT_CLIENT_BACKOFF_MAX:5000}
+    httpValidateAfterInactivityMs: ${EVENT_HTTP_VALIDATE_AFTER_INACTIVITY_MS:2000}
 
 feign:
   client:
