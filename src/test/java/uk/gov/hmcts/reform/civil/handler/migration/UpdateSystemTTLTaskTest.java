@@ -64,7 +64,7 @@ class UpdateSystemTTLTaskTest {
     }
 
     @Test
-    void shouldNotReplaceTtlWhenSpreadsheetShowsItAlreadyExists() {
+    void shouldSetSystemTtlFromSpreadsheetWhenItAlreadyExists() {
         Object existingTtl = Map.of("SystemTTL", "2030-01-01");
         Map<String, Object> originalData = Map.of("TTL", existingTtl);
         CaseDetails caseDetails = CaseDetails.builder().data(originalData).build();
@@ -74,8 +74,14 @@ class UpdateSystemTTLTaskTest {
             caseReference("2030-01-01")
         );
 
-        assertThat(result).containsEntry("TTL", existingTtl);
+        assertThat(result.get("TTL"))
+            .isInstanceOfSatisfying(TTL.class, ttl -> {
+                assertThat(ttl.getSystemTTL()).isEqualTo(LocalDate.of(2030, 1, 1));
+                assertThat(ttl.getOverrideTTL()).isNull();
+                assertThat(ttl.getSuspended()).isEqualTo("No");
+            });
         assertThat(result).isNotSameAs(originalData);
+        assertThat(originalData).containsEntry("TTL", existingTtl);
     }
 
     @Test
