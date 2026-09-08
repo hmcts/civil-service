@@ -6,7 +6,7 @@ properties([
   parameters([
     choice(name: 'FORCE_GREEN_BUILD', choices: ['false', 'true'],
       description: 'Should force pipeline to go green by not running any functional tests'),
-    choice(name: 'RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES', choices: ['false', 'true'],
+    choice(name: 'RUN_FAILED_TESTS', choices: ['false', 'true'],
       description: 'Runs the failed test files and test files that were not executed, contained within the \'testFilesReport.json\', from the latest previous pipeline run'),
     choice(name: 'ENVIRONMENT', choices: ['aat', 'demo', 'preview'],
       description: 'Environment to test'),
@@ -107,39 +107,32 @@ static Map<String, Object> secret(String secretName, String envVariable) {
   ]
 }
 
-void publishBootstrapReport() {
-    publishHTML([
-            allowMissing: true,
-            alwaysLinkToLastBuild: true,
-            keepAll: true,
-            reportDir: 'playwright-allure-bootstrap-report',
-            reportFiles: 'index.html',
-            reportName: 'Playwright Allure Bootstrap Report'
-        ])
-    sh "cp -r ./playwright-allure-bootstrap-report/history/  ./allure-bootstrap-history"
-    archiveArtifacts artifacts: 'allure-bootstrap-history/**', fingerprint: true
-  }
 
-  void publishFunctionalReport() {
-    publishHTML([
-            allowMissing: true,
-            alwaysLinkToLastBuild: true,
-            keepAll: true,
-            reportDir: 'playwright-allure-functional-report',
-            reportFiles: 'index.html',
-            reportName: 'Playwright Allure Functional Report'
-        ])
-    sh "cp -r ./playwright-allure-functional-report/history/  ./allure-functional-history"
-    archiveArtifacts artifacts: 'allure-functional-history/**', fingerprint: true
-  }
+void publishAllureReport(String reportDir, String reportName, String historyArchiveDir) {
+  publishHTML([
+    allowMissing: true,
+    alwaysLinkToLastBuild: true,
+    keepAll: true,
+    reportDir: reportDir,
+    reportFiles: 'index.html',
+    reportName: reportName
+  ])
+  sh "cp -r ./${reportDir}/history/ ./${historyArchiveDir}"
+  archiveArtifacts artifacts: "${historyArchiveDir}/**", fingerprint: true
+}
 
-def copyPreviousHistory(historyDir, resultsDir) {
+def copyPreviousAllureHistory(historyDir, resultsDir) {
   def buildFound = false
   def buildNumber = currentBuild.previousBuild ? currentBuild.previousBuild.number : 0
   def minBuildNumber = ((buildNumber - 8) > 0) ? buildNumber - 8 : 0
   while (!buildFound && buildNumber > minBuildNumber) {
     try {
-      copyArtifacts projectName: env.JOB_NAME, selector: specific("${buildNumber}"), filter: "**/${historyDir}/**", target: "${resultsDir}"
+      copyArtifacts(
+        projectName: env.JOB_NAME,
+        selector: specific("${buildNumber}"),
+        filter: "**/${historyDir}/**",
+        target: resultsDir
+      )
       sh "mv ${resultsDir}/${historyDir} ${resultsDir}/history"
       buildFound = true
     } catch (Exception error) {
@@ -149,38 +142,55 @@ def copyPreviousHistory(historyDir, resultsDir) {
   }
 }
 
-def copyPreviousAllureHistory() {
+def copyPrevTestFilesReport(reportFilePath) {
   def buildFound = false
   def buildNumber = currentBuild.previousBuild ? currentBuild.previousBuild.number : 0
   def minBuildNumber = ((buildNumber - 8) > 0) ? buildNumber - 8 : 0
-  def targetDir = "test-results/functional/allure-results/history"
-
   while (!buildFound && buildNumber > minBuildNumber) {
     try {
-      copyArtifacts(
-        projectName: env.JOB_NAME,
-        selector: specific("${buildNumber}"),
-        filter: "test-results/functional/allure-report/history/*",
-        target: targetDir,
-        flatten: true
-      )
-
+      copyArtifacts projectName: env.JOB_NAME, selector: specific("${buildNumber}"), filter: reportFilePath
       buildFound = true
-      echo "Successfully imported Allure history from build ${buildNumber}"
     } catch (Exception error) {
-      echo "Allure history artifact not found in build ${buildNumber}. Trying previous..."
+      echo "artifact not found: " + error.toString()
       buildNumber--
     }
   }
 }
 
-def copyPrevFailedAndNotExecutedTestFilesJson() {
+def checkHasPlaywrightLastRunStatus(expectedStatuses) {
+  def lastRunStatus = sh(
+    script: "jq -r '.status // empty' ${env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR}/${env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_PROJECT_DIR}/.last-run.json",
+    returnStdout: true
+  ).trim()
+  def statuses = expectedStatuses instanceof Collection ? expectedStatuses : [expectedStatuses]
+  return statuses.contains(lastRunStatus)
+}
+
+def checkHasFailedTestFiles() {
+  def failedTestFiles = sh(
+    script: "jq -r '.failedTestFiles | length' test-results/functional/testFilesReport.json",
+    returnStdout: true
+  ).trim()
+  return failedTestFiles == '0'
+}
+
+def copyPrevPlaywrightLastRun() {
   def buildFound = false
   def buildNumber = currentBuild.previousBuild ? currentBuild.previousBuild.number : 0
   def minBuildNumber = ((buildNumber - 8) > 0) ? buildNumber - 8 : 0
   while (!buildFound && buildNumber > minBuildNumber) {
     try {
-      copyArtifacts projectName: env.JOB_NAME, selector: specific("${buildNumber}"), filter: "test-results/functional/testFilesReport.json"
+      sh "rm -rf ${env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR}/${env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_PROJECT_DIR}"
+      copyArtifacts(
+        projectName: env.JOB_NAME,
+        selector: specific("${buildNumber}"),
+        filter: "${env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR}/${env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_PROJECT_DIR}/.last-run.json"
+      )
+      if (!checkHasPlaywrightLastRunStatus(['passed', 'failed'])) {
+        throw new Exception(
+          "Skipping copied .last-run.json from build ${buildNumber} because status was not 'passed' or 'failed'"
+        )
+      }
       buildFound = true
     } catch (Exception error) {
       echo "artifact not found: " + error.toString()
@@ -201,9 +211,11 @@ def secrets = [
 ]
 
 withNightlyPipeline(type, product, component) {
+  env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR = 'playwright-functional-test-results'
+  env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_PROJECT_DIR = 'civil-service-nightly'
   env.GRADLE_OPTS = "-Dorg.gradle.workers.max=3"
   env.FORCE_GREEN_BUILD=params.FORCE_GREEN_BUILD
-  env.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES=params.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES
+  env.RUN_FAILED_TESTS=params.RUN_FAILED_TESTS
   env.PLAYWRIGHT_WORKERS=params.PLAYWRIGHT_WORKERS
   env.PLAYWRIGHT_RETRIES=params.PLAYWRIGHT_RETRIES
   env.PLAYWRIGHT_EXUI_RETRIES=params.PLAYWRIGHT_EXUI_RETRIES
@@ -252,15 +264,8 @@ withNightlyPipeline(type, product, component) {
   ])
   loadVaultSecrets(secrets)
 
-  boolean playwrightSetupPassed = true
-  boolean flowInterrupted = false
   boolean forceGreenBuild = env.FORCE_GREEN_BUILD.toBoolean();
-  boolean runPrevFailedAndNotExecutedTestFiles = env.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES.toBoolean();
-  boolean playwrightRunSetup =
-    env.PLAYWRIGHT_RUN_DATA_SETUP.toBoolean() ||
-    env.PLAYWRIGHT_RUN_EXUI_USER_DATA_SETUP.toBoolean() ||
-    env.PLAYWRIGHT_RUN_CUI_USER_DATA_SETUP.toBoolean() ||
-    env.PLAYWRIGHT_RUN_CUI_USER_SETUP.toBoolean();
+  boolean runFailedTests = env.RUN_FAILED_TESTS.toBoolean();
 
   if(!forceGreenBuild) {
     afterAlways('DependencyCheckNightly') {
@@ -269,97 +274,129 @@ withNightlyPipeline(type, product, component) {
       """
       yarnBuilder.yarn('install-dependencies')
 
-      if(!runPrevFailedAndNotExecutedTestFiles) {
-        stage('Playwright test setup') {
-          try {
-            yarnBuilder.yarn('test:playwright:setup:install')
-            if(playwrightRunSetup) {
-              yarnBuilder.yarn('test:playwright:setup:civil-service-nightly:ci')
-            }
-          } catch (Exception error) {
-            if(error instanceof org.jenkinsci.plugins.workflow.steps.FlowInterruptedException) {
-              flowInterrupted = true
-            }
-            if(playwrightRunSetup) {
-              playwrightSetupPassed=false
-            }
-            unstable(message: "${STAGE_NAME} is unstable: " + error.toString())
-          } finally {
-            if(playwrightRunSetup) {
-              yarnBuilder.yarn('test:playwright:bootstrap:generate-report')
-            }
+      if(runFailedTests) {
+        copyPrevPlaywrightLastRun()
+        copyPrevTestFilesReport("${env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR}/${env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_PROJECT_DIR}/playwrightTestFilesReport.json")
+      }
+
+      boolean playwrightSetupPassed = true
+      boolean flowInterrupted = false
+      boolean lastRunPassed = env.RUN_FAILED_TESTS.toBoolean() && checkHasPlaywrightLastRunStatus('passed');
+      boolean playwrightRunSetup =
+        env.PLAYWRIGHT_RUN_DATA_SETUP.toBoolean() ||
+        env.PLAYWRIGHT_RUN_EXUI_USER_DATA_SETUP.toBoolean() ||
+        env.PLAYWRIGHT_RUN_CUI_USER_DATA_SETUP.toBoolean() ||
+        env.PLAYWRIGHT_RUN_CUI_USER_SETUP.toBoolean();
+
+      stage('Playwright test setup') {
+        try {
+          if(playwrightRunSetup) {
+            sh './playwright-e2e/scripts/playwright-run-civil-service-setup.sh'
+          }
+        } catch (Exception error) {
+          if(error instanceof org.jenkinsci.plugins.workflow.steps.FlowInterruptedException) {
+            flowInterrupted = true
+          }
+          if(playwrightRunSetup) {
+            playwrightSetupPassed=false
+          }
+          unstable(message: "${STAGE_NAME} is unstable: " + error.toString())
+        } finally {
+          if(playwrightRunSetup && !lastRunPassed) {
+            yarnBuilder.yarn('test:playwright:bootstrap:generate-report')
           }
         }
+      }
 
-        stage('Playwright full functional test') {
+      stage('Playwright full functional test') {
+        try {
+          if(flowInterrupted) {
+            throw new org.jenkinsci.plugins.workflow.steps.FlowInterruptedException()
+          }
+          if(playwrightSetupPassed) {
+            sh './playwright-e2e/scripts/playwright-run-civil-service-nightly-tests.sh'
+          } else {
+            throw new Error('Playwright test setup failed')
+          }
+        } catch (Exception error) {
+          if(error instanceof org.jenkinsci.plugins.workflow.steps.FlowInterruptedException) {
+            flowInterrupted = true
+          }
+          unstable(message: "${STAGE_NAME} is unstable: " + error.toString())
+        } finally {
+          if(playwrightSetupPassed && !lastRunPassed) {
+            copyPreviousAllureHistory('allure-functional-history', 'playwright-allure-functional-results');
+            sh 'cp playwright-categories.json playwright-allure-functional-results/categories.json'
+            yarnBuilder.yarn('test:playwright:functional:generate-report')
+            publishAllureReport(
+              'playwright-allure-functional-report', 
+              'Playwright Allure Functional Report', 
+              'playwright-allure-functional-history'
+            )
+          }
+          archiveArtifacts allowEmptyArchive: true, artifacts: "${env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR}/**/*"
+        }
+      }
+
+      if(playwrightRunSetup) {
+        stage('Playwright test teardown') {
           try {
-            if(flowInterrupted) {
-              throw new org.jenkinsci.plugins.workflow.steps.FlowInterruptedException()
-            }
-            if(playwrightSetupPassed) {
-              yarnBuilder.yarn('test:playwright:civil-service-nightly:ci')
-            }
+            sh './playwright-e2e/scripts/playwright-run-civil-service-teardown.sh'
           } catch (Exception error) {
-            if(error instanceof org.jenkinsci.plugins.workflow.steps.FlowInterruptedException) {
-              flowInterrupted = true
-            }
             unstable(message: "${STAGE_NAME} is unstable: " + error.toString())
           } finally {
-            if(playwrightSetupPassed) {
-              copyPreviousHistory('allure-functional-history', 'playwright-allure-functional-results');
-              sh 'cp playwright-categories.json playwright-allure-functional-results/categories.json'
-              yarnBuilder.yarn('test:playwright:functional:generate-report')
-              publishFunctionalReport()
-            }
-          }
-        }
-
-        if(playwrightRunSetup) {
-          stage('Playwright test teardown') {
-            try {
-              yarnBuilder.yarn('test:playwright:teardown:civil-service-nightly:ci')
-            } catch (Exception error) {
-              unstable(message: "${STAGE_NAME} is unstable: " + error.toString())
-            } finally {
-              copyPreviousHistory('allure-bootstrap-history', 'playwright-allure-bootstrap-results');
+            if(!lastRunPassed) {
+              copyPreviousAllureHistory('allure-bootstrap-history', 'playwright-allure-bootstrap-results');
               sh 'cp playwright-categories.json playwright-allure-bootstrap-results/categories.json'
               yarnBuilder.yarn('test:playwright:bootstrap:generate-report')
-              publishBootstrapReport()
+              publishAllureReport(
+                'playwright-allure-bootstrap-report', 
+                'Playwright Allure Bootstrap Report', 
+                'playwright-allure-bootstrap-history'
+              )
             }
           }
         }
+      }
+    }
 
-        enableFortifyScan()
+    if(!runFailedTests && !forceGreenBuild) {
+      enableFortifyScan()
 
-        afterAlways('fortify-scan') {
-          steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+      afterAlways('fortify-scan') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+      }
+    }
+
+    boolean hasFailedTestFiles = false;
+
+    if(!forceGreenBuild) {
+      before('fullFunctionalTest') {
+        if(runFailedTests) {
+          copyPrevTestFilesReport("test-results/functional/testFilesReport.json")
+          hasFailedTestFiles = checkHasFailedTestFiles()
+        }
+        if (!runFailedTests || !hasFailedTestFiles) {
+          copyPreviousAllureHistory('allure-functional-history', 'allure-functional-results');
         }
       }
     }
+    
+    enableFullFunctionalTest(200)
 
-    before('fullFunctionalTest') {
-      copyPreviousAllureHistory()
-      if(runPrevFailedAndNotExecutedTestFiles) {
-        copyPrevFailedAndNotExecutedTestFilesJson()
+    if(!forceGreenBuild) {
+      afterAlways('fullFunctionalTest') {
+        if (!runFailedTests || !hasFailedTestFiles) {
+          yarnBuilder.yarn('test:generate-report')
+          publishAllureReport(
+            'allure-functional-report',
+            'Allure Functional Report',
+            'allure-functional-history',
+          )
+        }
+        archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
+        env.TESTS_FOR_ACCESSIBILITY = false
       }
     }
-
-    afterAlways('fullFunctionalTest') {
-      steps.sh 'npx allure generate test-results/functional/allure-results --clean -o test-results/functional/allure-report'
-      publishHTML([
-        allowMissing: false,
-        alwaysLinkToLastBuild: true,
-        keepAll: true,
-        reportDir: 'test-results/functional/allure-report',
-        reportFiles: 'index.html',
-        reportName: 'Nightly E2E Allure Report'
-      ])
-      archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
-      env.TESTS_FOR_ACCESSIBILITY = false
-    }
   }
-
-  enableFullFunctionalTest(200)
-  
 }
-
