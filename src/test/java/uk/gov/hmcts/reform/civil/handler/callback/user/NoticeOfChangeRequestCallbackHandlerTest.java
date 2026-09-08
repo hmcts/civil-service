@@ -23,6 +23,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -123,6 +124,48 @@ public class NoticeOfChangeRequestCallbackHandlerTest extends BaseCallbackHandle
             when(caseAssignmentApi.checkNocApproval(params.getParams().get(BEARER_TOKEN).toString(),
                                                     authTokenGenerator.generate(),
                                                     params.getRequest())).thenThrow(badGateway);
+
+            SubmittedCallbackResponse response = assertDoesNotThrow(
+                () -> (SubmittedCallbackResponse) handler.handle(params)
+            );
+
+            assertThat(response.getConfirmationHeader()).isEqualTo("# Notice of change request submitted");
+            assertThat(response.getConfirmationBody()).contains("We could not confirm approval");
+        }
+
+        @Test
+        void shouldReturnConfirmation_whenCheckNocApprovalFailsWithBlankResponseBody() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            FeignException feignException = mock(FeignException.class);
+            when(feignException.status()).thenReturn(502);
+            when(feignException.contentUTF8()).thenReturn(" ");
+
+            when(caseAssignmentApi.checkNocApproval(params.getParams().get(BEARER_TOKEN).toString(),
+                                                    authTokenGenerator.generate(),
+                                                    params.getRequest())).thenThrow(feignException);
+
+            SubmittedCallbackResponse response = assertDoesNotThrow(
+                () -> (SubmittedCallbackResponse) handler.handle(params)
+            );
+
+            assertThat(response.getConfirmationHeader()).isEqualTo("# Notice of change request submitted");
+            assertThat(response.getConfirmationBody()).contains("We could not confirm approval");
+        }
+
+        @Test
+        void shouldReturnConfirmation_whenCheckNocApprovalFailsWithNullResponseBody() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            FeignException feignException = mock(FeignException.class);
+            when(feignException.status()).thenReturn(502);
+            when(feignException.contentUTF8()).thenReturn(null);
+
+            when(caseAssignmentApi.checkNocApproval(params.getParams().get(BEARER_TOKEN).toString(),
+                                                    authTokenGenerator.generate(),
+                                                    params.getRequest())).thenThrow(feignException);
 
             SubmittedCallbackResponse response = assertDoesNotThrow(
                 () -> (SubmittedCallbackResponse) handler.handle(params)
