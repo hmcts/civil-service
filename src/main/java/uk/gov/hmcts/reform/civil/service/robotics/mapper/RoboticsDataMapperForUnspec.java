@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.ClaimDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
+import uk.gov.hmcts.reform.civil.model.robotics.RPABreathingSpace;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
@@ -94,8 +95,21 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
             || caseData.getCcdState() == CASE_DISMISSED) {
             roboticsCaseData.setNoticeOfChange(RoboticsDataUtil.buildNoticeOfChange(caseData));
         }
+        if (caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM && caseData.hasBreathingSpace()) {
+            roboticsCaseData.setBreathingSpace(buildBreathingSpace(caseData));
+        }
 
         return roboticsCaseData;
+    }
+
+    private RPABreathingSpace buildBreathingSpace(CaseData caseData) {
+        var breathingSpaceEnterInfo = caseData.getBreathing().getEnter();
+        RPABreathingSpace breathingSpace = new RPABreathingSpace();
+        breathingSpace.setReference(breathingSpaceEnterInfo.getReference());
+        breathingSpace.setStartDate(breathingSpaceEnterInfo.getStart());
+        breathingSpace.setType(breathingSpaceEnterInfo.getType());
+        breathingSpace.setEndDate(breathingSpaceEnterInfo.getExpectedEnd());
+        return breathingSpace;
     }
 
     private ClaimDetails buildClaimDetails(CaseData caseData) {
