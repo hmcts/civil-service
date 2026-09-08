@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import feign.FeignException;
+import feign.Request;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +17,11 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -100,6 +106,30 @@ public class NoticeOfChangeRequestCallbackHandlerTest extends BaseCallbackHandle
             verify(caseAssignmentApi).checkNocApproval(params.getParams().get(BEARER_TOKEN).toString(),
                                                        authTokenGenerator.generate(),
                                                        params.getRequest());
+        }
+
+        @Test
+        void shouldReturnConfirmation_whenCheckNocApprovalFailsWithBadGateway() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            FeignException badGateway = new FeignException.BadGateway(
+                "Bad Gateway",
+                Request.create(Request.HttpMethod.POST, "/noc/check-noc-approval", Map.of(), null, StandardCharsets.UTF_8, null),
+                "upstream unavailable".getBytes(StandardCharsets.UTF_8),
+                Map.of()
+            );
+
+            when(caseAssignmentApi.checkNocApproval(params.getParams().get(BEARER_TOKEN).toString(),
+                                                    authTokenGenerator.generate(),
+                                                    params.getRequest())).thenThrow(badGateway);
+
+            SubmittedCallbackResponse response = assertDoesNotThrow(
+                () -> (SubmittedCallbackResponse) handler.handle(params)
+            );
+
+            assertThat(response.getConfirmationHeader()).isEqualTo("# Notice of change request submitted");
+            assertThat(response.getConfirmationBody()).contains("We could not confirm approval");
         }
     }
 }
