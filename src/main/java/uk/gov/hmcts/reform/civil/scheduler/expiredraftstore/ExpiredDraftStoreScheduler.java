@@ -11,10 +11,12 @@ import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledEventTracker;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import org.springframework.context.annotation.Profile;
 
 import java.time.OffsetDateTime;
 
 @Component
+@Profile("!contract-test")
 @RequiredArgsConstructor
 @Slf4j
 public class ExpiredDraftStoreScheduler implements CivilScheduler {
