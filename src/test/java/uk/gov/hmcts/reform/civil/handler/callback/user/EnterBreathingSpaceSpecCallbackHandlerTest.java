@@ -179,6 +179,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
     @Test
     void testAboutToSubmitCallback() {
         CaseData caseData = CaseData.builder().build();
+        caseData.setBreathing(new BreathingSpaceInfo());
 
         CallbackParams params = new CallbackParams()
             .caseData(caseData)
@@ -186,6 +187,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
         Assertions.assertTrue(response.getData().containsKey("businessProcess"));
+        Assertions.assertEquals("Yes", response.getData().get("breathingSpaceActive"));
     }
 
     @Test
