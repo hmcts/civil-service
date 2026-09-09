@@ -1,7 +1,11 @@
 package uk.gov.hmcts.reform.civil.notify;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.notify.audit.NotificationAuditService;
+import uk.gov.hmcts.reform.civil.utils.MaskHelper;
+import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendEmailResponse;
@@ -11,7 +15,6 @@ import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
@@ -20,6 +23,7 @@ public class NotificationService {
 
     private final NotificationClient notificationClient;
     private final Optional<NotificationAuditService> notificationAuditService;
+    private final ValidateEmailService validateEmailService;
 
     public void sendMail(
         String targetEmail,
@@ -27,11 +31,20 @@ public class NotificationService {
         Map<String, String> parameters,
         String reference
     ) {
+        String trimmedTargetEmail = StringUtils.trimToNull(targetEmail);
+        if (trimmedTargetEmail == null || !validateEmailService.validate(trimmedTargetEmail).isEmpty()) {
+            log.warn(
+                "NotificationService::sendMail::skipping invalid recipient for reference: {}, email: {}",
+                reference,
+                MaskHelper.maskEmail(targetEmail)
+            );
+            return;
+        }
         try {
             log.info("NotificationService::sendMail::templateID: {}", emailTemplate);
             SendEmailResponse sendEmailResponse = notificationClient.sendEmail(
                 emailTemplate,
-                targetEmail,
+                trimmedTargetEmail,
                 parameters,
                 reference
             );
@@ -40,7 +53,7 @@ public class NotificationService {
                      reference,
                      notificationId
             );
-            recordAudit(emailTemplate, targetEmail, reference, notificationId);
+            recordAudit(emailTemplate, trimmedTargetEmail, reference, notificationId);
         } catch (NotificationClientException e) {
             log.error("NotificationService::sendMail::error for reference: {}, message: {}", reference, e.getMessage());
             throw new NotificationException(e);
