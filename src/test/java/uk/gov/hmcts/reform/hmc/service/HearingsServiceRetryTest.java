@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.hmc.client.HearingsApi;
@@ -41,7 +40,6 @@ import static org.mockito.Mockito.when;
 class HearingsServiceRetryTest {
 
     @EnableRetry(proxyTargetClass = true)
-    @Configuration
     static class TestRetryConfig {
 
         @Bean
