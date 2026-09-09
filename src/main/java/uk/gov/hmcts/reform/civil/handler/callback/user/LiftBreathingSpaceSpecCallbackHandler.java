@@ -69,7 +69,6 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
 
         prepopulateEndDate(caseData);
 
-        objectMapper.findAndRegisterModules();
         return responseBuilder
             .data(caseData.toMap(objectMapper))
             .build();
