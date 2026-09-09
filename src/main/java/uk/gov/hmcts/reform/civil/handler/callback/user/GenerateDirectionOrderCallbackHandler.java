@@ -53,8 +53,6 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
-
-import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.nowInLocalZone;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -95,6 +93,7 @@ import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.STANDARD_BAS
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.SUBJECT_DETAILED_ASSESSMENT;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle.SHOW;
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.nowInLocalZone;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDateType.DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDateType.SINGLE_DATE;
@@ -749,7 +748,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             && savedFinalOrderFurtherHearingToggle != null)
             || isJudicialReferral(callbackParams)) {
             state = CASE_PROGRESSION;
-            caseData.setEnableUploadEvent(YES);
         }
         if (!ASSISTED_ORDER.equals(savedFinalOrderSelection)) {
             caseData.setFinalOrderFurtherHearingToggle(null);
