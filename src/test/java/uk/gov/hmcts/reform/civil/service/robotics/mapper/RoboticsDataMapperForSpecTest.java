@@ -129,11 +129,13 @@ class RoboticsDataMapperForSpecTest {
         caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
         caseData.setSubmittedDate(LocalDateTime.now().minusDays(14));
         caseData.setBreathing(new BreathingSpaceInfo()
-            .setEnter(new BreathingSpaceEnterInfo()
-                .setReference("BS-12345")
-                .setStart(startDate)
-                .setExpectedEnd(endDate)
-                .setType(BreathingSpaceType.MENTAL_HEALTH)));
+                                  .setEnter(new BreathingSpaceEnterInfo()
+                                                .setReference("BS-12345")
+                                                .setStart(startDate)
+                                                .setType(BreathingSpaceType.MENTAL_HEALTH))
+                                  .setLift(new BreathingSpaceLiftInfo()
+                                               .setExpectedEnd(endDate)
+                                               .setReasonToLift("reason to lift")));
 
         RoboticsCaseDataSpec mapped = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
@@ -145,7 +147,7 @@ class RoboticsDataMapperForSpecTest {
                 breathingSpace -> breathingSpace.getEndDate(),
                 breathingSpace -> breathingSpace.getReasonForLifting()
             )
-            .containsExactly("BS-12345", startDate, BreathingSpaceType.MENTAL_HEALTH, endDate, null);
+            .containsExactly("BS-12345", startDate, BreathingSpaceType.MENTAL_HEALTH, endDate, "reason to lift");
     }
 
     @Test

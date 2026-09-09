@@ -101,7 +101,11 @@ public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
         breathingSpace.setReference(breathingSpaceEnterInfo.getReference());
         breathingSpace.setStartDate(breathingSpaceEnterInfo.getStart());
         breathingSpace.setType(breathingSpaceEnterInfo.getType());
-        breathingSpace.setEndDate(breathingSpaceEnterInfo.getExpectedEnd());
+        var breathingSpaceLiftInfo = caseData.getBreathing().getLift();
+        if (breathingSpaceLiftInfo != null) {
+            breathingSpace.setEndDate(breathingSpaceLiftInfo.getExpectedEnd());
+            breathingSpace.setReasonForLifting(breathingSpaceLiftInfo.getReasonToLift());
+        }
         log.info("RoboticsCaseDataSpec RPABreathingSpace SPEC={}", breathingSpace.toString());
         log.info("RoboticsCaseDataSpec RPABreathingSpace LIFT SPEC={}", caseData.getBreathing().getLift());
         return breathingSpace;

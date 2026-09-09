@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.NoticeOfChange;
@@ -520,11 +521,13 @@ class RoboticsDataMapperForUnspecTest {
             .build();
         caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
         caseData.setBreathing(new BreathingSpaceInfo()
-            .setEnter(new BreathingSpaceEnterInfo()
-                .setReference("BS-12345")
-                .setStart(startDate)
-                .setExpectedEnd(endDate)
-                .setType(BreathingSpaceType.STANDARD)));
+                                  .setEnter(new BreathingSpaceEnterInfo()
+                                                .setReference("BS-12345")
+                                                .setStart(startDate)
+                                                .setType(BreathingSpaceType.STANDARD))
+                                  .setLift(new BreathingSpaceLiftInfo()
+                                               .setExpectedEnd(endDate)
+                                               .setReasonToLift("reason to lift")));
 
         RoboticsCaseData mapped = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
@@ -536,7 +539,7 @@ class RoboticsDataMapperForUnspecTest {
                 breathingSpace -> breathingSpace.getEndDate(),
                 breathingSpace -> breathingSpace.getReasonForLifting()
             )
-            .containsExactly("BS-12345", startDate, BreathingSpaceType.STANDARD, endDate, null);
+            .containsExactly("BS-12345", startDate, BreathingSpaceType.STANDARD, endDate, "reason to lift");
     }
 
     @Test
