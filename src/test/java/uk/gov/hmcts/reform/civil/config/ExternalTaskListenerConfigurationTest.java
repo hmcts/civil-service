@@ -94,6 +94,7 @@ class ExternalTaskListenerConfigurationTest {
             props.setClientBackoffInitial(500);
             props.setClientBackoffFactor(2);
             props.setClientBackoffMax(5000);
+            props.setHttpValidateAfterInactivityMs(2000);
             return props;
         }
     }
