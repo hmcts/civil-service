@@ -24,7 +24,7 @@ public class CaseDismissedScheduler implements CivilScheduler {
     private final CaseDismissedSearchService searchService;
     private final ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
     private final CaseDismissedScheduledTask caseDismissedScheduledTask;
-    private final OnGoingBusinessProcessCheck<CaseDetails> onGoingBusinessProcessCheck;
+    private final OnGoingBusinessProcessCheck onGoingBusinessProcessCheck;
 
     @Override
     public String getName() {
