@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import uk.gov.hmcts.reform.dashboard.exceptions.DraftClaimNotFoundException;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
@@ -104,6 +105,37 @@ class DraftClaimServiceTest {
             assertThat(result.draftClaim()).isSameAs(replacementDraft);
             verify(draftStoreService).deleteDraftAndFlush(expiredDraft);
             verify(draftStoreService).createDraft(USER_ID, NEW_CASE_ID, payload, DRAFT_TYPE);
+        }
+
+        @Test
+        void shouldReturnActiveDraftWhenCreateHitsUniqueConstraint() {
+            Map<String, Object> payload = Map.of("step", "claimant-details");
+            OffsetDateTime createdAt = OffsetDateTime.now().minusDays(1);
+            DraftStoreEntity existingDraft = draft(createdAt, DRAFT_TYPE.calculateExpiry(createdAt));
+            DataIntegrityViolationException uniqueViolation =
+                new DataIntegrityViolationException("uq_draft_store_user_draft_claim");
+            when(draftStoreService.getDraftsForUser(USER_ID, DRAFT_TYPE)).thenReturn(List.of());
+            when(draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE)).thenThrow(uniqueViolation);
+            when(draftStoreService.getActiveDraftsForUser(USER_ID, DRAFT_TYPE)).thenReturn(List.of(existingDraft));
+
+            DraftClaimCreationResult result = draftClaimService.createDraftClaim(USER_ID, CASE_ID, payload);
+
+            assertThat(result.newlyCreated()).isFalse();
+            assertThat(result.draftClaim()).isSameAs(existingDraft);
+            assertThat(existingDraft.getPayload()).containsEntry("step", "existing-payload");
+        }
+
+        @Test
+        void shouldRethrowWhenUniqueConstraintFailsAndNoActiveDraftExists() {
+            Map<String, Object> payload = Map.of("step", "claimant-details");
+            DataIntegrityViolationException uniqueViolation =
+                new DataIntegrityViolationException("uq_draft_store_user_draft_claim");
+            when(draftStoreService.getDraftsForUser(USER_ID, DRAFT_TYPE)).thenReturn(List.of());
+            when(draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE)).thenThrow(uniqueViolation);
+            when(draftStoreService.getActiveDraftsForUser(USER_ID, DRAFT_TYPE)).thenReturn(List.of());
+
+            assertThatThrownBy(() -> draftClaimService.createDraftClaim(USER_ID, CASE_ID, payload))
+                .isSameAs(uniqueViolation);
         }
 
         @Test
