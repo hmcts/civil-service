@@ -26,7 +26,7 @@ class CaseDismissedSchedulerTest {
     @Mock
     private CaseDismissedScheduledTask caseDismissedScheduledTask;
     @Mock
-    private OnGoingBusinessProcessCheck<CaseDetails> onGoingBusinessProcessCheck;
+    private OnGoingBusinessProcessCheck onGoingBusinessProcessCheck;
     @InjectMocks
     private CaseDismissedScheduler scheduler;
 

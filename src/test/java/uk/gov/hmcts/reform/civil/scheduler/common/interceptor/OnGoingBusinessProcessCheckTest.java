@@ -6,14 +6,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,31 +33,21 @@ class OnGoingBusinessProcessCheckTest {
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
     @Mock
-    private InterceptorChain<Object> chain;
+    private InterceptorChain<CaseDetails> chain;
 
-    private OnGoingBusinessProcessCheck<Object> check;
+    private OnGoingBusinessProcessCheck check;
 
     @BeforeEach
     void setUp() {
-        check = new OnGoingBusinessProcessCheck<>(coreCaseDataService, caseDetailsConverter);
-    }
-
-    @Test
-    void shouldCallNext_whenItemIsNotCaseDetails() {
-        InterceptorContext<Object> context = new InterceptorContext<>("scheduler", new Object());
-
-        check.accept(context, chain);
-
-        verify(chain).next(context);
-        verify(coreCaseDataService, never()).getCase(anyLong());
+        check = new OnGoingBusinessProcessCheck(coreCaseDataService, caseDetailsConverter);
     }
 
     @Test
     void shouldCallNext_whenCaseHasNoOngoingBusinessProcess() {
         CaseDetails caseDetails = CaseDetails.builder().id(123L).caseTypeId(CASE_TYPE).build();
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = new CaseDataBuilder().build();
 
-        InterceptorContext<Object> context = new InterceptorContext<>("scheduler", caseDetails);
+        InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", caseDetails);
         when(coreCaseDataService.getCase(123L)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
 
@@ -71,7 +63,7 @@ class OnGoingBusinessProcessCheckTest {
         CaseDetails caseDetails = CaseDetails.builder().id(123L).caseTypeId(GENERALAPPLICATION_CASE_TYPE).build();
         GeneralApplicationCaseData gaCaseData = new GeneralApplicationCaseData();
 
-        InterceptorContext<Object> context = new InterceptorContext<>("scheduler", caseDetails);
+        InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", caseDetails);
         when(coreCaseDataService.getCase(123L)).thenReturn(caseDetails);
         when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(gaCaseData);
 
@@ -85,12 +77,11 @@ class OnGoingBusinessProcessCheckTest {
     @Test
     void shouldThrowTaskAbortedException_whenCaseHasOngoingBusinessProcess() {
         CaseDetails caseDetails = CaseDetails.builder().id(123L).caseTypeId(CASE_TYPE).build();
-        CaseData caseData = CaseData.builder()
-            .businessProcess(new uk.gov.hmcts.reform.civil.model.BusinessProcess()
-                                 .setStatus(uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED))
+        CaseData caseData = new CaseDataBuilder()
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.STARTED))
             .build();
 
-        InterceptorContext<Object> context = new InterceptorContext<>("scheduler", caseDetails);
+        InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", caseDetails);
         when(coreCaseDataService.getCase(123L)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
 
@@ -103,10 +94,9 @@ class OnGoingBusinessProcessCheckTest {
     void shouldThrowTaskAbortedException_whenGACaseHasOngoingBusinessProcess() {
         CaseDetails caseDetails = CaseDetails.builder().id(123L).caseTypeId(GENERALAPPLICATION_CASE_TYPE).build();
         GeneralApplicationCaseData gaCaseData = new GeneralApplicationCaseData();
-        gaCaseData.setBusinessProcess(new uk.gov.hmcts.reform.civil.model.BusinessProcess()
-                                 .setStatus(uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED));
+        gaCaseData.setBusinessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.STARTED));
 
-        InterceptorContext<Object> context = new InterceptorContext<>("scheduler", caseDetails);
+        InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", caseDetails);
         when(coreCaseDataService.getCase(123L)).thenReturn(caseDetails);
         when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(gaCaseData);
 
