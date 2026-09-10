@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.dashboard.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.dashboard.exceptions.DraftClaimNotFoundException;
@@ -45,9 +46,15 @@ public class DraftClaimService {
             draftStoreService.deleteDraftAndFlush(draft);
         }
 
-        return DraftClaimCreationResult.newDraft(
-            draftStoreService.createDraft(userId, caseId, payload, DRAFT_TYPE)
-        );
+        try {
+            return DraftClaimCreationResult.newDraft(
+                draftStoreService.createDraft(userId, caseId, payload, DRAFT_TYPE)
+            );
+        } catch (DataIntegrityViolationException ex) {
+            return getActiveDraftClaimForUser(userId)
+                .map(DraftClaimCreationResult::existingDraft)
+                .orElseThrow(() -> ex);
+        }
     }
 
     @Transactional(readOnly = true)
