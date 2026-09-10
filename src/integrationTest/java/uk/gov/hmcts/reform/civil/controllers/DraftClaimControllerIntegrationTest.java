@@ -18,15 +18,25 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.DraftClaimRequest;
+import uk.gov.hmcts.reform.dashboard.services.DraftClaimCreationResult;
+import uk.gov.hmcts.reform.dashboard.services.DraftClaimService;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -49,6 +59,9 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private DraftStoreRepository draftStoreRepository;
+
+    @Autowired
+    private DraftClaimService draftClaimService;
 
     private UUID draftId;
 
@@ -142,6 +155,41 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
             .andExpect(status().isCreated());
 
         assertThat(draftStoreRepository.count()).isEqualTo(2);
+    }
+
+    @Test
+    void shouldKeepOneDraftWhenTwoCreatesRunConcurrently() throws Exception {
+        draftStoreRepository.deleteAll();
+        CountDownLatch ready = new CountDownLatch(2);
+        CountDownLatch start = new CountDownLatch(1);
+        List<DraftClaimCreationResult> results = Collections.synchronizedList(new ArrayList<>());
+
+        try (ExecutorService executor = Executors.newFixedThreadPool(2)) {
+            Runnable createDraft = () -> {
+                try {
+                    ready.countDown();
+                    start.await();
+                    results.add(draftClaimService.createDraftClaim(
+                        USER_ID,
+                        "123",
+                        new HashMap<>(PAYLOAD)
+                    ));
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                    throw new IllegalStateException(ex);
+                }
+            };
+            final Future<?> first = executor.submit(createDraft);
+            final Future<?> second = executor.submit(createDraft);
+            assertThat(ready.await(5, TimeUnit.SECONDS)).isTrue();
+            start.countDown();
+            first.get(10, TimeUnit.SECONDS);
+            second.get(10, TimeUnit.SECONDS);
+        }
+
+        assertThat(results).hasSize(2);
+        assertThat(results.get(0).draftClaim().getId()).isEqualTo(results.get(1).draftClaim().getId());
+        assertThat(draftStoreRepository.findByUserIdAndDraftTypeId(USER_ID, DRAFT_TYPE.getId())).hasSize(1);
     }
 
     @Test
