@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.SchedulerInterceptor;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.SchedulerInterceptorResolver;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.time.Duration;
 import java.time.Instant;
@@ -21,6 +22,7 @@ public class ScheduledTaskRunner<T, I> {
     private final ScheduledEventTracker eventTracker;
     private final ScheduledTaskProcessor<T, I> scheduledTaskProcessor;
     private final FeatureToggleService featureToggleService;
+    private final SchedulerInterceptorResolver interceptorResolver;
 
     /**
      * Executes the scheduled task if the feature toggle is enabled.
@@ -53,7 +55,10 @@ public class ScheduledTaskRunner<T, I> {
             Instant start = Instant.now();
             TaskResult<T> searchResult = config.getSearchResultSupplier().get();
             Duration searchDuration = Duration.between(start, Instant.now());
-            execute(new ScheduledTaskEventConfiguration(config.getSchedulerName()), searchResult, config.getScheduledTask(), config.getInterceptors(), searchDuration, start);
+
+            List<SchedulerInterceptor<T>> interceptors = interceptorResolver.resolveInterceptors(config);
+
+            execute(new ScheduledTaskEventConfiguration(config.getSchedulerName()), searchResult, config.getScheduledTask(), interceptors, searchDuration, start);
         }
     }
 

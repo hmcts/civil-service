@@ -42,6 +42,8 @@ public class CoreCaseDataApiMockHelper {
         when(idamClient.getAccessToken(any(), any())).thenReturn(ACCESS_TOKEN);
         when(idamClient.getUserInfo(ACCESS_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
         when(authTokenGenerator.generate()).thenReturn(GENERATED_TOKEN);
+        when(coreCaseDataApi.getCase(eq(ACCESS_TOKEN), eq(GENERATED_TOKEN), any()))
+            .thenReturn(CaseDetails.builder().data(java.util.Collections.emptyMap()).build());
     }
 
     public void resetMocks() {
