@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DirectionsQuestionnairePreparer;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
@@ -47,11 +48,14 @@ import static org.mockito.Mockito.CALLS_REAL_METHODS;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARENT_CLAIM_SETTLED;
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
@@ -82,6 +86,9 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
     private IStateFlowEngine stateFlowEngine;
 
     @Mock
+    private GenAppStateHelperService genAppStateHelperService;
+
+    @Mock
     private DirectionsQuestionnairePreparer directionsQuestionnairePreparer;
 
     @Mock
@@ -101,6 +108,25 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) determineNextState.handle(params);
 
         assertThat(response.getState()).isEqualTo(resultState);
+        verify(genAppStateHelperService, never()).triggerEvent(caseData, PARENT_CLAIM_SETTLED);
+    }
+
+    @Test
+    void shouldNotifyGeneralApplicationsWhenPostTranslationStateIsSettled() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YES)
+            .applicant1PartAdmitConfirmAmountPaidSpec(YES)
+            .build();
+
+        CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) determineNextState.handle(params);
+
+        assertThat(response.getState()).isEqualTo(CASE_SETTLED.name());
+        verify(genAppStateHelperService).triggerEvent(caseData, PARENT_CLAIM_SETTLED);
     }
 
     @ParameterizedTest
