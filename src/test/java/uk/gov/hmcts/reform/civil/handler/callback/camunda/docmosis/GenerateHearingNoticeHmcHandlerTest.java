@@ -5,10 +5,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -31,7 +32,6 @@ import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaServi
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-import uk.gov.hmcts.reform.civil.utils.HmcDataUtils;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
@@ -179,6 +179,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         updatedVars.setResponseDateTime(hearingResponseDate);
         updatedVars.setDays(List.of(hearingDay));
         updatedVars.setHearingType(TRIAL_HEARING_TYPE);
+        updatedVars.setHearingNoticeSkipped(false);
         var actual = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         verify(camundaService).setProcessVariables(
             PROCESS_INSTANCE_ID, updatedVars);
@@ -254,6 +255,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         updatedVars.setResponseDateTime(hearingResponseDate);
         updatedVars.setDays(expectedHearingDays);
         updatedVars.setHearingType(TRIAL_HEARING_TYPE);
+        updatedVars.setHearingNoticeSkipped(false);
         var actual = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         verify(camundaService).setProcessVariables(PROCESS_INSTANCE_ID, updatedVars);
 
@@ -492,10 +494,10 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
             .setHearingDetails(new HearingDetails()
                                 .setHearingType(TRIAL_HEARING_TYPE));
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
-        when(hearingNoticeHmcGenerator.generate(any(), eq(hearing), anyString(), nullable(String.class), anyString(), eq(HEARING_NOTICE_HMC)))
-            .thenReturn(List.of(CASE_DOCUMENT));
         when(hearingNoticeHmcGenerator.generate(any(), eq(hearing), anyString(), nullable(String.class), anyString(), eq(HEARING_NOTICE_HMC_WELSH)))
             .thenReturn(List.of(CASE_DOCUMENT_WELSH));
+        when(hearingNoticeHmcGenerator.generate(any(), eq(hearing), anyString(), nullable(String.class), anyString(), eq(HEARING_NOTICE_HMC)))
+            .thenReturn(List.of(CASE_DOCUMENT));
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -512,8 +514,10 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         assertThat(unwrapElements(updatedData.getHearingDocumentsWelsh()).get(1)).isEqualTo(existingWelsh);
     }
 
-    @Test
-    void shouldReturnNullHearingLocationWhenReferenceDataUnavailable() {
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" ", "\t"})
+    void shouldSkipHearingNoticeWhenLocationIsUnavailable(String venueId) {
         CaseDocument existingEnglish = new CaseDocument();
         existingEnglish.setDocumentName("existing-hearing-notice");
         existingEnglish.setDocumentType(HEARING_FORM);
@@ -552,23 +556,17 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
             .setHearingDetails(new HearingDetails()
                                 .setHearingType(TRIAL_HEARING_TYPE));
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
-        when(hearingNoticeHmcGenerator.generate(any(), eq(hearing), anyString(), nullable(String.class), anyString(), eq(HEARING_NOTICE_HMC)))
-            .thenReturn(List.of(CASE_DOCUMENT));
-
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_HEARING_NOTICE_HMC.name());
 
-        try (MockedStatic<HmcDataUtils> utils = Mockito.mockStatic(HmcDataUtils.class, Answers.CALLS_REAL_METHODS)) {
-            utils.when(() -> HmcDataUtils.getLocationRefData(HEARING_ID, EPIMS, "BEARER_TOKEN", "AAA6", locationRefDataService))
-                .thenReturn(null);
+        hearing.getHearingResponse().getHearingDaySchedule().getFirst().setHearingVenueId(venueId);
+        AboutToStartOrSubmitCallbackResponse actual = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            AboutToStartOrSubmitCallbackResponse actual = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            CaseData updatedData = mapper.convertValue(actual.getData(), CaseData.class);
-            assertThat(updatedData.getHearingLocation().getValue().getLabel()).isNull();
-            assertThat(updatedData.getHearingDocuments()).hasSize(2);
-            assertThat(unwrapElements(updatedData.getHearingDocuments()).get(0)).isEqualTo(CASE_DOCUMENT);
-            assertThat(unwrapElements(updatedData.getHearingDocuments()).get(1)).isEqualTo(existingEnglish);
-        }
+        CaseData updatedData = mapper.convertValue(actual.getData(), CaseData.class);
+        assertThat(actual.getData()).isEqualTo(caseData.toMap(mapper));
+        assertThat(unwrapElements(updatedData.getHearingDocuments())).containsExactly(existingEnglish);
+        assertThat(inputVariables.getHearingNoticeSkipped()).isTrue();
+        verify(camundaService).setProcessVariables(PROCESS_INSTANCE_ID, inputVariables);
+        Mockito.verifyNoInteractions(hearingNoticeHmcGenerator, hearingFeesService, locationRefDataService);
     }
 }

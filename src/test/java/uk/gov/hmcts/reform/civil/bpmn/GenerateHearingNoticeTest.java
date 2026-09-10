@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class GenerateHearingNoticeTest extends BpmnBaseTest {
 
+    private static final String HEARING_NOTICE_SKIPPED = "hearingNoticeSkipped";
     private static final String DIAGRAM_PATH = "camunda/%s";
     public static final String MESSAGE_NAME = "NOTIFY_HEARING_PARTIES";
     public static final String PROCESS_ID = "NOTIFY_HEARING_PARTIES";
@@ -107,6 +109,7 @@ public class GenerateHearingNoticeTest extends BpmnBaseTest {
                 DASHBOARD_SERVICE_ENABLED, true));
 
         variables.put("caseState", caseState);
+        variables.put("hearingNoticeSkipped", false);
 
         //complete the start business process
         ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
@@ -190,6 +193,35 @@ public class GenerateHearingNoticeTest extends BpmnBaseTest {
         completeBusinessProcess(endBusinessProcess);
 
         assertNoExternalTasksLeft();
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldEndWithoutNotifications_whenHearingNoticeSkipped(boolean lipCase) {
+        VariableMap variables = Variables.createVariables();
+        variables.put("flowFlags", Map.of(LIP_CASE, lipCase, "UNREPRESENTED_DEFENDANT_ONE", lipCase));
+        variables.put("caseState", "CASE_PROGRESSION");
+        variables.putValue(HEARING_NOTICE_SKIPPED, true);
+        assertCompleteExternalTask(assertNextExternalTask(START_BUSINESS_TOPIC), START_BUSINESS_TOPIC,
+                                   START_BUSINESS_EVENT, START_BUSINESS_ACTIVITY, variables);
+        assertCompleteExternalTask(assertNextExternalTask(PROCESS_CASE_EVENT), PROCESS_CASE_EVENT,
+                                   GENERATE_HEARING_NOTICE_HMC, GENERATE_HEARING_NOTICE_HMC_ACTIVITY_ID, variables);
+        completeBusinessProcess(assertNextExternalTask(END_BUSINESS_PROCESS));
+        assertNoExternalTasksLeft();
+    }
+
+    @Test
+    void shouldContinueToNotifications_whenSkipVariableIsAbsent() {
+        VariableMap variables = Variables.createVariables();
+        variables.put("flowFlags", Map.of(LIP_CASE, false, "UNREPRESENTED_DEFENDANT_ONE", false));
+        assertCompleteExternalTask(assertNextExternalTask(START_BUSINESS_TOPIC), START_BUSINESS_TOPIC,
+                                   START_BUSINESS_EVENT, START_BUSINESS_ACTIVITY, variables);
+        assertCompleteExternalTask(assertNextExternalTask(PROCESS_CASE_EVENT), PROCESS_CASE_EVENT,
+                                   GENERATE_HEARING_NOTICE_HMC, GENERATE_HEARING_NOTICE_HMC_ACTIVITY_ID, variables);
+
+        assertThat(assertNextExternalTask(PROCESS_CASE_EVENT).getActivityId())
+            .isEqualTo(HEARING_NOTICE_GENERATOR_HMC_NOTIFIER);
+        engine.getRuntimeService().deleteProcessInstance(processInstance.getId(), "Compatibility route verified");
     }
 
     @Test
