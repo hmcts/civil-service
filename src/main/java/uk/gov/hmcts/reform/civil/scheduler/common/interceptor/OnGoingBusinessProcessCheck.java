@@ -12,18 +12,14 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 @Component
 @AllArgsConstructor
-public class OnGoingBusinessProcessCheck<T> implements SchedulerInterceptor<T> {
+public class OnGoingBusinessProcessCheck implements SchedulerInterceptor<CaseDetails> {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
-    public void accept(InterceptorContext<T> context, InterceptorChain<T> chain) {
-        if (!(context.getItem() instanceof CaseDetails caseDetails)) {
-            chain.next(context);
-            return;
-        }
-
+    public void accept(InterceptorContext<CaseDetails> context, InterceptorChain<CaseDetails> chain) {
+        CaseDetails caseDetails = context.getItem();
         CaseDataHandler<?> handler = getHandler(caseDetails);
         process(context, chain, caseDetails, handler);
     }
@@ -33,8 +29,8 @@ public class OnGoingBusinessProcessCheck<T> implements SchedulerInterceptor<T> {
         return 1;
     }
 
-    private <B extends BaseCaseData> void process(InterceptorContext<T> context,
-                                                  InterceptorChain<T> chain,
+    private <B extends BaseCaseData> void process(InterceptorContext<CaseDetails> context,
+                                                  InterceptorChain<CaseDetails> chain,
                                                   CaseDetails caseDetails,
                                                   CaseDataHandler<B> handler) {
         B caseData = context.getAttribute(handler.getKey())
