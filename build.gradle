@@ -36,7 +36,7 @@ def versions = [
   azureJson         : '1.5.1',
   azureServiceBus   : '7.17.19',
   cucumber          : '7.34.7',
-  elasticsearch     : '9.4.4',
+  elasticsearch     : '9.4.6',
   httpclient5       : '5.6.4',
   httpcore5         : '5.4.3',
   jackson           : '2.22.2',
