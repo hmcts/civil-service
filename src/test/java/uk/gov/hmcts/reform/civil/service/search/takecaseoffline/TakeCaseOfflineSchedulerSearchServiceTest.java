@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.search.judgementbuffer;
+package uk.gov.hmcts.reform.civil.service.search.takecaseoffline;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,31 +14,34 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class JudgementBufferExpiredSearchServiceTest {
+class TakeCaseOfflineSchedulerSearchServiceTest {
 
     @Mock
     private ElasticSearchPaginatedStreamProvider elasticSearchPaginatedStreamProvider;
     @Mock
-    private JudgementBufferExpiredQueryProvider judgementBufferExpiredQueryProvider;
+    private TakeCaseOfflineQueryProvider takeCaseOfflineQueryProvider;
     @Mock
     private ElasticSearchResult elasticSearchResult;
 
-    private JudgementBufferExpiredSearchService searchService;
+    private TakeCaseOfflineSchedulerSearchService searchService;
 
     @BeforeEach
     void setup() {
-        searchService = new JudgementBufferExpiredSearchService(elasticSearchPaginatedStreamProvider, judgementBufferExpiredQueryProvider);
+        searchService = new TakeCaseOfflineSchedulerSearchService(
+            elasticSearchPaginatedStreamProvider,
+            takeCaseOfflineQueryProvider
+        );
         ReflectionTestUtils.setField(searchService, "pageSize", 50);
     }
 
     @Test
     void shouldCallStreamProviderWithCorrectParameters() {
-        when(elasticSearchPaginatedStreamProvider.getPaginatedSearchResult(judgementBufferExpiredQueryProvider, 50))
+        when(elasticSearchPaginatedStreamProvider.getPaginatedSearchResult(takeCaseOfflineQueryProvider, 50))
             .thenReturn(elasticSearchResult);
 
         ElasticSearchResult result = searchService.getElasticSearchResult();
 
         assertThat(result).isEqualTo(elasticSearchResult);
-        verify(elasticSearchPaginatedStreamProvider).getPaginatedSearchResult(judgementBufferExpiredQueryProvider, 50);
+        verify(elasticSearchPaginatedStreamProvider).getPaginatedSearchResult(takeCaseOfflineQueryProvider, 50);
     }
 }
