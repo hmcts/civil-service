@@ -7,13 +7,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
-import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.OnGoingBusinessProcessCheck;
 import uk.gov.hmcts.reform.civil.service.search.CaseDismissedSearchService;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,8 +23,6 @@ class CaseDismissedSchedulerTest {
     private ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
     @Mock
     private CaseDismissedScheduledTask caseDismissedScheduledTask;
-    @Mock
-    private OnGoingBusinessProcessCheck onGoingBusinessProcessCheck;
     @InjectMocks
     private CaseDismissedScheduler scheduler;
 
@@ -35,10 +31,10 @@ class CaseDismissedSchedulerTest {
         scheduler.runScheduledTask();
 
         assertThat(scheduler.getName()).isEqualTo(CaseDismissedScheduler.SCHEDULER_NAME);
-        verify(scheduledTaskRunner).run(argThat(config ->
-            CaseDismissedScheduler.SCHEDULER_NAME.equals(config.getSchedulerName())
-                && caseDismissedScheduledTask.equals(config.getScheduledTask())
-                && List.of(onGoingBusinessProcessCheck).equals(config.getInterceptors())
-        ));
+        verify(scheduledTaskRunner).run(
+            eq(CaseDismissedScheduler.SCHEDULER_NAME),
+            any(),
+            eq(caseDismissedScheduledTask)
+        );
     }
 }
