@@ -46,13 +46,19 @@ class MediationFileTransferSchedulerTest {
     @Test
     @SuppressWarnings("unchecked")
     void shouldRunCsvAndJsonMediationFileTransferTasks() {
-        CaseData csvCase = CaseData.builder().ccdCaseReference(1L).build();
-        CaseData jsonCase = CaseData.builder().ccdCaseReference(2L).build();
-        TaskResult<CaseData> csvResult = new ListTaskResult<>(List.of(csvCase), 1);
-        TaskResult<CaseData> jsonResult = new ListTaskResult<>(List.of(jsonCase), 1);
+        CaseData csvFailedCase = CaseData.builder().ccdCaseReference(1L).build();
+        CaseData csvSuccessfulCase = CaseData.builder().ccdCaseReference(2L).build();
+        CaseData jsonFailedCase = CaseData.builder().ccdCaseReference(3L).build();
+        CaseData jsonSuccessfulCase = CaseData.builder().ccdCaseReference(4L).build();
+        List<CaseData> csvCases = List.of(csvFailedCase, csvSuccessfulCase);
+        List<CaseData> jsonCases = List.of(jsonFailedCase, jsonSuccessfulCase);
+        TaskResult<CaseData> csvResult = new ListTaskResult<>(csvCases, 2);
+        TaskResult<CaseData> jsonResult = new ListTaskResult<>(jsonCases, 2);
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         when(searchService.getInMediationCsv()).thenReturn(csvResult);
         when(searchService.getInMediationJson()).thenReturn(jsonResult);
+        when(mediationFileTransferService.sendCsv(csvCases)).thenReturn(List.of(csvSuccessfulCase));
+        when(mediationFileTransferService.sendJson(jsonCases)).thenReturn(List.of(jsonSuccessfulCase));
 
         scheduler.runScheduledTask();
 
@@ -61,14 +67,14 @@ class MediationFileTransferSchedulerTest {
         verify(scheduledTaskRunner, times(2)).run(eq(SCHEDULER_NAME), supplierCaptor.capture(), eq(task));
 
         TaskResult<CaseData> csvTaskResult = supplierCaptor.getAllValues().get(0).get();
-        assertThat(csvTaskResult.itemStream()).containsExactly(csvCase);
-        assertThat(csvTaskResult.totalResults()).isEqualTo(1);
-        verify(mediationFileTransferService).sendCsv(List.of(csvCase));
+        assertThat(csvTaskResult.itemStream()).containsExactly(csvSuccessfulCase);
+        assertThat(csvTaskResult.totalResults()).isEqualTo(2);
+        verify(mediationFileTransferService).sendCsv(csvCases);
 
         TaskResult<CaseData> jsonTaskResult = supplierCaptor.getAllValues().get(1).get();
-        assertThat(jsonTaskResult.itemStream()).containsExactly(jsonCase);
-        assertThat(jsonTaskResult.totalResults()).isEqualTo(1);
-        verify(mediationFileTransferService).sendJson(List.of(jsonCase));
+        assertThat(jsonTaskResult.itemStream()).containsExactly(jsonSuccessfulCase);
+        assertThat(jsonTaskResult.totalResults()).isEqualTo(2);
+        verify(mediationFileTransferService).sendJson(jsonCases);
     }
 
     @Test
