@@ -84,6 +84,11 @@ allprojects {
   }
 
   dependencyCheck {
+    // runtimeClasspath extends Spring Boot's testAndDevelopmentOnly configuration, so
+    // dependency-check's name-based test detection classifies it as a test configuration
+    // and skips it entirely. The CI init script restricts the scan to runtimeClasspath,
+    // so with the default (true) nothing is scanned at all. See DTSCCI-6386.
+    skipTestGroups = false
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
     suppressionFile = 'config/owasp/suppressions.xml'
     formats = ['HTML', 'JSON']
