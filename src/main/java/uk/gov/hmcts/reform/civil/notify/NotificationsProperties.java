@@ -446,7 +446,13 @@ public class NotificationsProperties {
     private String notifyLiPApplicantBreathingSpaceLifted;
 
     @NotEmpty
+    private String notifyLiPApplicantBreathingSpaceLiftedWelsh;
+
+    @NotEmpty
     private String notifyLiPRespondentBreathingSpaceLifted;
+
+    @NotEmpty
+    private String notifyLiPRespondentBreathingSpaceLiftedWelsh;
 
     @NotEmpty
     private String claimantLipDeadlineExtension;
