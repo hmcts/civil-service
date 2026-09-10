@@ -527,7 +527,9 @@ notifications:
   notifyEnteredBreathingSpaceForDefendantLipWelsh: "98605ac9-f4db-406e-aa47-7b83ffca53af"
 
   notifyLiPApplicantBreathingSpaceLifted: "b6dbc714-210e-475d-a1db-bf5ea28de98b"
+  notifyLiPApplicantBreathingSpaceLiftedWelsh: "44100d49-d8b7-4c70-bcd5-9347f9d0110c"
   notifyLiPRespondentBreathingSpaceLifted: "4ca3017b-b2fa-4ac0-a867-9bfada50a80c"
+  notifyLiPRespondentBreathingSpaceLiftedWelsh: "52440946-2dc5-411f-8a54-454bbe36c4e1"
 
   notifyApplicantLipRequestJudgementByAdmissionNotificationTemplate: "d6625ee3-f794-4a87-b0a3-bef7dd0663b9"
   notifyRespondentLipRequestJudgementByAdmissionNotificationTemplate: "a6d44268-2044-4b9f-83f8-7ee41542d626"
