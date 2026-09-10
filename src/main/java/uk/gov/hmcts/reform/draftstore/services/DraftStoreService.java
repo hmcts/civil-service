@@ -1,8 +1,13 @@
 package uk.gov.hmcts.reform.draftstore.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
@@ -25,11 +30,16 @@ public class DraftStoreService {
     private static final String DRAFT_TYPE_NOT_NULL = "draftType must not be null";
 
     private final DraftStoreRepository draftStoreRepository;
+    private final TransactionTemplate requiresNewTransaction;
 
-    public DraftStoreService(DraftStoreRepository draftStoreRepository) {
+    public DraftStoreService(DraftStoreRepository draftStoreRepository,
+                             PlatformTransactionManager transactionManager) {
         this.draftStoreRepository = draftStoreRepository;
+        this.requiresNewTransaction = new TransactionTemplate(transactionManager);
+        this.requiresNewTransaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
     }
 
+    @Transactional(noRollbackFor = DataIntegrityViolationException.class)
     public DraftStoreEntity createDraft(String userId,
                                         String caseId,
                                         Map<String, Object> payload,
@@ -48,8 +58,13 @@ public class DraftStoreService {
             now,
             draftType.calculateExpiry(now)
         );
-        log.info("Creating draft type={} draftId={}", draftType, draft.getId());
-        return draftStoreRepository.save(draft);
+        try {
+            return persistDraft(draft, draftType);
+        } catch (DataIntegrityViolationException ex) {
+            return getActiveDraftsForUser(userId, draftType).stream()
+                .findFirst()
+                .orElseThrow(() -> ex);
+        }
     }
 
     @Transactional(readOnly = true)
@@ -104,11 +119,27 @@ public class DraftStoreService {
         ) > 0;
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void deleteDraftAndFlush(DraftStoreEntity draft) {
         Objects.requireNonNull(draft, "draft must not be null");
         log.info("Deleting expired draft typeId={} draftId={}", draft.getDraftTypeId(), draft.getId());
         draftStoreRepository.delete(draft);
         draftStoreRepository.flush();
+    }
+
+    private DraftStoreEntity persistDraft(DraftStoreEntity draft, DraftType draftType) {
+        if (draftType == DraftType.DRAFT_CLAIM) {
+            return persistNewDraft(draft);
+        }
+        log.info("Creating draft typeId={} draftId={}", draft.getDraftTypeId(), draft.getId());
+        return draftStoreRepository.saveAndFlush(draft);
+    }
+
+    private DraftStoreEntity persistNewDraft(DraftStoreEntity draft) {
+        return requiresNewTransaction.execute(status -> {
+            log.info("Creating draft typeId={} draftId={}", draft.getDraftTypeId(), draft.getId());
+            return draftStoreRepository.saveAndFlush(draft);
+        });
     }
 
     private DraftStoreEntity applyDraftUpdate(DraftStoreEntity existingDraft,
