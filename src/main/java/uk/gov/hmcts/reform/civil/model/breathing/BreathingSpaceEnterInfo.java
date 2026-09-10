@@ -16,4 +16,10 @@ public class BreathingSpaceEnterInfo {
     private String reference;
 
     private LocalDate start;
+
+    private LocalDate expectedEnd;
+
+    private String event;
+
+    private String eventDescription;
 }

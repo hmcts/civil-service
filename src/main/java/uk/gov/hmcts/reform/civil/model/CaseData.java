@@ -794,16 +794,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isInBreathingSpace() {
+    public boolean hasBreathingSpace() {
         return getBreathing() != null
             && getBreathing().getEnter() != null
             && getBreathing().getLift() == null;
-    }
-
-    @JsonIgnore
-    public boolean hasBreathingSpace() {
-        return getBreathing() != null
-            && getBreathing().getEnter() != null;
     }
 
     @JsonIgnore

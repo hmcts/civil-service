@@ -56,7 +56,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         }
         return caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
-            && caseData.isInBreathingSpace();
+            && caseData.hasBreathingSpace();
     }
 
     @Override
