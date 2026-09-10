@@ -63,7 +63,7 @@ class AsyncCaseMigrationServiceTest {
     }
 
     @Test
-    void shouldTriggerCmcMigrateCaseEventWithoutChangingData() {
+    void shouldSubmitDataReturnedByCmcMigrationTask() {
         @SuppressWarnings("unchecked")
         MigrationTask<ExcelCaseReference> migrationTask = mock(MigrationTask.class);
         when(migrationTask.getEventSummary()).thenReturn("summary");
@@ -83,12 +83,17 @@ class AsyncCaseMigrationServiceTest {
 
         ExcelCaseReference firstReference = excelCaseReference("1111222233334444");
         ExcelCaseReference secondReference = excelCaseReference("5555666677778888");
+        Map<String, Object> migratedData = Map.of("existing", "value", "new", "data");
+        when(migrationTask.migrateCmcCaseData(caseDetails, firstReference)).thenReturn(migratedData);
+        when(migrationTask.migrateCmcCaseData(caseDetails, secondReference)).thenReturn(migratedData);
 
         asyncCaseMigrationService.migrateCMCCasesAsync(migrationTask, List.of(firstReference, secondReference));
 
         verify(coreCaseDataService).startCMCUpdate("1111222233334444", ClaimEvent.MIGRATE_CASE);
         verify(coreCaseDataService).startCMCUpdate("5555666677778888", ClaimEvent.MIGRATE_CASE);
         verify(migrationTask, never()).migrateCaseData(ArgumentMatchers.any(), ArgumentMatchers.any());
+        verify(migrationTask).migrateCmcCaseData(caseDetails, firstReference);
+        verify(migrationTask).migrateCmcCaseData(caseDetails, secondReference);
 
         ArgumentCaptor<CaseDataContent> contentCaptor = ArgumentCaptor.forClass(CaseDataContent.class);
         verify(coreCaseDataService).submitCMCUpdate(ArgumentMatchers.eq("1111222233334444"), contentCaptor.capture());
@@ -97,7 +102,7 @@ class AsyncCaseMigrationServiceTest {
         assertEquals("token123", contentCaptor.getAllValues().get(0).getEventToken());
         assertEquals("summary", contentCaptor.getAllValues().get(0).getEvent().getSummary());
         assertEquals("description", contentCaptor.getAllValues().get(0).getEvent().getDescription());
-        assertEquals(existingData, contentCaptor.getAllValues().get(0).getData());
+        assertEquals(migratedData, contentCaptor.getAllValues().get(0).getData());
     }
 
     @Test
