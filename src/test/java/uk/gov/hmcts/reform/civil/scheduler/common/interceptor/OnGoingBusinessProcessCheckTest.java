@@ -44,7 +44,7 @@ class OnGoingBusinessProcessCheckTest {
 
     @Test
     void shouldCallNext_whenCaseHasNoOngoingBusinessProcess() {
-        CaseDetails caseDetails = CaseDetails.builder().id(123L).caseTypeId(CASE_TYPE).build();
+        CaseDetails caseDetails = CaseDetails.builder().id(123L).caseTypeId(CASE_TYPE).data(java.util.Map.of()).build();
         CaseData caseData = new CaseDataBuilder().build();
 
         InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", caseDetails);
@@ -60,7 +60,7 @@ class OnGoingBusinessProcessCheckTest {
 
     @Test
     void shouldCallNext_whenGACaseHasNoOngoingBusinessProcess() {
-        CaseDetails caseDetails = CaseDetails.builder().id(123L).caseTypeId(GENERALAPPLICATION_CASE_TYPE).build();
+        CaseDetails caseDetails = CaseDetails.builder().id(123L).caseTypeId(GENERALAPPLICATION_CASE_TYPE).data(java.util.Map.of()).build();
         GeneralApplicationCaseData gaCaseData = new GeneralApplicationCaseData();
 
         InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", caseDetails);
@@ -76,7 +76,7 @@ class OnGoingBusinessProcessCheckTest {
 
     @Test
     void shouldThrowTaskAbortedException_whenCaseHasOngoingBusinessProcess() {
-        CaseDetails caseDetails = CaseDetails.builder().id(123L).caseTypeId(CASE_TYPE).build();
+        CaseDetails caseDetails = CaseDetails.builder().id(123L).caseTypeId(CASE_TYPE).data(java.util.Map.of()).build();
         CaseData caseData = new CaseDataBuilder()
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.STARTED))
             .build();
@@ -92,7 +92,7 @@ class OnGoingBusinessProcessCheckTest {
 
     @Test
     void shouldThrowTaskAbortedException_whenGACaseHasOngoingBusinessProcess() {
-        CaseDetails caseDetails = CaseDetails.builder().id(123L).caseTypeId(GENERALAPPLICATION_CASE_TYPE).build();
+        CaseDetails caseDetails = CaseDetails.builder().id(123L).caseTypeId(GENERALAPPLICATION_CASE_TYPE).data(java.util.Map.of()).build();
         GeneralApplicationCaseData gaCaseData = new GeneralApplicationCaseData();
         gaCaseData.setBusinessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.STARTED));
 
@@ -104,4 +104,5 @@ class OnGoingBusinessProcessCheckTest {
         assertThat(exception.getReason()).isEqualTo("Ongoing business process");
         verify(chain, never()).next(context);
     }
+
 }

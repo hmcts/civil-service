@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.scheduler.common;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,6 +10,8 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.SchedulerInterceptor;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.SchedulerInterceptorResolver;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
@@ -19,6 +22,7 @@ import java.util.stream.Stream;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -42,8 +46,16 @@ class ScheduledTaskRunnerTest {
     @Mock
     private FeatureToggleService featureToggleService;
 
+    @Mock
+    private SchedulerInterceptorResolver interceptorResolver;
+
     @InjectMocks
     private ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
+
+    @BeforeEach
+    void setUp() {
+        doReturn(List.of()).when(interceptorResolver).resolveInterceptors(any());
+    }
 
     @Test
     void shouldRunScheduledTask_whenFeatureToggleIsEnabled() {
@@ -197,5 +209,24 @@ class ScheduledTaskRunnerTest {
         verify(scheduledEventTracker).jobStartedEvent(eventConfig, 1);
         verify(scheduledTaskProcessor).performProcessing(eq(eventConfig), eq(scheduledTask), eq(searchResult), anyList());
         verify(scheduledEventTracker).jobCompletedEvent(eq(eventConfig), any(ScheduledJobReport.class));
+    }
+
+    @Test
+    void shouldCallInterceptorResolver() {
+        // Given
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
+        CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
+        ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1), 1);
+        List<SchedulerInterceptor<CaseDetails>> interceptors = List.of((context, chain) -> { });
+        doReturn(interceptors).when(interceptorResolver).resolveInterceptors(any());
+        when(scheduledTaskProcessor.performProcessing(any(), any(), any(), anyList()))
+            .thenReturn(new ScheduledTaskOutcome<>(List.of(1L), List.of(), List.of(), false, "", Duration.ZERO, Duration.ZERO));
+
+        // When
+        scheduledTaskRunner.run(SCHEDULER_NAME, () -> searchResult, scheduledTask);
+
+        // Then
+        verify(interceptorResolver).resolveInterceptors(any());
+        verify(scheduledTaskProcessor).performProcessing(any(), any(), any(), eq(interceptors));
     }
 }

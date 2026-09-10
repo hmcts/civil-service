@@ -17,4 +17,6 @@ public class ScheduledTaskConfiguration<T, I> {
     ScheduledTask<T, I> scheduledTask;
     @Builder.Default
     List<SchedulerInterceptor<T>> interceptors = Collections.emptyList();
+    @Builder.Default
+    boolean useDefaultInterceptors = true;
 }
