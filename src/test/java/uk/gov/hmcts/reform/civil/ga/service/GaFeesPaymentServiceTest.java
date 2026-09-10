@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.ga.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
+import feign.Request;
+import feign.Response;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,8 +29,10 @@ import uk.gov.hmcts.reform.payments.request.CardPaymentServiceRequestDTO;
 import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -229,6 +233,33 @@ class GaFeesPaymentServiceTest {
     }
 
     @Test
+    void shouldTreatAlreadyPaidServiceRequestAsSuccessfulWhenCreatePaymentRequestReturnsPreconditionFailed() {
+        when(paymentsClient.createGovPayCardPaymentRequest(
+            "2023-1701090705688",
+            BEARER_TOKEN,
+            CARD_PAYMENT_SERVICE_REQUEST
+        )).thenThrow(alreadyPaidException());
+
+        CardPaymentStatusResponse govPaymentRequest =
+            feesPaymentService.createGovPaymentRequest(
+                "2801090368574910",
+                BEARER_TOKEN
+            );
+
+        assertThat(govPaymentRequest)
+            .isEqualTo(new CardPaymentStatusResponse()
+                           .setExternalReference("2023-1701090705688")
+                           .setPaymentReference("2023-1701090705688")
+                           .setStatus("Success"));
+
+        verify(paymentsClient).createGovPayCardPaymentRequest(
+            "2023-1701090705688",
+            BEARER_TOKEN,
+            CARD_PAYMENT_SERVICE_REQUEST
+        );
+    }
+
+    @Test
     void shouldFailOnCreatePaymentsApiTwiceThenHaveSuccessfulRetry() {
         CardPaymentServiceRequestResponse response = buildServiceRequestResponse();
 
@@ -381,6 +412,17 @@ class GaFeesPaymentServiceTest {
             "Initiated",
             "https://card.payments.service.gov.uk/secure/7b0716b2-40c4-413e-b62e-72c599c91960",
             OffsetDateTime.parse("2023-11-27T13:15:06.313+00:00")
+        );
+    }
+
+    private FeignException alreadyPaidException() {
+        return FeignException.errorStatus(
+            "createGovPayCardPaymentRequest",
+            Response.builder()
+                .request(Request.create(Request.HttpMethod.POST, "/card-payments", new HashMap<>(), null, null, null))
+                .status(412)
+                .body("serviceRequest has already been paid", StandardCharsets.UTF_8)
+                .build()
         );
     }
 }
