@@ -28,4 +28,6 @@ public interface DraftStoreRepository extends JpaRepository<DraftStoreEntity, UU
     );
 
     long deleteByIdAndUserIdAndDraftTypeId(UUID id, String userId, Integer draftTypeId);
+
+    long deleteByExpiresAtBefore(OffsetDateTime now);
 }
