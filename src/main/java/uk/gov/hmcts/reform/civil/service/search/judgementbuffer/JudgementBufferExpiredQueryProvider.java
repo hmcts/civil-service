@@ -22,7 +22,6 @@ import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.LOCAL_ZONE;
 /**
  * Provides the ElasticSearch query for identifying expired judgements.
  * This identifies cases in 'JUDGMENT_REQUESTED' state that have been in that state for more than 48 hours
- * and have no ongoing business process.
  */
 @Component
 @Slf4j
@@ -70,7 +69,6 @@ public class JudgementBufferExpiredQueryProvider implements PaginatedQueryProvid
             .should(boolQuery()
                         .must(rangeQuery("data.joDJCreatedDate").lte(formatToIsoLocal(timeMinus48WorkingHours)))
                         .must(commonQueryConstructs.beState(CaseState.JUDGMENT_REQUESTED))
-                        .must(commonQueryConstructs.haveNoOngoingBusinessProcess())
             );
     }
 

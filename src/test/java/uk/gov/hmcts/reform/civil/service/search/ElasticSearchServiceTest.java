@@ -87,7 +87,7 @@ abstract class ElasticSearchServiceTest {
         var result = searchService.getElasticSearchResult();
 
         assertThat(result.totalResults()).isEqualTo(1);
-        assertThat(result.caseDetailsStream()).hasSize(1);
+        assertThat(result.items()).hasSize(1);
     }
 
     private SearchResult buildSearchResultWithTotalCases(int i) {

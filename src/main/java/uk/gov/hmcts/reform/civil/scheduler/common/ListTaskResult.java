@@ -3,7 +3,12 @@ package uk.gov.hmcts.reform.civil.scheduler.common;
 import java.util.List;
 import java.util.stream.Stream;
 
-public record ListTaskResult<T>(List<T> items, int totalResults) implements TaskResult<T> {
+public record ListTaskResult<T>(List<T> items) implements TaskResult<T> {
+
+    @Override
+    public int totalResults() {
+        return items.size();
+    }
 
     @Override
     public Stream<T> itemStream() {
@@ -12,6 +17,6 @@ public record ListTaskResult<T>(List<T> items, int totalResults) implements Task
 
     @Override
     public boolean isEmpty() {
-        return totalResults == 0;
+        return items.isEmpty();
     }
 }

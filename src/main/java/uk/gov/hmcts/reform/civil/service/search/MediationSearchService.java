@@ -30,7 +30,7 @@ public class MediationSearchService {
             .map(this::toCaseData)
             .toList();
 
-        return new ListTaskResult<>(cases, cases.size());
+        return new ListTaskResult<>(cases);
     }
 
     private CaseData toCaseData(CaseDetails caseDetails) {

@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.search.CaseReadyBusinessProcessSearchService;
 
@@ -34,9 +35,12 @@ public class PollingEventEmitterScheduler implements CivilScheduler {
     @Override
     public void runScheduledTask() {
         scheduledTaskRunner.run(
-            SCHEDULER_NAME,
-            searchService::getElasticSearchResult,
-            pollingEventEmitterScheduledTask
+            ScheduledTaskConfiguration.<CaseDetails, Long>builder()
+                .schedulerName(SCHEDULER_NAME)
+                .searchResultSupplier(searchService::getElasticSearchResult)
+                .scheduledTask(pollingEventEmitterScheduledTask)
+                .useDefaultInterceptors(false)
+                .build()
         );
     }
 }

@@ -5,18 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.common.ListTaskResult;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Predicate;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseState.ORDER_MADE;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STAY_THE_CLAIM;
@@ -27,11 +22,10 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STAY_TH
 public class GAOrderMadeScheduler implements CivilScheduler {
 
     public static final String SCHEDULER_NAME = "GAOrderMadeScheduler";
-    private static final ZoneId LOCAL_ZONE = ZoneId.of("Europe/London");
 
     private final CaseStateSearchService searchService;
-    private final CaseDetailsConverter caseDetailsConverter;
-    private final ScheduledTaskRunner<GeneralApplicationCaseData, Long> scheduledTaskRunner;
+    private final GAOrderMadeStayDeadlineFilter filter;
+    private final ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
     private final GAOrderMadeScheduledTask gaOrderMadeScheduledTask;
 
     @Override
@@ -48,30 +42,14 @@ public class GAOrderMadeScheduler implements CivilScheduler {
         scheduledTaskRunner.run(
             SCHEDULER_NAME,
             () -> {
-                List<GeneralApplicationCaseData> applications = searchService
+                List<CaseDetails> applications = searchService
                     .getOrderMadeGeneralApplications(ORDER_MADE, STAY_THE_CLAIM)
                     .stream()
-                    .map(caseDetailsConverter::toGeneralApplicationCaseData)
-                    .filter(this::hasExpiredStayDeadline)
+                    .filter(filter::hasExpiredStayDeadline)
                     .toList();
-                return new ListTaskResult<>(applications, applications.size());
+                return new ListTaskResult<>(applications);
             },
             gaOrderMadeScheduledTask
         );
     }
-
-    boolean hasExpiredStayDeadline(GeneralApplicationCaseData caseData) {
-        return isJudgeOrderStayDeadlineExpired.or(isConsentOrderStayDeadlineExpired).test(caseData);
-    }
-
-    private final Predicate<GeneralApplicationCaseData> isJudgeOrderStayDeadlineExpired = caseData ->
-        caseData.getJudicialDecisionMakeOrder() != null
-            && caseData.getJudicialDecisionMakeOrder().getJudgeApproveEditOptionDate() != null
-            && !LocalDate.now(LOCAL_ZONE).isBefore(caseData.getJudicialDecisionMakeOrder()
-                                                       .getJudgeApproveEditOptionDate());
-
-    private final Predicate<GeneralApplicationCaseData> isConsentOrderStayDeadlineExpired = caseData ->
-        caseData.getApproveConsentOrder() != null
-            && Objects.nonNull(caseData.getApproveConsentOrder().getConsentOrderDateToEnd())
-            && !LocalDate.now(LOCAL_ZONE).isBefore(caseData.getApproveConsentOrder().getConsentOrderDateToEnd());
 }

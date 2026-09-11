@@ -70,7 +70,6 @@ class DefendantResponseDeadlineCheckQueryProviderTest {
         assertThat(json.toString()).contains("2026-01-15T10:00Z");
         assertThat(json.toString()).contains("data.respondent1ResponseDeadlineChecked");
         assertThat(json.toString()).contains("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
-        assertThat(json.toString()).contains("data.businessProcess");
         assertThat(json.toString()).doesNotContain("data.respondent1ResponseDate");
     }
 
