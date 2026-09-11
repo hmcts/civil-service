@@ -43,6 +43,10 @@ public class ScheduledEventTracker {
         );
     }
 
+    public void jobStartedEvent(ScheduledTaskEventConfiguration eventConfig) {
+        jobStartedEvent(eventConfig, 0);
+    }
+
     public void caseProcessedEvent(ScheduledTaskEventConfiguration eventConfig, Long caseId) {
         caseProcessedEvent(eventConfig, String.valueOf(caseId));
     }
@@ -98,6 +102,19 @@ public class ScheduledEventTracker {
                 SCHEDULER_NAME, eventConfig.getSchedulerName(),
                 TOTAL_CASES, ZERO,
                 SUCCEEDED_CASES, ZERO,
+                FAILED_CASES, ZERO,
+                CUMULATIVE_DELAY, ZERO
+            )
+        );
+    }
+
+    public void jobCompletedBulkEvent(ScheduledTaskEventConfiguration eventConfig, int count) {
+        telemetryService.trackEvent(
+            eventConfig.getJobCompletedEvent(),
+            Map.of(
+                SCHEDULER_NAME, eventConfig.getSchedulerName(),
+                TOTAL_CASES, String.valueOf(count),
+                SUCCEEDED_CASES, String.valueOf(count),
                 FAILED_CASES, ZERO,
                 CUMULATIVE_DELAY, ZERO
             )
