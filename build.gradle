@@ -48,7 +48,7 @@ def versions = [
   plexusUtils       : '4.0.3',
   postgresql        : '42.7.12',
   protonJ           : '0.35.0',
-  tika              : '3.3.2',
+  tika              : '4.0.0',
   tomcat            : '10.1.59',
   applicationInsights: '3.7.9',
   commonsLang3      : '3.20.0'
