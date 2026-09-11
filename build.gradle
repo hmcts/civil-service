@@ -790,8 +790,8 @@ tasks.withType(Test).configureEach { t ->
       jvmArgs '-XX:TieredStopAtLevel=1'
     }
     doFirst {
-      def settings = "mode=${testJitBenchmark}, maxWorkers=${gradle.startParameter.maxWorkerCount}, "
-          + "maxParallelForks=${t.maxParallelForks}, maxHeapSize=${t.maxHeapSize}"
+      def settings = "mode=${testJitBenchmark}, maxWorkers=${gradle.startParameter.maxWorkerCount}, " +
+          "maxParallelForks=${t.maxParallelForks}, maxHeapSize=${t.maxHeapSize}"
       logger.lifecycle("JIT benchmark: ${settings}")
       def report = benchmarkReport.get().asFile
       report.parentFile.mkdirs()
