@@ -54,6 +54,8 @@ public class MediationFileTransferSchedulerIT {
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         when(searchService.getInMediationCsv()).thenReturn(csvResult);
         when(searchService.getInMediationJson()).thenReturn(jsonResult);
+        when(mediationFileTransferService.sendCsv(List.of(csvCase))).thenReturn(List.of(csvCase));
+        when(mediationFileTransferService.sendJson(List.of(jsonCase))).thenReturn(List.of(jsonCase));
 
         new MediationFileTransferScheduler(
             searchService,

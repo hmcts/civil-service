@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import feign.Request;
+import feign.RetryableException;
 import org.apache.tika.Tika;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -303,6 +304,10 @@ class SecuredDocumentManagementServiceTest {
             );
 
             assertEquals(format(MESSAGE_TEMPLATE, documentPath), documentManagementException.getMessage());
+            assertEquals(
+                "Document binary response was empty for " + documentPath,
+                documentManagementException.getCause().getMessage()
+            );
 
             verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
         }
@@ -528,6 +533,10 @@ class SecuredDocumentManagementServiceTest {
             );
 
             assertEquals(format(MESSAGE_TEMPLATE, documentPath), documentManagementException.getMessage());
+            assertEquals(
+                "Document binary response was empty for " + documentPath,
+                documentManagementException.getCause().getMessage()
+            );
 
             verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
         }
@@ -555,6 +564,110 @@ class SecuredDocumentManagementServiceTest {
             );
 
             verify(caseDocumentClientApi).getDocumentBinary(anyString(), anyString(), eq(documentId));
+        }
+
+        @Test
+        void shouldThrowDocumentAccess_whenDownloadBinaryReturns401() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8aef03";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getDocumentBinary(anyString(), anyString(), eq(documentId)))
+                .thenThrow(buildFeignException(401));
+
+            DocumentAccessException ex = assertThrows(
+                DocumentAccessException.class,
+                () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath)
+            );
+
+            assertEquals(format(DocumentAccessException.MESSAGE_TEMPLATE, documentPath), ex.getMessage());
+        }
+
+        @Test
+        void shouldThrowInvalidDocumentLink_whenDownloadBinaryReturns400() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8aef04";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getDocumentBinary(anyString(), anyString(), eq(documentId)))
+                .thenThrow(buildFeignException(400));
+
+            InvalidDocumentLinkException ex = assertThrows(
+                InvalidDocumentLinkException.class,
+                () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath)
+            );
+
+            assertEquals(
+                format(InvalidDocumentLinkException.CLIENT_ERROR_MESSAGE_TEMPLATE, documentPath, 400),
+                ex.getMessage()
+            );
+        }
+
+        @Test
+        void shouldThrowDocumentDownloadException_whenDownloadBinaryReturns500() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8aef05";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getDocumentBinary(anyString(), anyString(), eq(documentId)))
+                .thenThrow(buildFeignException(500));
+
+            DocumentDownloadException ex = assertThrows(
+                DocumentDownloadException.class,
+                () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath)
+            );
+
+            assertEquals(format(MESSAGE_TEMPLATE, documentPath), ex.getMessage());
+            assertNotNull(ex.getCause());
+        }
+
+        @Test
+        void shouldThrowDocumentDownloadException_whenDownloadBinaryTimesOut() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8aef06";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getDocumentBinary(anyString(), anyString(), eq(documentId)))
+                .thenThrow(buildFeignException(504));
+
+            assertThrows(
+                DocumentDownloadException.class,
+                () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath)
+            );
+        }
+
+        @Test
+        void shouldThrowDocumentDownloadException_whenDownloadBinaryThrowsRetryableException() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8aef07";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getDocumentBinary(anyString(), anyString(), eq(documentId)))
+                .thenThrow(buildRetryableException());
+
+            DocumentDownloadException ex = assertThrows(
+                DocumentDownloadException.class,
+                () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath)
+            );
+
+            assertEquals(format(MESSAGE_TEMPLATE, documentPath), ex.getMessage());
+            assertNotNull(ex.getCause());
+        }
+
+        @Test
+        void shouldThrowDocumentDownloadException_whenBinaryBodyIsNull() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8aef08";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getDocumentBinary(anyString(), anyString(), eq(documentId)))
+                .thenReturn(responseEntity);
+            when(responseEntity.getBody()).thenReturn(null);
+
+            DocumentDownloadException ex = assertThrows(
+                DocumentDownloadException.class,
+                () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath)
+            );
+
+            assertEquals(format(MESSAGE_TEMPLATE, documentPath), ex.getMessage());
+            assertEquals(
+                "Document binary response was empty for " + documentPath,
+                ex.getCause().getMessage()
+            );
         }
     }
 
@@ -687,6 +800,58 @@ class SecuredDocumentManagementServiceTest {
             verify(caseDocumentClientApi)
                 .getMetadataForDocument(anyString(), anyString(), eq(documentId));
         }
+
+        @Test
+        void shouldThrowDocumentAccess_whenCdamReturns401() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b9";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi
+                     .getMetadataForDocument(anyString(), anyString(), eq(documentId))
+            ).thenThrow(buildFeignException(401));
+
+            assertThrows(
+                DocumentAccessException.class,
+                () -> documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath)
+            );
+
+            verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
+        }
+
+        @Test
+        void shouldThrowInvalidDocumentLink_whenCdamReturns400() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1ba";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi
+                     .getMetadataForDocument(anyString(), anyString(), eq(documentId))
+            ).thenThrow(buildFeignException(400));
+
+            InvalidDocumentLinkException ex = assertThrows(
+                InvalidDocumentLinkException.class,
+                () -> documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath)
+            );
+
+            assertEquals(
+                format(InvalidDocumentLinkException.CLIENT_ERROR_MESSAGE_TEMPLATE, documentPath, 400),
+                ex.getMessage()
+            );
+        }
+
+        @Test
+        void shouldThrowDocumentDownloadException_whenCdamReturns500() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1bb";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi
+                     .getMetadataForDocument(anyString(), anyString(), eq(documentId))
+            ).thenThrow(buildFeignException(500));
+
+            assertThrows(
+                DocumentDownloadException.class,
+                () -> documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath)
+            );
+        }
     }
 
     private static FeignException buildFeignException(int status) {
@@ -695,8 +860,18 @@ class SecuredDocumentManagementServiceTest {
         return switch (status) {
             case 404 -> new FeignException.NotFound("not found", request, new byte[]{}, Map.of());
             case 403 -> new FeignException.Forbidden("forbidden", request, new byte[]{}, Map.of());
+            case 401 -> new FeignException.Unauthorized("unauthorized", request, new byte[]{}, Map.of());
+            case 400 -> new FeignException.BadRequest("bad request", request, new byte[]{}, Map.of());
+            case 500 -> new FeignException.InternalServerError("server error", request, new byte[]{}, Map.of());
             default -> new FeignException.GatewayTimeout("timeout", request, new byte[]{}, Map.of());
         };
+    }
+
+    private static RetryableException buildRetryableException() {
+        Request request = Request.create(
+            Request.HttpMethod.GET, "/cases/documents/x", Map.of(), new byte[]{}, StandardCharsets.UTF_8, null);
+        return new RetryableException(
+            -1, "connect timeout", Request.HttpMethod.GET, null, (Long) null, request);
     }
 
     @Nested

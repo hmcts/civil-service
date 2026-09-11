@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.documentmanagement;
 
+import feign.FeignException;
+import feign.Request;
 import org.apache.tika.Tika;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,9 +17,13 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -25,17 +31,14 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
- * DTSCCI-5627 (EXC-CS-022): a short / malformed document self-href is a bad-input error, not a
- * transient download failure, so it must NOT be retried by the {@code @Retryable} download policy.
+ * DTSCCI-5627 (EXC-CS-022) / DTSCCI-6312 (EXC-CS-029): classified download failures must
+ * honour the {@code @Retryable} policy. Bad-input and access errors are attempted once;
+ * transient CDAM 5xx is retried up to {@code maxAttempts = 3}.
  *
  * <p>This lives in a separate class from {@link SecuredDocumentManagementServiceTest} because it
  * needs {@link EnableRetry} to activate the retry proxy. Without it the retry interceptor is not
  * applied, so the sibling test can only assert at the method level and cannot prove the
- * {@code noRetryFor} classification actually short-circuits the five attempts.
- *
- * <p>Pre-fix this fails (the wrapped {@link DocumentDownloadException} is retried on every attempt, so
- * {@code getUserInfo} is invoked five times and the test also incurs the full ~15s backoff);
- * post-fix the {@link InvalidDocumentLinkException} is excluded from retry and it is attempted once.
+ * {@code noRetryFor} classification actually short-circuits the three attempts.
  */
 @SpringBootTest(classes = {
     SecuredDocumentManagementService.class,
@@ -90,5 +93,43 @@ class SecuredDocumentManagementServiceRetryTest {
         verify(userService, times(1)).getUserInfo(BEARER_TOKEN);
         // the guard trips before any CDAM call, so neither document client is ever touched.
         verifyNoInteractions(caseDocumentClientApi, documentDownloadClient);
+    }
+
+    @Test
+    void downloadDocument_cdam500_isRetriedThreeTimes() {
+        String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
+        when(caseDocumentClientApi.getDocumentBinary(anyString(), anyString(), any(UUID.class)))
+            .thenAnswer(invocation -> {
+                throw buildFeignException(500);
+            });
+
+        assertThrows(
+            DocumentDownloadException.class,
+            () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath));
+
+        verify(userService, times(3)).getUserInfo(BEARER_TOKEN);
+    }
+
+    @Test
+    void downloadDocument_cdam401_isNotRetried() {
+        String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
+        when(caseDocumentClientApi.getDocumentBinary(anyString(), anyString(), any(UUID.class)))
+            .thenThrow(buildFeignException(401));
+
+        assertThrows(
+            DocumentAccessException.class,
+            () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath));
+
+        verify(userService, times(1)).getUserInfo(BEARER_TOKEN);
+    }
+
+    private static FeignException buildFeignException(int status) {
+        Request request = Request.create(
+            Request.HttpMethod.GET, "/cases/documents/x", Map.of(), new byte[]{}, StandardCharsets.UTF_8, null);
+        return switch (status) {
+            case 401 -> new FeignException.Unauthorized("unauthorized", request, new byte[]{}, Map.of());
+            case 500 -> new FeignException.InternalServerError("server error", request, new byte[]{}, Map.of());
+            default -> new FeignException.GatewayTimeout("timeout", request, new byte[]{}, Map.of());
+        };
     }
 }
