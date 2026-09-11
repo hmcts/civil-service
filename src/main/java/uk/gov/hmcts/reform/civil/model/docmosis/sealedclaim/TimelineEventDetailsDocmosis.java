@@ -12,12 +12,12 @@ import java.time.LocalDate;
  */
 public class TimelineEventDetailsDocmosis extends TimelineOfEventDetails {
 
-    public TimelineEventDetailsDocmosis(LocalDate timelineDate, String timelineDescription) {
-        super(timelineDate, timelineDescription);
+    public TimelineEventDetailsDocmosis(LocalDate timelineDate, String timelineDay, String timelineMonth, String timelineYear, String timelineDescription) {
+        super(timelineDate, timelineDay, timelineMonth, timelineYear, timelineDescription);
     }
 
     public TimelineEventDetailsDocmosis(TimelineOfEventDetails details) {
-        this(details.getTimelineDate(), details.getTimelineDescription());
+        this(details.getTimelineDate(), details.getTimelineDay(), details.getTimelineMonth(), details.getTimelineYear(), details.getTimelineDescription());
     }
 
     @Override
