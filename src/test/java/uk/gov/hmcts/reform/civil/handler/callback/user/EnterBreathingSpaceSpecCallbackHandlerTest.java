@@ -127,42 +127,6 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
     }
 
     @Test
-    public void whenEndDateIsNotFuture_thenReturnError() {
-        BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
-        enterInfo.setExpectedEnd(LocalDate.now());
-        BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
-        breathingInfo.setEnter(enterInfo);
-        CaseData caseData = CaseData.builder().build();
-        caseData.setBreathing(breathingInfo);
-
-        CallbackParams params = new CallbackParams()
-            .caseData(caseData)
-            .type(CallbackType.MID)
-            .pageId("enter-info");
-        AboutToStartOrSubmitCallbackResponse response =
-            (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
-        Assertions.assertFalse(response.getErrors().isEmpty());
-    }
-
-    @Test
-    public void whenEndDateIsFuture_thenReturnNoError() {
-        BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
-        enterInfo.setExpectedEnd(LocalDate.now().plusDays(1));
-        BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
-        breathingInfo.setEnter(enterInfo);
-        CaseData caseData = CaseData.builder().build();
-        caseData.setBreathing(breathingInfo);
-
-        CallbackParams params = new CallbackParams()
-            .caseData(caseData)
-            .type(CallbackType.MID)
-            .pageId("enter-info");
-        AboutToStartOrSubmitCallbackResponse response =
-            (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
-        Assertions.assertTrue(response.getErrors().isEmpty());
-    }
-
-    @Test
     public void whenSubmitted_thenIncludeHeader() {
         String claimNumber = "claim number";
         CaseData caseData = CaseData.builder().build();
@@ -179,6 +143,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
     @Test
     void testAboutToSubmitCallback() {
         CaseData caseData = CaseData.builder().build();
+        caseData.setBreathing(new BreathingSpaceInfo());
 
         CallbackParams params = new CallbackParams()
             .caseData(caseData)
@@ -186,6 +151,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
         Assertions.assertTrue(response.getData().containsKey("businessProcess"));
+        Assertions.assertEquals("Yes", response.getData().get("breathingSpaceActive"));
     }
 
     @Test

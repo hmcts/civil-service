@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
 @RequiredArgsConstructor
@@ -70,11 +71,6 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             errors.add("Start date must be today or before.");
         }
 
-        if (caseData.getBreathing().getEnter().getExpectedEnd() != null
-            && !caseData.getBreathing().getEnter().getExpectedEnd().isAfter(LocalDate.now())) {
-            errors.add("Expected end date must be in the future.");
-        }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
@@ -104,6 +100,7 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             .ifPresent(enter -> enter.setStart(LocalDate.now()));
 
         caseData.setBusinessProcess(BusinessProcess.ready(ENTER_BREATHING_SPACE_SPEC));
+        caseData.getBreathing().setActive(YES);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))

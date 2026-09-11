@@ -6,9 +6,17 @@ on:
       - master
     paths:
       - 'src/main/resources/camunda/**/*.bpmn'
+      - 'scripts/render-bpmn-diagrams.mjs'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/render-bpmn-diagrams.yml'
   pull_request:
     paths:
       - 'src/main/resources/camunda/**/*.bpmn'
+      - 'scripts/render-bpmn-diagrams.mjs'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/render-bpmn-diagrams.yml'
   workflow_dispatch:
 
 permissions:
@@ -31,17 +39,26 @@ jobs:
         run: npm ci --ignore-scripts
 
       - name: Download Puppeteer browser
-        run: node node_modules/puppeteer/install.mjs
+        run: npx --no-install puppeteer browsers install chrome
 
       - name: Determine changed BPMN files
         id: changed
         shell: bash
         run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "bpmn_list=src/main/resources/camunda/" >> "$GITHUB_OUTPUT"
+            exit 0
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
             git fetch origin "${{ github.base_ref }}"
             CHANGED=$(git diff --name-only "origin/${{ github.base_ref }}...${{ github.sha }}")
           else
             CHANGED=$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}")
+          fi
+
+          # Exercise all diagrams when the renderer or its dependencies change.
+          if echo "$CHANGED" | grep -qE '^(scripts/render-bpmn-diagrams\.mjs|package\.json|package-lock\.json|\.github/workflows/render-bpmn-diagrams\.yml)$'; then
+            echo "bpmn_list=src/main/resources/camunda/" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
           BPMN_CHANGED=$(echo "$CHANGED" | grep -E '^src/main/resources/camunda/.*\.bpmn$' || true)
