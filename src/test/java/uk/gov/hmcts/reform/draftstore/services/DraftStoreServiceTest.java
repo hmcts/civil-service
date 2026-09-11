@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.draftstore.services;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,6 +8,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
@@ -20,8 +24,11 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -38,8 +45,16 @@ class DraftStoreServiceTest {
     @Mock
     private DraftStoreRepository draftStoreRepository;
 
+    @Mock
+    private PlatformTransactionManager transactionManager;
+
     @InjectMocks
     private DraftStoreService draftStoreService;
+
+    @BeforeEach
+    void runCallbacksInMockTransactions() {
+        lenient().when(transactionManager.getTransaction(any())).thenReturn(mock(TransactionStatus.class));
+    }
 
     @Nested
     class CreateDraftTests {
@@ -47,13 +62,13 @@ class DraftStoreServiceTest {
         @Test
         void shouldCreateDraftWithExpiryWhenRequestIsValid() {
             Map<String, Object> payload = new HashMap<>(Map.of("step", "claimant-details"));
-            when(draftStoreRepository.save(any(DraftStoreEntity.class)))
+            when(draftStoreRepository.saveAndFlush(any(DraftStoreEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
             DraftStoreEntity result = draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE);
 
             ArgumentCaptor<DraftStoreEntity> captor = ArgumentCaptor.forClass(DraftStoreEntity.class);
-            verify(draftStoreRepository).save(captor.capture());
+            verify(draftStoreRepository).saveAndFlush(captor.capture());
             DraftStoreEntity savedDraft = captor.getValue();
             assertThat(result).isSameAs(savedDraft);
             assertThat(savedDraft.getId()).isNotNull();
@@ -82,6 +97,50 @@ class DraftStoreServiceTest {
                 .withMessage("payload must not be null");
 
             verifyNoInteractions(draftStoreRepository);
+        }
+
+        @Test
+        void shouldReturnActiveDraftWhenCreateHitsUniqueConstraint() {
+            Map<String, Object> payload = new HashMap<>(Map.of("step", "claimant-details"));
+            OffsetDateTime createdAt = OffsetDateTime.now();
+            DraftStoreEntity existingDraft = new DraftStoreEntity(
+                DRAFT_ID,
+                USER_ID,
+                CASE_ID,
+                DRAFT_TYPE.getId(),
+                new HashMap<>(Map.of("step", "existing-payload")),
+                createdAt,
+                createdAt,
+                DRAFT_TYPE.calculateExpiry(createdAt)
+            );
+            when(draftStoreRepository.saveAndFlush(any(DraftStoreEntity.class)))
+                .thenThrow(new DataIntegrityViolationException("uq_draft_store_user_draft_claim"));
+            when(draftStoreRepository.findByUserIdAndDraftTypeIdAndExpiresAtAfter(
+                eq(USER_ID),
+                eq(DRAFT_TYPE.getId()),
+                any(OffsetDateTime.class)
+            )).thenReturn(List.of(existingDraft));
+
+            DraftStoreEntity result = draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE);
+
+            assertThat(result).isSameAs(existingDraft);
+            assertThat(result.getPayload()).containsEntry("step", "existing-payload");
+        }
+
+        @Test
+        void shouldRethrowWhenUniqueConstraintFailsAndNoActiveDraftExists() {
+            Map<String, Object> payload = new HashMap<>(Map.of("step", "claimant-details"));
+            DataIntegrityViolationException uniqueViolation =
+                new DataIntegrityViolationException("uq_draft_store_user_draft_claim");
+            when(draftStoreRepository.saveAndFlush(any(DraftStoreEntity.class))).thenThrow(uniqueViolation);
+            when(draftStoreRepository.findByUserIdAndDraftTypeIdAndExpiresAtAfter(
+                eq(USER_ID),
+                eq(DRAFT_TYPE.getId()),
+                any(OffsetDateTime.class)
+            )).thenReturn(List.of());
+
+            assertThatThrownBy(() -> draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE))
+                .isSameAs(uniqueViolation);
         }
 
         @Test

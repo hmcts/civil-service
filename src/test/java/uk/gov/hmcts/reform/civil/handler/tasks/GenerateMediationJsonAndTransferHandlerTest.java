@@ -14,7 +14,10 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
+import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.mediation.MediationCase;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationJsonService;
 import uk.gov.hmcts.reform.civil.service.search.MediationCasesSearchService;
 
@@ -27,6 +30,8 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -62,6 +67,12 @@ class GenerateMediationJsonAndTransferHandlerTest {
 
     @Mock
     private SendGridClient sendGridClient;
+
+    @Mock
+    private CoreCaseDataService coreCaseDataService;
+
+    @Mock
+    private CaseTaskTrackingService caseTaskTrackingService;
 
     @Mock
     private MediationJsonService mediationJsonService;
@@ -119,6 +130,30 @@ class GenerateMediationJsonAndTransferHandlerTest {
         mediationJsonHandler.execute(externalTask, externalTaskService);
 
         verifyNoInteractions(searchService, mediationJsonService, sendGridClient);
+        verify(externalTaskService).complete(externalTask, null);
+    }
+
+    @Test
+    void shouldContinueProcessingOtherCasesWhenJsonGenerationFailsForOneCase() {
+        when(searchService.getInMediationCases(true))
+            .thenReturn(List.of(caseDetailsWithInMediationState, caseDetailsWithInMediationStateNotToProcess));
+        when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
+        when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationStateNotToProcess))
+            .thenReturn(caseDataInMediationNotToProcess);
+        when(mediationJsonService.generateJsonContent(caseDataInMediation))
+            .thenThrow(new RuntimeException("Unable to generate JSON"));
+        when(mediationJsonService.generateJsonContent(caseDataInMediationNotToProcess))
+            .thenReturn(new MediationCase().setCcdCaseNumber(caseDataInMediationNotToProcess.getCcdCaseReference()));
+        when(mediationCSVEmailConfiguration.getSender()).thenReturn(RECIPIENT);
+
+        mediationJsonHandler.execute(externalTask, externalTaskService);
+
+        verify(mediationJsonService).generateJsonContent(caseDataInMediation);
+        verify(mediationJsonService).generateJsonContent(caseDataInMediationNotToProcess);
+        verify(caseTaskTrackingService).trackCaseTask("1", "OCMC Mediation Data", "ocmc_mediation_data.json", null);
+        verify(sendGridClient, times(1)).sendEmail(anyString(), any());
+        verify(coreCaseDataService, never()).triggerEvent(eq(1L), any(), any(), anyString(), anyString());
+        verify(coreCaseDataService, times(1)).triggerEvent(eq(2L), any(), any(), anyString(), anyString());
         verify(externalTaskService).complete(externalTask, null);
     }
 
