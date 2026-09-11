@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.scheduler.common;
 
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
-public record ListTaskResult<T>(List<T> items) implements TaskResult<T> {
+public record SetTaskResult<T>(Set<T> items) implements TaskResult<T> {
 
     @Override
     public int totalResults() {

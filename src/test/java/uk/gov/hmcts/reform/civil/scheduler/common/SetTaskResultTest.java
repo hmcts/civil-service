@@ -2,24 +2,24 @@ package uk.gov.hmcts.reform.civil.scheduler.common;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ListTaskResultTest {
+class SetTaskResultTest {
 
     @Test
     void shouldExposeItemsAndTotalResults() {
-        ListTaskResult<String> result = new ListTaskResult<>(List.of("one", "two"));
+        SetTaskResult<String> result = new SetTaskResult<>(Set.of("one", "two"));
 
         assertThat(result.totalResults()).isEqualTo(2);
-        assertThat(result.itemStream()).containsExactly("one", "two");
+        assertThat(result.itemStream()).containsExactlyInAnyOrder("one", "two");
         assertThat(result.isEmpty()).isFalse();
     }
 
     @Test
-    void shouldBeEmptyWhenListIsEmpty() {
-        ListTaskResult<String> result = new ListTaskResult<>(List.of());
+    void shouldBeEmptyWhenSetIsEmpty() {
+        SetTaskResult<String> result = new SetTaskResult<>(Set.of());
 
         assertThat(result.isEmpty()).isTrue();
     }
