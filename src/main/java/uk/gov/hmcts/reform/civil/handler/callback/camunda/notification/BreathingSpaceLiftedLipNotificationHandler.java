@@ -1,36 +1,20 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.civil.callback.Callback;
-import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_APPLICANT_BREATHING_SPACE_LIFTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_RESPONDENT1_BREATHING_SPACE_LIFTED;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantEmail;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
-public class BreathingSpaceLiftedLipNotificationHandler extends CallbackHandler implements NotificationData {
+public class BreathingSpaceLiftedLipNotificationHandler extends AbstractBreathingSpaceLipNotificationHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_LIP_APPLICANT_BREATHING_SPACE_LIFTED,
@@ -41,21 +25,11 @@ public class BreathingSpaceLiftedLipNotificationHandler extends CallbackHandler 
     public static final String TASK_ID_APPLICANT = "BreathingSpaceLiftedNotifyLipApplicant";
     public static final String TASK_ID_RESPONDENT = "BreathingSpaceLiftedNotifyLipRespondent1";
 
-    private final NotificationService notificationService;
-    private final NotificationsProperties notificationsProperties;
-    private final NotificationsSignatureConfiguration configuration;
-    private final FeatureToggleService featureToggleService;
-
-    @Override
-    protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::notifyLipParty
-        );
-    }
-
-    @Override
-    public String camundaActivityId(CallbackParams callbackParams) {
-        return isApplicantEvent(callbackParams) ? TASK_ID_APPLICANT : TASK_ID_RESPONDENT;
+    public BreathingSpaceLiftedLipNotificationHandler(NotificationService notificationService,
+                                                      NotificationsProperties notificationsProperties,
+                                                      NotificationsSignatureConfiguration configuration,
+                                                      FeatureToggleService featureToggleService) {
+        super(notificationService, notificationsProperties, configuration, featureToggleService);
     }
 
     @Override
@@ -63,60 +37,44 @@ public class BreathingSpaceLiftedLipNotificationHandler extends CallbackHandler 
         return EVENTS;
     }
 
-    private CallbackResponse notifyLipParty(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        boolean applicantEvent = isApplicantEvent(callbackParams);
-        String recipient = applicantEvent
-            ? getApplicantEmail(caseData, true)
-            : caseData.getRespondent1Email();
-
-        if (StringUtils.isBlank(recipient)) {
-            log.info("Skipping breathing space lifted LiP notification for case {} — no email address",
-                     caseData.getLegacyCaseReference());
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
-        }
-
-        notificationService.sendMail(
-            recipient,
-            getTemplateId(caseData, applicantEvent),
-            addProperties(caseData, applicantEvent),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
-
-        return AboutToStartOrSubmitCallbackResponse.builder().build();
-    }
-
-    private String getTemplateId(CaseData caseData, boolean applicantEvent) {
-        if (applicantEvent) {
-            return caseData.isClaimantBilingual()
-                ? notificationsProperties.getNotifyLiPApplicantBreathingSpaceLiftedWelsh()
-                : notificationsProperties.getNotifyLiPApplicantBreathingSpaceLifted();
-        }
-        return caseData.isRespondentResponseBilingual()
-            ? notificationsProperties.getNotifyLiPRespondentBreathingSpaceLiftedWelsh()
-            : notificationsProperties.getNotifyLiPRespondentBreathingSpaceLifted();
-    }
-
-    private Map<String, String> addProperties(CaseData caseData, boolean applicantEvent) {
-        HashMap<String, String> properties = new HashMap<>();
-        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
-        properties.put(CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
-        properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
-        properties.put(PARTY_NAME, applicantEvent
-            ? getPartyNameBasedOnType(caseData.getApplicant1())
-            : getPartyNameBasedOnType(caseData.getRespondent1()));
-        addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isPublicQueryManagementEnabled(caseData));
-        return properties;
+    @Override
+    protected boolean isApplicantEvent(CallbackParams callbackParams) {
+        return NOTIFY_LIP_APPLICANT_BREATHING_SPACE_LIFTED.name()
+            .equals(callbackParams.getRequest().getEventId());
     }
 
     @Override
-    public Map<String, String> addProperties(CaseData caseData) {
-        return addProperties(caseData, true);
+    protected String getApplicantTaskId() {
+        return TASK_ID_APPLICANT;
     }
 
-    private boolean isApplicantEvent(CallbackParams callbackParams) {
-        return NOTIFY_LIP_APPLICANT_BREATHING_SPACE_LIFTED.name()
-            .equals(callbackParams.getRequest().getEventId());
+    @Override
+    protected String getRespondentTaskId() {
+        return TASK_ID_RESPONDENT;
+    }
+
+    @Override
+    protected String getReferenceTemplate() {
+        return REFERENCE_TEMPLATE;
+    }
+
+    @Override
+    protected String getApplicantTemplateId() {
+        return notificationsProperties.getNotifyLiPApplicantBreathingSpaceLifted();
+    }
+
+    @Override
+    protected String getApplicantWelshTemplateId() {
+        return notificationsProperties.getNotifyLiPApplicantBreathingSpaceLiftedWelsh();
+    }
+
+    @Override
+    protected String getRespondentTemplateId() {
+        return notificationsProperties.getNotifyLiPRespondentBreathingSpaceLifted();
+    }
+
+    @Override
+    protected String getRespondentWelshTemplateId() {
+        return notificationsProperties.getNotifyLiPRespondentBreathingSpaceLiftedWelsh();
     }
 }
