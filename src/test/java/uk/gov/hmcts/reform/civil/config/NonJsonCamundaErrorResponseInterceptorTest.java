@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
@@ -11,9 +12,13 @@ import org.apache.hc.core5.http.message.BasicClassicHttpResponse;
 import org.camunda.bpm.client.impl.EngineRestExceptionDto;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 class NonJsonCamundaErrorResponseInterceptorTest {
 
@@ -96,6 +101,60 @@ class NonJsonCamundaErrorResponseInterceptorTest {
         interceptor.process(response, null, null);
 
         assertThat(response.getEntity()).isNull();
+    }
+
+    @Test
+    void ignoresResponsesThatAreNotClassicHttpResponses() {
+        HttpResponse nonClassicResponse = mock(HttpResponse.class);
+
+        interceptor.process(nonClassicResponse, null, null);
+
+        verifyNoInteractions(nonClassicResponse);
+    }
+
+    @Test
+    void leavesOriginalEntityWhenTheBodyCannotBeBuffered() throws Exception {
+        HttpEntity explodingEntity = mock(HttpEntity.class);
+        when(explodingEntity.getContent()).thenThrow(new IOException("boom"));
+        ClassicHttpResponse response = response(502, explodingEntity);
+
+        interceptor.process(response, null, null);
+
+        assertThat(response.getEntity()).isSameAs(explodingEntity);
+    }
+
+    @Test
+    void leavesOriginalEntityWhenTheContentStreamIsNull() throws Exception {
+        HttpEntity entityWithNoStream = mock(HttpEntity.class);
+        when(entityWithNoStream.getContent()).thenReturn(null);
+        ClassicHttpResponse response = response(502, entityWithNoStream);
+
+        interceptor.process(response, null, null);
+
+        assertThat(response.getEntity()).isSameAs(entityWithNoStream);
+    }
+
+    @Test
+    void treatsWhitespacePrefixedJsonArraysAsJson() throws Exception {
+        String json = "  \n[1,2,3]";
+        ClassicHttpResponse response = response(500, new StringEntity(json, ContentType.TEXT_PLAIN));
+
+        interceptor.process(response, null, null);
+
+        String actual = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
+        assertThat(actual).isEqualTo(json);
+        assertThat(response.getEntity().getContentType()).isEqualTo(ContentType.APPLICATION_JSON.toString());
+    }
+
+    @Test
+    void truncatesLongNonJsonBodiesInTheMessageSnippet() throws Exception {
+        String longBody = "x".repeat(250);
+        ClassicHttpResponse response = response(502, new StringEntity(longBody, ContentType.TEXT_PLAIN));
+
+        interceptor.process(response, null, null);
+
+        String message = parse(response).getMessage();
+        assertThat(message).startsWith("x".repeat(200) + "...").endsWith("(HTTP 502)");
     }
 
     private static ClassicHttpResponse response(int code, HttpEntity entity) {
