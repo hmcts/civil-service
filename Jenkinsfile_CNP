@@ -183,6 +183,7 @@ withPipeline(type, product, component) {
 
   afterAlways('test') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/build/reports/jacoco/**'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/build/reports/test-jit/**'
   }
 
   afterAlways('pact-provider-verification') {
