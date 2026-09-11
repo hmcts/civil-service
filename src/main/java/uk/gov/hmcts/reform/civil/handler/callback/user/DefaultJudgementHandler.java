@@ -60,6 +60,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
         + "and tell you what happens next.";
     public static final String JUDGMENT_REQUESTED = "# Judgment for damages to be decided requested ";
     public static final String JUDGMENT_GRANTED_HEADER = "# Judgment for damages to be decided Granted ";
+    public static final String BREATHING_SPACE = "Default judgment cannot be applied for while claim is in"
+        + " breathing space";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT);
     private static final int DEFAULT_JUDGEMENT_DEADLINE_EXTENSION_MONTHS = 36;
     private final ObjectMapper objectMapper;
@@ -231,6 +233,11 @@ public class DefaultJudgementHandler extends CallbackHandler {
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         ArrayList<String> errors = new ArrayList<>();
+
+        if (caseData.getBreathing() != null && caseData.getBreathing().getActive() == YesOrNo.YES) {
+            errors.add(BREATHING_SPACE);
+        }
+
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
             // CIV-11985 restrict this event until 5 pm
             LocalDateTime deadlineToUse = caseData.getRespondent1ResponseDeadline()
