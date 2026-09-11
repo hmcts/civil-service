@@ -11,7 +11,8 @@ import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.judgementbuffer.JudgementBufferExpiredSearchService;
 
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -43,10 +44,11 @@ class JudgementBufferSchedulerTest {
 
             scheduler.runScheduledTask();
 
-            verify(scheduledTaskRunner).run(argThat(config ->
-                JudgementBufferScheduler.SCHEDULER_NAME.equals(config.getSchedulerName())
-                    && judgementBufferScheduledTask.equals(config.getScheduledTask())
-            ));
+            verify(scheduledTaskRunner).run(
+                eq(scheduler.getName()),
+                any(),
+                eq(judgementBufferScheduledTask)
+            );
         }
 
         @Test
