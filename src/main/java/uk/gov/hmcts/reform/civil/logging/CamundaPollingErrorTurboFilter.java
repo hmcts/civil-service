@@ -65,11 +65,17 @@ public class CamundaPollingErrorTurboFilter extends TurboFilter {
         if (!format.startsWith(FETCH_AND_LOCK_CODE) && !format.startsWith(PARSE_CODE)) {
             return FilterReply.NEUTRAL;
         }
-        if (!isTransientUpstream(t)) {
+        // Camunda uses SLF4J's varargs overload; Logback has not extracted its throwable yet.
+        Throwable error = t;
+        if (error == null && params != null && params.length > 0
+            && params[params.length - 1] instanceof Throwable throwable) {
+            error = throwable;
+        }
+        if (!isTransientUpstream(error)) {
             return FilterReply.NEUTRAL;
         }
 
-        recordAndMaybeSummarise(t);
+        recordAndMaybeSummarise(error);
         return FilterReply.DENY;
     }
 

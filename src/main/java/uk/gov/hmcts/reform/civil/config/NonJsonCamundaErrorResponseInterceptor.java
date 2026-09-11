@@ -36,7 +36,6 @@ public class NonJsonCamundaErrorResponseInterceptor implements HttpResponseInter
 
     static final String SYNTHETIC_TYPE = "UpstreamGatewayException";
 
-    private static final int MAX_BODY_BYTES = 8 * 1024;
     private static final int MAX_SNIPPET_CHARS = 200;
 
     @Override
@@ -52,7 +51,7 @@ public class NonJsonCamundaErrorResponseInterceptor implements HttpResponseInter
 
         byte[] body;
         try {
-            body = EntityUtils.toByteArray(classicResponse.getEntity(), MAX_BODY_BYTES);
+            body = EntityUtils.toByteArray(classicResponse.getEntity());
         } catch (Exception e) {
             // Could not buffer the body - leave the original entity in place and let the
             // client handle the read failure exactly as it does today.

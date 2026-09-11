@@ -41,6 +41,7 @@ class CamundaPollingErrorTurboFilterTest {
     void tearDown() {
         summaryLogger.detachAppender(summaryAppender);
         summaryAppender.stop();
+        loggerContext.stop();
     }
 
     @Test
@@ -52,6 +53,27 @@ class CamundaPollingErrorTurboFilterTest {
         assertThat(summaryAppender.list.get(0).getLevel()).isEqualTo(Level.WARN);
         assertThat(summaryAppender.list.get(0).getFormattedMessage())
             .contains("Suppressed 1 transient Camunda external-task fetchAndLock error");
+    }
+
+    @Test
+    void demotesCamundaVarargsErrorsThroughTheLogger() {
+        filter.start();
+        loggerContext.addTurboFilter(filter);
+        ListAppender<ILoggingEvent> errorAppender = new ListAppender<>();
+        errorAppender.start();
+        camundaLogger.addAppender(errorAppender);
+
+        camundaLogger.error(FETCH_MSG, new Object[]{wrapped(restException(502))});
+
+        assertThat(errorAppender.list).isEmpty();
+        assertThat(summaryAppender.list).hasSize(1);
+        assertThat(summaryAppender.list.get(0).getLevel()).isEqualTo(Level.WARN);
+
+        camundaLogger.error(FETCH_MSG, new Object[]{wrapped(restException(400))});
+
+        assertThat(errorAppender.list).hasSize(1);
+        assertThat(errorAppender.list.get(0).getLevel()).isEqualTo(Level.ERROR);
+        assertThat(summaryAppender.list).hasSize(1);
     }
 
     @Test

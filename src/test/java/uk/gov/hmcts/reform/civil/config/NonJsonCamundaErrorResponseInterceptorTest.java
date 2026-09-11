@@ -65,6 +65,21 @@ class NonJsonCamundaErrorResponseInterceptorTest {
     }
 
     @Test
+    void preservesJsonErrorBodiesLargerThanEightKilobytes() throws Exception {
+        String message = "x".repeat(9000);
+        String json = "{\"type\":\"RestException\",\"message\":\"" + message + "\"}";
+        ClassicHttpResponse response = response(500, new StringEntity(json, ContentType.APPLICATION_JSON));
+
+        interceptor.process(response, null, null);
+
+        String actual = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
+        assertThat(actual).isEqualTo(json);
+        EngineRestExceptionDto dto = objectMapper.readValue(actual, EngineRestExceptionDto.class);
+        assertThat(dto.getType()).isEqualTo("RestException");
+        assertThat(dto.getMessage()).isEqualTo(message);
+    }
+
+    @Test
     void leavesSuccessResponsesUntouched() throws Exception {
         HttpEntity original = new ByteArrayEntity("[]".getBytes(StandardCharsets.UTF_8), ContentType.APPLICATION_JSON);
         ClassicHttpResponse response = response(200, original);
