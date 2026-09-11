@@ -561,7 +561,7 @@ dependencies {
   implementation "org.flywaydb:flyway-database-postgresql"
   implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
   implementation "org.springframework.cloud:spring-cloud-openfeign-core"
-  implementation "com.github.hmcts:service-auth-provider-java-client:4.1.2"
+  implementation "com.github.hmcts:service-auth-provider-java-client:6.1.0"
   implementation "org.apache.tika:tika-core:${versions.tika}"
   implementation "io.github.openfeign:feign-httpclient:13.13"
   implementation "org.springframework.retry:spring-retry"
