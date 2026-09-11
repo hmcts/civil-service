@@ -83,6 +83,14 @@
         <cve>CVE-2026-59283</cve>
         <cve>CVE-2026-59313</cve>
         <cve>CVE-2026-59314</cve>
+        <!-- second disclosure batch, published to NVD 2026-09-11 -->
+        <cve>CVE-2026-47883</cve>
+        <cve>CVE-2026-47884</cve>
+        <cve>CVE-2026-47885</cve>
+        <cve>CVE-2026-47886</cve>
+        <cve>CVE-2026-47887</cve>
+        <cve>CVE-2026-47888</cve>
+        <cve>CVE-2026-47889</cve>
     </suppress>
     <suppress until="2026-11-10Z">
         <notes><![CDATA[
