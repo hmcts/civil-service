@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
+import uk.gov.hmcts.reform.civil.enums.ResponseMethod;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -79,6 +80,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
+import uk.gov.hmcts.reform.civil.model.scanneddocument.ScannedDocument;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.ClientContext;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
@@ -248,6 +250,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @Builder.Default
     private  List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
     private  List<Element<ManageDocument>> manageDocuments;
+    private  List<Element<ScannedDocument>> scannedDocuments;
     private  Document specClaimTemplateDocumentFiles;
     private  Document specClaimDetailsDocumentFiles;
     private  List<Evidence> speclistYourEvidenceList;
@@ -345,6 +348,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  String bundleEvent;
     private  YesOrNo fullAdmitNoPaymentSchedulerProcessed;
     private  YesOrNo isOtherRemedyAbandoned;
+
+    private ResponseMethod respondent1ResponseMethod;
+    private ResponseMethod respondent2ResponseMethod;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private  LocalDate otherRemedyAbandonedDate;
