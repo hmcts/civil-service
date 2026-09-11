@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorChain;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorContext;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorChainFactory;
@@ -11,7 +12,6 @@ import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.SchedulerIntercept
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.TaskAbortedException;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -65,7 +65,8 @@ public class ScheduledTaskProcessor<T, I> {
             .sequential()
             .limit(maxCasesPerRun(scheduledTask));
 
-        Instant startProcessing = Instant.now();
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         try {
             boolean completed = sequentialStream.allMatch(item -> processItem(
                 eventConfig,
@@ -76,6 +77,7 @@ public class ScheduledTaskProcessor<T, I> {
                 context
             ));
 
+            stopWatch.stop();
             return new ScheduledTaskOutcome<>(
                 context.succeededItems,
                 context.failedItems,
@@ -83,9 +85,12 @@ public class ScheduledTaskProcessor<T, I> {
                 !completed,
                 context.jobAbortReason.get(),
                 Duration.ofMillis(context.cumulativeDelayMillis.get()),
-                Duration.between(startProcessing, Instant.now())
+                Duration.ofNanos(stopWatch.getTotalTimeNanos())
             );
         } catch (ScheduledTaskInterruptedException e) {
+            if (stopWatch.isRunning()) {
+                stopWatch.stop();
+            }
             context.jobAbortReason.set(e.getMessage());
             return new ScheduledTaskOutcome<>(
                 context.succeededItems,
@@ -94,7 +99,7 @@ public class ScheduledTaskProcessor<T, I> {
                 true,
                 context.jobAbortReason.get(),
                 Duration.ofMillis(context.cumulativeDelayMillis.get()),
-                Duration.between(startProcessing, Instant.now())
+                Duration.ofNanos(stopWatch.getTotalTimeNanos())
             );
         }
     }

@@ -47,7 +47,7 @@ public class GAOrderMadeScheduler implements CivilScheduler {
                     .stream()
                     .filter(filter::hasExpiredStayDeadline)
                     .toList();
-                return new ListTaskResult<>(applications, applications.size());
+                return new ListTaskResult<>(applications);
             },
             gaOrderMadeScheduledTask
         );

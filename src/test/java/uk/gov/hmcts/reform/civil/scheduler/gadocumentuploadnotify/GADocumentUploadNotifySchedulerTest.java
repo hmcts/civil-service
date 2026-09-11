@@ -7,8 +7,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.ga.service.search.GaEvidenceUploadNotificationSearchService;
-import uk.gov.hmcts.reform.civil.scheduler.common.ListTaskResult;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
+import uk.gov.hmcts.reform.civil.scheduler.common.SetTaskResult;
 import uk.gov.hmcts.reform.civil.scheduler.common.TaskResult;
 
 import java.util.Set;
@@ -42,7 +42,7 @@ class GADocumentUploadNotifySchedulerTest {
             TaskResult<CaseDetails> result = config.getSearchResultSupplier().get();
             return GADocumentUploadNotifyScheduler.SCHEDULER_NAME.equals(config.getSchedulerName())
                 && gaDocumentUploadNotifyScheduledTask.equals(config.getScheduledTask())
-                && result instanceof ListTaskResult
+                && result instanceof SetTaskResult
                 && result.totalResults() == 1
                 && result.itemStream().toList().contains(caseDetails);
         }));

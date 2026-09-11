@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.ga.service.search.GaEvidenceUploadNotificationSearchService;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
-import uk.gov.hmcts.reform.civil.scheduler.common.ListTaskResult;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
-import java.util.List;
+import uk.gov.hmcts.reform.civil.scheduler.common.SetTaskResult;
+
 import java.util.Set;
 
 @Component
@@ -40,8 +40,7 @@ public class GADocumentUploadNotifyScheduler implements CivilScheduler {
             .schedulerName(SCHEDULER_NAME)
             .searchResultSupplier(() -> {
                 Set<CaseDetails> applications = searchService.getApplications();
-                List<CaseDetails> applicationsList = applications.stream().toList();
-                return new ListTaskResult<>(applicationsList, applicationsList.size());
+                return new SetTaskResult<>(applications);
             })
             .scheduledTask(gaDocumentUploadNotifyScheduledTask)
             .build());

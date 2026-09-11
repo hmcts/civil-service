@@ -3,11 +3,11 @@ package uk.gov.hmcts.reform.civil.scheduler.common;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.SchedulerInterceptor;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.SchedulerInterceptorResolver;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -52,13 +52,16 @@ public class ScheduledTaskRunner<T, I> {
     public void run(ScheduledTaskConfiguration<T, I> config) {
         if (featureToggleService.isSpringSchedulerEnabled(config.getSchedulerName())) {
             log.info("Running {} scheduler", config.getSchedulerName());
-            Instant start = Instant.now();
+            StopWatch stopWatch = new StopWatch(config.getSchedulerName());
+
+            stopWatch.start("search");
             TaskResult<T> searchResult = config.getSearchResultSupplier().get();
-            Duration searchDuration = Duration.between(start, Instant.now());
+            stopWatch.stop();
+            Duration searchDuration = Duration.ofNanos(stopWatch.getLastTaskTimeNanos());
 
             List<SchedulerInterceptor<T>> interceptors = interceptorResolver.resolveInterceptors(config);
 
-            execute(new ScheduledTaskEventConfiguration(config.getSchedulerName()), searchResult, config.getScheduledTask(), interceptors, searchDuration, start);
+            execute(new ScheduledTaskEventConfiguration(config.getSchedulerName()), searchResult, config.getScheduledTask(), interceptors, searchDuration, stopWatch);
         }
     }
 
@@ -71,14 +74,14 @@ public class ScheduledTaskRunner<T, I> {
      * @param scheduledTask  the task to be performed on each item
      * @param interceptors   the list of interceptors to apply
      * @param searchDuration the duration of the search
-     * @param start          the start time of the job
+     * @param stopWatch      the StopWatch for the job
      */
     private void execute(ScheduledTaskEventConfiguration eventConfig,
                          TaskResult<T> searchResult,
                          ScheduledTask<T, I> scheduledTask,
                          List<SchedulerInterceptor<T>> interceptors,
                          Duration searchDuration,
-                         Instant start) {
+                         StopWatch stopWatch) {
 
         if (searchResult == null) {
             eventTracker.jobAbortedEvent(eventConfig, "SearchResult cannot be null", searchDuration);
@@ -96,7 +99,7 @@ public class ScheduledTaskRunner<T, I> {
             return;
         }
 
-        processItems(eventConfig, scheduledTask, searchResult, interceptors, searchDuration, start);
+        processItems(eventConfig, scheduledTask, searchResult, interceptors, searchDuration, stopWatch);
     }
 
     /**
@@ -113,19 +116,21 @@ public class ScheduledTaskRunner<T, I> {
                               TaskResult<T> searchResult,
                               List<SchedulerInterceptor<T>> interceptors,
                               Duration searchDuration,
-                              Instant start) {
+                              StopWatch stopWatch) {
         int totalCases = searchResult.totalResults();
         eventTracker.jobStartedEvent(eventConfig, totalCases);
         log.info("Running scheduled task: {}, totalCases: {}", eventConfig.getSchedulerName(), totalCases);
 
+        stopWatch.start("process");
         ScheduledTaskOutcome<I> outcome = scheduledTaskProcessor.performProcessing(
             eventConfig,
             scheduledTask,
             searchResult,
             interceptors
         );
+        stopWatch.stop();
 
-        Duration totalDuration = Duration.between(start, Instant.now());
+        Duration totalDuration = Duration.ofNanos(stopWatch.getTotalTimeNanos());
 
         if (outcome.abortedEarly()) {
             eventTracker.jobAbortedEvent(

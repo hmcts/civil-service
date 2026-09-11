@@ -53,6 +53,6 @@ public class UnnotifiedHearingsSearchService {
             );
         }
 
-        return new ListTaskResult<>(hearingIds, totalFound);
+        return new ListTaskResult<>(hearingIds);
     }
 }
