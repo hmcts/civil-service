@@ -742,6 +742,14 @@ tasks.register('runProviderPactVerification') {
   dependsOn tasks.named('providerContractTests')
 }
 
+// Temporary DTSCCI-6351 comparison, controlled without changing the shared Jenkins command.
+def testJitBenchmark = providers.gradleProperty('testJitBenchmark').orNull
+if (testJitBenchmark != null) {
+  if (!(testJitBenchmark in ['default', 'c1'])) {
+    throw new GradleException('testJitBenchmark must be default or c1; omit it to disable benchmarking')
+  }
+}
+
 tasks.withType(Test).configureEach { t ->
   useJUnitPlatform()
 
@@ -772,8 +780,31 @@ tasks.withType(Test).configureEach { t ->
   minHeapSize = "256m"
   jvmArgs "-XX:MaxMetaspaceSize=512m"
   jvmArgs '-XX:ReservedCodeCacheSize=512m'
-  // Temurin 21.0.7 occasionally crashes in C2 (BoolNode::Ideal SIGSEGV); stay on C1 until upstream fix.
-  jvmArgs "-XX:TieredStopAtLevel=1"
+  if (t.name == 'test' && testJitBenchmark != null) {
+    def benchmarkReport = layout.buildDirectory.file('reports/test-jit/benchmark.txt')
+    long benchmarkStarted = 0
+    // Measure execution on every build, including repeated builds of the same commit.
+    outputs.upToDateWhen { false }
+    outputs.doNotCacheIf('JIT benchmark requires test execution') { true }
+    if (testJitBenchmark == 'c1') {
+      jvmArgs '-XX:TieredStopAtLevel=1'
+    }
+    doFirst {
+      def settings = "mode=${testJitBenchmark}, maxWorkers=${gradle.startParameter.maxWorkerCount}, " +
+          "maxParallelForks=${t.maxParallelForks}, maxHeapSize=${t.maxHeapSize}"
+      logger.lifecycle("JIT benchmark: ${settings}")
+      def report = benchmarkReport.get().asFile
+      report.parentFile.mkdirs()
+      report.text = "${settings}\nstatus=started\n"
+      benchmarkStarted = System.nanoTime()
+    }
+    doLast {
+      def seconds = (System.nanoTime() - benchmarkStarted) / 1_000_000_000.0
+      def result = "status=completed, durationSeconds=${String.format(java.util.Locale.ROOT, '%.3f', seconds)}"
+      logger.lifecycle("JIT benchmark: ${result}")
+      benchmarkReport.get().asFile.append("${result}\n", 'UTF-8')
+    }
+  }
   // Docker Desktop 29 (Engine API 1.54) rejects docker-java's older default API version.
   systemProperty 'api.version', System.getProperty('api.version', '1.40')
 
