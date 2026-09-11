@@ -26,4 +26,5 @@ public class HearingNoticeVariables implements MappableObject {
     public List<HearingDay> days;
     public Long requestVersion;
     public String hearingType;
+    public Boolean hearingNoticeSkipped;
 }
