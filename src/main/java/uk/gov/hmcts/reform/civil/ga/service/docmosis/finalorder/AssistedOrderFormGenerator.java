@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -464,14 +465,26 @@ public class AssistedOrderFormGenerator implements TemplateDataGenerator<Assiste
         StringBuilder otherLength = new StringBuilder();
         HearingLength other = caseData.getAssistedOrderFurtherHearingDetails().getLengthOfHearingOther();
         if (Objects.nonNull(other)) {
-            int otherDay = other.getLengthListOtherDays();
-            int otherHour = other.getLengthListOtherHours();
-            int otherMinute = other.getLengthListOtherMinutes();
-            otherLength.append(otherDay > 0 ? (otherDay + " days ") : "")
-                    .append(otherHour > 0 ? (otherHour + " hours ") : "")
-                    .append(otherMinute > 0 ? (otherMinute + " minutes") : "");
+            otherLength.append(formatLengthPart(other.getLengthListOtherDays(), "day"))
+                    .append(formatLengthPart(other.getLengthListOtherHours(), "hour"))
+                    .append(formatLengthPart(other.getLengthListOtherMinutes(), "minute"));
         }
         return otherLength.toString().trim();
+    }
+
+    private String formatLengthPart(String rawValue, String unit) {
+        if (rawValue == null) {
+            return "";
+        }
+
+        BigDecimal value = new BigDecimal(rawValue);
+        if (value.compareTo(BigDecimal.ZERO) <= 0) {
+            return "";
+        }
+
+        String displayValue = value.stripTrailingZeros().toPlainString();
+        String suffix = value.compareTo(BigDecimal.ONE) == 0 ? "" : "s";
+        return String.format("%s %s%s ", displayValue, unit, suffix);
     }
 
     protected Boolean checkFurtherHearingToggle(GeneralApplicationCaseData caseData) {
