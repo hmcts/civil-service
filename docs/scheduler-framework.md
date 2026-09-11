@@ -7,12 +7,12 @@ The service includes a common framework for implementing scheduled tasks. This f
 - **`CivilScheduler`**: The main interface for scheduler components. Implementations define a `getName()` and `runScheduledTask()`.
 - **`ScheduledTask<T, I>`**: A generic interface for the logic to be executed for each item found. It extends `Consumer<T>` and requires `getItemId(T item)` to be implemented.
 - **`ScheduledTaskRunner<T, I>`**: A generic Spring component that coordinates task execution, including feature toggle checks, logging, and item processing.
-- **`TaskResult<T>`**: An interface for search results, providing an `itemStream()` and `totalResults()`.
-- **`ListTaskResult<T>`**: A standard implementation of `TaskResult` used for wrapping a simple list of items (e.g., from an API call).
+- **`TaskResult<T>`**: A generic interface for search results, providing an `itemStream()` and `totalResults()`. It acts as a bridge between the search logic and the runner.
+- **`ListTaskResult<T>`**: A lightweight implementation of `TaskResult` used for wrapping a materialized collection of items (e.g., from an API call or a filtered list).
 - **`ElasticSearchService`**: A base class for services that search for cases to be processed by a scheduler via Elasticsearch.
-- **`ElasticSearchPaginatedStreamProvider`**: A component for performing efficient paginated searches using Elasticsearch's `search_after`.
-- **`PaginatedQueryProvider`**: An interface for providing Elasticsearch queries for paginated searches.
-- **`ElasticSearchResult`**: An implementation of `TaskResult` that provides a lazy-loading stream of `CaseDetails` for paginated results.
+- **`ElasticSearchPaginatedStreamProvider`**: A core component for performing efficient, memory-safe paginated searches using Elasticsearch's `search_after` mechanism.
+- **`PaginatedQueryProvider`**: An interface for providing dynamic Elasticsearch queries for each page during a paginated search.
+- **`ElasticSearchResult`**: An implementation of `TaskResult` that provides a lazy-loading stream of `CaseDetails`, fetching new pages only as the stream is consumed.
 
 ## Creating a New Scheduler
 
@@ -35,12 +35,58 @@ The service includes a common framework for implementing scheduled tasks. This f
 ## Best Practices & New Features
 
 ### External Filtering Logic
-For complex filtering (e.g., checking deadlines, case states, or specific business rules), it is recommended to extract the filtering logic into a separate `@Component` class. This improves testability and keeps the scheduler class focused on coordination.
+For complex filtering (e.g., checking deadlines, case states, or specific business rules), extract the filtering logic into a separate `@Component` class. This improves testability and keeps the scheduler class focused on coordination.
+
+#### Coding Style for Filters
+When implementing these filters, prefer using **direct private methods** over class-level `Predicate` fields. This approach:
+- **Avoids Initialization Issues**: Functional interfaces capturing injected services in field initializers can lead to `NullPointerException` or stale state.
+- **Improves Debugging**: Stack traces will explicitly name the logic method (e.g., `isStayDeadlineExpired`), making root cause analysis easier.
+- **Standard Practice**: Align with standard Spring and Java idioms for logic encapsulation.
+
+```java
+// Recommended Pattern
+public boolean hasExpiredDeadline(CaseDetails caseDetails) {
+    GeneralApplicationCaseData data = converter.toCaseData(caseDetails);
+    return isExpired(data);
+}
+
+private boolean isExpired(GeneralApplicationCaseData data) {
+    return !time.now().toLocalDate().isBefore(data.getDeadline());
+}
+```
 
 Example: `GAOrderMadeStayDeadlineFilter` or `GAUnlessOrderDeadlineFilter`.
 
+### Choosing the Right Task Result Type
+Selecting the appropriate `TaskResult` implementation is crucial for performance and memory management.
+
+| Result Type | Use Case | Benefits |
+|-------------|----------|----------|
+| **`ListTaskResult<T>`** | Small, materialized collections; items fetched from REST APIs; lists that require in-memory post-filtering. | Simple, low overhead, no stream state management. |
+| **`ElasticSearchResult`** | Large datasets from Elasticsearch; paginated case searches. | Memory efficient, lazy-loading (pages fetched only when needed). |
+
+**Decision Rule:** If you are performing a search that might return thousands of cases, use `ElasticSearchResult` via `ElasticSearchPaginatedStreamProvider`. If you are filtering a small set of cases already in memory, use `ListTaskResult`.
+
 ### Using `CaseDetails`
-When implementing `ScheduledTask`, prefer using `CaseDetails` as the item type (`T`). This avoids unnecessary early conversion to domain models if only a few fields are needed or if the conversion is handled better inside the task itself.
+When implementing `ScheduledTask`, prefer using `CaseDetails` as the item type (`T`). This avoids unnecessary early conversion to domain models and ensures compatibility with the standard interceptor chain.
+
+### Optimizing Interceptor Performance
+Interceptors like `OnGoingBusinessProcessCheck` may require additional case data to perform their checks. To avoid redundant network calls:
+1. **Source Filtering**: Ensure your Elasticsearch query includes the necessary fields (e.g., `businessProcess`) in the source filter.
+2. **Context Prepopulation**: The `ScheduledTaskRunner` populates the `InterceptorContext` with the `CaseDetails` returned by the search. If the required data is already present in `CaseDetails`, the interceptor will use it instead of fetching the case again from CCD.
+
+### Base GA Filter Pattern
+For General Application (GA) schedulers, consider creating filters that share a common pattern for data conversion:
+
+```java
+public abstract class GACaseFilter {
+    protected final CaseDetailsConverter converter;
+    protected final Time time;
+    
+    // Common conversion and base utility methods
+}
+```
+Standardizing GA filters reduces boilerplate and ensures consistent date handling across the GA sub-domain.
 
 ### Date and Time Handling
 Always use the Spring-injected `Time` service for any date or time calculations. This ensures consistency across the application and allows for easy mocking in unit tests.
