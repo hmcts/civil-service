@@ -94,6 +94,9 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
             || caseData.getCcdState() == CASE_DISMISSED) {
             roboticsCaseData.setNoticeOfChange(RoboticsDataUtil.buildNoticeOfChange(caseData));
         }
+        if (caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM && hasBreathingSpaceData(caseData)) {
+            roboticsCaseData.setBreathingSpace(buildBreathingSpace(caseData));
+        }
 
         return roboticsCaseData;
     }

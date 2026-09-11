@@ -87,7 +87,7 @@
       <bpmn:incoming>Flow_Claimant_Lip</bpmn:incoming>
       <bpmn:outgoing>Flow_LipApplicant_ToRpa</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_LipApplicant_ToRpa" sourceRef="BreathingSpaceLiftedNotifyLipApplicant" targetRef="NotifyRpaBsLifted" />
+    <bpmn:sequenceFlow id="Flow_LipApplicant_ToRpa" sourceRef="BreathingSpaceLiftedNotifyLipApplicant" targetRef="Activity_0g68wbz" />
 
     <bpmn:serviceTask id="NotifyApplicantSolicitorBSLifted" name="Notify Applicant Solicitor" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
@@ -98,18 +98,8 @@
       <bpmn:incoming>Flow_Claimant_Lr</bpmn:incoming>
       <bpmn:outgoing>Flow_LrApplicant_ToRpa</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_LrApplicant_ToRpa" sourceRef="NotifyApplicantSolicitorBSLifted" targetRef="NotifyRpaBsLifted" />
+    <bpmn:sequenceFlow id="Flow_LrApplicant_ToRpa" sourceRef="NotifyApplicantSolicitorBSLifted" targetRef="Activity_0g68wbz" />
 
-    <bpmn:serviceTask id="NotifyRpaBsLifted" name="Notify RPA on Continuous Feed" camunda:type="external" camunda:topic="processCaseEvent">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">NOTIFY_RPA_ON_CONTINUOUS_FEED</camunda:inputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_LrApplicant_ToRpa</bpmn:incoming>
-      <bpmn:incoming>Flow_LipApplicant_ToRpa</bpmn:incoming>
-      <bpmn:outgoing>Flow_1kass09</bpmn:outgoing>
-    </bpmn:serviceTask>
     <bpmn:endEvent id="Event_1g0kcde">
       <bpmn:incoming>Flow_1kj896s</bpmn:incoming>
     </bpmn:endEvent>
@@ -117,11 +107,11 @@
       <bpmn:extensionElements>
         <camunda:in variables="all" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1kass09</bpmn:incoming>
+      <bpmn:incoming>Flow_LrApplicant_ToRpa</bpmn:incoming>
+      <bpmn:incoming>Flow_LipApplicant_ToRpa</bpmn:incoming>
       <bpmn:outgoing>Flow_1kj896s</bpmn:outgoing>
     </bpmn:callActivity>
     <bpmn:sequenceFlow id="Flow_1kj896s" sourceRef="Activity_0g68wbz" targetRef="Event_1g0kcde" />
-    <bpmn:sequenceFlow id="Flow_1kass09" sourceRef="NotifyRpaBsLifted" targetRef="Activity_0g68wbz" />
   </bpmn:process>
   <bpmn:message id="Message_1bt9nfa" name="LIFT_BREATHING_SPACE_SPEC" />
   <bpmn:message id="Message_1sxevdt" name="LIFT_BREATHING_SPACE_SPEC" />
@@ -168,9 +158,6 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_LipApplicant_di" bpmnElement="BreathingSpaceLiftedNotifyLipApplicant">
         <dc:Bounds x="730" y="350" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1yug86e_di" bpmnElement="NotifyRpaBsLifted">
-        <dc:Bounds x="890" y="190" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0g68wbz_di" bpmnElement="Activity_0g68wbz">
         <dc:Bounds x="1050" y="190" width="100" height="80" />
@@ -219,15 +206,12 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_LrApplicant_ToRpa_di" bpmnElement="Flow_LrApplicant_ToRpa">
         <di:waypoint x="830" y="230" />
-        <di:waypoint x="890" y="230" />
+        <di:waypoint x="1050" y="230" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_LipApplicant_ToRpa_di" bpmnElement="Flow_LipApplicant_ToRpa">
         <di:waypoint x="830" y="390" />
         <di:waypoint x="940" y="390" />
-        <di:waypoint x="940" y="270" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1kass09_di" bpmnElement="Flow_1kass09">
-        <di:waypoint x="990" y="230" />
+        <di:waypoint x="940" y="230" />
         <di:waypoint x="1050" y="230" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1kj896s_di" bpmnElement="Flow_1kj896s">
