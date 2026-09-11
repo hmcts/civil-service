@@ -70,7 +70,11 @@ public class AsyncCaseMigrationService {
                     caseReference.getCaseReference(),
                     ClaimEvent.MIGRATE_CASE
                 );
-                CaseDataContent caseDataContent = buildCmcCaseDataContent(startEventResponse, task);
+                Map<String, Object> caseData = task.migrateCmcCaseData(
+                    startEventResponse.getCaseDetails(),
+                    caseReference
+                );
+                CaseDataContent caseDataContent = buildCmcCaseDataContent(startEventResponse, caseData, task);
                 coreCaseDataService.submitCMCUpdate(caseReference.getCaseReference(), caseDataContent);
                 log.info("CMC migration event completed for case ID: {}", caseReference.getCaseReference());
             } catch (RuntimeException e) {
@@ -180,15 +184,18 @@ public class AsyncCaseMigrationService {
             .build();
     }
 
-    protected CaseDataContent buildCmcCaseDataContent(StartEventResponse startEventResponse, MigrationTask<?> task) {
-        Map<String, Object> existingData = new HashMap<>(startEventResponse.getCaseDetails().getData());
+    protected CaseDataContent buildCmcCaseDataContent(
+        StartEventResponse startEventResponse,
+        Map<String, Object> caseData,
+        MigrationTask<?> task
+    ) {
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
             .event(Event.builder().id(startEventResponse.getEventId())
                        .summary(task.getEventSummary())
                        .description(task.getEventDescription())
                        .build())
-            .data(existingData)
+            .data(caseData)
             .build();
     }
 }
