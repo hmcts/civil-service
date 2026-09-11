@@ -7,7 +7,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
-import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.judgementbuffer.JudgementBufferExpiredSearchService;
@@ -36,11 +35,11 @@ public class JudgementBufferScheduler implements CivilScheduler {
     @Override
     public void runScheduledTask() {
         if (featureToggleService.isJudgmentBufferEnabled()) {
-            scheduledTaskRunner.run(ScheduledTaskConfiguration.<CaseDetails, Long>builder()
-                .schedulerName(SCHEDULER_NAME)
-                .searchResultSupplier(searchService::getElasticSearchResult)
-                .scheduledTask(judgementBufferScheduledTask)
-                .build());
+            scheduledTaskRunner.run(
+                SCHEDULER_NAME,
+                searchService::getElasticSearchResult,
+                judgementBufferScheduledTask
+            );
         }
     }
 }
