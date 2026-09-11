@@ -64,7 +64,7 @@ public class CamundaErrorAwareBackoffStrategy implements ErrorAwareBackoffStrate
             return 0L;
         }
 
-        long backoffTime = (long) (initTime * Math.pow(factor, currentLevel - 1));
+        long backoffTime = (long) (initTime * Math.pow(factor, (double) currentLevel - 1));
         return Math.min(backoffTime, maxTime);
     }
 }
