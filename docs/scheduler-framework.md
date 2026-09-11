@@ -88,8 +88,15 @@ public abstract class GACaseFilter {
 ```
 Standardizing GA filters reduces boilerplate and ensures consistent date handling across the GA sub-domain.
 
-### Date and Time Handling
-Always use the Spring-injected `Time` service for any date or time calculations. This ensures consistency across the application and allows for easy mocking in unit tests.
+### Date, Time, and Performance Handling
+Always use the Spring-injected `Time` service for any date or time logic involving business rules (e.g., checking deadlines).
+
+For performance monitoring and execution timing, the framework uses Spring's `StopWatch`. This provides:
+- **Consistency**: Unified timing mechanism across `ScheduledTaskRunner`, `ScheduledTaskProcessor`, and `InterceptorChain`.
+- **Granularity**: The ability to measure distinct phases (e.g., search duration vs. processing duration) within a single execution.
+- **Accuracy**: Uses `System.nanoTime()` internally for precise measurement of code execution.
+
+When implementing new components that require timing, prefer `StopWatch` over `Instant.now()` to maintain framework consistency.
 
 ```java
 private final Time time;

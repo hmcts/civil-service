@@ -47,7 +47,7 @@ public class GAUnlessOrderScheduler implements CivilScheduler {
                     .stream()
                     .filter(gaUnlessOrderDeadlineFilter::hasExpiredUnlessOrderDeadline)
                     .toList();
-                return new ListTaskResult<>(applications, applications.size());
+                return new ListTaskResult<>(applications);
             },
             gaUnlessOrderScheduledTask
         );

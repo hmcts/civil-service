@@ -57,14 +57,12 @@ public class InterceptorChain<T> {
     public void next(InterceptorContext<T> context) {
         if (index < interceptors.size()) {
             SchedulerInterceptor<T> interceptor = interceptors.get(index++);
-            if (log.isDebugEnabled()) {
-                log.debug("Executing interceptor: {}", interceptor.getClass().getSimpleName());
-            }
-
             String taskName = interceptor.getClass().getSimpleName();
             long beforeDownstream = totalDownstreamTimeNanos;
+
             StopWatch stopWatch = stopWatchFactory.apply(taskName);
             stopWatch.start();
+
             try {
                 interceptor.accept(context, this);
             } finally {
@@ -77,8 +75,10 @@ public class InterceptorChain<T> {
         } else if (index == interceptors.size()) {
             index++;
             taskExecuted = true;
+
             StopWatch stopWatch = stopWatchFactory.apply("FinalTask");
             stopWatch.start();
+
             try {
                 finalTask.accept(context);
             } finally {

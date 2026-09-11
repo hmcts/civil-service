@@ -49,8 +49,8 @@ public class MediationFileTransferSchedulerIT {
     void shouldExecuteMediationFileTransferScheduler() {
         CaseData csvCase = CaseData.builder().ccdCaseReference(1L).build();
         CaseData jsonCase = CaseData.builder().ccdCaseReference(2L).build();
-        TaskResult<CaseData> csvResult = new ListTaskResult<>(List.of(csvCase), 1);
-        TaskResult<CaseData> jsonResult = new ListTaskResult<>(List.of(jsonCase), 1);
+        TaskResult<CaseData> csvResult = new ListTaskResult<>(List.of(csvCase));
+        TaskResult<CaseData> jsonResult = new ListTaskResult<>(List.of(jsonCase));
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         when(searchService.getInMediationCsv()).thenReturn(csvResult);
         when(searchService.getInMediationJson()).thenReturn(jsonResult);
