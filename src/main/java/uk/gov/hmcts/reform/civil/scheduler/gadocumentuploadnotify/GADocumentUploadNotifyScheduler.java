@@ -11,8 +11,8 @@ import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.common.ListTaskResult;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
-
 import java.util.List;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -39,8 +39,9 @@ public class GADocumentUploadNotifyScheduler implements CivilScheduler {
         scheduledTaskRunner.run(ScheduledTaskConfiguration.<CaseDetails, Long>builder()
             .schedulerName(SCHEDULER_NAME)
             .searchResultSupplier(() -> {
-                List<CaseDetails> applications = searchService.getApplications().stream().toList();
-                return new ListTaskResult<>(applications, applications.size());
+                Set<CaseDetails> applications = searchService.getApplications();
+                List<CaseDetails> applicationsList = applications.stream().toList();
+                return new ListTaskResult<>(applicationsList, applicationsList.size());
             })
             .scheduledTask(gaDocumentUploadNotifyScheduledTask)
             .build());

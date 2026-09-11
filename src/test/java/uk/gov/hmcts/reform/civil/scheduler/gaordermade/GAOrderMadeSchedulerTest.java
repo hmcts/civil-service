@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
+import uk.gov.hmcts.reform.civil.scheduler.common.ListTaskResult;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.scheduler.common.TaskResult;
 
@@ -55,6 +56,8 @@ class GAOrderMadeSchedulerTest {
             supplierCaptor.capture(),
             eq(gaOrderMadeScheduledTask)
         );
-        assertThat(supplierCaptor.getValue().get().itemStream()).containsExactly(expiredCaseDetails);
+        TaskResult<CaseDetails> result = supplierCaptor.getValue().get();
+        assertThat(result).isInstanceOf(ListTaskResult.class);
+        assertThat(result.itemStream()).containsExactly(expiredCaseDetails);
     }
 }
