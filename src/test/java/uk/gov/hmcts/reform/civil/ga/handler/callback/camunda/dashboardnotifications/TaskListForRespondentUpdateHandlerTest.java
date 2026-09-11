@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotificat
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -40,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_ACTION_NEEDED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_IN_PROGRESS_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
 public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
@@ -69,6 +72,48 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
 
     @Nested
     class AboutToSubmitCallback {
+
+        @ParameterizedTest
+        @CsvSource({
+            "Listed for a Hearing, YES",
+            "Listed for a Hearing, NO",
+            "List for hearing, YES",
+            "List for hearing, NO"
+        })
+        void shouldKeepHearingListingInProgressWhenAnotherApplicationHasFinished(String storedStatus,
+                                                                               YesOrNo parentClaimantIsApplicant) {
+            CaseDetails caseDetails = CaseDetails.builder().build();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
+            caseData = caseData.copy()
+                .parentCaseReference(caseData.getCcdCaseReference().toString())
+                .isGaApplicantLip(YesOrNo.YES)
+                .respondent1Represented(YesOrNo.NO)
+                .respondentSolGaAppDetails(List.of(
+                    element(new GADetailsRespondentSol()
+                        .setParentClaimantIsApplicant(parentClaimantIsApplicant)
+                        .setCaseState(storedStatus)),
+                    element(new GADetailsRespondentSol()
+                        .setParentClaimantIsApplicant(YesOrNo.YES)
+                        .setCaseState("Order Made"))))
+                .build();
+            when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
+            when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(UPDATE_RESPONDENT_TASK_LIST_GA.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getParentCaseReference(),
+                SCENARIO_AAA6_GENERAL_APPLICATION_IN_PROGRESS_DEFENDANT.getScenario(),
+                "BEARER_TOKEN",
+                new ScenarioRequestParams(scenarioParams)
+            );
+            assertThat(caseData.getRespondentSolGaAppDetails().getFirst().getValue().getCaseState()).isEqualTo(storedStatus);
+        }
 
         @Test
         void shouldRecordDefendantScenarioActionNeeded_whenInvoked_claimantIsApplicant() {
