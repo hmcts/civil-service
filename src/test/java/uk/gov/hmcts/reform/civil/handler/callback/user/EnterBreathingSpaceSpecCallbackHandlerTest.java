@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -18,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE
 
 public class EnterBreathingSpaceSpecCallbackHandlerTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     private final EnterBreathingSpaceSpecCallbackHandler callbackHandler
         = new EnterBreathingSpaceSpecCallbackHandler(objectMapper);
 
@@ -87,9 +88,8 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
     }
 
     @Test
-    public void whenEndDateIsNotFuture_thenReturnError() {
+    public void whenStartDateFieldIsNotPresent_thenDefaultToToday() {
         BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
-        enterInfo.setExpectedEnd(LocalDate.now());
         BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
         breathingInfo.setEnter(enterInfo);
         CaseData caseData = CaseData.builder().build();
@@ -97,17 +97,19 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
 
         CallbackParams params = new CallbackParams()
             .caseData(caseData)
-            .type(CallbackType.MID)
-            .pageId("enter-info");
+            .type(CallbackType.ABOUT_TO_SUBMIT);
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
-        Assertions.assertFalse(response.getErrors().isEmpty());
+        assertThat(response.getData())
+            .extracting("enterBreathing")
+            .extracting("start")
+            .isEqualTo(LocalDate.now().toString());
     }
 
     @Test
-    public void whenEndDateIsFuture_thenReturnNoError() {
+    public void whenStartDateFieldIsPresent_thenDontDefaultToToday() {
         BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
-        enterInfo.setExpectedEnd(LocalDate.now().plusDays(1));
+        enterInfo.setStart(LocalDate.now().minusDays(1));
         BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
         breathingInfo.setEnter(enterInfo);
         CaseData caseData = CaseData.builder().build();
@@ -115,11 +117,13 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
 
         CallbackParams params = new CallbackParams()
             .caseData(caseData)
-            .type(CallbackType.MID)
-            .pageId("enter-info");
+            .type(CallbackType.ABOUT_TO_SUBMIT);
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
-        Assertions.assertTrue(response.getErrors().isEmpty());
+        assertThat(response.getData())
+            .extracting("enterBreathing")
+            .extracting("start")
+            .isEqualTo(LocalDate.now().minusDays(1).toString());
     }
 
     @Test
@@ -139,6 +143,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
     @Test
     void testAboutToSubmitCallback() {
         CaseData caseData = CaseData.builder().build();
+        caseData.setBreathing(new BreathingSpaceInfo());
 
         CallbackParams params = new CallbackParams()
             .caseData(caseData)
@@ -146,6 +151,7 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
         Assertions.assertTrue(response.getData().containsKey("businessProcess"));
+        Assertions.assertEquals("Yes", response.getData().get("breathingSpaceActive"));
     }
 
     @Test
