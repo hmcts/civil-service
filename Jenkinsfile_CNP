@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@2.7.0")
+@Library("Infrastructure@2.8.0")
 
 import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
