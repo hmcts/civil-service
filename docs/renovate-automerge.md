@@ -70,3 +70,55 @@ Defaults:
 - `threshold`: `1`
 
 To enable Slack delivery, add repository secret `RENOVATE_ALERT_SLACK_WEBHOOK_URL` with the target team-channel incoming webhook URL. Without the secret, the workflow still fails visibly and records the stalled PR list in the Actions run summary.
+
+## Merge window and Jenkins availability
+
+Renovate schedules use the `Europe/London` timezone inherited from the shared HMCTS preset. The repository currently permits Renovate activity after 08:00 and before 11:00 on weekdays. Most automerge-enabled package rules override only the merge window with `before 4pm every weekday`.
+
+The PTL Jenkins configuration is maintained in [`cnp-flux-config`](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/ptl-intsvc/jenkins.yaml). The controller and surrounding Flux manifests do not define an overnight shutdown schedule. The configured Kubernetes agents are created as required and discarded after 10 idle minutes. Azure VM agents have a five-minute idle retention strategy, while their shared template sets `shutdownOnIdle: false`. These agent lifecycle settings are not a scheduled shutdown of the Jenkins controller.
+
+Therefore, the checked-in configuration does not show Jenkins being unavailable outside office hours. However, automerge still depends on all required checks being present and successful for the current PR head:
+
+- A PR whose current head already has successful required checks can merge during its allowed automerge window.
+- If Renovate rebases or updates the branch, the new head must complete Jenkins and the other required checks before it can merge.
+- Any separate platform maintenance, cluster shutdown or Jenkins outage can leave the required Jenkins status pending or failed and will block automerge safely.
+
+To keep CI and merges inside a clear supported-hours window, prefer an explicit window on every automerge-enabled package rule:
+
+```json
+"automergeSchedule": ["after 8am and before 4pm every weekday"]
+```
+
+Using only `before 4pm every weekday` also includes the period after midnight. It should not be described as an out-of-hours exclusion.
+
+## Release freeze
+
+Use a code-controlled Renovate package rule for a planned release freeze. This is reviewable, auditable and consistent across repository administrators. LaunchDarkly is not suitable because Renovate evaluates repository configuration in Mend and does not call the application or its runtime feature flags.
+
+Add the following rule as the final item in `.github/renovate.json` under `packageRules`:
+
+```json
+{
+  "description": "Release freeze: disable Renovate automerge",
+  "matchPackageNames": ["*"],
+  "automerge": false
+}
+```
+
+The rule must remain last because Renovate combines all matching package rules and later values take precedence. It disables automerge without disabling dependency discovery or stopping Renovate from maintaining PRs.
+
+### Start a freeze
+
+1. Add the final freeze rule in a named pull request, including the release or change reference and intended end date in the PR description.
+2. Merge the rule before the freeze starts and manually run Renovate, or wait for its next scheduled run, so the configuration is applied.
+3. Check open Renovate PRs and disable any GitHub auto-merge requests that were enabled before the freeze. The new rule prevents Renovate from enabling automerge; it should not be relied on to cancel an auto-merge request already stored by GitHub.
+4. Confirm the Mend job log resolves the freeze rule with `automerge: false` and record the verification in the release ticket.
+
+### End a freeze
+
+1. Remove the freeze rule through a pull request after release approval is given.
+2. Merge the change and manually run Renovate, or wait for its next scheduled run.
+3. Verify a clean, in-scope Renovate PR is offered for automerge and merges only after all required checks pass.
+4. Continue monitoring `.github/workflows/renovate-stalled-alert.yml` for queues blocked by failed checks, required reviews or stale branches.
+
+For an emergency stop, the repository can instead be paused in the Mend Developer Portal. Pausing is broader than a release freeze because it also stops update discovery, rebases and PR maintenance. Changing branch protection is not recommended as a routine toggle because it affects all contributors and makes intentional freezes look like authorization failures.
