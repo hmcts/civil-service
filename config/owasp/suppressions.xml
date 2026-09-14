@@ -64,4 +64,79 @@
         <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin-stdlib@2\.4\.10$</packageUrl>
         <cve>CVE-2026-53914</cve>
     </suppress>
+    <suppress until="2026-11-10Z">
+        <notes><![CDATA[
+        NOT a false positive. Real, currently-unpatched CVE(s). Suppressed under DTSCCI-6387
+        because there is no released version to upgrade to: org.springframework 6.2.19
+        is the newest release in its line as of 2026-09-10. Clearing these requires moving to
+        Spring Boot 4.x (Spring Framework 7 / Spring Security 7), tracked separately.
+        Expires 2026-11-10Z - re-check for upstream patches then; do not extend without review.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework/spring-.*@6\.2\.19$</packageUrl>
+        <cve>CVE-2026-47890</cve>
+        <cve>CVE-2026-47891</cve>
+        <cve>CVE-2026-47892</cve>
+        <cve>CVE-2026-47893</cve>
+        <cve>CVE-2026-59280</cve>
+        <cve>CVE-2026-59281</cve>
+        <cve>CVE-2026-59282</cve>
+        <cve>CVE-2026-59283</cve>
+        <cve>CVE-2026-59313</cve>
+        <cve>CVE-2026-59314</cve>
+        <!-- second disclosure batch, published to NVD 2026-09-11 -->
+        <cve>CVE-2026-47883</cve>
+        <cve>CVE-2026-47884</cve>
+        <cve>CVE-2026-47885</cve>
+        <cve>CVE-2026-47886</cve>
+        <cve>CVE-2026-47887</cve>
+        <cve>CVE-2026-47888</cve>
+        <cve>CVE-2026-47889</cve>
+    </suppress>
+    <suppress until="2026-11-10Z">
+        <notes><![CDATA[
+        NOT a false positive. Real, currently-unpatched CVE(s). Suppressed under DTSCCI-6387
+        because there is no released version to upgrade to: org.springframework.security 6.5.11
+        is the newest release in its line as of 2026-09-10. Clearing these requires moving to
+        Spring Boot 4.x (Spring Framework 7 / Spring Security 7), tracked separately.
+        Expires 2026-11-10Z - re-check for upstream patches then; do not extend without review.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-.*@6\.5\.11$</packageUrl>
+        <cve>CVE-2026-47841</cve>
+        <cve>CVE-2026-47842</cve>
+        <cve>CVE-2026-59270</cve>
+        <cve>CVE-2026-59276</cve>
+    </suppress>
+    <suppress until="2026-11-10Z">
+        <notes><![CDATA[
+        NOT a false positive. Real, currently-unpatched CVE(s). Suppressed under DTSCCI-6387
+        because there is no released version to upgrade to: org.springframework.cloud 4.3.3
+        is the newest release in its line as of 2026-09-10. Clearing these requires moving to
+        Spring Boot 4.x (Spring Framework 7 / Spring Security 7), tracked separately.
+        Expires 2026-11-10Z - re-check for upstream patches then; do not extend without review.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.cloud/spring-cloud-.*@4\.3\.3$</packageUrl>
+        <cve>CVE-2026-59284</cve>
+    </suppress>
+    <suppress until="2026-11-10Z">
+        <notes><![CDATA[
+        NOT a false positive. Real, currently-unpatched CVE(s). Suppressed under DTSCCI-6387
+        because there is no released version to upgrade to: org.springframework.data 3.5.13
+        is the newest release in its line as of 2026-09-10. Clearing these requires moving to
+        Spring Boot 4.x (Spring Framework 7 / Spring Security 7), tracked separately.
+        Expires 2026-11-10Z - re-check for upstream patches then; do not extend without review.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.data/spring-data-jpa@3\.5\.13$</packageUrl>
+        <cve>CVE-2026-47834</cve>
+    </suppress>
+    <suppress until="2026-11-10Z">
+        <notes><![CDATA[
+        NOT a false positive. Real, currently-unpatched CVE(s). Suppressed under DTSCCI-6387
+        because there is no released version to upgrade to: io.projectreactor.netty 1.2.18
+        is the newest release in its line as of 2026-09-10. Clearing these requires moving to
+        Spring Boot 4.x (Spring Framework 7 / Spring Security 7), tracked separately.
+        Expires 2026-11-10Z - re-check for upstream patches then; do not extend without review.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.projectreactor\.netty/reactor-netty-.*@1\.2\.18$</packageUrl>
+        <cve>CVE-2026-47874</cve>
+    </suppress>
 </suppressions>

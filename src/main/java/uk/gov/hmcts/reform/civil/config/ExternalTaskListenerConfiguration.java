@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.civil.config;
 
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.util.Timeout;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.backoff.ExponentialBackoffStrategy;
@@ -48,6 +52,14 @@ public class ExternalTaskListenerConfiguration {
             eventProperties.getClientBackoffMax());
     }
 
+    /**
+     * HttpClient 5 pool tuning for Camunda {@code fetchAndLock} (EXC-CS-037).
+     *
+     * <p>Default {@code validateAfterInactivity} is unset, so stale keep-alive sockets
+     * are reused after Camunda pod restarts or idle timeouts and surface as
+     * {@code NoHttpResponseException}. Do not set a 30s response timeout here: the
+     * long-poll {@code asyncResponseTimeout} is 29500ms and would race it (EXC-CS-105).
+     */
     @Bean
     public ExternalTaskClient client(BackoffStrategy externalTaskBackoffStrategy) {
         return ExternalTaskClient.create()
@@ -57,6 +69,17 @@ public class ExternalTaskListenerConfiguration {
             .backoffStrategy(externalTaskBackoffStrategy)
             .lockDuration(eventProperties.getLockDuration()) //wait for some time to finish task before it gets picked by another client
             .baseUrl(baseUrl)
+            .customizeHttpClient(httpClientBuilder -> httpClientBuilder
+                .setConnectionManager(PoolingHttpClientConnectionManagerBuilder.create()
+                    .setDefaultConnectionConfig(ConnectionConfig.custom()
+                        .setValidateAfterInactivity(TimeValue.ofMilliseconds(
+                            eventProperties.getHttpValidateAfterInactivityMs()))
+                        .setConnectTimeout(Timeout.ofMilliseconds(5000))
+                        .build())
+                    .build())
+                .evictExpiredConnections()
+                .evictIdleConnections(TimeValue.ofSeconds(10))
+                .setRetryStrategy(new CamundaStaleConnectionRetryStrategy()))
             .build();
     }
 
