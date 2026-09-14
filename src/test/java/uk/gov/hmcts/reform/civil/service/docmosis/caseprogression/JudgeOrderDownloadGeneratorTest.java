@@ -308,6 +308,25 @@ class JudgeOrderDownloadGeneratorTest {
     }
 
     @Test
+    void shouldGenerateBlankTemplateBeforeHearing_whenTemplateOptionIsMissing() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(BLANK_TEMPLATE_BEFORE_HEARING_DOCX), eq("docx")))
+            .thenReturn(new DocmosisDocument(BLANK_TEMPLATE_BEFORE_HEARING_DOCX.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(FILE_BLANK_BEFORE_HEARING, bytes, JUDGE_FINAL_ORDER)))
+            .thenReturn(BLANK_TEMPLATE_BEFORE_HEARING);
+        when(documentHearingLocationHelper.getCaseManagementLocationDetailsNro(any(), any(), any())).thenReturn(locationRefData);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .finalOrderSelection(FinalOrderSelection.DOWNLOAD_ORDER_TEMPLATE)
+            .finalOrderDownloadTemplateOptions(null)
+            .caseManagementLocation(caseManagementLocation)
+            .build();
+        CaseDocument caseDocument = judgeOrderDownloadGenerator.generate(caseData, BEARER_TOKEN);
+
+        assertNotNull(caseDocument);
+        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_BLANK_BEFORE_HEARING, bytes, JUDGE_FINAL_ORDER));
+    }
+
+    @Test
     void shouldGenerateBlankTemplateAfterHearing_whenOptionSelected() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(BLANK_TEMPLATE_AFTER_HEARING_DOCX), eq("docx")))
             .thenReturn(new DocmosisDocument(BLANK_TEMPLATE_AFTER_HEARING_DOCX.getDocumentTitle(), bytes));

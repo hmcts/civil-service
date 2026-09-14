@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.controllers.fees;
 
+import feign.FeignException;
+import feign.Request;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,7 @@ import uk.gov.hmcts.reform.civil.service.PaymentRequestUpdateCallbackService;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -77,13 +80,13 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
     }
 
     @Test
-    public void whenPaymentCallbackIsReceivedWithServiceAuthorisationButreturnsfalseReturn400() throws Exception {
-        when(authorisationService.isPaymentCallbackServiceAuthorized(any())).thenReturn(false);
+    public void whenPaymentCallbackIsReceivedWithServiceAuthorisationButReturnsFalseReturn401() throws Exception {
+        when(authorisationService.isServiceAuthorized(any())).thenReturn(false);
         mockMvc.perform(
             MockMvcRequestBuilders.put(PAYMENT_CALLBACK_URL, "")
                 .header(SERVICE_AUTHORIZATION, S2S_AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(toJson(buildServiceDto()))).andExpect(status().is5xxServerError());
+                .content(toJson(buildServiceDto()))).andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -116,6 +119,21 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
             .andExpect(status().is5xxServerError());
     }
 
+    @Test
+    public void whenServiceRequestUpdateRequestButDownstreamGatewayTimeoutOccurs_thenHttp503() throws Exception {
+        doThrow(new FeignException.GatewayTimeout(
+            "Gateway Timeout",
+            request(),
+            new byte[]{},
+            Map.of()
+        ))
+            .when(requestUpdateCallbackService)
+            .processCallback(any(), any());
+
+        doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
+            .andExpect(status().isServiceUnavailable());
+    }
+
     private ServiceRequestUpdateDto buildServiceDto() {
         return new ServiceRequestUpdateDto()
             .setCcdCaseNumber(CCD_CASE_NUMBER)
@@ -126,6 +144,10 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
                 .caseReference(REFERENCE)
                 .accountNumber(ACCOUNT_NUMBER)
                 .build());
+    }
+
+    private Request request() {
+        return Request.create(Request.HttpMethod.GET, "url", Map.of(), null, null, null);
     }
 
     @SneakyThrows

@@ -48,12 +48,13 @@ public class CoreCaseUserService {
                 .filter(c -> c.getUserId().equals(userId)).distinct()
                 .map(CaseAssignedUserRole::getCaseRole).toList();
         } catch (FeignException.GatewayTimeout | FeignException.BadGateway | FeignException.ServiceUnavailable e) {
+            log.error("Retryable FeignException caseId: {} userId: {}", caseId, userId);
             throw new RetryableCaseUserException(e.getMessage(), e);
         } catch (FeignException.NotFound ex) {
-            log.error("User Roles not found", ex);
+            log.error("User roles not found for caseId: {} userId: {}", caseId, userId, ex);
             return Collections.emptyList();
         } catch (Exception ex) {
-            log.error("[CoreCaseUserService] Unexpected error occurred", ex);
+            log.error("[CoreCaseUserService] Unexpected error occurred for caseId: {} userId: {}", caseId, userId, ex);
             return Collections.emptyList();
         }
     }
