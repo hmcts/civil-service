@@ -73,33 +73,17 @@ To enable Slack delivery, add repository secret `RENOVATE_ALERT_SLACK_WEBHOOK_UR
 
 ## Merge window and Jenkins availability
 
-Renovate schedules use the `Europe/London` timezone inherited from the shared HMCTS preset. The repository currently permits Renovate activity after 08:00 and before 11:00 on weekdays. Most automerge-enabled package rules override only the merge window with `before 4pm every weekday`.
+Renovate uses the `Europe/London` timezone inherited from the shared HMCTS preset. PTL Jenkins runs on `cft-ptl-00-aks`, which [`hmcts/auto-shutdown`](https://github.com/hmcts/auto-shutdown) normally stops from 20:00 to 06:30 daily. There is no scheduled weekend startup. An approved exclusion is required for overnight or weekend use; it can postpone shutdown until 23:00 or keep PTL running overnight.
 
-The PTL Jenkins configuration is maintained in [`cnp-flux-config`](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/ptl-intsvc/jenkins.yaml). The Jenkins manifests do not define the platform shutdown schedule. They configure Kubernetes agents to be discarded after 10 idle minutes and Azure VM agents with a five-minute idle retention strategy; these agent lifecycle settings are separate from the cluster schedule.
-
-The underlying `cft-ptl-00-aks` cluster is tagged for shutdown and is controlled by [`hmcts/auto-shutdown`](https://github.com/hmcts/auto-shutdown). Its README states the default cluster outage as 20:00 to 06:30 every day. The current workflows provide the more precise implementation details:
-
-- Shutdown runs are scheduled every day at `19:00` and `22:00` UTC, documented in the workflow as 20:00 and 23:00 BST.
-- The normal 20:00 BST run stops PTL unless an approved exclusion applies.
-- An exclusion with `stay_on_late: No` postpones shutdown until the 23:00 BST run. `stay_on_late: Yes` also skips the later run.
-- Startup is scheduled on weekdays at `05:11` UTC, documented in the workflow as 06:11 BST. The README describes the default availability boundary as 06:30, allowing time for startup.
-- There is no scheduled weekend startup. An environment required over a weekend needs an exclusion beginning on Friday, as stated by the exclusion request form.
-
-The cron expressions are fixed in UTC. Their inline comments describe BST, so the wall-clock times during GMT are one hour earlier unless the workflows are seasonally updated. For operational planning, use the published 20:00-06:30 outage window, avoid its boundaries, and check the current workflows and exclusion dashboard before relying on out-of-hours Jenkins availability.
-
-Automerge depends on all required checks being present and successful for the current PR head:
-
-- A PR whose current head already has successful required checks can merge during its allowed automerge window.
-- If Renovate rebases or updates the branch, the new head must complete Jenkins and the other required checks before it can merge.
-- Any separate platform maintenance, cluster shutdown or Jenkins outage can leave the required Jenkins status pending or failed and will block automerge safely.
-
-To keep CI and merges inside a clear supported-hours window, prefer an explicit window on every automerge-enabled package rule:
+If Renovate updates or rebases a PR while Jenkins is unavailable, the required check cannot complete and automerge remains blocked. Each Renovate merge also advances `master`, which can make developer and other Renovate branches stale and trigger rebases or repeated CI. Keep the merge window short and early in the working day to limit that disruption while Jenkins is available:
 
 ```json
-"automergeSchedule": ["after 8am and before 4pm every weekday"]
+"automergeSchedule": ["after 8am and before 11am every weekday"]
 ```
 
-Using only `before 4pm every weekday` also includes the period after midnight. It should not be described as an out-of-hours exclusion.
+This window keeps Jenkins and support available while limiting disruption to developer PRs from changes to `master`, rebases and CI reruns. It also matches the repository's existing top-level Renovate schedule.
+
+Apply the same window to every automerge-enabled package rule so broader rule-level schedules do not override it. Using only `before 4pm every weekday` also permits merges after midnight. The stalled-queue alert remains the control for updates that cannot merge within the window.
 
 ## Release freeze
 
