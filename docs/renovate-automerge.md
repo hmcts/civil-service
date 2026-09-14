@@ -75,9 +75,19 @@ To enable Slack delivery, add repository secret `RENOVATE_ALERT_SLACK_WEBHOOK_UR
 
 Renovate schedules use the `Europe/London` timezone inherited from the shared HMCTS preset. The repository currently permits Renovate activity after 08:00 and before 11:00 on weekdays. Most automerge-enabled package rules override only the merge window with `before 4pm every weekday`.
 
-The PTL Jenkins configuration is maintained in [`cnp-flux-config`](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/ptl-intsvc/jenkins.yaml). The controller and surrounding Flux manifests do not define an overnight shutdown schedule. The configured Kubernetes agents are created as required and discarded after 10 idle minutes. Azure VM agents have a five-minute idle retention strategy, while their shared template sets `shutdownOnIdle: false`. These agent lifecycle settings are not a scheduled shutdown of the Jenkins controller.
+The PTL Jenkins configuration is maintained in [`cnp-flux-config`](https://github.com/hmcts/cnp-flux-config/blob/master/apps/jenkins/jenkins/ptl-intsvc/jenkins.yaml). The Jenkins manifests do not define the platform shutdown schedule. They configure Kubernetes agents to be discarded after 10 idle minutes and Azure VM agents with a five-minute idle retention strategy; these agent lifecycle settings are separate from the cluster schedule.
 
-Therefore, the checked-in configuration does not show Jenkins being unavailable outside office hours. However, automerge still depends on all required checks being present and successful for the current PR head:
+The underlying `cft-ptl-00-aks` cluster is tagged for shutdown and is controlled by [`hmcts/auto-shutdown`](https://github.com/hmcts/auto-shutdown). Its README states the default cluster outage as 20:00 to 06:30 every day. The current workflows provide the more precise implementation details:
+
+- Shutdown runs are scheduled every day at `19:00` and `22:00` UTC, documented in the workflow as 20:00 and 23:00 BST.
+- The normal 20:00 BST run stops PTL unless an approved exclusion applies.
+- An exclusion with `stay_on_late: No` postpones shutdown until the 23:00 BST run. `stay_on_late: Yes` also skips the later run.
+- Startup is scheduled on weekdays at `05:11` UTC, documented in the workflow as 06:11 BST. The README describes the default availability boundary as 06:30, allowing time for startup.
+- There is no scheduled weekend startup. An environment required over a weekend needs an exclusion beginning on Friday, as stated by the exclusion request form.
+
+The cron expressions are fixed in UTC. Their inline comments describe BST, so the wall-clock times during GMT are one hour earlier unless the workflows are seasonally updated. For operational planning, use the published 20:00-06:30 outage window, avoid its boundaries, and check the current workflows and exclusion dashboard before relying on out-of-hours Jenkins availability.
+
+Automerge depends on all required checks being present and successful for the current PR head:
 
 - A PR whose current head already has successful required checks can merge during its allowed automerge window.
 - If Renovate rebases or updates the branch, the new head must complete Jenkins and the other required checks before it can merge.
