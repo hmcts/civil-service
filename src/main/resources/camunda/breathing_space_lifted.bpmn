@@ -45,7 +45,7 @@
       <bpmn:outgoing>Flow_LiftToRespondentSolicitor</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_0lzk3lu" sourceRef="NotifyApplicantSolicitorBSLifted" targetRef="Gateway_LipDefendantLift" />
-    <bpmn:sequenceFlow id="Flow_LiftLipToRpa" name="LiP Defendant" sourceRef="Gateway_LipDefendantLift" targetRef="NotifyRpaBsLifted">
+    <bpmn:sequenceFlow id="Flow_LiftLipToRpa" name="LiP Defendant" sourceRef="Gateway_LipDefendantLift" targetRef="Activity_0g68wbz">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.UNREPRESENTED_DEFENDANT_ONE &amp;&amp; flowFlags.UNREPRESENTED_DEFENDANT_ONE}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_LiftToRespondentSolicitor" name="LR Defendant" sourceRef="Gateway_LipDefendantLift" targetRef="NotifyRespondentSolicitorBSLifted">
@@ -60,16 +60,6 @@
       <bpmn:incoming>Flow_LiftToRespondentSolicitor</bpmn:incoming>
       <bpmn:outgoing>Flow_03l3ldx</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="NotifyRpaBsLifted" name="Notify RPA on Continuous Feed" camunda:type="external" camunda:topic="processCaseEvent">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">NOTIFY_RPA_ON_CONTINUOUS_FEED</camunda:inputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_03l3ldx</bpmn:incoming>
-      <bpmn:incoming>Flow_LiftLipToRpa</bpmn:incoming>
-      <bpmn:outgoing>Flow_1kass09</bpmn:outgoing>
-    </bpmn:serviceTask>
     <bpmn:endEvent id="Event_1g0kcde">
       <bpmn:incoming>Flow_1kj896s</bpmn:incoming>
     </bpmn:endEvent>
@@ -77,21 +67,17 @@
       <bpmn:extensionElements>
         <camunda:in variables="all" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1kass09</bpmn:incoming>
+      <bpmn:incoming>Flow_03l3ldx</bpmn:incoming>
+      <bpmn:incoming>Flow_LiftLipToRpa</bpmn:incoming>
       <bpmn:outgoing>Flow_1kj896s</bpmn:outgoing>
     </bpmn:callActivity>
     <bpmn:sequenceFlow id="Flow_1kj896s" sourceRef="Activity_0g68wbz" targetRef="Event_1g0kcde" />
-    <bpmn:sequenceFlow id="Flow_1kass09" sourceRef="NotifyRpaBsLifted" targetRef="Activity_0g68wbz" />
-    <bpmn:sequenceFlow id="Flow_03l3ldx" sourceRef="NotifyRespondentSolicitorBSLifted" targetRef="NotifyRpaBsLifted" />
+    <bpmn:sequenceFlow id="Flow_03l3ldx" sourceRef="NotifyRespondentSolicitorBSLifted" targetRef="Activity_0g68wbz" />
   </bpmn:process>
   <bpmn:message id="Message_1bt9nfa" name="LIFT_BREATHING_SPACE_SPEC" />
   <bpmn:message id="Message_1sxevdt" name="LIFT_BREATHING_SPACE_SPEC" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="BREATHING_SPACE_LIFTED">
-      <bpmndi:BPMNEdge id="Flow_1kass09_di" bpmnElement="Flow_1kass09">
-        <di:waypoint x="820" y="230" />
-        <di:waypoint x="850" y="230" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1kj896s_di" bpmnElement="Flow_1kj896s">
         <di:waypoint x="950" y="230" />
         <di:waypoint x="992" y="230" />
@@ -107,8 +93,8 @@
       <bpmndi:BPMNEdge id="Flow_LiftLipToRpa_di" bpmnElement="Flow_LiftLipToRpa">
         <di:waypoint x="550" y="205" />
         <di:waypoint x="550" y="140" />
-        <di:waypoint x="760" y="140" />
-        <di:waypoint x="760" y="190" />
+        <di:waypoint x="900" y="140" />
+        <di:waypoint x="900" y="190" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1nq6ydh_di" bpmnElement="Flow_1nq6ydh">
         <di:waypoint x="350" y="230" />
@@ -124,7 +110,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_03l3ldx_di" bpmnElement="Flow_03l3ldx">
         <di:waypoint x="700" y="230" />
-        <di:waypoint x="710" y="230" />
+        <di:waypoint x="850" y="230" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_0y09tpb_di" bpmnElement="Event_0y09tpb">
         <dc:Bounds x="172" y="212" width="36" height="36" />
@@ -155,9 +141,6 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0g68wbz_di" bpmnElement="Activity_0g68wbz">
         <dc:Bounds x="850" y="190" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1yug86e_di" bpmnElement="NotifyRpaBsLifted">
-        <dc:Bounds x="710" y="190" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0371z1y_di" bpmnElement="Event_0371z1y">
         <dc:Bounds x="282" y="172" width="36" height="36" />

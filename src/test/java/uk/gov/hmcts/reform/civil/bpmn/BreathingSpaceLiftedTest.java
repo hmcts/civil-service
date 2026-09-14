@@ -20,22 +20,19 @@ public class BreathingSpaceLiftedTest extends BpmnBaseTest {
         = "NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED";
     public static final String NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED
         = "NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED";
-    public static final String NOTIFY_RPA_ON_CONTINUOUS_FEED
-        = "NOTIFY_RPA_ON_CONTINUOUS_FEED";
 
     //ACTIVITY IDs
     public static final String NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID
         = "NotifyApplicantSolicitorBSLifted";
     public static final String NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID
         = "NotifyRespondentSolicitorBSLifted";
-    public static final String NOTIFY_RPA_ON_CONTINUOUS_FEED_ACTIVITY_ID = "NotifyRpaBsLifted";
 
     public BreathingSpaceLiftedTest() {
         super("breathing_space_lifted.bpmn", PROCESS_ID);
     }
 
     @Test
-    void shouldSuccessfullyCompleteBreathingSpaceLifted_withRpa() {
+    void shouldSuccessfullyCompleteBreathingSpaceLiftedWithoutRpa() {
         VariableMap variables = flowFlagVariables(false);
 
         assertFalse(processInstance.isEnded());
@@ -69,16 +66,6 @@ public class BreathingSpaceLiftedTest extends BpmnBaseTest {
                                    variables
         );
 
-        //complete the Robotics notification
-        ExternalTask forRobotics = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            forRobotics,
-            PROCESS_CASE_EVENT,
-            NOTIFY_RPA_ON_CONTINUOUS_FEED,
-            NOTIFY_RPA_ON_CONTINUOUS_FEED_ACTIVITY_ID,
-            variables
-        );
-
         ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);
         completeBusinessProcess(endBusinessProcess);
         assertNoExternalTasksLeft();
@@ -109,15 +96,6 @@ public class BreathingSpaceLiftedTest extends BpmnBaseTest {
         );
 
         // LiP defendant skips respondent solicitor notification
-        ExternalTask forRobotics = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            forRobotics,
-            PROCESS_CASE_EVENT,
-            NOTIFY_RPA_ON_CONTINUOUS_FEED,
-            NOTIFY_RPA_ON_CONTINUOUS_FEED_ACTIVITY_ID,
-            variables
-        );
-
         ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);
         completeBusinessProcess(endBusinessProcess);
         assertNoExternalTasksLeft();
