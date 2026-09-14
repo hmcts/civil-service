@@ -81,7 +81,7 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
 
     @Test
     public void whenPaymentCallbackIsReceivedWithServiceAuthorisationButReturnsFalseReturn401() throws Exception {
-        when(authorisationService.isServiceAuthorized(any())).thenReturn(false);
+        when(authorisationService.isPaymentCallbackServiceAuthorized(any())).thenReturn(false);
         mockMvc.perform(
             MockMvcRequestBuilders.put(PAYMENT_CALLBACK_URL, "")
                 .header(SERVICE_AUTHORIZATION, S2S_AUTH_TOKEN)

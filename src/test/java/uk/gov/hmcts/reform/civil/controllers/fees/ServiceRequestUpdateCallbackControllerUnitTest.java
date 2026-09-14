@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.exceptions.InternalServerErrorException;
+import uk.gov.hmcts.reform.civil.exceptions.InvalidTokenException;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import uk.gov.hmcts.reform.civil.service.PaymentRequestUpdateCallbackService;
@@ -44,15 +45,13 @@ class ServiceRequestUpdateCallbackControllerUnitTest {
     }
 
     @Test
-    void shouldThrowInternalServerErrorWhenServiceIsNotAuthorised() {
+    void shouldThrowInvalidTokenExceptionWhenServiceIsNotAuthorised() {
         ServiceRequestUpdateDto request = request();
         when(authorisationService.isPaymentCallbackServiceAuthorized(S2S_TOKEN)).thenReturn(false);
 
         assertThatThrownBy(() -> controller.serviceRequestUpdate(S2S_TOKEN, request))
-            .isInstanceOf(InternalServerErrorException.class)
-            .hasCauseInstanceOf(RuntimeException.class)
-            .cause()
-            .hasMessage("Invalid Client");
+            .isInstanceOf(InvalidTokenException.class)
+            .hasMessage("Invalid S2S token");
 
         verify(requestUpdateCallbackService, never()).processCallback(request, FeeType.HEARING.name());
     }
