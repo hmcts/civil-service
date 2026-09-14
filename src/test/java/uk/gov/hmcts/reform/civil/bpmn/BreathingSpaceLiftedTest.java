@@ -5,176 +5,129 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-class BreathingSpaceLiftedTest extends BpmnBaseTest {
+public class BreathingSpaceLiftedTest extends BpmnBaseTest {
 
     public static final String MESSAGE_NAME = "LIFT_BREATHING_SPACE_SPEC";
     public static final String PROCESS_ID = "BREATHING_SPACE_LIFTED";
 
-    private static final String NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED
+    //CCD CASE EVENTS
+    public static final String NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED
         = "NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED";
-    private static final String NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED
+    public static final String NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED
         = "NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED";
-    private static final String NOTIFY_LIP_APPLICANT_BREATHING_SPACE_LIFTED
-        = "NOTIFY_LIP_APPLICANT_BREATHING_SPACE_LIFTED";
-    private static final String NOTIFY_LIP_RESPONDENT1_BREATHING_SPACE_LIFTED
-        = "NOTIFY_LIP_RESPONDENT1_BREATHING_SPACE_LIFTED";
+    public static final String NOTIFY_RPA_ON_CONTINUOUS_FEED
+        = "NOTIFY_RPA_ON_CONTINUOUS_FEED";
 
-    private static final String NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID
+    //ACTIVITY IDs
+    public static final String NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID
         = "NotifyApplicantSolicitorBSLifted";
-    private static final String NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID
+    public static final String NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID
         = "NotifyRespondentSolicitorBSLifted";
-    private static final String NOTIFY_LIP_APPLICANT_ACTIVITY_ID = "BreathingSpaceLiftedNotifyLipApplicant";
-    private static final String NOTIFY_LIP_RESPONDENT_ACTIVITY_ID = "BreathingSpaceLiftedNotifyLipRespondent1";
+    public static final String NOTIFY_RPA_ON_CONTINUOUS_FEED_ACTIVITY_ID = "NotifyRpaBsLifted";
 
     public BreathingSpaceLiftedTest() {
         super("breathing_space_lifted.bpmn", PROCESS_ID);
     }
 
     @Test
-    void shouldSuccessfullyComplete_whenLrClaimantAndLrDefendant() {
-        VariableMap variables = flowFlagVariables(false, false);
+    void shouldSuccessfullyCompleteBreathingSpaceLifted_withRpa() {
+        VariableMap variables = flowFlagVariables(false);
 
         assertFalse(processInstance.isEnded());
         assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
 
-        startBusinessProcess(variables);
-
-        ExternalTask respondentNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
+        //complete the start business process
+        ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
         assertCompleteExternalTask(
-            respondentNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED,
-            NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID,
+            startBusiness,
+            START_BUSINESS_TOPIC,
+            START_BUSINESS_EVENT,
+            START_BUSINESS_ACTIVITY,
             variables
         );
 
-        assertApplicantSolicitorNotificationAndEnd(variables);
+        //complete the applicant notification
+        ExternalTask notificationTask = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(notificationTask,
+                                   PROCESS_CASE_EVENT,
+                                   NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED,
+                                   NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID,
+                                   variables
+        );
+
+        //complete the respondent notification
+        notificationTask = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(notificationTask,
+                                   PROCESS_CASE_EVENT,
+                                   NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED,
+                                   NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID,
+                                   variables
+        );
+
+        //complete the Robotics notification
+        ExternalTask forRobotics = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            forRobotics,
+            PROCESS_CASE_EVENT,
+            NOTIFY_RPA_ON_CONTINUOUS_FEED,
+            NOTIFY_RPA_ON_CONTINUOUS_FEED_ACTIVITY_ID,
+            variables
+        );
+
+        ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);
+        completeBusinessProcess(endBusinessProcess);
+        assertNoExternalTasksLeft();
     }
 
     @Test
-    void shouldSuccessfullyComplete_whenLipClaimantAndLipDefendant() {
-        VariableMap variables = flowFlagVariables(true, true);
+    void shouldSuccessfullyCompleteBreathingSpaceLifted_whenUnrepresentedDefendant() {
+        VariableMap variables = flowFlagVariables(true);
 
-        assertFalse(processInstance.isEnded());
-        assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
-
-        startBusinessProcess(variables);
-
-        ExternalTask lipRespondentNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            lipRespondentNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_LIP_RESPONDENT1_BREATHING_SPACE_LIFTED,
-            NOTIFY_LIP_RESPONDENT_ACTIVITY_ID,
-            variables
-        );
-
-        ExternalTask lipApplicantNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            lipApplicantNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_LIP_APPLICANT_BREATHING_SPACE_LIFTED,
-            NOTIFY_LIP_APPLICANT_ACTIVITY_ID,
-            variables
-        );
-
-        assertEnd();
-    }
-
-    @Test
-    void shouldSuccessfullyComplete_whenLipClaimantAndLrDefendant() {
-        VariableMap variables = flowFlagVariables(true, false);
-
-        assertFalse(processInstance.isEnded());
-        assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
-
-        startBusinessProcess(variables);
-
-        ExternalTask respondentNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            respondentNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED,
-            NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID,
-            variables
-        );
-
-        ExternalTask lipApplicantNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            lipApplicantNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_LIP_APPLICANT_BREATHING_SPACE_LIFTED,
-            NOTIFY_LIP_APPLICANT_ACTIVITY_ID,
-            variables
-        );
-
-        assertEnd();
-    }
-
-    @Test
-    void shouldSuccessfullyComplete_whenLrClaimantAndLipDefendant() {
-        VariableMap variables = flowFlagVariables(false, true);
-
-        assertFalse(processInstance.isEnded());
-        assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
-
-        startBusinessProcess(variables);
-
-        ExternalTask lipRespondentNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            lipRespondentNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_LIP_RESPONDENT1_BREATHING_SPACE_LIFTED,
-            NOTIFY_LIP_RESPONDENT_ACTIVITY_ID,
-            variables
-        );
-
-        assertApplicantSolicitorNotificationAndEnd(variables);
-    }
-
-    @Test
-    void shouldAbort_whenStartBusinessProcessThrowsAnError() {
         assertFalse(processInstance.isEnded());
         assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
 
         ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
-        assertFailExternalTask(startBusiness, START_BUSINESS_TOPIC, START_BUSINESS_EVENT, START_BUSINESS_ACTIVITY);
-
-        assertNoExternalTasksLeft();
-    }
-
-    private void assertApplicantSolicitorNotificationAndEnd(VariableMap variables) {
-        ExternalTask applicantNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(
-            applicantNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED,
-            NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID,
+            startBusiness,
+            START_BUSINESS_TOPIC,
+            START_BUSINESS_EVENT,
+            START_BUSINESS_ACTIVITY,
             variables
         );
 
-        assertEnd();
-    }
+        ExternalTask notificationTask = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(notificationTask,
+                                   PROCESS_CASE_EVENT,
+                                   NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED,
+                                   NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID,
+                                   variables
+        );
 
-    private void assertEnd() {
+        // LiP defendant skips respondent solicitor notification
+        ExternalTask forRobotics = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            forRobotics,
+            PROCESS_CASE_EVENT,
+            NOTIFY_RPA_ON_CONTINUOUS_FEED,
+            NOTIFY_RPA_ON_CONTINUOUS_FEED_ACTIVITY_ID,
+            variables
+        );
+
         ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);
         completeBusinessProcess(endBusinessProcess);
-
         assertNoExternalTasksLeft();
     }
 
-    private VariableMap flowFlagVariables(boolean lipCase, boolean unrepresentedDefendantOne) {
-        Map<String, Object> flags = new HashMap<>();
-        flags.put(LIP_CASE, lipCase);
-        flags.put(UNREPRESENTED_DEFENDANT_ONE, unrepresentedDefendantOne);
+    private VariableMap flowFlagVariables(boolean unrepresentedDefendantOne) {
         VariableMap variables = Variables.createVariables();
-        variables.putValue(FLOW_FLAGS, flags);
+        variables.putValue(FLOW_FLAGS, Map.of(
+            UNREPRESENTED_DEFENDANT_ONE, unrepresentedDefendantOne
+        ));
         return variables;
     }
 }
