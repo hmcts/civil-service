@@ -37,7 +37,7 @@ jobs:
     steps:
       - name: Find stalled Renovate PRs
         id: stalled
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           MAX_AGE_DAYS: ${{ inputs.max_age_days || '3' }}
           THRESHOLD: ${{ inputs.threshold || '1' }}
