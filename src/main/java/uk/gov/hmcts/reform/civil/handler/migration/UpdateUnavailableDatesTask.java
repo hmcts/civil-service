@@ -10,13 +10,17 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-abstract class UpdateUnavailableDatesTask extends MigrationTask<UnavailableDatesCaseReference> {
+abstract class UpdateUnavailableDatesTask extends MigrationTaskWithMetadata<UnavailableDatesCaseReference> {
 
     private static final String CLAIMANT = "claimant";
     private static final String DEFENDANT = "defendant";
 
-    protected UpdateUnavailableDatesTask() {
-        super(UnavailableDatesCaseReference.class);
+    protected UpdateUnavailableDatesTask(
+        String taskName,
+        String eventSummary,
+        String eventDescription
+    ) {
+        super(UnavailableDatesCaseReference.class, taskName, eventSummary, eventDescription);
     }
 
     @Override
@@ -35,6 +39,20 @@ abstract class UpdateUnavailableDatesTask extends MigrationTask<UnavailableDates
     }
 
     protected abstract List<Element<UnavailableDate>> getUnavailableDates(CaseData caseData, String partyType);
+
+    protected final boolean isDefendant(String partyType) {
+        return DEFENDANT.equals(partyType);
+    }
+
+    protected final List<Element<UnavailableDate>> requireUnavailableDates(
+        List<Element<UnavailableDate>> unavailableDates,
+        String fieldDescription
+    ) {
+        if (unavailableDates == null || unavailableDates.isEmpty()) {
+            throw new IllegalStateException(fieldDescription + " must not be null or empty");
+        }
+        return unavailableDates;
+    }
 
     private void validate(CaseData caseData, UnavailableDatesCaseReference caseReference) {
         if (caseData == null) {

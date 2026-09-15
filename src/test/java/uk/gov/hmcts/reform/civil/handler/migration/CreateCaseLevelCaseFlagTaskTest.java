@@ -59,7 +59,10 @@ class CreateCaseLevelCaseFlagTaskTest {
 
     @Test
     void shouldRejectBlankComment() {
-        assertThatThrownBy(() -> task.migrateCaseData(CaseData.builder().build(), reference(" ")))
+        CaseData caseData = CaseData.builder().build();
+        CaseFlagCaseReference reference = reference(" ");
+
+        assertThatThrownBy(() -> task.migrateCaseData(caseData, reference))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Case flag comment must not be blank");
     }

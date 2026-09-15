@@ -12,21 +12,12 @@ import java.util.List;
 @Component
 public class UpdateMediationUnavailabilityDatesTask extends UpdateUnavailableDatesTask {
 
-    private static final String DEFENDANT = "defendant";
-
-    @Override
-    protected String getEventSummary() {
-        return "Update mediation unavailable dates via migration task";
-    }
-
-    @Override
-    protected String getTaskName() {
-        return "UpdateMediationUnavailabilityDatesTask";
-    }
-
-    @Override
-    protected String getEventDescription() {
-        return "This task restores missing mediation unavailable dates on the case";
+    public UpdateMediationUnavailabilityDatesTask() {
+        super(
+            "UpdateMediationUnavailabilityDatesTask",
+            "Update mediation unavailable dates via migration task",
+            "This task restores missing mediation unavailable dates on the case"
+        );
     }
 
     @Override
@@ -34,16 +25,15 @@ public class UpdateMediationUnavailabilityDatesTask extends UpdateUnavailableDat
         CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
         MediationLiPCarm response = null;
         if (caseDataLiP != null) {
-            if (DEFENDANT.equals(partyType)) {
+            if (isDefendant(partyType)) {
                 response = caseDataLiP.getRespondent1MediationLiPResponseCarm();
             } else {
                 response = caseDataLiP.getApplicant1LiPResponseCarm();
             }
         }
-        if (response == null || response.getUnavailableDatesForMediation() == null
-            || response.getUnavailableDatesForMediation().isEmpty()) {
-            throw new IllegalStateException("Mediation unavailable dates must not be null or empty");
-        }
-        return response.getUnavailableDatesForMediation();
+        return requireUnavailableDates(
+            response == null ? null : response.getUnavailableDatesForMediation(),
+            "Mediation unavailable dates"
+        );
     }
 }

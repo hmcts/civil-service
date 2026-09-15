@@ -11,33 +11,23 @@ import java.util.List;
 @Component
 public class UpdateSmallClaimHearingUnavailabilityDatesTask extends UpdateUnavailableDatesTask {
 
-    private static final String DEFENDANT = "defendant";
-
-    @Override
-    protected String getEventSummary() {
-        return "Update small claim hearing unavailable dates via migration task";
-    }
-
-    @Override
-    protected String getTaskName() {
-        return "UpdateSmallClaimHearingUnavailabilityDatesTask";
-    }
-
-    @Override
-    protected String getEventDescription() {
-        return "This task restores missing small claim hearing unavailable dates on the case";
+    public UpdateSmallClaimHearingUnavailabilityDatesTask() {
+        super(
+            "UpdateSmallClaimHearingUnavailabilityDatesTask",
+            "Update small claim hearing unavailable dates via migration task",
+            "This task restores missing small claim hearing unavailable dates on the case"
+        );
     }
 
     @Override
     protected List<Element<UnavailableDate>> getUnavailableDates(CaseData caseData, String partyType) {
-        SmallClaimHearing hearing = DEFENDANT.equals(partyType)
+        SmallClaimHearing hearing = isDefendant(partyType)
             ? getRespondentHearing(caseData)
             : getApplicantHearing(caseData);
-        if (hearing == null || hearing.getSmallClaimUnavailableDate() == null
-            || hearing.getSmallClaimUnavailableDate().isEmpty()) {
-            throw new IllegalStateException("Small claim hearing unavailable dates must not be null or empty");
-        }
-        return hearing.getSmallClaimUnavailableDate();
+        return requireUnavailableDates(
+            hearing == null ? null : hearing.getSmallClaimUnavailableDate(),
+            "Small claim hearing unavailable dates"
+        );
     }
 
     private SmallClaimHearing getRespondentHearing(CaseData caseData) {

@@ -15,28 +15,18 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CASE_FLAGS;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Component
-public class CreateCaseLevelCaseFlagTask extends MigrationTask<CaseFlagCaseReference> {
+public class CreateCaseLevelCaseFlagTask extends MigrationTaskWithMetadata<CaseFlagCaseReference> {
 
     private static final String ACTIVE = "Active";
     private static final String OTHER = "Other";
 
     public CreateCaseLevelCaseFlagTask() {
-        super(CaseFlagCaseReference.class);
-    }
-
-    @Override
-    protected String getEventSummary() {
-        return "Create case-level flag via migration task";
-    }
-
-    @Override
-    protected String getTaskName() {
-        return "CreateCaseLevelCaseFlagTask";
-    }
-
-    @Override
-    protected String getEventDescription() {
-        return "This task creates an Other flag at case level";
+        super(
+            CaseFlagCaseReference.class,
+            "CreateCaseLevelCaseFlagTask",
+            "Create case-level flag via migration task",
+            "This task creates an Other flag at case level"
+        );
     }
 
     @Override
