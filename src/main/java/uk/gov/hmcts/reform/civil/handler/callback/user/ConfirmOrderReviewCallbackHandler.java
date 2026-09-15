@@ -127,6 +127,8 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
             caseData.setBusinessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW));
         } else if (YesOrNo.YES.equals(caseData.getIsFinalOrder())) {
             caseData.setBusinessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW_FINAL_ORDER));
+        } else {
+            caseData.setBusinessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW));
         }
 
         if (nonNull(caseData.getObligationData())) {

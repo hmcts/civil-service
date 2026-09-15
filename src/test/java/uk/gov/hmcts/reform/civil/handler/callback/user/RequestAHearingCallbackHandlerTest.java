@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -20,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.RequestAHearingCallbackHandler.LISTING_REQUESTED;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.RequestAHearingCallbackHandler.LISTING_REQUESTED_TASKS;
@@ -70,6 +72,17 @@ class RequestAHearingCallbackHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         assertThat(response.getData().get("requestAnotherHearing")).isNull();
+    }
+
+    @Test
+    void shouldSetBusinessProcessReady_whenAboutToSubmit() {
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+        assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo("HEARING_SCHEDULED_RETRIGGER");
+        assertThat(updatedData.getBusinessProcess().getStatus()).isEqualTo(BusinessProcessStatus.READY);
     }
 
     @Test
