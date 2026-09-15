@@ -27,6 +27,21 @@
   ],
   "packageRules": [
     {
+      "matchPackageNames": ["com.github.hmcts:core-case-data-store-client"],
+      "allowedVersions": "<6.0.0",
+      "description": "Version 6 requires Spring Boot 4 and Jackson 3; retain the compatible client until the service migrates"
+    },
+    {
+      "matchPackageNames": ["com.github.hmcts:auth-checker-lib"],
+      "allowedVersions": "<3.2.0",
+      "description": "Version 3.2 requires Spring Boot 4; retain the compatible client until the service migrates"
+    },
+    {
+      "matchPackageNames": ["com.github.hmcts:ccd-case-document-am-client"],
+      "allowedVersions": "<1.60.0",
+      "description": "Version 1.60.0 requires Spring Boot 4; retain the compatible client until the service migrates"
+    },
+    {
       "matchPackagePatterns": ["pact"],
       "enabled": false
     },

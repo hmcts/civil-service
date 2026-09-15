@@ -262,6 +262,8 @@ payments:
     url: ${PAYMENTS_API_URL:http://localhost:8765}
 
 idam:
+  oidc:
+    url: ${IDAM_OIDC_URL:${idam.web.url}}
   s2s-auth:
     microservice: civil_service
     totp_secret: ${CIVIL_CLIENT_TOTP_SECRET}
