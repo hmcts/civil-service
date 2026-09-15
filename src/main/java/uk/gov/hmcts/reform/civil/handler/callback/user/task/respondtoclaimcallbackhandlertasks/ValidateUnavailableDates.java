@@ -22,7 +22,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 
 @Component
@@ -64,16 +63,11 @@ public class ValidateUnavailableDates implements CaseTask {
     }
 
     private boolean isRespondent2ResponseAndHearingDifferent(CaseData caseData) {
-        return isRespondent2SameLegalRep(caseData)
+        return caseData.respondent2HasSameLegalRep()
             && caseData.getRespondentResponseIsSame() != null
             && caseData.getRespondentResponseIsSame() == NO
             && caseData.getRespondent2DQ() != null
             && caseData.getRespondent2DQ().getHearing() != null;
-    }
-
-    private boolean isRespondent2SameLegalRep(CaseData caseData) {
-        return caseData.getRespondent2SameLegalRepresentative() != null
-            && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
 
     private boolean isSolicitorRepresentingOneOrBothRespondents(CallbackParams callbackParams, CaseRole caseRole) {

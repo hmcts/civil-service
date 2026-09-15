@@ -13,8 +13,8 @@ import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
-import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.validation.PostcodeValidator.POSTCODE_REQUIRED_ERROR;
 
 @Component
 @RequiredArgsConstructor
@@ -33,7 +34,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class ValidateDateOfBirth implements CaseTask {
 
     private final DateOfBirthValidator dateOfBirthValidator;
-    private final PostcodeValidator postcodeValidator;
     private final ObjectMapper objectMapper;
     private final RespondToClaimSpecUtils respondToClaimSpecUtils;
 
@@ -41,11 +41,11 @@ public class ValidateDateOfBirth implements CaseTask {
         log.info("Executing callback task for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
 
         Party respondent = getRespondent(callbackParams);
-        List<String> errors = dateOfBirthValidator.validate(respondent);
+        List<String> errors = new ArrayList<>(dateOfBirthValidator.validate(respondent));
         log.info("CaseId {}: Date of birth validation errors: {}", callbackParams.getCaseData().getCcdCaseReference(), errors);
 
         CaseData caseData = callbackParams.getCaseData();
-        errors.addAll(correspondenceAddressCorrect(caseData));
+        errors.addAll(validateCorrespondenceAddressPostcodeRequired(caseData));
         log.info("CaseId {}: Correspondence address validation errors: {}", caseData.getCcdCaseReference(), errors);
 
         updateSolicitorResponse(callbackParams, caseData);
@@ -93,15 +93,15 @@ public class ValidateDateOfBirth implements CaseTask {
         return ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData));
     }
 
-    private List<String> correspondenceAddressCorrect(CaseData caseData) {
+    private List<String> validateCorrespondenceAddressPostcodeRequired(CaseData caseData) {
         log.info("Validating correspondence address for caseId: {}", caseData.getCcdCaseReference());
 
         if (isCorrespondenceAddressRequired(caseData.getIsRespondent1(), caseData.getSpecAoSRespondentCorrespondenceAddressRequired())) {
             log.info("CaseId {}: Respondent 1 correspondence address validation required", caseData.getCcdCaseReference());
-            return validatePostcode(caseData.getSpecAoSRespondentCorrespondenceAddressdetails());
+            return validatePostcodeRequired(caseData.getSpecAoSRespondentCorrespondenceAddressdetails());
         } else if (isCorrespondenceAddressRequired(caseData.getIsRespondent2(), caseData.getSpecAoSRespondent2CorrespondenceAddressRequired())) {
             log.info("CaseId {}: Respondent 2 correspondence address validation required", caseData.getCcdCaseReference());
-            return validatePostcode(caseData.getSpecAoSRespondent2CorrespondenceAddressdetails());
+            return validatePostcodeRequired(caseData.getSpecAoSRespondent2CorrespondenceAddressdetails());
         }
         return Collections.emptyList();
     }
@@ -111,8 +111,11 @@ public class ValidateDateOfBirth implements CaseTask {
         return isRespondent == YesOrNo.YES && isAddressRequired == YesOrNo.NO;
     }
 
-    private List<String> validatePostcode(Address address) {
-        log.info("Validating postcode");
-        return postcodeValidator.validate(Optional.ofNullable(address).map(Address::getPostCode).orElse(null));
+    private List<String> validatePostcodeRequired(Address address) {
+        log.info("Validating postcode is present");
+        String postcode = Optional.ofNullable(address).map(Address::getPostCode).orElse(null);
+        return postcode == null || postcode.isBlank()
+            ? List.of(POSTCODE_REQUIRED_ERROR)
+            : Collections.emptyList();
     }
 }

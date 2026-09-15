@@ -7,9 +7,12 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeSchedulerVars;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingResponse;
@@ -18,18 +21,19 @@ import uk.gov.hmcts.reform.hmc.service.HearingsService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
-import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @Slf4j
 @Component
 public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
+
+    private static final String SCHEDULER_NAME = "AutomatedHearingNotice";
 
     private final UserService userService;
     private final SystemUpdateUserConfiguration userConfig;
     private final HearingsService hearingsService;
     private final RuntimeService runtimeService;
     private final ObjectMapper mapper;
+    private final FeatureToggleService featureToggleService;
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -41,7 +45,8 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
         HearingsService hearingsService,
         RuntimeService runtimeService,
         ObjectMapper mapper,
-        ApplicationEventPublisher applicationEventPublisher
+        ApplicationEventPublisher applicationEventPublisher,
+        FeatureToggleService featureToggleService
     ) {
         super(externalTaskCompletionService, eventProperties);
         this.userService = userService;
@@ -50,10 +55,14 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
         this.runtimeService = runtimeService;
         this.mapper = mapper;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.featureToggleService = featureToggleService;
     }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
+        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
+            return new ExternalTaskData();
+        }
 
         HearingNoticeSchedulerVars schedulerVars = mapper.convertValue(externalTask.getAllVariables(), HearingNoticeSchedulerVars.class);
         List<String> dispatchedHearingIds = getDispatchedHearingIds(schedulerVars);

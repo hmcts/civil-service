@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -17,9 +18,11 @@ public class SchedulerRegistry {
 
     private final Map<String, CivilScheduler> schedulers;
     private final TaskExecutor taskExecutor;
+    private final FeatureToggleService featureToggleService;
 
     public SchedulerRegistry(List<CivilScheduler> schedulers,
-                             @Qualifier("asyncHandlerExecutor") TaskExecutor taskExecutor) {
+                             @Qualifier("asyncHandlerExecutor") TaskExecutor taskExecutor,
+                             FeatureToggleService featureToggleService) {
         this.schedulers = schedulers.stream()
             .collect(Collectors.toMap(
                 CivilScheduler::getName,
@@ -30,6 +33,7 @@ public class SchedulerRegistry {
                 }
             ));
         this.taskExecutor = taskExecutor;
+        this.featureToggleService = featureToggleService;
     }
 
     public boolean runScheduler(String name) {
@@ -46,10 +50,13 @@ public class SchedulerRegistry {
     }
 
     public List<String> getSchedulerNames() {
-        return List.copyOf(schedulers.keySet());
+        return schedulers.keySet().stream()
+            .filter(featureToggleService::isSpringSchedulerEnabled)
+            .toList();
     }
 
     private Optional<CivilScheduler> getScheduler(String name) {
-        return Optional.ofNullable(schedulers.get(name));
+        return Optional.ofNullable(schedulers.get(name))
+            .filter(scheduler -> featureToggleService.isSpringSchedulerEnabled(scheduler.getName()));
     }
 }

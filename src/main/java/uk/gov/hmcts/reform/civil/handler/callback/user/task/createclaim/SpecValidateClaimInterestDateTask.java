@@ -1,22 +1,28 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class SpecValidateClaimInterestDateTask {
 
     private static final String CREATE_CLAIM_SPEC_EVENT = "CREATE_CLAIM_SPEC";
 
+    private final InterestCalculator interestCalculator;
+
     public CallbackResponse specValidateClaimInterestDate(CaseData caseData, String eventId) {
         if (isCreateClaimSpecEvent(eventId)) {
             List<String> errors = validateInterestDate(caseData);
+            errors.addAll(interestCalculator.getInterestValidationErrors(caseData));
             return buildCallbackResponse(errors);
         }
         return buildCallbackResponse(new ArrayList<>());

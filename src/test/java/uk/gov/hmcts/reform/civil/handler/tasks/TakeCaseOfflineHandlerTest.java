@@ -33,6 +33,7 @@ import static org.mockito.Mockito.when;
 import org.mockito.Spy;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 @ExtendWith(SpringExtension.class)
 class TakeCaseOfflineHandlerTest {
@@ -48,6 +49,10 @@ class TakeCaseOfflineHandlerTest {
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @Spy
     private EventProperties eventProperties = configuredEventProperties();
 
@@ -84,6 +89,16 @@ class TakeCaseOfflineHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verifyNoInteractions(applicationEventPublisher);
+    }
+
+    @Test
+    void shouldNotEmitTakeCaseOfflineEvent_whenSpringSchedulerIsEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled("TakeCaseOffline")).thenReturn(true);
+
+        handler.execute(mockTask, externalTaskService);
+
+        verifyNoInteractions(searchService, applicationEventPublisher);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test

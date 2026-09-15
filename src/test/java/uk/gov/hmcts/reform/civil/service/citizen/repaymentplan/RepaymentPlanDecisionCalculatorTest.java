@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.repaymentplan.ClaimantProposedPlan;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Month;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -100,9 +101,11 @@ class RepaymentPlanDecisionCalculatorTest {
     @Nested
     class DecisionCalculationOnPayBySetDate {
 
-        private static final LocalDate DEFENDANT_REPAYMENT_DATE = LocalDate.of(2023, 9, 22);
-        private static final LocalDate CLAIMANT_PROPOSED_DATE_BEFORE_DEFENDANT_DATE = LocalDate.of(2023, 8, 22);
-        private static final LocalDate CLAIMANT_PROPOSED_DATE_AFTER_DEFENDANT_DATE = LocalDate.of(2023, 10, 22);
+        private static final LocalDate DEFENDANT_REPAYMENT_DATE = LocalDate.of(2023, Month.SEPTEMBER, 22);
+        private static final LocalDate CLAIMANT_PROPOSED_DATE_BEFORE_DEFENDANT_DATE = LocalDate.of(2023,
+                                                                                                   Month.AUGUST, 22);
+        private static final LocalDate CLAIMANT_PROPOSED_DATE_AFTER_DEFENDANT_DATE = LocalDate.of(2023,
+                                                                                                  Month.OCTOBER, 22);
 
         @Mock
         private RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
@@ -194,13 +197,26 @@ class RepaymentPlanDecisionCalculatorTest {
             //Then
             assertThat(decision.isInFavourOfDefendant()).isTrue();
         }
+
+        @Test
+        void shouldChooseDefendantPlan_whenDefendantSetDateDetailsAreMissing() {
+            //Given
+            given(caseData.getDefenceAdmitPartPaymentTimeRouteRequired()).willReturn(BY_SET_DATE);
+            given(caseData.getRespondToAdmittedClaimOwingAmountPounds()).willReturn(UNAFFORDABLE_CLAIM_TOTAL);
+
+            //When
+            RepaymentDecisionType decision = repaymentPlanDecisionCalculator.calculateRepaymentDecision(
+                caseData,
+                claimantProposedPlan
+            );
+
+            //Then
+            assertThat(decision.isInFavourOfDefendant()).isTrue();
+        }
     }
 
     @Nested
     class DecisionCalculationOnPayByInstalments {
-
-        @Mock
-        private RepaymentPlanLRspec claimantRepaymentPlan;
 
         @BeforeEach
         void setUp() {

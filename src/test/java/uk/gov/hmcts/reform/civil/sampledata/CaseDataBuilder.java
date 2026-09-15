@@ -3333,6 +3333,7 @@ public class CaseDataBuilder {
             .setTimestamp(LocalDateTime.now());
         if (formerSolicitorEmail != null) {
             newChange.setFormerRepresentationEmailAddress(formerSolicitorEmail);
+            newChange.setFormerRepresentationReference("previous-solicitor-reference");
         }
         changeOfRepresentation = newChange;
         return this;

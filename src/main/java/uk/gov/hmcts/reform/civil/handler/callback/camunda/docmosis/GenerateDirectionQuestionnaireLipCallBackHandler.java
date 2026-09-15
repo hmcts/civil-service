@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -16,8 +17,10 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionQuestionnaireLipGeneratorFactory;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.builders.DQGeneratorFormBuilder;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.Collections;
@@ -30,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_RESPONSE_DQ_LIP_SEALED);
@@ -41,6 +45,7 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
     private final DirectionQuestionnaireLipGeneratorFactory directionQuestionnaireLipGeneratorFactory;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
     private final AssignCategoryId assignCategoryId;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -59,10 +64,24 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .build();
         }
-        CaseDocument sealedDQForm = directionQuestionnaireLipGeneratorFactory
-            .getDirectionQuestionnaire()
-            .generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
-        if (sealedDQForm.getDocumentName().contains("claimant")
+        CaseDocument sealedDQForm;
+        try {
+            sealedDQForm = directionQuestionnaireLipGeneratorFactory
+                .getDirectionQuestionnaire()
+                .generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        } catch (IllegalStateException ex) {
+            if (!DQGeneratorFormBuilder.ERROR_FLOW_STATE_PAST_DEADLINE.equals(ex.getMessage())) {
+                throw ex;
+            }
+            log.info(
+                "Skipping LiP direction questionnaire generation for case {} because flow state is past deadline",
+                caseData.getCcdCaseReference()
+            );
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .build();
+        }
+        if (featureToggleService.isWelshEnabledForMainCase()
+            && sealedDQForm.getDocumentName().contains("claimant")
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             assignCategoryId.assignCategoryIdToCaseDocument(sealedDQForm, DocCategory.DQ_APP1.getValue());
             List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData()
@@ -71,7 +90,8 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
             caseData.setBilingualHint(YesOrNo.YES);
             caseData.setPreTranslationDocuments(translatedDocuments);
             caseData.setPreTranslationDocumentType(PreTranslationDocumentType.LIP_CLAIMANT_DQ);
-        } else if (sealedDQForm.getDocumentName().contains("defendant")
+        } else if (featureToggleService.isWelshEnabledForMainCase()
+            && sealedDQForm.getDocumentName().contains("defendant")
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             assignCategoryId.assignCategoryIdToCaseDocument(sealedDQForm, DocCategory.DQ_DEF1.getValue());
             caseData.setRespondent1OriginalDqDoc(sealedDQForm);

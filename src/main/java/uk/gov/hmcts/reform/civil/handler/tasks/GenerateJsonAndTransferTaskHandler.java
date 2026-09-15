@@ -12,8 +12,10 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
+import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCase;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCases;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationDTO;
@@ -35,6 +37,8 @@ public class GenerateJsonAndTransferTaskHandler extends GenerateMediationFileAnd
 
     private final MediationCSVEmailConfiguration localMediationCSVEmailConfiguration;
 
+    protected final CaseTaskTrackingService caseTaskTrackingService;
+
     private static final String FILENAME = "ocmc_mediation_data.json";
 
     protected GenerateJsonAndTransferTaskHandler(ExternalTaskCompletionService externalTaskCompletionService,
@@ -45,7 +49,8 @@ public class GenerateJsonAndTransferTaskHandler extends GenerateMediationFileAnd
                                                  SendGridClient sendGridClient,
                                                  MediationCSVEmailConfiguration mediationCSVEmailConfiguration,
                                                  MediationJsonService mediationJsonService,
-                                                 MediationCSVEmailConfiguration mediationCSVEmailConfiguration1) {
+                                                 MediationCSVEmailConfiguration mediationCSVEmailConfiguration1,
+                                                 FeatureToggleService featureToggleService, CaseTaskTrackingService caseTaskTrackingService) {
         super(
             externalTaskCompletionService,
             eventProperties,
@@ -53,14 +58,19 @@ public class GenerateJsonAndTransferTaskHandler extends GenerateMediationFileAnd
             coreCaseDataService,
             caseDetailsConverter,
             sendGridClient,
-            mediationCSVEmailConfiguration
+            mediationCSVEmailConfiguration,
+            featureToggleService
         );
         this.mediationJsonService = mediationJsonService;
         this.localMediationCSVEmailConfiguration = mediationCSVEmailConfiguration1;
+        this.caseTaskTrackingService = caseTaskTrackingService;
     }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
+        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
+            return new ExternalTaskData();
+        }
 
         List<CaseDetails> cases = caseSearchService.getInMediationCases(true);
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
@@ -78,20 +88,36 @@ public class GenerateJsonAndTransferTaskHandler extends GenerateMediationFileAnd
         try {
             if (!inMediationCases.isEmpty()) {
                 List<MediationCase> casesList = new ArrayList<>();
+                List<CaseData> successfulCases = new ArrayList<>();
                 for (CaseData caseData : inMediationCases) {
-                    MediationCase mediationCase = generateJsonForCase(caseData);
-                    casesList.add(mediationCase);
+                    try {
+                        MediationCase mediationCase = generateJsonForCase(caseData);
+                        casesList.add(mediationCase);
+                        successfulCases.add(caseData);
+                    } catch (Exception e) {
+                        log.error("Generate mediation JSON failed for case with id: '{}'",
+                                  caseData.getCcdCaseReference(), e);
+                        caseTaskTrackingService.trackCaseTask(
+                            caseData.getCcdCaseReference().toString(),
+                            SUBJECT,
+                            FILENAME,
+                            null
+                        );
+                    }
+                }
+
+                if (casesList.isEmpty()) {
+                    return new ExternalTaskData();
                 }
 
                 MediationDTO mediationDTO = convertToMediationDTO(casesList);
-
                 Optional<EmailData> emailData = prepareEmail(mediationDTO);
 
                 if (externalTask.getVariable("dontSendEmail") == null) {
                     emailData.ifPresent(data -> sendMediationFileEmail(data));
                 }
 
-                inMediationCases.stream().forEach(this::setMediationFileSent);
+                successfulCases.forEach(this::setMediationFileSent);
             }
         } catch (Exception e) {
             log.error(e.getMessage());

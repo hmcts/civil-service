@@ -10,6 +10,8 @@ import java.util.Locale;
 @Component
 public class PostcodeValidator {
 
+    public static final String POSTCODE_REQUIRED_ERROR = "Please enter Postcode";
+
     private final PostcodeLookupService postcodeLookupService;
 
     public PostcodeValidator(PostcodeLookupService postcodeLookupService) {
@@ -33,7 +35,7 @@ public class PostcodeValidator {
                 errors.add("Postcode must be in England or Wales");
             }
         } else {
-            errors.add("Please enter Postcode");
+            errors.add(POSTCODE_REQUIRED_ERROR);
         }
         return errors;
     }

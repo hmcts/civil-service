@@ -613,6 +613,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(YES)
                 .respondentSolicitor1AgreedDeadlineExtension(extensionDateRespondent1)
+                .respondent2(new PartyBuilder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -671,6 +672,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
                     .addRespondent2(YES)
                     .respondent2SameLegalRepresentative(YES)
                     .respondentSolicitor1AgreedDeadlineExtension(extensionDateRespondent1)
+                    .respondent2(new PartyBuilder().individual().build())
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -24,7 +26,6 @@ import java.util.Optional;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.IND;
@@ -35,7 +36,7 @@ import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 
 @ExtendWith(SpringExtension.class)
-public class HearingsPartyMapperTest {
+class HearingsPartyMapperTest {
 
     private static final String CLAIMANT_ROLE = "CLAI";
     private static final String DEFENDANT_ROLE = "DEFE";
@@ -1069,17 +1070,28 @@ public class HearingsPartyMapperTest {
         assertThat(actualPartyDetailsModel).isEqualTo(expected);
     }
 
-    @Test
-    void shouldThrow_whenApplicantOrganisationPolicyIsNull() {
+    @ParameterizedTest
+    @ValueSource(strings = {APPLICANT_ORG_ID, RESPONDENT_ONE_ORG_ID, RESPONDENT_TWO_ORG_ID})
+    void shouldOmitSolicitorOrganisation_whenOrganisationPolicyIsNull(String organisationId) {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateApplicantRespondToDefenceAndProceed()
-            .build()
-            .toBuilder()
-            .applicant1OrganisationPolicy(null)
+            .multiPartyClaimTwoDefendantSolicitors()
+            .atStateApplicantRespondToDefenceAndProceed(ONE_V_TWO_TWO_LEGAL_REP)
+            .build();
+        List<PartyDetailsModel> expected = buildPartyObjectForHearingPayload(caseData, organisationService);
+
+        assertThat(expected).extracting(PartyDetailsModel::getPartyID).contains(organisationId);
+        expected.removeIf(party -> organisationId.equals(party.getPartyID()));
+
+        caseData = caseData.toBuilder()
+            .applicant1OrganisationPolicy(APPLICANT_ORG_ID.equals(organisationId)
+                ? null : caseData.getApplicant1OrganisationPolicy())
+            .respondent1OrganisationPolicy(RESPONDENT_ONE_ORG_ID.equals(organisationId)
+                ? null : caseData.getRespondent1OrganisationPolicy())
+            .respondent2OrganisationPolicy(RESPONDENT_TWO_ORG_ID.equals(organisationId)
+                ? null : caseData.getRespondent2OrganisationPolicy())
             .build();
 
-        assertThatThrownBy(() -> buildPartyObjectForHearingPayload(caseData, organisationService))
-            .isInstanceOf(NullPointerException.class);
+        assertThat(buildPartyObjectForHearingPayload(caseData, organisationService)).isEqualTo(expected);
     }
 
     private PartyDetailsModel buildExpectedIndividualPartyDetails(String partyId, String firstName, String lastName,

@@ -184,11 +184,11 @@ class ValidateRespondentExpertsTest {
                 .respondent1DQ(respondent1DQ)
                 .respondent2DQ(respondent2DQ)
                 .respondentResponseIsSame(NO)
+                .respondent2SameLegalRepresentative(YES)
                 .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_ONE_LEGAL_REP);
-            lenient().when(respondToClaimSpecUtils.isRespondent2HasSameLegalRep(caseData)).thenReturn(true);
             lenient().when(respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)).thenReturn(false);
             lenient().when(respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)).thenReturn(false);
 
@@ -207,11 +207,11 @@ class ValidateRespondentExpertsTest {
                 .respondent1DQ(respondent1DQ)
                 .respondent2DQ(respondent2DQ)
                 .respondentResponseIsSame(YES)
+                .respondent2SameLegalRepresentative(YES)
                 .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_ONE_LEGAL_REP);
-            lenient().when(respondToClaimSpecUtils.isRespondent2HasSameLegalRep(caseData)).thenReturn(true);
             lenient().when(respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)).thenReturn(false);
             lenient().when(respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)).thenReturn(false);
 
@@ -229,11 +229,11 @@ class ValidateRespondentExpertsTest {
         caseData = CaseDataBuilder.builder()
                 .respondent1DQ(respondent1DQ)
                 .respondent2DQ(respondent2DQ)
+                .respondent2SameLegalRepresentative(YES)
                 .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_ONE_LEGAL_REP);
-            lenient().when(respondToClaimSpecUtils.isRespondent2HasSameLegalRep(caseData)).thenReturn(true);
             lenient().when(respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)).thenReturn(false);
             lenient().when(respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)).thenReturn(false);
 
@@ -252,11 +252,11 @@ class ValidateRespondentExpertsTest {
                 .respondentResponseIsSame(NO)
                 .respondent1DQ(respondent1DQ)
                 .respondent2DQ(respondent2DQ)
+                .respondent2SameLegalRepresentative(YES)
                 .build();
         when(callbackParams.getCaseData()).thenReturn(caseData);
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_ONE_LEGAL_REP);
-            lenient().when(respondToClaimSpecUtils.isRespondent2HasSameLegalRep(caseData)).thenReturn(true);
             lenient().when(respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)).thenReturn(false);
             lenient().when(respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)).thenReturn(false);
 
@@ -272,13 +272,13 @@ class ValidateRespondentExpertsTest {
         Witnesses respondent2DQWitnesses = new Witnesses();
         respondent2DQWitnesses.setWitnessesToAppear(YES);
         caseData = CaseDataBuilder.builder()
-                .respondent1DQ(respondent1DQ).build();
+                .respondent1DQ(respondent1DQ)
+                .respondent2SameLegalRepresentative(YES).build();
         caseData.setRespondent2DQWitnessesSmallClaim(respondent2DQWitnesses);
         caseData.setRespondentResponseIsSame(NO);
         when(callbackParams.getCaseData()).thenReturn(caseData);
         try (MockedStatic<MultiPartyScenario> mockedScenario = mockStatic(MultiPartyScenario.class)) {
             mockedScenario.when(() -> MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(ONE_V_TWO_ONE_LEGAL_REP);
-            lenient().when(respondToClaimSpecUtils.isRespondent2HasSameLegalRep(caseData)).thenReturn(true);
             lenient().when(respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)).thenReturn(false);
             lenient().when(respondToClaimSpecUtils.isSolicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)).thenReturn(false);
 

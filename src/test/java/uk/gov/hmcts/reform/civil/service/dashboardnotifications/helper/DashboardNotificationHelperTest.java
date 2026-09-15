@@ -3,14 +3,9 @@ package uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
@@ -25,14 +20,11 @@ import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
@@ -152,79 +144,35 @@ class DashboardNotificationHelperTest {
     }
 
     @Nested
-    class IsEligibleForReconsiderationTests {
+    class IsSDODrawnPreCPReleaseTests {
 
-        private static Stream<Arguments> provideCsvSourceTrueCases() {
-            return Stream.of(
-                Arguments.of("SMALL_CLAIM", BigDecimal.valueOf(500), null),
-                Arguments.of("SMALL_CLAIM", BigDecimal.valueOf(10000), null),
-                Arguments.of("SMALL_CLAIM", BigDecimal.valueOf(10000), DecisionOnRequestReconsiderationOptions.YES),
-                Arguments.of("SMALL_CLAIM", BigDecimal.valueOf(10000), null)
-            );
-        }
-
-        private static Stream<Arguments> provideCsvSourceFalseCases() {
-            return Stream.of(
-                Arguments.of("SMALL_CLAIM", BigDecimal.valueOf(1000), CREATE_SDO),
-                Arguments.of("SMALL_CLAIM", BigDecimal.valueOf(10000), CREATE_SDO),
-                Arguments.of("SMALL_CLAIM", BigDecimal.valueOf(10001), null),
-                Arguments.of("FAST_CLAIM", BigDecimal.valueOf(1000), null)
-            );
-        }
-
-        @ParameterizedTest
-        @MethodSource("provideCsvSourceTrueCases")
-        void shouldReturnTrue_ForGiven(String responseClaimTrack,
-                                       BigDecimal totalClaimAmount,
-                                       DecisionOnRequestReconsiderationOptions option) {
-            CaseData caseData = new CaseDataBuilder()
+        @Test
+        void shouldReturnTrue_whenNotCaseProgressionEnabledAndLocationWhiteListedAndNotWelshEnabledForMainCase() {
+            CaseData caseData = CaseDataBuilder.builder()
                 .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION))
                 .build();
-            caseData.setResponseClaimTrack(responseClaimTrack);
-            caseData.setTotalClaimAmount(totalClaimAmount);
-            caseData.setDecisionOnRequestReconsiderationOptions(option);
 
-            assertTrue(dashboardDecisionHelper.isEligibleForReconsideration(caseData));
+            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(false);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+
+            assertTrue(dashboardDecisionHelper.isSDODrawnPreCPRelease(caseData));
         }
 
         @Test
-        void shouldReturnTrue_whenClaimantBilingual() {
-            CaseData caseData = new CaseDataBuilder()
+        void shouldReturnFalse_whenEitherCaseProgressionEnabledOrLocationWhiteListedOrWelshEnabledForMainCase() {
+            CaseData caseData = CaseDataBuilder.builder()
                 .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION))
                 .build();
-            caseData.setResponseClaimTrack("SMALL_CLAIM");
-            caseData.setTotalClaimAmount(BigDecimal.valueOf(500));
-            caseData.setClaimantBilingualLanguagePreference(Language.BOTH.toString());
 
-            assertTrue(dashboardDecisionHelper.isEligibleForReconsideration(caseData));
-            verifyNoInteractions(featureToggleService);
-        }
+            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
-        @Test
-        void shouldReturnTrue_whenLocationWhitelistingIsNotConsulted() {
-            CaseData caseData = new CaseDataBuilder()
-                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION))
-                .build();
-            caseData.setResponseClaimTrack("SMALL_CLAIM");
-            caseData.setTotalClaimAmount(BigDecimal.valueOf(500));
+            assertFalse(dashboardDecisionHelper.isSDODrawnPreCPRelease(caseData));
 
-            assertTrue(dashboardDecisionHelper.isEligibleForReconsideration(caseData));
-            verifyNoInteractions(featureToggleService);
-        }
+            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(false);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
-        @ParameterizedTest
-        @MethodSource("provideCsvSourceFalseCases")
-        void shouldReturnFalse_ForGiven(String responseClaimTrack,
-                                        BigDecimal totalClaimAmount,
-                                        DecisionOnRequestReconsiderationOptions option) {
-            CaseData caseData = new CaseDataBuilder()
-                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION))
-                .build();
-            caseData.setResponseClaimTrack(responseClaimTrack);
-            caseData.setTotalClaimAmount(totalClaimAmount);
-            caseData.setDecisionOnRequestReconsiderationOptions(option);
-
-            assertFalse(dashboardDecisionHelper.isEligibleForReconsideration(caseData));
+            assertFalse(dashboardDecisionHelper.isSDODrawnPreCPRelease(caseData));
         }
     }
 

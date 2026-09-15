@@ -9,12 +9,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.properties.AsyncHandlerProperties;
+import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.event.CvpJoinLinkEvent;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.CaseHearingDateSearchService;
 
 import java.util.Map;
@@ -32,12 +36,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import org.mockito.Spy;
-import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
-import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 @ExtendWith(SpringExtension.class)
 class CvpJoinLinkSchedulerHandlerTest {
+
+    private static final String SCHEDULER_NAME = "HearingCvpLink";
 
     @Mock
     private ExternalTask mockTask;
@@ -52,10 +55,12 @@ class CvpJoinLinkSchedulerHandlerTest {
     private ApplicationEventPublisher applicationEventPublisher;
 
     @Mock
+    private FeatureToggleService featureToggleService;
+
+    @Mock
     private AsyncHandlerProperties asyncHandlerProperties;
     @Spy
     private EventProperties eventProperties = configuredEventProperties();
-
     @Spy
     private ExternalTaskCompletionService externalTaskCompletionService = new ExternalTaskCompletionService();
 
@@ -64,6 +69,7 @@ class CvpJoinLinkSchedulerHandlerTest {
 
     @BeforeEach
     void init() {
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(false);
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
     }
@@ -89,6 +95,16 @@ class CvpJoinLinkSchedulerHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verifyNoInteractions(applicationEventPublisher);
+    }
+
+    @Test
+    void shouldNotProcessCasesWhenSpringSchedulerFeatureToggleIsEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
+
+        handler.execute(mockTask, externalTaskService);
+
+        verifyNoInteractions(searchService, applicationEventPublisher);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test

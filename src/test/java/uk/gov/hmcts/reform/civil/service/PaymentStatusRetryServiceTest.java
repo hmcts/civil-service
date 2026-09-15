@@ -163,13 +163,23 @@ class PaymentStatusRetryServiceTest {
             .setStatus("success")
             .setPaymentReference("ref");
 
-        when(coreCaseDataService.getCase(CASE_ID)).thenThrow(new RuntimeException());
+        RuntimeException cause = new RuntimeException("CCD unavailable");
+        when(coreCaseDataService.getCase(CASE_ID)).thenThrow(cause);
 
         PaymentStatusRetryService spyService = spy(service);
+        String caseReference = CASE_ID.toString();
 
-        assertThrows(CaseDataUpdateException.class, () ->
-            spyService.updatePaymentStatus(FeeType.CLAIMISSUED, CASE_ID.toString(), response)
+        CaseDataUpdateException exception = assertThrows(
+            CaseDataUpdateException.class,
+            () -> spyService.updatePaymentStatus(FeeType.CLAIMISSUED, caseReference, response)
         );
+
+        assertThat(exception)
+            .hasMessage("CCD unavailable")
+            .hasCause(cause);
+        assertThat(listAppender.list).hasSize(1);
+        assertThat(listAppender.list.getFirst().getFormattedMessage())
+            .contains("Payment status update failed for case 123 and fee type CLAIMISSUED. Status: success, ErrorCode: null");
 
         CardPaymentStatusResponse recoverResponse = new CardPaymentStatusResponse()
             .setStatus("FAILED")
@@ -178,12 +188,44 @@ class PaymentStatusRetryServiceTest {
             .setErrorDescription("Payment failed");
 
         CaseDataUpdateException ex = new CaseDataUpdateException("test error", new RuntimeException());
+        listAppender.list.clear();
         service.recover(ex, FeeType.CLAIMISSUED, CASE_ID.toString(), recoverResponse);
 
         assertThat(listAppender.list).hasSize(1);
         assertThat(listAppender.list.getFirst().getLevel()).isEqualTo(Level.ERROR);
         assertThat(listAppender.list.getFirst().getFormattedMessage())
             .contains("Payment status update failed after retries for case 123 and fee type CLAIMISSUED. Status: FAILED, ErrorCode: ERR001");
+    }
+
+    @Test
+    void shouldLogOriginalCauseWhenUpdatePaymentStatusCaseDataFails() {
+        RuntimeException cause = new RuntimeException("CCD submit failed");
+        when(caseData.isLipvLipOneVOne()).thenReturn(true);
+        String caseReference = CASE_ID.toString();
+        when(coreCaseDataService.startUpdate(caseReference, CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT))
+            .thenThrow(cause);
+
+        assertThatThrownBy(() -> service.updatePaymentStatus(FeeType.CLAIMISSUED, caseReference, caseData))
+            .isInstanceOf(CaseDataUpdateException.class)
+            .hasMessage("CCD submit failed")
+            .hasCause(cause);
+
+        assertThat(listAppender.list).hasSize(1);
+        assertThat(listAppender.list.getFirst().getLevel()).isEqualTo(Level.ERROR);
+        assertThat(listAppender.list.getFirst().getFormattedMessage())
+            .contains("Payment status update failed for case 123 and fee type CLAIMISSUED");
+    }
+
+    @Test
+    void shouldNotWrapUnsupportedFeeTypeWhenUpdatePaymentStatusCaseDataFails() {
+        String caseReference = CASE_ID.toString();
+
+        assertThatThrownBy(() -> service.updatePaymentStatus(APPLICATION, caseReference, caseData))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Unsupported fee type for event: APPLICATION");
+
+        assertThat(listAppender.list).isEmpty();
+        verifyNoMoreInteractions(coreCaseDataService);
     }
 
     @Test
@@ -282,4 +324,3 @@ class PaymentStatusRetryServiceTest {
             .contains("Payment status update failed after retries for case 12345 and fee type CLAIMISSUED. Status: FAILED, ErrorCode: ERR123");
     }
 }
-

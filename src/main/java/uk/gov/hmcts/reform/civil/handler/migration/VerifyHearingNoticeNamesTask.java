@@ -221,7 +221,15 @@ public class VerifyHearingNoticeNamesTask extends MigrationTask<CaseReference> {
     private void addParty(Set<String> names, Party party) {
         if (party != null) {
             add(names, party.getPartyName());
+            // A notice attendee is the plain individual name from the HMC hearing. getPartyName()
+            // does not always yield that: for a sole trader it appends " Trading as ...", and the
+            // individual name fields are only populated for INDIVIDUAL parties. Add the type-specific
+            // name forms so sole trader / company / organisation parties are matched too.
             add(names, joinName(party.getIndividualFirstName(), party.getIndividualLastName()));
+            add(names, joinName(party.getSoleTraderFirstName(), party.getSoleTraderLastName()));
+            add(names, party.getSoleTraderTradingAs());
+            add(names, party.getCompanyName());
+            add(names, party.getOrganisationName());
         }
     }
 
