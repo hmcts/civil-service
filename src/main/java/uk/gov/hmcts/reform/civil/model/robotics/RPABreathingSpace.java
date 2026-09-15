@@ -9,7 +9,11 @@ import java.time.LocalDate;
 @Data
 public class RPABreathingSpace {
 
+    private String reference;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private LocalDate startDate;
     private BreathingSpaceType type;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDate endDate;
+    private String reasonForLifting;
 }
