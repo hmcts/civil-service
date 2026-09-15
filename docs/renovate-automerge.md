@@ -70,3 +70,49 @@ Defaults:
 - `threshold`: `1`
 
 To enable Slack delivery, add repository secret `RENOVATE_ALERT_SLACK_WEBHOOK_URL` with the target team-channel incoming webhook URL. Without the secret, the workflow still fails visibly and records the stalled PR list in the Actions run summary.
+
+## Merge window and Jenkins availability
+
+Renovate uses the `Europe/London` timezone inherited from the shared HMCTS preset. PTL Jenkins runs on `cft-ptl-00-aks`, which [`hmcts/auto-shutdown`](https://github.com/hmcts/auto-shutdown) normally stops from 20:00 to 06:30 daily. There is no scheduled weekend startup. An approved exclusion is required for overnight or weekend use; it can postpone shutdown until 23:00 or keep PTL running overnight.
+
+If Renovate updates or rebases a PR while Jenkins is unavailable, the required check cannot complete and automerge remains blocked. Each Renovate merge also advances `master`, which can make developer and other Renovate branches stale and trigger rebases or repeated CI. Keep the merge window short and early in the working day to limit that disruption while Jenkins is available:
+
+```json
+"automergeSchedule": ["after 8am and before 11am every weekday"]
+```
+
+This window keeps Jenkins and support available while limiting disruption to developer PRs from changes to `master`, rebases and CI reruns. It also matches the repository's existing top-level Renovate schedule.
+
+Apply the same window to every automerge-enabled package rule so broader rule-level schedules do not override it. Using only `before 4pm every weekday` also permits merges after midnight. The stalled-queue alert remains the control for updates that cannot merge within the window.
+
+## Release freeze
+
+Use a code-controlled Renovate package rule for a planned release freeze. This is reviewable, auditable and consistent across repository administrators. LaunchDarkly is not suitable because Renovate evaluates repository configuration in Mend and does not call the application or its runtime feature flags.
+
+Add the following rule as the final item in `.github/renovate.json` under `packageRules`:
+
+```json
+{
+  "description": "Release freeze: disable Renovate automerge",
+  "matchPackageNames": ["*"],
+  "automerge": false
+}
+```
+
+The rule must remain last because Renovate combines all matching package rules and later values take precedence. It disables automerge without disabling dependency discovery or stopping Renovate from maintaining PRs.
+
+### Start a freeze
+
+1. Add the final freeze rule in a named pull request, including the release or change reference and intended end date in the PR description.
+2. Merge the rule before the freeze starts and manually run Renovate, or wait for its next scheduled run, so the configuration is applied.
+3. Check open Renovate PRs and disable any GitHub auto-merge requests that were enabled before the freeze. The new rule prevents Renovate from enabling automerge; it should not be relied on to cancel an auto-merge request already stored by GitHub.
+4. Confirm the Mend job log resolves the freeze rule with `automerge: false` and record the verification in the release ticket.
+
+### End a freeze
+
+1. Remove the freeze rule through a pull request after release approval is given.
+2. Merge the change and manually run Renovate, or wait for its next scheduled run.
+3. Verify a clean, in-scope Renovate PR is offered for automerge and merges only after all required checks pass.
+4. Continue monitoring `.github/workflows/renovate-stalled-alert.yml` for queues blocked by failed checks, required reviews or stale branches.
+
+For an emergency stop, the repository can instead be paused in the Mend Developer Portal. Pausing is broader than a release freeze because it also stops update discovery, rebases and PR maintenance. Changing branch protection is not recommended as a routine toggle because it affects all contributors and makes intentional freezes look like authorization failures.
