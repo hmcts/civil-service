@@ -137,6 +137,7 @@ withPipeline(type, product, component) {
   }
 
   onMaster {
+    env.PACT_BRANCH_NAME = "master"
     enableHighLevelDataSetup("", true)
     env.ENVIRONMENT = "aat"
     env.CCD_DEFINITION_BRANCH = "master"
