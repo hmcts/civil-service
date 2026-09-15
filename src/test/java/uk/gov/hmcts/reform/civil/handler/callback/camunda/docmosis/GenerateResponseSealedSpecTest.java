@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimResponseFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -63,14 +62,11 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
     @Mock
     private CivilStitchService civilStitchService;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
         handler = new GenerateResponseSealedSpec(mapper, sealedClaimResponseFormGeneratorForSpec, civilStitchService,
-                                                 new AssignCategoryId(), featureToggleService
+                                                 new AssignCategoryId()
         );
         mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
 
@@ -304,7 +300,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
             any(CaseData.class),
             anyString()
         )).thenReturn(SEALED_FORM);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData localCaseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build();
         CaseDocument caseDocument = new CaseDocument();
@@ -354,7 +349,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
             any(CaseData.class),
             anyString()
         )).thenReturn(SEALED_FORM);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData localCaseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued().build();
         CaseDocument caseDocument = new CaseDocument();

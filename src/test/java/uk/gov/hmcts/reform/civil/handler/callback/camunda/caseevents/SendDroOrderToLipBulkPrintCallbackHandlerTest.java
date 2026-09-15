@@ -13,14 +13,11 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SendHearingBulkPrintService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_DRO_ORDER_TO_LIP_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_DRO_ORDER_TO_LIP_DEFENDANT;
@@ -37,23 +34,21 @@ public class SendDroOrderToLipBulkPrintCallbackHandlerTest extends BaseCallbackH
     private SendDroOrderToLipBulkPrintCallbackHandler handler;
 
     @MockBean
-    private FeatureToggleService featureToggleService;
-    @MockBean
     private SendHearingBulkPrintService sendDROBulkPrintService;
 
     public static final String TASK_ID_DEFENDANT = "SendToDefendantLIP";
     public static final String TASK_ID_CLAIMANT = "SendDORToClaimantLIP";
 
     @Test
-    void shouldNotCallRecordScenario_whenWelshFlagIsDisabled() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+    void shouldSendDroDocument() {
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, CaseDataBuilder.builder().build())
             .build();
+        callbackParams.getRequest().setEventId(SEND_DRO_ORDER_TO_LIP_DEFENDANT.name());
 
         handler.handle(callbackParams);
-        verifyNoInteractions(sendDROBulkPrintService);
+        verify(sendDROBulkPrintService).sendDecisionReconsiderationToLip(any(), any(), any());
     }
 
     @Test
@@ -75,7 +70,6 @@ public class SendDroOrderToLipBulkPrintCallbackHandlerTest extends BaseCallbackH
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfullyForDefendantLiP() {
 
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(new CaseDocument().setDocumentType(DECISION_MADE_ON_APPLICATIONS))).build();
@@ -93,7 +87,6 @@ public class SendDroOrderToLipBulkPrintCallbackHandlerTest extends BaseCallbackH
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfullyForClaimantLiP() {
 
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(new CaseDocument().setDocumentType(DECISION_MADE_ON_APPLICATIONS))).build();

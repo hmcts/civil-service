@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.workflow.dashboard;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -23,11 +22,6 @@ class OrderMadeClaimantWorkflowTest extends DashboardWorkflowIntegrationTest {
     public static final String CLAIMANT = "CLAIMANT";
     @MockBean
     private FeatureToggleService featureToggleService;
-
-    @BeforeEach
-    void setup() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-    }
 
     @Test
     void shouldCreateOrderMadeClaimantNotificationViaAboutToSubmitCallback() throws Exception {

@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.CourtOfficerOrderGenerator;
@@ -69,8 +68,6 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
     private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     @Mock
     private CourtOfficerOrderGenerator courtOfficerOrderGenerator;
-    @Mock
-    private FeatureToggleService featureToggleService;
     @Mock
     private UserService userService;
 
@@ -252,25 +249,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldHideDocumentIfClaimantWelsh_onAboutToSubmit() {
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-            // Given
-            caseData.setPreviewCourtOfficerOrder(courtOfficerOrder);
-            caseData.setPreTranslationDocuments(new ArrayList<>());
-            caseData.setClaimantBilingualLanguagePreference("BOTH");
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
-            // Then
-            assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
-            assertThat(updatedData.getPreviewCourtOfficerOrder()).isNull();
-            assertThat(updatedData.getCurrentCamundaBusinessProcessName()).isNull();
-        }
-
-        @Test
-        void shouldAddADocumentInCollectionWhenWelshFTisOn_onAboutToSubmit() {
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        void shouldAddADocumentInCollectionForEnglishClaimant_onAboutToSubmit() {
             // Given
             caseData.setPreviewCourtOfficerOrder(courtOfficerOrder);
             caseData.setCourtOfficersOrders(new ArrayList<>());
@@ -286,8 +265,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotHideDocumentIfWelshDisabled_onAboutToSubmit() {
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+        void shouldHideDocumentIfClaimantWelsh_onAboutToSubmit() {
             // Given
             caseData.setPreviewCourtOfficerOrder(courtOfficerOrder);
             caseData.setPreTranslationDocuments(new ArrayList<>());
@@ -297,14 +275,13 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             // Then
-            assertThat(updatedData.getPreTranslationDocuments()).hasSize(0);
-            assertThat(updatedData.getPreviewCourtOfficerOrder()).isNotNull();
-            assertThat(updatedData.getCurrentCamundaBusinessProcessName()).isNotNull();
+            assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
+            assertThat(updatedData.getPreviewCourtOfficerOrder()).isNull();
+            assertThat(updatedData.getCurrentCamundaBusinessProcessName()).isNull();
         }
 
         @Test
         void shouldHideDocumentIfDefendantWelsh_onAboutToSubmit() {
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             // Given
             caseData.setPreviewCourtOfficerOrder(courtOfficerOrder);
             caseData.setPreTranslationDocuments(new ArrayList<>());

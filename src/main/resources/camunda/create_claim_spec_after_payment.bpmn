@@ -176,7 +176,7 @@
       <bpmn:incoming>Flow_116a9qv</bpmn:incoming>
       <bpmn:outgoing>Flow_07e8le1</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_07e8le1" sourceRef="ClaimSubmissionNotifyParties" targetRef="Gateway_10298sl" />
+    <bpmn:sequenceFlow id="Flow_07e8le1" sourceRef="ClaimSubmissionNotifyParties" targetRef="RemovePaymentDashboardNotification" />
     <bpmn:sequenceFlow id="Flow_07blx0g" sourceRef="IssueClaimForSpecUnrepresentedSolicitor" targetRef="Gateway_0sx9s0b" />
     <bpmn:sequenceFlow id="Flow_02kkae4" sourceRef="GenerateDashboardNotificationsCreateClaimAfterPayment" targetRef="ContinuingClaimOnlineSpecClaimNotifier" />
     <bpmn:sequenceFlow id="Flow_0ce9o0c" sourceRef="ContinuingClaimOnlineSpecClaimNotifier" targetRef="GeneratePipLetter" />
@@ -195,7 +195,6 @@
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_RPA_Case_Handed_Offline_Completed</bpmn:incoming>
       <bpmn:incoming>Flow_1g36kc5</bpmn:incoming>
-      <bpmn:incoming>Flow_0g57iey</bpmn:incoming>
       <bpmn:incoming>Flow_0lrhrxg</bpmn:incoming>
       <bpmn:outgoing>Flow_17vsjp4</bpmn:outgoing>
     </bpmn:callActivity>
@@ -264,21 +263,10 @@
           <camunda:inputParameter name="Input_1qb5qjs" />
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0h4gcra</bpmn:incoming>
+      <bpmn:incoming>Flow_07e8le1</bpmn:incoming>
       <bpmn:outgoing>Flow_0lrhrxg</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_0lrhrxg" sourceRef="RemovePaymentDashboardNotification" targetRef="Activity_19rrcw0" />
-    <bpmn:exclusiveGateway id="Gateway_10298sl" name="Welsh enabled?">
-      <bpmn:incoming>Flow_07e8le1</bpmn:incoming>
-      <bpmn:outgoing>Flow_0h4gcra</bpmn:outgoing>
-      <bpmn:outgoing>Flow_0g57iey</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_0h4gcra" name="Yes" sourceRef="Gateway_10298sl" targetRef="RemovePaymentDashboardNotification">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.WELSH_ENABLED &amp;&amp; flowFlags.WELSH_ENABLED}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_0g57iey" name="No" sourceRef="Gateway_10298sl" targetRef="Activity_19rrcw0">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${empty flowFlags.WELSH_ENABLED || !flowFlags.WELSH_ENABLED}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0nutn2b" sourceRef="GeneratePipLetter" targetRef="NotifyRoboticsOnContinuousFeed" />
     <bpmn:serviceTask id="GeneratePipLetter" name="Generate Pip Letter" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
@@ -401,14 +389,8 @@
         <dc:Bounds x="2310" y="410" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0vpvf0p_di" bpmnElement="RemovePaymentDashboardNotification">
-        <dc:Bounds x="1140" y="800" width="100" height="80" />
+        <dc:Bounds x="930" y="800" width="100" height="80" />
         <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_10298sl_di" bpmnElement="Gateway_10298sl" isMarkerVisible="true">
-        <dc:Bounds x="895" y="815" width="50" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="882" y="872" width="79" height="14" />
-        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_0sq9pcz" bpmnElement="GeneratePipLetter">
         <dc:Bounds x="1930" y="410" width="100" height="80" />
@@ -553,7 +535,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_07e8le1_di" bpmnElement="Flow_07e8le1">
         <di:waypoint x="790" y="840" />
-        <di:waypoint x="895" y="840" />
+        <di:waypoint x="930" y="840" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_07blx0g_di" bpmnElement="Flow_07blx0g">
         <di:waypoint x="1430" y="450" />
@@ -588,25 +570,9 @@
         <di:waypoint x="2450" y="450" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0lrhrxg_di" bpmnElement="Flow_0lrhrxg">
-        <di:waypoint x="1240" y="840" />
+        <di:waypoint x="1030" y="840" />
         <di:waypoint x="2500" y="840" />
         <di:waypoint x="2500" y="490" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0h4gcra_di" bpmnElement="Flow_0h4gcra">
-        <di:waypoint x="945" y="840" />
-        <di:waypoint x="1140" y="840" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1033" y="822" width="19" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0g57iey_di" bpmnElement="Flow_0g57iey">
-        <di:waypoint x="920" y="815" />
-        <di:waypoint x="920" y="760" />
-        <di:waypoint x="2490" y="760" />
-        <di:waypoint x="2490" y="490" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1701" y="742" width="15" height="14" />
-        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0nutn2b_di" bpmnElement="Flow_0nutn2b">
         <di:waypoint x="2030" y="450" />

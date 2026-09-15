@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimResponseFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -52,7 +51,6 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
 
     private final CivilStitchService civilStitchService;
     private final AssignCategoryId assignCategoryId;
-    private final FeatureToggleService featureToggleService;
 
     @Value("${stitching.enabled:true}")
     private boolean stitchEnabled;
@@ -116,7 +114,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
     private void isLipWelshApplicant(CaseData caseData,
                                      CaseDocument sealedForm,
                                      CaseDocument copy) {
-        if (featureToggleService.isWelshEnabledForMainCase() && caseData.isLipvLROneVOne()
+        if (caseData.isLipvLROneVOne()
             && caseData.isClaimantBilingual()
             && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState())) {
             List<Element<CaseDocument>> preTranslationDocs =
@@ -163,7 +161,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 LocalDate.now().toString()
             ));
         }
-        if (featureToggleService.isWelshEnabledForMainCase() && caseData.isLipvLROneVOne()
+        if (caseData.isLipvLROneVOne()
             && caseData.isClaimantBilingual() && caseData.getRespondent1OriginalDqDoc() != null
             && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState())) {
             documents.add(

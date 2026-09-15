@@ -10,15 +10,12 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,7 +32,7 @@ class SdoJourneyToggleServiceTest {
     }
 
     @Test
-    void shouldApplyJourneyFlagsBasedOnToggles() {
+    void shouldApplyJourneyFlagsForCarmAndBilingualCase() {
         when(featureToggleService.isCarmEnabled(any(CaseData.class))).thenReturn(true);
         when(featureToggleService.isWelshJourneyEnabled(any(CaseData.class))).thenReturn(true);
 
@@ -87,81 +84,14 @@ class SdoJourneyToggleServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
 
-        assertThat(service.resolveEaCourtLocation(caseData, true)).isNull();
+        assertThat(service.resolveEaCourtLocation(caseData)).isNull();
     }
 
     @Test
-    void shouldReturnYesWhenWelshJourneyEnabled() {
+    void shouldReturnYesForSpecCasesWhenResolvingEaCourt() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
-        assertThat(service.resolveEaCourtLocation(caseData, true)).isEqualTo(YesOrNo.YES);
-    }
-
-    @Test
-    void shouldReturnNoForLipCaseWhenLocationNotWhitelisted() {
-        CaseData caseData = mock(CaseData.class);
-        when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.SPEC_CLAIM);
-        when(caseData.isApplicantLiP()).thenReturn(true);
-        when(caseData.isLipvLipOneVOne()).thenReturn(true);
-        when(caseData.getCaseManagementLocation()).thenReturn(new CaseLocationCivil().setBaseLocation("123"));
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed("123")).thenReturn(false);
-
-        assertThat(service.resolveEaCourtLocation(caseData, false)).isEqualTo(YesOrNo.NO);
-    }
-
-    @Test
-    void shouldReturnYesForLipCaseWhenLocationWhitelisted() {
-        CaseData caseData = mock(CaseData.class);
-        when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.SPEC_CLAIM);
-        when(caseData.isApplicantLiP()).thenReturn(true);
-        when(caseData.isLipvLipOneVOne()).thenReturn(true);
-        when(caseData.getCaseManagementLocation()).thenReturn(new CaseLocationCivil().setBaseLocation("123"));
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed("123")).thenReturn(true);
-
-        assertThat(service.resolveEaCourtLocation(caseData, false)).isEqualTo(YesOrNo.YES);
-    }
-
-    @Test
-    void shouldReturnNoForLipvLROneVOneEvenWhenNoCEnabledAndWhitelisted() {
-        CaseData caseData = mock(CaseData.class);
-        when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.SPEC_CLAIM);
-        when(caseData.isApplicantLiP()).thenReturn(true);
-        when(caseData.isLipvLipOneVOne()).thenReturn(false);
-        when(caseData.isLRvLipOneVOne()).thenReturn(false);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-
-        assertThat(service.resolveEaCourtLocation(caseData, false)).isEqualTo(YesOrNo.NO);
-    }
-
-    @Test
-    void shouldThrowWhenBaseLocationMissingForLipCase() {
-        CaseData caseData = mock(CaseData.class);
-        when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.SPEC_CLAIM);
-        when(caseData.isApplicantLiP()).thenReturn(true);
-        when(caseData.isLipvLipOneVOne()).thenReturn(true);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-
-        assertThatThrownBy(() -> service.resolveEaCourtLocation(caseData, true))
-            .isInstanceOf(NullPointerException.class);
-    }
-
-    @Test
-    void shouldReturnYesForLipvLROneVOneWhenAllowedAndNoCEnabledAndWhitelisted() {
-        CaseData caseData = mock(CaseData.class);
-        when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.SPEC_CLAIM);
-        when(caseData.isApplicantLiP()).thenReturn(true);
-        when(caseData.isLipvLipOneVOne()).thenReturn(false);
-        when(caseData.isLRvLipOneVOne()).thenReturn(false);
-        when(caseData.isLipvLROneVOne()).thenReturn(true);
-        when(caseData.getCaseManagementLocation()).thenReturn(new CaseLocationCivil().setBaseLocation("321"));
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-        when(featureToggleService.isDefendantNoCOnlineForCase(caseData)).thenReturn(true);
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed("321")).thenReturn(true);
-
-        assertThat(service.resolveEaCourtLocation(caseData, true)).isEqualTo(YesOrNo.YES);
+        assertThat(service.resolveEaCourtLocation(caseData)).isEqualTo(YesOrNo.YES);
     }
 }

@@ -120,9 +120,8 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toMap(objectMapper));
 
-        boolean needsTranslating = featureToggleService.isWelshEnabledForMainCase()
-            ? (callbackParams.getCaseData().isRespondentResponseBilingual() || callbackParams.getCaseData().isClaimantBilingual())
-            : callbackParams.getCaseData().isRespondentResponseBilingual();
+        boolean needsTranslating = callbackParams.getCaseData().isRespondentResponseBilingual()
+            || callbackParams.getCaseData().isClaimantBilingual();
 
         if (!needsTranslating) {
             responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
@@ -181,30 +180,28 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         caseData.setApplicant1ResponseDeadline(applicantDeadline);
         caseData.setNextDeadline(applicantDeadline != null ? applicantDeadline.toLocalDate() : null);
 
-        if (featureToggleService.isWelshEnabledForMainCase()) {
-            Optional<Language> optionalLanguage = Optional.ofNullable(caseData.getRespondent1DQ())
-                .map(Respondent1DQ::getRespondent1DQLanguage).map(WelshLanguageRequirements::getDocuments);
-            String respondentLanguageString = optionalLanguage.map(Language::name).orElse(null);
-            optionalLanguage.ifPresent(docLanguage -> {
-                CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
-                RespondentLiPResponse respondent1LiPResponse = caseDataLiP != null && caseDataLiP.getRespondent1LiPResponse() != null
-                    ? caseDataLiP.getRespondent1LiPResponse()
-                    : new RespondentLiPResponse();
+        Optional<Language> optionalLanguage = Optional.ofNullable(caseData.getRespondent1DQ())
+            .map(Respondent1DQ::getRespondent1DQLanguage).map(WelshLanguageRequirements::getDocuments);
+        String respondentLanguageString = optionalLanguage.map(Language::name).orElse(null);
+        optionalLanguage.ifPresent(docLanguage -> {
+            CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
+            RespondentLiPResponse respondent1LiPResponse = caseDataLiP != null && caseDataLiP.getRespondent1LiPResponse() != null
+                ? caseDataLiP.getRespondent1LiPResponse()
+                : new RespondentLiPResponse();
 
-                respondent1LiPResponse.setRespondent1ResponseLanguage(docLanguage.name());
+            respondent1LiPResponse.setRespondent1ResponseLanguage(docLanguage.name());
 
-                CaseDataLiP updatedCaseDataLiP = caseDataLiP != null ? caseDataLiP : new CaseDataLiP();
-                updatedCaseDataLiP.setRespondent1LiPResponse(respondent1LiPResponse);
-                caseData.setCaseDataLiP(updatedCaseDataLiP);
-            });
-            if (respondentLanguageString == null) {
-                respondentLanguageString = Optional.ofNullable(caseData.getCaseDataLiP())
-                    .map(CaseDataLiP::getRespondent1LiPResponse)
-                    .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
-                    .orElse(null);
-            }
-            caseData.setDefendantLanguagePreferenceDisplay(PreferredLanguage.fromString(respondentLanguageString));
+            CaseDataLiP updatedCaseDataLiP = caseDataLiP != null ? caseDataLiP : new CaseDataLiP();
+            updatedCaseDataLiP.setRespondent1LiPResponse(respondent1LiPResponse);
+            caseData.setCaseDataLiP(updatedCaseDataLiP);
+        });
+        if (respondentLanguageString == null) {
+            respondentLanguageString = Optional.ofNullable(caseData.getCaseDataLiP())
+                .map(CaseDataLiP::getRespondent1LiPResponse)
+                .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
+                .orElse(null);
         }
+        caseData.setDefendantLanguagePreferenceDisplay(PreferredLanguage.fromString(respondentLanguageString));
         return caseData;
     }
 

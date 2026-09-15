@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.PageToken;
 import uk.gov.hmcts.reform.civil.model.search.PaginatedQuery;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.search.common.CommonQueryConstructs;
 import uk.gov.hmcts.reform.civil.service.search.common.PaginatedQueryProvider;
@@ -32,14 +31,11 @@ public class DefendantResponseDeadlineCheckQueryProvider implements PaginatedQue
     private static final int START_INDEX = 0;
 
     private final CommonQueryConstructs commonQueryConstructs;
-    private final FeatureToggleService featureToggleService;
     private final Time time;
 
     public DefendantResponseDeadlineCheckQueryProvider(CommonQueryConstructs commonQueryConstructs,
-                                                       FeatureToggleService featureToggleService,
                                                        Time time) {
         this.commonQueryConstructs = commonQueryConstructs;
-        this.featureToggleService = featureToggleService;
         this.time = time;
     }
 
@@ -71,9 +67,7 @@ public class DefendantResponseDeadlineCheckQueryProvider implements PaginatedQue
             .must(commonQueryConstructs.beState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
             .must(commonQueryConstructs.haveNoOngoingBusinessProcess());
 
-        if (featureToggleService.isWelshEnabledForMainCase()) {
-            deadlineExpired.mustNot(existsQuery("data.respondent1ResponseDate"));
-        }
+        deadlineExpired.mustNot(existsQuery("data.respondent1ResponseDate"));
 
         return boolQuery()
             .minimumShouldMatch(1)
