@@ -7,11 +7,11 @@ plugins {
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.1.7'
   id 'org.springframework.boot' version '3.5.16'
-  id 'org.owasp.dependencycheck' version '12.2.1'
+  id 'org.owasp.dependencycheck' version '13.0.0'
   id 'com.github.ben-manes.versions' version '0.54.0'
   id 'org.sonarqube' version '7.3.1.8318'
   id 'au.com.dius.pact' version '4.6.17'
-  id "io.freefair.lombok" version "8.14.4"
+  id "io.freefair.lombok" version "9.5.0"
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.5"
@@ -36,7 +36,7 @@ def versions = [
   azureJson         : '1.5.1',
   azureServiceBus   : '7.17.19',
   cucumber          : '7.34.7',
-  elasticsearch     : '9.4.4',
+  elasticsearch     : '9.4.6',
   httpclient5       : '5.6.4',
   httpcore5         : '5.4.3',
   jackson           : '2.22.2',
@@ -84,6 +84,11 @@ allprojects {
   }
 
   dependencyCheck {
+    // runtimeClasspath extends Spring Boot's testAndDevelopmentOnly configuration, so
+    // dependency-check's name-based test detection classifies it as a test configuration
+    // and skips it entirely. The CI init script restricts the scan to runtimeClasspath,
+    // so with the default (true) nothing is scanned at all. See DTSCCI-6386.
+    skipTestGroups = false
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
     suppressionFile = 'config/owasp/suppressions.xml'
     formats = ['HTML', 'JSON']
