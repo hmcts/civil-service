@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
@@ -33,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARENT_CLAIM_SETTLED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CLAIM_STATE_AFTER_CLAIMANT_INTENTION_LR_DOC_UPLOADED;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
@@ -58,6 +60,7 @@ public class DetermineNextState extends CallbackHandler {
     private final FeatureToggleService featureToggleService;
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
     private final IStateFlowEngine stateFlowEngine;
+    private final GenAppStateHelperService genAppStateHelperService;
     private Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT),
         this::updateClaimStatePostTranslation
@@ -101,6 +104,9 @@ public class DetermineNextState extends CallbackHandler {
     private CallbackResponse updateClaimStatePostTranslation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String nextState = determineNextStatePostTranslation(caseData, callbackParams);
+        if (CaseState.CASE_SETTLED.name().equals(nextState)) {
+            genAppStateHelperService.triggerEvent(caseData, PARENT_CLAIM_SETTLED);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .state(nextState)

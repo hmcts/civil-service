@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARENT_CLAIM_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.helpers.settlediscontinue.DiscontinueClaimHelper.is1v2LrVLrCase;
 
@@ -63,6 +65,7 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
         + "Any updates will be sent by post.";
     private final ObjectMapper objectMapper;
     private final FeatureToggleService featureToggleService;
+    private final GenAppStateHelperService genAppStateHelperService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -206,8 +209,12 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
                                                                   .getValue().getLabel());
         }
         caseData.setPreviousCCDState(caseData.getCcdState());
+        String caseState = updateCaseState(caseData);
+        if (CASE_DISCONTINUED.name().equals(caseState)) {
+            genAppStateHelperService.triggerEvent(caseData, PARENT_CLAIM_DISCONTINUED);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .state(updateCaseState(caseData))
+                .state(caseState)
                 .data(caseData.toMap(objectMapper))
                 .build();
     }
