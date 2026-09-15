@@ -307,7 +307,8 @@ civil:
   test-user:
     username: ${TEST_USERNAME:test@example.com}
     password: ${TEST_PASSWORD:Password12!}
-  authorised-services: ${CIVIL_S2S_AUTHORISED_SERVICES:payment_app,ccd_data,civil_service,civil-citizen-ui}
+  authorised-services: ${CIVIL_S2S_AUTHORISED_SERVICES:ccd_data,civil_service,civil-citizen-ui}
+  payment-callback-authorised-services: ${CIVIL_PAYMENT_CALLBACK_S2S_AUTHORISED_SERVICES:payment_app,civil_service}
 
 core_case_data:
   api:
@@ -764,7 +765,7 @@ async:
     dispatchDelay: ${EVENT_DISPATCH_DELAY:1900}
     clientBackoffInitial: ${EVENT_CLIENT_BACKOFF_INITIAL:500}
     clientBackoffFactor: ${EVENT_CLIENT_BACKOFF_FACTOR:2}
-    clientBackoffMax: ${EVENT_CLIENT_BACKOFF_MAX:5000}
+    clientBackoffMax: ${EVENT_CLIENT_BACKOFF_MAX:60000}
     httpValidateAfterInactivityMs: ${EVENT_HTTP_VALIDATE_AFTER_INACTIVITY_MS:2000}
 
 feign:
