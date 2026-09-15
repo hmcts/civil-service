@@ -126,10 +126,14 @@ class UpdateMediationUnavailabilityDatesTaskTest {
         CaseData caseData = caseDataWithResponses(
             List.of(new Element<>(UUID.randomUUID(), populated)), null
         );
+        UnavailableDatesCaseReference reference = reference(
+            "defendant",
+            "SINGLE_DATE",
+            LocalDate.of(2026, 9, 7),
+            LocalDate.of(2026, 9, 14)
+        );
 
-        assertThatThrownBy(() -> task.migrateCaseData(caseData, reference(
-            "defendant", "SINGLE_DATE", LocalDate.of(2026, 9, 7), LocalDate.of(2026, 9, 14)
-        )))
+        assertThatThrownBy(() -> task.migrateCaseData(caseData, reference))
             .isInstanceOf(IllegalStateException.class)
             .hasMessage("No SINGLE_DATE unavailable date requires an update");
     }

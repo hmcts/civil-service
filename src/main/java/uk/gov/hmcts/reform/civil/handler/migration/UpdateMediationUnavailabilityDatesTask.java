@@ -32,9 +32,14 @@ public class UpdateMediationUnavailabilityDatesTask extends UpdateUnavailableDat
     @Override
     protected List<Element<UnavailableDate>> getUnavailableDates(CaseData caseData, String partyType) {
         CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
-        MediationLiPCarm response = caseDataLiP == null ? null : DEFENDANT.equals(partyType)
-            ? caseDataLiP.getRespondent1MediationLiPResponseCarm()
-            : caseDataLiP.getApplicant1LiPResponseCarm();
+        MediationLiPCarm response = null;
+        if (caseDataLiP != null) {
+            if (DEFENDANT.equals(partyType)) {
+                response = caseDataLiP.getRespondent1MediationLiPResponseCarm();
+            } else {
+                response = caseDataLiP.getApplicant1LiPResponseCarm();
+            }
+        }
         if (response == null || response.getUnavailableDatesForMediation() == null
             || response.getUnavailableDatesForMediation().isEmpty()) {
             throw new IllegalStateException("Mediation unavailable dates must not be null or empty");

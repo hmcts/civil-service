@@ -90,10 +90,14 @@ class UpdateSmallClaimHearingUnavailabilityDatesTaskTest {
     @Test
     void shouldNotReadMediationDates() {
         CaseData caseData = CaseData.builder().build();
+        UnavailableDatesCaseReference reference = reference(
+            "defendant",
+            "SINGLE_DATE",
+            LocalDate.of(2026, 10, 5),
+            LocalDate.of(2026, 10, 5)
+        );
 
-        assertThatThrownBy(() -> task.migrateCaseData(caseData, reference(
-            "defendant", "SINGLE_DATE", LocalDate.of(2026, 10, 5), LocalDate.of(2026, 10, 5)
-        )))
+        assertThatThrownBy(() -> task.migrateCaseData(caseData, reference))
             .isInstanceOf(IllegalStateException.class)
             .hasMessage("Small claim hearing unavailable dates must not be null or empty");
     }

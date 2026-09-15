@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 abstract class UpdateUnavailableDatesTask extends MigrationTask<UnavailableDatesCaseReference> {
 
@@ -63,7 +64,7 @@ abstract class UpdateUnavailableDatesTask extends MigrationTask<UnavailableDates
     ) {
         UnavailableDate unavailableDate = unavailableDates.stream()
             .map(Element::getValue)
-            .filter(value -> value != null)
+            .filter(Objects::nonNull)
             .filter(value -> unavailableDateType == value.getUnavailableDateType())
             .filter(value -> value.getDate() == null)
             .findFirst()
