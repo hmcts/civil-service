@@ -7,7 +7,11 @@
   "labels": [
     "dependencies"
   ],
-  "automergeSchedule": ["after 8am and before 11am every weekday"],
+  "automergeSchedule": [
+    "after 7am and before 8am every weekday",
+    "after 6pm and before 8pm every weekday"
+  ],
+  "platformAutomerge": false,
   "schedule": ["after 8am and before 11am every weekday"],
   "rebaseWhen": "behind-base-branch",
   "automergeStrategy": "squash",
@@ -55,8 +59,7 @@
       "groupName": "All non-major updates",
       "groupSlug": "all-non-major",
       "automerge": true,
-      "automergeType": "pr",
-      "automergeSchedule": ["before 4pm every weekday"]
+      "automergeType": "pr"
     },
     {
       "matchPackagePatterns": ["^org\\.camunda\\.bpm"],
@@ -70,8 +73,7 @@
       "groupName": "Helm chart updates",
       "groupSlug": "helm-charts",
       "automerge": true,
-      "automergeType": "pr",
-      "automergeSchedule": ["before 4pm every weekday"]
+      "automergeType": "pr"
     },
     {
       "matchPackagePatterns": [
@@ -85,16 +87,14 @@
       "groupName": "Spring Boot and related updates",
       "groupSlug": "spring-boot-related",
       "automerge": true,
-      "automergeType": "pr",
-      "automergeSchedule": ["before 4pm every weekday"]
+      "automergeType": "pr"
     },
     {
       "matchManagers": ["terraform"],
       "groupName": "Terraform updates",
       "groupSlug": "terraform",
       "automerge": true,
-      "automergeType": "pr",
-      "automergeSchedule": ["before 4pm every weekday"]
+      "automergeType": "pr"
     },
     {
       "matchPackagePatterns": [
@@ -104,8 +104,7 @@
       "groupName": "Lombok updates",
       "groupSlug": "lombok",
       "automerge": true,
-      "automergeType": "pr",
-      "automergeSchedule": ["before 4pm every weekday"]
+      "automergeType": "pr"
     }
   ]
 }
