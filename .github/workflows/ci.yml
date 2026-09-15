@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: '3.14'
       - name: Install Semgrep
-        run: python -m pip install semgrep==1.136.0
+        run: python -m pip install semgrep==1.177.0
       - name: Test PII logging rules
         run: semgrep test .semgrep
       - name: Scan changed application code for PII logging
