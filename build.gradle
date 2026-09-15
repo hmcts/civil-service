@@ -759,9 +759,10 @@ tasks.withType(Test).configureEach { t ->
   } else {
     description = "Runs unit tests"
     maxHeapSize = "1536m"
-    // Disable class data sharing to avoid potential issues with shared class metadata in test forks,
-    // increases memory usage but improves stability in CI environments
-    jvmArgs '-Xshare:off'
+    // Retain the existing CDS setting for test tasks outside the unit-test comparison.
+    if (t.name != 'test') {
+      jvmArgs '-Xshare:off'
+    }
     // Use Parallel GC for faster, short-lived test forks
     jvmArgs '-XX:+UseParallelGC'
   }
@@ -772,8 +773,6 @@ tasks.withType(Test).configureEach { t ->
   minHeapSize = "256m"
   jvmArgs "-XX:MaxMetaspaceSize=512m"
   jvmArgs '-XX:ReservedCodeCacheSize=512m'
-  // Temurin 21.0.7 occasionally crashes in C2 (BoolNode::Ideal SIGSEGV); stay on C1 until upstream fix.
-  jvmArgs "-XX:TieredStopAtLevel=1"
   // Docker Desktop 29 (Engine API 1.54) rejects docker-java's older default API version.
   systemProperty 'api.version', System.getProperty('api.version', '1.40')
 
