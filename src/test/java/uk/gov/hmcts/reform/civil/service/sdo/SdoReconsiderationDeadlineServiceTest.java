@@ -12,7 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 
@@ -32,13 +31,8 @@ import static uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOp
 @ExtendWith(MockitoExtension.class)
 class SdoReconsiderationDeadlineServiceTest {
 
-    private static final String BASE_LOCATION = "Base Location";
-
     @Mock
     private WorkingDayIndicator workingDayIndicator;
-
-    @Mock
-    private SdoFeatureToggleService featureToggleService;
 
     @Mock
     private Time time;
@@ -97,50 +91,20 @@ class SdoReconsiderationDeadlineServiceTest {
 
         @ParameterizedTest
         @MethodSource("provideCsvSourceTrueCases")
-        void shouldReturnTrue_ForGiven_whenFeatureToggleTrue(String responseClaimTrack,
-                                                             BigDecimal totalClaimAmount,
-                                                             DecisionOnRequestReconsiderationOptions option) {
+        void shouldReturnTrue_ForGiven(String responseClaimTrack,
+                                       BigDecimal totalClaimAmount,
+                                       DecisionOnRequestReconsiderationOptions option) {
             CaseData caseData = caseData(responseClaimTrack, totalClaimAmount, option);
-
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(true);
 
             assertTrue(reconsiderationDeadlineService.isEligibleForReconsideration(caseData));
-        }
-
-        @ParameterizedTest
-        @MethodSource("provideCsvSourceTrueCases")
-        void shouldReturnTrue_ForGiven_whenWelshEnabledForMainCase(String responseClaimTrack,
-                                                                   BigDecimal totalClaimAmount,
-                                                                   DecisionOnRequestReconsiderationOptions option) {
-            CaseData caseData = caseData(responseClaimTrack, totalClaimAmount, option);
-
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(false);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-
-            assertTrue(reconsiderationDeadlineService.isEligibleForReconsideration(caseData));
-        }
-
-        @ParameterizedTest
-        @MethodSource("provideCsvSourceTrueCases")
-        void shouldReturnFalse_ForGiven_whenFeatureTogglesAreFalse(String responseClaimTrack,
-                                                                   BigDecimal totalClaimAmount,
-                                                                   DecisionOnRequestReconsiderationOptions option) {
-            CaseData caseData = caseData(responseClaimTrack, totalClaimAmount, option);
-
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(false);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-
-            assertFalse(reconsiderationDeadlineService.isEligibleForReconsideration(caseData));
         }
 
         @ParameterizedTest
         @MethodSource("provideCsvSourceFalseCases")
-        void shouldReturnFalse_ForGiven_whenFeatureToggleTrue(String responseClaimTrack,
-                                                              BigDecimal totalClaimAmount,
-                                                              DecisionOnRequestReconsiderationOptions option) {
+        void shouldReturnFalse_ForGiven(String responseClaimTrack,
+                                        BigDecimal totalClaimAmount,
+                                        DecisionOnRequestReconsiderationOptions option) {
             CaseData caseData = caseData(responseClaimTrack, totalClaimAmount, option);
-
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(true);
 
             assertFalse(reconsiderationDeadlineService.isEligibleForReconsideration(caseData));
         }
@@ -148,9 +112,7 @@ class SdoReconsiderationDeadlineServiceTest {
         private CaseData caseData(String responseClaimTrack,
                                   BigDecimal totalClaimAmount,
                                   DecisionOnRequestReconsiderationOptions option) {
-            CaseData caseData = new CaseDataBuilder()
-                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION))
-                .build();
+            CaseData caseData = new CaseDataBuilder().build();
             caseData.setResponseClaimTrack(responseClaimTrack);
             caseData.setTotalClaimAmount(totalClaimAmount);
             caseData.setDecisionOnRequestReconsiderationOptions(option);

@@ -46,7 +46,6 @@ class GenerateDirectionsOrderWorkflowTest extends WorkflowIntegrationTest {
         when(locationRefDataService.getHearingCourtLocations(anyString(), anyString()))
             .thenReturn(List.of(locationRefData));
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
 
         when(userService.getUserDetails(anyString()))
             .thenReturn(UserDetails.builder()

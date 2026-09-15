@@ -46,12 +46,6 @@ public class DashboardNotificationHelper {
         return findMediationUnsuccessfulReason(caseData, List.of(NOT_CONTACTABLE_DEFENDANT_ONE));
     }
 
-    public boolean isSDODrawnPreCPRelease(CaseData caseData) {
-        return !(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(
-            caseData.getCaseManagementLocation().getBaseLocation())
-            || featureToggleService.isWelshEnabledForMainCase());
-    }
-
     public boolean hasTrackChanged(CaseData caseData) {
         return SMALL_CLAIM.equals(getPreviousAllocatedTrack(caseData))
             && !caseData.isSmallClaim();
