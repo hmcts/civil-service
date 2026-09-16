@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -108,6 +109,21 @@ class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnError_WhenAboutToStartIsInvokedAndInBreathingSpace() {
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            breathingSpaceInfo.setActive(YES);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setBreathing(breathingSpaceInfo);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getErrors()).contains("Default judgment cannot be applied for while claim is "
+                                                          + "in breathing space");
         }
     }
 
