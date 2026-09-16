@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
+import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -37,15 +38,20 @@ public class ClaimSettledDefendantLiPLetterGenerator {
         log.info("Generating claim settled letter for caseId {}", caseId);
 
         CaseDocument claimSettledDoc = generateLetter(caseData, auth, CLAIM_SETTLED_LIP_DEFENDANT_LETTER);
+        log.info("Generated claim settled letter document for caseId {}, documentUrl: {}, binaryUrl: {}",
+                 caseId, claimSettledDoc.getDocumentLink().getDocumentUrl(),
+                 claimSettledDoc.getDocumentLink().getDocumentBinaryUrl());
 
         String errorMessage = "Failed getting claim settled letter for caseId {}";
         byte[] letterContent = documentDownloadService.downloadDocument(claimSettledDoc, auth, caseId.toString(), errorMessage);
 
         List<String> recipients = getRecipientsList(caseData);
         List<String> bulkPrintFileNames = List.of(claimSettledDoc.getDocumentLink().getDocumentFileName());
-        bulkPrintService.printLetter(letterContent, String.valueOf(caseData.getCcdCaseReference()),
+        SendLetterResponse sendLetterResponse = bulkPrintService.printLetter(letterContent, String.valueOf(caseData.getCcdCaseReference()),
                                      caseData.getLegacyCaseReference(), CLAIM_SETTLED_LETTER_TITLE,
                                      recipients, bulkPrintFileNames);
+        log.info("Claim settled letter sent to bulk print for caseId {}, send-letter-service letterId: {}",
+                 caseId, sendLetterResponse.letterId);
     }
 
     private CaseDocument generateLetter(CaseData caseData, String authorisation, DocmosisTemplates template) {

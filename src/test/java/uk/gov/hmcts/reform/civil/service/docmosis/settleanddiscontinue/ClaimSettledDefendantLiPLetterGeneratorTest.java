@@ -20,8 +20,10 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
+import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -81,6 +83,9 @@ class ClaimSettledDefendantLiPLetterGeneratorTest {
         given(documentDownloadService.downloadDocument(
             any(), any(), anyString(), anyString()
         )).willReturn(bytes);
+
+        when(bulkPrintService.printLetter(any(), anyString(), anyString(), anyString(), any(), any()))
+            .thenReturn(new SendLetterResponse(UUID.randomUUID()));
 
         Party applicant = new PartyBuilder().soleTrader().build();
         Party defendant = new PartyBuilder().soleTrader().build();
