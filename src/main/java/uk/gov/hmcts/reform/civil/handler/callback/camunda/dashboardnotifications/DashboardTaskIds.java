@@ -74,4 +74,5 @@ public final class DashboardTaskIds {
     public static final String PROCESS_COSC = "GenerateDashboardNotificationsProcessCOSC";
     public static final String CLAIM_DISMISSED = "GenerateDashboardNotificationsClaimDismissed";
     public static final String REQUEST_A_LISTING = "GenerateDashboardNotificationRequestAListing";
+    public static final String CONFIRM_ORDER_REVIEW_NOT_FINAL = "GenerateDashboardNotificationConfirmOrderReviewNotFinal";
 }

@@ -38,8 +38,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW_DASHBOARD_UPDATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW_FINAL_ORDER;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED_RETRIGGER;
 import static uk.gov.hmcts.reform.civil.enums.CourtStaffNextSteps.STILL_TASKS;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -131,9 +131,7 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
         } else if (YesOrNo.YES.equals(caseData.getIsFinalOrder())) {
             caseData.setBusinessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW_FINAL_ORDER));
         } else if (isReturningFromDecisionOutcome) {
-            // reuses the Request a Listing business process purely to reactivate the hearing-documents
-            // dashboard tasks on return to Case Progression - not an actual listing request
-            caseData.setBusinessProcess(BusinessProcess.ready(HEARING_SCHEDULED_RETRIGGER));
+            caseData.setBusinessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW_DASHBOARD_UPDATE));
         }
 
         if (nonNull(caseData.getObligationData())) {
