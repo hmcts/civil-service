@@ -44,11 +44,12 @@ abstract class UpdateUnavailableDatesTask
         UnavailableDateType unavailableDateType =
             parseUnavailableDateType(caseReference.getUnavailableDateType());
 
-        updateNextMissingDate(
-            getUnavailableDates(caseData, partyType),
-            caseReference,
-            unavailableDateType
-        );
+        getUnavailableDateCollections(caseData, partyType)
+            .forEach(unavailableDates -> updateNextMissingDate(
+                unavailableDates,
+                caseReference,
+                unavailableDateType
+            ));
 
         return caseData;
     }
@@ -57,6 +58,13 @@ abstract class UpdateUnavailableDatesTask
         CaseData caseData,
         String partyType
     );
+
+    protected List<List<Element<UnavailableDate>>> getUnavailableDateCollections(
+        CaseData caseData,
+        String partyType
+    ) {
+        return List.of(getUnavailableDates(caseData, partyType));
+    }
 
     protected final boolean isDefendant(String partyType) {
         return DEFENDANT.equals(partyType);

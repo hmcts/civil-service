@@ -19,6 +19,7 @@ public class CreateCaseLevelCaseFlagTask extends MigrationTaskWithMetadata<CaseF
 
     private static final String ACTIVE = "Active";
     private static final String OTHER = "Other";
+    public static final String OTHER_FLAG_CODE = "OT0001";
 
     public CreateCaseLevelCaseFlagTask() {
         super(
@@ -45,6 +46,7 @@ public class CreateCaseLevelCaseFlagTask extends MigrationTaskWithMetadata<CaseF
         details.add(element(new FlagDetail()
                                 .setName(OTHER)
                                 .setFlagComment(caseReference.getComment())
+                                .setFlagCode(OTHER_FLAG_CODE)
                                 .setStatus(ACTIVE)));
 
         Flags updatedFlags = new Flags()

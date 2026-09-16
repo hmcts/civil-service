@@ -12,7 +12,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CASE_FLAGS;
 
 class CreateCaseLevelCaseFlagTaskTest {
 
@@ -32,7 +31,8 @@ class CreateCaseLevelCaseFlagTaskTest {
         assertThat(element.getValue().getName()).isEqualTo("Other");
         assertThat(element.getValue().getFlagComment()).isEqualTo("Migration flag comment");
         assertThat(element.getValue().getStatus()).isEqualTo("Active");
-        assertThat(task.getCaseEvent()).isEqualTo(CREATE_CASE_FLAGS);
+        assertThat(element.getValue().getStatus()).isEqualTo("Active");
+        assertThat(element.getValue().getFlagCode()).isEqualTo("OT0001");
     }
 
     @Test

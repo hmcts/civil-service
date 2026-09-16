@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.bulkupdate.csv;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -24,6 +25,7 @@ public class UnavailableDatesCaseReference extends CaseReference implements Exce
     @JsonProperty
     private String unavailableDateType;
     @JsonProperty
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate fromDate;
     @JsonProperty
     private LocalDate toDate;
