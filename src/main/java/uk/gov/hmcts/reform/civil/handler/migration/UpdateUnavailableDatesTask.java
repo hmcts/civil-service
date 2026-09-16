@@ -24,11 +24,19 @@ abstract class UpdateUnavailableDatesTask extends MigrationTaskWithMetadata<Unav
     }
 
     @Override
-    protected final CaseData migrateCaseData(CaseData caseData, UnavailableDatesCaseReference caseReference) {
+    protected final CaseData migrateCaseData(
+        CaseData caseData,
+        UnavailableDatesCaseReference caseReference
+    ) {
         validate(caseData, caseReference);
 
-        String partyType = caseReference.getPartyType().trim().toLowerCase(Locale.ENGLISH);
-        UnavailableDateType unavailableDateType = parseUnavailableDateType(caseReference.getUnavailableDateType());
+        String partyType = caseReference.getPartyType()
+            .trim()
+            .toLowerCase(Locale.ENGLISH);
+
+        UnavailableDateType unavailableDateType =
+            parseUnavailableDateType(caseReference.getUnavailableDateType());
+
         updateNextMissingDate(
             getUnavailableDates(caseData, partyType),
             caseReference,
@@ -38,7 +46,10 @@ abstract class UpdateUnavailableDatesTask extends MigrationTaskWithMetadata<Unav
         return caseData;
     }
 
-    protected abstract List<Element<UnavailableDate>> getUnavailableDates(CaseData caseData, String partyType);
+    protected abstract List<Element<UnavailableDate>> getUnavailableDates(
+        CaseData caseData,
+        String partyType
+    );
 
     protected final boolean isDefendant(String partyType) {
         return DEFENDANT.equals(partyType);
@@ -49,18 +60,31 @@ abstract class UpdateUnavailableDatesTask extends MigrationTaskWithMetadata<Unav
         String fieldDescription
     ) {
         if (unavailableDates == null || unavailableDates.isEmpty()) {
-            throw new IllegalStateException(fieldDescription + " must not be null or empty");
+            throw new IllegalStateException(
+                fieldDescription + " must not be null or empty"
+            );
         }
+
         return unavailableDates;
     }
 
-    private void validate(CaseData caseData, UnavailableDatesCaseReference caseReference) {
+    private void validate(
+        CaseData caseData,
+        UnavailableDatesCaseReference caseReference
+    ) {
         if (caseData == null) {
-            throw new IllegalArgumentException("CaseData must not be null");
+            throw new IllegalArgumentException(
+                "CaseData must not be null"
+            );
         }
-        if (caseReference == null || caseReference.getCaseReference() == null) {
-            throw new IllegalArgumentException("CaseReference fields must not be null");
+
+        if (caseReference == null
+            || caseReference.getCaseReference() == null) {
+            throw new IllegalArgumentException(
+                "CaseReference fields must not be null"
+            );
         }
+
         if (caseReference.getPartyType() == null
             || caseReference.getUnavailableDateType() == null
             || caseReference.getFromDate() == null) {
@@ -68,11 +92,27 @@ abstract class UpdateUnavailableDatesTask extends MigrationTaskWithMetadata<Unav
                 "Party type, unavailable date type and from date must not be null"
             );
         }
-        String partyType = caseReference.getPartyType().trim().toLowerCase(Locale.ENGLISH);
-        if (!CLAIMANT.equals(partyType) && !DEFENDANT.equals(partyType)) {
-            throw new IllegalArgumentException("Party type must be claimant or defendant");
+
+        String partyType = caseReference.getPartyType()
+            .trim()
+            .toLowerCase(Locale.ENGLISH);
+
+        if (!CLAIMANT.equals(partyType)
+            && !DEFENDANT.equals(partyType)) {
+            throw new IllegalArgumentException(
+                "Party type must be claimant or defendant"
+            );
         }
-        parseUnavailableDateType(caseReference.getUnavailableDateType());
+
+        UnavailableDateType unavailableDateType =
+            parseUnavailableDateType(caseReference.getUnavailableDateType());
+
+        if (unavailableDateType == UnavailableDateType.DATE_RANGE
+            && caseReference.getToDate() == null) {
+            throw new IllegalArgumentException(
+                "To date must not be null for DATE_RANGE"
+            );
+        }
     }
 
     private void updateNextMissingDate(
@@ -80,27 +120,61 @@ abstract class UpdateUnavailableDatesTask extends MigrationTaskWithMetadata<Unav
         UnavailableDatesCaseReference caseReference,
         UnavailableDateType unavailableDateType
     ) {
-        UnavailableDate unavailableDate = unavailableDates.stream()
+        if (unavailableDates == null || unavailableDates.isEmpty()) {
+            return;
+        }
+
+        unavailableDates.stream()
             .map(Element::getValue)
             .filter(Objects::nonNull)
-            .filter(value -> unavailableDateType == value.getUnavailableDateType())
-            .filter(value -> value.getDate() == null)
+            .filter(value ->
+                        unavailableDateType == value.getUnavailableDateType()
+            )
+            .filter(value ->
+                        requiresUpdate(value, unavailableDateType)
+            )
             .findFirst()
-            .orElseThrow(() -> new IllegalStateException(
-                "No " + unavailableDateType + " unavailable date requires an update"
-            ));
+            .ifPresent(unavailableDate ->
+                           updateUnavailableDate(
+                               unavailableDate,
+                               caseReference,
+                               unavailableDateType
+                           )
+            );
+    }
 
-        unavailableDate.setDate(caseReference.getFromDate());
-        unavailableDate.setFromDate(caseReference.getFromDate());
-        if (caseReference.getToDate() != null) {
-            unavailableDate.setToDate(caseReference.getToDate());
+    private boolean requiresUpdate(
+        UnavailableDate unavailableDate,
+        UnavailableDateType unavailableDateType
+    ) {
+        if (unavailableDateType == UnavailableDateType.SINGLE_DATE) {
+            return unavailableDate.getDate() == null;
         }
+
+        return unavailableDate.getFromDate() == null;
+    }
+
+    private void updateUnavailableDate(
+        UnavailableDate unavailableDate,
+        UnavailableDatesCaseReference caseReference,
+        UnavailableDateType unavailableDateType
+    ) {
+        if (unavailableDateType == UnavailableDateType.SINGLE_DATE) {
+            unavailableDate.setDate(caseReference.getFromDate());
+            return;
+        }
+
+        unavailableDate.setFromDate(caseReference.getFromDate());
+        unavailableDate.setToDate(caseReference.getToDate());
     }
 
     private UnavailableDateType parseUnavailableDateType(String value) {
         try {
             return UnavailableDateType.valueOf(
-                value.trim().replace(' ', '_').replace('-', '_').toUpperCase(Locale.ENGLISH)
+                value.trim()
+                    .replace(' ', '_')
+                    .replace('-', '_')
+                    .toUpperCase(Locale.ENGLISH)
             );
         } catch (IllegalArgumentException exception) {
             throw new IllegalArgumentException(
