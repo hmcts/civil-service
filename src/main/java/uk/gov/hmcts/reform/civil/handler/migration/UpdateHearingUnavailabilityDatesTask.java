@@ -25,9 +25,11 @@ public class UpdateHearingUnavailabilityDatesTask extends UpdateUnavailableDates
         SmallClaimHearing hearing = isDefendant(partyType)
             ? getRespondentHearing(caseData)
             : getApplicantHearing(caseData);
-        return unavailableDatesOrEmpty(
-            hearing == null ? null : hearing.getSmallClaimUnavailableDate()
-        );
+        if (hearing == null && isDefendant(partyType)) {
+            Hearing fastTrackHearing = getRespondentFastTrackHearing(caseData);
+            return unavailableDatesOrEmpty(fastTrackHearing == null ? null : fastTrackHearing.getUnavailableDates());
+        }
+        return unavailableDatesOrEmpty(hearing == null ? null : hearing.getSmallClaimUnavailableDate());
     }
 
     @Override
@@ -74,5 +76,11 @@ public class UpdateHearingUnavailabilityDatesTask extends UpdateUnavailableDates
         return caseData.getApplicant1DQ() == null
             ? null
             : caseData.getApplicant1DQ().getApplicant1DQSmallClaimHearing();
+    }
+
+    private Hearing getRespondentFastTrackHearing(CaseData caseData) {
+        return caseData.getRespondent1DQ() == null
+            ? null
+            : caseData.getRespondent1DQ().getRespondent1DQHearingFastClaim();
     }
 }

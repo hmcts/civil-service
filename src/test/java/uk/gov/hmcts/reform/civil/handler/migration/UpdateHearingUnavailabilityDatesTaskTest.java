@@ -54,6 +54,34 @@ class UpdateHearingUnavailabilityDatesTaskTest {
     }
 
     @Test
+    void shouldUpdateRespondentFastTrackHearingDateWhenSmallClaimHearingIsAbsent() {
+        UUID elementId = UUID.randomUUID();
+        UnavailableDate fastTrackMissingDate = unavailableDate("defendant", UnavailableDateType.DATE_RANGE);
+        UnavailableDate hearingMissingDate = unavailableDate("defendant", UnavailableDateType.DATE_RANGE);
+        UnavailableDate tabMissingDate = unavailableDate("defendant", UnavailableDateType.DATE_RANGE);
+        CaseData caseData = CaseData.builder()
+            .respondent1DQ(new Respondent1DQ()
+                               .setRespondent1DQHearingFastClaim(
+                                   hearing(elementId, List.of(fastTrackMissingDate))
+                               )
+                               .setRespondent1DQHearing(hearing(List.of(hearingMissingDate))))
+            .respondent1UnavailableDatesForTab(elements(List.of(tabMissingDate)))
+            .build();
+
+        task.migrateCaseData(caseData, reference(
+            "defendant", "DATE_RANGE", LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 18)
+        ));
+
+        Element<UnavailableDate> updated = caseData.getRespondent1DQ()
+            .getRespondent1DQHearingFastClaim().getUnavailableDates().getFirst();
+        assertThat(updated.getId()).isEqualTo(elementId);
+        assertThat(updated.getValue().getUnavailableDateType()).isEqualTo(UnavailableDateType.DATE_RANGE);
+        assertUpdated(updated.getValue(), LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 18));
+        assertUpdated(hearingMissingDate, LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 18));
+        assertUpdated(tabMissingDate, LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 18));
+    }
+
+    @Test
     void shouldUpdateApplicantSmallClaimHearingBasedOnPartyTypeAndDateType() {
         UnavailableDate dateRange = unavailableDate("defendant", UnavailableDateType.DATE_RANGE);
         UnavailableDate singleDate = unavailableDate("defendant", UnavailableDateType.SINGLE_DATE);
@@ -127,6 +155,12 @@ class UpdateHearingUnavailabilityDatesTaskTest {
 
     private Hearing hearing(List<UnavailableDate> unavailableDates) {
         return new Hearing().setUnavailableDates(elements(unavailableDates));
+    }
+
+    private Hearing hearing(UUID firstElementId, List<UnavailableDate> unavailableDates) {
+        Hearing hearing = hearing(unavailableDates);
+        hearing.getUnavailableDates().getFirst().setId(firstElementId);
+        return hearing;
     }
 
     private List<Element<UnavailableDate>> elements(List<UnavailableDate> unavailableDates) {
