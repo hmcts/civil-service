@@ -5,11 +5,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.notify.audit.NotificationAuditService;
+import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendEmailResponse;
 
 import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,6 +24,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.BDDMockito.willReturn;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationServiceTest {
@@ -32,14 +35,17 @@ class NotificationServiceTest {
     @Mock
     private NotificationAuditService notificationAuditService;
 
+    @Mock
+    private ValidateEmailService validateEmailService;
+
     private NotificationService service;
 
     private NotificationService serviceWithAudit() {
-        return new NotificationService(notificationClient, Optional.of(notificationAuditService));
+        return new NotificationService(notificationClient, Optional.of(notificationAuditService), validateEmailService);
     }
 
     private NotificationService serviceWithoutAudit() {
-        return new NotificationService(notificationClient, Optional.empty());
+        return new NotificationService(notificationClient, Optional.empty(), validateEmailService);
     }
 
     @Test
@@ -47,6 +53,7 @@ class NotificationServiceTest {
         // Given
         service = serviceWithoutAudit();
         SendEmailResponse response = mock(SendEmailResponse.class);
+        willReturn(List.of()).given(validateEmailService).validate("email@email.com");
         given(notificationClient.sendEmail(any(), any(), any(), any())).willReturn(response);
         given(response.getNotificationId()).willReturn(UUID.randomUUID());
 
@@ -61,6 +68,7 @@ class NotificationServiceTest {
     void shouldNotThrowException_whenSendEmailResponseIsNull() throws NotificationClientException {
         // Given
         service = serviceWithoutAudit();
+        willReturn(List.of()).given(validateEmailService).validate("email@email.com");
         given(notificationClient.sendEmail(any(), any(), any(), any())).willReturn(null);
 
         // When
@@ -76,6 +84,7 @@ class NotificationServiceTest {
         // Given
         service = serviceWithoutAudit();
         SendEmailResponse response = mock(SendEmailResponse.class);
+        willReturn(List.of()).given(validateEmailService).validate("email@email.com");
         given(notificationClient.sendEmail(any(), any(), any(), any())).willReturn(response);
         given(response.getNotificationId()).willReturn(null);
 
@@ -91,6 +100,7 @@ class NotificationServiceTest {
     void shouldReturnException_whenNotificationClientSendEmailReturnsException() throws NotificationClientException {
         // Given
         service = serviceWithoutAudit();
+        willReturn(List.of()).given(validateEmailService).validate("email@email.com");
         given(notificationClient.sendEmail(any(), any(), any(), any()))
             .willThrow(new NotificationClientException("error"));
         // When  // Then
@@ -130,6 +140,7 @@ class NotificationServiceTest {
         service = serviceWithAudit();
         SendEmailResponse response = mock(SendEmailResponse.class);
         UUID notificationId = UUID.randomUUID();
+        willReturn(List.of()).given(validateEmailService).validate("email@email.com");
         given(notificationClient.sendEmail(any(), any(), any(), any())).willReturn(response);
         given(response.getNotificationId()).willReturn(notificationId);
 
@@ -149,6 +160,7 @@ class NotificationServiceTest {
     void shouldNotRecordAudit_whenSendThrows() throws NotificationClientException {
         // Given
         service = serviceWithAudit();
+        willReturn(List.of()).given(validateEmailService).validate("email@email.com");
         given(notificationClient.sendEmail(any(), any(), any(), any()))
             .willThrow(new NotificationClientException("boom"));
 
@@ -165,11 +177,43 @@ class NotificationServiceTest {
         SendEmailResponse response = mock(SendEmailResponse.class);
         given(notificationClient.sendEmail(any(), any(), any(), any())).willReturn(response);
         given(response.getNotificationId()).willReturn(UUID.randomUUID());
+        willReturn(List.of()).given(validateEmailService).validate("email@email.com");
         doThrow(new RuntimeException("audit broken"))
             .when(notificationAuditService).record(any(), any(), any(), any());
 
         // When  // Then — must not throw
         service.sendMail("email@email.com", "template", Map.of("param1", "param1"), "reference");
+        verify(notificationClient)
+            .sendEmail("template", "email@email.com", Map.of("param1", "param1"), "reference");
+    }
+
+    @Test
+    void shouldSkipNotification_whenEmailInvalid() throws NotificationClientException {
+        // Given
+        service = serviceWithoutAudit();
+        given(validateEmailService.validate("not-an-email")).willReturn(List.of("invalid"));
+
+        // When
+        service.sendMail("not-an-email", "template", Map.of("param1", "param1"), "reference");
+
+        // Then
+        verify(notificationClient, never()).sendEmail(any(), any(), any(), any());
+        verify(notificationAuditService, never()).record(any(), any(), any(), any());
+    }
+
+    @Test
+    void shouldTrimNotificationEmailBeforeSending() throws NotificationClientException {
+        // Given
+        service = serviceWithoutAudit();
+        SendEmailResponse response = mock(SendEmailResponse.class);
+        willReturn(List.of()).given(validateEmailService).validate("email@email.com");
+        given(notificationClient.sendEmail(any(), any(), any(), any())).willReturn(response);
+        given(response.getNotificationId()).willReturn(UUID.randomUUID());
+
+        // When
+        service.sendMail("  email@email.com  ", "template", Map.of("param1", "param1"), "reference");
+
+        // Then
         verify(notificationClient)
             .sendEmail("template", "email@email.com", Map.of("param1", "param1"), "reference");
     }
