@@ -21,7 +21,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARKED_PAID_IN_FULL;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIM_SETTLED_LETTER_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_UNSPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
@@ -60,7 +60,7 @@ public class SettleClaimUnspecCallbackHandler extends CallbackHandler {
             responseBuilder.state(CASE_SETTLED.name());
         } else {
             caseData.setPreStayState(caseData.getCcdState().toString());
-            caseData.setBusinessProcess(BusinessProcess.ready(SETTLE_CLAIM_MARKED_PAID_IN_FULL));
+            caseData.setBusinessProcess(BusinessProcess.ready(CLAIM_SETTLED_LETTER_NOTIFICATION));
             responseBuilder.state(CASE_STAYED.name());
         }
 

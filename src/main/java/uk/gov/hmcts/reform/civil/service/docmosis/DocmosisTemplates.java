@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis;
 
 import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.ACKNOWLEDGEMENT_OF_CLAIM_FORM;
 import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.CERTIFICATE_OF_DEBT_PAYMENT_PDF;
+import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.CLAIM_SETTLED_LETTER;
 import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.DEFAULT_JUDGMENT_SPEC_FORM;
 import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.constants.EnumDuplicateLiteralConstants.DIRECTIONS_QUESTIONNAIRE_FORM;
@@ -57,6 +58,8 @@ public enum DocmosisTemplates {
     DEFAULT_JUDGMENT_COVER_LETTER("CV-SPC-STD-ENG-DJ-COVER-LETTER-00985.docx", "default_judgment_cover_letter.pdf"),
     SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER("CV-SPC-LET-ENG-LIP-SD0001.docx", SETTLE_CLAIM_PAID_IN_FULL_LETTER),
     SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER_WELSH("CV-SPC-LET-WEL-LIP-SD0001.docx", SETTLE_CLAIM_PAID_IN_FULL_LETTER),
+    CLAIM_SETTLED_LIP_DEFENDANT_LETTER("CV-SPC-LET-ENG-LIP-SD0002.docx", CLAIM_SETTLED_LETTER),
+    CLAIM_SETTLED_LIP_DEFENDANT_LETTER_WELSH("CV-SPC-LET-WEL-LIP-SD0002.docx", CLAIM_SETTLED_LETTER),
     DEFENDANT_RESPONSE_SPEC_FAST_TRACK_INT("CV-SPC-HRN-ENG-01358.docx", DIRECTIONS_QUESTIONNAIRE_FORM),
     CLAIMANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01356.docx", DIRECTIONS_QUESTIONNAIRE_FORM),
     CLAIMANT_RESPONSE_SPEC_FAST_TRACK_INT("CV-SPC-HRN-ENG-01359.docx", DIRECTIONS_QUESTIONNAIRE_FORM),
