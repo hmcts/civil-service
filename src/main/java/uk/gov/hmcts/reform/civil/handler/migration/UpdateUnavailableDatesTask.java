@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -61,17 +62,12 @@ abstract class UpdateUnavailableDatesTask
         return DEFENDANT.equals(partyType);
     }
 
-    protected final List<Element<UnavailableDate>> requireUnavailableDates(
-        List<Element<UnavailableDate>> unavailableDates,
-        String fieldDescription
+    protected final List<Element<UnavailableDate>> unavailableDatesOrEmpty(
+        List<Element<UnavailableDate>> unavailableDates
     ) {
-        if (unavailableDates == null || unavailableDates.isEmpty()) {
-            throw new IllegalStateException(
-                fieldDescription + " must not be null or empty"
-            );
-        }
-
-        return unavailableDates;
+        return unavailableDates == null
+            ? Collections.emptyList()
+            : unavailableDates;
     }
 
     private void validate(

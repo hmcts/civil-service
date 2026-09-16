@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class UpdateSmallClaimHearingUnavailabilityDatesTaskTest {
 
@@ -88,7 +87,7 @@ class UpdateSmallClaimHearingUnavailabilityDatesTaskTest {
     }
 
     @Test
-    void shouldNotReadMediationDates() {
+    void shouldNotFailWhenHearingDatesAreAbsent() {
         CaseData caseData = CaseData.builder().build();
         UnavailableDatesCaseReference reference = reference(
             "defendant",
@@ -97,9 +96,9 @@ class UpdateSmallClaimHearingUnavailabilityDatesTaskTest {
             LocalDate.of(2026, 10, 5)
         );
 
-        assertThatThrownBy(() -> task.migrateCaseData(caseData, reference))
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessage("Small claim hearing unavailable dates must not be null or empty");
+        CaseData result = task.migrateCaseData(caseData, reference);
+
+        assertThat(result).isSameAs(caseData);
     }
 
     private SmallClaimHearing smallClaimHearing(

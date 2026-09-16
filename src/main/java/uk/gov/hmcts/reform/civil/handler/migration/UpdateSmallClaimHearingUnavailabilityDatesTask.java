@@ -24,9 +24,8 @@ public class UpdateSmallClaimHearingUnavailabilityDatesTask extends UpdateUnavai
         SmallClaimHearing hearing = isDefendant(partyType)
             ? getRespondentHearing(caseData)
             : getApplicantHearing(caseData);
-        return requireUnavailableDates(
-            hearing == null ? null : hearing.getSmallClaimUnavailableDate(),
-            "Small claim hearing unavailable dates"
+        return unavailableDatesOrEmpty(
+            hearing == null ? null : hearing.getSmallClaimUnavailableDate()
         );
     }
 
