@@ -102,13 +102,17 @@ public class CaseEventService {
     public CaseDetails submitEventForNewClaim(EventSubmissionParams params) {
         StartEventResponse eventResponse = startEvent(params.getAuthorisation(), params.getUserId(), params.getEvent());
         CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(eventResponse, params.getUpdates());
-        return coreCaseDataApi.submitForCitizen(params.getAuthorisation(),
+        log.debug("Submitting new claim event {} for userId {}", params.getEvent(), params.getUserId());
+        CaseDetails caseDetails = coreCaseDataApi.submitForCitizen(params.getAuthorisation(),
                                                 authTokenGenerator.generate(),
                                                 params.getUserId(),
                                                 JURISDICTION,
                                                 CASE_TYPE,
                                                 true, caseDataContent
         );
+        log.debug("Submitted new claim event {} for userId {}, resulting caseId {}", params.getEvent(), params.getUserId(),
+            caseDetails.getId());
+        return caseDetails;
     }
 
     public CaseDetails submitEvent(EventSubmissionParams params) {

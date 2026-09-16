@@ -166,7 +166,9 @@ public class CasesController {
             .setUserId(submitterId)
             .setEvent(eventDto.getEvent())
             .setUpdates(eventDto.getCaseDataUpdate());
+        log.debug("Submitting citizen event {} for caseId {} and submitterId {}", eventDto.getEvent(), caseId, submitterId);
         CaseDetails caseDetails = caseEventService.submitEvent(params);
+        log.debug("Submitted citizen event {} for caseId {}, resulting state {}", eventDto.getEvent(), caseId, caseDetails.getState());
         return new ResponseEntity<>(caseDetails, HttpStatus.OK);
     }
 
