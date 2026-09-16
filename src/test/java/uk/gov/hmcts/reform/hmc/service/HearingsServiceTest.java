@@ -1,15 +1,21 @@
 package uk.gov.hmcts.reform.hmc.service;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.databind.JsonNode;
 import feign.FeignException;
 import feign.Request;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.slf4j.LoggerFactory;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.hmc.client.HearingsApi;
@@ -54,6 +60,9 @@ class HearingsServiceTest {
 
     @InjectMocks
     private HearingsService hearingNoticeService;
+    private ListAppender<ILoggingEvent> listAppender;
+    private Logger logger;
+    private Level previousLogLevel;
 
     private static final String USER_TOKEN = "user_token";
     private static final String SERVICE_TOKEN = "service_token";
@@ -73,6 +82,19 @@ class HearingsServiceTest {
     @BeforeEach
     void setUp() {
         when(authTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
+        logger = (Logger) LoggerFactory.getLogger(HearingsService.class);
+        previousLogLevel = logger.getLevel();
+        logger.setLevel(Level.ERROR);
+        listAppender = new ListAppender<>();
+        listAppender.start();
+        logger.addAppender(listAppender);
+    }
+
+    @AfterEach
+    void tearDown() {
+        logger.detachAppender(listAppender);
+        listAppender.stop();
+        logger.setLevel(previousLogLevel);
     }
 
     @Nested
@@ -204,6 +226,11 @@ class HearingsServiceTest {
             String actualMessage = exception.getMessage();
 
             assertTrue(actualMessage.contains(expectedMessage));
+            Assertions.assertThat(listAppender.list).hasSize(1);
+            Assertions.assertThat(listAppender.list.get(0).getFormattedMessage())
+                .contains("Failed to update partiesNotified with Id: hearing_id from HMC")
+                .contains("Status: 404")
+                .contains("response body: not found response body");
         }
     }
 
@@ -285,6 +312,12 @@ class HearingsServiceTest {
             String actualMessage = exception.getMessage();
 
             assertTrue(actualMessage.contains(expectedMessage));
+            Assertions.assertThat(listAppender.list).hasSize(1);
+            Assertions.assertThat(listAppender.list.get(0).getFormattedMessage())
+                .contains("Failed to retrieve hearings for case: " + CASE_ID)
+                .contains("with status: " + HMC_STATUS)
+                .contains("Status: 404")
+                .contains("response body: not found response body");
         }
     }
 }
