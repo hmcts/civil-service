@@ -21,7 +21,6 @@ public class ClaimSettledDefendantLiPLetter implements MappableObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate letterIssueDate;
-    private String letterIssueDateWelsh;
     private String defendantLipName;
     private String addressLine1;
     private String addressLine2;
@@ -30,5 +29,4 @@ public class ClaimSettledDefendantLiPLetter implements MappableObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate dateOfEvent;
-    private String dateOfEventWelsh;
 }
