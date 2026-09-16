@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-abstract class UpdateUnavailableDatesTask extends MigrationTaskWithMetadata<UnavailableDatesCaseReference> {
+abstract class UpdateUnavailableDatesTask
+    extends MigrationTaskWithMetadata<UnavailableDatesCaseReference> {
 
     private static final String CLAIMANT = "claimant";
     private static final String DEFENDANT = "defendant";
@@ -20,7 +21,12 @@ abstract class UpdateUnavailableDatesTask extends MigrationTaskWithMetadata<Unav
         String eventSummary,
         String eventDescription
     ) {
-        super(UnavailableDatesCaseReference.class, taskName, eventSummary, eventDescription);
+        super(
+            UnavailableDatesCaseReference.class,
+            taskName,
+            eventSummary,
+            eventDescription
+        );
     }
 
     @Override
@@ -104,15 +110,9 @@ abstract class UpdateUnavailableDatesTask extends MigrationTaskWithMetadata<Unav
             );
         }
 
-        UnavailableDateType unavailableDateType =
-            parseUnavailableDateType(caseReference.getUnavailableDateType());
-
-        if (unavailableDateType == UnavailableDateType.DATE_RANGE
-            && caseReference.getToDate() == null) {
-            throw new IllegalArgumentException(
-                "To date must not be null for DATE_RANGE"
-            );
-        }
+        parseUnavailableDateType(
+            caseReference.getUnavailableDateType()
+        );
     }
 
     private void updateNextMissingDate(
@@ -120,55 +120,34 @@ abstract class UpdateUnavailableDatesTask extends MigrationTaskWithMetadata<Unav
         UnavailableDatesCaseReference caseReference,
         UnavailableDateType unavailableDateType
     ) {
-        if (unavailableDates == null || unavailableDates.isEmpty()) {
-            return;
-        }
-
         unavailableDates.stream()
             .map(Element::getValue)
             .filter(Objects::nonNull)
             .filter(value ->
                         unavailableDateType == value.getUnavailableDateType()
             )
-            .filter(value ->
-                        requiresUpdate(value, unavailableDateType)
-            )
+            .filter(value -> value.getDate() == null)
             .findFirst()
-            .ifPresent(unavailableDate ->
-                           updateUnavailableDate(
-                               unavailableDate,
-                               caseReference,
-                               unavailableDateType
-                           )
-            );
+            .ifPresent(unavailableDate -> {
+                unavailableDate.setDate(
+                    caseReference.getFromDate()
+                );
+
+                unavailableDate.setFromDate(
+                    caseReference.getFromDate()
+                );
+
+                if (caseReference.getToDate() != null) {
+                    unavailableDate.setToDate(
+                        caseReference.getToDate()
+                    );
+                }
+            });
     }
 
-    private boolean requiresUpdate(
-        UnavailableDate unavailableDate,
-        UnavailableDateType unavailableDateType
+    private UnavailableDateType parseUnavailableDateType(
+        String value
     ) {
-        if (unavailableDateType == UnavailableDateType.SINGLE_DATE) {
-            return unavailableDate.getDate() == null;
-        }
-
-        return unavailableDate.getFromDate() == null;
-    }
-
-    private void updateUnavailableDate(
-        UnavailableDate unavailableDate,
-        UnavailableDatesCaseReference caseReference,
-        UnavailableDateType unavailableDateType
-    ) {
-        if (unavailableDateType == UnavailableDateType.SINGLE_DATE) {
-            unavailableDate.setDate(caseReference.getFromDate());
-            return;
-        }
-
-        unavailableDate.setFromDate(caseReference.getFromDate());
-        unavailableDate.setToDate(caseReference.getToDate());
-    }
-
-    private UnavailableDateType parseUnavailableDateType(String value) {
         try {
             return UnavailableDateType.valueOf(
                 value.trim()
