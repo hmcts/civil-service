@@ -41,7 +41,7 @@ public class ServiceRequestUpdateCallbackController {
     public void serviceRequestUpdate(
         @RequestHeader("ServiceAuthorization") String s2sToken,
         @RequestBody ServiceRequestUpdateDto serviceRequestUpdateDto) {
-        if (!authorisationService.isServiceAuthorized(s2sToken)) {
+        if (!authorisationService.isPaymentCallbackServiceAuthorized(s2sToken)) {
             throw new InvalidTokenException("Invalid S2S token");
         }
 
