@@ -11,12 +11,12 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
+import uk.gov.hmcts.reform.civil.utils.BreathingSpaceUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -36,7 +36,6 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(LIFT_BREATHING_SPACE_SPEC);
 
     private final ObjectMapper objectMapper;
-    private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -46,14 +45,14 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(CallbackType.ABOUT_TO_START), this::aboutToStart,
-            callbackKey(CallbackType.MID, "enter-info"), this::checkEnterInfo,
-            callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::updateBusinessProcessToReady,
-            callbackKey(CallbackType.SUBMITTED), this::buildSubmittedText
+            callbackKey(CallbackType.ABOUT_TO_START), this::validateCanLiftBreathingSpace,
+            callbackKey(CallbackType.MID, "enter-info"), this::validateBreathingSpaceLiftInfo,
+            callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::prepareLiftBreathingSpaceSubmit,
+            callbackKey(CallbackType.SUBMITTED), this::buildConfirmationResponse
         );
     }
 
-    private CallbackResponse aboutToStart(CallbackParams callbackParams) {
+    private CallbackResponse validateCanLiftBreathingSpace(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder();
@@ -67,14 +66,14 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             )).build();
         }
 
-        prepopulateEndDate(caseData);
+        prepopulateExpectedEndDate(caseData);
 
         return responseBuilder
             .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private static void prepopulateEndDate(CaseData caseData) {
+    private static void prepopulateExpectedEndDate(CaseData caseData) {
         LocalDate startDate = caseData.getBreathing().getEnter().getStart();
 
         BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
@@ -87,7 +86,7 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         }
     }
 
-    private CallbackResponse checkEnterInfo(CallbackParams callbackParams) {
+    private CallbackResponse validateBreathingSpaceLiftInfo(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         int standardBSMaxDurationDays = 60;
 
@@ -111,9 +110,10 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private CallbackResponse updateBusinessProcessToReady(CallbackParams callbackParams) {
-        CaseData data = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
+    private CallbackResponse prepareLiftBreathingSpaceSubmit(CallbackParams callbackParams) {
+        CaseData data = callbackParams.getCaseData();
         data.setBusinessProcess(BusinessProcess.ready(LIFT_BREATHING_SPACE_SPEC));
+        BreathingSpaceUtils.addLiftDetailsToCurrentBreathingSpace(data);
         data.getBreathing().setActive(NO);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -121,7 +121,7 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private CallbackResponse buildSubmittedText(CallbackParams callbackParams) {
+    private CallbackResponse buildConfirmationResponse(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String claimNumber = caseData.getLegacyCaseReference();
 
