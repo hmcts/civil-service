@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.workflow.helper.CaseDataTemplates;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -49,6 +50,7 @@ public final class CreateSdoFixtures {
         }).toBuilder()
             .ccdState(CaseState.JUDICIAL_REFERRAL)
             .caseAccessCategory(SPEC_CLAIM)
+            .totalClaimAmount(BigDecimal.valueOf(1_000))
             .sdoOrderDocument(sdoDocument())
             .build();
     }
