@@ -73,6 +73,7 @@ public class ClaimSettledDefendantLiPLetterGenerator {
     public ClaimSettledDefendantLiPLetter getTemplateData(CaseData caseData) {
         return new ClaimSettledDefendantLiPLetter()
             .setClaimReferenceNumber(caseData.getLegacyCaseReference())
+            .setCcdCaseReference(String.valueOf(caseData.getCcdCaseReference()))
             .setLetterIssueDate(LocalDate.now())
             .setDefendantLipName(caseData.getRespondent1().getPartyName())
             .setAddressLine1(caseData.getRespondent1().getPrimaryAddress().getAddressLine1())
