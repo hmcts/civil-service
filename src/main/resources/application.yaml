@@ -55,9 +55,6 @@ spring:
     placeholder-replacement: false
     table: schema_version
     baseline-on-migrate: true
-    postgresql:
-      # Let CREATE INDEX CONCURRENTLY finish without waiting on Flyway's own transaction.
-      transactional-lock: false
 
   cloud:
     openfeign:
