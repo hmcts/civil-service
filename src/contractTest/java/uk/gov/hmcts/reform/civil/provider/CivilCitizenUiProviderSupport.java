@@ -5,6 +5,10 @@ import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvide
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.type.TypeReference;
+import feign.FeignException;
+import uk.gov.hmcts.reform.civil.filters.RequestFilter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
@@ -37,7 +41,11 @@ import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
 import uk.gov.hmcts.reform.civil.service.user.UserInformationService;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
 import java.time.OffsetDateTime;
 import java.util.Map;
 
@@ -92,6 +100,7 @@ abstract class CivilCitizenUiProviderSupport {
         ObjectMapper mapper = buildObjectMapper();
         MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter(mapper);
         mockMvc = MockMvcBuilders.standaloneSetup(paymentController, feesController, casesController)
+            .addFilters(new RequestFilter())
             .setMessageConverters(new StringHttpMessageConverter(), messageConverter)
             .setControllerAdvice(new ControllerExceptionHandler(), new ResourceExceptionHandler(mapper),
                                  new UncaughtExceptionHandler())
@@ -195,6 +204,79 @@ abstract class CivilCitizenUiProviderSupport {
             .setEvent(CaseEvent.CREATE_LIP_CLAIM)
             .setUpdates(Map.of());
         when(caseEventService.submitEvent(expected)).thenReturn(contractCase());
+    }
+
+    @State("A draft individual-company claim can be submitted")
+    void individualCompanyDraft() throws IOException {
+        draftCanBeSubmitted("individual-company");
+    }
+
+    @State("A draft company-organisation claim can be submitted")
+    void companyOrganisationDraft() throws IOException {
+        draftCanBeSubmitted("company-organisation");
+    }
+
+    @State("A draft organisation-sole-trader claim can be submitted")
+    void organisationSoleTraderDraft() throws IOException {
+        draftCanBeSubmitted("organisation-sole-trader");
+    }
+
+    @State("A draft sole-trader-individual claim can be submitted")
+    void soleTraderIndividualDraft() throws IOException {
+        draftCanBeSubmitted("sole-trader-individual");
+    }
+
+    private void draftCanBeSubmitted(String variant) throws IOException {
+        ObjectMapper mapper = buildObjectMapper();
+        JsonNode examples;
+        try (var stream = getClass().getResourceAsStream("/civil-cui-draft-claims.json")) {
+            examples = mapper.readTree(java.util.Objects.requireNonNull(stream));
+        }
+        Map<String, Object> updates = mapper.convertValue(examples.get("common"), new TypeReference<>() { });
+        updates.putAll(mapper.convertValue(examples.get("variants").get(variant), new TypeReference<>() { }));
+        Map<String, Object> data = new HashMap<>(updates);
+        data.put("legacyCaseReference", "000MC001");
+        data.put("applicant1", mapper.convertValue(updates.get("applicant1"), uk.gov.hmcts.reform.civil.model.Party.class));
+        data.put("respondent1", mapper.convertValue(updates.get("respondent1"), uk.gov.hmcts.reform.civil.model.Party.class));
+        when(caseEventService.submitEvent(eventParams("draft", updates))).thenReturn(CaseDetails.builder()
+            .id(Long.valueOf(CUI_CASE_REFERENCE))
+            .state("PENDING_CASE_ISSUED")
+            .lastModified(LocalDateTime.of(2025, 2, 3, 10, 15, 30))
+            .data(data)
+            .build());
+    }
+
+    @State("Citizen event submission returns callback errors and warnings")
+    void callbackErrorsAndWarnings() throws IOException {
+        rejectedEvent(Map.of("callbackErrors", List.of("Claim cannot be submitted"),
+                             "callbackWarnings", List.of("Check the claim details")));
+    }
+
+    @State("Citizen event submission returns field validation errors")
+    void fieldValidationErrors() throws IOException {
+        rejectedEvent(Map.of("details", Map.of("field_errors", List.of(
+            Map.of("id", "applicant1.partyEmail", "message", "Enter a valid email address")))));
+    }
+
+    @State("Citizen event submission returns no actionable validation fields")
+    void noActionableValidationFields() throws IOException {
+        rejectedEvent(Map.of("message", "Submission rejected"));
+    }
+
+    private void rejectedEvent(Map<String, Object> upstreamBody) throws IOException {
+        // The real ResourceExceptionHandler must translate this downstream exception.
+        when(caseEventService.submitEvent(eventParams(CUI_CASE_REFERENCE, Map.of())))
+            .thenThrow(new FeignException.UnprocessableEntity("Submission rejected", mock(feign.Request.class),
+                                                            buildObjectMapper().writeValueAsBytes(upstreamBody), Map.of()));
+    }
+
+    private EventSubmissionParams eventParams(String caseId, Map<String, Object> updates) {
+        return new EventSubmissionParams()
+            .setAuthorisation(AUTH_HEADER)
+            .setCaseId(caseId)
+            .setUserId("cui-user-id")
+            .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+            .setUpdates(updates);
     }
 
     private CaseDetails contractCase() {
