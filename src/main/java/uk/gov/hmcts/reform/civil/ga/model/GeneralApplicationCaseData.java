@@ -36,7 +36,6 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialWrittenRepres
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAMakeApplicationAvailableCheck;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAOrderCourtOwnInitiativeGAspec;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAOrderWithoutNoticeGAspec;
-import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAReferToJudgeGAspec;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAReferToLegalAdvisorGAspec;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GARespondentDebtorOfferGAspec;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GARespondentResponse;
@@ -233,7 +232,6 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
     private String respondent1OrganisationIDCopy;
     private String respondent2OrganisationIDCopy;
     private YesOrNo respondent2SameLegalRepresentative;
-    private GAReferToJudgeGAspec referToJudge;
     private GAReferToLegalAdvisorGAspec referToLegalAdvisor;
     private LocalDateTime applicationClosedDate;
     private LocalDateTime applicationTakenOfflineDate;
@@ -502,7 +500,6 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
         this.respondent1OrganisationIDCopy = other.respondent1OrganisationIDCopy;
         this.respondent2OrganisationIDCopy = other.respondent2OrganisationIDCopy;
         this.respondent2SameLegalRepresentative = other.respondent2SameLegalRepresentative;
-        this.referToJudge = other.referToJudge;
         this.referToLegalAdvisor = other.referToLegalAdvisor;
         this.applicationClosedDate = other.applicationClosedDate;
         this.applicationTakenOfflineDate = other.applicationTakenOfflineDate;
@@ -1225,11 +1222,6 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
 
     public GeneralApplicationCaseData respondent2SameLegalRepresentative(YesOrNo respondent2SameLegalRepresentative) {
         this.respondent2SameLegalRepresentative = respondent2SameLegalRepresentative;
-        return this;
-    }
-
-    public GeneralApplicationCaseData referToJudge(GAReferToJudgeGAspec referToJudge) {
-        this.referToJudge = referToJudge;
         return this;
     }
 
