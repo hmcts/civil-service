@@ -37,7 +37,7 @@
     <bpmn:sequenceFlow id="Flow_77875455488" sourceRef="Event_0kza4it444" targetRef="Event_55878855778" />
     <bpmn:sequenceFlow id="Flow_87785545545544" sourceRef="stay_case_event" targetRef="Activity_7842144454545" />
     <bpmn:sequenceFlow id="Flow_78545522598879" sourceRef="Activity_7842144454545" targetRef="GenerateDashboardNotificationRequestAListing" />
-    <bpmn:serviceTask id="GenerateDashboardNotificationRequestAListing" name="Generate Dashboard Notifications" camunda:type="external" camunda:topic="processCaseEvent">
+    <bpmn:serviceTask id="GenerateDashboardNotificationRequestAListing" name="Generate Dashboard Notifications" camunda:type="external" camunda:topic="dashboardNotifications">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="caseEvent">DASHBOARD_NOTIFICATION_EVENT</camunda:inputParameter>
