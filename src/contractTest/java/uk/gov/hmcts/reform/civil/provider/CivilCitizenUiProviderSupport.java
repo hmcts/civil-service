@@ -4,54 +4,76 @@ import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
 import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
-import uk.gov.hmcts.reform.civil.filters.RequestFilter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import uk.gov.hmcts.reform.civil.config.JacksonConfiguration;
-import uk.gov.hmcts.reform.civil.advice.ControllerExceptionHandler;
-import uk.gov.hmcts.reform.civil.advice.ResourceExceptionHandler;
-import uk.gov.hmcts.reform.civil.advice.UncaughtExceptionHandler;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.advice.ControllerExceptionHandler;
+import uk.gov.hmcts.reform.civil.advice.ResourceExceptionHandler;
+import uk.gov.hmcts.reform.civil.advice.UncaughtExceptionHandler;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.JacksonConfiguration;
+import uk.gov.hmcts.reform.civil.controllers.cases.CaseAssignmentController;
 import uk.gov.hmcts.reform.civil.controllers.cases.CasesController;
 import uk.gov.hmcts.reform.civil.controllers.fees.FeesController;
 import uk.gov.hmcts.reform.civil.controllers.fees.FeesPaymentController;
+import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.filters.RequestFilter;
 import uk.gov.hmcts.reform.civil.ga.service.GaFeesPaymentService;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatus;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
+import uk.gov.hmcts.reform.civil.service.AssignCaseService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeesPaymentService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
+import uk.gov.hmcts.reform.civil.service.citizen.defendant.LipDefendantCaseAssignmentService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
+import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
+import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
+import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
+import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService;
+import uk.gov.hmcts.reform.civil.service.search.exceptions.SearchServiceCaseNotFoundException;
 import uk.gov.hmcts.reform.civil.service.user.UserInformationService;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
-import java.time.OffsetDateTime;
 import java.util.Map;
+import java.util.Optional;
 
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+// The legacy OCMC response needs a scoped Pact content-type override. Prevent
+// concurrent tests from observing that temporary JVM property.
+@org.junit.jupiter.api.parallel.Isolated
 abstract class CivilCitizenUiProviderSupport {
 
     private static final String AUTH_HEADER = "Bearer some-access-token";
@@ -75,6 +97,18 @@ abstract class CivilCitizenUiProviderSupport {
     private CaseEventService caseEventService;
     @Mock
     private UserInformationService userInformationService;
+    @Mock
+    private DashboardClaimInfoService dashboardClaimInfoService;
+    @Mock
+    private CaseLegacyReferenceSearchService referenceSearchService;
+    @Mock
+    private DefendantPinToPostLRspecService pinService;
+    @Mock
+    private AssignCaseService assignCaseService;
+    @Mock
+    private LipDefendantCaseAssignmentService lipAssignmentService;
+    private Runnable stateVerification = () -> { };
+    private boolean rawOcmcResponse;
     private AutoCloseable mocks;
 
     @BeforeEach
@@ -90,16 +124,20 @@ abstract class CivilCitizenUiProviderSupport {
         CasesController casesController = new CasesController(
             mock(uk.gov.hmcts.reform.civil.service.RoleAssignmentsService.class), coreCaseDataService,
             mock(uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService.class),
-            mock(uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService.class), caseEventService,
+            dashboardClaimInfoService, caseEventService,
             mock(uk.gov.hmcts.reform.civil.ga.service.events.GaCaseEventService.class),
             mock(uk.gov.hmcts.reform.civil.service.search.CaseSdtRequestSearchService.class),
             mock(uk.gov.hmcts.reform.civil.service.bulkclaims.CaseworkerCaseEventService.class),
             mock(uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService.class),
             mock(uk.gov.hmcts.reform.civil.validation.PostcodeValidator.class), userInformationService,
             mock(uk.gov.hmcts.reform.civil.service.citizen.repaymentplan.RepaymentPlanDecisionService.class));
+        CaseAssignmentController assignmentController = new CaseAssignmentController(
+            referenceSearchService, pinService, assignCaseService, lipAssignmentService, coreCaseDataService);
+        stateVerification = () -> { };
+        rawOcmcResponse = false;
         ObjectMapper mapper = buildObjectMapper();
         MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter(mapper);
-        mockMvc = MockMvcBuilders.standaloneSetup(paymentController, feesController, casesController)
+        mockMvc = MockMvcBuilders.standaloneSetup(paymentController, feesController, casesController, assignmentController)
             .addFilters(new RequestFilter())
             .setMessageConverters(new StringHttpMessageConverter(), messageConverter)
             .setControllerAdvice(new ControllerExceptionHandler(), new ResourceExceptionHandler(mapper),
@@ -114,15 +152,46 @@ abstract class CivilCitizenUiProviderSupport {
 
     @AfterEach
     void tearDown() throws Exception {
-        if (mocks != null) {
-            mocks.close();
+        try {
+            stateVerification.run();
+        } finally {
+            if (mocks != null) {
+                mocks.close();
+            }
         }
     }
 
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider.class)
     void verifyPactInteractions(PactVerificationContext context) {
-        java.util.Objects.requireNonNull(context, "No CUI Pact interaction loaded").verifyInteraction();
+        java.util.Objects.requireNonNull(context, "No CUI Pact interaction loaded");
+        if (!rawOcmcResponse) {
+            context.verifyInteraction();
+            return;
+        }
+        // This endpoint returns an unquoted URL with application/json. Compare its
+        // exact text and actual header, without rewriting either. Diff generation
+        // otherwise tries to pretty-print the raw URL as JSON, even on a match.
+        String contentTypeKey = "pact.content_type.override.application/json";
+        String diffKey = "pact.verifier.generateDiff";
+        String previousContentType = System.getProperty(contentTypeKey);
+        String previousDiff = System.getProperty(diffKey);
+        try {
+            System.setProperty(contentTypeKey, "text");
+            System.setProperty(diffKey, "false");
+            context.verifyInteraction();
+        } finally {
+            restoreProperty(contentTypeKey, previousContentType);
+            restoreProperty(diffKey, previousDiff);
+        }
+    }
+
+    private static void restoreProperty(String key, String value) {
+        if (value == null) {
+            System.clearProperty(key);
+        } else {
+            System.setProperty(key, value);
+        }
     }
 
     @State("Claim issue payment can be initiated for case 1234567890123456")
@@ -285,6 +354,169 @@ abstract class CivilCitizenUiProviderSupport {
             .state("PENDING_CASE_ISSUED")
             .data(Map.of("legacyCaseReference", "000MC001"))
             .build();
+    }
+
+    @State("Case details and claimant access are available")
+    void claimantCaseAccess() {
+        caseAccess(false, List.of("[CLAIMANT]"));
+    }
+
+    @State("Case details and defendant access are available")
+    void defendantCaseAccess() {
+        caseAccess(true, List.of("[DEFENDANT]"));
+    }
+
+    @State("Case details and no roles access are available")
+    void emptyCaseAccess() {
+        caseAccess(false, List.of());
+    }
+
+    private void caseAccess(boolean defendant, List<String> roles) {
+        when(coreCaseDataService.getCase(Long.valueOf(CUI_CASE_REFERENCE), AUTH_HEADER))
+            .thenReturn(readableCase(defendant));
+        when(userInformationService.getUserCaseRoles(CUI_CASE_REFERENCE, AUTH_HEADER)).thenReturn(roles);
+    }
+
+    @State("The requested case does not exist")
+    void missingCase() {
+        when(coreCaseDataService.getCase(Long.valueOf(CUI_CASE_REFERENCE), AUTH_HEADER)).thenThrow(notFound());
+    }
+
+    private FeignException.NotFound notFound() {
+        return new FeignException.NotFound("Case not found", mock(feign.Request.class), new byte[0], Map.of());
+    }
+
+    private CaseDetails readableCase(boolean defendant) {
+        return CaseDetails.builder().id(Long.valueOf(CUI_CASE_REFERENCE)).caseTypeId("CIVIL")
+            .state(defendant ? "AWAITING_RESPONDENT_ACKNOWLEDGEMENT" : "CASE_ISSUED")
+            .lastModified(LocalDateTime.of(2025, 2, 3, 10, 15, 30))
+            .data(Map.of(
+                "legacyCaseReference", "000MC001", "totalClaimAmount", new BigDecimal("1000"),
+                "applicant1", new Party().setType(Party.Type.INDIVIDUAL)
+                    .setIndividualFirstName("Alex").setIndividualLastName("Example"),
+                "respondent1", new Party().setType(Party.Type.COMPANY).setCompanyName("Example Services"),
+                "businessProcess", new BusinessProcess().setCamundaEvent("CREATE_LIP_CLAIM")
+                    .setStatus(defendant ? BusinessProcessStatus.STARTED : BusinessProcessStatus.FINISHED)))
+            .build();
+    }
+
+    @State("The claimant dashboard page 1 is available")
+    void claimantDashboard() {
+        when(dashboardClaimInfoService.getDashboardClaimantResponse(AUTH_HEADER, "cui-user-id", 1))
+            .thenReturn(dashboard());
+    }
+
+    @State("The defendant dashboard page 1 is available")
+    void defendantDashboard() {
+        when(dashboardClaimInfoService.getDashboardDefendantResponse(AUTH_HEADER, "cui-user-id", 1))
+            .thenReturn(dashboard());
+    }
+
+    @State("The claimant dashboard page 2 is available")
+    void emptyClaimantDashboard() {
+        when(dashboardClaimInfoService.getDashboardClaimantResponse(AUTH_HEADER, "cui-user-id", 2))
+            .thenReturn(new DashboardResponse(List.of(), 0));
+    }
+
+    @State("The defendant dashboard page 2 is available")
+    void emptyDefendantDashboard() {
+        when(dashboardClaimInfoService.getDashboardDefendantResponse(AUTH_HEADER, "cui-user-id", 2))
+            .thenReturn(new DashboardResponse(List.of(), 0));
+    }
+
+    private DashboardResponse dashboard() {
+        return new DashboardResponse(List.of(dashboardItem(false), dashboardItem(true)), 2);
+    }
+
+    private DashboardClaimInfo dashboardItem(boolean ocmc) {
+        return new DashboardClaimInfo().setClaimId(ocmc ? "2222333344445555" : CUI_CASE_REFERENCE)
+            .setClaimNumber(ocmc ? "000MC002" : "000MC001").setClaimantName("Alex Example")
+            .setDefendantName("Example Services").setClaimAmount(new BigDecimal("1000.00"))
+            .setStatus(DashboardClaimStatus.CASE_DISMISSED).setOcmc(ocmc);
+    }
+
+    @State("A Civil reference and PIN are valid")
+    void validCivilPin() {
+        CaseDetails details = readableCase(false);
+        when(referenceSearchService.getCaseDataByLegacyReference("000MC001")).thenReturn(details);
+        stateVerification = () -> verify(pinService).validatePin(details, "123456");
+    }
+
+    @State("Civil PIN validation fails for invalid PIN")
+    void invalidCivilPin() {
+        CaseDetails details = readableCase(false);
+        when(referenceSearchService.getCaseDataByLegacyReference("000MC001")).thenReturn(details);
+        doThrow(new PinNotMatchException()).when(pinService).validatePin(details, "123456");
+    }
+
+    @State("Civil PIN validation fails for missing claim")
+    void missingCivilPinClaim() {
+        when(referenceSearchService.getCaseDataByLegacyReference("000MC001"))
+            .thenThrow(new SearchServiceCaseNotFoundException());
+    }
+
+    @State("An OCMC reference and PIN are valid")
+    void validOcmcPin() {
+        rawOcmcResponse = true;
+        when(pinService.validateOcmcPin("12345678", "000MC001"))
+            .thenReturn("https://moneyclaims.aat.platform.hmcts.net/claim/000MC001");
+    }
+
+    @State("An OCMC PIN is invalid")
+    void invalidOcmcPin() {
+        when(pinService.validateOcmcPin("12345678", "000MC001")).thenThrow(new PinNotMatchException());
+    }
+
+    @State("Defendant link status is linked")
+    void linkedDefendant() {
+        defendantLink(true);
+    }
+
+    @State("Defendant link status is unlinked")
+    void unlinkedDefendant() {
+        defendantLink(false);
+    }
+
+    private void defendantLink(boolean linked) {
+        CaseDetails details = readableCase(false);
+        when(referenceSearchService.getCivilOrOcmcCaseDataByCaseReference("000MC001")).thenReturn(details);
+        when(pinService.isDefendantLinked(details)).thenReturn(linked);
+    }
+
+    @State("Defendant link status is no search result")
+    void missingLinkSearchResult() {
+        when(referenceSearchService.getCivilOrOcmcCaseDataByCaseReference("000MC001")).thenReturn(null);
+    }
+
+    @State("Defendant link status is upstream not found")
+    void missingLinkUpstream() {
+        when(referenceSearchService.getCivilOrOcmcCaseDataByCaseReference("000MC001")).thenThrow(notFound());
+    }
+
+    @State("Defendant link status is provider failure")
+    void linkProviderFailure() {
+        when(referenceSearchService.getCivilOrOcmcCaseDataByCaseReference("000MC001"))
+            .thenThrow(new IllegalStateException("Search unavailable"));
+    }
+
+    @State("Defendant assignment is accepted")
+    void acceptedAssignment() {
+        CaseDetails details = readableCase(false);
+        when(coreCaseDataService.getCase(Long.valueOf(CUI_CASE_REFERENCE))).thenReturn(details);
+        stateVerification = () -> {
+            verify(pinService).validatePin(details, "123456");
+            verify(assignCaseService).assignCase(AUTH_HEADER, CUI_CASE_REFERENCE, Optional.of(CaseRole.DEFENDANT));
+            verify(lipAssignmentService).addLipDefendantToCaseDefendantUserDetails(
+                AUTH_HEADER, CUI_CASE_REFERENCE, Optional.of(CaseRole.DEFENDANT), Optional.of(details));
+        };
+    }
+
+    @State("Defendant assignment is rejected PIN")
+    void rejectedAssignment() {
+        CaseDetails details = readableCase(false);
+        when(coreCaseDataService.getCase(Long.valueOf(CUI_CASE_REFERENCE))).thenReturn(details);
+        doThrow(new PinNotMatchException()).when(pinService).validatePin(details, "123456");
+        stateVerification = () -> verifyNoInteractions(assignCaseService, lipAssignmentService);
     }
 
     private ObjectMapper buildObjectMapper() {
