@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.migration;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
@@ -40,8 +41,16 @@ public class UpdateHearingUnavailabilityDatesTask extends UpdateUnavailableDates
         return List.of(
             getUnavailableDates(caseData, partyType),
             getHearingUnavailableDates(caseData, partyType),
-            getUnavailableDatesForTab(caseData, partyType)
+            getUnavailableDatesForTab(caseData, partyType),
+            getPartyUnavailableDates(caseData, partyType)
         );
+    }
+
+    private List<Element<UnavailableDate>> getPartyUnavailableDates(CaseData caseData, String partyType) {
+        Party party = isDefendant(partyType)
+            ? caseData.getRespondent1()
+            : caseData.getApplicant1();
+        return unavailableDatesOrEmpty(party == null ? null : party.getUnavailableDates());
     }
 
     private List<Element<UnavailableDate>> getHearingUnavailableDates(CaseData caseData, String partyType) {

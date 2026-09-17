@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.UnavailableDatesCaseReference;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -38,9 +39,11 @@ class UpdateHearingUnavailabilityDatesTaskTest {
             .respondent1UnavailableDatesForTab(elements(List.of(tabMissingDate)))
             .build();
 
-        task.migrateCaseData(caseData, reference(
-            "defendant", "DATE_RANGE", LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 18)
-        ));
+        task.migrateCaseData(
+            caseData, reference(
+                "defendant", "DATE_RANGE", LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 18)
+            )
+        );
 
         Element<UnavailableDate> updated = caseData.getRespondent1DQ()
             .getRespondent1DQHearingSmallClaim().getSmallClaimUnavailableDate().getFirst();
@@ -68,9 +71,11 @@ class UpdateHearingUnavailabilityDatesTaskTest {
             .respondent1UnavailableDatesForTab(elements(List.of(tabMissingDate)))
             .build();
 
-        task.migrateCaseData(caseData, reference(
-            "defendant", "DATE_RANGE", LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 18)
-        ));
+        task.migrateCaseData(
+            caseData, reference(
+                "defendant", "DATE_RANGE", LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 18)
+            )
+        );
 
         Element<UnavailableDate> updated = caseData.getRespondent1DQ()
             .getRespondent1DQHearingFastClaim().getUnavailableDates().getFirst();
@@ -96,9 +101,11 @@ class UpdateHearingUnavailabilityDatesTaskTest {
             .applicant1UnavailableDatesForTab(elements(List.of(tabSingleDate)))
             .build();
 
-        task.migrateCaseData(caseData, reference(
-            "claimant", "SINGLE_DATE", LocalDate.of(2026, 11, 2), LocalDate.of(2026, 11, 2)
-        ));
+        task.migrateCaseData(
+            caseData, reference(
+                "claimant", "SINGLE_DATE", LocalDate.of(2026, 11, 2), LocalDate.of(2026, 11, 2)
+            )
+        );
 
         assertThat(dateRange.getDate()).isNull();
         assertThat(singleDate.getDate()).isEqualTo(LocalDate.of(2026, 11, 2));
@@ -118,12 +125,16 @@ class UpdateHearingUnavailabilityDatesTaskTest {
             ))
             .build();
 
-        task.migrateCaseData(caseData, reference(
-            "claimant", "SINGLE_DATE", LocalDate.of(2026, 10, 5), LocalDate.of(2026, 10, 5)
-        ));
-        task.migrateCaseData(caseData, reference(
-            "claimant", "SINGLE_DATE", LocalDate.of(2026, 10, 12), LocalDate.of(2026, 10, 12)
-        ));
+        task.migrateCaseData(
+            caseData, reference(
+                "claimant", "SINGLE_DATE", LocalDate.of(2026, 10, 5), LocalDate.of(2026, 10, 5)
+            )
+        );
+        task.migrateCaseData(
+            caseData, reference(
+                "claimant", "SINGLE_DATE", LocalDate.of(2026, 10, 12), LocalDate.of(2026, 10, 12)
+            )
+        );
 
         assertThat(first.getDate()).isEqualTo(LocalDate.of(2026, 10, 5));
         assertThat(second.getDate()).isEqualTo(LocalDate.of(2026, 10, 12));
@@ -142,6 +153,43 @@ class UpdateHearingUnavailabilityDatesTaskTest {
         CaseData result = task.migrateCaseData(caseData, reference);
 
         assertThat(result).isSameAs(caseData);
+    }
+
+    @Test
+    void shouldNotFailWhenHearingAndPartyDatesAreAbsent() {
+        CaseData caseData = CaseData.builder().build();
+        UnavailableDatesCaseReference reference = reference(
+            "defendant",
+            "SINGLE_DATE",
+            LocalDate.of(2026, 10, 5),
+            LocalDate.of(2026, 10, 5)
+        );
+        CaseData result = task.migrateCaseData(caseData, reference);
+        assertThat(result).isSameAs(caseData);
+    }
+
+    @Test
+    void shouldUpdateRespondentPartyUnavailableDatesWhenOtherCollectionsAreAbsent() {
+        UnavailableDate partyMissingDate = unavailableDate("defendant", UnavailableDateType.SINGLE_DATE);
+        CaseData caseData = CaseData.builder().respondent1(new Party().setUnavailableDates(elements(List.of(
+            partyMissingDate)))).build();
+        task.migrateCaseData(
+            caseData,
+            reference("defendant", "SINGLE_DATE", LocalDate.of(2026, 12, 3), LocalDate.of(2026, 12, 3))
+        );
+        assertUpdated(partyMissingDate, LocalDate.of(2026, 12, 3), LocalDate.of(2026, 12, 3));
+    }
+
+    @Test
+    void shouldUpdateApplicantPartyUnavailableDatesWhenOtherCollectionsAreAbsent() {
+        UnavailableDate partyMissingDate = unavailableDate("claimant", UnavailableDateType.DATE_RANGE);
+        CaseData caseData = CaseData.builder().applicant1(new Party().setUnavailableDates(elements(List.of(
+            partyMissingDate)))).build();
+        task.migrateCaseData(
+            caseData,
+            reference("claimant", "DATE_RANGE", LocalDate.of(2026, 12, 7), LocalDate.of(2026, 12, 14))
+        );
+        assertUpdated(partyMissingDate, LocalDate.of(2026, 12, 7), LocalDate.of(2026, 12, 14));
     }
 
     private SmallClaimHearing smallClaimHearing(
