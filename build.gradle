@@ -205,6 +205,11 @@ tasks.withType(Copy).configureEach {
 
 tasks.withType(Test).configureEach {
   dependsOn preparePatchedMigrations
+  // forwarded so the Camunda wire-format test can target a running engine; the test
+  // stays disabled when this is absent, which is the case in CI
+  if (System.getProperty('camunda.probe.url')) {
+    systemProperty 'camunda.probe.url', System.getProperty('camunda.probe.url')
+  }
   systemProperty 'spring.flyway.locations', "filesystem:${layout.buildDirectory.get().asFile.absolutePath}/tmp/patched-migrations"
 }
 
