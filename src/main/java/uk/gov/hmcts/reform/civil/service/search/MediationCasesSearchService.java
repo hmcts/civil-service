@@ -126,7 +126,7 @@ public class MediationCasesSearchService extends ElasticSearchService {
 
         ZonedDateTime now = ZonedDateTime.parse(timeNow).withZoneSameInstant(ZoneOffset.UTC);
         ZonedDateTime startOfToday = startOfDay(now.toLocalDate());
-        ZonedDateTime eightDaysAgo = startOfToday.minusDays(8);
+        ZonedDateTime thrityDaysAgo = startOfToday.minusDays(30);
 
         if (carmEnabled) {
             return new Query(
@@ -135,7 +135,7 @@ public class MediationCasesSearchService extends ElasticSearchService {
                     .must(beState(IN_MEDIATION))
                     .must(submittedDate(carmEnabled))
                     .must(rangeQuery("data.claimMovedToMediationOn")
-                              .gt(eightDaysAgo.toString()).lt(startOfToday.toString()))
+                              .gt(thrityDaysAgo.toString()).lt(startOfToday.toString()))
                     .mustNot(matchQuery("data.mediationFileSentToMmt", "Yes")),
                 emptyList(),
                 startIndex,
@@ -150,7 +150,7 @@ public class MediationCasesSearchService extends ElasticSearchService {
                             .must(beState(IN_MEDIATION))
                             .must(submittedDate(carmEnabled))
                             .must(rangeQuery("data.claimMovedToMediationOn")
-                                      .gt(eightDaysAgo.toString()).lt(startOfToday.toString())))
+                                      .gt(thrityDaysAgo.toString()).lt(startOfToday.toString())))
                 .mustNot(matchQuery("data.mediationFileSentToMmt", "Yes")),
             emptyList(),
             startIndex

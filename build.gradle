@@ -43,7 +43,7 @@ def versions = [
   jackson3          : '3.2.2',
   kotlin            : '2.4.20',
   log4j             : '2.26.1',
-  netty             : '4.1.137.Final',
+  netty             : '4.1.138.Final',
   pdfbox            : '3.0.8',
   plexusUtils       : '4.1.0',
   postgresql        : '42.7.13',
