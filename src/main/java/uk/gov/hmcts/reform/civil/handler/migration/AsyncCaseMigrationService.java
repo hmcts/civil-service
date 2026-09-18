@@ -115,8 +115,12 @@ public class AsyncCaseMigrationService {
                 }
                 CaseData caseData;
                 StartEventResponse startEventResponse;
+                CaseEvent caseEvent = Optional.ofNullable(task.getCaseEvent()).orElse(CaseEvent.UPDATE_CASE_DATA);
                 if (isGA) {
-                    startEventResponse = coreCaseDataService.startGeneralApplicationUpdate(caseReference.getCaseReference(), CaseEvent.UPDATE_CASE_DATA);
+                    startEventResponse = coreCaseDataService.startGeneralApplicationUpdate(
+                        caseReference.getCaseReference(),
+                        caseEvent
+                    );
                     CaseDetails caseDetails = startEventResponse.getCaseDetails();
                     caseData = caseDetailsConverter.toGACaseData(caseDetails);
                     GeneralApplicationCaseData gaCaseData = caseDetailsConverter.toGeneralApplicationCaseData(caseDetails);
@@ -124,7 +128,7 @@ public class AsyncCaseMigrationService {
                 } else {
                     startEventResponse = coreCaseDataService.startUpdate(
                             caseReference.getCaseReference(),
-                            CaseEvent.UPDATE_CASE_DATA
+                            caseEvent
                     );
                     CaseDetails caseDetails = startEventResponse.getCaseDetails();
                     caseData = caseDetailsConverter.toCaseData(caseDetails);
