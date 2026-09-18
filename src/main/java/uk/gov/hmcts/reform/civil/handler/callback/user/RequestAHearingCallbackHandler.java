@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.utils.HearingTypeListUtils;
 
@@ -39,7 +40,7 @@ public class RequestAHearingCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::clearFieldsAndPopulateHearingTypeList,
-            callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_SUBMIT), this::startDashboardUpdate,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -58,6 +59,15 @@ public class RequestAHearingCallbackHandler extends CallbackHandler {
         } else if (nonNull(claimTrack) && claimTrack.equals("MULTI_CLAIM")) {
             caseData.setRequestHearingNoticeDynamic(HearingTypeListUtils.MULTI_LIST);
         }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse startDashboardUpdate(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        caseData.setBusinessProcess(BusinessProcess.ready(HEARING_SCHEDULED_RETRIGGER));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
