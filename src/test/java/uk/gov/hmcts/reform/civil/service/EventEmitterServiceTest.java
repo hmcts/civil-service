@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import feign.FeignException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +34,7 @@ class EventEmitterServiceTest {
     private ApplicationEventPublisher applicationEventPublisher;
 
     @Mock
-    private RemoteProcessEngineException mockedRemoteProcessEngineException;
+    private FeignException mockedFeignException;
 
     @Mock
     private RuntimeService runtimeService;
@@ -94,7 +94,7 @@ class EventEmitterServiceTest {
     void shouldSendMessageAndTriggerEvent_whenInvoked_withoutTenantId() {
         when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
         when(messageCorrelationBuilder.correlateStartMessage())
-            .thenThrow(mockedRemoteProcessEngineException)
+            .thenThrow(mockedFeignException)
             .thenReturn(null);
 
         CaseData caseData = createCaseData(TEST_EVENT, CASE_ID);
@@ -119,7 +119,7 @@ class EventEmitterServiceTest {
     @Test
     void shouldSendMessageAndNotTriggerEvent_whenNotTrue_withoutTenantId() {
         when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException);
+        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedFeignException);
 
         CaseData caseData = createCaseData(TEST_EVENT, CASE_ID);
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData, false);
@@ -132,7 +132,7 @@ class EventEmitterServiceTest {
     @Test
     void shouldHandleException_whenInvoked() {
         when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException);
+        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedFeignException);
 
         CaseData caseData = createCaseData(TEST_EVENT, CASE_ID);
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);

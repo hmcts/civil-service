@@ -790,6 +790,16 @@ feign:
       document-management-metadata-download-api:
         loggerLevel: basic
 
+camunda:
+  rest:
+    client:
+      # Holunda registers a global Feign ErrorDecoder that wraps every Feign client's
+      # errors in RemoteProcessEngineException, losing the HTTP status. Disabling it
+      # restores Feign's default decoder so FeignException carries the real status,
+      # which the retry classification in ExternalTaskExceptionHelper depends on.
+      error-decoding:
+        enabled: false
+
 docStore:
   doc:
     removal:

@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.ga.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.event.DispatchBusinessProcessEvent;
@@ -37,7 +37,7 @@ public class GaEventEmitterService {
                 applicationEventPublisher.publishEvent(new DispatchBusinessProcessEvent(caseId, businessProcess));
             }
             log.info("Camunda event emitted successfully with tenant");
-        } catch (RemoteProcessEngineException ex) {
+        } catch (FeignException ex) {
             nullTenantAttempt = true;
         } catch (Exception e) {
             log.error(format("Emitting %s camunda event failed for case: %d, tenant: %s, message: %s",
@@ -80,7 +80,7 @@ public class GaEventEmitterService {
                 applicationEventPublisher.publishEvent(new DispatchBusinessProcessEvent(caseId, judgeBusinessProcess));
             }
             log.info("Camunda event emitted successfully with tenant");
-        } catch (RemoteProcessEngineException ex) {
+        } catch (FeignException ex) {
             nullTenantAttempt = true;
         } catch (Exception e) {
             log.error(format("Emitting %s camunda event failed for case: %d, tenant: %s, message: %s",

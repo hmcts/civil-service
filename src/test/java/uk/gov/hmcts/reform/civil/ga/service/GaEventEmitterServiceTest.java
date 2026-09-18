@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.ga.service;
 
+import feign.FeignException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +32,7 @@ class GaEventEmitterServiceTest {
     private ApplicationEventPublisher applicationEventPublisher;
 
     @Mock
-    private RemoteProcessEngineException mockedRemoteProcessEngineException;
+    private FeignException mockedFeignException;
 
     @Mock
     private RuntimeService runtimeService;
@@ -75,7 +75,7 @@ class GaEventEmitterServiceTest {
     @Test
     void shouldSendMessageAndTriggerEvent_whenInvoked_withoutTenantId() {
         when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException)
+        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedFeignException)
             .thenReturn(null);
 
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
@@ -118,7 +118,7 @@ class GaEventEmitterServiceTest {
     @Test
     void shouldSendMessageAndTriggerGAEvent_whenInvoked_withoutTenantId() {
         when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException)
+        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedFeignException)
             .thenReturn(null);
 
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
@@ -178,7 +178,7 @@ class GaEventEmitterServiceTest {
     @Test
     void shouldHandleException_whenInvoked() {
         when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException);
+        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedFeignException);
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
         GeneralApplication generalApplication = new GeneralApplication()
             .setBusinessProcess(businessProcess);
@@ -200,7 +200,7 @@ class GaEventEmitterServiceTest {
     @Test
     void shouldHandleException_whenInvokedGA() {
         when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException);
+        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedFeignException);
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
 
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
