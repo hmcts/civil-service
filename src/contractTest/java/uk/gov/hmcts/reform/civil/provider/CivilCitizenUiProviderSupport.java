@@ -63,6 +63,15 @@ import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService
 import uk.gov.hmcts.reform.civil.service.search.exceptions.SearchServiceCaseNotFoundException;
 import uk.gov.hmcts.reform.civil.service.user.UserInformationService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
+import uk.gov.hmcts.reform.dashboard.controllers.DashboardController;
+import uk.gov.hmcts.reform.dashboard.data.Notification;
+import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.data.TaskList;
+import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
+import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -73,6 +82,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -123,6 +133,12 @@ abstract class CivilCitizenUiProviderSupport {
     private DeadlineExtensionCalculatorService deadlineCalculator;
     @Mock
     private RepaymentPlanDecisionService repaymentDecisionService;
+    @Mock
+    private TaskListService taskListService;
+    @Mock
+    private DashboardNotificationService dashboardNotificationService;
+    @Mock
+    private DashboardScenariosService dashboardScenariosService;
     private boolean rawOcmcResponse;
     private AutoCloseable mocks;
 
@@ -148,11 +164,14 @@ abstract class CivilCitizenUiProviderSupport {
             repaymentDecisionService);
         CaseAssignmentController assignmentController = new CaseAssignmentController(
             referenceSearchService, pinService, assignCaseService, lipAssignmentService, coreCaseDataService);
+        DashboardController dashboardController = new DashboardController(
+            taskListService, dashboardNotificationService, dashboardScenariosService);
         stateVerification = () -> { };
         rawOcmcResponse = false;
         ObjectMapper mapper = buildObjectMapper();
         MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter(mapper);
-        mockMvc = MockMvcBuilders.standaloneSetup(paymentController, feesController, casesController, assignmentController)
+        mockMvc = MockMvcBuilders.standaloneSetup(
+                paymentController, feesController, casesController, assignmentController, dashboardController)
             .addFilters(new RequestFilter())
             .setMessageConverters(new StringHttpMessageConverter(), messageConverter)
             .setControllerAdvice(new ControllerExceptionHandler(), new ResourceExceptionHandler(mapper),
@@ -647,6 +666,143 @@ abstract class CivilCitizenUiProviderSupport {
     @State("The repayment decision is IN_FAVOUR_OF_DEFENDANT")
     void repaymentDecisionForDefendant() throws IOException {
         repaymentDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
+    }
+
+    private JsonNode dashboardExamples() throws IOException {
+        try (var input = getClass().getResourceAsStream("/civil-cui-dashboard.json")) {
+            return buildObjectMapper().readTree(java.util.Objects.requireNonNull(input));
+        }
+    }
+
+    private void dashboardTasks(String role, boolean populated) throws IOException {
+        List<TaskList> tasks = populated ? buildObjectMapper().convertValue(dashboardExamples().get("tasks"),
+                                                                          new TypeReference<List<TaskList>>() { })
+            : List.of();
+        // Check fixture statuses against the real provider enum and its Welsh names.
+        for (TaskList task : tasks) {
+            TaskStatus status = TaskStatus.getTaskStatusByName(task.getCurrentStatusEn());
+            org.junit.jupiter.api.Assertions.assertEquals(status.getWelshName(), task.getCurrentStatusCy());
+        }
+        when(taskListService.getTaskList(CUI_CASE_REFERENCE, role)).thenReturn(tasks);
+    }
+
+    private List<Notification> dashboardNotifications(boolean populated) throws IOException {
+        return populated ? buildObjectMapper().convertValue(dashboardExamples().get("notifications"),
+                                                           new TypeReference<List<Notification>>() { }) : List.of();
+    }
+
+    @State("The CLAIMANT dashboard task list is populated")
+    void claimantTasksPopulated() throws IOException {
+        dashboardTasks("CLAIMANT", true);
+    }
+
+    @State("The CLAIMANT Civil notifications are populated")
+    void claimantNotificationsPopulated() throws IOException {
+        when(dashboardNotificationService.getNotifications(CUI_CASE_REFERENCE, "CLAIMANT"))
+            .thenReturn(dashboardNotifications(true));
+    }
+
+    @State("The CLAIMANT dashboard task list is empty")
+    void claimantTasksEmpty() throws IOException {
+        dashboardTasks("CLAIMANT", false);
+    }
+
+    @State("The CLAIMANT Civil notifications are empty")
+    void claimantNotificationsEmpty() throws IOException {
+        when(dashboardNotificationService.getNotifications(CUI_CASE_REFERENCE, "CLAIMANT"))
+            .thenReturn(dashboardNotifications(false));
+    }
+
+    @State("The DEFENDANT dashboard task list is populated")
+    void defendantTasksPopulated() throws IOException {
+        dashboardTasks("DEFENDANT", true);
+    }
+
+    @State("The DEFENDANT Civil notifications are populated")
+    void defendantNotificationsPopulated() throws IOException {
+        when(dashboardNotificationService.getNotifications(CUI_CASE_REFERENCE, "DEFENDANT"))
+            .thenReturn(dashboardNotifications(true));
+    }
+
+    @State("The DEFENDANT dashboard task list is empty")
+    void defendantTasksEmpty() throws IOException {
+        dashboardTasks("DEFENDANT", false);
+    }
+
+    @State("The DEFENDANT Civil notifications are empty")
+    void defendantNotificationsEmpty() throws IOException {
+        when(dashboardNotificationService.getNotifications(CUI_CASE_REFERENCE, "DEFENDANT"))
+            .thenReturn(dashboardNotifications(false));
+    }
+
+    @State("The APPLICANT GA notifications are populated")
+    void applicantGaNotificationsPopulated() throws IOException {
+        when(dashboardNotificationService.getAllCasesNotifications(
+            List.of("2222333344445555", "3333444455556666"), "APPLICANT"))
+            .thenReturn(Map.of("2222333344445555", dashboardNotifications(true),
+                               "3333444455556666", List.of()));
+    }
+
+    @State("The APPLICANT GA notifications are empty")
+    void applicantGaNotificationsEmpty() throws IOException {
+        when(dashboardNotificationService.getAllCasesNotifications(
+            List.of("2222333344445555", "3333444455556666"), "APPLICANT"))
+            .thenReturn(Map.of("2222333344445555", dashboardNotifications(false),
+                               "3333444455556666", List.of()));
+    }
+
+    @State("The RESPONDENT GA notifications are populated")
+    void respondentGaNotificationsPopulated() throws IOException {
+        when(dashboardNotificationService.getAllCasesNotifications(
+            List.of("2222333344445555", "3333444455556666"), "RESPONDENT"))
+            .thenReturn(Map.of("2222333344445555", dashboardNotifications(true),
+                               "3333444455556666", List.of()));
+    }
+
+    @State("The RESPONDENT GA notifications are empty")
+    void respondentGaNotificationsEmpty() throws IOException {
+        when(dashboardNotificationService.getAllCasesNotifications(
+            List.of("2222333344445555", "3333444455556666"), "RESPONDENT"))
+            .thenReturn(Map.of("2222333344445555", dashboardNotifications(false),
+                               "3333444455556666", List.of()));
+    }
+
+    @State("A draft dashboard scenario can be created")
+    void draftDashboardScenario() {
+        stateVerification = () -> verify(dashboardScenariosService).recordScenarios(
+            AUTH_HEADER, "Scenario.AAA6.ClaimIssue.ClaimSubmit.Required", "cui-user-id",
+            new ScenarioRequestParams(new HashMap<>()));
+    }
+
+    @State("A dashboard notification update has a valid identifier")
+    void notificationClick() {
+        stateVerification = () -> verify(dashboardNotificationService).recordClick(dashboardItemId(), AUTH_HEADER);
+    }
+
+    @State("A dashboard task update has a valid identifier")
+    void dashboardTaskUpdate() {
+        TaskListEntity updated = new TaskListEntity();
+        updated.setId(dashboardItemId());
+        updated.setReference(CUI_CASE_REFERENCE);
+        updated.setCurrentStatus(TaskStatus.DONE.getPlaceValue());
+        when(taskListService.updateTaskListItem(dashboardItemId())).thenReturn(updated);
+        stateVerification = () -> verify(taskListService).updateTaskListItem(dashboardItemId());
+    }
+
+    @State({"A dashboard notification update has a malformed identifier",
+        "A dashboard task update has a malformed identifier"})
+    void malformedDashboardUpdate() {
+        stateVerification = () -> verifyNoInteractions(taskListService, dashboardNotificationService);
+    }
+
+    @State("The dashboard task to update does not exist")
+    void missingDashboardTask() {
+        when(taskListService.updateTaskListItem(dashboardItemId()))
+            .thenThrow(new IllegalArgumentException("Invalid task item identifier " + dashboardItemId()));
+    }
+
+    private UUID dashboardItemId() {
+        return UUID.fromString("10000000-0000-4000-8000-000000000001");
     }
 
     private ObjectMapper buildObjectMapper() {
