@@ -8,7 +8,6 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Map;
 
@@ -195,16 +194,14 @@ public class UploadTranslatedClaimantIntentionDocumentTest extends BpmnBaseTest 
         assertNoExternalTasksLeft();
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"true", "false"})
-    void shouldRunProcess_ClaimIsHavingMediation(boolean welshEnabled) {
+    @Test
+    void shouldRunProcess_ClaimIsHavingMediation() {
         //assert process has started
         assertFalse(processInstance.isEnded());
         //complete the start business process
         ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
         VariableMap variables = Variables.createVariables();
         variables.putValue("flowState", "MAIN.IN_MEDIATION");
-        variables.put(FLOW_FLAGS, Map.of(WELSH_ENABLED, welshEnabled));
         assertCompleteExternalTask(
                 startBusiness,
                 START_BUSINESS_TOPIC,

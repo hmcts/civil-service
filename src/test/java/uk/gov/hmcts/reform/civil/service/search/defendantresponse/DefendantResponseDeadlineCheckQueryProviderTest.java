@@ -11,7 +11,6 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.search.PageToken;
 import uk.gov.hmcts.reform.civil.model.search.PaginatedQuery;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.search.common.CommonQueryConstructs;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
@@ -32,9 +31,6 @@ class DefendantResponseDeadlineCheckQueryProviderTest {
     private CommonQueryConstructs commonQueryConstructs;
 
     @Mock
-    private FeatureToggleService featureToggleService;
-
-    @Mock
     private Time time;
 
     @InjectMocks
@@ -48,7 +44,6 @@ class DefendantResponseDeadlineCheckQueryProviderTest {
     @Test
     void shouldReturnCorrectInitialPaginatedQuery() throws Exception {
         // Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         PageToken pageToken = PageToken.initial();
         int pageSize = 50;
 
@@ -71,28 +66,12 @@ class DefendantResponseDeadlineCheckQueryProviderTest {
         assertThat(json.toString()).contains("data.respondent1ResponseDeadlineChecked");
         assertThat(json.toString()).contains("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
         assertThat(json.toString()).contains("data.businessProcess");
-        assertThat(json.toString()).doesNotContain("data.respondent1ResponseDate");
-    }
-
-    @Test
-    void shouldExcludeCasesWithAResponseDate_whenWelshIsEnabledForMainCase() throws Exception {
-        // Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-
-        // When
-        PaginatedQuery query = provider.getPaginatedQuery(PageToken.initial(), 50);
-
-        // Then
-        JsonNode json = objectMapper.readTree(query.getJsonString(objectMapper));
-
         assertThat(json.toString()).contains("data.respondent1ResponseDate");
-        assertThat(json.toString()).contains("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
     }
 
     @Test
     void shouldReturnCorrectQueryWithSearchAfter() throws Exception {
         // Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         PageToken pageToken = PageToken.of("12345");
         int pageSize = 10;
 

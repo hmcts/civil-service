@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.hearing.HearingNoticeHmcGenerator;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
@@ -46,7 +45,6 @@ import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyF
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingDays;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getLocationRefData;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getTotalHearingDurationInMinutes;
-import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.isWelshHearingTemplate;
 
 @Service
 @RequiredArgsConstructor
@@ -64,7 +62,6 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final LocationReferenceDataService locationRefDataService;
     private final HearingFeesService hearingFeesService;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -99,9 +96,7 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
 
         buildDocument(callbackParams, hearing, hearingLocation, camundaVars.getHearingId(), HEARING_NOTICE_HMC);
 
-        // Check DQ document language if Welsh not enabled, only check main language flag if enabled
-        if ((!featureToggleService.isWelshEnabledForMainCase() && isWelshHearingTemplate(caseData))
-                || (featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()))) {
+        if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
             String hearingLocationWelsh = getHearingLocation(camundaVars.getHearingId(),
                                                              hearing,
                                                              bearerToken,

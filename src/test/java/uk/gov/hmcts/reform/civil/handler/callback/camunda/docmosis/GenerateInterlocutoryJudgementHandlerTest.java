@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.dto.ClaimantResponseOnCourtDeci
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse.InterlocutoryJudgementDocGenerator;
 
@@ -33,7 +32,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.INTERLOCUTORY_JUDGEMENT;
 
@@ -63,8 +61,6 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
     private InterlocutoryJudgementDocGenerator interlocutoryJudgementDocGenerator;
     @Mock
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     private GenerateInterlocutoryJudgementHandler handler;
 
@@ -77,8 +73,7 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
         handler = new GenerateInterlocutoryJudgementHandler(
             mapper,
             interlocutoryJudgementDocGenerator,
-            systemGeneratedDocumentService,
-            featureToggleService
+            systemGeneratedDocumentService
         );
 
     }
@@ -105,34 +100,8 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
     }
 
     @Test
-    void shouldNotHideInterlocutoryJudgementDocWhenClaimantHasWelshPreferenceAndWelshToggleDisabled() {
-        //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-        given(interlocutoryJudgementDocGenerator.generateInterlocutoryJudgementDoc(
-            any(CaseData.class),
-            anyString()
-        )).willReturn(FORM);
-        CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setRespondent1(new Party().setType(Party.Type.INDIVIDUAL));
-        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
-        claimantLiPResponse.setClaimantResponseOnCourtDecision(
-            ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE);
-        claimantLiPResponse.setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
-        CaseDataLiP caseDataLiP = new CaseDataLiP();
-        caseDataLiP.setApplicant1LiPResponse(claimantLiPResponse);
-        caseData.setCaseDataLiP(caseDataLiP);
-        caseData.setClaimantBilingualLanguagePreference("WELSH");
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getPreTranslationDocuments()).hasSize(0);
-        verify(interlocutoryJudgementDocGenerator).generateInterlocutoryJudgementDoc(caseData, BEARER_TOKEN);
-    }
-
-    @Test
     void shouldHideInterlocutoryJudgementDocWhenClaimantHasWelshPreference() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(interlocutoryJudgementDocGenerator.generateInterlocutoryJudgementDoc(
             any(CaseData.class),
             anyString()
@@ -158,7 +127,6 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
     @Test
     void shouldHideInterlocutoryJudgementDocWhenDefendantHasWelshPreference() {
         //Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(interlocutoryJudgementDocGenerator.generateInterlocutoryJudgementDoc(
             any(CaseData.class),
             anyString()
@@ -222,4 +190,3 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
         verify(interlocutoryJudgementDocGenerator, times(0)).generateInterlocutoryJudgementDoc(caseData, BEARER_TOKEN);
     }
 }
-

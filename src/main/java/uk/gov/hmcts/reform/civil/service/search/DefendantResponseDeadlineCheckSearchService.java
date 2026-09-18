@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 
@@ -19,39 +18,20 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 @Slf4j
 public class DefendantResponseDeadlineCheckSearchService extends ElasticSearchService {
 
-    private final FeatureToggleService featureToggleService;
-
-    public DefendantResponseDeadlineCheckSearchService(CoreCaseDataService coreCaseDataService,
-                                                       FeatureToggleService featureToggleService) {
+    public DefendantResponseDeadlineCheckSearchService(CoreCaseDataService coreCaseDataService) {
         super(coreCaseDataService);
-        this.featureToggleService = featureToggleService;
     }
 
     @Override
     public Query query(int startIndex, String timeNow) {
         log.info("Call to DefendantResponseDeadlineCheckSearchService query with index {} and timeNow {}", startIndex, timeNow);
-        if (featureToggleService.isWelshEnabledForMainCase()) {
-            return new Query(
-                boolQuery()
-                    .minimumShouldMatch(1)
-                    .should(boolQuery()
-                                .must(rangeQuery("data.respondent1ResponseDeadline").lt(timeNow))
-                                .mustNot(matchQuery("data.respondent1ResponseDeadlineChecked", "Yes"))
-                                .mustNot(existsQuery("data.respondent1ResponseDate"))
-                                .must(beState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
-                                .must(haveNoOngoingBusinessProcess())
-                    ),
-                List.of("reference"),
-                startIndex,
-                true
-            );
-        }
         return new Query(
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
                             .must(rangeQuery("data.respondent1ResponseDeadline").lt(timeNow))
                             .mustNot(matchQuery("data.respondent1ResponseDeadlineChecked", "Yes"))
+                            .mustNot(existsQuery("data.respondent1ResponseDate"))
                             .must(beState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
                             .must(haveNoOngoingBusinessProcess())
                 ),

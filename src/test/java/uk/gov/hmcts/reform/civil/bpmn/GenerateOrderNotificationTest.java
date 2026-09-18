@@ -230,7 +230,6 @@ class GenerateOrderNotificationTest extends BpmnBaseTest {
         variables.put("flowFlags", Map.of(
             UNREPRESENTED_DEFENDANT_ONE, true,
             LIP_CASE, true,
-            WELSH_ENABLED, true,
             CLAIM_ISSUE_BILINGUAL, claimantBilingual,
             RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL, defendantBilingual));
 

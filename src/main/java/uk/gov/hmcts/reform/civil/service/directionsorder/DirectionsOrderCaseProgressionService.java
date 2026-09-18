@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoJourneyToggleService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoLocationService;
 
 /**
- * Shared helper used by both SDO and DJ submission flows to keep EA-court toggles
+ * Shared helper used by both SDO and DJ submission flows to keep EA-court routing
  * and WA location updates consistent while handler-level services remain slim.
  */
 @Service
@@ -22,8 +22,8 @@ public class DirectionsOrderCaseProgressionService {
     private final SdoFeatureToggleService featureToggleService;
     private final SdoLocationService sdoLocationService;
 
-    public void applyEaCourtLocation(CaseData caseData, boolean allowLipvLrWithNoC) {
-        YesOrNo resolvedEaCourt = sdoJourneyToggleService.resolveEaCourtLocation(caseData, allowLipvLrWithNoC);
+    public void applyEaCourtLocation(CaseData caseData) {
+        YesOrNo resolvedEaCourt = sdoJourneyToggleService.resolveEaCourtLocation(caseData);
         if (resolvedEaCourt != null) {
             log.info("Setting EA court location={} for caseId {}", resolvedEaCourt, caseData.getCcdCaseReference());
             caseData.setEaCourtLocation(resolvedEaCourt);
@@ -31,16 +31,14 @@ public class DirectionsOrderCaseProgressionService {
     }
 
     public void applyCaseProgressionRouting(CaseData caseData,
-                                            String authToken,
-                                            boolean allowLipvLrWithNoC) {
-        applyCaseProgressionRouting(caseData, authToken, false, allowLipvLrWithNoC);
+                                            String authToken) {
+        applyCaseProgressionRouting(caseData, authToken, false);
     }
 
     public void applyCaseProgressionRouting(CaseData caseData,
                                             String authToken,
-                                            boolean clearWaMetadataWhenDisabled,
-                                            boolean allowLipvLrWithNoC) {
-        applyEaCourtLocation(caseData, allowLipvLrWithNoC);
+                                            boolean clearWaMetadataWhenDisabled) {
+        applyEaCourtLocation(caseData);
         updateWaLocationsIfEnabled(caseData, authToken, clearWaMetadataWhenDisabled);
     }
 
