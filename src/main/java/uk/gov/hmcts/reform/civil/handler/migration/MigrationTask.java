@@ -1,13 +1,18 @@
 package uk.gov.hmcts.reform.civil.handler.migration;
 
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 
 public abstract class MigrationTask<T extends CaseReference> {
 
@@ -33,6 +38,13 @@ public abstract class MigrationTask<T extends CaseReference> {
         return migrateCaseData(caseData, caseReference);
     }
 
+    protected Map<String, Object> migrateCmcCaseData(
+        CaseDetails caseDetails,
+        T caseReference
+    ) {
+        return caseDetails != null ? caseDetails.getData() : null;
+    }
+
     protected List<String> getFieldsToNullify() {
         return Collections.emptyList();
     }
@@ -48,6 +60,10 @@ public abstract class MigrationTask<T extends CaseReference> {
 
     protected Class<T> getType() {
         return type;
+    }
+
+    protected CaseEvent getCaseEvent() {
+        return UPDATE_CASE_DATA;
     }
 
     public Optional<String> getUpdatedState(String state) {
