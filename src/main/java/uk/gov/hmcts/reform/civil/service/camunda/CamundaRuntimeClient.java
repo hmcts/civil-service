@@ -2,17 +2,17 @@ package uk.gov.hmcts.reform.civil.service.camunda;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.camunda.community.rest.client.model.VariableValueDto;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.civil.model.camunda.CamundaVariableValue;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /*
- * There is currently an issue with the getVariables with using the RunTimeService in org.camunda.community.
- * This class was created to handle retrieving camunda process variables directly.
+ * Retrieves Camunda process variables directly over REST rather than through a
+ * RuntimeService implementation.
  * */
 @Slf4j
 @Component
@@ -24,7 +24,7 @@ public class CamundaRuntimeClient {
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> getProcessVariables(String processInstanceId) {
-        HashMap<String, VariableValueDto> variablesResponse = camundaRestEngineApi.getProcessVariables(processInstanceId, authTokenGenerator.generate());
+        HashMap<String, CamundaVariableValue> variablesResponse = camundaRestEngineApi.getProcessVariables(processInstanceId, authTokenGenerator.generate());
         HashMap parsedResponse = new HashMap<String, Object>();
         variablesResponse.entrySet().stream().forEach(entry -> parsedResponse.put(entry.getKey(), entry.getValue().getValue()));
         return parsedResponse;
