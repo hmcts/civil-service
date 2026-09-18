@@ -36,11 +36,16 @@ import uk.gov.hmcts.reform.civil.filters.RequestFilter;
 import uk.gov.hmcts.reform.civil.ga.service.GaFeesPaymentService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee2Dto;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatus;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.GeneralApplicationFeeRequest;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
+import uk.gov.hmcts.reform.civil.model.repaymentplan.ClaimantProposedPlan;
 import uk.gov.hmcts.reform.civil.service.AssignCaseService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeesPaymentService;
@@ -49,15 +54,19 @@ import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.citizen.defendant.LipDefendantCaseAssignmentService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
+import uk.gov.hmcts.reform.civil.service.citizen.repaymentplan.RepaymentPlanDecisionService;
 import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
+import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService;
 import uk.gov.hmcts.reform.civil.service.search.exceptions.SearchServiceCaseNotFoundException;
 import uk.gov.hmcts.reform.civil.service.user.UserInformationService;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
@@ -108,6 +117,12 @@ abstract class CivilCitizenUiProviderSupport {
     @Mock
     private LipDefendantCaseAssignmentService lipAssignmentService;
     private Runnable stateVerification = () -> { };
+    @Mock
+    private InterestCalculator interestCalculator;
+    @Mock
+    private DeadlineExtensionCalculatorService deadlineCalculator;
+    @Mock
+    private RepaymentPlanDecisionService repaymentDecisionService;
     private boolean rawOcmcResponse;
     private AutoCloseable mocks;
 
@@ -120,7 +135,7 @@ abstract class CivilCitizenUiProviderSupport {
         mocks = MockitoAnnotations.openMocks(this);
         FeesPaymentController paymentController = new FeesPaymentController(feesPaymentService, gaFeesPaymentService);
         FeesController feesController = new FeesController(
-            feesService, generalAppFeesService, mock(uk.gov.hmcts.reform.civil.utils.InterestCalculator.class));
+            feesService, generalAppFeesService, interestCalculator);
         CasesController casesController = new CasesController(
             mock(uk.gov.hmcts.reform.civil.service.RoleAssignmentsService.class), coreCaseDataService,
             mock(uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService.class),
@@ -128,9 +143,9 @@ abstract class CivilCitizenUiProviderSupport {
             mock(uk.gov.hmcts.reform.civil.ga.service.events.GaCaseEventService.class),
             mock(uk.gov.hmcts.reform.civil.service.search.CaseSdtRequestSearchService.class),
             mock(uk.gov.hmcts.reform.civil.service.bulkclaims.CaseworkerCaseEventService.class),
-            mock(uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService.class),
+            deadlineCalculator,
             mock(uk.gov.hmcts.reform.civil.validation.PostcodeValidator.class), userInformationService,
-            mock(uk.gov.hmcts.reform.civil.service.citizen.repaymentplan.RepaymentPlanDecisionService.class));
+            repaymentDecisionService);
         CaseAssignmentController assignmentController = new CaseAssignmentController(
             referenceSearchService, pinService, assignCaseService, lipAssignmentService, coreCaseDataService);
         stateVerification = () -> { };
@@ -517,6 +532,121 @@ abstract class CivilCitizenUiProviderSupport {
         when(coreCaseDataService.getCase(Long.valueOf(CUI_CASE_REFERENCE))).thenReturn(details);
         doThrow(new PinNotMatchException()).when(pinService).validatePin(details, "123456");
         stateVerification = () -> verifyNoInteractions(assignCaseService, lipAssignmentService);
+    }
+
+    private JsonNode calculationExamples() throws IOException {
+        try (var input = getClass().getResourceAsStream("/civil-cui-calculations.json")) {
+            return buildObjectMapper().readTree(java.util.Objects.requireNonNull(input));
+        }
+    }
+
+    private void interestExample(String name) throws IOException {
+        JsonNode example = calculationExamples().get("interest").get(name);
+        CaseData expected = buildObjectMapper().treeToValue(example.get("request"), CaseData.class);
+        when(interestCalculator.getInterestValidationErrors(expected)).thenReturn(List.of());
+        when(interestCalculator.calculateInterest(expected)).thenReturn(example.get("result").decimalValue());
+        stateVerification = () -> {
+            verify(interestCalculator).getInterestValidationErrors(expected);
+            verify(interestCalculator).calculateInterest(expected);
+        };
+    }
+
+    @State("Claim interest statutory can be calculated")
+    void statutoryInterest() throws IOException {
+        interestExample("statutory");
+    }
+
+    @State("Claim interest different rate zero can be calculated")
+    void zeroInterest() throws IOException {
+        interestExample("different rate zero");
+    }
+
+    @State("Claim interest breakdown can be calculated")
+    void breakdownInterest() throws IOException {
+        interestExample("breakdown");
+    }
+
+    @State("A hearing fee is available for a claim amount of 1000")
+    void hearingFee() {
+        when(feesService.getHearingFeeDataByTotalClaimAmount(new BigDecimal("1000")))
+            .thenReturn(new Fee(new BigDecimal("30300"), "FEE0442", "2"));
+    }
+
+    @State("Flat and percentage fee ranges are available")
+    void feeRanges() throws IOException {
+        List<Fee2Dto> ranges = buildObjectMapper().convertValue(calculationExamples().get("ranges"),
+                                                              new TypeReference<List<Fee2Dto>>() { });
+        when(feesService.getFeeRange()).thenReturn(ranges);
+    }
+
+    private void generalApplicationFee(String name) throws IOException {
+        GeneralApplicationFeeRequest expected = buildObjectMapper().treeToValue(
+            calculationExamples().get("generalApplication").get(name), GeneralApplicationFeeRequest.class);
+        when(generalAppFeesService.getFeeForGALiP(expected.getApplicationTypes(), expected.getWithConsent(),
+                                                 expected.getWithNotice(), expected.getHearingDate()))
+            .thenReturn(new Fee(new BigDecimal("30300"), "FEE0442", "2"));
+    }
+
+    @State("A General Application fee for consent is available")
+    void consentFee() throws IOException {
+        generalApplicationFee("consent");
+    }
+
+    @State("A General Application fee for notice is available")
+    void noticeFee() throws IOException {
+        generalApplicationFee("notice");
+    }
+
+    @State("A General Application fee for without notice is available")
+    void withoutNoticeFee() throws IOException {
+        generalApplicationFee("without notice");
+    }
+
+    @State("A General Application fee for adjourn hearing is available")
+    void adjournHearingFee() throws IOException {
+        generalApplicationFee("adjourn hearing");
+    }
+
+    @State("A response deadline with 0 extra days can be calculated")
+    void responseDeadlinePlus0() {
+        when(deadlineCalculator.calculateExtendedDeadline(LocalDate.of(2025, 2, 3), 0))
+            .thenReturn(LocalDate.parse("2025-02-03"));
+    }
+
+    @State("A response deadline with 5 extra days can be calculated")
+    void responseDeadlinePlus5() {
+        when(deadlineCalculator.calculateExtendedDeadline(LocalDate.of(2025, 2, 3), 5))
+            .thenReturn(LocalDate.parse("2025-02-10"));
+    }
+
+    @State("An agreed response deadline is present")
+    void agreedDeadlinePresent() {
+        when(coreCaseDataService.getAgreedDeadlineResponseDate(Long.valueOf(CUI_CASE_REFERENCE), AUTH_HEADER))
+            .thenReturn(LocalDate.of(2025, 2, 10));
+    }
+
+    @State("An agreed response deadline is absent")
+    void agreedDeadlineAbsent() {
+        when(coreCaseDataService.getAgreedDeadlineResponseDate(Long.valueOf(CUI_CASE_REFERENCE), AUTH_HEADER))
+            .thenReturn(null);
+    }
+
+    private void repaymentDecision(RepaymentDecisionType decision) throws IOException {
+        ClaimantProposedPlan expected = buildObjectMapper().treeToValue(
+            calculationExamples().get("repayment"), ClaimantProposedPlan.class);
+        CaseDetails details = readableCase(false);
+        when(coreCaseDataService.getCase(Long.valueOf(CUI_CASE_REFERENCE), AUTH_HEADER)).thenReturn(details);
+        when(repaymentDecisionService.getCalculatedDecision(details, expected)).thenReturn(decision);
+    }
+
+    @State("The repayment decision is IN_FAVOUR_OF_CLAIMANT")
+    void repaymentDecisionForClaimant() throws IOException {
+        repaymentDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
+    }
+
+    @State("The repayment decision is IN_FAVOUR_OF_DEFENDANT")
+    void repaymentDecisionForDefendant() throws IOException {
+        repaymentDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
     }
 
     private ObjectMapper buildObjectMapper() {
