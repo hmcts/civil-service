@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.engine.RuntimeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ContactDetailsUpdatedEvent;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -30,14 +30,14 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 class ContactInformationUpdatedCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
-    private RuntimeService runTimeService;
+    private CamundaRuntimeClient camundaRuntimeClient;
 
     private ContactInformationUpdatedCallbackHandler handler;
 
     @BeforeEach
     void setup() {
         ObjectMapper objectMapper = new ObjectMapper();
-        handler = new ContactInformationUpdatedCallbackHandler(runTimeService, objectMapper);
+        handler = new ContactInformationUpdatedCallbackHandler(camundaRuntimeClient, objectMapper);
     }
 
     @ParameterizedTest
@@ -60,7 +60,7 @@ class ContactInformationUpdatedCallbackHandlerTest extends BaseCallbackHandlerTe
 
         assertNotNull(result);
         assertNotNull(result.getData());
-        verify(runTimeService).setVariable(processId, "submittedByCaseworker", submittedByCaseworker);
+        verify(camundaRuntimeClient).setProcessVariable(processId, "submittedByCaseworker", submittedByCaseworker);
         assertNull(result.getData().get("contactDetailsUpdatedEvent"));
     }
 

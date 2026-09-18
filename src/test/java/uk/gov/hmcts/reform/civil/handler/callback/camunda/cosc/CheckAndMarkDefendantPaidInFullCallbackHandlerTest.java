@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.cosc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.engine.RuntimeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.time.LocalDate;
@@ -39,7 +39,7 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
     @Mock
     private JudgmentPaidInFullOnlineMapper paidInFullJudgmentOnlineMapper;
     @Mock
-    private RuntimeService runtimeService;
+    private CamundaRuntimeClient camundaRuntimeClient;
     @Mock
     private InterestCalculator interestCalculator;
 
@@ -54,7 +54,7 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
         objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         handler = new CheckAndMarkDefendantPaidInFullCallbackHandler(
             paidInFullJudgmentOnlineMapper,
-            runtimeService,
+            camundaRuntimeClient,
             objectMapper,
             interestCalculator
         );
@@ -75,7 +75,7 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
 
         handler.handle(params);
 
-        verify(runtimeService, times(1)).setVariable(PROCESS_INSTANCE_ID, SEND_DETAILS_CJES, false);
+        verify(camundaRuntimeClient, times(1)).setProcessVariable(PROCESS_INSTANCE_ID, SEND_DETAILS_CJES, false);
         verifyNoInteractions(paidInFullJudgmentOnlineMapper);
     }
 
@@ -110,7 +110,7 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
 
         assertEquals(expected, updatedData.getActiveJudgment());
         assertThat(updatedData.getJoCoscRpaStatus()).isEqualTo(SATISFIED);
-        verify(runtimeService, times(1)).setVariable(PROCESS_INSTANCE_ID, SEND_DETAILS_CJES, true);
+        verify(camundaRuntimeClient, times(1)).setProcessVariable(PROCESS_INSTANCE_ID, SEND_DETAILS_CJES, true);
         assertThat(updatedData.getJoDefendantMarkedPaidInFullIssueDate()).isNotNull();
     }
 
