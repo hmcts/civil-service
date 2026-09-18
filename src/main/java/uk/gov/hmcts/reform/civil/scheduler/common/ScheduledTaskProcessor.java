@@ -4,9 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorChain;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorContext;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorChainFactory;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.SchedulerInterceptor;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.TaskAbortedException;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -21,6 +26,7 @@ import java.util.stream.Stream;
 public class ScheduledTaskProcessor<T, I> {
 
     private final ScheduledEventTracker eventTracker;
+    private final InterceptorChainFactory interceptorChainFactory;
 
     @Value("${scheduler.circuitBreakerThreshold:5}")
     private int circuitBreakerThreshold;
@@ -38,11 +44,14 @@ public class ScheduledTaskProcessor<T, I> {
     public ScheduledTaskOutcome<I> performProcessing(ScheduledTaskEventConfiguration eventConfig,
                                                      ScheduledTask<T, I> scheduledTask,
                                                      TaskResult<T> searchResult) {
-        List<I> succeededItems = new ArrayList<>();
-        List<I> failedItems = new ArrayList<>();
-        AtomicInteger consecutiveFailures = new AtomicInteger();
-        AtomicReference<String> abortReason = new AtomicReference<>();
-        AtomicLong cumulativeDelayMillis = new AtomicLong();
+        return performProcessing(eventConfig, scheduledTask, searchResult, new ArrayList<>());
+    }
+
+    public ScheduledTaskOutcome<I> performProcessing(ScheduledTaskEventConfiguration eventConfig,
+                                                     ScheduledTask<T, I> scheduledTask,
+                                                     TaskResult<T> searchResult,
+                                                     List<SchedulerInterceptor<T>> interceptors) {
+        ProcessingContext context = new ProcessingContext();
         ScheduledTaskBackPressure backPressure = new ScheduledTaskBackPressure(
             eventConfig.getSchedulerName(),
             scheduledTask.backPressureConfiguration(),
@@ -50,73 +59,118 @@ public class ScheduledTaskProcessor<T, I> {
             eventConfig
         );
 
+        List<SchedulerInterceptor<T>> sortedInterceptors = interceptorChainFactory.sortInterceptors(interceptors);
+
         Stream<T> sequentialStream = searchResult.itemStream()
             .sequential()
             .limit(maxCasesPerRun(scheduledTask));
 
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         try {
             boolean completed = sequentialStream.allMatch(item -> processItem(
                 eventConfig,
                 scheduledTask,
+                sortedInterceptors,
                 item,
                 backPressure,
-                succeededItems,
-                failedItems,
-                consecutiveFailures,
-                abortReason,
-                cumulativeDelayMillis
+                context
             ));
 
+            stopWatch.stop();
             return new ScheduledTaskOutcome<>(
-                succeededItems,
-                failedItems,
+                context.succeededItems,
+                context.failedItems,
+                context.abortedItems,
                 !completed,
-                abortReason.get(),
-                Duration.ofMillis(cumulativeDelayMillis.get())
+                context.jobAbortReason.get(),
+                Duration.ofMillis(context.cumulativeDelayMillis.get()),
+                Duration.ofNanos(stopWatch.getTotalTimeNanos())
             );
         } catch (ScheduledTaskInterruptedException e) {
-            abortReason.set(e.getMessage());
+            if (stopWatch.isRunning()) {
+                stopWatch.stop();
+            }
+            context.jobAbortReason.set(e.getMessage());
             return new ScheduledTaskOutcome<>(
-                succeededItems,
-                failedItems,
+                context.succeededItems,
+                context.failedItems,
+                context.abortedItems,
                 true,
-                abortReason.get(),
-                Duration.ofMillis(cumulativeDelayMillis.get())
+                context.jobAbortReason.get(),
+                Duration.ofMillis(context.cumulativeDelayMillis.get()),
+                Duration.ofNanos(stopWatch.getTotalTimeNanos())
             );
         }
     }
 
     private boolean processItem(ScheduledTaskEventConfiguration eventConfig,
-                                       ScheduledTask<T, I> scheduledTask,
-                                       T item,
-                                       ScheduledTaskBackPressure backPressure,
-                                       List<I> succeededItems,
-                                       List<I> failedItems,
-                                       AtomicInteger consecutiveFailures,
-                                       AtomicReference<String> abortReason,
-                                       AtomicLong cumulativeDelayMillis) {
-        applyBackPressure(backPressure, cumulativeDelayMillis);
+                                ScheduledTask<T, I> scheduledTask,
+                                List<SchedulerInterceptor<T>> sortedInterceptors,
+                                T item,
+                                ScheduledTaskBackPressure backPressure,
+                                ProcessingContext context) {
+        applyBackPressure(backPressure, context);
 
         I itemId = scheduledTask.getItemId(item);
-        Instant startedAt = Instant.now();
+        InterceptorContext<T> interceptorContext = new InterceptorContext<>(eventConfig.getSchedulerName(), item);
 
         try {
-            scheduledTask.accept(item);
-            backPressure.afterSuccess(Duration.between(startedAt, Instant.now()));
-            eventTracker.caseProcessedEvent(eventConfig, itemId.toString());
-            succeededItems.add(itemId);
-            consecutiveFailures.set(0);
-        } catch (Exception e) {
-            backPressure.afterFailure();
-            failedItems.add(itemId);
-            eventTracker.caseFailedEvent(eventConfig, itemId.toString(), e);
-            log.error("Error processing item {}: {}", itemId, e.getMessage(), e);
-            int failures = consecutiveFailures.incrementAndGet();
+            InterceptorChain<T> chain = interceptorChainFactory.buildChain(scheduledTask, sortedInterceptors);
+            chain.next(interceptorContext);
 
-            if (failures >= circuitBreakerThreshold) {
-                abortReason.set(Objects.toString(e.getMessage(), e.getClass().getSimpleName()));
-                return false;
+            if (chain.wasTaskExecuted()) {
+                Duration duration = Duration.ofNanos(chain.getTotalTimeNanos());
+                handleSuccess(eventConfig, itemId, duration, backPressure, context, interceptorContext);
+            } else {
+                handleAbortion(eventConfig, itemId, "Silent abortion", interceptorContext, context);
             }
+        } catch (TaskAbortedException e) {
+            handleAbortion(eventConfig, itemId, e.getReason(), interceptorContext, context);
+        } catch (Exception e) {
+            return handleFailure(eventConfig, itemId, e, backPressure, context, interceptorContext);
+        }
+        return true;
+    }
+
+    private void handleSuccess(ScheduledTaskEventConfiguration eventConfig,
+                               I itemId,
+                               Duration duration,
+                               ScheduledTaskBackPressure backPressure,
+                               ProcessingContext context,
+                               InterceptorContext<T> interceptorContext) {
+        backPressure.afterSuccess(duration);
+        eventTracker.caseProcessedEvent(eventConfig, itemId.toString(), interceptorContext.getMetrics());
+        context.succeededItems.add(itemId);
+        context.consecutiveFailures.set(0);
+    }
+
+    private void handleAbortion(ScheduledTaskEventConfiguration eventConfig,
+                                I itemId,
+                                String reason,
+                                InterceptorContext<T> interceptorContext,
+                                ProcessingContext context) {
+        log.info("Scheduled task: {}, ItemId: {}, Aborted: {}",
+                 eventConfig.getSchedulerName(), itemId, reason);
+        eventTracker.caseAbortedEvent(eventConfig, itemId.toString(), reason, interceptorContext.getMetrics());
+        context.abortedItems.add(itemId);
+    }
+
+    private boolean handleFailure(ScheduledTaskEventConfiguration eventConfig,
+                                  I itemId,
+                                  Exception e,
+                                  ScheduledTaskBackPressure backPressure,
+                                  ProcessingContext context,
+                                  InterceptorContext<T> interceptorContext) {
+        backPressure.afterFailure();
+        context.failedItems.add(itemId);
+        eventTracker.caseFailedEvent(eventConfig, itemId.toString(), e, interceptorContext.getMetrics());
+        log.error("Error processing item {}: {}", itemId, e.getMessage(), e);
+        int failures = context.consecutiveFailures.incrementAndGet();
+
+        if (failures >= circuitBreakerThreshold) {
+            context.jobAbortReason.set(Objects.toString(e.getMessage(), e.getClass().getSimpleName()));
+            return false;
         }
         return true;
     }
@@ -129,7 +183,7 @@ public class ScheduledTaskProcessor<T, I> {
         return maxCasesPerRun;
     }
 
-    private void applyBackPressure(ScheduledTaskBackPressure backPressure, AtomicLong cumulativeDelayMillis) {
+    private void applyBackPressure(ScheduledTaskBackPressure backPressure, ProcessingContext context) {
         Duration delay = backPressure.currentDelay();
         if (delay.isZero()) {
             return;
@@ -137,7 +191,7 @@ public class ScheduledTaskProcessor<T, I> {
 
         try {
             log.debug("Applying scheduled task backpressure delay: {}", delay);
-            cumulativeDelayMillis.addAndGet(delay.toMillis());
+            context.cumulativeDelayMillis.addAndGet(delay.toMillis());
             sleep(delay);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -150,5 +204,15 @@ public class ScheduledTaskProcessor<T, I> {
 
     void sleep(Duration delay) throws InterruptedException {
         Thread.sleep(delay.toMillis());
+    }
+
+    @RequiredArgsConstructor
+    private class ProcessingContext {
+        private final List<I> succeededItems = new ArrayList<>();
+        private final List<I> failedItems = new ArrayList<>();
+        private final List<I> abortedItems = new ArrayList<>();
+        private final AtomicInteger consecutiveFailures = new AtomicInteger();
+        private final AtomicReference<String> jobAbortReason = new AtomicReference<>();
+        private final AtomicLong cumulativeDelayMillis = new AtomicLong();
     }
 }

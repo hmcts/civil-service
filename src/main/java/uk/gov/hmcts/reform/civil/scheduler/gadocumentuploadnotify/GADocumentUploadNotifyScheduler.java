@@ -8,10 +8,11 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.ga.service.search.GaEvidenceUploadNotificationSearchService;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
-import uk.gov.hmcts.reform.civil.scheduler.common.ListTaskResult;
+import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
+import uk.gov.hmcts.reform.civil.scheduler.common.SetTaskResult;
 
-import java.util.List;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -35,13 +36,13 @@ public class GADocumentUploadNotifyScheduler implements CivilScheduler {
         lockAtLeastFor = "${scheduler.lockAtLeastFor}")
     @Override
     public void runScheduledTask() {
-        scheduledTaskRunner.run(
-            SCHEDULER_NAME,
-            () -> {
-                List<CaseDetails> applications = searchService.getApplications().stream().toList();
-                return new ListTaskResult<>(applications, applications.size());
-            },
-            gaDocumentUploadNotifyScheduledTask
-        );
+        scheduledTaskRunner.run(ScheduledTaskConfiguration.<CaseDetails, Long>builder()
+            .schedulerName(SCHEDULER_NAME)
+            .searchResultSupplier(() -> {
+                Set<CaseDetails> applications = searchService.getApplications();
+                return new SetTaskResult<>(applications);
+            })
+            .scheduledTask(gaDocumentUploadNotifyScheduledTask)
+            .build());
     }
 }

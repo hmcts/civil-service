@@ -10,6 +10,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorChain;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorChainFactory;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.TaskAbortedException;
 import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
 import java.time.Duration;
@@ -20,6 +23,9 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -30,12 +36,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ScheduledTaskProcessorTest {
 
     @Mock
     private ScheduledEventTracker scheduledEventTracker;
+
+    @Mock
+    private InterceptorChainFactory interceptorChainFactory;
 
     @Mock(answer = Answers.CALLS_REAL_METHODS)
     private ScheduledTask<CaseDetails, Long> scheduledTask;
@@ -48,6 +58,13 @@ class ScheduledTaskProcessorTest {
         lenient().when(scheduledTask.getItemId(any())).thenAnswer(invocation -> {
             CaseDetails caseDetails = invocation.getArgument(0);
             return caseDetails != null ? caseDetails.getId() : null;
+        });
+
+        lenient().when(interceptorChainFactory.sortInterceptors(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        lenient().when(interceptorChainFactory.buildChain(any(), any())).thenAnswer(invocation -> {
+            ScheduledTask<CaseDetails, Long> task = invocation.getArgument(0);
+            return new InterceptorChain<CaseDetails>(List.of(), ctx -> task.accept(ctx.getItem()));
         });
     }
 
@@ -66,6 +83,7 @@ class ScheduledTaskProcessorTest {
         assertThat(outcome).isNotNull();
         assertThat(outcome.succeededCases().size()).isEqualTo(3);
         assertThat(outcome.failedCases().size()).isEqualTo(0);
+        assertThat(outcome.abortedCases()).isEmpty();
 
         verify(scheduledTask).accept(case1);
         verify(scheduledTask).accept(case2);
@@ -75,9 +93,9 @@ class ScheduledTaskProcessorTest {
         verify(scheduledTask, times(3)).getItemId(any());
         verifyNoMoreInteractions(scheduledTask);
 
-        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, String.valueOf(case1.getId()));
-        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, String.valueOf(case2.getId()));
-        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, String.valueOf(case3.getId()));
+        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq(String.valueOf(case1.getId())), anyMap());
+        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq(String.valueOf(case2.getId())), anyMap());
+        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq(String.valueOf(case3.getId())), anyMap());
         verifyNoMoreInteractions(scheduledEventTracker);
     }
 
@@ -115,15 +133,17 @@ class ScheduledTaskProcessorTest {
         assertThat(outcome.failedCases()).isEmpty();
         assertThat(task.processedCases()).containsExactly(1L, 2L);
 
-        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, "1");
-        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, "2");
-        verify(scheduledEventTracker, never()).caseProcessedEvent(eventConfig, "3");
+        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq("1"), anyMap());
+        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq("2"), anyMap());
+        verify(scheduledEventTracker, never()).caseProcessedEvent(eq(eventConfig), eq("3"), anyMap());
         verifyNoMoreInteractions(scheduledEventTracker);
     }
 
     @Test
     void shouldApplyDynamicBackPressure_whenFailuresRecover() {
-        CapturingScheduledTaskProcessor processor = new CapturingScheduledTaskProcessor(scheduledEventTracker);
+        CapturingScheduledTaskProcessor processor = new CapturingScheduledTaskProcessor(scheduledEventTracker,
+                                                                                        interceptorChainFactory
+        );
         ReflectionTestUtils.setField(processor, "circuitBreakerThreshold", 5);
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         CaseDetails case2 = CaseDetailsBuilder.builder().id(2L).build();
@@ -153,9 +173,9 @@ class ScheduledTaskProcessorTest {
         assertThat(processor.delays()).containsExactly(Duration.ofMillis(10), Duration.ofMillis(5));
         assertThat(outcome.cumulativeDelay()).isEqualTo(Duration.ofMillis(15));
 
-        verify(scheduledEventTracker).caseFailedEvent(eventConfig, "1", error);
-        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, "2");
-        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, "3");
+        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq("1"), eq(error), anyMap());
+        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq("2"), anyMap());
+        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq("3"), anyMap());
         verify(scheduledEventTracker).backPressureUpdatedEvent(eventConfig, Duration.ZERO, Duration.ofMillis(10));
         verify(scheduledEventTracker).backPressureUpdatedEvent(eventConfig, Duration.ofMillis(10), Duration.ofMillis(5));
         verify(scheduledEventTracker).backPressureUpdatedEvent(eventConfig, Duration.ofMillis(5), Duration.ZERO);
@@ -163,7 +183,9 @@ class ScheduledTaskProcessorTest {
 
     @Test
     void shouldAbortProcessing_whenInterruptedDuringBackPressureDelay() {
-        InterruptingScheduledTaskProcessor processor = new InterruptingScheduledTaskProcessor(scheduledEventTracker);
+        InterruptingScheduledTaskProcessor processor = new InterruptingScheduledTaskProcessor(scheduledEventTracker,
+                                                                                              interceptorChainFactory
+        );
         CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
         RecordingScheduledTask task = new RecordingScheduledTask(
             Long.MAX_VALUE,
@@ -186,7 +208,7 @@ class ScheduledTaskProcessorTest {
             );
 
             assertThat(outcome.abortedEarly()).isTrue();
-            assertThat(outcome.abortReason()).isEqualTo(
+            assertThat(outcome.jobAbortReason()).isEqualTo(
                 "Scheduled task interrupted while applying backpressure"
             );
             assertThat(outcome.succeededCases()).isEmpty();
@@ -221,15 +243,15 @@ class ScheduledTaskProcessorTest {
         ScheduledTaskOutcome<Long> outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
 
         assertThat(outcome.abortedEarly()).isTrue();
-        assertThat(outcome.abortReason()).isEqualTo("Error 2");
+        assertThat(outcome.jobAbortReason()).isEqualTo("Error 2");
         assertThat(outcome.succeededCases()).isEmpty();
         assertThat(outcome.failedCases()).containsExactly(1L, 2L);
 
         verify(scheduledTask).accept(case1);
         verify(scheduledTask).accept(case2);
 
-        verify(scheduledEventTracker).caseFailedEvent(eventConfig, "1", error1);
-        verify(scheduledEventTracker).caseFailedEvent(eventConfig, "2", error2);
+        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq("1"), eq(error1), anyMap());
+        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq("2"), eq(error2), anyMap());
         verifyNoMoreInteractions(scheduledEventTracker);
     }
 
@@ -258,9 +280,9 @@ class ScheduledTaskProcessorTest {
         assertThat(outcome.succeededCases()).containsExactly(102L);
         assertThat(outcome.failedCases()).containsExactly(101L, 103L);
 
-        verify(scheduledEventTracker).caseFailedEvent(eventConfig, "101", error1);
-        verify(scheduledEventTracker).caseProcessedEvent(eventConfig, "102");
-        verify(scheduledEventTracker).caseFailedEvent(eventConfig, "103", error3);
+        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq("101"), eq(error1), anyMap());
+        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq("102"), anyMap());
+        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq("103"), eq(error3), anyMap());
     }
 
     @Test
@@ -277,7 +299,7 @@ class ScheduledTaskProcessorTest {
         ScheduledTaskOutcome<Long> outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
 
         assertThat(outcome.abortedEarly()).isTrue();
-        assertThat(outcome.abortReason()).isEqualTo("RuntimeException");
+        assertThat(outcome.jobAbortReason()).isEqualTo("RuntimeException");
         assertThat(outcome.failedCases()).containsExactly(1L);
     }
 
@@ -314,7 +336,8 @@ class ScheduledTaskProcessorTest {
         CaseDetails case2 = CaseDetailsBuilder.builder().id(2L).build();
         List<CaseDetails> cases = List.of(case1, case2);
 
-        doThrow(new RuntimeException("Error 1")).when(scheduledTask).accept(case1);
+        RuntimeException error1 = new RuntimeException("Error 1");
+        doThrow(error1).when(scheduledTask).accept(case1);
 
         ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
         ElasticSearchResult searchResult = new ElasticSearchResult(cases.stream(), 2);
@@ -327,8 +350,61 @@ class ScheduledTaskProcessorTest {
 
         // Verify that case 2 was NEVER even attempted
         verify(scheduledTask, never()).accept(case2);
-        verify(scheduledEventTracker, never()).caseProcessedEvent(any(), eq(2L));
-        verify(scheduledEventTracker, never()).caseFailedEvent(any(), eq(2L), any());
+        verify(scheduledEventTracker, never()).caseProcessedEvent(any(), anyString(), anyMap());
+        verify(scheduledEventTracker, never()).caseFailedEvent(any(), eq("2"), any(), anyMap());
+        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq("1"), eq(error1), anyMap());
+    }
+
+    @Test
+    void shouldHandleTaskAbortedException() {
+        ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
+        CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
+        ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1), 1);
+
+        when(interceptorChainFactory.buildChain(any(), any())).thenAnswer(invocation ->
+            new InterceptorChain<CaseDetails>(
+                List.of((context, chain) -> {
+                    throw new TaskAbortedException("Ongoing business process");
+                }),
+                ctx -> scheduledTask.accept(ctx.getItem())
+            )
+        );
+
+        ScheduledTaskOutcome<Long> outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
+
+        assertThat(outcome.succeededCases()).isEmpty();
+        assertThat(outcome.failedCases()).isEmpty();
+        assertThat(outcome.abortedCases()).containsExactly(1L);
+        assertThat(outcome.abortedEarly()).isFalse();
+
+        verify(scheduledEventTracker).caseAbortedEvent(eq(eventConfig), eq("1"), eq("Ongoing business process"), anyMap());
+        verify(scheduledTask, never()).accept(any());
+    }
+
+    @Test
+    void shouldHandleSilentAbortion() {
+        ScheduledTaskEventConfiguration eventConfig = new ScheduledTaskEventConfiguration("JudgmentBuffer");
+        CaseDetails case1 = CaseDetailsBuilder.builder().id(1L).build();
+        ElasticSearchResult searchResult = new ElasticSearchResult(Stream.of(case1), 1);
+
+        when(interceptorChainFactory.buildChain(any(), any())).thenAnswer(invocation ->
+            new InterceptorChain<CaseDetails>(
+                List.of((context, chain) -> {
+                    // Silently aborts by not calling chain.next()
+                }),
+                ctx -> scheduledTask.accept(ctx.getItem())
+            )
+        );
+
+        ScheduledTaskOutcome<Long> outcome = scheduledTaskProcessor.performProcessing(eventConfig, scheduledTask, searchResult);
+
+        assertThat(outcome.succeededCases()).isEmpty();
+        assertThat(outcome.failedCases()).isEmpty();
+        assertThat(outcome.abortedCases()).containsExactly(1L);
+        assertThat(outcome.abortedEarly()).isFalse();
+
+        verify(scheduledEventTracker).caseAbortedEvent(eq(eventConfig), eq("1"), eq("Silent abortion"), anyMap());
+        verify(scheduledTask, never()).accept(any());
     }
 
     private static class RecordingScheduledTask implements ScheduledTask<CaseDetails, Long> {
@@ -387,8 +463,8 @@ class ScheduledTaskProcessorTest {
 
         private final List<Duration> delays = new ArrayList<>();
 
-        CapturingScheduledTaskProcessor(ScheduledEventTracker eventTracker) {
-            super(eventTracker);
+        CapturingScheduledTaskProcessor(ScheduledEventTracker eventTracker, InterceptorChainFactory interceptorChainFactory) {
+            super(eventTracker, interceptorChainFactory);
         }
 
         @Override
@@ -403,8 +479,8 @@ class ScheduledTaskProcessorTest {
 
     private static class InterruptingScheduledTaskProcessor extends ScheduledTaskProcessor<CaseDetails, Long> {
 
-        InterruptingScheduledTaskProcessor(ScheduledEventTracker eventTracker) {
-            super(eventTracker);
+        InterruptingScheduledTaskProcessor(ScheduledEventTracker eventTracker, InterceptorChainFactory interceptorChainFactory) {
+            super(eventTracker, interceptorChainFactory);
         }
 
         @Override
