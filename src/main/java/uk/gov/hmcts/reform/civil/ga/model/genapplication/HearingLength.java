@@ -13,18 +13,48 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 public class HearingLength {
 
-    private int lengthListOtherDays;
-    private int lengthListOtherHours;
-    private int lengthListOtherMinutes;
+    private String lengthListOtherDays;
+    private String lengthListOtherHours;
+    private String lengthListOtherMinutes;
 
     @JsonCreator
-    HearingLength(@JsonProperty("lengthListOtherDays") int lengthListOtherDays,
-                  @JsonProperty("lengthListOtherHours") int lengthListOtherHours,
-                  @JsonProperty("lengthListOtherMinutes") int lengthListOtherMinutes
+    HearingLength(@JsonProperty("lengthListOtherDays") String lengthListOtherDays,
+                  @JsonProperty("lengthListOtherHours") String lengthListOtherHours,
+                  @JsonProperty("lengthListOtherMinutes") String lengthListOtherMinutes
     ) {
 
         this.lengthListOtherDays = lengthListOtherDays;
         this.lengthListOtherHours = lengthListOtherHours;
         this.lengthListOtherMinutes = lengthListOtherMinutes;
+    }
+
+    public HearingLength setLengthListOtherDays(int lengthListOtherDays) {
+        this.lengthListOtherDays = String.valueOf(lengthListOtherDays);
+        return this;
+    }
+
+    public HearingLength setLengthListOtherDays(String lengthListOtherDays) {
+        this.lengthListOtherDays = lengthListOtherDays;
+        return this;
+    }
+
+    public HearingLength setLengthListOtherHours(int lengthListOtherHours) {
+        this.lengthListOtherHours = String.valueOf(lengthListOtherHours);
+        return this;
+    }
+
+    public HearingLength setLengthListOtherHours(String lengthListOtherHours) {
+        this.lengthListOtherHours = lengthListOtherHours;
+        return this;
+    }
+
+    public HearingLength setLengthListOtherMinutes(int lengthListOtherMinutes) {
+        this.lengthListOtherMinutes = String.valueOf(lengthListOtherMinutes);
+        return this;
+    }
+
+    public HearingLength setLengthListOtherMinutes(String lengthListOtherMinutes) {
+        this.lengthListOtherMinutes = lengthListOtherMinutes;
+        return this;
     }
 }
