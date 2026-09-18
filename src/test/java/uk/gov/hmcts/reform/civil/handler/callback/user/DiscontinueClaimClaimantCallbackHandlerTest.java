@@ -28,17 +28,21 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARENT_CLAIM_DISCONTINUED;
 
 @SpringBootTest(classes = {
     DiscontinueClaimClaimantCallbackHandler.class,
@@ -54,6 +58,8 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
     private CaseDetailsConverter caseDetailsConverter;
     @MockBean
     private FeatureToggleService featureToggleService;
+    @MockBean
+    private GenAppStateHelperService genAppStateHelperService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -267,6 +273,7 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getState()).isEqualTo(CaseState.CASE_DISCONTINUED.name());
+            verify(genAppStateHelperService).triggerEvent(caseData, PARENT_CLAIM_DISCONTINUED);
         }
 
         @Test
@@ -357,6 +364,7 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getState()).isEqualTo(caseData.getCcdState().name());
+            verify(genAppStateHelperService, never()).triggerEvent(caseData, PARENT_CLAIM_DISCONTINUED);
         }
     }
 
