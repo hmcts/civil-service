@@ -437,6 +437,9 @@ public class HmcDataUtils {
     public static LocationRefData getLocationRefData(String hearingId, String venueId,
                                                      String bearerToken, String serviceId,
                                                      LocationReferenceDataService locationRefDataService) {
+        if (venueId == null || venueId.isBlank()) {
+            return null;
+        }
         List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(bearerToken, serviceId);
         var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(venueId)).toList();
         if (!matchedLocations.isEmpty()) {
