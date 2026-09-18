@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.hearingnotice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.engine.RuntimeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,9 +26,6 @@ public class HearingNoticeCamundaServiceTest {
 
     @Mock
     private ObjectMapper mapper;
-
-    @Mock
-    private RuntimeService runtimeService;
 
     @Mock
     private CamundaRuntimeClient runtimeClient;
@@ -85,6 +81,6 @@ public class HearingNoticeCamundaServiceTest {
 
         hearingNoticeCamundaService.setProcessVariables(PROCESS_INSTANCE_ID, variables);
 
-        verify(runtimeService).setVariables(PROCESS_INSTANCE_ID, variables.toMap(mapper));
+        verify(runtimeClient).setProcessVariables(PROCESS_INSTANCE_ID, variables.toMap(mapper));
     }
 }

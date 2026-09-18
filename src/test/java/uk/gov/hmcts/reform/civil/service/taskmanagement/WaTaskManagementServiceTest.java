@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.taskmanagement;
 
+import feign.Request;
+import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,7 +21,6 @@ import uk.gov.hmcts.reform.civil.model.taskmanagement.SearchParameterKey;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.SearchParameterList;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.SearchTaskRequest;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.Task;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,9 +79,14 @@ class WaTaskManagementServiceTest {
         }
 
         @Test
-        void getAllTasks_shouldThrowInternalServerErrorException_whenRemoteProcessEngineExceptionIsThrown() {
+        void getAllTasks_shouldThrowInternalServerErrorException_whenFeignExceptionIsThrown() {
             when(taskManagementClient.searchWithCriteria(anyString(), anyString(), any(SearchTaskRequest.class)))
-                .thenThrow(new RemoteProcessEngineException("Task management error",  new Throwable()));
+                .thenThrow(new FeignException.InternalServerError(
+                    "Task management error",
+                    Request.create(Request.HttpMethod.GET, "url", java.util.Map.of(), null, null, null),
+                    null,
+                    null
+                ));
 
             assertThrows(InternalServerErrorException.class, () -> taskManagementService.getAllTasks(CASE_ID, USER_TOKEN));
         }
@@ -124,9 +130,14 @@ class WaTaskManagementServiceTest {
         }
 
         @Test
-        void claimTask_shouldThrowInternalServerErrorException_whenRemoteProcessEngineExceptionIsThrown() {
+        void claimTask_shouldThrowInternalServerErrorException_whenFeignExceptionIsThrown() {
             String taskId = "TaskId";
-            doThrow(new RemoteProcessEngineException("Task management error", new Throwable()))
+            doThrow(new FeignException.InternalServerError(
+                "Task management error",
+                Request.create(Request.HttpMethod.GET, "url", java.util.Map.of(), null, null, null),
+                null,
+                null
+            ))
                 .when(taskManagementClient)
                 .claimTask(anyString(), anyString(), anyString());
 

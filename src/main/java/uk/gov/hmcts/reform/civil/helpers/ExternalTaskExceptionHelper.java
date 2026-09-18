@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.helpers;
 import feign.FeignException;
 import feign.Request;
 import feign.RetryableException;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
 
 import java.util.Arrays;
 
@@ -52,11 +51,12 @@ public class ExternalTaskExceptionHelper {
             }
         }
 
-        if (throwable instanceof RemoteProcessEngineException) {
-            return !hasNonRetryableClientErrorMessage(throwable.getMessage());
-        }
-
-        return true;
+        // Nothing in the cause chain carried an HTTP status. This previously only
+        // happened for Holunda's RemoteProcessEngineException, which discarded the
+        // status; with Feign's default decoder the status is normally present, so this
+        // is reached only for failures raised outside the Feign layer. Classify by
+        // message as before rather than assuming the call is safe to repeat.
+        return throwable == null || !hasNonRetryableClientErrorMessage(throwable.getMessage());
     }
 
     private static boolean isRetryableFeignException(FeignException feignException) {

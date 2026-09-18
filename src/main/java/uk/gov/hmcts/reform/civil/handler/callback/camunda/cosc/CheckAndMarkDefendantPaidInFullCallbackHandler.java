@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.cosc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -16,6 +15,7 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
@@ -42,7 +42,7 @@ public class CheckAndMarkDefendantPaidInFullCallbackHandler extends CallbackHand
     private static final String SEND_DETAILS_CJES = "sendDetailsToCJES";
 
     private final JudgmentPaidInFullOnlineMapper paidInFullJudgmentOnlineMapper;
-    private final RuntimeService runtimeService;
+    private final CamundaRuntimeClient camundaRuntimeClient;
     private final ObjectMapper objectMapper;
     private final InterestCalculator interestCalculator;
 
@@ -70,9 +70,9 @@ public class CheckAndMarkDefendantPaidInFullCallbackHandler extends CallbackHand
                 .orElse(null);
 
         if (nonNull(judgementPaidDate)) {
-            runtimeService.setVariable(caseData.getBusinessProcess().getProcessInstanceId(), SEND_DETAILS_CJES, false);
+            camundaRuntimeClient.setProcessVariable(caseData.getBusinessProcess().getProcessInstanceId(), SEND_DETAILS_CJES, false);
         } else {
-            runtimeService.setVariable(caseData.getBusinessProcess().getProcessInstanceId(), SEND_DETAILS_CJES, true);
+            camundaRuntimeClient.setProcessVariable(caseData.getBusinessProcess().getProcessInstanceId(), SEND_DETAILS_CJES, true);
             caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
             caseData.setActiveJudgment(paidInFullJudgmentOnlineMapper.addUpdateActiveJudgment(
                 caseData,

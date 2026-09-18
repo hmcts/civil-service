@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.user;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.exceptions.UpstreamUnavailableException;
 import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
@@ -29,7 +29,7 @@ public class UserInformationService {
                 throw new UserNotFoundOnCaseException(userInfo.getUid());
             }
             return roles;
-        } catch (RemoteProcessEngineException e) {
+        } catch (FeignException e) {
             throw new UpstreamUnavailableException("CCD case-users", caseId, userInfo.getUid(), e);
         }
     }
