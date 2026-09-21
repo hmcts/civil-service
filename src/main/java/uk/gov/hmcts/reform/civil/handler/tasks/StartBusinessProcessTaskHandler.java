@@ -62,10 +62,6 @@ public class StartBusinessProcessTaskHandler extends BaseExternalTaskHandler {
         return new ExternalTaskData().setVariables(variables);
     }
 
-    /*
-     * Only for the claim settled letter process: lets its BPMN skip the letter event (and its case history
-     * entry) when the letter is not due. Not set for any other process.
-     */
     private void addClaimSettledLetterVariable(CaseData caseData, VariableMap variables) {
         BusinessProcess businessProcess = caseData.getBusinessProcess();
         if (businessProcess != null
