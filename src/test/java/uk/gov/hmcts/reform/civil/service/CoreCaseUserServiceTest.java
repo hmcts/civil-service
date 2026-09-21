@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import feign.FeignException;
+import feign.Request;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,11 +22,16 @@ import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.exceptions.RetryableCaseUserException;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import static feign.Request.HttpMethod.GET;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -287,6 +294,18 @@ class CoreCaseUserServiceTest {
     @Nested
     class GetUserCaseRoles {
 
+        private final FeignException gatewayTimeoutException = new FeignException.GatewayTimeout(
+            "gateway timeout message",
+            Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
+            "gateway timeout response body".getBytes(UTF_8),
+            Map.of());
+
+        private final FeignException notFoundException = new FeignException.NotFound(
+            "not found message",
+            Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
+            "not found response body".getBytes(UTF_8),
+            Map.of());
+
         @BeforeEach
         void setup() {
             when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(
@@ -332,6 +351,43 @@ class CoreCaseUserServiceTest {
                 .thenReturn(caseAssignedUserRolesResource);
 
             assertThat(service.getUserRoles(CASE_ID).getCaseAssignmentUserRoles()).hasSize(2);
+        }
+
+        @Test
+        void shouldThrowRetryableCaseUserException_whenGatewayTimeoutThrown() {
+            when(caseAccessDataStoreApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenThrow(gatewayTimeoutException);
+
+            assertThatThrownBy(() -> service.getUserCaseRoles(CASE_ID, USER_ID))
+                .isInstanceOf(RetryableCaseUserException.class)
+                .hasCause(gatewayTimeoutException);
+        }
+
+        @Test
+        void shouldReturnEmptyList_whenUserRolesNotFound() {
+            when(caseAccessDataStoreApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenThrow(notFoundException);
+
+            var userCaseRoles = service.getUserCaseRoles(CASE_ID, USER_ID);
+
+            assertThat(userCaseRoles).isEmpty();
+        }
+
+        @Test
+        void shouldReturnEmptyList_whenUnexpectedExceptionThrown() {
+            when(caseAccessDataStoreApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenThrow(new RuntimeException("unexpected"));
+
+            var userCaseRoles = service.getUserCaseRoles(CASE_ID, USER_ID);
+
+            assertThat(userCaseRoles).isEmpty();
+        }
+
+        @Test
+        void shouldReturnEmptyList_whenRecoveringRetryableCaseUserException() {
+            var userCaseRoles = service.recover(new RetryableCaseUserException("retry exhausted"));
+
+            assertThat(userCaseRoles).isEmpty();
         }
     }
 }

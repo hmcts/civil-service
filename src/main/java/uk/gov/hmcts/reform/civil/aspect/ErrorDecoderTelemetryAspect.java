@@ -17,7 +17,9 @@ public class ErrorDecoderTelemetryAspect {
 
     private final FeignErrorTelemetryService telemetryService;
 
-    @Around("execution(* feign.codec.ErrorDecoder.decode(String, feign.Response)) && args(methodKey, response)")
+    @Around("execution(* feign.codec.ErrorDecoder.decode(String, feign.Response))"
+        + " && !within(org.camunda.community.rest.exception.CamundaHttpFeignErrorDecoder)"
+        + " && args(methodKey, response)")
     public Object trackErrorDecoderTelemetry(ProceedingJoinPoint joinPoint, String methodKey, Response response) throws Throwable {
         if (telemetryService == null) {
             return joinPoint.proceed();

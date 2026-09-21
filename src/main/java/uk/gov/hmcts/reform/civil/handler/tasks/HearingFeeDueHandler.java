@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.scheduler.hearingfee.HearingFeeScheduler;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
@@ -51,6 +52,10 @@ public class HearingFeeDueHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
+        if (featureToggleService.isSpringSchedulerEnabled(HearingFeeScheduler.SCHEDULER_NAME)) {
+            return new ExternalTaskData();
+        }
+
         Set<CaseDetails> cases = caseSearchService.getCases();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
@@ -64,6 +69,7 @@ public class HearingFeeDueHandler extends BaseExternalTaskHandler {
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
             }
         });
+
         return new ExternalTaskData();
     }
 

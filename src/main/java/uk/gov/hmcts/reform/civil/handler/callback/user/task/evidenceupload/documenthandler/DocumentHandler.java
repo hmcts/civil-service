@@ -48,12 +48,27 @@ public abstract class DocumentHandler<T> {
         if (getDocumentList(caseData) == null || getDocumentList(caseData).isEmpty()) {
             return;
         }
-        renameDocuments(getDocumentList(caseData));
         LocalDateTime halfFivePmYesterday = LocalDateTime.of(LocalDate.now().minusDays(1), LocalTime.of(17, 30));
         getDocumentList(caseData).forEach(document -> {
-            setCategoryId(document);
-            LocalDateTime dateTime = uploadDocumentRetriever.getDocumentDateTime(document);
-            buildNotificationText(litigantType, notificationStringBuilder, dateTime, halfFivePmYesterday);
+            try {
+                Document documentToAddId = uploadDocumentRetriever.getDocument(document);
+                if (documentToAddId == null) {
+                    log.warn(
+                        "Skipping evidence upload document because underlying Document is missing. documentCategory={}, evidenceUploadType={}",
+                        documentCategory, evidenceUploadType
+                    );
+                    return;
+                }
+                renameDocuments(List.of(document));
+                setCategoryId(documentToAddId);
+                LocalDateTime dateTime = uploadDocumentRetriever.getDocumentDateTime(document);
+                buildNotificationText(litigantType, notificationStringBuilder, dateTime, halfFivePmYesterday);
+            } catch (RuntimeException exception) {
+                log.warn(
+                    "Skipping evidence upload document because it could not be processed. documentCategory={}, evidenceUploadType={}",
+                    documentCategory, evidenceUploadType, exception
+                );
+            }
         });
     }
 
@@ -67,8 +82,7 @@ public abstract class DocumentHandler<T> {
         }
     }
 
-    private void setCategoryId(Element<T> document) {
-        Document documentToAddId = uploadDocumentRetriever.getDocument(document);
+    private void setCategoryId(Document documentToAddId) {
         documentToAddId.setCategoryID(documentCategory.getCategoryId());
     }
 
@@ -76,7 +90,9 @@ public abstract class DocumentHandler<T> {
         documentUpload.forEach(x -> {
             UploadEvidenceDocumentType type = (UploadEvidenceDocumentType) x.getValue();
             String ext = FilenameUtils.getExtension(type.getDocumentUpload().getDocumentFileName());
-            String newName = type.getDocumentIssuedDate().format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
+            String newName = type.getDocumentIssuedDate() == null
+                ? type.getBundleName() + END + ext
+                : type.getDocumentIssuedDate().format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
                 + HYPHEN
                 + type.getBundleName()
                 + END + ext;
@@ -91,9 +107,7 @@ public abstract class DocumentHandler<T> {
             String newName = prefix
                 + SPACE
                 + type.getTypeOfDocument()
-                + SPACE
-                + type.getDocumentIssuedDate()
-                .format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
+                + issuedDateSegment(type.getDocumentIssuedDate())
                 + END + ext;
             type.getDocumentUpload().setDocumentFileName(newName);
         });
@@ -153,9 +167,7 @@ public abstract class DocumentHandler<T> {
             String newName = type.getTypeOfDocument()
                 + body
                 + type.getWitnessOptionName()
-                + SPACE
-                + type.getDocumentIssuedDate()
-                .format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
+                + issuedDateSegment(type.getDocumentIssuedDate())
                 + END + ext;
             type.getDocumentUpload().setDocumentFileName(newName);
         });
@@ -168,6 +180,13 @@ public abstract class DocumentHandler<T> {
     protected boolean shouldPopulatePostBundleUploadList() {
         return true;
     }
+    private String issuedDateSegment(LocalDate issuedDate) {
+        return issuedDate == null
+            ? ""
+            : SPACE + issuedDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK));
+    }
+
+    public void addUploadDocList(CaseData caseData) {
 
     public void addUploadDocList(CaseData caseData) {
         if (!shouldPopulatePostBundleUploadList()) {

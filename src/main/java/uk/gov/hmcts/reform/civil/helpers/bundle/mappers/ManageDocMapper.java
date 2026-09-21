@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public interface ManageDocMapper {
             bundlingRequestDocuments.add(
                 buildBundlingRequestDoc(
                     generateDocName(getDocumentNameBasedOfCategory(docCategory), md.getValue().getDocumentName(),
-                                    null, LocalDateTime.parse(md.getValue().getDocumentLink().getUploadTimestamp()).toLocalDate()),
+                                    null, getDocumentDate(md.getValue())),
                     md.getValue().getDocumentLink(),
                     md.getValue().getDocumentType().name()
                 )
@@ -36,12 +37,21 @@ public interface ManageDocMapper {
             bundlingRequestDocuments.add(
                 buildBundlingRequestDoc(
                     generateDocName(getDocumentNameBasedOfCategory(docCategory), md.getValue().getDocumentName(),
-                                    null, LocalDateTime.parse(md.getValue().getDocumentLink().getUploadTimestamp()).toLocalDate()),
+                                    null, getDocumentDate(md.getValue())),
                      md.getValue().getDocumentLink(),
                      md.getValue().getDocumentType().name()
                  )
             );
         }
+    }
+
+    default LocalDate getDocumentDate(ManageDocument manageDocument) {
+        String uploadTimestamp = manageDocument.getDocumentLink().getUploadTimestamp();
+        if (uploadTimestamp != null) {
+            return LocalDateTime.parse(uploadTimestamp).toLocalDate();
+        }
+
+        return manageDocument.getCreatedDatetime().toLocalDate();
     }
 
     default String getDocumentNameBasedOfCategory(DocCategory docCategory) {

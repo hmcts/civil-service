@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -45,11 +46,32 @@ public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        assert externalTask.getVariable("caseEvent") != null;
-        assert externalTask.getVariable("caseIds") != null;
+        String caseEventName = externalTask.getVariable("caseEvent");
+        if (caseEventName == null) {
+            throw new InvalidCaseDataException(
+                "Required Camunda variable 'caseEvent' is null. "
+                + "Set 'caseEvent' to a valid CaseEvent enum name before starting this process."
+            );
+        }
 
         String caseIds = externalTask.getVariable("caseIds");
-        CaseEvent caseEvent = CaseEvent.valueOf(externalTask.getVariable("caseEvent"));
+        if (caseIds == null) {
+            throw new InvalidCaseDataException(
+                "Required Camunda variable 'caseIds' is null. "
+                + "Set 'caseIds' to a comma-separated list of case IDs before starting this process."
+            );
+        }
+
+        CaseEvent caseEvent;
+        try {
+            caseEvent = CaseEvent.valueOf(caseEventName);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidCaseDataException(
+                "Camunda variable 'caseEvent' has unknown value '" + caseEventName
+                + "'. Must be a valid CaseEvent enum name.",
+                e
+            );
+        }
         String eventSummary = "Re-trigger of " + caseEvent.name();
         String eventDescription = "Process ID: %s".formatted(externalTask.getProcessInstanceId());
         Map<String, Object> caseData = getCaseData(externalTask);
@@ -70,9 +92,9 @@ public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
                     eventSummary,
                     eventDescription
                 );
-                log.debug("Retrigger CaseId: {} finished. Case data: {}", caseId, caseData);
+                log.debug("Retrigger CaseId: {} finished", caseId);
             } catch (Exception e) {
-                log.error("ERROR Retrigger CaseId: {}. Case data: {},  {}", caseId, caseData, e.getMessage(), e);
+                log.error("ERROR Retrigger CaseId: {} failed", caseId, e);
             }
         }
         return new ExternalTaskData();
@@ -89,7 +111,7 @@ public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
         try {
             return mapper.readValue(caseDataString, typeRef);
         } catch (Exception e) {
-            log.error("Case data could not be deserialized {}", caseDataString, e);
+            log.error("Case data could not be deserialized", e);
             throw new IllegalArgumentException("Exception deserializing case data", e);
         }
     }

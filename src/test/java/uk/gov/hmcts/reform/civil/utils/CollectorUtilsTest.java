@@ -27,8 +27,10 @@ public class CollectorUtilsTest {
 
     @Test
     void shouldThrowError_whenListHasMoreThanOneObject() {
-        assertThrows(
+        IllegalStateException exception = assertThrows(
             IllegalStateException.class,
             () -> list.stream().collect(toSingleton()));
+
+        assertThat(exception).hasMessage("Expected exactly one element but found 2");
     }
 }

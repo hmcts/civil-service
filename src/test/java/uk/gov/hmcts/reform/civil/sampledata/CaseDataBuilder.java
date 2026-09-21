@@ -968,6 +968,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder hearingDueDate(LocalDate hearingDueDate) {
+        this.hearingDueDate = hearingDueDate;
+        return this;
+    }
+
     public CaseDataBuilder respondent1DQWithFixedRecoverableCosts() {
         respondent1DQ = respondent1DQ.copy()
             .setRespondent1DQFixedRecoverableCosts(new FixedRecoverableCosts()
@@ -3328,6 +3333,7 @@ public class CaseDataBuilder {
             .setTimestamp(LocalDateTime.now());
         if (formerSolicitorEmail != null) {
             newChange.setFormerRepresentationEmailAddress(formerSolicitorEmail);
+            newChange.setFormerRepresentationReference("previous-solicitor-reference");
         }
         changeOfRepresentation = newChange;
         return this;

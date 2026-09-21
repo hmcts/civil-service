@@ -240,8 +240,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
 
         caseData.setIsRespondent1(null);
 
-        if (caseData.getRespondent2SameLegalRepresentative() != null
-            && caseData.getRespondent2SameLegalRepresentative() == YES) {
+        if (caseData.respondent2HasSameLegalRep()) {
 
             caseData.setBusinessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE));
             caseData.setRespondent1TimeExtensionDate(time.now());

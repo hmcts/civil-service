@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -105,6 +106,76 @@ class NotificationUtilsTest {
             .solicitorReferences(null).build();
 
         String actual = NotificationUtils.buildPartiesReferencesEmailSubject(caseData);
+
+        assertThat(actual).isEqualTo("Claimant reference: Not provided - Defendant 1 reference: Not provided - Defendant 2 reference: Not provided");
+    }
+
+    @Test
+    void shouldReturnSuppliedReferences_whenTheyDifferFromTheOnesOnTheCase() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build();
+        SolicitorReferences suppliedReferences = new SolicitorReferences()
+            .setApplicantSolicitor1Reference("restored-claimant-ref")
+            .setRespondentSolicitor1Reference("restored-defendant-ref");
+
+        String actual = NotificationUtils.buildPartiesReferencesEmailSubject(
+            caseData, suppliedReferences, caseData.getRespondentSolicitor2Reference());
+
+        assertThat(actual).isEqualTo("Claimant reference: restored-claimant-ref - Defendant reference: restored-defendant-ref");
+    }
+
+    @Test
+    void shouldUseFallbackRespondent2Reference_when1v2DSSuppliedReferencesAreNull() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimTwoDefendantSolicitors()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build();
+
+        String actual = NotificationUtils.buildPartiesReferencesEmailSubject(caseData, null, "01234");
+
+        assertThat(actual).isEqualTo("Claimant reference: Not provided - Defendant 1 reference: Not provided - Defendant 2 reference: 01234");
+    }
+
+    @Test
+    void shouldUseFallbackRespondent2Reference_when1v2DSSuppliedRespondent2ReferenceIsNull() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimTwoDefendantSolicitors()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build();
+        SolicitorReferences suppliedReferences = new SolicitorReferences()
+            .setApplicantSolicitor1Reference("12345")
+            .setRespondentSolicitor1Reference("6789");
+
+        String actual = NotificationUtils.buildPartiesReferencesEmailSubject(caseData, suppliedReferences, "01234");
+
+        assertThat(actual).isEqualTo("Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 01234");
+    }
+
+    @Test
+    void shouldPreferSuppliedRespondent2Reference_when1v2DSFallbackAlsoProvided() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimTwoDefendantSolicitors()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build();
+        SolicitorReferences suppliedReferences = new SolicitorReferences()
+            .setApplicantSolicitor1Reference("12345")
+            .setRespondentSolicitor1Reference("6789")
+            .setRespondentSolicitor2Reference("restored-defendant2-ref");
+
+        String actual = NotificationUtils.buildPartiesReferencesEmailSubject(caseData, suppliedReferences, "01234");
+
+        assertThat(actual).isEqualTo("Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: restored-defendant2-ref");
+    }
+
+    @Test
+    void shouldReturnNotProvided_when1v2DSSuppliedReferencesAndFallbackAreNull() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimTwoDefendantSolicitors()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build();
+
+        String actual = NotificationUtils.buildPartiesReferencesEmailSubject(caseData, null, null);
 
         assertThat(actual).isEqualTo("Claimant reference: Not provided - Defendant 1 reference: Not provided - Defendant 2 reference: Not provided");
     }

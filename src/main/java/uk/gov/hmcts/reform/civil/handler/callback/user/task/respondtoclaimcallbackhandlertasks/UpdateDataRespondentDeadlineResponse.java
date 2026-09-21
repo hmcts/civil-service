@@ -139,7 +139,7 @@ public class UpdateDataRespondentDeadlineResponse {
     }
 
     private void updateRespondent2Date(CaseData caseData, LocalDateTime responseDate) {
-        if (isRespondent2SameLegalRep(caseData)) {
+        if (caseData.respondent2HasSameLegalRep()) {
             if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
                 caseData.setRespondent2ClaimResponseType(caseData.getRespondent1ClaimResponseType());
             }
@@ -217,11 +217,6 @@ public class UpdateDataRespondentDeadlineResponse {
                                                .getRespondent2DQRequestedCourt());
         }
 
-    }
-
-    private boolean isRespondent2SameLegalRep(CaseData caseData) {
-        return caseData.getRespondent2SameLegalRepresentative() != null
-            && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
 
     private boolean isRespondent2NotPresent(CaseData caseData) {

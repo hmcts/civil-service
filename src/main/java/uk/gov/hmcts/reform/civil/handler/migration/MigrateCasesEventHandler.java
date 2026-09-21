@@ -45,6 +45,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
     private static final String EXCEL_FILE = "excelFile";
     private static final String STATE = "state";
     private static final String IS_GA_CASE = "isGACase";
+    private static final String IS_CMC_CASE = "isCMCCase";
     private static final int EXCEL_BUFFER_SIZE = 8192;
     private final CaseReferenceCsvLoader caseReferenceCsvLoader;
     private final MigrationTaskFactory migrationTaskFactory;
@@ -91,7 +92,12 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
 
         String state = externalTask.getVariable(STATE);
         String isGACase = externalTask.getVariable(IS_GA_CASE);
-        asyncCaseMigrationService.migrateCasesAsync(task, caseReferences, state, isGACase != null);
+        String isCMCCase = externalTask.getVariable(IS_CMC_CASE);
+        if (isCMCCase != null) {
+            asyncCaseMigrationService.migrateCMCCasesAsync(task, caseReferences);
+        } else {
+            asyncCaseMigrationService.migrateCasesAsync(task, caseReferences, state, isGACase != null);
+        }
 
         return new ExternalTaskData();
     }

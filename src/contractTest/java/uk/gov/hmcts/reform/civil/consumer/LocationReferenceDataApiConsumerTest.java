@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.util.List;
 
-import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonArray;
+import static au.com.dius.pact.consumer.dsl.PactDslJsonArray.arrayMinLike;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -93,26 +93,24 @@ public class LocationReferenceDataApiConsumerTest extends BaseContractTest {
     }
 
     static DslPart buildLocationRefDataResponseBody(String serviceId) {
-        return newJsonArray(response ->
-                                response
-                                    .object(locationRefData -> locationRefData
-                                        .stringType("court_venue_id", "12345")
-                                        .stringType("service_code", serviceId)
-                                        .stringType("epimms_id", "epimmsIdTest123")
-                                        .stringType("site_name", "siteNameTest123")
-                                        .stringType("region_id", "regionIdTest123")
-                                        .stringType("region", "regionTest123")
-                                        .stringType("court_type", "courtTypeTest123")
-                                        .stringType("court_type_id", "courtTypeIdTest123")
-                                        .stringType("court_address", "courtAddressTest123")
-                                        .stringType("postcode", "postcodeTest123")
-                                        .stringType("phone_number", "phoneNumberTest123")
-                                        .stringType("court_location_code", "courtLocationCodeTest123")
-                                        .stringType("court_status", "courtStatusTest123")
-                                        .stringType("court_name", "courtNameTest123")
-                                        .stringType("venue_name", "venueNameTest123")
-                                        .stringType("location_type", "locationTypeTest123")
-                                        .stringType("parent_location", "parentLocationTest123"))
-        ).build();
+        return arrayMinLike(1, 1)
+            .stringType("court_venue_id", "12345")
+            .stringType("service_code", serviceId)
+            .stringType("epimms_id", "epimmsIdTest123")
+            .stringType("site_name", "siteNameTest123")
+            .stringType("region_id", "regionIdTest123")
+            .stringType("region", "regionTest123")
+            .stringType("court_type", "courtTypeTest123")
+            .stringType("court_type_id", "courtTypeIdTest123")
+            .stringType("court_address", "courtAddressTest123")
+            .stringType("postcode", "postcodeTest123")
+            .stringType("phone_number", "phoneNumberTest123")
+            .stringType("court_location_code", "courtLocationCodeTest123")
+            .stringType("court_status", "courtStatusTest123")
+            .stringType("court_name", "courtNameTest123")
+            .stringType("venue_name", "venueNameTest123")
+            .stringType("location_type", "locationTypeTest123")
+            .stringType("parent_location", "parentLocationTest123")
+            .closeObject();
     }
 }
