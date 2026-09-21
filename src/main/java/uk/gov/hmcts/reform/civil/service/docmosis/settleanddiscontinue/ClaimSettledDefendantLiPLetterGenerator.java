@@ -30,7 +30,6 @@ public class ClaimSettledDefendantLiPLetterGenerator {
     private final DocumentManagementService documentManagementService;
     private final DocumentDownloadService documentDownloadService;
     private final BulkPrintService bulkPrintService;
-    public static final String TASK_ID = "SendClaimSettledLetterLipDef";
     private static final String CLAIM_SETTLED_LETTER_TITLE = "claim-settled-letter";
 
     public void generateAndPrintClaimSettledLetter(CaseData caseData, String auth) {

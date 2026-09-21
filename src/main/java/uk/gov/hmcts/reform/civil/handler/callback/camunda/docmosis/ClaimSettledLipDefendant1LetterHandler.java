@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -21,7 +20,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ClaimSettledLipDefendant1LetterHandler extends CallbackHandler {
@@ -52,16 +50,8 @@ public class ClaimSettledLipDefendant1LetterHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         if (isClaimSettledLetterRequired(caseData)) {
-            log.info("Sending claim settled letter to LiP defendant for caseId {}, preStayState: {}",
-                     caseData.getCcdCaseReference(), caseData.getPreStayState());
             String auth = callbackParams.getParams().get(BEARER_TOKEN).toString();
             lipLetterGenerator.generateAndPrintClaimSettledLetter(caseData, auth);
-        } else {
-            log.info("Claim settled letter NOT sent to LiP defendant for caseId {}, "
-                         + "respondent1Represented: {}, preStayState: {} (letter only sent when defendant is LiP "
-                         + "and preStayState is {})",
-                     caseData.getCcdCaseReference(), caseData.getRespondent1Represented(),
-                     caseData.getPreStayState(), AWAITING_CASE_DETAILS_NOTIFICATION);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
