@@ -777,6 +777,13 @@ tasks.withType(Test).configureEach { t ->
   minHeapSize = "256m"
   jvmArgs "-XX:MaxMetaspaceSize=512m"
   jvmArgs '-XX:ReservedCodeCacheSize=512m'
+  // JDK 21.0.10 on Apple Silicon crashes the test worker (SIGSEGV in C2, BoolNode::Ideal)
+  // while compiling this Jackson method about 40s into the unit suite. The surviving
+  // forks still report a green run, so the failure is easy to miss: a full run shows
+  // ~17,400 tests, a truncated one ~12,700. Excluding the one method from JIT sidesteps
+  // the bug at no measurable cost; remove once the JDK is upgraded past it.
+  jvmArgs '-XX:CompileCommand=quiet'
+  jvmArgs '-XX:CompileCommand=exclude,com.fasterxml.jackson.databind.introspect.POJOPropertiesCollector::_addFields'
   // Docker Desktop 29 (Engine API 1.54) rejects docker-java's older default API version.
   systemProperty 'api.version', System.getProperty('api.version', '1.40')
 
