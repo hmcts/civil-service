@@ -30,15 +30,15 @@ public class DraftStoreService {
     private static final String DRAFT_TYPE_NOT_NULL = "draftType must not be null";
 
     private final DraftStoreRepository draftStoreRepository;
+    private final TransactionTemplate requiresNewTransaction;
 
     public DraftStoreService(DraftStoreRepository draftStoreRepository,
                              PlatformTransactionManager transactionManager) {
         this.draftStoreRepository = draftStoreRepository;
-        TransactionTemplate requiresNewTransaction = new TransactionTemplate(transactionManager);
-        requiresNewTransaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        this.requiresNewTransaction = new TransactionTemplate(transactionManager);
+        this.requiresNewTransaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
     }
 
-    @Transactional(noRollbackFor = DataIntegrityViolationException.class)
     public DraftStoreEntity createDraft(String userId,
                                         String caseId,
                                         Map<String, Object> payload,
@@ -127,8 +127,10 @@ public class DraftStoreService {
     }
 
     private DraftStoreEntity persistDraft(DraftStoreEntity draft) {
-        log.info("Creating draft typeId={} draftId={}", draft.getDraftTypeId(), draft.getId());
-        return draftStoreRepository.saveAndFlush(draft);
+        return requiresNewTransaction.execute(status -> {
+            log.info("Creating draft typeId={} draftId={}", draft.getDraftTypeId(), draft.getId());
+            return draftStoreRepository.saveAndFlush(draft);
+        });
     }
 
     private DraftStoreEntity applyDraftUpdate(DraftStoreEntity existingDraft,
