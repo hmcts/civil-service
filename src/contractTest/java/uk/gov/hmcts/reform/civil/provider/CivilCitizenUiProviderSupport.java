@@ -107,6 +107,8 @@ abstract class CivilCitizenUiProviderSupport {
     @Mock
     private GaFeesPaymentService gaFeesPaymentService;
     @Mock
+    private uk.gov.hmcts.reform.civil.ga.service.events.GaCaseEventService gaCaseEventService;
+    @Mock
     private FeesService feesService;
     @Mock
     private GeneralAppFeesService generalAppFeesService;
@@ -156,7 +158,7 @@ abstract class CivilCitizenUiProviderSupport {
             mock(uk.gov.hmcts.reform.civil.service.RoleAssignmentsService.class), coreCaseDataService,
             mock(uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService.class),
             dashboardClaimInfoService, caseEventService,
-            mock(uk.gov.hmcts.reform.civil.ga.service.events.GaCaseEventService.class),
+            gaCaseEventService,
             mock(uk.gov.hmcts.reform.civil.service.search.CaseSdtRequestSearchService.class),
             mock(uk.gov.hmcts.reform.civil.service.bulkclaims.CaseworkerCaseEventService.class),
             deadlineCalculator,
@@ -287,9 +289,157 @@ abstract class CivilCitizenUiProviderSupport {
                 .setExternalReference("2023-1701090705688")
                 .setPaymentReference(PAYMENT_REFERENCE)
                 .setStatus("Success")
-                .setPaymentFor("claimissued")
                 .setPaymentAmount(new BigDecimal("200"))
         );
+    }
+
+    @State("A hearing payment can be initiated")
+    void hearingPaymentCreation() {
+        when(feesPaymentService.createGovPaymentRequest(FeeType.HEARING, CASE_REFERENCE, AUTH_HEADER))
+            .thenReturn(new CardPaymentStatusResponse().setExternalReference("2023-1701090705688")
+                .setPaymentReference(PAYMENT_REFERENCE).setStatus("Initiated")
+                .setNextUrl("https://card.payments.service.gov.uk/secure/hearing-payment")
+                .setDateCreated(OffsetDateTime.parse("2023-11-27T13:15:06.313Z")));
+    }
+
+    private void paymentStatus(String kind, String status) {
+        CardPaymentStatusResponse response = new CardPaymentStatusResponse()
+            .setExternalReference("2023-1701090705688").setPaymentReference(PAYMENT_REFERENCE)
+            .setStatus(status).setPaymentAmount(new BigDecimal("200"));
+        if ("Failed".equals(status)) {
+            response.setErrorCode("P010").setErrorDescription("Payment was cancelled by the user");
+        }
+        if ("GA".equals(kind)) {
+            when(gaFeesPaymentService.getGovPaymentRequestStatus(CASE_REFERENCE, PAYMENT_REFERENCE, AUTH_HEADER))
+                .thenReturn(response);
+        } else {
+            response.setPaymentFor(kind.toLowerCase(java.util.Locale.ROOT));
+            when(feesPaymentService.getGovPaymentRequestStatus(
+                FeeType.valueOf(kind), CASE_REFERENCE, PAYMENT_REFERENCE, AUTH_HEADER)).thenReturn(response);
+        }
+    }
+
+    private void missingPayment(String kind) {
+        // PaymentStatusService wraps downstream not-found failures in PaymentsApiException;
+        // the production uncaught-exception advice returns 500, not 404.
+        uk.gov.hmcts.reform.civil.exceptions.PaymentsApiException error =
+            new uk.gov.hmcts.reform.civil.exceptions.PaymentsApiException("Payment not found");
+        if ("GA".equals(kind)) {
+            when(gaFeesPaymentService.getGovPaymentRequestStatus(CASE_REFERENCE, PAYMENT_REFERENCE, AUTH_HEADER))
+                .thenThrow(error);
+        } else {
+            when(feesPaymentService.getGovPaymentRequestStatus(
+                FeeType.valueOf(kind), CASE_REFERENCE, PAYMENT_REFERENCE, AUTH_HEADER)).thenThrow(error);
+        }
+    }
+
+    @State("Hearing Help with Fees can be submitted")
+    void hearingHelpWithFees() {
+        Map<String, Object> updates = Map.of("hwfFeeType", "HEARING", "hearingHelpFeesReferenceNumber", "HWF-123-456");
+        when(caseEventService.submitEvent(eventParams(CASE_REFERENCE, updates)
+            .setEvent(CaseEvent.APPLY_HELP_WITH_HEARING_FEE)))
+            .thenReturn(CaseDetails.builder().id(Long.valueOf(CASE_REFERENCE)).state("HEARING_READINESS")
+                .lastModified(LocalDateTime.parse("2025-02-03T10:00:00")).data(updates).build());
+    }
+
+    @State("GA Help with Fees submission is Yes")
+    void gaHelpWithFeesYes() throws IOException {
+        gaHelpWithFees("Yes", false);
+    }
+
+    @State("GA Help with Fees submission is No")
+    void gaHelpWithFeesNo() throws IOException {
+        gaHelpWithFees("No", false);
+    }
+
+    @State("GA Help with Fees submission is rejected")
+    void gaHelpWithFeesRejected() throws IOException {
+        gaHelpWithFees("Yes", true);
+    }
+
+    private void gaHelpWithFees(String option, boolean rejected) throws IOException {
+        Map<String, Object> help = new HashMap<>();
+        help.put("helpWithFee", option);
+        if ("Yes".equals(option)) {
+            help.put("helpWithFeesReferenceNumber", "HWF-123-456");
+        }
+        EventSubmissionParams params = eventParams(CASE_REFERENCE, Map.of("generalAppHelpWithFees", help))
+            .setEvent(CaseEvent.NOTIFY_HELP_WITH_FEE);
+        if (rejected) {
+            when(gaCaseEventService.submitEvent(params)).thenThrow(new FeignException.UnprocessableEntity(
+                "Help with Fees rejected", mock(feign.Request.class),
+                buildObjectMapper().writeValueAsBytes(Map.of("callbackErrors", List.of("Reference is invalid"))), Map.of()));
+        } else {
+            when(gaCaseEventService.submitEvent(params)).thenReturn(CaseDetails.builder()
+                .id(Long.valueOf(CASE_REFERENCE)).state("AWAITING_APPLICATION_PAYMENT")
+                .data(Map.of("generalAppHelpWithFees", help)).build());
+        }
+        stateVerification = () -> verify(gaCaseEventService).submitEvent(params);
+    }
+
+    @State("The CLAIMISSUED payment status is Failed")
+    void paymentClaimIssuedFailed() {
+        paymentStatus("CLAIMISSUED", "Failed");
+    }
+
+    @State("The CLAIMISSUED payment status is Initiated")
+    void paymentClaimIssuedInitiated() {
+        paymentStatus("CLAIMISSUED", "Initiated");
+    }
+
+    @State("The CLAIMISSUED payment status is Pending")
+    void paymentClaimIssuedPending() {
+        paymentStatus("CLAIMISSUED", "Pending");
+    }
+
+    @State("The CLAIMISSUED payment cannot be found upstream")
+    void missingClaimIssuedPayment() {
+        missingPayment("CLAIMISSUED");
+    }
+
+    @State("The HEARING payment status is Success")
+    void paymentHearingSuccess() {
+        paymentStatus("HEARING", "Success");
+    }
+
+    @State("The HEARING payment status is Failed")
+    void paymentHearingFailed() {
+        paymentStatus("HEARING", "Failed");
+    }
+
+    @State("The HEARING payment status is Initiated")
+    void paymentHearingInitiated() {
+        paymentStatus("HEARING", "Initiated");
+    }
+
+    @State("The HEARING payment status is Pending")
+    void paymentHearingPending() {
+        paymentStatus("HEARING", "Pending");
+    }
+
+    @State("The HEARING payment cannot be found upstream")
+    void missingHearingPayment() {
+        missingPayment("HEARING");
+    }
+
+    @State("The GA payment status is Failed")
+    void paymentGAFailed() {
+        paymentStatus("GA", "Failed");
+    }
+
+    @State("The GA payment status is Initiated")
+    void paymentGAInitiated() {
+        paymentStatus("GA", "Initiated");
+    }
+
+    @State("The GA payment status is Pending")
+    void paymentGAPending() {
+        paymentStatus("GA", "Pending");
+    }
+
+    @State("The GA payment cannot be found upstream")
+    void missingGAPayment() {
+        missingPayment("GA");
     }
 
     @State("A claim issue fee is available for a claim amount of 1000")
