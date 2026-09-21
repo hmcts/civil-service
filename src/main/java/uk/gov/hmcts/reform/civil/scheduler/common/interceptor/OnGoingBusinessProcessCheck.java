@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.scheduler.common.interceptor;
 
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -11,11 +10,20 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 @Component
-@AllArgsConstructor
 public class OnGoingBusinessProcessCheck implements SchedulerInterceptor<CaseDetails> {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final CivilCaseDataHandler civilCaseDataHandler;
+    private final GACaseDataHandler gaCaseDataHandler;
+
+    public OnGoingBusinessProcessCheck(CoreCaseDataService coreCaseDataService,
+                                       CaseDetailsConverter caseDetailsConverter) {
+        this.coreCaseDataService = coreCaseDataService;
+        this.caseDetailsConverter = caseDetailsConverter;
+        this.civilCaseDataHandler = new CivilCaseDataHandler();
+        this.gaCaseDataHandler = new GACaseDataHandler();
+    }
 
     @Override
     public void accept(InterceptorContext<CaseDetails> context, InterceptorChain<CaseDetails> chain) {
@@ -51,9 +59,9 @@ public class OnGoingBusinessProcessCheck implements SchedulerInterceptor<CaseDet
 
     private CaseDataHandler<?> getHandler(CaseDetails caseDetails) {
         if (CaseTypeIdentifier.isGeneralApplication(caseDetails)) {
-            return new GACaseDataHandler();
+            return gaCaseDataHandler;
         }
-        return new CivilCaseDataHandler();
+        return civilCaseDataHandler;
     }
 
     private interface CaseDataHandler<B extends BaseCaseData> {
