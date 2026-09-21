@@ -37,9 +37,6 @@ public class ClaimSettledDefendantLiPLetterGenerator {
         log.info("Generating claim settled letter for caseId {}", caseId);
 
         CaseDocument claimSettledDoc = generateLetter(caseData, auth, CLAIM_SETTLED_LIP_DEFENDANT_LETTER);
-        log.info("Generated claim settled letter document for caseId {}, documentUrl: {}, binaryUrl: {}",
-                 caseId, claimSettledDoc.getDocumentLink().getDocumentUrl(),
-                 claimSettledDoc.getDocumentLink().getDocumentBinaryUrl());
 
         String errorMessage = "Failed getting claim settled letter for caseId {}";
         byte[] letterContent = documentDownloadService.downloadDocument(claimSettledDoc, auth, caseId.toString(), errorMessage);
