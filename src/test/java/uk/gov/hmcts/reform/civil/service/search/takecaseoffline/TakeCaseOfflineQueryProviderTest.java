@@ -60,4 +60,17 @@ class TakeCaseOfflineQueryProviderTest {
         String queryStr = query.getQueryBuilder().toString();
         assertThat(queryStr).contains("applicant1ResponseDate");
     }
+
+    @Test
+    void shouldConvertTimeToUtc_handlingDaylightSavingTime() {
+        LocalDateTime nowInBst = LocalDateTime.of(2024, 6, 1, 12, 0);
+        when(time.now()).thenReturn(nowInBst);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+
+        PaginatedQuery query = queryProvider.getPaginatedQuery(PageToken.initial(), 50);
+
+        assertThat(query).isNotNull();
+        String queryStr = query.getQueryBuilder().toString();
+        assertThat(queryStr).contains("2024-06-01T11:00Z");
+    }
 }

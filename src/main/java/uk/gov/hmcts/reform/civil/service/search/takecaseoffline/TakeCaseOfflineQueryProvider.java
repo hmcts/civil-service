@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.service.search.common.CommonQueryConstructs;
 import uk.gov.hmcts.reform.civil.service.search.common.PaginatedQueryProvider;
 
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -20,6 +19,7 @@ import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.LOCAL_ZONE;
 
 @Component
 @RequiredArgsConstructor
@@ -31,7 +31,7 @@ public class TakeCaseOfflineQueryProvider implements PaginatedQueryProvider {
 
     @Override
     public PaginatedQuery getPaginatedQuery(PageToken pageToken, int pageSize) {
-        String timeNow = ZonedDateTime.of(time.now(), ZoneOffset.UTC).toString();
+        String timeNow = time.now().atZone(LOCAL_ZONE).withZoneSameInstant(ZoneOffset.UTC).toString();
         return new PaginatedQuery(
             buildQuery(timeNow),
             List.of("reference"),

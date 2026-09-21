@@ -49,7 +49,7 @@ public class HearingFeePublisherService {
     }
 
     private boolean isHearingFeePaid(PaymentDetails paymentDetails, CaseData caseData) {
-        return isSuccessfulPaymentBeforeDueDate(paymentDetails, caseData)
+        return isSuccessfulPaymentWithDueDatePassed(paymentDetails, caseData)
             || caseData.hearingFeePaymentDoneWithHWF();
     }
 
@@ -58,7 +58,7 @@ public class HearingFeePublisherService {
             && isHearingDueDatePassed(caseData.getHearingDueDate());
     }
 
-    private boolean isSuccessfulPaymentBeforeDueDate(PaymentDetails paymentDetails, CaseData caseData) {
+    private boolean isSuccessfulPaymentWithDueDatePassed(PaymentDetails paymentDetails, CaseData caseData) {
         return paymentDetails != null
             && paymentDetails.getStatus() == PaymentStatus.SUCCESS
             && isHearingDueDatePassed(caseData.getHearingDueDate());
