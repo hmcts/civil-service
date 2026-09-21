@@ -545,6 +545,63 @@ abstract class CivilCitizenUiProviderSupport {
         verifiedCitizenEvent(CaseEvent.queryManagementRaiseQuery, updates, data, "CASE_PROGRESSION");
     }
 
+    private void judgmentEvent(CaseEvent event, Map<String, Object> updates, String state) {
+        EventSubmissionParams params = eventParams(CUI_CASE_REFERENCE, updates).setEvent(event);
+        when(caseEventService.submitEvent(params)).thenReturn(CaseDetails.builder()
+            .id(Long.valueOf(CUI_CASE_REFERENCE)).state("CASE_PROGRESSION")
+            .lastModified(LocalDateTime.of(2025, 6, 4, 10, 0)).data(updates).build());
+        stateVerification = () -> verify(caseEventService).submitEvent(params);
+    }
+
+    @State("The default judgment or settlement event can be submitted")
+    void defaultJudgmentEvent() {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("ccjPaymentPaidSomeOption", "No");
+        updates.put("ccjPaymentPaidSomeAmount", null);
+        updates.put("ccjJudgmentAmountClaimFee", "11500");
+        updates.put("ccjJudgmentLipInterest", "0");
+        updates.put("applicant1RepaymentOptionForDefendantSpec", "SET_DATE");
+        updates.put("applicant1RequestedPaymentDateForDefendantSpec", Map.of("paymentSetDate", "2025-06-01"));
+        updates.put("totalClaimAmount", 1000);
+        judgmentEvent(CaseEvent.DEFAULT_JUDGEMENT_SPEC, updates, "CASE_PROGRESSION");
+    }
+
+    @State("The admission judgment or settlement event can be submitted")
+    void admissionJudgmentEvent() {
+        Map<String, Object> updates = Map.ofEntries(
+            Map.entry("ccjPaymentPaidSomeOption", "Yes"),
+            Map.entry("ccjPaymentPaidSomeAmount", "20000"),
+            Map.entry("ccjJudgmentAmountClaimFee", "11500"),
+            Map.entry("ccjJudgmentLipInterest", "0"),
+            Map.entry("applicant1RepaymentOptionForDefendantSpec", "REPAYMENT_PLAN"),
+            Map.entry("applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec", "ONCE_ONE_MONTH"),
+            Map.entry("applicant1SuggestInstalmentsPaymentAmountForDefendantSpec", 10000),
+            Map.entry("applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec", "2025-06-01"),
+            Map.entry("totalClaimAmount", 1000));
+        judgmentEvent(CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC, updates, "CASE_PROGRESSION");
+    }
+
+    @State("The settled judgment or settlement event can be submitted")
+    void settledJudgmentEvent() {
+        Map<String, Object> updates = Map.ofEntries(
+            Map.entry("applicant1ClaimSettledDate", "2025-06-02"));
+        judgmentEvent(CaseEvent.LIP_CLAIM_SETTLED, updates, "CASE_PROGRESSION");
+    }
+
+    @State("The signed judgment or settlement event can be submitted")
+    void signedJudgmentEvent() {
+        Map<String, Object> updates = Map.ofEntries(
+            Map.entry("respondentSignSettlementAgreement", "Yes"));
+        judgmentEvent(CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT, updates, "CASE_PROGRESSION");
+    }
+
+    @State("The paid judgment or settlement event can be submitted")
+    void paidJudgmentEvent() {
+        Map<String, Object> updates = Map.ofEntries(
+            Map.entry("joJudgmentPaidInFull", Map.of("dateOfFullPaymentMade", "2025-06-03", "confirmFullPaymentMade", List.of("CONFIRMED"))));
+        judgmentEvent(CaseEvent.JUDGMENT_PAID_IN_FULL, updates, "CASE_PROGRESSION");
+    }
+
     @State("A claim issue fee is available for a claim amount of 1000")
     void claimIssueFeeExists() {
         when(feesService.getFeeDataByTotalClaimAmount(new BigDecimal("1000")))
