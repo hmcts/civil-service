@@ -50,6 +50,7 @@ public class CaseDocumentAmApiConsumerTest extends BaseContractTest {
     private static final String DOCUMENT_BINARY_URL = DOCUMENT_SELF_URL + "/binary";
     private static final String HASH_TOKEN = "hash-token";
     private static final String USER_ID = "user-id";
+    private static final String MULTIPART_BOUNDARY = "civil-case-document-boundary";
 
     @Autowired
     private DocumentManagementService documentManagementService;
@@ -140,6 +141,7 @@ public class CaseDocumentAmApiConsumerTest extends BaseContractTest {
 
     private MultipartEntityBuilder buildUploadDocumentRequest() {
         return MultipartEntityBuilder.create()
+            .setBoundary(MULTIPART_BOUNDARY)
             .setMode(HttpMultipartMode.EXTENDED)
             .addTextBody("caseTypeId", "CIVIL", ContentType.create(MediaType.TEXT_PLAIN_VALUE, StandardCharsets.UTF_8))
             .addTextBody("jurisdictionId", "CIVIL", ContentType.create(MediaType.TEXT_PLAIN_VALUE, StandardCharsets.UTF_8))
