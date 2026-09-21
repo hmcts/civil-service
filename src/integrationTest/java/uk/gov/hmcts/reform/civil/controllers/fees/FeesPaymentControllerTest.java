@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -151,6 +152,16 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
     }
 
     @ParameterizedTest
+    @ValueSource(strings = {"undefined", "null", "UNDEFINED", "NULL"})
+    @SneakyThrows
+    void shouldReturnBadRequestWhenPaymentReferenceIsUnusable(String paymentReference) {
+        doGet(BEARER_TOKEN, FEES_PAYMENT_STATUS_URL, HEARING.name(), "123", paymentReference)
+            .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(paymentsClient);
+    }
+
+    @ParameterizedTest
     @CsvSource({"Success"})
     @SneakyThrows
     void shouldNotCallSubmitUpdate_WhenPaymentAlreadyApplied(String status) {
@@ -279,6 +290,16 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
             verify(gaCoreCaseDataService, times(3)).getCase(123L);
             verify(gaCoreCaseDataService, times(3)).startUpdate("123", INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT);
             verify(gaCoreCaseDataService, times(3)).submitUpdate(eq("123"), any(CaseDataContent.class));
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"undefined", "null", "UNDEFINED", "NULL"})
+        @SneakyThrows
+        void shouldReturnBadRequestWhenPaymentReferenceIsUnusable(String paymentReference) {
+            doGet(BEARER_TOKEN, GA_FEES_PAYMENT_STATUS_URL, "123", paymentReference)
+                .andExpect(status().isBadRequest());
+
+            verifyNoInteractions(paymentsClient);
         }
 
         @ParameterizedTest

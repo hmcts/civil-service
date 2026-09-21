@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@2.7.0")
+@Library("Infrastructure@2.8.0")
 
 import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
@@ -137,6 +137,7 @@ withPipeline(type, product, component) {
   }
 
   onMaster {
+    env.PACT_BRANCH_NAME = "master"
     enableHighLevelDataSetup("", true)
     env.ENVIRONMENT = "aat"
     env.CCD_DEFINITION_BRANCH = "master"

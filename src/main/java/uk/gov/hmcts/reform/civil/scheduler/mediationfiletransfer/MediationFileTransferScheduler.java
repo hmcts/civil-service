@@ -52,14 +52,14 @@ public class MediationFileTransferScheduler implements CivilScheduler {
     private TaskResult<CaseData> getCsvCasesAfterTransfer() {
         TaskResult<CaseData> result = searchService.getInMediationCsv();
         List<CaseData> cases = result.itemStream().toList();
-        mediationFileTransferService.sendCsv(cases);
-        return new ListTaskResult<>(cases, result.totalResults());
+        List<CaseData> successfulCases = mediationFileTransferService.sendCsv(cases);
+        return new ListTaskResult<>(successfulCases, result.totalResults());
     }
 
     private TaskResult<CaseData> getJsonCasesAfterTransfer() {
         TaskResult<CaseData> result = searchService.getInMediationJson();
         List<CaseData> cases = result.itemStream().toList();
-        mediationFileTransferService.sendJson(cases);
-        return new ListTaskResult<>(cases, result.totalResults());
+        List<CaseData> successfulCases = mediationFileTransferService.sendJson(cases);
+        return new ListTaskResult<>(successfulCases, result.totalResults());
     }
 }
