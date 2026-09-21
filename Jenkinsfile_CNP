@@ -227,6 +227,10 @@ withPipeline(type, product, component) {
 
   before('smoketest:aat') {
     setStagingUrls()
+    copyPrevPlaywrightLastRunAndTestFilesReport()
+  }
+
+  afterAlways('smoketest:aat') {
     archiveArtifacts allowEmptyArchive: true, artifacts: "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/**/*"
     publishPlaywrightSmokeReports()
   }
