@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis.ClaimSettledLipDefendant1LetterHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 public class StartBusinessProcessTaskHandler extends BaseExternalTaskHandler {
 
     public static final String BUSINESS_PROCESS = "businessProcess";
+    public static final String CLAIM_SETTLED_LETTER_REQUIRED = "isClaimSettledLetterRequired";
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
@@ -55,8 +57,23 @@ public class StartBusinessProcessTaskHandler extends BaseExternalTaskHandler {
         var stateFlow = stateFlowEngine.getStateFlow(caseData);
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
         variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
+        addClaimSettledLetterVariable(caseData, variables);
 
         return new ExternalTaskData().setVariables(variables);
+    }
+
+    /*
+     * Only for the claim settled letter process: lets its BPMN skip the letter event (and its case history
+     * entry) when the letter is not due. Not set for any other process.
+     */
+    private void addClaimSettledLetterVariable(CaseData caseData, VariableMap variables) {
+        BusinessProcess businessProcess = caseData.getBusinessProcess();
+        if (businessProcess != null
+            && CaseEvent.CLAIM_SETTLED_LETTER_NOTIFICATION.name().equals(businessProcess.getCamundaEvent())) {
+            boolean letterRequired = ClaimSettledLipDefendant1LetterHandler.isClaimSettledLetterRequired(caseData);
+            log.info("Claim settled letter required: {} for caseId {}", letterRequired, caseData.getCcdCaseReference());
+            variables.putValue(CLAIM_SETTLED_LETTER_REQUIRED, letterRequired);
+        }
     }
 
     @Override

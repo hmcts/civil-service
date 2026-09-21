@@ -5,7 +5,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.Map;
 
@@ -20,14 +20,24 @@ class ClaimSettledLetterNotificationTest extends BpmnBaseTest {
     public static final String SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1_EVENT = "SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1";
     public static final String NOTIFY_EVENT_ID = "SettleClaimPaidInFullNotificationNotifier";
     public static final String NOTIFY_EVENT_EVENT = "NOTIFY_EVENT";
+    public static final String CLAIM_SETTLED_LETTER_REQUIRED = "isClaimSettledLetterRequired";
 
     public ClaimSettledLetterNotificationTest() {
         super("claim_settled_letter_notification.bpmn", PROCESS_ID);
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldSuccessfullyComplete(boolean isLiPDefendant) {
+    @CsvSource(value = {
+        // isLiPDefendant, isClaimSettledLetterRequired (null = not set), expectLetterEvent
+        "true, true, true",
+        "true, false, false",
+        "false, true, false",
+        "false, false, false",
+        // variable not set (e.g. BPMN deployed before civil-service): keep original behaviour
+        "true, null, true",
+        "false, null, false"
+    }, nullValues = "null")
+    void shouldSuccessfullyComplete(boolean isLiPDefendant, Boolean isClaimSettledLetterRequired, boolean expectLetterEvent) {
         //assert process has started
         assertFalse(processInstance.isEnded());
 
@@ -36,6 +46,9 @@ class ClaimSettledLetterNotificationTest extends BpmnBaseTest {
 
         VariableMap variables = Variables.createVariables();
         variables.put(FLOW_FLAGS, Map.of(UNREPRESENTED_DEFENDANT_ONE, isLiPDefendant));
+        if (isClaimSettledLetterRequired != null) {
+            variables.put(CLAIM_SETTLED_LETTER_REQUIRED, isClaimSettledLetterRequired);
+        }
 
         //complete the start business process
         ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
@@ -48,7 +61,7 @@ class ClaimSettledLetterNotificationTest extends BpmnBaseTest {
         );
 
         ExternalTask nextTask = assertNextExternalTask(PROCESS_CASE_EVENT);
-        if (isLiPDefendant) {
+        if (expectLetterEvent) {
             //complete the letter generation task
             assertCompleteExternalTask(
                 nextTask,

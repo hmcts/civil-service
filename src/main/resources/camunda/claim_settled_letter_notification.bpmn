@@ -14,7 +14,7 @@
       <bpmn:outgoing>Flow_startBusiness_to_gateway</bpmn:outgoing>
     </bpmn:callActivity>
     <bpmn:sequenceFlow id="Flow_start_to_startBusiness" sourceRef="Event_start" targetRef="ClaimSettledLetterNotificationProcess" />
-    <bpmn:exclusiveGateway id="Gateway_defendantRepresented">
+    <bpmn:exclusiveGateway id="Gateway_defendantRepresented" name="Claim settled letter required?" default="Flow_gateway_to_notify">
       <bpmn:incoming>Flow_startBusiness_to_gateway</bpmn:incoming>
       <bpmn:outgoing>Flow_gateway_to_sendLetter</bpmn:outgoing>
       <bpmn:outgoing>Flow_gateway_to_notify</bpmn:outgoing>
@@ -29,8 +29,8 @@
       <bpmn:incoming>Flow_gateway_to_sendLetter</bpmn:incoming>
       <bpmn:outgoing>Flow_sendLetter_to_notify</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_gateway_to_sendLetter" name="LiP Defendant1" sourceRef="Gateway_defendantRepresented" targetRef="SendLetterClaimSettledDefendantLiP">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.UNREPRESENTED_DEFENDANT_ONE &amp;&amp; flowFlags.UNREPRESENTED_DEFENDANT_ONE}</bpmn:conditionExpression>
+    <bpmn:sequenceFlow id="Flow_gateway_to_sendLetter" name="Letter required" sourceRef="Gateway_defendantRepresented" targetRef="SendLetterClaimSettledDefendantLiP">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.UNREPRESENTED_DEFENDANT_ONE &amp;&amp; flowFlags.UNREPRESENTED_DEFENDANT_ONE &amp;&amp; (empty execution.getVariable('isClaimSettledLetterRequired') || execution.getVariable('isClaimSettledLetterRequired'))}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:serviceTask id="SettleClaimPaidInFullNotificationNotifier" name="Notify parties" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
@@ -42,9 +42,7 @@
       <bpmn:incoming>Flow_sendLetter_to_notify</bpmn:incoming>
       <bpmn:outgoing>Flow_notify_to_endBusiness</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_gateway_to_notify" name="LR Defendant1" sourceRef="Gateway_defendantRepresented" targetRef="SettleClaimPaidInFullNotificationNotifier">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${empty flowFlags.UNREPRESENTED_DEFENDANT_ONE || (!empty flowFlags.UNREPRESENTED_DEFENDANT_ONE &amp;&amp; !flowFlags.UNREPRESENTED_DEFENDANT_ONE)}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_gateway_to_notify" name="No letter" sourceRef="Gateway_defendantRepresented" targetRef="SettleClaimPaidInFullNotificationNotifier" />
     <bpmn:sequenceFlow id="Flow_sendLetter_to_notify" sourceRef="SendLetterClaimSettledDefendantLiP" targetRef="SettleClaimPaidInFullNotificationNotifier" />
     <bpmn:callActivity id="Activity_endBusiness" name="End Business Process" calledElement="EndBusinessProcess">
       <bpmn:extensionElements>

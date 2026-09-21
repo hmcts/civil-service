@@ -51,7 +51,7 @@ public class ClaimSettledLipDefendant1LetterHandler extends CallbackHandler {
     private CallbackResponse sendClaimSettledLetterToLiPDefendant1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (shouldSendLetter(caseData)) {
+        if (isClaimSettledLetterRequired(caseData)) {
             log.info("Sending claim settled letter to LiP defendant for caseId {}, preStayState: {}",
                      caseData.getCcdCaseReference(), caseData.getPreStayState());
             String auth = callbackParams.getParams().get(BEARER_TOKEN).toString();
@@ -67,11 +67,21 @@ public class ClaimSettledLipDefendant1LetterHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private boolean isRespondent1Lip(CaseData caseData) {
+    private static boolean isRespondent1Lip(CaseData caseData) {
         return YesOrNo.NO.equals(caseData.getRespondent1Represented());
     }
 
-    private boolean shouldSendLetter(CaseData caseData) {
+    /*
+     * OCCC-297/352 (Def LiP letter): the claim was settled via SETTLE_CLAIM_UNSPEC (Claimant LR, before the
+     * defendant has joined/responded), which stashes the state the claim was in immediately before settlement
+     * in preStayState. POs agreed the letter must only go out when that state was "Awaiting Claim Details
+     * Notification" - not "Awaiting Claim Notification", since the defendant's postal address may not yet be
+     * reliable that early.
+     *
+     * Also evaluated by StartBusinessProcessTaskHandler so the claim settled letter BPMN can skip the
+     * SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1 event (and its case history entry) when no letter is due.
+     */
+    public static boolean isClaimSettledLetterRequired(CaseData caseData) {
         return isRespondent1Lip(caseData)
             && AWAITING_CASE_DETAILS_NOTIFICATION.name().equals(caseData.getPreStayState());
     }
