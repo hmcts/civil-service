@@ -36,7 +36,11 @@ public class GaEventEmitterService {
                 applicationEventPublisher.publishEvent(new DispatchBusinessProcessEvent(caseId, businessProcess));
             }
             log.info("Camunda event emitted successfully with tenant");
-        } catch (FeignException ex) {
+        } catch (FeignException.BadRequest ex) {
+            // 400 is the engine reporting no start message definition for this tenant
+            // (MismatchingMessageCorrelationException), the only case the without-tenant
+            // retry is for. Anything else, including a RetryableException on a request
+            // the engine may already have committed, must not correlate a second time.
             nullTenantAttempt = true;
         } catch (Exception e) {
             log.error(format("Emitting %s camunda event failed for case: %d, tenant: %s, message: %s",
@@ -73,7 +77,11 @@ public class GaEventEmitterService {
                 applicationEventPublisher.publishEvent(new DispatchBusinessProcessEvent(caseId, judgeBusinessProcess));
             }
             log.info("Camunda event emitted successfully with tenant");
-        } catch (FeignException ex) {
+        } catch (FeignException.BadRequest ex) {
+            // 400 is the engine reporting no start message definition for this tenant
+            // (MismatchingMessageCorrelationException), the only case the without-tenant
+            // retry is for. Anything else, including a RetryableException on a request
+            // the engine may already have committed, must not correlate a second time.
             nullTenantAttempt = true;
         } catch (Exception e) {
             log.error(format("Emitting %s camunda event failed for case: %d, tenant: %s, message: %s",

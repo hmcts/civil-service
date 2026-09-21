@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import feign.FeignException;
+import feign.Request;
+import feign.RetryableException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -35,7 +38,7 @@ class EventEmitterServiceTest {
     private ApplicationEventPublisher applicationEventPublisher;
 
     @Mock
-    private FeignException mockedFeignException;
+    private FeignException.BadRequest mockedFeignException;
 
     @Mock
     private CamundaRuntimeClient camundaRuntimeClient;
@@ -91,6 +94,34 @@ class EventEmitterServiceTest {
         verify(camundaRuntimeClient).correlateStartMessage(TEST_EVENT, "civil", Map.of("caseId", CASE_ID));
         verify(camundaRuntimeClient).correlateStartMessageWithoutTenant(TEST_EVENT, Map.of("caseId", CASE_ID));
         verify(applicationEventPublisher, times(2)).publishEvent(new DispatchBusinessProcessEvent(CASE_ID, caseData.getBusinessProcess()));
+    }
+
+    @Test
+    void shouldNotCorrelateAgainWithoutTenant_whenTenantAttemptTimesOut() {
+        doThrow(new RetryableException(
+            -1, "Read timed out", Request.HttpMethod.POST, (Long) null,
+            Request.create(Request.HttpMethod.POST, "url", Map.of(), null, null, null)
+        )).when(camundaRuntimeClient).correlateStartMessage(any(), any(), any());
+
+        CaseData caseData = createCaseData(TEST_EVENT, CASE_ID);
+        eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
+
+        verify(camundaRuntimeClient).correlateStartMessage(TEST_EVENT, "civil", Map.of("caseId", CASE_ID));
+        verify(camundaRuntimeClient, never()).correlateStartMessageWithoutTenant(any(), any());
+        verify(applicationEventPublisher, times(1)).publishEvent(new DispatchBusinessProcessEvent(CASE_ID, caseData.getBusinessProcess()));
+    }
+
+    @Test
+    void shouldNotCorrelateAgainWithoutTenant_whenEngineReturnsServerError() {
+        doThrow(new FeignException.BadGateway(
+            "Bad gateway", Request.create(Request.HttpMethod.POST, "url", Map.of(), null, null, null), null, null
+        )).when(camundaRuntimeClient).correlateStartMessage(any(), any(), any());
+
+        CaseData caseData = createCaseData(TEST_EVENT, CASE_ID);
+        eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
+
+        verify(camundaRuntimeClient, never()).correlateStartMessageWithoutTenant(any(), any());
+        verify(applicationEventPublisher, times(1)).publishEvent(new DispatchBusinessProcessEvent(CASE_ID, caseData.getBusinessProcess()));
     }
 
     @Test

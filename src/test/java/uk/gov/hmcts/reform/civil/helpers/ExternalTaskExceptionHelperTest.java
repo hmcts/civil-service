@@ -98,17 +98,22 @@ class ExternalTaskExceptionHelperTest {
     }
 
     @Test
-    void shouldReturnFalseForNonFeignFailureWithClientErrorMessage() {
+    void shouldReturnTrueForNonFeignFailureRegardlessOfMessage() {
         Throwable exception = new RuntimeException(
             "Error during remote invocation of DocmosisApiClient#createDocument(DocmosisRequest): Bad Request"
         );
 
-        assertThat(ExternalTaskExceptionHelper.isRetryable(exception)).isFalse();
+        assertThat(ExternalTaskExceptionHelper.isRetryable(exception)).isTrue();
     }
 
     @Test
-    void shouldReturnTrueForNonFeignFailureWithoutClientErrorMessage() {
-        Throwable exception = new RuntimeException("Error during remote invocation: Bad Gateway");
+    void shouldReturnTrueForInternalServerErrorOnNonIdempotentMethod() {
+        Throwable exception = new FeignException.InternalServerError(
+            "Internal server error",
+            Request.create(Request.HttpMethod.POST, "url", Map.of(), null, null, null),
+            null,
+            null
+        );
 
         assertThat(ExternalTaskExceptionHelper.isRetryable(exception)).isTrue();
     }

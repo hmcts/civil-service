@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.ga.service;
 
 import feign.FeignException;
+import feign.Request;
+import feign.RetryableException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +34,7 @@ class GaEventEmitterServiceTest {
     private ApplicationEventPublisher applicationEventPublisher;
 
     @Mock
-    private FeignException mockedFeignException;
+    private FeignException.BadRequest mockedFeignException;
 
     @Mock
     private CamundaRuntimeClient camundaRuntimeClient;
@@ -84,6 +86,41 @@ class GaEventEmitterServiceTest {
         verify(camundaRuntimeClient).correlateStartMessage("TEST_EVENT", "civil", Map.of("caseId", 1L));
         verify(camundaRuntimeClient).correlateStartMessageWithoutTenant("TEST_EVENT", Map.of("caseId", 1L));
         verify(applicationEventPublisher).publishEvent(new DispatchBusinessProcessEvent(1L, businessProcess));
+    }
+
+    @Test
+    void shouldNotCorrelateAgainWithoutTenant_whenTenantAttemptTimesOut() {
+        var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
+        GeneralApplication generalApplication = new GeneralApplication()
+            .setBusinessProcess(businessProcess);
+        doThrow(new RetryableException(
+            -1, "Read timed out", Request.HttpMethod.POST, (Long) null,
+            Request.create(Request.HttpMethod.POST, "url", Map.of(), null, null, null)
+        )).when(camundaRuntimeClient).correlateStartMessage(any(), any(), any());
+
+        eventEmitterService.emitBusinessProcessCamundaEvent(1L, generalApplication, true);
+
+        verify(camundaRuntimeClient).correlateStartMessage("TEST_EVENT", "civil", Map.of("caseId", 1L));
+        verify(camundaRuntimeClient, never()).correlateStartMessageWithoutTenant(any(), any());
+        verifyNoInteractions(applicationEventPublisher);
+    }
+
+    @Test
+    void shouldNotCorrelateGAEventAgainWithoutTenant_whenTenantAttemptTimesOut() {
+        var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .businessProcess(businessProcess)
+            .ccdCaseReference(1L)
+            .build();
+        doThrow(new RetryableException(
+            -1, "Read timed out", Request.HttpMethod.POST, (Long) null,
+            Request.create(Request.HttpMethod.POST, "url", Map.of(), null, null, null)
+        )).when(camundaRuntimeClient).correlateStartMessage(any(), any(), any());
+
+        eventEmitterService.emitBusinessProcessCamundaGAEvent(caseData, true);
+
+        verify(camundaRuntimeClient, never()).correlateStartMessageWithoutTenant(any(), any());
+        verifyNoInteractions(applicationEventPublisher);
     }
 
     @Test
