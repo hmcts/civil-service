@@ -25,9 +25,9 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
-          python-version: '3.11'
+          python-version: '3.14'
       - name: Install Semgrep
-        run: python -m pip install semgrep==1.136.0
+        run: 'python -m pip install --only-binary=:all: semgrep==1.177.0'
       - name: Test PII logging rules
         run: semgrep test .semgrep
       - name: Scan changed application code for PII logging
@@ -70,7 +70,7 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
-          java-version: 21
+          java-version: 21.0.12+101.0.LTS
       - name: Run checks
         run: ./gradlew check
       - name: Run integration tests
