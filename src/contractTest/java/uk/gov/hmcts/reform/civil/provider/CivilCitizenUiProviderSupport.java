@@ -442,6 +442,109 @@ abstract class CivilCitizenUiProviderSupport {
         missingPayment("GA");
     }
 
+    private Map<String, Object> responseExample(String resource, String variant) throws IOException {
+        ObjectMapper mapper = buildObjectMapper();
+        try (var stream = getClass().getResourceAsStream(resource)) {
+            return mapper.convertValue(mapper.readTree(java.util.Objects.requireNonNull(stream)).get(variant),
+                                       new TypeReference<>() { });
+        }
+    }
+
+    private void citizenResponse(String variant, String responseType) throws IOException {
+        Map<String, Object> updates = responseExample("/civil-cui-responses.json", variant);
+        // CCD returns case data, not an echo of every UI update field. Select the
+        // persisted fields consumed by this journey and use their real model types.
+        Map<String, Object> data = new HashMap<>();
+        for (String field : List.of("respondent1", "respondent1LiPResponse", "respondent1LiPResponseCarm",
+            "respondent1DQLanguage", "respondent1RepaymentPlan", "respondToClaimAdmitPartLRspec",
+            "defenceRouteRequired", "detailsOfWhyDoesYouDisputeTheClaim", "defenceAdmitPartPaymentTimeRouteRequired",
+            "respondToAdmittedClaimOwingAmountPounds", "applicant1AcceptAdmitAmountPaidSpec",
+            "applicant1AcceptFullAdmitPaymentPlanSpec", "applicant1RepaymentOptionForDefendantSpec",
+            "applicant1SuggestInstalmentsPaymentAmountForDefendantSpec",
+            "applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec",
+            "applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec",
+            "applicant1RequestedPaymentDateForDefendantSpec", "applicant1LiPResponseCarm")) {
+            if (updates.containsKey(field)) {
+                data.put(field, updates.get(field));
+            }
+        }
+        data.put("respondent1ClaimResponseTypeForSpec", responseType);
+        // Serialize real CaseData models, including money strings and LocalDate fields.
+        CaseData returned = buildObjectMapper().convertValue(data, CaseData.class);
+        data = buildObjectMapper().convertValue(returned, new TypeReference<>() { });
+        verifiedCitizenEvent(variant.startsWith("claimant-") ? CaseEvent.CLAIMANT_RESPONSE_CUI
+            : CaseEvent.DEFENDANT_RESPONSE_CUI, updates, data, "AWAITING_APPLICANT_INTENTION");
+    }
+
+    private void verifiedCitizenEvent(CaseEvent event, Map<String, Object> updates,
+                                      Map<String, Object> data, String state) {
+        EventSubmissionParams params = eventParams(CUI_CASE_REFERENCE, updates).setEvent(event);
+        when(caseEventService.submitEvent(params)).thenReturn(CaseDetails.builder()
+            .id(Long.valueOf(CUI_CASE_REFERENCE)).state(state)
+            .lastModified(LocalDateTime.of(2025, 5, 1, 10, 0)).data(data).build());
+        stateVerification = () -> verify(caseEventService).submitEvent(params);
+    }
+
+    @State("An agreed response extension can be submitted")
+    void agreedResponseExtension() {
+        Map<String, Object> updates = Map.of("respondentSolicitor1AgreedDeadlineExtension", "2025-07-01",
+                                             "respondent1LiPResponse", Map.of("respondent1ResponseLanguage", "BOTH"));
+        Map<String, Object> data = new HashMap<>(updates);
+        data.put("respondentSolicitor1AgreedDeadlineExtension", LocalDate.of(2025, 7, 1));
+        verifiedCitizenEvent(CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC, updates, data, "AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
+    }
+
+    @State("The defence citizen response can be submitted")
+    void defenceResponse() throws IOException {
+        citizenResponse("defence", "FULL_DEFENCE");
+    }
+
+    @State("The full-admission citizen response can be submitted")
+    void fullAdmissionResponse() throws IOException {
+        citizenResponse("full-admission", "FULL_ADMISSION");
+    }
+
+    @State("The part-admission citizen response can be submitted")
+    void partAdmissionResponse() throws IOException {
+        citizenResponse("part-admission", "PART_ADMISSION");
+    }
+
+    @State("The claimant-acceptance citizen response can be submitted")
+    void claimantAcceptanceResponse() throws IOException {
+        citizenResponse("claimant-acceptance", "PART_ADMISSION");
+    }
+
+    @State("The claimant-rejection citizen response can be submitted")
+    void claimantRejectionResponse() throws IOException {
+        citizenResponse("claimant-rejection", "PART_ADMISSION");
+    }
+
+    @State("The claimant-instalments citizen response can be submitted")
+    void claimantInstalmentsResponse() throws IOException {
+        citizenResponse("claimant-instalments", "FULL_ADMISSION");
+    }
+
+    @State("The claimant-set-date citizen response can be submitted")
+    void claimantSetDateResponse() throws IOException {
+        citizenResponse("claimant-set-date", "FULL_ADMISSION");
+    }
+
+    @State("A new citizen query can be submitted")
+    void newQuery() throws IOException {
+        Map<String, Object> updates = responseExample("/civil-cui-queries.json", "new");
+        Map<String, Object> data = Map.of("queries", buildObjectMapper().convertValue(updates.get("queries"),
+            uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection.class));
+        verifiedCitizenEvent(CaseEvent.queryManagementRaiseQuery, updates, data, "CASE_PROGRESSION");
+    }
+
+    @State("A follow-up citizen query can be submitted")
+    void followUpQuery() throws IOException {
+        Map<String, Object> updates = responseExample("/civil-cui-queries.json", "follow-up");
+        Map<String, Object> data = Map.of("queries", buildObjectMapper().convertValue(updates.get("queries"),
+            uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection.class));
+        verifiedCitizenEvent(CaseEvent.queryManagementRaiseQuery, updates, data, "CASE_PROGRESSION");
+    }
+
     @State("A claim issue fee is available for a claim amount of 1000")
     void claimIssueFeeExists() {
         when(feesService.getFeeDataByTotalClaimAmount(new BigDecimal("1000")))
