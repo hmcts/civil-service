@@ -142,6 +142,8 @@ withPipeline(type, product, component) {
     env.CAMUNDA_DEFINITION_BRANCH = checkForCamundaDefinitionBranchLabel()
     env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR = 'civil-service-pr'
     env.PLAYWRIGHT_PR_FT_GROUPS = getPlaywrightFunctionalTestsGroups()
+    env.SKIP_FUNCTIONAL_TESTS = checkForSkipFunctionalTests(env.BRANCH_NAME)
+    env.RUN_ALL_FUNCTIONAL_TESTS = checkForRunAllFunctionalTests(env.BRANCH_NAME)
 
     setPreviewUrls(product, component)
 
@@ -217,12 +219,12 @@ withPipeline(type, product, component) {
 
   afterAlways('smoketest:preview') {
     archiveArtifacts allowEmptyArchive: true, artifacts: "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/**/*"
-    publishPlaywrightSmokeReports()
+    publishPlaywrightSmokeReports(yarnBuilder)
   }
 
   afterAlways('functionalTest:preview') {
     archiveArtifacts allowEmptyArchive: true, artifacts: "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/**/*"
-    publishPlaywrightFunctionalReports()
+    publishPlaywrightFunctionalReports(yarnBuilder)
   }
 
   before('smoketest:aat') {
@@ -232,7 +234,7 @@ withPipeline(type, product, component) {
 
   afterAlways('smoketest:aat') {
     archiveArtifacts allowEmptyArchive: true, artifacts: "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/**/*"
-    publishPlaywrightSmokeReports()
+    publishPlaywrightSmokeReports(yarnBuilder)
   }
 
   afterSuccess('functionalTest:aat') {
@@ -251,7 +253,7 @@ withPipeline(type, product, component) {
 
   afterAlways('functionalTest:aat') {
     archiveArtifacts allowEmptyArchive: true, artifacts: "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/**/*"
-    publishPlaywrightFunctionalReports()
+    publishPlaywrightFunctionalReports(yarnBuilder)
   }
 }
 
@@ -371,7 +373,7 @@ def checkHasPlaywrightLastRunStatus(expectedStatuses) {
   return statuses.contains(lastRunStatus)
 }
 
-def publishPlaywrightSmokeReports() {
+def publishPlaywrightSmokeReports(yarnBuilder) {
   def playwrightTestsFlags = "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/playwrightTestsFlags.properties"
 
   if (fileExists(playwrightTestsFlags)) {
@@ -404,7 +406,7 @@ def publishPlaywrightSmokeReports() {
   }
 }
 
-def publishPlaywrightFunctionalReports() {
+def publishPlaywrightFunctionalReports(yarnBuilder) {
   def playwrightTestsFlags = "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/playwrightTestsFlags.properties"
 
   if (fileExists(playwrightTestsFlags)) {
