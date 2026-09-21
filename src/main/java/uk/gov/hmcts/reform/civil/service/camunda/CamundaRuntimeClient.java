@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.camunda;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.model.camunda.CamundaMessageCorrelation;
 import uk.gov.hmcts.reform.civil.model.camunda.CamundaVariableValue;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +60,14 @@ public class CamundaRuntimeClient {
      *
      * <p>A null {@code tenantId} is omitted from the request rather than sent as null,
      * matching the correlation builder calls that never set a tenant.</p>
+     *
+     * <p>{@code POST /message} correlates to a waiting execution in preference to a start
+     * event, whereas {@code correlateStartMessage()} only ever started a process. The two
+     * are equivalent today because no civil BPMN has a message intermediate catch event or
+     * receive task (checked in civil-camunda-bpmn-definition). If one is added with the same
+     * message name as a start event, this call would resume that instance instead of starting
+     * a new one; pass a correlation that cannot match an execution, or add a start-only
+     * variant, before doing that.</p>
      */
     public void correlateStartMessage(String messageName, String tenantId, Map<String, Object> variables) {
         camundaRestEngineApi.correlateMessage(
@@ -98,6 +105,14 @@ public class CamundaRuntimeClient {
      * serialisation format, which the engine deserialises on read so the value comes
      * back as a JSON array or object. Sending a complex value untyped would make the
      * engine fall back to Java serialisation.</p>
+     *
+     * <p>The {@code objectTypeName} is always a JDK collection type. Both the engine
+     * (on {@code GET .../variables}, which deserialises by default) and the external task
+     * client resolve that name with {@code Class.forName}, so a civil-service class name
+     * would fail every read of that instance's variables. A value whose JSON form is a
+     * scalar (an enum, a date the {@link ObjectMapper} writes as text, a
+     * {@link java.math.BigDecimal}) is therefore sent as the matching Camunda primitive
+     * rather than as an {@code Object}.</p>
      */
     private CamundaVariableValue toVariableValue(Object value) {
         if (value == null) {
@@ -107,27 +122,39 @@ public class CamundaRuntimeClient {
             || value instanceof Long || value instanceof Double) {
             return new CamundaVariableValue().setValue(value).setType(value.getClass().getSimpleName());
         }
-        try {
-            return new CamundaVariableValue()
-                .setValue(objectMapper.writeValueAsString(value))
-                .setType("Object")
-                .setValueInfo(Map.of(
-                    "objectTypeName", objectTypeNameOf(value),
-                    "serializationDataFormat", "application/json"));
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException(
-                format("Could not serialise Camunda process variable of type %s", value.getClass().getName()), e);
+        JsonNode node = objectMapper.valueToTree(value);
+        if (node.isObject()) {
+            return jsonObjectValue(node, "java.util.LinkedHashMap");
         }
+        if (node.isArray()) {
+            return jsonObjectValue(node, "java.util.ArrayList");
+        }
+        if (node.isTextual()) {
+            return new CamundaVariableValue().setValue(node.textValue()).setType("String");
+        }
+        if (node.isBoolean()) {
+            return new CamundaVariableValue().setValue(node.booleanValue()).setType("Boolean");
+        }
+        if (node.isIntegralNumber()) {
+            return new CamundaVariableValue().setValue(node.longValue()).setType("Long");
+        }
+        if (node.isNumber()) {
+            return new CamundaVariableValue().setValue(node.doubleValue()).setType("Double");
+        }
+        if (node.isNull()) {
+            return new CamundaVariableValue().setType("Null");
+        }
+        throw new IllegalArgumentException(
+            format("Could not map Camunda process variable of type %s (JSON %s)", value.getClass().getName(), node.getNodeType()));
     }
 
-    private static String objectTypeNameOf(Object value) {
-        if (value instanceof Collection) {
-            return "java.util.ArrayList";
-        }
-        if (value instanceof Map) {
-            return "java.util.LinkedHashMap";
-        }
-        return value.getClass().getName();
+    private static CamundaVariableValue jsonObjectValue(JsonNode node, String objectTypeName) {
+        return new CamundaVariableValue()
+            .setValue(node.toString())
+            .setType("Object")
+            .setValueInfo(Map.of(
+                "objectTypeName", objectTypeName,
+                "serializationDataFormat", "application/json"));
     }
 
     public Map<String, Object> getEvaluatedDmnCourtLocations(String courtId, String caseTrackValue) {
