@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -20,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ClaimSettledLipDefendant1LetterHandler extends CallbackHandler {
@@ -50,8 +52,16 @@ public class ClaimSettledLipDefendant1LetterHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         if (shouldSendLetter(caseData)) {
+            log.info("Sending claim settled letter to LiP defendant for caseId {}, preStayState: {}",
+                     caseData.getCcdCaseReference(), caseData.getPreStayState());
             String auth = callbackParams.getParams().get(BEARER_TOKEN).toString();
             lipLetterGenerator.generateAndPrintClaimSettledLetter(caseData, auth);
+        } else {
+            log.info("Claim settled letter NOT sent to LiP defendant for caseId {}, "
+                         + "respondent1Represented: {}, preStayState: {} (letter only sent when defendant is LiP "
+                         + "and preStayState is {})",
+                     caseData.getCcdCaseReference(), caseData.getRespondent1Represented(),
+                     caseData.getPreStayState(), AWAITING_CASE_DETAILS_NOTIFICATION);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -61,13 +71,6 @@ public class ClaimSettledLipDefendant1LetterHandler extends CallbackHandler {
         return YesOrNo.NO.equals(caseData.getRespondent1Represented());
     }
 
-    /*
-     * OCCC-297/352 (Def LiP letter): the claim was settled via SETTLE_CLAIM_UNSPEC (Claimant LR, before the
-     * defendant has joined/responded), which stashes the state the claim was in immediately before settlement
-     * in preStayState. POs agreed the letter must only go out when that state was "Awaiting Claim Details
-     * Notification" - not "Awaiting Claim Notification", since the defendant's postal address may not yet be
-     * reliable that early.
-     */
     private boolean shouldSendLetter(CaseData caseData) {
         return isRespondent1Lip(caseData)
             && AWAITING_CASE_DETAILS_NOTIFICATION.name().equals(caseData.getPreStayState());
