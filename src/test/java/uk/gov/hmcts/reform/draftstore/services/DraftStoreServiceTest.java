@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.draftstore.services;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,8 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
@@ -27,8 +24,6 @@ import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -46,15 +41,10 @@ class DraftStoreServiceTest {
     private DraftStoreRepository draftStoreRepository;
 
     @Mock
-    private PlatformTransactionManager transactionManager;
+    private DraftStoreTransactionService draftStoreTransactionService;
 
     @InjectMocks
     private DraftStoreService draftStoreService;
-
-    @BeforeEach
-    void runCallbacksInMockTransactions() {
-        lenient().when(transactionManager.getTransaction(any())).thenReturn(mock(TransactionStatus.class));
-    }
 
     @Nested
     class CreateDraftTests {
@@ -62,13 +52,13 @@ class DraftStoreServiceTest {
         @Test
         void shouldCreateDraftWithExpiryWhenRequestIsValid() {
             Map<String, Object> payload = new HashMap<>(Map.of("step", "claimant-details"));
-            when(draftStoreRepository.saveAndFlush(any(DraftStoreEntity.class)))
+            when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
             DraftStoreEntity result = draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE);
 
             ArgumentCaptor<DraftStoreEntity> captor = ArgumentCaptor.forClass(DraftStoreEntity.class);
-            verify(draftStoreRepository).saveAndFlush(captor.capture());
+            verify(draftStoreTransactionService).saveInNewTransaction(captor.capture());
             DraftStoreEntity savedDraft = captor.getValue();
             assertThat(result).isSameAs(savedDraft);
             assertThat(savedDraft.getId()).isNotNull();
@@ -113,13 +103,13 @@ class DraftStoreServiceTest {
                 createdAt,
                 DRAFT_TYPE.calculateExpiry(createdAt)
             );
-            when(draftStoreRepository.saveAndFlush(any(DraftStoreEntity.class)))
-                .thenThrow(new DataIntegrityViolationException("uq_draft_store_user_draft_claim"));
             when(draftStoreRepository.findByUserIdAndDraftTypeIdAndExpiresAtAfter(
                 eq(USER_ID),
                 eq(DRAFT_TYPE.getId()),
                 any(OffsetDateTime.class)
             )).thenReturn(List.of(existingDraft));
+            when(draftStoreTransactionService.saveInNewTransaction(any()))
+                .thenThrow(new DataIntegrityViolationException("uq_draft_store_user_draft_claim"));
 
             DraftStoreEntity result = draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE);
 
@@ -132,7 +122,7 @@ class DraftStoreServiceTest {
             Map<String, Object> payload = new HashMap<>(Map.of("step", "claimant-details"));
             DataIntegrityViolationException uniqueViolation =
                 new DataIntegrityViolationException("uq_draft_store_user_draft_claim");
-            when(draftStoreRepository.saveAndFlush(any(DraftStoreEntity.class))).thenThrow(uniqueViolation);
+            when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class))).thenThrow(uniqueViolation);
             when(draftStoreRepository.findByUserIdAndDraftTypeIdAndExpiresAtAfter(
                 eq(USER_ID),
                 eq(DRAFT_TYPE.getId()),
