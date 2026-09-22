@@ -31,6 +31,8 @@ import uk.gov.hmcts.reform.civil.config.JacksonConfiguration;
 import uk.gov.hmcts.reform.civil.controllers.cases.CaseAssignmentController;
 import uk.gov.hmcts.reform.civil.controllers.cases.CasesController;
 import uk.gov.hmcts.reform.civil.controllers.cases.DocumentController;
+import uk.gov.hmcts.reform.civil.controllers.airlines.FlightController;
+import uk.gov.hmcts.reform.civil.controllers.locations.LocationController;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentNotFoundException;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -48,6 +50,7 @@ import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
 import uk.gov.hmcts.reform.civil.model.Fee2Dto;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -57,6 +60,9 @@ import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.GeneralApplicationFeeRequest;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.repaymentplan.ClaimantProposedPlan;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.AirlineEpimsDataLoader;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.service.AssignCaseService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeesPaymentService;
@@ -75,6 +81,7 @@ import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService
 import uk.gov.hmcts.reform.civil.service.search.exceptions.SearchServiceCaseNotFoundException;
 import uk.gov.hmcts.reform.civil.service.user.UserInformationService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
+import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.dashboard.controllers.DashboardController;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -153,6 +160,10 @@ abstract class CivilCitizenUiProviderSupport {
     @Mock
     private InterestCalculator interestCalculator;
     @Mock
+    private LocationReferenceDataService locationReferenceDataService;
+    @Mock
+    private AirlineEpimsDataLoader airlineEpimsDataLoader;
+    @Mock
     private DeadlineExtensionCalculatorService deadlineCalculator;
     @Mock
     private RepaymentPlanDecisionService repaymentDecisionService;
@@ -190,13 +201,15 @@ abstract class CivilCitizenUiProviderSupport {
         DashboardController dashboardController = new DashboardController(
             taskListService, dashboardNotificationService, dashboardScenariosService);
         DocumentController documentController = new DocumentController(claimFormService, documentManagementService);
+        LocationController locationController = new LocationController(locationReferenceDataService, new CourtLocationUtils());
+        FlightController flightController = new FlightController(airlineEpimsDataLoader);
         stateVerification = () -> { };
         rawOcmcResponse = false;
         ObjectMapper mapper = buildObjectMapper();
         MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter(mapper);
         mockMvc = MockMvcBuilders.standaloneSetup(
                 paymentController, feesController, casesController, assignmentController, dashboardController,
-                documentController)
+                documentController, locationController, flightController)
             .addFilters(new RequestFilter())
             .setMessageConverters(new StringHttpMessageConverter(), new ResourceHttpMessageConverter(), messageConverter)
             .setControllerAdvice(new ControllerExceptionHandler(), new ResourceExceptionHandler(mapper),
@@ -251,6 +264,36 @@ abstract class CivilCitizenUiProviderSupport {
         } else {
             System.setProperty(key, value);
         }
+    }
+
+    @State("Court locations are available")
+    void courtLocationsAvailable() {
+        when(locationReferenceDataService.getCourtLocationsForDefaultJudgments(AUTH_HEADER, "AAA6"))
+            .thenReturn(List.of(new LocationRefData().setSiteName("Example Court")
+                .setCourtAddress("1 Example Street").setPostcode("EX1 2PL")));
+        stateVerification = () -> verify(locationReferenceDataService)
+            .getCourtLocationsForDefaultJudgments(AUTH_HEADER, "AAA6");
+    }
+
+    @State("No court locations are available")
+    void noCourtLocationsAvailable() {
+        when(locationReferenceDataService.getCourtLocationsForDefaultJudgments(AUTH_HEADER, "AAA6"))
+            .thenReturn(List.of());
+        stateVerification = () -> verify(locationReferenceDataService)
+            .getCourtLocationsForDefaultJudgments(AUTH_HEADER, "AAA6");
+    }
+
+    @State("Airlines are available")
+    void airlinesAvailable() {
+        when(airlineEpimsDataLoader.getAirlineEpimsIDList()).thenReturn(List.of(
+            new AirlineEpimsId("Example Air", "AIR-001")));
+        stateVerification = () -> verify(airlineEpimsDataLoader).getAirlineEpimsIDList();
+    }
+
+    @State("No airlines are available")
+    void noAirlinesAvailable() {
+        when(airlineEpimsDataLoader.getAirlineEpimsIDList()).thenReturn(List.of());
+        stateVerification = () -> verify(airlineEpimsDataLoader).getAirlineEpimsIDList();
     }
 
     @State("Claim issue payment can be initiated for case 1234567890123456")
