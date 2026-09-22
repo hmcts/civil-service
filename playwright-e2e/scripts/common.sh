@@ -7,6 +7,16 @@ PLAYWRIGHT_LAST_RUN_REPORT="${PLAYWRIGHT_TEST_RESULTS_DIR}/${PLAYWRIGHT_FUNCTION
 PREV_PLAYWRIGHT_LAST_RUN_REPORT="${PLAYWRIGHT_TEST_RESULTS_DIR}/.prev-last-run.json"
 PLAYWRIGHT_TESTS_FLAGS="${PLAYWRIGHT_TEST_RESULTS_DIR}/playwrightTestsFlags.properties"
 
+write_empty_smoke_results_xml() {
+  local smoke_results_xml="test-results/smoke/results.xml"
+
+  mkdir -p "$(dirname "$smoke_results_xml")"
+  cat > "$smoke_results_xml" <<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="0" failures="0" skipped="0" errors="0" time="0"></testsuites>
+XML
+}
+
 write_report_flags() {
   local setup_tests_failed="${1:-false}"
   local smoke_tests_failed="${2:-false}"

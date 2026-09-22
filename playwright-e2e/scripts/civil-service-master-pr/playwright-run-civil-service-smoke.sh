@@ -39,6 +39,7 @@ cp "$PLAYWRIGHT_LAST_RUN_REPORT" "$PREV_PLAYWRIGHT_LAST_RUN_REPORT"
 
 # Check if SKIP_FUNCTIONAL_TESTS is set to true
 if should_skip_functional_tests; then
+  write_empty_smoke_results_xml
   exit 0
 
 #Check if RUN_ALL_FUNCTIONAL_TESTS is set to true
@@ -63,6 +64,7 @@ elif ! compare_ft_groups; then
 
 # Check if latest current git commit has not changed, ft_groups match and previous last run json has status passed.
 elif previous_run_has_status_passed; then
+  write_empty_smoke_results_xml
   exit 0
 
 # Check if the previous last run json has a status other than failed.
