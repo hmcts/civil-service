@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
 import java.time.LocalDate;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CLAIM_SETTLED_LETTER;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.UNSPEC_CLAIM_SETTLED_LETTER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.CLAIM_SETTLED_LIP_DEFENDANT_LETTER;
 
 @Slf4j
@@ -30,7 +30,7 @@ public class ClaimSettledDefendantLiPLetterGenerator {
     private final DocumentManagementService documentManagementService;
     private final DocumentDownloadService documentDownloadService;
     private final BulkPrintService bulkPrintService;
-    private static final String CLAIM_SETTLED_LETTER_TITLE = "claim-settled-letter";
+    private static final String UNSPEC_CLAIM_SETTLED_LETTER_TITLE = "unspec-claim-settled-letter";
 
     public void generateAndPrintClaimSettledLetter(CaseData caseData, String auth) {
         Long caseId = caseData.getCcdCaseReference();
@@ -44,7 +44,7 @@ public class ClaimSettledDefendantLiPLetterGenerator {
         List<String> recipients = getRecipientsList(caseData);
         List<String> bulkPrintFileNames = List.of(claimSettledDoc.getDocumentLink().getDocumentFileName());
         SendLetterResponse sendLetterResponse = bulkPrintService.printLetter(letterContent, String.valueOf(caseData.getCcdCaseReference()),
-                                     caseData.getLegacyCaseReference(), CLAIM_SETTLED_LETTER_TITLE,
+                                     caseData.getLegacyCaseReference(), UNSPEC_CLAIM_SETTLED_LETTER_TITLE,
                                      recipients, bulkPrintFileNames);
         log.info("Claim settled letter sent to bulk print for caseId {}, send-letter-service letterId: {}",
                  caseId, sendLetterResponse.letterId);
@@ -57,7 +57,7 @@ public class ClaimSettledDefendantLiPLetterGenerator {
             new PDF(
                 CLAIM_SETTLED_LIP_DEFENDANT_LETTER.getDocumentTitle(),
                 claimSettledLetter.getBytes(),
-                CLAIM_SETTLED_LETTER
+                UNSPEC_CLAIM_SETTLED_LETTER
             )
         );
     }

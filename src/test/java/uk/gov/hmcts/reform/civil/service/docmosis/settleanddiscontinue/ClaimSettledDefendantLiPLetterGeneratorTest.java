@@ -31,7 +31,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CLAIM_SETTLED_LETTER;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.UNSPEC_CLAIM_SETTLED_LETTER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.CLAIM_SETTLED_LIP_DEFENDANT_LETTER;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,13 +49,13 @@ class ClaimSettledDefendantLiPLetterGeneratorTest {
     @Mock
     private BulkPrintService bulkPrintService;
 
-    private static final String CLAIM_SETTLED_LETTER_TITLE = "claim-settled-letter";
+    private static final String UNSPEC_CLAIM_SETTLED_LETTER_TITLE = "unspec-claim-settled-letter";
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
     private static final CaseDocument CLAIM_SETTLED_DOC = CaseDocumentBuilder.builder()
-        .documentName("claim_settled_letter.pdf")
-        .documentType(CLAIM_SETTLED_LETTER)
+        .documentName("unspec_claim_settled_letter.pdf")
+        .documentType(UNSPEC_CLAIM_SETTLED_LETTER)
         .build();
 
     @Test
@@ -74,7 +74,7 @@ class ClaimSettledDefendantLiPLetterGeneratorTest {
                      BEARER_TOKEN,
                      new PDF(CLAIM_SETTLED_LIP_DEFENDANT_LETTER.getDocumentTitle(),
                              LETTER_CONTENT,
-                             CLAIM_SETTLED_LETTER
+                             UNSPEC_CLAIM_SETTLED_LETTER
                      )
                  ))
             .thenReturn(CLAIM_SETTLED_DOC);
@@ -106,7 +106,7 @@ class ClaimSettledDefendantLiPLetterGeneratorTest {
                 LETTER_CONTENT,
                 caseData.getCcdCaseReference().toString(),
                 caseData.getLegacyCaseReference(),
-                CLAIM_SETTLED_LETTER_TITLE,
+                UNSPEC_CLAIM_SETTLED_LETTER_TITLE,
                 List.of(caseData.getRespondent1().getPartyName()),
                 List.of(CLAIM_SETTLED_DOC.getDocumentLink().getDocumentFileName())
             );

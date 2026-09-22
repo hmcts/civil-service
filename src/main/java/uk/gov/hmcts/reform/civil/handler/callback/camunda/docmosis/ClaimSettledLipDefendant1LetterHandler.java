@@ -17,14 +17,14 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1_UNSPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_UNSPEC_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 
 @RequiredArgsConstructor
 @Service
 public class ClaimSettledLipDefendant1LetterHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1_UNSPEC);
+    private static final List<CaseEvent> EVENTS = List.of(SEND_UNSPEC_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1);
     public static final String TASK_ID = "SendClaimSettledLetterLipDef";
     private final ClaimSettledDefendantLiPLetterGenerator lipLetterGenerator;
 

@@ -43,7 +43,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIM_SETTLED_LETTER_NOTIFICATION_UNSPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UNSPEC_CLAIM_SETTLED_LETTER_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.START_BUSINESS_PROCESS;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
@@ -131,7 +131,7 @@ class StartBusinessProcessTaskHandlerTest {
     void shouldSetClaimSettledLetterRequired_whenClaimSettledLetterProcess(YesOrNo respondent1Represented,
                                                                           String preStayState,
                                                                           boolean expectedLetterRequired) {
-        BusinessProcess businessProcess = BusinessProcess.ready(CLAIM_SETTLED_LETTER_NOTIFICATION_UNSPEC);
+        BusinessProcess businessProcess = BusinessProcess.ready(UNSPEC_CLAIM_SETTLED_LETTER_NOTIFICATION);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft().businessProcess(businessProcess).build();
         caseData.setRespondent1Represented(respondent1Represented);
         caseData.setPreStayState(preStayState);

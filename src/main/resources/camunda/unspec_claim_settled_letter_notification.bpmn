@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_claim_settled_letter" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.35.0">
-  <bpmn:process id="CLAIM_SETTLED_LETTER_NOTIFICATION_UNSPEC_ID" name="Claim Settled Letter Notification" isExecutable="true" camunda:historyTimeToLive="P90D">
+  <bpmn:process id="UNSPEC_CLAIM_SETTLED_LETTER_NOTIFICATION_ID" name="Claim Settled Letter Notification" isExecutable="true" camunda:historyTimeToLive="P90D">
     <bpmn:startEvent id="Event_start" name="Start">
       <bpmn:outgoing>Flow_start_to_startBusiness</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_start" messageRef="Message_claim_settled_letter" />
@@ -23,7 +23,7 @@
     <bpmn:serviceTask id="SendLetterClaimSettledDefendantLiP" name="Generate, print and post claim settled letter to Defendant LiP" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1_UNSPEC</camunda:inputParameter>
+          <camunda:inputParameter name="caseEvent">SEND_UNSPEC_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_gateway_to_sendLetter</bpmn:incoming>
@@ -65,9 +65,9 @@
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_abort_to_abortEnd" sourceRef="Event_abort" targetRef="Event_abortEnd" />
   </bpmn:process>
-  <bpmn:message id="Message_claim_settled_letter" name="CLAIM_SETTLED_LETTER_NOTIFICATION_UNSPEC" />
+  <bpmn:message id="Message_claim_settled_letter" name="UNSPEC_CLAIM_SETTLED_LETTER_NOTIFICATION" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="CLAIM_SETTLED_LETTER_NOTIFICATION_UNSPEC_ID">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="UNSPEC_CLAIM_SETTLED_LETTER_NOTIFICATION_ID">
       <bpmndi:BPMNShape id="Event_start_di" bpmnElement="Event_start">
         <dc:Bounds x="152" y="192" width="36" height="36" />
         <bpmndi:BPMNLabel>

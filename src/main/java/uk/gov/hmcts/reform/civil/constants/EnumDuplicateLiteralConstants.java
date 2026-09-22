@@ -10,7 +10,7 @@ public class EnumDuplicateLiteralConstants {
     public static final String WITNESS_EVIDENCE = "Witness evidence";
     public static final String ACKNOWLEDGEMENT_OF_CLAIM_FORM = "acknowledgement_of_claim_form_%s.pdf";
     public static final String CERTIFICATE_OF_DEBT_PAYMENT_PDF = "Certificate_of_debt_payment_%s.pdf";
-    public static final String CLAIM_SETTLED_LETTER = "claim_settled_letter.pdf";
+    public static final String UNSPEC_CLAIM_SETTLED_LETTER = "unspec_claim_settled_letter.pdf";
     public static final String DEFAULT_JUDGMENT_SPEC_FORM = "default_judgment_spec_form_%s.pdf";
     public static final String DIRECTIONS_ORDER = "%s_Directions order.docx";
     public static final String DIRECTIONS_QUESTIONNAIRE_FORM = "%s_directions_questionnaire_form_%s.pdf";
