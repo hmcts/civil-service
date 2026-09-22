@@ -14,7 +14,9 @@ import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,6 +29,13 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.JacksonConfiguration;
 import uk.gov.hmcts.reform.civil.controllers.cases.CaseAssignmentController;
 import uk.gov.hmcts.reform.civil.controllers.cases.CasesController;
+import uk.gov.hmcts.reform.civil.controllers.cases.DocumentController;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentNotFoundException;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 import uk.gov.hmcts.reform.civil.controllers.fees.FeesController;
 import uk.gov.hmcts.reform.civil.controllers.fees.FeesPaymentController;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
@@ -51,6 +60,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeesPaymentService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
+import uk.gov.hmcts.reform.civil.service.documentmanagement.ClaimFormService;
 import uk.gov.hmcts.reform.civil.service.citizen.defendant.LipDefendantCaseAssignmentService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
@@ -85,6 +95,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -116,6 +128,10 @@ abstract class CivilCitizenUiProviderSupport {
     private CoreCaseDataService coreCaseDataService;
     @Mock
     private CaseEventService caseEventService;
+    @Mock
+    private DocumentManagementService documentManagementService;
+    @Mock
+    private ClaimFormService claimFormService;
     @Mock
     private UserInformationService userInformationService;
     @Mock
@@ -168,14 +184,16 @@ abstract class CivilCitizenUiProviderSupport {
             referenceSearchService, pinService, assignCaseService, lipAssignmentService, coreCaseDataService);
         DashboardController dashboardController = new DashboardController(
             taskListService, dashboardNotificationService, dashboardScenariosService);
+        DocumentController documentController = new DocumentController(claimFormService, documentManagementService);
         stateVerification = () -> { };
         rawOcmcResponse = false;
         ObjectMapper mapper = buildObjectMapper();
         MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter(mapper);
         mockMvc = MockMvcBuilders.standaloneSetup(
-                paymentController, feesController, casesController, assignmentController, dashboardController)
+                paymentController, feesController, casesController, assignmentController, dashboardController,
+                documentController)
             .addFilters(new RequestFilter())
-            .setMessageConverters(new StringHttpMessageConverter(), messageConverter)
+            .setMessageConverters(new StringHttpMessageConverter(), new ResourceHttpMessageConverter(), messageConverter)
             .setControllerAdvice(new ControllerExceptionHandler(), new ResourceExceptionHandler(mapper),
                                  new UncaughtExceptionHandler())
             .build();
@@ -483,6 +501,91 @@ abstract class CivilCitizenUiProviderSupport {
             .id(Long.valueOf(CUI_CASE_REFERENCE)).state(state)
             .lastModified(LocalDateTime.of(2025, 5, 1, 10, 0)).data(data).build());
         stateVerification = () -> verify(caseEventService).submitEvent(params);
+    }
+
+    @State("A synthetic citizen document can be uploaded")
+    void syntheticDocumentUpload() {
+        Document link = new Document("https://documents.example.test/documents/evidence-001",
+            "https://documents.example.test/documents/evidence-001/binary", "evidence.bin", null, null, null);
+        CaseDocument uploaded = new CaseDocument().setDocumentLink(link).setDocumentName("evidence.bin")
+            .setDocumentSize(5).setCreatedDatetime(LocalDateTime.of(2025, 4, 1, 9, 30)).setCreatedBy("citizen");
+        when(documentManagementService.uploadDocument(eq(AUTH_HEADER), any(UploadedDocument.class))).thenReturn(uploaded);
+        stateVerification = () -> verify(documentManagementService).uploadDocument(eq(AUTH_HEADER),
+            org.mockito.ArgumentMatchers.<UploadedDocument>argThat(value -> value != null && "evidence.bin".equals(value.getFileBaseName())
+                && value.getFile() != null && "evidence.bin".equals(value.getFile().getOriginalFilename())
+                && value.getFile().getSize() == 5));
+    }
+
+    @State("A synthetic document exists for download")
+    void syntheticDocumentDownload() {
+        byte[] bytes = "Synthetic CUI document contract bytes; no personal or case data.\n"
+            .getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        when(claimFormService.downloadDocumentById(AUTH_HEADER, "document-001"))
+            .thenReturn(new DownloadedDocumentResponse(new ByteArrayResource(bytes), "evidence.txt", "text/plain"));
+    }
+
+    @State("The requested document does not exist")
+    void missingSyntheticDocument() {
+        when(claimFormService.downloadDocumentById(AUTH_HEADER, "missing-document"))
+            .thenThrow(new DocumentNotFoundException("missing-document", null));
+    }
+
+    @State("A translated EVIDENCE_UPLOAD_APPLICANT event can be submitted")
+    void applicantEvidenceUpload() {
+        Map<String, Object> value = Map.of("createdDatetime", "2025-04-01T09:30:00.000Z",
+            "witnessOptionDocument", Map.of("document_url", "https://documents.example.test/documents/evidence-001",
+                "document_binary_url", "https://documents.example.test/documents/evidence-001/binary",
+                "document_filename", "evidence.txt"), "witnessOptionName", "Witness statement",
+            "witnessOptionUploadDate", "2025-03-30T00:00:00.000Z");
+        Map<String, Object> updates = Map.of("caseDocumentUploadDate", "2025-04-01T09:30:00.000Z",
+            "documentWitnessStatement", List.of(Map.of("id", "evidence-entry-001", "value", value)));
+        verifiedCitizenEvent(CaseEvent.EVIDENCE_UPLOAD_APPLICANT, updates, updates, "CASE_PROGRESSION");
+    }
+
+    @State("A translated EVIDENCE_UPLOAD_RESPONDENT event can be submitted")
+    void respondentEvidenceUpload() {
+        Map<String, Object> value = Map.of("createdDatetime", "2025-04-01T09:30:00.000Z",
+            "witnessOptionDocument", Map.of("document_url", "https://documents.example.test/documents/evidence-001",
+                "document_binary_url", "https://documents.example.test/documents/evidence-001/binary",
+                "document_filename", "evidence.txt"), "witnessOptionName", "Witness statement",
+            "witnessOptionUploadDate", "2025-03-30T00:00:00.000Z");
+        Map<String, Object> updates = Map.of("caseDocumentUploadDateRes", "2025-04-01T09:30:00.000Z",
+            "documentWitnessStatementRes", List.of(Map.of("id", "evidence-entry-001", "value", value)));
+        verifiedCitizenEvent(CaseEvent.EVIDENCE_UPLOAD_RESPONDENT, updates, updates, "CASE_PROGRESSION");
+    }
+
+    @State("A CUI mediation document submission can be made")
+    void mediationDocumentSubmission() {
+        Map<String, Object> updates = Map.of("app1MediationDocumentsReferred", List.of(Map.of("id", "mediation-entry-001",
+            "value", Map.of("document", Map.of("document_url", "https://documents.example.test/documents/evidence-001",
+                "document_binary_url", "https://documents.example.test/documents/evidence-001/binary",
+                "document_filename", "evidence.txt", "category_id", "ClaimantOneMediationDocs"),
+                "documentDate", "2025-03-30T00:00:00.000Z",
+                "documentType", "Invoice", "documentUploadedDatetime", "2025-04-01T09:30:00.000Z"))));
+        verifiedCitizenEvent(CaseEvent.CUI_UPLOAD_MEDIATION_DOCUMENTS, updates, updates, "CASE_PROGRESSION");
+    }
+
+    @State("A translated trial readiness response can be submitted")
+    void trialReadinessSubmission() {
+        Map<String, Object> updates = Map.of("trialReadyApplicant", "Yes",
+            "applicantRevisedHearingRequirements", Map.of("revisedHearingRequirements", "Yes",
+                "revisedHearingComments", "A step-free hearing room is required."),
+            "applicantHearingOtherComments", Map.of("hearingOtherComments", "Please list the witness first."));
+        verifiedCitizenEvent(CaseEvent.TRIAL_READINESS, updates, updates, "CASE_PROGRESSION");
+    }
+
+    @State("A translated reconsideration initial request can be submitted")
+    void initialReconsiderationSubmission() {
+        Map<String, Object> updates = Map.of("requestForReviewCommentsDefendant",
+            "The decision should be reconsidered because the payment was recorded.");
+        verifiedCitizenEvent(CaseEvent.REQUEST_FOR_RECONSIDERATION, updates, updates, "CASE_PROGRESSION");
+    }
+
+    @State("A translated reconsideration comments response can be submitted")
+    void reconsiderationCommentsSubmission() {
+        Map<String, Object> updates = Map.of("requestForReviewCommentsClaimant",
+            "Please review the evidence filed after judgment.");
+        verifiedCitizenEvent(CaseEvent.REQUEST_FOR_RECONSIDERATION, updates, updates, "CASE_PROGRESSION");
     }
 
     @State("An agreed response extension can be submitted")
