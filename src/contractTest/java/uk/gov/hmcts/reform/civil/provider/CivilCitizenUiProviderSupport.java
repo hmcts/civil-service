@@ -525,14 +525,18 @@ abstract class CivilCitizenUiProviderSupport {
     void syntheticDocumentDownload() {
         byte[] bytes = "Synthetic CUI document contract bytes; no personal or case data.\n"
             .getBytes(java.nio.charset.StandardCharsets.UTF_8);
-        when(claimFormService.downloadDocumentById(AUTH_HEADER, "document-001"))
+        when(claimFormService.downloadDocumentById(AUTH_HEADER, "document-001", null))
             .thenReturn(new DownloadedDocumentResponse(new ByteArrayResource(bytes), "evidence.txt", "text/plain"));
+        stateVerification = () -> verify(claimFormService)
+            .downloadDocumentById(AUTH_HEADER, "document-001", null);
     }
 
     @State("The requested document does not exist")
     void missingSyntheticDocument() {
-        when(claimFormService.downloadDocumentById(AUTH_HEADER, "missing-document"))
+        when(claimFormService.downloadDocumentById(AUTH_HEADER, "missing-document", null))
             .thenThrow(new DocumentNotFoundException("missing-document", null));
+        stateVerification = () -> verify(claimFormService)
+            .downloadDocumentById(AUTH_HEADER, "missing-document", null);
     }
 
     @State("A translated EVIDENCE_UPLOAD_APPLICANT event can be submitted")
