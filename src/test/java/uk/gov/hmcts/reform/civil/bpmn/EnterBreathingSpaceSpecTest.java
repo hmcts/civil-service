@@ -25,8 +25,6 @@ class EnterBreathingSpaceSpecTest extends BpmnBaseTest {
     private static final String NOTIFY_LIP_RESPONDENT_ACTIVITY_ID = "BreathingSpaceEnterNotifyLipRespondent1";
     private static final String NOTIFY_LIP_APPLICANT = "NOTIFY_LIP_APPLICANT_BREATHING_SPACE_ENTER";
     private static final String NOTIFY_LIP_APPLICANT_ACTIVITY_ID = "BreathingSpaceEnterNotifyLipApplicant";
-    private static final String NOTIFY_RPA_ON_CONTINUOUS_FEED = "NOTIFY_RPA_ON_CONTINUOUS_FEED";
-    private static final String NOTIFY_RPA_ON_CONTINUOUS_FEED_ACTIVITY_ID = "NotifyRoboticsBreathingSpaceEnter";
 
     EnterBreathingSpaceSpecTest() {
         super("enter_breathing_space_spec.bpmn", PROCESS_ID);
@@ -50,7 +48,7 @@ class EnterBreathingSpaceSpecTest extends BpmnBaseTest {
             variables
         );
 
-        assertApplicantSolicitorAndRoboticsNotifications(variables);
+        assertApplicantSolicitorNotificationAndEnd(variables);
     }
 
     @Test
@@ -80,7 +78,7 @@ class EnterBreathingSpaceSpecTest extends BpmnBaseTest {
             variables
         );
 
-        assertApplicantSolicitorAndRoboticsNotifications(variables);
+        assertApplicantSolicitorNotificationAndEnd(variables);
     }
 
     @Test
@@ -110,7 +108,7 @@ class EnterBreathingSpaceSpecTest extends BpmnBaseTest {
             variables
         );
 
-        assertRoboticsAndEnd(variables);
+        assertEnd();
     }
 
     @Test
@@ -140,7 +138,7 @@ class EnterBreathingSpaceSpecTest extends BpmnBaseTest {
             variables
         );
 
-        assertRoboticsAndEnd(variables);
+        assertEnd();
     }
 
     @Test
@@ -161,7 +159,7 @@ class EnterBreathingSpaceSpecTest extends BpmnBaseTest {
             variables
         );
 
-        assertApplicantSolicitorAndRoboticsNotifications(variables);
+        assertApplicantSolicitorNotificationAndEnd(variables);
     }
 
     @Test
@@ -175,7 +173,7 @@ class EnterBreathingSpaceSpecTest extends BpmnBaseTest {
         assertNoExternalTasksLeft();
     }
 
-    private void assertApplicantSolicitorAndRoboticsNotifications(VariableMap variables) {
+    private void assertApplicantSolicitorNotificationAndEnd(VariableMap variables) {
         ExternalTask applicantNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(
             applicantNotification,
@@ -185,19 +183,10 @@ class EnterBreathingSpaceSpecTest extends BpmnBaseTest {
             variables
         );
 
-        assertRoboticsAndEnd(variables);
+        assertEnd();
     }
 
-    private void assertRoboticsAndEnd(VariableMap variables) {
-        ExternalTask roboticsNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            roboticsNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_RPA_ON_CONTINUOUS_FEED,
-            NOTIFY_RPA_ON_CONTINUOUS_FEED_ACTIVITY_ID,
-            variables
-        );
-
+    private void assertEnd() {
         ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);
         completeBusinessProcess(endBusinessProcess);
 
