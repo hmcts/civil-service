@@ -12,8 +12,8 @@ write_empty_smoke_results_xml() {
 
   mkdir -p "$(dirname "$smoke_results_xml")"
   cat > "$smoke_results_xml" <<'XML'
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites tests="0" failures="0" skipped="0" errors="0" time="0"></testsuites>
+  <?xml version="1.0" encoding="UTF-8"?>
+  <testsuites tests="0" failures="0" skipped="0" errors="0" time="0"></testsuites>
 XML
 }
 
@@ -53,7 +53,7 @@ write_tests_skipped_flag() {
 
   write_report_flags "$setup_tests_failed" "$smoke_tests_failed" true
 
-  echo "Skipping smoke and functionaltests. PLAYWRIGHT_TESTS_SKIPPED=true"
+  echo "Skipping smoke and functional tests. PLAYWRIGHT_TESTS_SKIPPED=true"
 }
 
 run_playwright_teardown() {
