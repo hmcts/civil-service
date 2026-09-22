@@ -65,7 +65,7 @@ public class StartBusinessProcessTaskHandler extends BaseExternalTaskHandler {
     private void addClaimSettledLetterVariable(CaseData caseData, VariableMap variables) {
         BusinessProcess businessProcess = caseData.getBusinessProcess();
         if (businessProcess != null
-            && CaseEvent.CLAIM_SETTLED_LETTER_NOTIFICATION.name().equals(businessProcess.getCamundaEvent())) {
+            && CaseEvent.CLAIM_SETTLED_LETTER_NOTIFICATION_UNSPEC.name().equals(businessProcess.getCamundaEvent())) {
             boolean letterRequired = ClaimSettledLipDefendant1LetterHandler.isClaimSettledLetterRequired(caseData);
             log.info("Claim settled letter required: {} for caseId {} (respondent1Represented: {}, preStayState: {})",
                      letterRequired, caseData.getCcdCaseReference(), caseData.getRespondent1Represented(),

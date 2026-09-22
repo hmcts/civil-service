@@ -22,7 +22,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1_UNSPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 
@@ -41,13 +41,13 @@ public class ClaimSettledLipDefendant1LetterHandlerTest extends BaseCallbackHand
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1);
+        assertThat(handler.handledEvents()).contains(SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1_UNSPEC);
     }
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-                SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1.name()).build())
+                SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1_UNSPEC.name()).build())
                                                  .build())).isEqualTo(TASK_ID);
     }
 
@@ -58,7 +58,7 @@ public class ClaimSettledLipDefendant1LetterHandlerTest extends BaseCallbackHand
             .respondent1Represented(YesOrNo.NO).build();
         caseData.setPreStayState(AWAITING_CASE_DETAILS_NOTIFICATION.name());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        params.getRequest().setEventId(SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1.name());
+        params.getRequest().setEventId(SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1_UNSPEC.name());
 
         // when
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -78,7 +78,7 @@ public class ClaimSettledLipDefendant1LetterHandlerTest extends BaseCallbackHand
             .respondent1Represented(YesOrNo.YES).build();
         caseData.setPreStayState(AWAITING_CASE_DETAILS_NOTIFICATION.name());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        params.getRequest().setEventId(SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1.name());
+        params.getRequest().setEventId(SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1_UNSPEC.name());
 
         // when
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -95,7 +95,7 @@ public class ClaimSettledLipDefendant1LetterHandlerTest extends BaseCallbackHand
             .respondent1Represented(YesOrNo.NO).build();
         caseData.setPreStayState(CASE_ISSUED.name());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        params.getRequest().setEventId(SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1.name());
+        params.getRequest().setEventId(SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1_UNSPEC.name());
 
         // when
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -111,7 +111,7 @@ public class ClaimSettledLipDefendant1LetterHandlerTest extends BaseCallbackHand
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1Represented(YesOrNo.NO).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        params.getRequest().setEventId(SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1.name());
+        params.getRequest().setEventId(SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1_UNSPEC.name());
 
         // when
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

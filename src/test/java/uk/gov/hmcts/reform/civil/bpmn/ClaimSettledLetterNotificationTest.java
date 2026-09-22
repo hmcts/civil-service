@@ -14,16 +14,16 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class ClaimSettledLetterNotificationTest extends BpmnBaseTest {
 
-    public static final String MESSAGE_NAME = "CLAIM_SETTLED_LETTER_NOTIFICATION";
-    public static final String PROCESS_ID = "CLAIM_SETTLED_LETTER_NOTIFICATION_ID";
+    public static final String MESSAGE_NAME = "CLAIM_SETTLED_LETTER_NOTIFICATION_UNSPEC";
+    public static final String PROCESS_ID = "CLAIM_SETTLED_LETTER_NOTIFICATION_UNSPEC_ID";
     public static final String SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1_ID = "SendLetterClaimSettledDefendantLiP";
-    public static final String SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1_EVENT = "SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1";
+    public static final String SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1_EVENT = "SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1_UNSPEC";
     public static final String NOTIFY_EVENT_ID = "SettleClaimPaidInFullNotificationNotifier";
     public static final String NOTIFY_EVENT_EVENT = "NOTIFY_EVENT";
     public static final String CLAIM_SETTLED_LETTER_REQUIRED = "isClaimSettledLetterRequired";
 
     public ClaimSettledLetterNotificationTest() {
-        super("claim_settled_letter_notification.bpmn", PROCESS_ID);
+        super("claim_settled_letter_notification_unspec.bpmn", PROCESS_ID);
     }
 
     @ParameterizedTest
