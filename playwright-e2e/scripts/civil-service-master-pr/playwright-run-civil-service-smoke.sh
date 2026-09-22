@@ -3,9 +3,18 @@ set -e
 
 source "$(dirname "${BASH_SOURCE[0]}")/../common.sh"
 
-echo "Loaded common.sh:"
-grep -n "write_empty_smoke_results_xml" "$(dirname "${BASH_SOURCE[0]}")/../common.sh" || true
-declare -F write_empty_smoke_results_xml || true
+common_script="$(dirname "${BASH_SOURCE[0]}")/../common.sh"
+echo "Loaded common.sh: ${common_script}"
+if grep -n "write_empty_smoke_results_xml" "${common_script}"; then
+  echo "write_empty_smoke_results_xml exists in common.sh"
+else
+  echo "write_empty_smoke_results_xml does not exist in common.sh"
+fi
+if declare -F write_empty_smoke_results_xml; then
+  echo "write_empty_smoke_results_xml function is loaded"
+else
+  echo "write_empty_smoke_results_xml function is not loaded"
+fi
 
 run_playwright_setup() {
   echo "Running playwright setup tests on ${ENVIRONMENT} env"
