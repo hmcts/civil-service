@@ -3,11 +3,8 @@ package uk.gov.hmcts.reform.draftstore.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
@@ -30,13 +27,12 @@ public class DraftStoreService {
     private static final String DRAFT_TYPE_NOT_NULL = "draftType must not be null";
 
     private final DraftStoreRepository draftStoreRepository;
-    private final TransactionTemplate requiresNewTransaction;
+    private final DraftStoreTransactionService draftStoreTransactionService;
 
     public DraftStoreService(DraftStoreRepository draftStoreRepository,
-                             PlatformTransactionManager transactionManager) {
+                             DraftStoreTransactionService draftStoreTransactionService) {
         this.draftStoreRepository = draftStoreRepository;
-        this.requiresNewTransaction = new TransactionTemplate(transactionManager);
-        this.requiresNewTransaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        this.draftStoreTransactionService = draftStoreTransactionService;
     }
 
     public DraftStoreEntity createDraft(String userId,
@@ -58,7 +54,7 @@ public class DraftStoreService {
             draftType.calculateExpiry(now)
         );
         try {
-            return persistDraft(draft);
+            return draftStoreTransactionService.saveInNewTransaction(draft);
         } catch (DataIntegrityViolationException ex) {
             return getActiveDraftsForUser(userId, draftType).stream()
                 .findFirst()
@@ -124,13 +120,6 @@ public class DraftStoreService {
         log.info("Deleting expired draft typeId={} draftId={}", draft.getDraftTypeId(), draft.getId());
         draftStoreRepository.delete(draft);
         draftStoreRepository.flush();
-    }
-
-    private DraftStoreEntity persistDraft(DraftStoreEntity draft) {
-        return requiresNewTransaction.execute(status -> {
-            log.info("Creating draft typeId={} draftId={}", draft.getDraftTypeId(), draft.getId());
-            return draftStoreRepository.saveAndFlush(draft);
-        });
     }
 
     private DraftStoreEntity applyDraftUpdate(DraftStoreEntity existingDraft,
