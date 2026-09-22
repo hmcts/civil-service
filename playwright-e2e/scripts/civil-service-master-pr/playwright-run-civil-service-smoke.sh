@@ -26,7 +26,19 @@ run_smoke_tests() {
 
 #MAIN SCRIPT
 
+# Check if SKIP_FUNCTIONAL_TESTS is set to true
+if should_skip_functional_tests; then
+  write_empty_smoke_results_xml
+  exit 0
+fi
+
 write_report_flags false false
+
+#Check if RUN_ALL_FUNCTIONAL_TESTS is set to true
+if should_run_all_functional_tests; then
+  run_playwright_setup
+  run_smoke_tests
+fi
 
 # Check if the playwrightTestFilesReport json or last run json is not found or is empty.
 if report_missing_or_empty "$PLAYWRIGHT_TEST_FILES_REPORT" || report_missing_or_empty "$PLAYWRIGHT_LAST_RUN_REPORT"; then
@@ -37,18 +49,8 @@ fi
 mv "$PLAYWRIGHT_TEST_FILES_REPORT" "$PREV_PLAYWRIGHT_TEST_FILES_REPORT"
 cp "$PLAYWRIGHT_LAST_RUN_REPORT" "$PREV_PLAYWRIGHT_LAST_RUN_REPORT"
 
-# Check if SKIP_FUNCTIONAL_TESTS is set to true
-if should_skip_functional_tests; then
-  write_empty_smoke_results_xml
-  exit 0
-
-#Check if RUN_ALL_FUNCTIONAL_TESTS is set to true
-elif should_run_all_functional_tests; then
-  run_playwright_setup
-  run_smoke_tests
-
 # Check if the previous last run json is not found or is empty.
-elif report_missing_or_empty "$PREV_PLAYWRIGHT_LAST_RUN_REPORT"; then
+if report_missing_or_empty "$PREV_PLAYWRIGHT_LAST_RUN_REPORT"; then
   run_playwright_setup
   run_smoke_tests
 
