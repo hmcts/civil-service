@@ -19,10 +19,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.cloud.openfeign.FeignAutoConfiguration;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertySource;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.HttpClientFeignConfiguration;
@@ -72,7 +74,17 @@ import static org.mockito.Mockito.when;
  * first request may already have started the process.</p>
  */
 @SpringBootTest(classes = FeignFailureHandlingTest.Config.class)
+@ActiveProfiles(FeignFailureHandlingTest.PROFILE)
 class FeignFailureHandlingTest {
+
+    /**
+     * {@code Application} declares {@code @ComponentScan("uk.gov.hmcts.reform")} without Spring
+     * Boot's test-type exclude filter, so every full-application context (integration and
+     * contract tests share this classpath) would scan the nested {@link Config} in and its
+     * {@code AuthTokenGenerator} bean would clash with the production one. Gating the config on a
+     * profile that only this test activates keeps it out of those contexts.
+     */
+    static final String PROFILE = "feign-failure-handling-test";
 
     private static final String TENANT_BODY_MARKER = "\"tenantId\":\"civil\"";
     private static final String NO_TENANT_BODY_MARKER = "\"withoutTenantId\":true";
@@ -152,6 +164,7 @@ class FeignFailureHandlingTest {
     }
 
     @Configuration
+    @Profile(PROFILE)
     @EnableFeignClients(clients = CamundaRuntimeApi.class)
     @ImportAutoConfiguration({FeignAutoConfiguration.class, HttpMessageConvertersAutoConfiguration.class, JacksonAutoConfiguration.class})
     @Import({HttpClientFeignConfiguration.class, CamundaRuntimeClient.class, EventEmitterService.class})
