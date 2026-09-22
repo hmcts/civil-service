@@ -64,8 +64,10 @@ public class DocumentController {
     public
         ResponseEntity<Resource> downloadDocumentById(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
-        @NotNull @PathVariable String documentId) {
-        DownloadedDocumentResponse documentResponse = claimFormService.downloadDocumentById(authorisation, documentId);
+        @NotNull @PathVariable String documentId,
+        @RequestParam(required = false) String caseId) {
+        DownloadedDocumentResponse documentResponse =
+            claimFormService.downloadDocumentById(authorisation, documentId, caseId);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.valueOf(documentResponse.mimeType()));
         headers.set("original-file-name", documentResponse.fileName());
