@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.when;
@@ -111,6 +112,42 @@ class RoboticsDataMapperForSpecTest {
             .anyMatch(p -> p.getName().equals(caseData.getApplicant1().getPartyName())));
         Assertions.assertTrue(mapped.getLitigiousParties().stream()
             .anyMatch(p -> p.getName().equals(caseData.getRespondent1().getPartyName())));
+    }
+
+    @Test
+    void shouldMapActiveBreathingSpaceWhenCaseGoesOffline() {
+        LocalDate startDate = LocalDate.of(2026, 9, 1);
+        LocalDate endDate = LocalDate.of(2026, 10, 1);
+        CaseData caseData = CaseDataBuilder.builder()
+            .legacyCaseReference("reference")
+            .totalInterest(BigDecimal.ZERO)
+            .totalClaimAmount(BigDecimal.valueOf(15000_00))
+            .applicant1(createPartyWithCompany("company 1"))
+            .respondent1(createPartyWithCompany("company 2"))
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicant1solicitor@gmail.com"))
+            .build();
+        caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+        caseData.setSubmittedDate(LocalDateTime.now().minusDays(14));
+        caseData.setBreathing(new BreathingSpaceInfo()
+                                  .setEnter(new BreathingSpaceEnterInfo()
+                                                .setReference("BS-12345")
+                                                .setStart(startDate)
+                                                .setType(BreathingSpaceType.MENTAL_HEALTH))
+                                  .setLift(new BreathingSpaceLiftInfo()
+                                               .setExpectedEnd(endDate)
+                                               .setReasonToLift("reason to lift")));
+
+        RoboticsCaseDataSpec mapped = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
+        assertThat(mapped.getBreathingSpace())
+            .extracting(
+                breathingSpace -> breathingSpace.getReference(),
+                breathingSpace -> breathingSpace.getStartDate(),
+                breathingSpace -> breathingSpace.getType(),
+                breathingSpace -> breathingSpace.getEndDate(),
+                breathingSpace -> breathingSpace.getReasonForLifting()
+            )
+            .containsExactly("BS-12345", startDate, BreathingSpaceType.MENTAL_HEALTH, endDate, "reason to lift");
     }
 
     @Test
