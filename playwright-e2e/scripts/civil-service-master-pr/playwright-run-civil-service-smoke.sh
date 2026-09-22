@@ -3,6 +3,10 @@ set -e
 
 source "$(dirname "${BASH_SOURCE[0]}")/../common.sh"
 
+echo "Loaded common.sh:"
+grep -n "write_empty_smoke_results_xml" "$(dirname "${BASH_SOURCE[0]}")/../common.sh" || true
+declare -F write_empty_smoke_results_xml || true
+
 run_playwright_setup() {
   echo "Running playwright setup tests on ${ENVIRONMENT} env"
   yarn test:playwright:setup:install
