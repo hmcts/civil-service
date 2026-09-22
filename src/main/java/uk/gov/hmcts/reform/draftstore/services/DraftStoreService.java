@@ -51,7 +51,7 @@ public class DraftStoreService {
             copyPayload(payload),
             now,
             now,
-            draftType.calculateExpiry(now)
+            now.plusDays((Long) payload.get("draftClaimCacheTtlDays"))
         );
         try {
             return draftStoreTransactionService.saveInNewTransaction(draft);
