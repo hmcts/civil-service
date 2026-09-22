@@ -22,6 +22,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.advice.ControllerExceptionHandler;
 import uk.gov.hmcts.reform.civil.advice.ResourceExceptionHandler;
 import uk.gov.hmcts.reform.civil.advice.UncaughtExceptionHandler;
@@ -43,6 +44,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.filters.RequestFilter;
 import uk.gov.hmcts.reform.civil.ga.service.GaFeesPaymentService;
+import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -111,6 +113,7 @@ abstract class CivilCitizenUiProviderSupport {
     private static final String CASE_REFERENCE = "1234567890123456";
     private static final String PAYMENT_REFERENCE = "RC-1701-0909-0602-0418";
     private static final String CUI_CASE_REFERENCE = "1111222233334444";
+    private static final String CUI_GA_CASE_REFERENCE = "2222333344445555";
 
     MockMvc mockMvc;
 
@@ -118,6 +121,8 @@ abstract class CivilCitizenUiProviderSupport {
     private FeesPaymentService feesPaymentService;
     @Mock
     private GaFeesPaymentService gaFeesPaymentService;
+    @Mock
+    private GaCoreCaseDataService gaCoreCaseDataService;
     @Mock
     private uk.gov.hmcts.reform.civil.ga.service.events.GaCaseEventService gaCaseEventService;
     @Mock
@@ -172,7 +177,7 @@ abstract class CivilCitizenUiProviderSupport {
             feesService, generalAppFeesService, interestCalculator);
         CasesController casesController = new CasesController(
             mock(uk.gov.hmcts.reform.civil.service.RoleAssignmentsService.class), coreCaseDataService,
-            mock(uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService.class),
+            gaCoreCaseDataService,
             dashboardClaimInfoService, caseEventService,
             gaCaseEventService,
             mock(uk.gov.hmcts.reform.civil.service.search.CaseSdtRequestSearchService.class),
@@ -784,6 +789,177 @@ abstract class CivilCitizenUiProviderSupport {
         when(caseEventService.submitEvent(eventParams(CUI_CASE_REFERENCE, Map.of())))
             .thenThrow(new FeignException.UnprocessableEntity("Submission rejected", mock(feign.Request.class),
                                                             buildObjectMapper().writeValueAsBytes(upstreamBody), Map.of()));
+    }
+
+    @State("A General Application case exists")
+    void generalApplicationCaseExists() {
+        Map<String, Object> caseData = Map.of(
+            "applicationTypes", "ADJOURN_HEARING",
+            "generalAppType", Map.of("types", List.of("ADJOURN_HEARING")),
+            "applicationFeeAmountInPence", "27500",
+            "generalAppRespondentDebtorOffer", Map.of("respondentDebtorOffer", "DECLINE", "monthlyInstalment", "12500"),
+            "caseLink", Map.of("CaseReference", CUI_CASE_REFERENCE),
+            "gaAddlDoc", List.of(Map.of("id", "document-1", "value", Map.of(
+                "document_url", "http://dm-store/documents/ga-doc-1",
+                "document_binary_url", "http://dm-store/documents/ga-doc-1/binary",
+                "document_filename", "hearing-evidence.pdf")))
+        );
+        when(coreCaseDataService.getCase(Long.valueOf(CUI_GA_CASE_REFERENCE), AUTH_HEADER))
+            .thenReturn(gaCase(CUI_GA_CASE_REFERENCE, "AWAITING_RESPONDENT_RESPONSE", "2025-04-28T09:00:00",
+                "2025-05-01T10:00:00", caseData));
+    }
+
+    @State("General Applications for parent case are populated")
+    void generalApplicationsForParentArePopulated() {
+        SearchResult result = SearchResult.builder().total(2).cases(List.of(
+            gaCase("3333444455556666", "APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION", "2025-04-30T09:00:00",
+                "2025-05-02T10:00:00", Map.of("generalAppType", Map.of("types", List.of("SETTLE_BY_CONSENT")),
+                    "applicationFeeAmountInPence", "10000", "caseLink", Map.of("CaseReference", CUI_CASE_REFERENCE))),
+            gaCase(CUI_GA_CASE_REFERENCE, "AWAITING_RESPONDENT_RESPONSE", "2025-04-28T09:00:00",
+                "2025-05-01T10:00:00", Map.of("generalAppType", Map.of("types", List.of("ADJOURN_HEARING")),
+                    "applicationFeeAmountInPence", "27500", "caseLink", Map.of("CaseReference", CUI_CASE_REFERENCE)))
+        )).build();
+        when(gaCoreCaseDataService.searchGeneralApplicationWithCaseId(CUI_CASE_REFERENCE, AUTH_HEADER)).thenReturn(result);
+    }
+
+    @State("General Applications for parent case are empty")
+    void generalApplicationsForParentAreEmpty() {
+        when(gaCoreCaseDataService.searchGeneralApplicationWithCaseId(CUI_CASE_REFERENCE, AUTH_HEADER))
+            .thenReturn(SearchResult.builder().total(0).cases(List.of()).build());
+    }
+
+    private CaseDetails gaCase(String id, String state, String createdDate, String lastModified,
+                               Map<String, Object> caseData) {
+        return CaseDetails.builder().id(Long.valueOf(id)).state(state)
+            .createdDate(LocalDateTime.parse(createdDate)).lastModified(LocalDateTime.parse(lastModified))
+            .data(caseData).build();
+    }
+
+    @State("An ordinary GA can be initiated")
+    void ordinaryGaCanBeInitiated() {
+        Map<String, Object> updates = ordinaryGaUpdates();
+        verifiedCitizenGaEvent(CaseEvent.INITIATE_GENERAL_APPLICATION, updates, Map.of(
+            "generalApplications", List.of(Map.of("id", CUI_GA_CASE_REFERENCE, "value", Map.of(
+                "caseLink", Map.of("CaseReference", CUI_CASE_REFERENCE),
+                "generalAppSubmittedDateGAspec", "2025-05-01", "parentClaimantIsApplicant", "Yes")))));
+    }
+
+    @State("A COSC GA can be initiated")
+    void coscGaCanBeInitiated() {
+        Map<String, Object> updates = Map.of(
+            "generalAppType", Map.of("types", List.of("CONFIRM_CCJ_DEBT_PAID")),
+            "generalAppRespondentAgreement", Map.of("hasAgreed", "No"),
+            "certOfSC", Map.of("defendantFinalPaymentDate", "2025-04-15",
+                "debtPaymentEvidence", Map.of("debtPaymentOption", "MADE_FULL_PAYMENT_TO_COURT")),
+            "generalAppStatementOfTruth", Map.of("name", "Alex Applicant", "role", "Claimant"),
+            "generalAppInformOtherParty", Map.of("isWithNotice", "No", "reasonsForWithoutNotice", "DummyVal"),
+            "generalAppEvidenceDocument", List.of(Map.of("value", Map.of(
+                "document_url", "http://dm-store/documents/ga-doc-1",
+                "document_binary_url", "http://dm-store/documents/ga-doc-1/binary",
+                "document_filename", "hearing-evidence.pdf", "category_id", "evidence")))
+        );
+        verifiedCitizenGaEvent(CaseEvent.INITIATE_GENERAL_APPLICATION_COSC, updates, Map.of(
+            "generalApplications", List.of(Map.of("id", CUI_GA_CASE_REFERENCE, "value", Map.of(
+                "caseLink", Map.of("CaseReference", CUI_CASE_REFERENCE),
+                "generalAppSubmittedDateGAspec", "2025-05-01", "parentClaimantIsApplicant", "Yes")))));
+    }
+
+    private Map<String, Object> ordinaryGaUpdates() {
+        return Map.ofEntries(
+            Map.entry("generalAppType", Map.of("types", List.of("ADJOURN_HEARING"))),
+            Map.entry("generalAppRespondentAgreement", Map.of("hasAgreed", "Yes")),
+            Map.entry("generalAppInformOtherParty", Map.of("isWithNotice", "No", "reasonsForWithoutNotice", "Urgent hearing date")),
+            Map.entry("generalAppAskForCosts", "Yes"),
+            Map.entry("generalAppDetailsOfOrder", "Move the hearing to a later date"),
+            Map.entry("generalAppDetailsOfOrderColl", List.of(Map.of("value", "Move the hearing to a later date"))),
+            Map.entry("generalAppReasonsOfOrder", "The parties need additional preparation time"),
+            Map.entry("generalAppReasonsOfOrderColl", List.of(Map.of("value", "The parties need additional preparation time"))),
+            Map.entry("generalAppEvidenceDocument", List.of(Map.of("value", Map.of(
+                "document_url", "http://dm-store/documents/ga-doc-1",
+                "document_binary_url", "http://dm-store/documents/ga-doc-1/binary",
+                "document_filename", "hearing-evidence.pdf", "category_id", "evidence")))),
+            Map.entry("generalAppHearingDetails", Map.of(
+                "HearingPreferencesPreferredType", "TELEPHONE", "ReasonForPreferredHearingType", "The witness cannot travel",
+                "HearingPreferredLocation", Map.of("value", Map.of("label", "Leeds")),
+                "HearingDetailsTelephoneNumber", "07123456789", "HearingDetailsEmailID", "applicant@example.com",
+                "unavailableTrialRequiredYesOrNo", "No", "SupportRequirement", List.of())),
+            Map.entry("generalAppStatementOfTruth", Map.of("name", "Alex Applicant", "role", "Claimant"))
+        );
+    }
+
+    private void verifiedCitizenGaEvent(CaseEvent event, Map<String, Object> updates, Map<String, Object> responseData) {
+        EventSubmissionParams params = eventParams(CUI_CASE_REFERENCE, updates).setEvent(event);
+        when(caseEventService.submitEvent(params)).thenReturn(CaseDetails.builder()
+            .id(Long.valueOf(CUI_CASE_REFERENCE)).state("CASE_PROGRESSION")
+            .lastModified(LocalDateTime.parse("2025-05-01T10:00:00")).data(responseData).build());
+        stateVerification = () -> verify(caseEventService).submitEvent(params);
+    }
+
+    @State("An ordinary GA response can be submitted")
+    void ordinaryGaResponse() {
+        gaApplicationEvent(CaseEvent.RESPOND_TO_APPLICATION, gaResponseUpdates());
+    }
+
+    @State("An urgent GA response can be submitted")
+    void urgentGaResponse() {
+        gaApplicationEvent(CaseEvent.RESPOND_TO_APPLICATION_URGENT_LIP, gaResponseUpdates());
+    }
+
+    private Map<String, Object> gaResponseUpdates() {
+        return Map.of(
+            "hearingDetailsResp", Map.of(
+                "HearingPreferencesPreferredType", "TELEPHONE", "ReasonForPreferredHearingType", "A remote hearing is needed",
+                "HearingPreferredLocation", Map.of("value", Map.of("label", "Leeds")),
+                "HearingDetailsTelephoneNumber", "07123456789", "HearingDetailsEmailID", "respondent@example.com",
+                "unavailableTrialRequiredYesOrNo", "No", "SupportRequirement", List.of()),
+            "gaRespondentDebtorOffer", Map.of("respondentDebtorOffer", "DECLINE", "debtorObjections", "The offer should be paid monthly",
+                "paymentPlan", "INSTALMENT", "monthlyInstalment", "12500"),
+            "gaRespondentConsent", "No", "generalAppRespondent1Representative", Map.of("hasAgreed", "No"),
+            "generalAppRespondReason", "The proposed order is not agreed",
+            "generalAppRespondDocument", List.of(Map.of("value", Map.of(
+                "document_url", "http://dm-store/documents/ga-doc-1", "document_binary_url", "http://dm-store/documents/ga-doc-1/binary",
+                "document_filename", "hearing-evidence.pdf", "category_id", "evidence"))),
+            "generalAppResponseStatementOfTruth", Map.of("name", "Riley Respondent", "role", "Defendant")
+        );
+    }
+
+    @State("additional documents can be submitted to a General Application")
+    void gaAdditionalDocuments() {
+        gaApplicationEvent(CaseEvent.UPLOAD_ADDL_DOCUMENTS, Map.of("uploadDocument", List.of(Map.of(
+            "id", "10000000-0000-4000-8000-000000000001", "value", Map.of("typeOfDocument", "Hearing evidence",
+                "documentUpload", Map.of("document_url", "http://dm-store/documents/ga-doc-1",
+                    "document_binary_url", "http://dm-store/documents/ga-doc-1/binary", "document_filename", "hearing-evidence.pdf"))))));
+    }
+
+    @State("judge directions documents can be submitted to a General Application")
+    void gaJudgeDirections() {
+        gaApplicationEvent(CaseEvent.RESPOND_TO_JUDGE_DIRECTIONS, Map.of("generalAppDirOrderUpload", gaDocumentCollection()));
+    }
+
+    @State("judge additional information documents can be submitted to a General Application")
+    void gaJudgeAdditionalInformation() {
+        gaApplicationEvent(CaseEvent.RESPOND_TO_JUDGE_ADDITIONAL_INFO, Map.of(
+            "generalAppAddlnInfoUpload", gaDocumentCollection(), "generalAppAddlnInfoText", "Please review this document"));
+    }
+
+    @State("judge written representation documents can be submitted to a General Application")
+    void gaJudgeWrittenRepresentation() {
+        gaApplicationEvent(CaseEvent.RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION, Map.of("generalAppWrittenRepUpload", gaDocumentCollection()));
+    }
+
+    private List<Map<String, Object>> gaDocumentCollection() {
+        return List.of(Map.of("value", Map.of("document_url", "http://dm-store/documents/ga-doc-1",
+            "document_binary_url", "http://dm-store/documents/ga-doc-1/binary",
+            "document_filename", "hearing-evidence.pdf", "category_id", "evidence")));
+    }
+
+    private void gaApplicationEvent(CaseEvent event, Map<String, Object> updates) {
+        EventSubmissionParams params = new EventSubmissionParams().setAuthorisation(AUTH_HEADER)
+            .setCaseId(CUI_GA_CASE_REFERENCE).setUserId("cui-user-id").setEvent(event).setUpdates(updates);
+        when(gaCaseEventService.submitEvent(params)).thenReturn(CaseDetails.builder()
+            .id(Long.valueOf(CUI_GA_CASE_REFERENCE)).state("AWAITING_RESPONDENT_RESPONSE")
+            .lastModified(LocalDateTime.parse("2025-05-01T10:00:00")).data(updates).build());
+        stateVerification = () -> verify(gaCaseEventService).submitEvent(params);
     }
 
     private EventSubmissionParams eventParams(String caseId, Map<String, Object> updates) {
