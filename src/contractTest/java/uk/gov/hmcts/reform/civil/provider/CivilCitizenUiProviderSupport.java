@@ -117,6 +117,7 @@ import static org.mockito.Mockito.when;
 abstract class CivilCitizenUiProviderSupport {
 
     private static final String AUTH_HEADER = "Bearer some-access-token";
+    private static final String COURT_LOCATIONS_AUTH_HEADER = "Bearer reference-data-access-token";
     private static final String CASE_REFERENCE = "1234567890123456";
     private static final String PAYMENT_REFERENCE = "RC-1701-0909-0602-0418";
     private static final String CUI_CASE_REFERENCE = "1111222233334444";
@@ -268,19 +269,19 @@ abstract class CivilCitizenUiProviderSupport {
 
     @State("Court locations are available")
     void courtLocationsAvailable() {
-        when(locationReferenceDataService.getCourtLocationsForDefaultJudgments(AUTH_HEADER, "AAA6"))
+        when(locationReferenceDataService.getCourtLocationsForDefaultJudgments(COURT_LOCATIONS_AUTH_HEADER, "AAA6"))
             .thenReturn(List.of(new LocationRefData().setSiteName("Example Court")
                 .setCourtAddress("1 Example Street").setPostcode("EX1 2PL")));
         stateVerification = () -> verify(locationReferenceDataService)
-            .getCourtLocationsForDefaultJudgments(AUTH_HEADER, "AAA6");
+            .getCourtLocationsForDefaultJudgments(COURT_LOCATIONS_AUTH_HEADER, "AAA6");
     }
 
     @State("No court locations are available")
     void noCourtLocationsAvailable() {
-        when(locationReferenceDataService.getCourtLocationsForDefaultJudgments(AUTH_HEADER, "AAA6"))
+        when(locationReferenceDataService.getCourtLocationsForDefaultJudgments(COURT_LOCATIONS_AUTH_HEADER, "AAA6"))
             .thenReturn(List.of());
         stateVerification = () -> verify(locationReferenceDataService)
-            .getCourtLocationsForDefaultJudgments(AUTH_HEADER, "AAA6");
+            .getCourtLocationsForDefaultJudgments(COURT_LOCATIONS_AUTH_HEADER, "AAA6");
     }
 
     @State("Airlines are available")
