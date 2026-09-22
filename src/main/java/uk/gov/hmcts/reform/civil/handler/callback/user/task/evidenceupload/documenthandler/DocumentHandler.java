@@ -180,13 +180,12 @@ public abstract class DocumentHandler<T> {
     protected boolean shouldPopulatePostBundleUploadList() {
         return true;
     }
+
     private String issuedDateSegment(LocalDate issuedDate) {
         return issuedDate == null
             ? ""
             : SPACE + issuedDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK));
     }
-
-    public void addUploadDocList(CaseData caseData) {
 
     public void addUploadDocList(CaseData caseData) {
         if (!shouldPopulatePostBundleUploadList()) {
