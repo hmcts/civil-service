@@ -18,15 +18,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.cloud.openfeign.FeignAutoConfiguration;
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.HttpClientFeignConfiguration;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
@@ -43,6 +40,7 @@ import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.function.Supplier;
@@ -62,7 +60,10 @@ import static org.mockito.Mockito.when;
  * Drives the failure paths that the happy-path regression never reaches, through the real
  * Feign stack (Spring Cloud OpenFeign, the production {@link HttpClientFeignConfiguration}
  * with its Apache client, read timeout and default {@code ErrorDecoder} bean) against a
- * local HTTP server that returns whatever status or delay each test asks for.
+ * local HTTP server that returns whatever status or delay each test asks for. Only the
+ * production {@link CamundaRuntimeApi} client is registered: a test-only {@code @FeignClient}
+ * would be picked up by the application's {@code @EnableFeignClients} scan in the integration
+ * and contract test contexts, where its URL property does not exist.
  *
  * <p>Two things are under test. First, that an external task classifies upstream failures
  * the way production traffic needs: 500 and idempotent 5xx retry with backoff, 4xx and
@@ -118,7 +119,6 @@ class FeignFailureHandlingTest {
     static void properties(DynamicPropertyRegistry registry) {
         Supplier<Object> url = () -> "http://127.0.0.1:" + server.getAddress().getPort();
         registry.add("feign.client.config.processInstance.url", url);
-        registry.add("fault.api.url", url);
         registry.add("http.client.readTimeout", () -> READ_TIMEOUT_MS);
         registry.add("http.client.connectTimeout", () -> 1000);
         registry.add("http.client.requestTimeout", () -> 1000);
@@ -133,15 +133,6 @@ class FeignFailureHandlingTest {
         responseStatus = 200;
         responseDelayMs = 0;
         requestLog.clear();
-    }
-
-    @FeignClient(name = "fault-api", url = "${fault.api.url}")
-    interface FaultApi {
-        @GetMapping("/upstream/read")
-        String read();
-
-        @PostMapping("/upstream/write")
-        String write();
     }
 
     /** Minimal external task handler whose business logic is one upstream Feign call. */
@@ -161,7 +152,7 @@ class FeignFailureHandlingTest {
     }
 
     @Configuration
-    @EnableFeignClients(clients = {CamundaRuntimeApi.class, FaultApi.class})
+    @EnableFeignClients(clients = CamundaRuntimeApi.class)
     @ImportAutoConfiguration({FeignAutoConfiguration.class, HttpMessageConvertersAutoConfiguration.class, JacksonAutoConfiguration.class})
     @Import({HttpClientFeignConfiguration.class, CamundaRuntimeClient.class, EventEmitterService.class})
     static class Config {
@@ -183,7 +174,7 @@ class FeignFailureHandlingTest {
     private TelemetryClient telemetryClient;
 
     @Autowired
-    private FaultApi faultApi;
+    private CamundaRuntimeClient camundaClient;
 
     @Autowired
     private EventEmitterService eventEmitterService;
@@ -226,7 +217,7 @@ class FeignFailureHandlingTest {
         void upstream500OnRead_isRetriedWithBackoff() {
             responseStatus = 500;
 
-            handler(faultApi::read).execute(externalTask, externalTaskService);
+            handler(() -> camundaClient.getProcessVariables("proc-1")).execute(externalTask, externalTaskService);
 
             verify(externalTaskService).handleFailure(eq(externalTask), anyString(), anyString(), eq(MAX_RETRIES - 1), longThat(backoff -> backoff > 0));
             verify(completionService, never()).completeTask(any(), any(), any(), any());
@@ -236,7 +227,7 @@ class FeignFailureHandlingTest {
         void upstream500OnWrite_isStillRetried_matchingPreHolundaBehaviour() {
             responseStatus = 500;
 
-            handler(faultApi::write).execute(externalTask, externalTaskService);
+            handler(() -> camundaClient.setProcessVariables("proc-1", Map.of("flag", true))).execute(externalTask, externalTaskService);
 
             verify(externalTaskService).handleFailure(eq(externalTask), anyString(), anyString(), eq(MAX_RETRIES - 1), longThat(backoff -> backoff > 0));
         }
@@ -245,7 +236,7 @@ class FeignFailureHandlingTest {
         void upstream404_failsImmediatelyWithNoRetries() {
             responseStatus = 404;
 
-            handler(faultApi::read).execute(externalTask, externalTaskService);
+            handler(() -> camundaClient.getProcessVariables("proc-1")).execute(externalTask, externalTaskService);
 
             verify(externalTaskService).handleFailure(eq(externalTask), anyString(), anyString(), eq(0), eq(1000L));
         }
@@ -254,7 +245,7 @@ class FeignFailureHandlingTest {
         void upstream502OnIdempotentRead_isRetried() {
             responseStatus = 502;
 
-            handler(faultApi::read).execute(externalTask, externalTaskService);
+            handler(() -> camundaClient.getProcessVariables("proc-1")).execute(externalTask, externalTaskService);
 
             verify(externalTaskService).handleFailure(eq(externalTask), anyString(), anyString(), eq(MAX_RETRIES - 1), longThat(backoff -> backoff > 0));
         }
@@ -263,7 +254,7 @@ class FeignFailureHandlingTest {
         void upstream502OnNonIdempotentWrite_failsImmediately() {
             responseStatus = 502;
 
-            handler(faultApi::write).execute(externalTask, externalTaskService);
+            handler(() -> camundaClient.setProcessVariables("proc-1", Map.of("flag", true))).execute(externalTask, externalTaskService);
 
             verify(externalTaskService).handleFailure(eq(externalTask), anyString(), anyString(), eq(0), eq(1000L));
         }
@@ -273,7 +264,7 @@ class FeignFailureHandlingTest {
             responseDelayMs = READ_TIMEOUT_MS * 3L;
 
             long started = System.nanoTime();
-            handler(faultApi::read).execute(externalTask, externalTaskService);
+            handler(() -> camundaClient.getProcessVariables("proc-1")).execute(externalTask, externalTaskService);
             assertThat((System.nanoTime() - started) / 1_000_000).isLessThan(responseDelayMs);
 
             verify(externalTaskService).handleFailure(eq(externalTask), anyString(), anyString(), eq(MAX_RETRIES - 1), longThat(backoff -> backoff > 0));
@@ -284,7 +275,7 @@ class FeignFailureHandlingTest {
             responseStatus = 500;
             when(externalTask.getRetries()).thenReturn(1);
 
-            handler(faultApi::read).execute(externalTask, externalTaskService);
+            handler(() -> camundaClient.getProcessVariables("proc-1")).execute(externalTask, externalTaskService);
 
             verify(externalTaskService).handleFailure(eq(externalTask), anyString(), anyString(), eq(0), longThat(backoff -> backoff > 0));
         }
