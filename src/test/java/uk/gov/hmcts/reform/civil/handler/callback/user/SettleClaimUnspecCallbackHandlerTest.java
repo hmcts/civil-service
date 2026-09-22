@@ -81,6 +81,7 @@ class SettleClaimUnspecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getState()).isEqualTo(CASE_STAYED.name());
             assertThat(updatedData.getBusinessProcess().getCamundaEvent())
                 .isEqualTo(CLAIM_SETTLED_LETTER_NOTIFICATION.name());
+
             assertThat(updatedData.getPreStayState()).isEqualTo(caseData.getCcdState().toString());
         }
     }
