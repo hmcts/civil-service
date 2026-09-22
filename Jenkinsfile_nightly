@@ -301,7 +301,7 @@ withNightlyPipeline(type, product, component) {
         stage('Playwright test setup') {
           try {
             if(playwrightRunSetup) {
-              sh './playwright-e2e/scripts/civil-service-nightly/playwright-run-civil-service-nightly-setup.sh'
+              sh 'bash ./playwright-e2e/scripts/civil-nightly/civil-service/playwright-run-civil-service-nightly-setup.sh'
             }
           } catch (Exception error) {
             if(error instanceof org.jenkinsci.plugins.workflow.steps.FlowInterruptedException) {
@@ -319,7 +319,7 @@ withNightlyPipeline(type, product, component) {
             throw new org.jenkinsci.plugins.workflow.steps.FlowInterruptedException()
           }
           if(playwrightSetupPassed) {
-            sh './playwright-e2e/scripts/civil-service-nightly/playwright-run-civil-service-nightly-tests.sh'
+            sh 'bash ./playwright-e2e/scripts/civil-nightly/civil-service/playwright-run-civil-service-nightly-tests.sh'
           } else {
             throw new Error('Playwright test setup failed')
           }
@@ -346,7 +346,7 @@ withNightlyPipeline(type, product, component) {
       if(playwrightRunSetup) {
         stage('Playwright test teardown') {
           try {
-            sh './playwright-e2e/scripts/civil-service-nightly/playwright-run-civil-service-nightly-teardown.sh'
+            sh 'bash ./playwright-e2e/scripts/civil-nightly/civil-service/playwright-run-civil-service-nightly-teardown.sh'
           } catch (Exception error) {
             unstable(message: "${STAGE_NAME} is unstable: " + error.toString())
           } finally {

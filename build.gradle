@@ -368,7 +368,7 @@ def runSmokeTests = tasks.register('runSmokeTests', Exec) {
   description = 'Runs smoke tests.'
   dependsOn installSmokeTestDependencies
   mustRunAfter awaitApplicationReadiness
-  commandLine './playwright-e2e/scripts/civil-service-master-pr/playwright-run-civil-service-smoke.sh'
+  commandLine 'bash', "${projectDir}/playwright-e2e/scripts/civil-master-pr/civil-service/playwright-run-civil-service-smoke.sh"
 }
 
 tasks.register('smoke') {
@@ -382,7 +382,7 @@ def runApiTests = tasks.register('runApiTests', Exec) {
   onlyIf {
     !isNightlyRun()
   }
-  commandLine './playwright-e2e/scripts/civil-service-master-pr/playwright-run-civil-service-master-pr-tests.sh'
+  commandLine 'bash', "${projectDir}/playwright-e2e/scripts/civil-master-pr/civil-service/playwright-run-civil-service-master-pr-tests.sh"
 }
 
 def runNightlyApiTests = tasks.register('runNightlyApiTests', Exec) {
@@ -390,7 +390,7 @@ def runNightlyApiTests = tasks.register('runNightlyApiTests', Exec) {
   onlyIf {
     isNightlyRun()
   }
-  commandLine './bin/run-nightly-api-tests.sh'
+  commandLine 'bash', "${projectDir}/e2e/run-nightly-api-tests.sh"
 }
 
 runNightlyApiTests.configure {
