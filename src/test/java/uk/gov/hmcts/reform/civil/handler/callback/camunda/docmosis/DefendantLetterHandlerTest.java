@@ -37,7 +37,7 @@ public class DefendantLetterHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private ClaimSettledDefendantLiPLetterGenerator lipLetterGenerator;
 
-    public static final String TASK_ID = "SendClaimSettledLetterLipDef";
+    public static final String TASK_ID = "SendLetterClaimSettledDefendantLiP";
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {

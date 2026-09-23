@@ -28,7 +28,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 
 @Service
 @RequiredArgsConstructor
-public class SettleClaimUnspecCallbackHandler extends CallbackHandler {
+public class SettleUnspecClaimCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(SETTLE_CLAIM_UNSPEC);
     private static final List<String> CASEWORKER_ROLES = List.of("caseworker-civil-admin", "caseworker-civil-staff");

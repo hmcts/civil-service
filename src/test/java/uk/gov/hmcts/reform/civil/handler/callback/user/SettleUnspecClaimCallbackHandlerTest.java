@@ -31,9 +31,9 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 
 @ExtendWith(MockitoExtension.class)
-class SettleClaimUnspecCallbackHandlerTest extends BaseCallbackHandlerTest {
+class SettleUnspecClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    private SettleClaimUnspecCallbackHandler handler;
+    private SettleUnspecClaimCallbackHandler handler;
 
     private ObjectMapper objectMapper;
 
@@ -43,7 +43,7 @@ class SettleClaimUnspecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @BeforeEach
     void setup() {
         objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-        handler = new SettleClaimUnspecCallbackHandler(objectMapper, userService);
+        handler = new SettleUnspecClaimCallbackHandler(objectMapper, userService);
     }
 
     @Test
