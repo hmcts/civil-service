@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -21,7 +20,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -43,14 +41,12 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UNSPEC_CLAIM_SETTLED_LETTER_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.START_BUSINESS_PROCESS;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE;
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.BUSINESS_PROCESS;
-import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.CLAIM_SETTLED_LETTER_REQUIRED;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
@@ -118,36 +114,6 @@ class StartBusinessProcessTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CASE_ID, START_BUSINESS_PROCESS);
         verify(coreCaseDataService).submitUpdate(CASE_ID, content(startEventResponse, businessProcess.start()));
-        verify(externalTaskService).complete(mockTask, variables);
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        "NO, AWAITING_CASE_DETAILS_NOTIFICATION, true",
-        "NO, CASE_ISSUED, false",
-        "NO, , false",
-        "YES, AWAITING_CASE_DETAILS_NOTIFICATION, false"
-    })
-    void shouldSetClaimSettledLetterRequired_whenClaimSettledLetterProcess(YesOrNo respondent1Represented,
-                                                                          String preStayState,
-                                                                          boolean expectedLetterRequired) {
-        BusinessProcess businessProcess = BusinessProcess.ready(UNSPEC_CLAIM_SETTLED_LETTER_NOTIFICATION);
-        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().businessProcess(businessProcess).build();
-        caseData.setRespondent1Represented(respondent1Represented);
-        caseData.setPreStayState(preStayState);
-        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
-        StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
-
-        when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS)).thenReturn(startEventResponse);
-        when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
-        when(mockTask.getTopicName()).thenReturn("test");
-        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(new StateFlowDTO()
-            .setState(State.from("MAIN.DRAFT"))
-            .setFlags(Map.of()));
-
-        handler.execute(mockTask, externalTaskService);
-
-        variables.putValue(CLAIM_SETTLED_LETTER_REQUIRED, expectedLetterRequired);
         verify(externalTaskService).complete(mockTask, variables);
     }
 

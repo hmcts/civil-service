@@ -22,7 +22,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NO
 
 @RequiredArgsConstructor
 @Service
-public class ClaimSettledLipDefendant1LetterHandler extends CallbackHandler {
+public class DefendantLetterHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(SEND_UNSPEC_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1);
     public static final String TASK_ID = "SendClaimSettledLetterLipDef";
