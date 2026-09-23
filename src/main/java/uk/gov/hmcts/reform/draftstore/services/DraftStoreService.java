@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.draftstore.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
@@ -114,12 +113,8 @@ public class DraftStoreService {
         ) > 0;
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void deleteDraftAndFlush(DraftStoreEntity draft) {
-        Objects.requireNonNull(draft, "draft must not be null");
-        log.info("Deleting expired draft typeId={} draftId={}", draft.getDraftTypeId(), draft.getId());
-        draftStoreRepository.delete(draft);
-        draftStoreRepository.flush();
+        draftStoreTransactionService.deleteInNewTransaction(draft);
     }
 
     private DraftStoreEntity applyDraftUpdate(DraftStoreEntity existingDraft,

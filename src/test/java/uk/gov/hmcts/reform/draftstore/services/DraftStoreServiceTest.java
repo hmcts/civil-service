@@ -313,8 +313,7 @@ class DraftStoreServiceTest {
 
             draftStoreService.deleteDraftAndFlush(draft);
 
-            verify(draftStoreRepository).delete(draft);
-            verify(draftStoreRepository).flush();
+            verify(draftStoreTransactionService).deleteInNewTransaction(draft);
         }
     }
 
