@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
+import java.util.UUID;
 
 import java.util.Objects;
 
@@ -43,5 +44,21 @@ public class DraftStoreTransactionService {
         log.info("Deleting expired draft typeId={} draftId={}", draft.getDraftTypeId(), draft.getId());
         draftStoreRepository.delete(draft);
         draftStoreRepository.flush();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public long deleteByIdInNewTransaction(UUID draftId, String userId, Integer draftTypeId) {
+        Objects.requireNonNull(draftId, "draftId must not be null");
+        Objects.requireNonNull(userId, "userId must not be null");
+        Objects.requireNonNull(draftTypeId, "draftTypeId must not be null");
+        entityManager.joinTransaction();
+        log.info("Deleting draft typeId={} draftId={}", draftTypeId, draftId);
+        long deleted = draftStoreRepository.deleteByIdAndUserIdAndDraftTypeId(
+            draftId,
+            userId,
+            draftTypeId
+        );
+        draftStoreRepository.flush();
+        return deleted;
     }
 }
