@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.bpmn;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -22,8 +23,30 @@ class ClaimSettledLetterNotificationTest extends BpmnBaseTest {
     public static final String NOTIFY_EVENT_EVENT = "NOTIFY_EVENT";
     public static final String CLAIM_SETTLED_LETTER_REQUIRED = "isClaimSettledLetterRequired";
 
+    public static final String START_BUSINESS_TOPIC = "START_UNSPEC_CLAIM_SETTLED_LETTER_BUSINESS_PROCESS";
+    public static final String START_BUSINESS_ACTIVITY = "StartUnspecClaimSettledLetterBusinessProcessTaskId";
+    private static final String DIAGRAM_PATH = "camunda/%s";
+
     public ClaimSettledLetterNotificationTest() {
         super("unspec_claim_settled_letter_notification.bpmn", PROCESS_ID);
+    }
+
+    @BeforeEach
+    @Override
+    void setup() {
+        startBusinessProcessDeployment = engine.getRepositoryService()
+            .createDeployment()
+            .addClasspathResource(String.format(DIAGRAM_PATH, "start_unspec_claim_settled_letter_business_process.bpmn"))
+            .deploy();
+        endBusinessProcessDeployment = engine.getRepositoryService()
+            .createDeployment()
+            .addClasspathResource(String.format(DIAGRAM_PATH, "end_business_process.bpmn"))
+            .deploy();
+        deployment = engine.getRepositoryService()
+            .createDeployment()
+            .addClasspathResource(String.format(DIAGRAM_PATH, bpmnFileName))
+            .deploy();
+        processInstance = engine.getRuntimeService().startProcessInstanceByKey(processId);
     }
 
     @ParameterizedTest

@@ -31,6 +31,7 @@ public class ClaimSettledDefendantLiPLetterGenerator {
     private final DocumentDownloadService documentDownloadService;
     private final BulkPrintService bulkPrintService;
     private static final String UNSPEC_CLAIM_SETTLED_LETTER_TITLE = "unspec-claim-settled-letter";
+    private static final String CLAIM_SETTLED_LETTER_DOWNLOAD_ERROR = "Failed getting claim settled letter for caseId {}";
 
     public void generateAndPrintClaimSettledLetter(CaseData caseData, String auth) {
         Long caseId = caseData.getCcdCaseReference();
@@ -38,12 +39,12 @@ public class ClaimSettledDefendantLiPLetterGenerator {
 
         CaseDocument claimSettledDoc = generateLetter(caseData, auth, CLAIM_SETTLED_LIP_DEFENDANT_LETTER);
 
-        String errorMessage = "Failed getting claim settled letter for caseId {}";
-        byte[] letterContent = documentDownloadService.downloadDocument(claimSettledDoc, auth, caseId.toString(), errorMessage);
+        byte[] letterContent = documentDownloadService.downloadDocument(claimSettledDoc, auth, caseId.toString(),
+                                                                        CLAIM_SETTLED_LETTER_DOWNLOAD_ERROR);
 
         List<String> recipients = getRecipientsList(caseData);
         List<String> bulkPrintFileNames = List.of(claimSettledDoc.getDocumentLink().getDocumentFileName());
-        SendLetterResponse sendLetterResponse = bulkPrintService.printLetter(letterContent, String.valueOf(caseData.getCcdCaseReference()),
+        SendLetterResponse sendLetterResponse = bulkPrintService.printLetter(letterContent, caseId.toString(),
                                      caseData.getLegacyCaseReference(), UNSPEC_CLAIM_SETTLED_LETTER_TITLE,
                                      recipients, bulkPrintFileNames);
         log.info("Claim settled letter sent to bulk print for caseId {}, send-letter-service letterId: {}",

@@ -27,17 +27,17 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NO
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 
 @SpringBootTest(classes = {
-    ClaimSettledLipDefendant1LetterHandler.class,
+    DefendantLetterHandler.class,
     JacksonAutoConfiguration.class
 })
-public class ClaimSettledLipDefendant1LetterHandlerTest extends BaseCallbackHandlerTest {
+public class DefendantLetterHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
-    private ClaimSettledLipDefendant1LetterHandler handler;
+    private DefendantLetterHandler handler;
     @MockBean
     private ClaimSettledDefendantLiPLetterGenerator lipLetterGenerator;
 
-    public static final String TASK_ID = "SendClaimSettledLetterLipDef";
+    public static final String TASK_ID = "SendLetterClaimSettledDefendantLiP";
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
