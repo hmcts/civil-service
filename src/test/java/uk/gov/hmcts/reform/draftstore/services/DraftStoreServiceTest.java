@@ -215,7 +215,7 @@ class DraftStoreServiceTest {
                 eq(DRAFT_TYPE.getId()),
                 any(OffsetDateTime.class)
             )).thenReturn(Optional.of(existingDraft));
-            when(draftStoreRepository.save(any(DraftStoreEntity.class)))
+            when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
             Optional<DraftStoreEntity> result = draftStoreService.updateDraft(
@@ -230,7 +230,7 @@ class DraftStoreServiceTest {
             assertThat(existingDraft.getCaseId()).isEqualTo(NEW_CASE_ID);
             assertThat(existingDraft.getPayload()).isEqualTo(payload).isNotSameAs(payload);
             assertThat(existingDraft.getUpdatedAt()).isNotNull();
-            verify(draftStoreRepository).save(existingDraft);
+            verify(draftStoreTransactionService).saveInNewTransaction(existingDraft);
         }
 
         @Test
@@ -242,7 +242,7 @@ class DraftStoreServiceTest {
                 eq(DRAFT_TYPE.getId()),
                 any(OffsetDateTime.class)
             )).thenReturn(Optional.of(existingDraft));
-            when(draftStoreRepository.save(any(DraftStoreEntity.class)))
+            when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
             Optional<DraftStoreEntity> result = draftStoreService.updateDraft(
@@ -283,7 +283,7 @@ class DraftStoreServiceTest {
 
         @Test
         void shouldReturnTrueWhenDraftIsDeleted() {
-            when(draftStoreRepository.deleteByIdAndUserIdAndDraftTypeId(
+            when(draftStoreTransactionService.deleteByIdInNewTransaction(
                 DRAFT_ID,
                 USER_ID,
                 DRAFT_TYPE.getId()
@@ -292,11 +292,15 @@ class DraftStoreServiceTest {
             boolean result = draftStoreService.deleteDraft(DRAFT_ID, USER_ID, DRAFT_TYPE);
 
             assertThat(result).isTrue();
+            verify(draftStoreTransactionService).deleteByIdInNewTransaction(
+                DRAFT_ID,
+                USER_ID,
+                DRAFT_TYPE.getId());
         }
 
         @Test
         void shouldReturnFalseWhenDraftDoesNotExist() {
-            when(draftStoreRepository.deleteByIdAndUserIdAndDraftTypeId(
+            when(draftStoreTransactionService.deleteByIdInNewTransaction(
                 DRAFT_ID,
                 USER_ID,
                 DRAFT_TYPE.getId()
@@ -305,6 +309,10 @@ class DraftStoreServiceTest {
             boolean result = draftStoreService.deleteDraft(DRAFT_ID, USER_ID, DRAFT_TYPE);
 
             assertThat(result).isFalse();
+            verify(draftStoreTransactionService).deleteByIdInNewTransaction(
+                DRAFT_ID,
+                USER_ID,
+                DRAFT_TYPE.getId());
         }
 
         @Test
