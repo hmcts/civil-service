@@ -509,6 +509,7 @@ notifications:
   notifyDefendantLIPClaimantSettleTheClaimTemplate: "38cc4b02-90f4-4fae-adf3-6f7d9b80ee51"
   notifyDefendantLIPClaimantSettleTheClaimTemplateWelsh: "ca8a8101-94fa-4586-82d3-0e172f234260"
   notifyDefendantLRClaimantSettleTheClaimTemplate: "034573ca-fece-4ed5-bdb6-4f39065bf60a"
+  notifyDefendantLRClaimantSettleTheClaimUnspecTemplate: "034573ca-fece-4ed5-bdb6-4f39065bf60a"
 
   notifyLipUpdateTemplate: "edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf"
   notifyLipUpdateTemplateBilingual: "730f4e11-3cb0-43a7-aeeb-8373a28fbc1d"

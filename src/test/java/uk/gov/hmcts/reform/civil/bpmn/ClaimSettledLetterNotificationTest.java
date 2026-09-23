@@ -18,7 +18,7 @@ class ClaimSettledLetterNotificationTest extends BpmnBaseTest {
     public static final String PROCESS_ID = "UNSPEC_CLAIM_SETTLED_LETTER_NOTIFICATION_ID";
     public static final String SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1_ID = "SendLetterClaimSettledDefendantLiP";
     public static final String SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1_EVENT = "SEND_UNSPEC_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1";
-    public static final String NOTIFY_EVENT_ID = "SettleClaimPaidInFullNotificationNotifier";
+    public static final String NOTIFY_EVENT_ID = "UnspecClaimSettledNotifier";
     public static final String NOTIFY_EVENT_EVENT = "NOTIFY_EVENT";
     public static final String CLAIM_SETTLED_LETTER_REQUIRED = "isClaimSettledLetterRequired";
 
