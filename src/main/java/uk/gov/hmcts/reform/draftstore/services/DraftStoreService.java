@@ -106,7 +106,7 @@ public class DraftStoreService {
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
         log.info("Deleting draft type={} draftId={}", draftType, draftId);
-        return draftStoreRepository.deleteByIdAndUserIdAndDraftTypeId(
+        return draftStoreTransactionService.deleteByIdInNewTransaction(
             draftId,
             userId,
             draftType.getId()
@@ -125,7 +125,7 @@ public class DraftStoreService {
         }
         existingDraft.setPayload(copyPayload(payload));
         existingDraft.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-        return draftStoreRepository.save(existingDraft);
+        return draftStoreTransactionService.saveInNewTransaction(existingDraft);
     }
 
     private Map<String, Object> copyPayload(Map<String, Object> payload) {
