@@ -211,10 +211,6 @@ withPipeline(type, product, component) {
 
   before('smoketest:preview') {
     copyPrevPlaywrightLastRunAndTestFilesReport()
-    env.RUN_FAILING_FUNCTIONAL_TESTS = checkForRunFailingFunctionalTests(env.BRANCH_NAME)
-    env.RUN_FAILING_SETUP_TESTS = checkForRunFailingSetupTests(env.BRANCH_NAME)
-    env.RUN_FAILING_TEARDOWN_TESTS = checkForRunFailingTeardownTests(env.BRANCH_NAME)
-    env.RUN_FAILING_SMOKE_TESTS = checkForRunFailingSmokeTests(env.BRANCH_NAME)
   }
 
   afterAlways('smoketest:preview') {
@@ -270,23 +266,6 @@ def checkForSkipFunctionalTests(branch_name) {
 def checkForRunAllFunctionalTests(branch_name) {
   return new GithubAPI(this).getLabelsbyPattern(branch_name, "runAllFunctionalTests").contains("runAllFunctionalTests")
 }
-
-def checkForRunFailingSetupTests(branch_name) {
-  return new GithubAPI(this).getLabelsbyPattern(branch_name, "runFailingSetupTests").contains("runFailingSetupTests")
-}
-
-def checkForRunFailingFunctionalTests(branch_name) {
-  return new GithubAPI(this).getLabelsbyPattern(branch_name, "runFailingFunctionalTests").contains("runFailingFunctionalTests")
-}
-
-def checkForRunFailingSmokeTests(branch_name) {
-  return new GithubAPI(this).getLabelsbyPattern(branch_name, "runFailingSmokeTests").contains("runFailingSmokeTests")
-}
-
-def checkForRunFailingTeardownTests(branch_name) {
-  return new GithubAPI(this).getLabelsbyPattern(branch_name, "runFailingTeardownTests").contains("runFailingTeardownTests")
-}
-
 def checkForPrValuesLabel(branch_name, label) {
   return new GithubAPI(this).getLabelsbyPattern(branch_name, "pr-values:" + label).contains("pr-values:" + label)
 }
