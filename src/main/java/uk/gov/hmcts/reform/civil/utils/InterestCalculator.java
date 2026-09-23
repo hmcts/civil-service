@@ -130,14 +130,26 @@ public class InterestCalculator {
     }
 
     private BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate, LocalDate interestToDate) {
+        LocalDate interestFromDate;
         if (InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE.equals(caseData.getInterestClaimFrom())) {
-            LocalDate interestFromDate = getSubmittedDate(caseData);
-            return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate, interestFromDate, interestToDate);
+            interestFromDate = getSubmittedDate(caseData);
         } else if (InterestClaimFromType.FROM_A_SPECIFIC_DATE.equals(caseData.getInterestClaimFrom())) {
-            return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate,
-                caseData.getInterestFromSpecificDate(), interestToDate);
+            interestFromDate = caseData.getInterestFromSpecificDate();
+        } else {
+            return ZERO;
         }
-        return ZERO;
+        return calculateInterestAmountForPeriod(caseData, interestRate, interestFromDate, interestToDate);
+    }
+
+    private BigDecimal calculateInterestAmountForPeriod(CaseData caseData,
+                                                        BigDecimal interestRate,
+                                                        LocalDate interestFromDate,
+                                                        LocalDate interestToDate) {
+        long numberOfDays = getNumberOfDays(interestFromDate, interestToDate);
+        long pausedDays = getBreathingSpacePausedDays(caseData, interestFromDate, interestToDate);
+        long accruableDays = Math.max(0L, numberOfDays - pausedDays);
+        BigDecimal interestPerDay = getInterestPerDay(caseData.getTotalClaimAmount(), interestRate);
+        return interestPerDay.multiply(BigDecimal.valueOf(accruableDays));
     }
 
     private LocalDate getToDate(CaseData caseData) {
@@ -162,6 +174,45 @@ public class InterestCalculator {
             numberOfDays = Math.abs(ChronoUnit.DAYS.between(interestToSpecificDate, interestFromSpecificDate));
         }
         return numberOfDays;
+    }
+
+    private static long getBreathingSpacePausedDays(CaseData caseData,
+                                                    LocalDate interestFrom,
+                                                    LocalDate interestTo) {
+        if (caseData.getBreathing() == null
+            || caseData.getBreathing().getEnter() == null
+            || caseData.getBreathing().getEnter().getStart() == null) {
+            return 0;
+        }
+
+        LocalDate pauseStart = caseData.getBreathing().getEnter().getStart();
+        LocalDate pauseEnd = caseData.getBreathing().getLift() != null
+            && caseData.getBreathing().getLift().getExpectedEnd() != null
+            ? caseData.getBreathing().getLift().getExpectedEnd()
+            : LocalDate.now();
+
+        return countPausedDaysInInterestPeriod(pauseStart, pauseEnd, interestFrom, interestTo);
+    }
+
+    private static long countPausedDaysInInterestPeriod(LocalDate pauseStart,
+                                                        LocalDate pauseEnd,
+                                                        LocalDate interestFrom,
+                                                        LocalDate interestTo) {
+        if (pauseStart == null || pauseEnd == null || interestFrom == null || interestTo == null) {
+            return 0;
+        }
+        if (pauseEnd.isBefore(pauseStart) || interestTo.isBefore(interestFrom) || interestTo.equals(interestFrom)) {
+            return 0;
+        }
+
+        LocalDate accrualWindowStart = interestFrom.plusDays(1);
+        LocalDate overlapStart = pauseStart.isAfter(accrualWindowStart) ? pauseStart : accrualWindowStart;
+        LocalDate overlapEnd = pauseEnd.isBefore(interestTo) ? pauseEnd : interestTo;
+
+        if (overlapEnd.isBefore(overlapStart)) {
+            return 0;
+        }
+        return ChronoUnit.DAYS.between(overlapStart, overlapEnd) + 1;
     }
 
     @NotNull
