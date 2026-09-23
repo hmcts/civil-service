@@ -141,8 +141,8 @@ withPipeline(type, product, component) {
     env.CAMUNDA_DEFINITION_BRANCH = checkForCamundaDefinitionBranchLabel()
     env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR = 'civil-service-pr'
     env.PLAYWRIGHT_PR_FT_GROUPS = getPlaywrightFunctionalTestsGroups()
-    env.SKIP_FUNCTIONAL_TESTS = checkForSkipFunctionalTests(env.BRANCH_NAME)
-    env.RUN_ALL_FUNCTIONAL_TESTS = checkForRunAllFunctionalTests(env.BRANCH_NAME)
+    env.PLAYWRIGHT_SKIP_FUNCTIONAL_TESTS = checkForSkipFunctionalTests(env.BRANCH_NAME)
+    env.PLAYWRIGHT_RUN_ALL_FUNCTIONAL_TESTS = checkForRunAllFunctionalTests(env.BRANCH_NAME)
 
     setPreviewUrls(product, component)
 
