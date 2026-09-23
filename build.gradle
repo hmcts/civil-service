@@ -715,6 +715,9 @@ tasks.register('contract', Test) {
   setClasspath(sourceSets.contractTest.runtimeClasspath)
   useJUnitPlatform()
   systemProperty 'pact.rootDir', "pacts"
+  // URL-encoded token requests are textual; write them as plain V4 bodies so
+  // providers do not need the legacy base64 reader compatibility switch.
+  systemProperty 'pact.content_type.override.application/x-www-form-urlencoded', 'text'
 }
 
 tasks.register('runAndPublishConsumerPactTests', Test) {
@@ -722,6 +725,7 @@ tasks.register('runAndPublishConsumerPactTests', Test) {
   logger.lifecycle("Runs pact Tests")
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
+  systemProperty 'pact.content_type.override.application/x-www-form-urlencoded', 'text'
   finalizedBy(pactPublish)
 }
 
