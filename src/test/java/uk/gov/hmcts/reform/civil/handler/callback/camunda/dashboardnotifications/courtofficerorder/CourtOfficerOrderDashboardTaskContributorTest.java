@@ -5,6 +5,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskIds;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.uploadhearingdocuments.UploadHearingDocumentsClaimantDashboardTask;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.uploadhearingdocuments.UploadHearingDocumentsDefendantDashboardTask;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -18,13 +20,29 @@ class CourtOfficerOrderDashboardTaskContributorTest {
     @Mock
     private CourtOfficerOrderDefendantDashboardTask defendantTask;
 
+    @Mock
+    private UploadHearingDocumentsClaimantDashboardTask uploadHearingDocumentsClaimantTask;
+
+    @Mock
+    private UploadHearingDocumentsDefendantDashboardTask uploadHearingDocumentsDefendantTask;
+
     @Test
     void shouldExposeTaskIdAndHandlers() {
         CourtOfficerOrderDashboardTaskContributor contributor =
-            new CourtOfficerOrderDashboardTaskContributor(claimantTask, defendantTask);
+            new CourtOfficerOrderDashboardTaskContributor(
+                claimantTask,
+                defendantTask,
+                uploadHearingDocumentsClaimantTask,
+                uploadHearingDocumentsDefendantTask
+            );
 
         assertThat(contributor.taskId()).isEqualTo(DashboardTaskIds.COURT_OFFICER_ORDER);
-        assertThat(contributor.dashboardTasks()).containsExactly(claimantTask, defendantTask);
+        assertThat(contributor.dashboardTasks()).containsExactly(
+            claimantTask,
+            defendantTask,
+            uploadHearingDocumentsClaimantTask,
+            uploadHearingDocumentsDefendantTask
+        );
         assertThatThrownBy(() -> contributor.dashboardTasks().add(claimantTask))
             .isInstanceOf(UnsupportedOperationException.class);
     }

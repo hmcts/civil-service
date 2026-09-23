@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.utils.HearingTypeListUtils;
@@ -67,7 +68,11 @@ public class RequestAHearingCallbackHandler extends CallbackHandler {
 
     private CallbackResponse startDashboardUpdate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        caseData.setBusinessProcess(BusinessProcess.ready(HEARING_SCHEDULED_RETRIGGER));
+        boolean isReturningFromDecisionOutcome = CaseState.DECISION_OUTCOME.toString()
+            .equals(callbackParams.getRequest().getCaseDetails().getState());
+        if (isReturningFromDecisionOutcome) {
+            caseData.setBusinessProcess(BusinessProcess.ready(HEARING_SCHEDULED_RETRIGGER));
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))

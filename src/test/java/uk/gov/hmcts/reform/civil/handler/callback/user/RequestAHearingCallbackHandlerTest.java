@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -75,14 +76,23 @@ class RequestAHearingCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldSetBusinessProcessReady_whenAboutToSubmit() {
+    void shouldSetBusinessProcessReady_whenAboutToSubmit_andReturningFromDecisionOutcome() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, CaseState.DECISION_OUTCOME);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
 
         assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo("HEARING_SCHEDULED_RETRIGGER");
         assertThat(updatedData.getBusinessProcess().getStatus()).isEqualTo(BusinessProcessStatus.READY);
+    }
+
+    @Test
+    void shouldNotSetBusinessProcess_whenAboutToSubmit_andCaseIsNotReturningFromDecisionOutcome() {
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, CaseState.CASE_PROGRESSION);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getData().get("businessProcess")).isNull();
     }
 
     @Test
