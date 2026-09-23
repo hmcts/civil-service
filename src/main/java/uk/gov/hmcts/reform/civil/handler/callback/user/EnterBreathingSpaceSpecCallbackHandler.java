@@ -71,11 +71,6 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             errors.add("Start date must be today or before.");
         }
 
-        if (caseData.getBreathing().getEnter().getExpectedEnd() != null
-            && !caseData.getBreathing().getEnter().getExpectedEnd().isAfter(LocalDate.now())) {
-            errors.add("Expected end date must be in the future.");
-        }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
