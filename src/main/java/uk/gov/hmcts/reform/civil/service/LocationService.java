@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService.CIVIL_NATIONAL_BUSINESS_CENTRE;
 import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
 
 @Service
@@ -48,7 +49,8 @@ public class LocationService {
     public Pair<CaseLocationCivil, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
         if (hasSDOBeenMade(caseData)) {
             log.info("WorkAllocation Location If for caseId {}", caseData.getCcdCaseReference());
-            return Pair.of(assignCaseManagementLocationToMainCaseLocation(caseData, authToken), false);
+            CaseLocationCivil caseLocationCivil = assignCaseManagementLocationToMainCaseLocation(caseData, authToken);
+            return Pair.of(caseLocationCivil, CIVIL_NATIONAL_BUSINESS_CENTRE.equals(caseLocationCivil.getSiteName()));
         } else {
             log.info("WorkAllocation Location Else for caseId {}", caseData.getCcdCaseReference());
             return getWorkAllocationLocationBeforeSdo(caseData, authToken);
@@ -75,12 +77,12 @@ public class LocationService {
     }
 
     private boolean hasSDOBeenMade(CaseData caseData) {
-        log.info("hasSDOBeenMade If for caseId {}", caseData.getCcdCaseReference());
-        return (!statesBeforeSDO.contains(caseData.getCcdState())
+        boolean hasSDOBeenMade =  (!statesBeforeSDO.contains(caseData.getCcdState())
             && !settleDiscontinueStates.contains(caseData.getCcdState()))
             || (!statesBeforeSDO.contains(caseData.getPreviousCCDState())
             && settleDiscontinueStates.contains(caseData.getCcdState()));
-
+        log.info("hasSDOBeenMade If for caseId {} {}", caseData.getCcdCaseReference(), hasSDOBeenMade);
+        return hasSDOBeenMade;
     }
 
     public LocationRefData getWorkAllocationLocationDetails(String baseLocation, String authToken, String serviceId) {
