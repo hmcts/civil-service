@@ -652,6 +652,19 @@
         "type"
       ],
       "properties": {
+        "reference": {
+          "$id": "#/properties/breathing/reference",
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Breathing Space reference number"
+        },
+        "startDate": {
+          "$id": "#/properties/breathing/startDate",
+          "$ref": "#/definitions/formatDateOrNull",
+          "description": "Breathing Space start date"
+        },
         "type": {
           "$id": "#/properties/breathing/type",
           "type": "string",
@@ -664,6 +677,14 @@
           "$id": "#/properties/breathing/endDate",
           "$ref": "#/definitions/formatDateOrNull",
           "description": ""
+        },
+        "reasonForLifting": {
+          "$id": "#/properties/breathing/reasonForLifting",
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Reason the Breathing Space was lifted"
         }
       },
       "additionalProperties": false
