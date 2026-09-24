@@ -71,24 +71,24 @@ class DraftStoreTransactionServiceTest {
     @Test
     void shouldJoinTransactionBeforeDeleteByIdAndFlush() {
         UUID draftId = UUID.randomUUID();
-        when(draftStoreRepository.deleteByIdAndUserIdAndDraftTypeId(
-            draftId, "user", DraftType.DRAFT_CLAIM.getId()))
+        when(draftStoreRepository.deleteByIdAndUserIdAndDraftType(
+            draftId, "user", DraftType.DRAFT_CLAIM))
             .thenReturn(1L);
 
         long deleted = draftStoreTransactionService.deleteByIdInNewTransaction(
-            draftId, "user", DraftType.DRAFT_CLAIM.getId());
+            draftId, "user", DraftType.DRAFT_CLAIM);
 
         assertThat(deleted).isEqualTo(1L);
         InOrder order = inOrder(entityManager, draftStoreRepository);
         order.verify(entityManager).joinTransaction();
-        order.verify(draftStoreRepository).deleteByIdAndUserIdAndDraftTypeId(
-            draftId, "user", DraftType.DRAFT_CLAIM.getId());
+        order.verify(draftStoreRepository).deleteByIdAndUserIdAndDraftType(
+            draftId, "user", DraftType.DRAFT_CLAIM);
         order.verify(draftStoreRepository).flush();
     }
 
     private DraftStoreEntity draft() {
         OffsetDateTime now = OffsetDateTime.now();
-        return new DraftStoreEntity(UUID.randomUUID(), "user", null, DraftType.DRAFT_CLAIM.getId(),
+        return new DraftStoreEntity(UUID.randomUUID(), "user", null, DraftType.DRAFT_CLAIM,
                                     new HashMap<>(), now, now, now.plusDays(30));
     }
 }
