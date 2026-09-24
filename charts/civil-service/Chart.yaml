@@ -11,23 +11,23 @@ dependencies:
     version: 6.1.1
     repository: 'oci://hmctsprod.azurecr.io/helm'
   - name: ccd
-    version: 9.2.4
+    version: 9.3.0
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: ccd.enabled
   - name: xui-webapp
-    version: 1.0.46
+    version: 1.0.49
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: xui-webapp.enabled
   - name: idam-pr
-    version: ~2.3.0
+    version: ~2.4.0
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: idam-pr.enabled
   - name: camunda-bpm
-    version: 0.0.50
+    version: 0.0.51
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: camunda-bpm.enabled
   - name: aac-manage-case-assignment
-    version: 0.2.27
+    version: 0.2.28
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: aac-manage-case-assignment.enabled
   - name: wiremock
@@ -39,10 +39,10 @@ dependencies:
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: ccd-case-document-am-api.enabled
   - name: em-ccdorc
-    version: 2.2.0
+    version: 2.2.1
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: em-ccdorc.enabled
   - name: em-stitching
-    version: 2.0.5
+    version: 2.0.6
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: em-stitching.enabled
