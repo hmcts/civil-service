@@ -73,6 +73,7 @@ class ClaimFormMapperTest {
                               .setEvidenceType("LETTERS_EMAILS_AND_OTHER_CORRESPONDENCE")
                               .setLettersEmailsAndOtherCorrespondenceEvidence("This is Letter"))
         );
+        LocalDate now = LocalDate.now();
         CaseData caseData = CaseData.builder()
             .applicant1(new Party()
                             .setIndividualLastName(INDIVIDUAL_LAST_NAME)
@@ -82,7 +83,7 @@ class ClaimFormMapperTest {
                             .setType(Party.Type.INDIVIDUAL))
             .timelineOfEvents(List.of(
                 new TimelineOfEvents(
-                    new TimelineOfEventDetails(LocalDate.now(), "desc"),
+                    new TimelineOfEventDetails(now, String.valueOf(now.getDayOfMonth()), String.valueOf(now.getMonthValue()), String.valueOf(now.getYear()), "desc"),
                     "1"
                 )))
             .respondent1(new Party()

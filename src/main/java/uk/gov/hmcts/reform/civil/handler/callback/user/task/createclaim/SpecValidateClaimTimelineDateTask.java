@@ -22,8 +22,10 @@ public class SpecValidateClaimTimelineDateTask {
         List<String> errors = new ArrayList<>();
         if (caseDataHasTimelineOfEvents(caseData)) {
             caseData.getTimelineOfEvents().forEach(timelineEvent -> {
-                if (isFutureTimelineDate(timelineEvent)) {
+                if (isFullDate(timelineEvent) && isFutureTimelineDate(timelineEvent)) {
                     errors.add("Correct the date. You can’t use a future date.");
+                } else if (!isMonthAndYearOnly(timelineEvent)) {
+                    errors.add("Correct the date. You must enter atleast month and year.");
                 }
             });
         }
@@ -34,8 +36,20 @@ public class SpecValidateClaimTimelineDateTask {
         return caseData.getTimelineOfEvents() != null && !caseData.getTimelineOfEvents().isEmpty();
     }
 
+    private boolean isFullDate(TimelineOfEvents timelineEvent) {
+        return timelineEvent.getValue().getTimelineDay() != null && timelineEvent.getValue().getTimelineMonth() != null && timelineEvent.getValue().getTimelineYear() != null;
+    }
+
+    private boolean isMonthAndYearOnly(TimelineOfEvents timelineEvent) {
+        return timelineEvent.getValue().getTimelineDay() == null && timelineEvent.getValue().getTimelineMonth() != null && timelineEvent.getValue().getTimelineYear() != null;
+    }
+
     private boolean isFutureTimelineDate(TimelineOfEvents timelineEvent) {
-        return timelineEvent.getValue().getTimelineDate().isAfter(LocalDate.now());
+        int year = Integer.parseInt(timelineEvent.getValue().getTimelineYear());
+        int month = Integer.parseInt(timelineEvent.getValue().getTimelineMonth());
+        int dayOfMonth = Integer.parseInt(timelineEvent.getValue().getTimelineDay());
+        LocalDate timeLineDate = LocalDate.of(year, month, dayOfMonth);
+        return timeLineDate.isAfter(LocalDate.now());
     }
 
     private CallbackResponse buildCallbackResponse(List<String> errors) {
