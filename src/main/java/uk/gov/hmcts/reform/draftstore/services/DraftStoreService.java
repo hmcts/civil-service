@@ -24,6 +24,8 @@ public class DraftStoreService {
 
     private static final String USER_ID_NOT_NULL = "userId must not be null";
     private static final String DRAFT_TYPE_NOT_NULL = "draftType must not be null";
+    static final String TTL_DAYS_FIELD = "draftClaimCacheTtlDays";
+    static final long DEFAULT_TTL_DAYS = 30L;
 
     private final DraftStoreRepository draftStoreRepository;
     private final DraftStoreTransactionService draftStoreTransactionService;
@@ -40,17 +42,18 @@ public class DraftStoreService {
                                         DraftType draftType) {
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
+        Map<String, Object> payloadCopy = copyPayload(payload);
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
 
         DraftStoreEntity draft = new DraftStoreEntity(
             UUID.randomUUID(),
             userId,
             caseId,
-            draftType.getId(),
-            copyPayload(payload),
+            draftType,
+            payloadCopy,
             now,
             now,
-            draftType.calculateExpiry(now)
+            now.plusDays(resolveTtlDays(payloadCopy))
         );
         try {
             return draftStoreTransactionService.saveInNewTransaction(draft);
@@ -65,16 +68,16 @@ public class DraftStoreService {
     public List<DraftStoreEntity> getDraftsForUser(String userId, DraftType draftType) {
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
-        return draftStoreRepository.findByUserIdAndDraftTypeId(userId, draftType.getId());
+        return draftStoreRepository.findByUserIdAndDraftType(userId, draftType);
     }
 
     @Transactional(readOnly = true)
     public List<DraftStoreEntity> getActiveDraftsForUser(String userId, DraftType draftType) {
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
-        return draftStoreRepository.findByUserIdAndDraftTypeIdAndExpiresAtAfter(
+        return draftStoreRepository.findByUserIdAndDraftTypeAndExpiresAtAfter(
             userId,
-            draftType.getId(),
+            draftType,
             OffsetDateTime.now(ZoneOffset.UTC)
         );
     }
@@ -84,10 +87,10 @@ public class DraftStoreService {
         Objects.requireNonNull(draftId, "draftId must not be null");
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
-        return draftStoreRepository.findByIdAndUserIdAndDraftTypeIdAndExpiresAtAfter(
+        return draftStoreRepository.findByIdAndUserIdAndDraftTypeAndExpiresAtAfter(
             draftId,
             userId,
-            draftType.getId(),
+            draftType,
             OffsetDateTime.now(ZoneOffset.UTC)
         );
     }
@@ -109,7 +112,7 @@ public class DraftStoreService {
         return draftStoreTransactionService.deleteByIdInNewTransaction(
             draftId,
             userId,
-            draftType.getId()
+            draftType
         ) > 0;
     }
 
@@ -126,6 +129,26 @@ public class DraftStoreService {
         existingDraft.setPayload(copyPayload(payload));
         existingDraft.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
         return draftStoreTransactionService.saveInNewTransaction(existingDraft);
+    }
+
+    private long resolveTtlDays(Map<String, Object> payload) {
+        Object value = payload.get(TTL_DAYS_FIELD);
+        Long ttlDays = null;
+        if (value instanceof Number number) {
+            ttlDays = number.longValue();
+        } else if (value instanceof String text) {
+            try {
+                ttlDays = Long.parseLong(text.trim());
+            } catch (NumberFormatException ex) {
+                ttlDays = null;
+            }
+        }
+        if (ttlDays == null || ttlDays <= 0) {
+            log.warn("Missing or invalid {} in draft payload (value={}), defaulting to {} days",
+                     TTL_DAYS_FIELD, value, DEFAULT_TTL_DAYS);
+            return DEFAULT_TTL_DAYS;
+        }
+        return ttlDays;
     }
 
     private Map<String, Object> copyPayload(Map<String, Object> payload) {
