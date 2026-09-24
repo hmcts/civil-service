@@ -404,7 +404,7 @@ withNightlyPipeline(type, product, component) {
     if(!forceGreenBuild) {
       before('fullFunctionalTest') {
         if(playwrightSmokeTestsFailed) {
-          env.SKIP_FULL_FUNCTIONAL_TESTS = 'true'
+          env.PLAYWRIGHT_NIGHTLY_SETUP_OR_SMOKE_TESTS_FAILED = 'true'
           return
         }
         if(runFailedTests) {
@@ -421,8 +421,8 @@ withNightlyPipeline(type, product, component) {
 
     if(!forceGreenBuild) {
       afterAlways('fullFunctionalTest') {
-        if(playwrightSmokeTestsFailed) {
-          echo 'Skipping functional test report generation because the Playwright smoke test failed.'
+        if(playwrightSetupFailed || playwrightSmokeTestsFailed) {
+          echo 'Skipping functional test report generation because the Playwright setup or smoke test failed.'
           return
         }
         if (!runFailedTests || !hasFailedTestFiles) {
