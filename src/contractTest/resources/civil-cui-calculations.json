@@ -1,0 +1,115 @@
+{
+  "interest": {
+    "statutory": {
+      "request": {
+        "totalClaimAmount": 1000,
+        "claimInterest": "Yes",
+        "interestClaimOptions": "SAME_RATE_INTEREST",
+        "interestClaimFrom": "FROM_A_SPECIFIC_DATE",
+        "interestFromSpecificDate": "2025-01-01",
+        "interestFromSpecificDateDescription": "Invoice overdue",
+        "interestClaimUntil": "UNTIL_CLAIM_SUBMIT_DATE",
+        "submittedDate": "2025-02-03T00:00:00.000Z",
+        "sameRateInterestSelection": {
+          "sameRateInterestType": "SAME_RATE_INTEREST_8_PC"
+        }
+      },
+      "result": 7.23
+    },
+    "different rate zero": {
+      "request": {
+        "totalClaimAmount": 1000,
+        "claimInterest": "Yes",
+        "interestClaimOptions": "SAME_RATE_INTEREST",
+        "interestClaimFrom": "FROM_A_SPECIFIC_DATE",
+        "interestFromSpecificDate": "2025-02-03",
+        "interestFromSpecificDateDescription": "Invoice overdue",
+        "interestClaimUntil": "UNTIL_CLAIM_SUBMIT_DATE",
+        "submittedDate": "2025-02-03T00:00:00.000Z",
+        "sameRateInterestSelection": {
+          "sameRateInterestType": "SAME_RATE_INTEREST_DIFFERENT_RATE",
+          "differentRate": 5,
+          "differentRateReason": "Contractual rate"
+        }
+      },
+      "result": 0
+    },
+    "breakdown": {
+      "request": {
+        "totalClaimAmount": 1000,
+        "claimInterest": "Yes",
+        "interestClaimOptions": "BREAK_DOWN_INTEREST",
+        "interestClaimFrom": "FROM_A_SPECIFIC_DATE",
+        "interestFromSpecificDate": "2025-01-01",
+        "interestFromSpecificDateDescription": "Invoice overdue",
+        "interestClaimUntil": "UNTIL_CLAIM_SUBMIT_DATE",
+        "submittedDate": "2025-02-03T00:00:00.000Z",
+        "breakDownInterestTotal": 12.34,
+        "breakDownInterestDescription": "Interest on two invoices"
+      },
+      "result": 12.34
+    }
+  },
+  "ranges": [
+    {
+      "min_range": 0,
+      "max_range": 300,
+      "current_version": {
+        "flat_amount": {
+          "amount": 35
+        }
+      }
+    },
+    {
+      "min_range": 10000,
+      "current_version": {
+        "percentage_amount": {
+          "percentage": 5
+        }
+      },
+      "max_range": null
+    }
+  ],
+  "generalApplication": {
+    "consent": {
+      "applicationTypes": [
+        "EXTEND_TIME"
+      ],
+      "withConsent": true,
+      "withNotice": true,
+      "hearingDate": null
+    },
+    "notice": {
+      "applicationTypes": [
+        "EXTEND_TIME"
+      ],
+      "withConsent": false,
+      "withNotice": true,
+      "hearingDate": null
+    },
+    "without notice": {
+      "applicationTypes": [
+        "EXTEND_TIME"
+      ],
+      "withConsent": false,
+      "withNotice": false,
+      "hearingDate": null
+    },
+    "adjourn hearing": {
+      "applicationTypes": [
+        "ADJOURN_HEARING"
+      ],
+      "withConsent": false,
+      "withNotice": true,
+      "hearingDate": "2025-04-01"
+    }
+  },
+  "repayment": {
+    "repaymentPlanLRspec": {
+      "paymentAmount": 12500,
+      "repaymentFrequency": "ONCE_ONE_MONTH",
+      "firstRepaymentDate": "2025-03-01"
+    },
+    "proposedRepaymentType": "SUGGESTION_OF_REPAYMENT_PLAN"
+  }
+}

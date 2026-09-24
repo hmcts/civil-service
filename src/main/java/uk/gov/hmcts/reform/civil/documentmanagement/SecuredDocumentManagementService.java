@@ -189,10 +189,12 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                 );
             }
 
-            return Optional.ofNullable(responseEntity.getBody())
+            return Optional.ofNullable(responseEntity)
+                .map(ResponseEntity::getBody)
                 .map(ByteArrayResource.class::cast)
                 .map(ByteArrayResource::getByteArray)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new IllegalStateException(
+                    "Document binary response was empty for " + documentPath));
         } catch (DocumentDownloadException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -227,6 +229,10 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                     userInfo.getUid(),
                     URI.create(documentMetadata.links.binary.href).getPath().replaceFirst("/", "")
                 );
+            }
+
+            if (responseEntity == null || responseEntity.getBody() == null) {
+                throw new IllegalStateException("Document binary response was empty for " + documentPath);
             }
 
             return new DownloadedDocumentResponse(responseEntity.getBody(), documentMetadata.originalDocumentName,
@@ -270,9 +276,10 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     /**
      * Maps a download/metadata failure onto a specific exception so callers and the
      * controller advice can return a meaningful status: CDAM 404 -> not found,
-     * CDAM 403 -> access refused, a malformed reference -> bad request, and any other
-     * (transient) failure -> the retryable {@link DocumentDownloadException}. An
-     * already-classified exception is returned as-is so it is not re-wrapped or retried.
+     * CDAM 403/401 -> access refused, a malformed reference or other CDAM 4xx -> bad
+     * request, and any other (transient) failure -> the retryable
+     * {@link DocumentDownloadException}. An already-classified exception is returned
+     * as-is so it is not re-wrapped or retried.
      */
     private RuntimeException classifyDownloadFailure(String documentPath, Exception ex) {
         if (ex instanceof DocumentNotFoundException
@@ -298,8 +305,40 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
             log.error("Invalid document reference {}", documentPath, ex);
             return new InvalidDocumentLinkException(documentPath, ex);
         }
-        log.error("Failed downloading document {}", documentPath, ex);
+        if (ex instanceof FeignException feignException) {
+            int status = feignException.status();
+            if (status == 401) {
+                log.error("Access to document {} refused by document management", documentPath, ex);
+                return new DocumentAccessException(documentPath, ex);
+            }
+            if (isNonRetryableClientError(status)) {
+                log.error("Document management rejected request for {} with status {}", documentPath, status, ex);
+                return new InvalidDocumentLinkException(documentPath, status, ex);
+            }
+        }
+        log.error(
+            "Failed downloading document {} [cause={}, status={}]",
+            documentPath,
+            ex.getClass().getName(),
+            feignStatus(ex),
+            ex
+        );
         return new DocumentDownloadException(documentPath, ex);
+    }
+
+    /**
+     * Remaining CDAM 4xx after 401/403/404 have been classified. 408 and 429 are
+     * left to the retryable fallback, as is every 5xx and a missing status.
+     */
+    private static boolean isNonRetryableClientError(int status) {
+        return status >= 400 && status < 500 && status != 408 && status != 429;
+    }
+
+    private static String feignStatus(Exception ex) {
+        if (ex instanceof FeignException feignException) {
+            return String.valueOf(feignException.status());
+        }
+        return "n/a";
     }
 
     private UUID getDocumentIdFromSelfHref(String selfHref) {
