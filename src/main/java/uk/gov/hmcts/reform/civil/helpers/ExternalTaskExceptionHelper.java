@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.helpers;
 import feign.FeignException;
 import feign.Request;
 import feign.RetryableException;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
 
 import java.util.Arrays;
 
@@ -13,29 +12,10 @@ public class ExternalTaskExceptionHelper {
 
     private static final int HTTP_REQUEST_TIMEOUT = 408;
     private static final int HTTP_TOO_MANY_REQUESTS = 429;
+    private static final int HTTP_INTERNAL_SERVER_ERROR = 500;
     private static final int HTTP_BAD_GATEWAY = 502;
     private static final int HTTP_SERVICE_UNAVAILABLE = 503;
     private static final int HTTP_GATEWAY_TIMEOUT = 504;
-
-    private static final String BAD_REQUEST = "bad request";
-    private static final String UNAUTHORIZED = "unauthorized";
-    private static final String FORBIDDEN = "forbidden";
-    private static final String NOT_FOUND = "not found";
-    private static final String METHOD_NOT_ALLOWED = "method not allowed";
-    private static final String NOT_ACCEPTABLE = "not acceptable";
-    private static final String CONFLICT = "conflict";
-    private static final String GONE = "gone";
-    private static final String LENGTH_REQUIRED = "length required";
-    private static final String PRECONDITION_FAILED = "precondition failed";
-    private static final String PAYLOAD_TOO_LARGE = "payload too large";
-    private static final String URI_TOO_LONG = "uri too long";
-    private static final String UNSUPPORTED_MEDIA_TYPE = "unsupported media type";
-    private static final String UNPROCESSABLE_ENTITY = "unprocessable entity";
-    private static final String UNPROCESSABLE_CONTENT = "unprocessable content";
-    private static final String LOCKED = "locked";
-    private static final String FAILED_DEPENDENCY = "failed dependency";
-    private static final String PRECONDITION_REQUIRED = "precondition required";
-    private static final String REQUEST_HEADER_FIELDS_TOO_LARGE = "request header fields too large";
 
     private ExternalTaskExceptionHelper() {
         // Utility class
@@ -52,15 +32,23 @@ public class ExternalTaskExceptionHelper {
             }
         }
 
-        if (throwable instanceof RemoteProcessEngineException) {
-            return !hasNonRetryableClientErrorMessage(throwable.getMessage());
-        }
-
+        // Nothing in the cause chain carried an HTTP status, so this is a failure raised
+        // outside the Feign layer. Treat it as retryable, as before this helper stopped
+        // seeing Holunda's RemoteProcessEngineException: the message-based check only
+        // ever applied to that wrapped type and its 4xx/5xx are now classified by status.
         return true;
     }
 
     private static boolean isRetryableFeignException(FeignException feignException) {
         int status = feignException.status();
+        if (status == HTTP_INTERNAL_SERVER_ERROR) {
+            // Under Holunda's decoder a 500 arrived as RemoteProcessEngineException with no
+            // 4xx wording and was retried regardless of HTTP method (about 18 CCD
+            // start/submit-event 500s a day inside external tasks, most transient).
+            // Keep that until retrying non-idempotent CCD submits on 500 is decided
+            // deliberately; DTSCCI-6393 records the numbers.
+            return true;
+        }
         if (status > 0 && !isRetryableStatus(status)) {
             return false;
         }
@@ -78,33 +66,6 @@ public class ExternalTaskExceptionHelper {
                 HTTP_GATEWAY_TIMEOUT -> true;
             default -> false;
         };
-    }
-
-    static boolean hasNonRetryableClientErrorMessage(String message) {
-        if (message == null) {
-            return false;
-        }
-
-        String normalizedMessage = message.toLowerCase();
-        return normalizedMessage.contains(BAD_REQUEST)
-            || normalizedMessage.contains(UNAUTHORIZED)
-            || normalizedMessage.contains(FORBIDDEN)
-            || normalizedMessage.contains(NOT_FOUND)
-            || normalizedMessage.contains(METHOD_NOT_ALLOWED)
-            || normalizedMessage.contains(NOT_ACCEPTABLE)
-            || normalizedMessage.contains(CONFLICT)
-            || normalizedMessage.contains(GONE)
-            || normalizedMessage.contains(LENGTH_REQUIRED)
-            || normalizedMessage.contains(PRECONDITION_FAILED)
-            || normalizedMessage.contains(PAYLOAD_TOO_LARGE)
-            || normalizedMessage.contains(URI_TOO_LONG)
-            || normalizedMessage.contains(UNSUPPORTED_MEDIA_TYPE)
-            || normalizedMessage.contains(UNPROCESSABLE_ENTITY)
-            || normalizedMessage.contains(UNPROCESSABLE_CONTENT)
-            || normalizedMessage.contains(LOCKED)
-            || normalizedMessage.contains(FAILED_DEPENDENCY)
-            || normalizedMessage.contains(PRECONDITION_REQUIRED)
-            || normalizedMessage.contains(REQUEST_HEADER_FIELDS_TOO_LARGE);
     }
 
     public static String getStackTrace(Throwable throwable) {

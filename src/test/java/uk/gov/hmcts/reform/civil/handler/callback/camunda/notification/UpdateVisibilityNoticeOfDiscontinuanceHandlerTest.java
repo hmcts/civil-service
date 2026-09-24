@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.camunda.bpm.engine.RuntimeService;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -19,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import static org.mockito.Mockito.verify;
@@ -32,7 +32,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 class UpdateVisibilityNoticeOfDiscontinuanceHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
-    private RuntimeService runTimeService;
+    private CamundaRuntimeClient camundaRuntimeClient;
 
     @Autowired
     private UpdateVisibilityNoticeOfDiscontinuanceHandler handler;
@@ -66,7 +66,7 @@ class UpdateVisibilityNoticeOfDiscontinuanceHandlerTest extends BaseCallbackHand
             //When
             handler.handle(params);
             //Then
-            verify(runTimeService).setVariable(PROCESS_ID, "discontinuanceValidationSuccess", toggleState);
+            verify(camundaRuntimeClient).setProcessVariable(PROCESS_ID, "discontinuanceValidationSuccess", toggleState);
         }
 
     }

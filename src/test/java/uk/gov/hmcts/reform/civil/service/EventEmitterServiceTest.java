@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
+import feign.FeignException;
+import feign.Request;
+import feign.RetryableException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,12 +16,16 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 
+import java.util.HashMap;
+import java.util.Map;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,13 +38,10 @@ class EventEmitterServiceTest {
     private ApplicationEventPublisher applicationEventPublisher;
 
     @Mock
-    private RemoteProcessEngineException mockedRemoteProcessEngineException;
+    private FeignException.BadRequest mockedFeignException;
 
     @Mock
-    private RuntimeService runtimeService;
-
-    @Mock
-    private MessageCorrelationBuilder messageCorrelationBuilder;
+    private CamundaRuntimeClient camundaRuntimeClient;
 
     private static final String TEST_EVENT = "TEST_EVENT";
     private static final String TEST_EVENT_QM = "queryManagementRaiseQuery";
@@ -50,19 +51,13 @@ class EventEmitterServiceTest {
 
     @BeforeEach
     void setup() {
-        when(runtimeService.createMessageCorrelation(any())).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.setVariable(any(), any())).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.tenantId(any())).thenReturn(messageCorrelationBuilder);
     }
 
     @Test
     void shouldSendMessageAndTriggerEvent_whenInvoked_withTenantId() {
         CaseData caseData = createCaseData(TEST_EVENT, CASE_ID);
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
-        verify(runtimeService).createMessageCorrelation(TEST_EVENT);
-        verify(messageCorrelationBuilder).setVariable("caseId", CASE_ID);
-        verify(messageCorrelationBuilder).tenantId("civil");
-        verify(messageCorrelationBuilder).correlateStartMessage();
+        verify(camundaRuntimeClient).correlateStartMessage(TEST_EVENT, "civil", Map.of("caseId", CASE_ID));
         verify(applicationEventPublisher).publishEvent(new DispatchBusinessProcessEvent(CASE_ID, caseData.getBusinessProcess()));
     }
 
@@ -70,11 +65,10 @@ class EventEmitterServiceTest {
     void shouldSendMessageAndTriggerQueryManagementEvent_whenInvoked_withTenantId() {
         CaseData caseData = createCaseData(TEST_EVENT_QM, CASE_ID);
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
-        verify(runtimeService).createMessageCorrelation(TEST_EVENT_QM);
-        verify(messageCorrelationBuilder).setVariable("caseId", CASE_ID);
-        verify(messageCorrelationBuilder).setVariable("queryId", QUERY_ID);
-        verify(messageCorrelationBuilder).tenantId("civil");
-        verify(messageCorrelationBuilder).correlateStartMessage();
+        Map<String, Object> expected = new HashMap<>();
+        expected.put("caseId", CASE_ID);
+        expected.put("queryId", QUERY_ID);
+        verify(camundaRuntimeClient).correlateStartMessage(TEST_EVENT_QM, "civil", expected);
         verify(applicationEventPublisher).publishEvent(new DispatchBusinessProcessEvent(CASE_ID, caseData.getBusinessProcess()));
     }
 
@@ -82,63 +76,85 @@ class EventEmitterServiceTest {
     void shouldSendMessageAndTriggerResponseToQueryEvent_whenInvoked_withTenantId() {
         CaseData caseData = createCaseData(TEST_EVENT_QM_RESPONSE, CASE_ID);
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
-        verify(runtimeService).createMessageCorrelation(TEST_EVENT_QM_RESPONSE);
-        verify(messageCorrelationBuilder).setVariable("caseId", CASE_ID);
-        verify(messageCorrelationBuilder).setVariable("queryId", QUERY_ID);
-        verify(messageCorrelationBuilder).tenantId("civil");
-        verify(messageCorrelationBuilder).correlateStartMessage();
+        Map<String, Object> expected = new HashMap<>();
+        expected.put("caseId", CASE_ID);
+        expected.put("queryId", QUERY_ID);
+        verify(camundaRuntimeClient).correlateStartMessage(TEST_EVENT_QM_RESPONSE, "civil", expected);
         verify(applicationEventPublisher).publishEvent(new DispatchBusinessProcessEvent(CASE_ID, caseData.getBusinessProcess()));
     }
 
     @Test
     void shouldSendMessageAndTriggerEvent_whenInvoked_withoutTenantId() {
-        when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.correlateStartMessage())
-            .thenThrow(mockedRemoteProcessEngineException)
-            .thenReturn(null);
+        doThrow(mockedFeignException).when(camundaRuntimeClient)
+            .correlateStartMessage(any(), any(), any());
 
         CaseData caseData = createCaseData(TEST_EVENT, CASE_ID);
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
 
-        verify(runtimeService, times(2)).createMessageCorrelation(TEST_EVENT);
-        verify(messageCorrelationBuilder, times(2)).setVariable("caseId", CASE_ID);
-        verify(messageCorrelationBuilder).withoutTenantId();
-        verify(messageCorrelationBuilder, times(2)).correlateStartMessage();
+        verify(camundaRuntimeClient).correlateStartMessage(TEST_EVENT, "civil", Map.of("caseId", CASE_ID));
+        verify(camundaRuntimeClient).correlateStartMessageWithoutTenant(TEST_EVENT, Map.of("caseId", CASE_ID));
         verify(applicationEventPublisher, times(2)).publishEvent(new DispatchBusinessProcessEvent(CASE_ID, caseData.getBusinessProcess()));
+    }
+
+    @Test
+    void shouldNotCorrelateAgainWithoutTenant_whenTenantAttemptTimesOut() {
+        doThrow(new RetryableException(
+            -1, "Read timed out", Request.HttpMethod.POST, (Long) null,
+            Request.create(Request.HttpMethod.POST, "url", Map.of(), null, null, null)
+        )).when(camundaRuntimeClient).correlateStartMessage(any(), any(), any());
+
+        CaseData caseData = createCaseData(TEST_EVENT, CASE_ID);
+        eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
+
+        verify(camundaRuntimeClient).correlateStartMessage(TEST_EVENT, "civil", Map.of("caseId", CASE_ID));
+        verify(camundaRuntimeClient, never()).correlateStartMessageWithoutTenant(any(), any());
+        verify(applicationEventPublisher, times(1)).publishEvent(new DispatchBusinessProcessEvent(CASE_ID, caseData.getBusinessProcess()));
+    }
+
+    @Test
+    void shouldNotCorrelateAgainWithoutTenant_whenEngineReturnsServerError() {
+        doThrow(new FeignException.BadGateway(
+            "Bad gateway", Request.create(Request.HttpMethod.POST, "url", Map.of(), null, null, null), null, null
+        )).when(camundaRuntimeClient).correlateStartMessage(any(), any(), any());
+
+        CaseData caseData = createCaseData(TEST_EVENT, CASE_ID);
+        eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
+
+        verify(camundaRuntimeClient, never()).correlateStartMessageWithoutTenant(any(), any());
+        verify(applicationEventPublisher, times(1)).publishEvent(new DispatchBusinessProcessEvent(CASE_ID, caseData.getBusinessProcess()));
     }
 
     @Test
     void shouldSendMessageAndNotTriggerEvent_whenNotTrue_withTenantId() {
         CaseData caseData = createCaseData(TEST_EVENT, CASE_ID);
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData, false);
-        verify(runtimeService).createMessageCorrelation(TEST_EVENT);
-        verify(messageCorrelationBuilder).correlateStartMessage();
+        verify(camundaRuntimeClient).correlateStartMessage(TEST_EVENT, "civil", Map.of("caseId", CASE_ID));
         verifyNoInteractions(applicationEventPublisher);
     }
 
     @Test
     void shouldSendMessageAndNotTriggerEvent_whenNotTrue_withoutTenantId() {
-        when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException);
+        doThrow(mockedFeignException).when(camundaRuntimeClient)
+            .correlateStartMessage(any(), any(), any());
 
         CaseData caseData = createCaseData(TEST_EVENT, CASE_ID);
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData, false);
 
-        verify(runtimeService, times(2)).createMessageCorrelation(TEST_EVENT);
-        verify(messageCorrelationBuilder, times(2)).correlateStartMessage();
+        verify(camundaRuntimeClient).correlateStartMessage(TEST_EVENT, "civil", Map.of("caseId", CASE_ID));
+        verify(camundaRuntimeClient).correlateStartMessageWithoutTenant(TEST_EVENT, Map.of("caseId", CASE_ID));
         verifyNoInteractions(applicationEventPublisher);
     }
 
     @Test
     void shouldHandleException_whenInvoked() {
-        when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException);
+        doThrow(mockedFeignException).when(camundaRuntimeClient)
+            .correlateStartMessage(any(), any(), any());
 
         CaseData caseData = createCaseData(TEST_EVENT, CASE_ID);
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
 
-        verify(runtimeService, times(2)).createMessageCorrelation(TEST_EVENT);
-        verify(messageCorrelationBuilder, times(2)).correlateStartMessage();
+        verify(camundaRuntimeClient).correlateStartMessage(TEST_EVENT, "civil", Map.of("caseId", CASE_ID));
+        verify(camundaRuntimeClient).correlateStartMessageWithoutTenant(TEST_EVENT, Map.of("caseId", CASE_ID));
     }
 
     private CaseData createCaseData(String event, long caseId) {
