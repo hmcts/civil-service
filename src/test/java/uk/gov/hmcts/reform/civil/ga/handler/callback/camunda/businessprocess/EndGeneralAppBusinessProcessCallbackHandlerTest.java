@@ -1358,23 +1358,23 @@ class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralApplication
             GeneralApplicationsDetails generalApp = objectMapper.convertValue(
                     ((LinkedHashMap<?, ?>) generalApplicationDetails.getFirst()).get("value"),
                     new TypeReference<>() {});
-            assertThat(generalApp.getCaseState()).isEqualTo("Listed for a Hearing");
+            assertThat(generalApp.getCaseState()).isEqualTo("List for hearing");
 
             GADetailsRespondentSol generalAppResp = objectMapper.convertValue(
                     ((LinkedHashMap<?, ?>) gaDetailsRespondentSol.getFirst()).get("value"),
                     new TypeReference<>() {});
-            assertThat(generalAppResp.getCaseState()).isEqualTo("Listed for a Hearing");
+            assertThat(generalAppResp.getCaseState()).isEqualTo("List for hearing");
 
             GADetailsRespondentSol generalAppRespTwo = objectMapper.convertValue(
                     ((LinkedHashMap<?, ?>) gaDetailsRespondentSolTwo.getFirst()).get("value"),
                     new TypeReference<>() {});
             assertThat(generalAppRespTwo.getCaseState())
-                    .isEqualTo("Listed for a Hearing");
+                    .isEqualTo("List for hearing");
             GeneralApplicationsDetails gaDetailsMasterColl = objectMapper.convertValue(
                     ((LinkedHashMap<?, ?>) gaDetailsMasterCollection.getFirst()).get("value"),
                     new TypeReference<>() {});
             assertThat(gaDetailsMasterColl.getCaseState())
-                    .isEqualTo("Listed for a Hearing");
+                    .isEqualTo("List for hearing");
         }
 
         @Test
