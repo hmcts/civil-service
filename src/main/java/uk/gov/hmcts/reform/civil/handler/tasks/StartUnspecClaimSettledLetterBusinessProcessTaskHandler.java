@@ -13,10 +13,6 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 
-/**
- * Starts the unspec claim settled letter business process and adds the variable the BPMN
- * uses to decide whether the letter task runs, so the letter event is only recorded when a letter is sent.
- */
 @Component
 public class StartUnspecClaimSettledLetterBusinessProcessTaskHandler extends BaseExternalTaskHandler {
 
