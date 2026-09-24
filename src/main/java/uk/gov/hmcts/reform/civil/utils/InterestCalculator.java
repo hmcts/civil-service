@@ -6,6 +6,9 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.StoredBreathingSpace;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
@@ -146,7 +149,7 @@ public class InterestCalculator {
                                                         LocalDate interestFromDate,
                                                         LocalDate interestToDate) {
         long numberOfDays = getNumberOfDays(interestFromDate, interestToDate);
-        long pausedDays = getBreathingSpacePausedDays(caseData, interestFromDate, interestToDate);
+        long pausedDays = countInterestDaysPausedByBreathingSpace(caseData, interestFromDate, interestToDate);
         long accruableDays = Math.max(0L, numberOfDays - pausedDays);
         BigDecimal interestPerDay = getInterestPerDay(caseData.getTotalClaimAmount(), interestRate);
         return interestPerDay.multiply(BigDecimal.valueOf(accruableDays));
@@ -176,43 +179,63 @@ public class InterestCalculator {
         return numberOfDays;
     }
 
-    private static long getBreathingSpacePausedDays(CaseData caseData,
-                                                    LocalDate interestFrom,
-                                                    LocalDate interestTo) {
-        if (caseData.getBreathing() == null
-            || caseData.getBreathing().getEnter() == null
-            || caseData.getBreathing().getEnter().getStart() == null) {
-            return 0;
+    private static long countInterestDaysPausedByBreathingSpace(CaseData caseData,
+                                                                LocalDate interestFromDate,
+                                                                LocalDate interestToDate) {
+        long pausedDays = 0;
+        for (BreathingSpaceDateRange dateRange : getStoredBreathingSpaceDateRanges(caseData)) {
+            pausedDays += countDaysBreathingSpaceOverlapsInterestPeriod(
+                dateRange.start(),
+                dateRange.end(),
+                interestFromDate,
+                interestToDate
+            );
         }
-
-        LocalDate pauseStart = caseData.getBreathing().getEnter().getStart();
-        LocalDate pauseEnd = caseData.getBreathing().getLift() != null
-            && caseData.getBreathing().getLift().getExpectedEnd() != null
-            ? caseData.getBreathing().getLift().getExpectedEnd()
-            : LocalDate.now();
-
-        return countPausedDaysInInterestPeriod(pauseStart, pauseEnd, interestFrom, interestTo);
+        return pausedDays;
     }
 
-    private static long countPausedDaysInInterestPeriod(LocalDate pauseStart,
-                                                        LocalDate pauseEnd,
-                                                        LocalDate interestFrom,
-                                                        LocalDate interestTo) {
-        if (pauseStart == null || pauseEnd == null || interestFrom == null || interestTo == null) {
-            return 0;
+    private static List<BreathingSpaceDateRange> getStoredBreathingSpaceDateRanges(CaseData caseData) {
+        if (caseData.getBreathing() == null
+            || caseData.getBreathing().getStoredBreathingSpace() == null) {
+            return List.of();
         }
-        if (pauseEnd.isBefore(pauseStart) || interestTo.isBefore(interestFrom) || interestTo.equals(interestFrom)) {
-            return 0;
+        List<BreathingSpaceDateRange> dateRanges = new ArrayList<>();
+        for (Element<StoredBreathingSpace> storedBreathingSpace : caseData.getBreathing().getStoredBreathingSpace()) {
+            StoredBreathingSpace storedCycle = storedBreathingSpace.getValue();
+            dateRanges.add(new BreathingSpaceDateRange(
+                storedCycle.getEnter().getStart(),
+                getBreathingSpaceEndDateOrToday(storedCycle.getLift())
+            ));
         }
+        return dateRanges;
+    }
 
-        LocalDate accrualWindowStart = interestFrom.plusDays(1);
-        LocalDate overlapStart = pauseStart.isAfter(accrualWindowStart) ? pauseStart : accrualWindowStart;
-        LocalDate overlapEnd = pauseEnd.isBefore(interestTo) ? pauseEnd : interestTo;
+    private static LocalDate getBreathingSpaceEndDateOrToday(BreathingSpaceLiftInfo lift) {
+        if (lift == null) {
+            return LocalDate.now();
+        }
+        return lift.getExpectedEnd();
+    }
 
-        if (overlapEnd.isBefore(overlapStart)) {
+    private record BreathingSpaceDateRange(LocalDate start, LocalDate end) {
+    }
+
+    private static long countDaysBreathingSpaceOverlapsInterestPeriod(LocalDate breathingSpaceStart,
+                                                                      LocalDate breathingSpaceEnd,
+                                                                      LocalDate interestFromDate,
+                                                                      LocalDate interestToDate) {
+        LocalDate firstInterestDay = interestFromDate.plusDays(1);
+        LocalDate firstPausedInterestDay = breathingSpaceStart.isAfter(firstInterestDay)
+            ? breathingSpaceStart
+            : firstInterestDay;
+        LocalDate lastPausedInterestDay = breathingSpaceEnd.isBefore(interestToDate)
+            ? breathingSpaceEnd
+            : interestToDate;
+
+        if (lastPausedInterestDay.isBefore(firstPausedInterestDay)) {
             return 0;
         }
-        return ChronoUnit.DAYS.between(overlapStart, overlapEnd) + 1;
+        return ChronoUnit.DAYS.between(firstPausedInterestDay, lastPausedInterestDay) + 1;
     }
 
     @NotNull
