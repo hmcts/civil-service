@@ -18,5 +18,6 @@ public class ExternalTaskInput {
     CaseEvent caseEvent;
     String generalAppParentCaseLink;
     Boolean triggeredViaScheduler;
+    Boolean hearingNoticeSkipped;
     String generalApplicationCaseId;
 }

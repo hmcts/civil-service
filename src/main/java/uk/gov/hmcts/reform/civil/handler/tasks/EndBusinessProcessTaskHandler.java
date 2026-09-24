@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_BUSINESS_PROCESS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HEARING_NOTICE;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
@@ -54,6 +55,10 @@ public class EndBusinessProcessTaskHandler extends BaseExternalTaskHandler {
         BusinessProcess businessProcess = data.getBusinessProcess();
         if (businessProcess.getStatusOrDefault() != BusinessProcessStatus.FINISHED) {
             coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
+            if (Boolean.TRUE.equals(externalTaskInput.getHearingNoticeSkipped())) {
+                log.info("Triggering manual hearing listing task for case {} after hearing notice was skipped", caseId);
+                coreCaseDataService.triggerEvent(Long.valueOf(caseId), INVALID_HEARING_NOTICE);
+            }
         } else {
             log.info("Stopping multiple calls, END_BUSINESS_PROCESS already performed for caseid: {}", caseId);
         }

@@ -33,6 +33,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_BUSINESS_PROCESS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HEARING_NOTICE;
 
 @ExtendWith(MockitoExtension.class)
 class EndBusinessProcessTaskHandlerTest {
@@ -121,6 +122,29 @@ class EndBusinessProcessTaskHandlerTest {
 
         verify(coreCaseDataService).startUpdate(CASE_ID, END_BUSINESS_PROCESS);
         verify(coreCaseDataService).submitUpdate(CASE_ID, getCaseDataContent(caseDetails, startEventResponse));
+        verify(externalTaskService).complete(mockExternalTask, null);
+    }
+
+    @Test
+    void shouldTriggerManualHearingListingTask_whenHearingNoticeWasSkipped() {
+        CaseData caseData = new CaseDataBuilder()
+            .atStateClaimDraft()
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
+            .build();
+
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
+        StartEventResponse startEventResponse = startEventResponse(caseDetails);
+        when(coreCaseDataService.startUpdate(CASE_ID, END_BUSINESS_PROCESS)).thenReturn(startEventResponse);
+        when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+        when(mockExternalTask.getAllVariables()).thenReturn(Map.of(
+            "caseId", CASE_ID,
+            "caseEvent", END_BUSINESS_PROCESS,
+            "hearingNoticeSkipped", true
+        ));
+
+        handler.execute(mockExternalTask, externalTaskService);
+
+        verify(coreCaseDataService).triggerEvent(Long.valueOf(CASE_ID), INVALID_HEARING_NOTICE);
         verify(externalTaskService).complete(mockExternalTask, null);
     }
 
