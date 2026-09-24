@@ -117,7 +117,7 @@ withPipeline(type, product, component) {
 
   env.PLAYWRIGHT_TEST_RESULTS_DIR = 'playwright-test-results'
   env.PLAYWRIGHT_BOOTSTRAP_TEST_RESULTS_DIR = 'civil-service-bootstrap'
-  env.PLAYWRIGHT_SMOKE_TEST_RESULTS_DIR = 'civil-service-smoke'
+  env.PLAYWRIGHT_SMOKE_TEST_RESULTS_DIR = 'civil-service-master-pr-smoke'
   env.PLAYWRIGHT_WORKERS = 8
   env.PLAYWRIGHT_RETRIES = 1
   env.PLAYWRIGHT_EXUI_RETRIES = 1

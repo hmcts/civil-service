@@ -221,6 +221,7 @@ def secrets = [
 withNightlyPipeline(type, product, component) {
   env.PLAYWRIGHT_TEST_RESULTS_DIR = 'playwright-test-results'
   env.PLAYWRIGHT_BOOTSTRAP_TEST_RESULTS_DIR = 'civil-service-bootstrap'
+  env.PLAYWRIGHT_SMOKE_TEST_RESULTS_DIR = 'civil-service-nightly-smoke'
   env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR = 'civil-service-nightly'
   env.GRADLE_OPTS = "-Dorg.gradle.workers.max=3"
   env.FORCE_GREEN_BUILD=params.FORCE_GREEN_BUILD
@@ -276,7 +277,7 @@ withNightlyPipeline(type, product, component) {
 
   boolean forceGreenBuild = env.FORCE_GREEN_BUILD.toBoolean();
   boolean runFailedTests = env.RUN_FAILED_TESTS.toBoolean();
-  boolean playwrightSmokeTestFailed = false;
+  boolean playwrightSmokeTestsFailed = false;
 
   if(!forceGreenBuild) {
     afterAlways('DependencyCheckNightly') {
@@ -290,7 +291,7 @@ withNightlyPipeline(type, product, component) {
       }
 
       boolean playwrightSetupFailed = false;
-      playwrightSmokeTestFailed = false;
+      playwrightSmokeTestsFailed = false;
       boolean flowInterrupted = false;
       boolean lastRunPassed = env.RUN_FAILED_TESTS.toBoolean() && checkHasPlaywrightLastRunStatus('passed');
       boolean playwrightRunSetup =
@@ -321,12 +322,12 @@ withNightlyPipeline(type, product, component) {
             if(error instanceof org.jenkinsci.plugins.workflow.steps.FlowInterruptedException) {
               flowInterrupted = true
             }
-            playwrightSmokeTestFailed = true
+            playwrightSmokeTestsFailed = true
             unstable(message: "${STAGE_NAME} is unstable: " + error.toString())
           } finally {
             archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-smoke-test-results/**/*'
 
-            if (playwrightSmokeTestFailed && !lastRunPassed) {
+            if (playwrightSmokeTestsFailed && !lastRunPassed) {
               copyPreviousAllureHistory(
                 'playwright-allure-functional-history',
                 'playwright-allure-functional-results'
@@ -343,7 +344,7 @@ withNightlyPipeline(type, product, component) {
         }
       }
 
-      if(!flowInterrupted && !playwrightSetupFailed && !playwrightSmokeTestFailed) {
+      if(!flowInterrupted && !playwrightSetupFailed && !playwrightSmokeTestsFailed) {
         stage('Playwright full functional test') {
           try {
             sh 'bash ./playwright-e2e/scripts/civil-nightly/civil-service/playwright-run-civil-service-nightly-tests.sh'
@@ -402,7 +403,7 @@ withNightlyPipeline(type, product, component) {
 
     if(!forceGreenBuild) {
       before('fullFunctionalTest') {
-        if(playwrightSmokeTestFailed) {
+        if(playwrightSmokeTestsFailed) {
           env.SKIP_FULL_FUNCTIONAL_TESTS = 'true'
           return
         }
@@ -420,7 +421,7 @@ withNightlyPipeline(type, product, component) {
 
     if(!forceGreenBuild) {
       afterAlways('fullFunctionalTest') {
-        if(playwrightSmokeTestFailed) {
+        if(playwrightSmokeTestsFailed) {
           echo 'Skipping functional test report generation because the Playwright smoke test failed.'
           return
         }
