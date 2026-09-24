@@ -29,7 +29,7 @@ public class BreathingSpaceUtils {
     }
 
     public static Optional<String> getCannotEnterBreathingSpaceReason(CaseData caseData) {
-        if (isBreathingSpaceActive(caseData) || hasBreathingSpaceStillInForce(caseData)) {
+        if (caseData.hasBreathingSpace()) {
             return Optional.of(ALREADY_IN_BREATHING_SPACE);
         }
         if (getCompletedBreathingSpaceCount(caseData) >= getDefendantCount(caseData)) {
@@ -42,43 +42,14 @@ public class BreathingSpaceUtils {
         return YES.equals(caseData.getAddRespondent2()) ? 2 : 1;
     }
 
-    public static boolean isBreathingSpaceActive(CaseData caseData) {
-        return caseData.getBreathing() != null
-            && YES.equals(caseData.getBreathing().getActive());
-    }
-
     public static int getCompletedBreathingSpaceCount(CaseData caseData) {
         return (int) getStoredBreathingSpaceItems(caseData.getBreathing()).stream()
             .filter(BreathingSpaceUtils::hasLeftBreathingSpace)
             .count();
     }
 
-    private static boolean hasBreathingSpaceStillInForce(CaseData caseData) {
-        if (caseData.getBreathing() == null) {
-            return false;
-        }
-        if (getStoredBreathingSpaceItems(caseData.getBreathing()).stream()
-            .anyMatch(BreathingSpaceUtils::isStillInForce)) {
-            return true;
-        }
-        BreathingSpaceLiftInfo currentLift = caseData.getBreathing().getLift();
-        return currentLift != null && isEndDateStillInForce(currentLift.getExpectedEnd());
-    }
-
-    private static boolean isStillInForce(StoredBreathingSpace storedBreathingSpace) {
-        if (storedBreathingSpace.getLift() == null) {
-            return true;
-        }
-        return isEndDateStillInForce(storedBreathingSpace.getLift().getExpectedEnd());
-    }
-
     private static boolean hasLeftBreathingSpace(StoredBreathingSpace storedBreathingSpace) {
-        return storedBreathingSpace.getLift() != null
-            && !isEndDateStillInForce(storedBreathingSpace.getLift().getExpectedEnd());
-    }
-
-    private static boolean isEndDateStillInForce(LocalDate expectedEnd) {
-        return expectedEnd != null && !expectedEnd.isBefore(LocalDate.now());
+        return storedBreathingSpace.getLift() != null;
     }
 
     public static void addEnteredBreathingSpaceToHistory(CaseData caseData) {

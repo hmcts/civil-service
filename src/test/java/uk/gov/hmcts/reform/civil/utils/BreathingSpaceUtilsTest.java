@@ -37,14 +37,14 @@ class BreathingSpaceUtilsTest {
     }
 
     @Test
-    void cannotEnterWhenLiftEndDateHasNotPassed() {
+    void cannotEnterAgainWhenSingleDefendantHasLeftEvenIfEndDateHasNotPassed() {
         CaseData endsInTheFuture = liftedCase(LocalDate.now(), LocalDate.now().plusDays(60), false);
         CaseData endsToday = liftedCase(LocalDate.now().minusDays(1), LocalDate.now(), false);
 
         assertThat(BreathingSpaceUtils.getCannotEnterBreathingSpaceReason(endsInTheFuture))
-            .contains(ALREADY_IN_BREATHING_SPACE);
+            .contains(ALL_DEFENDANTS_LEFT);
         assertThat(BreathingSpaceUtils.getCannotEnterBreathingSpaceReason(endsToday))
-            .contains(ALREADY_IN_BREATHING_SPACE);
+            .contains(ALL_DEFENDANTS_LEFT);
     }
 
     @Test
@@ -55,19 +55,12 @@ class BreathingSpaceUtilsTest {
     }
 
     @Test
-    void allowsSecondEnterOnOneVTwoAfterFirstLiftEndDateHasPassed() {
-        CaseData caseData = liftedCase(LocalDate.now().minusDays(5), LocalDate.now().minusDays(1), true);
+    void allowsSecondEnterOnOneVTwoOnceFirstDefendantHasLeft() {
+        CaseData endDatePassed = liftedCase(LocalDate.now().minusDays(5), LocalDate.now().minusDays(1), true);
+        CaseData endDateInTheFuture = liftedCase(LocalDate.now(), LocalDate.now().plusDays(60), true);
 
-        assertThat(BreathingSpaceUtils.getCannotEnterBreathingSpaceReason(caseData)).isEmpty();
-    }
-
-    @Test
-    void cannotEnterSecondDefendantWhileFirstLiftEndDateIsInTheFuture() {
-        CaseData caseData = liftedCase(LocalDate.now(), LocalDate.now().plusDays(60), true);
-        caseData.getBreathing().setActive(YesOrNo.NO);
-
-        assertThat(BreathingSpaceUtils.getCannotEnterBreathingSpaceReason(caseData))
-            .contains(ALREADY_IN_BREATHING_SPACE);
+        assertThat(BreathingSpaceUtils.getCannotEnterBreathingSpaceReason(endDatePassed)).isEmpty();
+        assertThat(BreathingSpaceUtils.getCannotEnterBreathingSpaceReason(endDateInTheFuture)).isEmpty();
     }
 
     @Test
