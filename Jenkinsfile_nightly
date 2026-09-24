@@ -168,9 +168,9 @@ def checkHasPlaywrightLastRunStatus(expectedStatuses) {
   return statuses.contains(lastRunStatus)
 }
 
-def checkHasFailedTestFiles() {
+def checkHasFailedTestFiles(reportFilePath) {
   def failedTestFiles = sh(
-    script: "jq -r '.failedTestFiles | length' test-results/functional/testFilesReport.json",
+    script: "jq -r '.failedTestFiles | length' ${reportFilePath}",
     returnStdout: true
   ).trim()
   return failedTestFiles == '0'
@@ -408,11 +408,9 @@ withNightlyPipeline(type, product, component) {
           return
         }
         if(runFailedTests) {
-          copyPrevTestFilesReport("test-results/functional/testFilesReport.json")
-          hasFailedTestFiles = checkHasFailedTestFiles()
-        }
-        if (!runFailedTests || !hasFailedTestFiles) {
-          copyPreviousAllureHistory('allure-functional-history', 'allure-functional-results');
+          def testFilesReportPath = "test-results/functional/testFilesReport.json"
+          copyPrevTestFilesReport(testFilesReportPath)
+          hasFailedTestFiles = checkHasFailedTestFiles(testFilesReportPath)
         }
       }
     }
@@ -426,6 +424,7 @@ withNightlyPipeline(type, product, component) {
           return
         }
         if (!runFailedTests || !hasFailedTestFiles) {
+          copyPreviousAllureHistory('allure-functional-history', 'allure-functional-results');
           yarnBuilder.yarn('test:generate-report')
           publishAllureReport(
             'allure-functional-report',
