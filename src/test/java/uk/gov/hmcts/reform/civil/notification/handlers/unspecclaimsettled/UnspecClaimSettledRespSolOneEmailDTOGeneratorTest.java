@@ -13,11 +13,13 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -112,8 +114,6 @@ class UnspecClaimSettledRespSolOneEmailDTOGeneratorTest {
         try (MockedStatic<NotificationUtils> notificationUtils = Mockito.mockStatic(NotificationUtils.class)) {
             notificationUtils.when(() -> NotificationUtils.getLegalOrganizationNameForRespondent(any(), anyBoolean(), any()))
                 .thenReturn("Test Legal Org");
-            notificationUtils.when(() -> NotificationUtils.getRespondentLegalOrganizationName(any(), any()))
-                .thenReturn("Test Legal Org");
             properties = emailDTOGenerator.addCustomProperties(new HashMap<>(), caseData);
         }
 
@@ -136,11 +136,27 @@ class UnspecClaimSettledRespSolOneEmailDTOGeneratorTest {
         try (MockedStatic<NotificationUtils> notificationUtils = Mockito.mockStatic(NotificationUtils.class)) {
             notificationUtils.when(() -> NotificationUtils.getLegalOrganizationNameForRespondent(any(), anyBoolean(), any()))
                 .thenReturn("Test Legal Org");
-            notificationUtils.when(() -> NotificationUtils.getRespondentLegalOrganizationName(any(), any()))
-                .thenReturn("Test Legal Org");
             properties = emailDTOGenerator.addCustomProperties(new HashMap<>(), caseData);
         }
 
         assertThat(properties).containsEntry(DEFENDANT_REFERENCE_NUMBER, "Not provided");
+    }
+
+    @Test
+    void shouldUseOrganisationIdCopyForLegalRepName_whenOrganisationPolicyIsCleared() {
+        // Before the defendant is notified, the org policy is cleared and the org id is held in the copy field
+        CaseData caseData = CaseData.builder()
+            .applicant1(new Party().setType(Party.Type.COMPANY).setCompanyName("Claimant Company Ltd"))
+            .ccdCaseReference(1234567890123456L)
+            .respondent1OrganisationPolicy(new OrganisationPolicy()
+                                               .setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation()))
+            .respondent1OrganisationIDCopy("ORG-ID-1")
+            .build();
+        when(organisationService.findOrganisationById("ORG-ID-1"))
+            .thenReturn(Optional.of(new Organisation().setName("Defendant Legal Org")));
+
+        Map<String, String> properties = emailDTOGenerator.addCustomProperties(new HashMap<>(), caseData);
+
+        assertThat(properties).containsEntry(LEGAL_REP_NAME, "Defendant Legal Org");
     }
 }
