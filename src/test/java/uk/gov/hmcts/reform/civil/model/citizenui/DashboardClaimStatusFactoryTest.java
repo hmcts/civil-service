@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -890,5 +891,28 @@ class DashboardClaimStatusFactoryTest {
             new CcdDashboardClaimantClaimMatcher(caseData, toggleService, eventHistory)
         );
         assertThat(claimantStatus).isEqualTo(DashboardClaimStatus.ORDER_MADE);
+    }
+
+    @Test
+    void shouldReturnDecisionForReconsiderationMade_whenJudgeSelectedCreateSDO() {
+        CaseDocument sdoDocument = new CaseDocument()
+            .setDocumentType(DocumentType.SDO_ORDER)
+            .setCreatedDatetime(LocalDateTime.now().minusDays(1));
+
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+            .totalClaimAmount(BigDecimal.valueOf(999))
+            .orderRequestedForReviewClaimant(YesOrNo.YES)
+            .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO)
+            .systemGeneratedCaseDocuments(List.of(element(sdoDocument)))
+            .build();
+
+        List<CaseEventDetail> eventHistory = Collections.emptyList();
+        CcdDashboardClaimantClaimMatcher matcher = new CcdDashboardClaimantClaimMatcher(caseData, toggleService, eventHistory);
+
+        DashboardClaimStatus status = claimStatusFactory.getDashboardClaimStatus(matcher);
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.DECISION_FOR_RECONSIDERATION_MADE);
     }
 }
