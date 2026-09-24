@@ -368,7 +368,7 @@ def runSmokeTests = tasks.register('runSmokeTests', Exec) {
   description = 'Runs smoke tests.'
   dependsOn installSmokeTestDependencies
   mustRunAfter awaitApplicationReadiness
-  commandLine 'bash', "${projectDir}/playwright-e2e/scripts/civil-master-pr/civil-service/playwright-run-civil-service-smoke.sh"
+  commandLine 'bash', "${projectDir}/playwright-e2e/scripts/civil-master-pr/civil-service/playwright-run-civil-service-master-pr-smoke.sh"
 }
 
 tasks.register('smoke') {
