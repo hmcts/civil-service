@@ -5,6 +5,7 @@ import feign.Client;
 import feign.Request;
 import feign.Response;
 import feign.httpclient.ApacheHttpClient;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
+@Slf4j
 public class HttpClientFeignConfiguration {
 
     @Value("${http.client.connectTimeout:5000}")
@@ -101,7 +103,13 @@ public class HttpClientFeignConfiguration {
                 reportMetrics(service, System.currentTimeMillis() - startTime, true, null);
                 return response;
             } catch (Exception e) {
-                reportMetrics(service, System.currentTimeMillis() - startTime, false, e);
+                long duration = System.currentTimeMillis() - startTime;
+                log.error(
+                    "Outbound Feign request failed: targetHost={}, method={}, elapsedMs={}, connectTimeoutMs={}, readTimeoutMs={}, exceptionType={}",
+                    service, request.httpMethod(), duration, options.connectTimeoutMillis(), options.readTimeoutMillis(),
+                    e.getClass().getName()
+                );
+                reportMetrics(service, duration, false, e);
                 throw e;
             }
         }
