@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.model.search.Query;
+import uk.gov.hmcts.reform.civil.scheduler.common.SetTaskResult;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
 import java.math.BigDecimal;
 import java.time.ZoneOffset;
@@ -42,9 +42,9 @@ public abstract class ElasticSearchService {
         return caseDetails;
     }
 
-    public ElasticSearchResult getElasticSearchResult() {
+    public SetTaskResult<CaseDetails> getElasticSearchResult() {
         Set<CaseDetails> caseDetails = getCases();
-        return new ElasticSearchResult(caseDetails.stream(), caseDetails.size());
+        return new SetTaskResult<>(caseDetails);
     }
 
     abstract Query query(int startIndex, String timeNow);

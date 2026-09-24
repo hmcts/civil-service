@@ -11,10 +11,12 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.UUID;
 
+import static java.util.Collections.emptyMap;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
@@ -42,6 +44,8 @@ public class CoreCaseDataApiMockHelper {
         when(idamClient.getAccessToken(any(), any())).thenReturn(ACCESS_TOKEN);
         when(idamClient.getUserInfo(ACCESS_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
         when(authTokenGenerator.generate()).thenReturn(GENERATED_TOKEN);
+        when(coreCaseDataApi.getCase(eq(ACCESS_TOKEN), eq(GENERATED_TOKEN), any()))
+            .thenReturn(CaseDetails.builder().data(emptyMap()).build());
     }
 
     public void resetMocks() {
@@ -118,7 +122,7 @@ public class CoreCaseDataApiMockHelper {
     }
 
     public void verifySubmitEvent(int expectedCount) {
-        verify(coreCaseDataApi, org.mockito.Mockito.times(expectedCount)).submitEventForCaseWorker(
+        verify(coreCaseDataApi, times(expectedCount)).submitEventForCaseWorker(
             any(),
             any(),
             any(),
