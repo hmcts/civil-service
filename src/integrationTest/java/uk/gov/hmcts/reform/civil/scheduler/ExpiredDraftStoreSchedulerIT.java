@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.config.TestIdamConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledEventTracker;
 import uk.gov.hmcts.reform.civil.scheduler.expiredraftstore.ExpiredDraftStoreScheduler;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
 
@@ -67,7 +68,7 @@ public class ExpiredDraftStoreSchedulerIT {
             UUID.randomUUID(),
             "user-1",
             null,
-            1,
+            DraftType.DRAFT_CLAIM,
             Map.of("data", "expired"),
             now.minusDays(3),
             now.minusDays(2),
@@ -78,7 +79,7 @@ public class ExpiredDraftStoreSchedulerIT {
             UUID.randomUUID(),
             "user-2",
             null,
-            1,
+            DraftType.DRAFT_CLAIM,
             Map.of("data", "future"),
             now.minusDays(1),
             now,
@@ -113,7 +114,7 @@ public class ExpiredDraftStoreSchedulerIT {
             UUID.randomUUID(),
             "user-4",
             null,
-            1,
+            DraftType.DRAFT_CLAIM,
             Map.of("data", "expired"),
             now.minusDays(3),
             now.minusDays(2),

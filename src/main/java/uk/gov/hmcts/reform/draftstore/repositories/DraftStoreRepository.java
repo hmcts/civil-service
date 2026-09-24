@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.draftstore.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 
 import java.time.OffsetDateTime;
@@ -12,22 +13,22 @@ import java.util.UUID;
 @Repository
 public interface DraftStoreRepository extends JpaRepository<DraftStoreEntity, UUID> {
 
-    List<DraftStoreEntity> findByUserIdAndDraftTypeId(String userId, Integer draftTypeId);
+    List<DraftStoreEntity> findByUserIdAndDraftType(String userId, DraftType draftType);
 
-    List<DraftStoreEntity> findByUserIdAndDraftTypeIdAndExpiresAtAfter(
+    List<DraftStoreEntity> findByUserIdAndDraftTypeAndExpiresAtAfter(
         String userId,
-        Integer draftTypeId,
+        DraftType draftType,
         OffsetDateTime now
     );
 
-    Optional<DraftStoreEntity> findByIdAndUserIdAndDraftTypeIdAndExpiresAtAfter(
+    Optional<DraftStoreEntity> findByIdAndUserIdAndDraftTypeAndExpiresAtAfter(
         UUID id,
         String userId,
-        Integer draftTypeId,
+        DraftType draftType,
         OffsetDateTime now
     );
 
-    long deleteByIdAndUserIdAndDraftTypeId(UUID id, String userId, Integer draftTypeId);
+    long deleteByIdAndUserIdAndDraftType(UUID id, String userId, DraftType draftType);
 
     long deleteByExpiresAtBefore(OffsetDateTime now);
 }

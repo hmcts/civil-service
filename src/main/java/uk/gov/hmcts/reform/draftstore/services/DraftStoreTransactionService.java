@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
 import java.util.UUID;
@@ -33,7 +34,7 @@ public class DraftStoreTransactionService {
     public DraftStoreEntity saveInNewTransaction(DraftStoreEntity draft) {
         Objects.requireNonNull(draft, "draft must not be null");
         entityManager.joinTransaction();
-        log.info("Creating draft typeId={} draftId={}", draft.getDraftTypeId(), draft.getId());
+        log.info("Creating draft type={} draftId={}", draft.getDraftType(), draft.getId());
         return draftStoreRepository.saveAndFlush(draft);
     }
 
@@ -41,22 +42,22 @@ public class DraftStoreTransactionService {
     public void deleteInNewTransaction(DraftStoreEntity draft) {
         Objects.requireNonNull(draft, "draft must not be null");
         entityManager.joinTransaction();
-        log.info("Deleting expired draft typeId={} draftId={}", draft.getDraftTypeId(), draft.getId());
+        log.info("Deleting expired draft type={} draftId={}", draft.getDraftType(), draft.getId());
         draftStoreRepository.delete(draft);
         draftStoreRepository.flush();
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public long deleteByIdInNewTransaction(UUID draftId, String userId, Integer draftTypeId) {
+    public long deleteByIdInNewTransaction(UUID draftId, String userId, DraftType draftType) {
         Objects.requireNonNull(draftId, "draftId must not be null");
         Objects.requireNonNull(userId, "userId must not be null");
-        Objects.requireNonNull(draftTypeId, "draftTypeId must not be null");
+        Objects.requireNonNull(draftType, "draftType must not be null");
         entityManager.joinTransaction();
-        log.info("Deleting draft typeId={} draftId={}", draftTypeId, draftId);
-        long deleted = draftStoreRepository.deleteByIdAndUserIdAndDraftTypeId(
+        log.info("Deleting draft type={} draftId={}", draftType, draftId);
+        long deleted = draftStoreRepository.deleteByIdAndUserIdAndDraftType(
             draftId,
             userId,
-            draftTypeId
+            draftType
         );
         draftStoreRepository.flush();
         return deleted;
