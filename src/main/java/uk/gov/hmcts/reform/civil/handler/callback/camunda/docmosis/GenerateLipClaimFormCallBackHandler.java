@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimform.ClaimFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -43,7 +42,6 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
     private final AssignCategoryId assignCategoryId;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
     private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm);
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -82,7 +80,7 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
     private CaseData buildClaimFormData(CaseData caseData, CaseDocument caseDocument, CaseEvent event) {
         List<Element<CaseDocument>> translatedDocuments = null;
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = null;
-        if (featureToggleService.isWelshEnabledForMainCase() && caseData.isClaimantBilingual()
+        if (caseData.isClaimantBilingual()
             && event == GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC) {
             translatedDocuments = caseData.getPreTranslationDocuments();
             translatedDocuments.add(element(caseDocument));

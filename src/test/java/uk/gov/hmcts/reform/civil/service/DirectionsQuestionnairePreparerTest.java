@@ -43,9 +43,6 @@ class DirectionsQuestionnairePreparerTest {
     @Mock
     private AssignCategoryId assignCategoryId;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     @InjectMocks
     private DirectionsQuestionnairePreparer preparer;
 
@@ -80,7 +77,6 @@ class DirectionsQuestionnairePreparerTest {
     @Test
     void shouldPrepareDirectionsQuestionnaire_singleResponse_ClaimantDqPreTranslation() {
         // Given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
         respondentLiPResponse.setRespondent1ResponseLanguage("WELSH");
         CaseDataLiP caseDataLiP = new CaseDataLiP();
@@ -123,7 +119,6 @@ class DirectionsQuestionnairePreparerTest {
         caseDocument.setDocumentName("directionsQuestionnaire");
         when(directionsQuestionnaireGenerator.generate(any(CaseData.class), eq(userToken)))
             .thenReturn(caseDocument);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         // When
         CaseData result = preparer.prepareDirectionsQuestionnaire(caseData, userToken);
 

@@ -71,7 +71,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
     private DeadlinesCalculator deadlinesCalculator;
 
     @MockBean
-    private FeatureToggleService toggleService;
+    private FeatureToggleService featureToggleService;
 
     @MockBean
     private CasemanReferenceNumberRepository casemanReferenceNumberRepository;
@@ -260,18 +260,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotSetLanguageDisplayIfWelshDisabled() {
-            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                    CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
-                .build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
-
-            assertThat(response.getData().get("claimantLanguagePreferenceDisplay")).isNull();
-        }
-
-        @Test
         void shouldSetLanguageDisplayToEnglishIfNotSpecified() {
-            when(toggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
@@ -282,7 +271,6 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetLanguageDisplayToEnglishAndWelshIfSpecified() {
-            when(toggleService.isWelshEnabledForMainCase()).thenReturn(true);
             caseData.setClaimantBilingualLanguagePreference("BOTH");
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())

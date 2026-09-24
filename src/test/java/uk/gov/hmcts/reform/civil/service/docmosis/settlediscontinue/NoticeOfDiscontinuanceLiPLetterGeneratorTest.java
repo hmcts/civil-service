@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
 import java.util.List;
@@ -29,7 +28,6 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
@@ -44,8 +42,6 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
 
     static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     private static final CaseDocument caseDocument = CaseDocumentBuilder.builder()
             .documentName("NoticeOfDiscontinuance.pdf")
@@ -65,7 +61,6 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
 
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         Party respondent1 = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
@@ -93,7 +88,6 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
 
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfullyWhenWelshParty() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party respondent1 = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
@@ -121,7 +115,6 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
 
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfullyWhenMainCaseHasBilingualParty() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party respondent1 = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)

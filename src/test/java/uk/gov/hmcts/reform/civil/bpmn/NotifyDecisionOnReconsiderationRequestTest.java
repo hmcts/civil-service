@@ -130,7 +130,6 @@ class NotifyDecisionOnReconsiderationRequestTest extends BpmnBaseTest {
 
         VariableMap variables = Variables.createVariables();
         variables.put("flowFlags", Map.of(LIP_CASE, true,
-                WELSH_ENABLED, true,
                 UNREPRESENTED_DEFENDANT_ONE, false
         ));
 
@@ -182,58 +181,6 @@ class NotifyDecisionOnReconsiderationRequestTest extends BpmnBaseTest {
     }
 
     @Test
-    void shouldNotTriggerBulkPrintForClaimantWhenWelshFlagDisabledForLipCase() {
-
-        //assert process has started
-        assertFalse(processInstance.isEnded());
-
-        //assert message start event
-        assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
-
-        VariableMap variables = Variables.createVariables();
-        variables.put("flowFlags", Map.of(LIP_CASE, true,
-                WELSH_ENABLED, false,
-                UNREPRESENTED_DEFENDANT_ONE, false
-        ));
-
-        //complete the start business process
-        ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
-        assertCompleteExternalTask(
-                startBusiness,
-                START_BUSINESS_TOPIC,
-                START_BUSINESS_EVENT,
-                START_BUSINESS_ACTIVITY,
-                variables
-        );
-
-        //complete the notification to parties
-        ExternalTask partyNotifications = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            partyNotifications,
-            PROCESS_CASE_EVENT,
-            NOTIFY_EVENT,
-            NOTIFY_ACTIVITY_ID,
-            variables
-        );
-
-        //complete the dashboard notification
-        ExternalTask dashboardNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-                dashboardNotification,
-                PROCESS_CASE_EVENT,
-                "DASHBOARD_NOTIFICATION_EVENT",
-                "GenerateDashboardNotificationsDecisionReconsideration",
-                variables
-        );
-
-        //end business process
-        ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);
-        completeBusinessProcess(endBusinessProcess);
-
-        assertNoExternalTasksLeft();
-    }
-
-    @Test
     void shouldSuccessfullyTriggerBulkPrintForOnlyDefendantAndDashboardEvents() {
 
         //assert process has started
@@ -244,7 +191,6 @@ class NotifyDecisionOnReconsiderationRequestTest extends BpmnBaseTest {
 
         VariableMap variables = Variables.createVariables();
         variables.put("flowFlags", Map.of(LIP_CASE, false,
-                WELSH_ENABLED, true,
                 UNREPRESENTED_DEFENDANT_ONE, true
         ));
 
@@ -296,57 +242,6 @@ class NotifyDecisionOnReconsiderationRequestTest extends BpmnBaseTest {
     }
 
     @Test
-    void shouldNotTriggerBulkPrintForDefendantWhenLipDefendantAndWelshFlagDisabledWithoutDashboardEvents() {
-
-        //assert process has started
-        assertFalse(processInstance.isEnded());
-
-        //assert message start event
-        assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
-
-        VariableMap variables = Variables.createVariables();
-        variables.put("flowFlags", Map.of(UNREPRESENTED_DEFENDANT_ONE, true,
-                WELSH_ENABLED, false
-        ));
-
-        //complete the start business process
-        ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
-        assertCompleteExternalTask(
-                startBusiness,
-                START_BUSINESS_TOPIC,
-                START_BUSINESS_EVENT,
-                START_BUSINESS_ACTIVITY,
-                variables
-        );
-
-        //complete the notification to parties
-        ExternalTask partyNotifications = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            partyNotifications,
-            PROCESS_CASE_EVENT,
-            NOTIFY_EVENT,
-            NOTIFY_ACTIVITY_ID,
-            variables
-        );
-
-        //complete the dashboard notification
-        ExternalTask dashboardNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-                dashboardNotification,
-                PROCESS_CASE_EVENT,
-                "DASHBOARD_NOTIFICATION_EVENT",
-                "GenerateDashboardNotificationsDecisionReconsideration",
-                variables
-        );
-
-        //end business process
-        ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);
-        completeBusinessProcess(endBusinessProcess);
-
-        assertNoExternalTasksLeft();
-    }
-
-    @Test
     void shouldSuccessfullyTriggerBulkPrintForBothClaimantNDefendantAndDashboardEvents() {
 
         //assert process has started
@@ -357,7 +252,6 @@ class NotifyDecisionOnReconsiderationRequestTest extends BpmnBaseTest {
 
         VariableMap variables = Variables.createVariables();
         variables.put("flowFlags", Map.of(LIP_CASE, true,
-                WELSH_ENABLED, true,
                 UNREPRESENTED_DEFENDANT_ONE, true
         ));
 
@@ -428,9 +322,7 @@ class NotifyDecisionOnReconsiderationRequestTest extends BpmnBaseTest {
         assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
 
         VariableMap variables = Variables.createVariables();
-        variables.put("flowFlags", Map.of(LIP_CASE, true,
-                WELSH_ENABLED, true
-        ));
+        variables.put("flowFlags", Map.of(LIP_CASE, true));
 
         //complete the start business process
         ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
@@ -490,7 +382,6 @@ class NotifyDecisionOnReconsiderationRequestTest extends BpmnBaseTest {
 
         VariableMap variables = Variables.createVariables();
         variables.put("flowFlags", Map.of(LIP_CASE, false,
-                WELSH_ENABLED, true,
                 UNREPRESENTED_DEFENDANT_ONE, false
         ));
 
