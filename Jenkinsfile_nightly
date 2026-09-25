@@ -1,7 +1,7 @@
 #!groovy
 
 properties([
-  pipelineTriggers([cron('H 17 * * 1-5')]),  
+  //pipelineTriggers([cron('H 17 * * 1-5')]),
   copyArtifactPermission('/HMCTS_a_to_c_Nightly/civil-service/*'),
   parameters([
     choice(name: 'FORCE_GREEN_BUILD', choices: ['false', 'true'],
@@ -81,7 +81,7 @@ properties([
     choice(name: 'PLAYWRIGHT_RUN_DATA_SETUP', choices: ['true', 'false'],
       description: 'Runs setup projects for caching data before running functional tests'),
     choice(name: 'PLAYWRIGHT_WA_ENABLED', choices: ['true', 'false'],
-      description: 'Will include work allocation functionality in tests when set to \'true\''),     
+      description: 'Will include work allocation functionality in tests when set to \'true\''),
     choice(name: 'PLAYWRIGHT_ZOD_VALIDATION_ENABLED', choices: ['true', 'false'],
       description: 'Enables Zod schema validation in Playwright API steps'),
     string(name: 'WAIT_FOR_TIMEOUT_MS',
@@ -99,7 +99,7 @@ def type = "java"
 def product = "civil"
 def component = "service"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
-def ccdBranch = "master"
+def ccdBranch = "nightly-dev"
 
 static Map<String, Object> secret(String secretName, String envVariable) {
   [$class     : 'AzureKeyVaultSecret',
