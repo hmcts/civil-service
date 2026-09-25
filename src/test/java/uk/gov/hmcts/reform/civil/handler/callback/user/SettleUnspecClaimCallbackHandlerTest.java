@@ -25,15 +25,15 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARKED_PAID_IN_FULL;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UNSPEC_CLAIM_SETTLED_LETTER_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_UNSPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 
 @ExtendWith(MockitoExtension.class)
-class SettleClaimUnspecCallbackHandlerTest extends BaseCallbackHandlerTest {
+class SettleUnspecClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    private SettleClaimUnspecCallbackHandler handler;
+    private SettleUnspecClaimCallbackHandler handler;
 
     private ObjectMapper objectMapper;
 
@@ -43,7 +43,7 @@ class SettleClaimUnspecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @BeforeEach
     void setup() {
         objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-        handler = new SettleClaimUnspecCallbackHandler(objectMapper, userService);
+        handler = new SettleUnspecClaimCallbackHandler(objectMapper, userService);
     }
 
     @Test
@@ -80,7 +80,8 @@ class SettleClaimUnspecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getState()).isEqualTo(CASE_STAYED.name());
             assertThat(updatedData.getBusinessProcess().getCamundaEvent())
-                .isEqualTo(SETTLE_CLAIM_MARKED_PAID_IN_FULL.name());
+                .isEqualTo(UNSPEC_CLAIM_SETTLED_LETTER_NOTIFICATION.name());
+
             assertThat(updatedData.getPreStayState()).isEqualTo(caseData.getCcdState().toString());
         }
     }
