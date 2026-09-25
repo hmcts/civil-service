@@ -2,10 +2,14 @@ package uk.gov.hmcts.reform.civil.consumer;
 
 import au.com.dius.pact.consumer.dsl.DslPart;
 import au.com.dius.pact.consumer.dsl.LambdaDsl;
+import au.com.dius.pact.consumer.dsl.PactBuilder;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit.MockServerConfig;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
+import au.com.dius.pact.core.model.PactSpecVersion;
 import au.com.dius.pact.core.model.RequestResponsePact;
+import au.com.dius.pact.core.model.V4Pact;
+import au.com.dius.pact.core.model.ContentTypeHint;
 import au.com.dius.pact.core.model.annotations.Pact;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
@@ -43,32 +47,35 @@ public class IdamApiConsumerTest extends BaseContractTest {
     private static final String PASSWORD = "password";
     private static final String ACCESS_TOKEN = "access-token";
     private static final String SCOPE = "openid profile roles";
-    private static final String TOKEN_REQUEST_BODY = "client_id=civil-service"
-        + "&client_secret=client-secret"
+    private static final String TOKEN_REQUEST_BODY = "password=password"
         + "&grant_type=password"
+        + "&scope=openid+profile+roles"
+        + "&client_secret=client-secret"
         + "&redirect_uri=http%3A%2F%2Flocalhost%2Freceiver"
-        + "&username=civil-system-user%40example.com"
-        + "&password=password"
-        + "&scope=openid+profile+roles";
+        + "&client_id=civil-service"
+        + "&username=civil-system-user%40example.com";
 
     @Autowired
     private IdamClient idamClient;
 
     @Pact(consumer = "civil_service", provider = IDAM_OIDC_PROVIDER)
-    public RequestResponsePact generateOpenIdToken(PactDslWithProvider builder) {
-        return builder
-            .given("a token is requested")
-            .uponReceiving("a password grant token request")
-            .path("/o/token")
-            .method(HttpMethod.POST.toString())
-            .matchHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded.*",
-                         MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-            .body(TOKEN_REQUEST_BODY, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-            .willRespondWith()
-            .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .body(buildTokenResponse())
-            .status(HttpStatus.SC_OK)
-            .toPact();
+    public V4Pact generateOpenIdToken(PactBuilder builder) {
+        builder.given("a token is requested")
+            .expectsToReceiveHttpInteraction("a password grant token request", request -> request
+                .withRequest(requestBuilder -> {
+                    requestBuilder
+                        .method(HttpMethod.POST.toString())
+                        .path("/o/token")
+                        .body(TOKEN_REQUEST_BODY, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+                    requestBuilder.build().getBody().setContentTypeHint(ContentTypeHint.TEXT);
+                    return requestBuilder;
+                })
+                .willRespondWith(response -> response
+                    .status(HttpStatus.SC_OK)
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .body(buildTokenResponse())));
+
+        return builder.toPact();
     }
 
     @Pact(consumer = "civil_service", provider = IDAM_OIDC_PROVIDER)
@@ -102,7 +109,8 @@ public class IdamApiConsumerTest extends BaseContractTest {
     }
 
     @Test
-    @PactTestFor(providerName = IDAM_OIDC_PROVIDER, pactMethod = "generateOpenIdToken")
+    @PactTestFor(providerName = IDAM_OIDC_PROVIDER, pactMethod = "generateOpenIdToken",
+        pactVersion = PactSpecVersion.V4)
     public void verifyGenerateOpenIdToken() {
         String accessToken = idamClient.getAccessToken(USER_EMAIL, PASSWORD);
 
