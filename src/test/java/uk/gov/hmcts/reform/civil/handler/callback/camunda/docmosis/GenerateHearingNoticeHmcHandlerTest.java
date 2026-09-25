@@ -52,6 +52,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -603,7 +604,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         assertThatThrownBy(() -> handler.handle(params)).isSameAs(failure);
 
         assertThat(inputVariables.getHearingNoticeSkipped()).isNull();
-        verify(camundaService, Mockito.never()).setProcessVariables(anyString(), any());
+        verify(camundaService, never()).setProcessVariables(anyString(), any());
         Mockito.verifyNoInteractions(hearingNoticeHmcGenerator, hearingFeesService);
     }
 
