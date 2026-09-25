@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
@@ -19,14 +20,25 @@ public class FullAdmitSetDateConfirmationText implements RespondToClaimConfirmat
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
-        if (!RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || !YesOrNo.NO.equals(caseData.getSpecDefenceFullAdmittedRequired())
+        YesOrNo fullAdmittedRequired = caseData.isCurrentDefendantRespondent2()
+            ? caseData.getSpecDefenceFullAdmitted2Required()
+            : caseData.getSpecDefenceFullAdmittedRequired();
+        if (!RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getCurrentDefendantClaimResponseTypeForSpec())
+            || !YesOrNo.NO.equals(fullAdmittedRequired)
             || !RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE.equals(
-            caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
+            caseData.getCurrentDefendantPaymentTimeRoute())) {
             return Optional.empty();
         }
 
-        LocalDate whenWillYouPay = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+        RespondToClaimAdmitPartLRspec admitPart = caseData.isCurrentDefendantRespondent2()
+            ? caseData.getRespondToClaimAdmitPartLRspec2()
+            : caseData.getRespondToClaimAdmitPartLRspec();
+        LocalDate whenWillYouPay = Optional.ofNullable(admitPart)
+            .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
+            .orElse(null);
+        if (whenWillYouPay == null) {
+            return Optional.empty();
+        }
 
         String applicantName = caseData.getApplicant1().getPartyName();
         if (caseData.getApplicant2() != null) {

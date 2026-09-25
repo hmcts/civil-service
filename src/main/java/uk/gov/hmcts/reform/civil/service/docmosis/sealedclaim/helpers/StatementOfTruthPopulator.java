@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.helpers;
 
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseFormForSpec;
@@ -35,13 +36,26 @@ public class StatementOfTruthPopulator {
 
         form.setStatementOfTruth(statementOfTruth)
             .setAllocatedTrack(caseData.getResponseClaimTrack())
-            .setResponseType(caseData.getRespondentClaimResponseTypeForSpecGeneric())
+            .setResponseType(resolveResponseType(caseData))
             .setCheckCarmToggle(featureToggleService.isCarmEnabledForCase(caseData))
-            .setMediation(caseData.getResponseClaimMediationSpecRequired());
+            .setMediation(isRespondent2(caseData)
+                              ? caseData.getResponseClaimMediationSpec2Required()
+                              : caseData.getResponseClaimMediationSpecRequired());
+    }
+
+    private RespondentResponseTypeSpec resolveResponseType(CaseData caseData) {
+        if (isRespondent2(caseData) && caseData.getRespondent2ClaimResponseTypeForSpec() != null) {
+            return caseData.getRespondent2ClaimResponseTypeForSpec();
+        }
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
+            return caseData.getRespondent1ClaimResponseTypeForSpec();
+        }
+        return caseData.getRespondentClaimResponseTypeForSpecGeneric();
     }
 
     private boolean isRespondent2(CaseData caseData) {
-        return (caseData.getRespondent2ResponseDate() != null)
+        return caseData.getRespondent2() != null
+            && (caseData.getRespondent2ResponseDate() != null)
             && (caseData.getRespondent1ResponseDate() == null
             || caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()));
     }

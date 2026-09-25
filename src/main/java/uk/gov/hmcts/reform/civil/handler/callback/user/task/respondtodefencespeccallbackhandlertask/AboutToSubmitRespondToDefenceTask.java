@@ -281,6 +281,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         caseData.setRespondent1GeneratedResponseDocument(null);
         caseData.setRespondent2GeneratedResponseDocument(null);
         caseData.setRespondent1ClaimResponseDocumentSpec(null);
+        caseData.setRespondent2ClaimResponseDocumentSpec(null);
     }
 
     private String putCaseStateInJudicialReferral(CaseData caseData) {

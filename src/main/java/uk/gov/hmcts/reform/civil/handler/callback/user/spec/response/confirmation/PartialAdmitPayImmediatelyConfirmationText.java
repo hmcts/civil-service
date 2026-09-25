@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
@@ -12,13 +11,14 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.EnumSet;
 import java.util.Optional;
 
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
@@ -29,13 +29,24 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
 
-        if (!RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(
-            caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
+        RespondentResponseTypeSpec currentResponseType = caseData.getCurrentDefendantClaimResponseTypeForSpec();
+        if (currentResponseType == null
+            || !EnumSet.of(RespondentResponseTypeSpec.FULL_ADMISSION, RespondentResponseTypeSpec.PART_ADMISSION)
+            .contains(currentResponseType)
+            || !RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(
+            caseData.getCurrentDefendantPaymentTimeRoute())) {
             return Optional.empty();
         }
-        LocalDate whenBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
-            .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
-            .orElse(null);
+        LocalDate whenBePaid;
+        if (YES.equals(caseData.getIsRespondent2())) {
+            whenBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec2())
+                .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
+                .orElse(null);
+        } else {
+            whenBePaid = Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
+                .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
+                .orElse(null);
+        }
 
         boolean isPartAdmitLRAdmissionBulk = checkLrAdmissionBulk(caseData, featureToggleService);
         BigDecimal claimOwingAmount = getClaimOwingAmount(caseData, isPartAdmitLRAdmissionBulk);
@@ -84,7 +95,7 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
         }
 
         boolean isFullAdmission = RespondentResponseTypeSpec.FULL_ADMISSION.equals(
-            caseData.getRespondentClaimResponseTypeForSpecGeneric()
+            caseData.getCurrentDefendantClaimResponseTypeForSpec()
         );
 
         if (isNull(claimOwingAmount) && isFullAdmission) {
@@ -111,38 +122,25 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
     }
 
     private boolean checkLrAdmissionBulk(CaseData caseData, FeatureToggleService featureToggleService) {
-
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
-        boolean isRespondent1PartAdmission = RespondentResponseTypeSpec.PART_ADMISSION.equals(
-                caseData.getRespondentClaimResponseTypeForSpecGeneric());
-
-        boolean isRespondent2PartAdmission =
-                RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec());
-
-        boolean isPartAdmission = isRespondent1PartAdmission;
-
-        if ((ONE_V_TWO_TWO_LEGAL_REP.equals(multiPartyScenario) && YesOrNo.YES.equals(caseData.getIsRespondent2()))) {
-            isPartAdmission = isRespondent2PartAdmission;
-        } else if ((ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario)
-                && caseData.getRespondentResponseIsSame().equals(NO))) {
-            isPartAdmission = false;
+        if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario)
+            && NO.equals(caseData.getRespondentResponseIsSame())) {
+            return false;
         }
 
-        return isPartAdmission;
+        return RespondentResponseTypeSpec.PART_ADMISSION.equals(
+            caseData.getCurrentDefendantClaimResponseTypeForSpec());
     }
 
     private BigDecimal getClaimOwingAmount(CaseData caseData, boolean isPartLRAdmission) {
-        BigDecimal claimOwingAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
-
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-
-        if (isPartLRAdmission) {
-            if ((ONE_V_TWO_TWO_LEGAL_REP.equals(multiPartyScenario) && YesOrNo.YES.equals(caseData.getIsRespondent2()))) {
-                claimOwingAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds2();
-            }
+        if (!isPartLRAdmission) {
+            return null;
         }
-        return claimOwingAmount;
+        if (caseData.isCurrentDefendantRespondent2()) {
+            return caseData.getRespondToAdmittedClaimOwingAmountPounds2();
+        }
+        return caseData.getRespondToAdmittedClaimOwingAmountPounds();
     }
 
     private String getPartAdmitLrAdmissionBulkConfirmationText(CaseData caseData, BigDecimal claimOwingAmount) {

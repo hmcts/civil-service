@@ -36,9 +36,7 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS_LR_ADMISSION_BULK;
@@ -142,7 +140,8 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     }
 
     private void handleTimeline(SealedClaimResponseFormForSpec form, CaseData caseData) {
-        if (caseData.getSpecResponseTimelineDocumentFiles() != null) {
+        // Uploaded timeline file is respondent 1 only; respondent 2 uses event timeline.
+        if (!isRespondent2(caseData) && caseData.getSpecResponseTimelineDocumentFiles() != null) {
             form.setTimelineUploaded(true)
                 .setSpecResponseTimelineDocumentFiles(
                     caseData.getSpecResponseTimelineDocumentFiles().getDocumentFileName()
@@ -166,13 +165,12 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     }
 
     private void handlePayments(CaseData caseData, SealedClaimResponseFormForSpec form) {
-        Stream.of(caseData.getRespondToClaim(), caseData.getRespondToAdmittedClaim())
-            .filter(Objects::nonNull)
-            .findFirst()
-            .ifPresent(response -> form
-                .setPoundsPaid(MonetaryConversions.penniesToPounds(response.getHowMuchWasPaid()).toString())
-                .setPaymentDate(response.getWhenWasThisAmountPaid())
-                .setPaymentMethod(getPaymentMethod(response)));
+        RespondToClaim respondToClaim = caseData.getResponseToClaim();
+        if (respondToClaim != null && respondToClaim.getHowMuchWasPaid() != null) {
+            form.setPoundsPaid(MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()).toString())
+                .setPaymentDate(respondToClaim.getWhenWasThisAmountPaid())
+                .setPaymentMethod(getPaymentMethod(respondToClaim));
+        }
     }
 
     private void addRepaymentPlanDetails(SealedClaimResponseFormForSpec form, CaseData caseData) {
@@ -259,7 +257,8 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     }
 
     private boolean isRespondent2(CaseData caseData) {
-        return (caseData.getRespondent2ResponseDate() != null)
+        return caseData.getRespondent2() != null
+            && (caseData.getRespondent2ResponseDate() != null)
             && (caseData.getRespondent1ResponseDate() == null
             || caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()));
     }
@@ -405,12 +404,24 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData, docmosisTemplate
         );
-        String fileName = String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
+        String fileName = getSealedFormFileName(caseData, docmosisTemplate);
 
         return documentManagementService.uploadDocument(
             authorization,
             new PDF(fileName, docmosisDocument.getBytes(), DocumentType.SEALED_CLAIM)
         );
+    }
+
+    private String getSealedFormFileName(CaseData caseData, DocmosisTemplates docmosisTemplate) {
+        String caseRef = caseData.getLegacyCaseReference();
+        if (isRespondent2(caseData)) {
+            return String.format("%s_defendant2_response_sealed_form.pdf", caseRef);
+        }
+        if (caseData.getRespondent2() != null
+            && MultiPartyScenario.getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
+            return String.format("%s_defendant_response_sealed_form.pdf", caseRef);
+        }
+        return String.format(docmosisTemplate.getDocumentTitle(), caseRef);
     }
 
     private DocmosisTemplates getTemplate(CaseData caseData) {

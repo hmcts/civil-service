@@ -199,7 +199,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                             + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
                     format(CASES_CASE_DETAILS_CLAIM_DOCUMENTS, caseData.getCcdCaseReference())
             );
-        } else if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+        } else if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(
+            caseData.getCurrentDefendantClaimResponseTypeForSpec())
                 && (caseData.isPayBySetDate())) {
             return format(
                 "<h2 class=\"govuk-heading-m\">What happens next</h2>"
