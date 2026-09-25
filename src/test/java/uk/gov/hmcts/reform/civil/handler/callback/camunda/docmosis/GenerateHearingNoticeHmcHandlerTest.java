@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -120,8 +121,9 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         CASE_DOCUMENT_WELSH = caseDocumentWelsh;
     }
 
-    @Test
-    void shouldPopulateCamundaProcessVariables_andReturnExpectedCaseData() {
+    @ParameterizedTest
+    @ValueSource(strings = {"AAA7-TRI", "AAA7-DIS", "AAA7-DRH"})
+    void shouldPopulateCamundaProcessVariables_andReturnExpectedCaseData(String hearingType) {
         CaseData caseData = CaseDataBuilder.builder().build();
         BusinessProcess businessProcess = new BusinessProcess();
         businessProcess.setProcessInstanceId(PROCESS_INSTANCE_ID);
@@ -135,6 +137,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         HearingNoticeVariables inputVariables = new HearingNoticeVariables();
         inputVariables.setHearingId(HEARING_ID);
         inputVariables.setCaseId(CASE_ID);
+        inputVariables.setHearingNoticeSkipped(true);
 
         List<LocationRefData> locations = List.of(new LocationRefData()
                                                       .setEpimmsId(EPIMS));
@@ -156,7 +159,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
             .setRequestDetails(new HearingRequestDetails()
                                 .setVersionNumber(VERSION_NUMBER))
             .setHearingDetails(new HearingDetails()
-                                .setHearingType(TRIAL_HEARING_TYPE));
+                                .setHearingType(hearingType));
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
         when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString(), anyString(), anyString(), any())).thenReturn(List.of(CASE_DOCUMENT));
         Fee expectedFee = new Fee();
@@ -177,7 +180,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         updatedVars.setHearingLocationEpims(EPIMS);
         updatedVars.setResponseDateTime(hearingResponseDate);
         updatedVars.setDays(List.of(hearingDay));
-        updatedVars.setHearingType(TRIAL_HEARING_TYPE);
+        updatedVars.setHearingType(hearingType);
         updatedVars.setHearingNoticeSkipped(false);
         var actual = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         verify(camundaService).setProcessVariables(
@@ -513,8 +516,10 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         assertThat(unwrapElements(updatedData.getHearingDocumentsWelsh()).get(1)).isEqualTo(existingWelsh);
     }
 
-    @Test
-    void shouldSkipHearingNoticeWhenLocationIsUnavailable() {
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" ", "unknown-venue"})
+    void shouldSkipHearingNoticeWhenLocationIsUnavailable(String venueId) {
         CaseDocument existingEnglish = new CaseDocument();
         existingEnglish.setDocumentName("existing-hearing-notice");
         existingEnglish.setDocumentType(HEARING_FORM);
@@ -555,7 +560,11 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_HEARING_NOTICE_HMC.name());
-        hearing.getHearingResponse().getHearingDaySchedule().getFirst().setHearingVenueId(null);
+        hearing.getHearingResponse().getHearingDaySchedule().getFirst().setHearingVenueId(venueId);
+        if ("unknown-venue".equals(venueId)) {
+            when(locationRefDataService.getHearingCourtLocations(anyString(), anyString()))
+                .thenReturn(List.of(new LocationRefData().setEpimmsId(EPIMS)));
+        }
 
         AboutToStartOrSubmitCallbackResponse actual = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -564,11 +573,15 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         assertThat(unwrapElements(updatedData.getHearingDocuments())).containsExactly(existingEnglish);
         assertThat(inputVariables.getHearingNoticeSkipped()).isTrue();
         verify(camundaService).setProcessVariables(PROCESS_INSTANCE_ID, inputVariables);
-        Mockito.verifyNoInteractions(hearingNoticeHmcGenerator, hearingFeesService, locationRefDataService);
+        Mockito.verifyNoInteractions(hearingNoticeHmcGenerator, hearingFeesService);
+        if (!"unknown-venue".equals(venueId)) {
+            Mockito.verifyNoInteractions(locationRefDataService);
+        }
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"AAA7-APP", "AAA7-CCM"})
+    @NullAndEmptySource
+    @ValueSource(strings = {"AAA7-APP", "AAA7-CCM", " ", "\t"})
     void shouldSkipHearingNoticeWhenHearingTypeIsInvalid(String hearingType) {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimantFullDefence().build();
         BusinessProcess businessProcess = new BusinessProcess().setProcessInstanceId(PROCESS_INSTANCE_ID);
