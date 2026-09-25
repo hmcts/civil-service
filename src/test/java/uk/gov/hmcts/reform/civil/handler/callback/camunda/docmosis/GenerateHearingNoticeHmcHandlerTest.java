@@ -46,6 +46,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -577,6 +578,33 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         if (!"unknown-venue".equals(venueId)) {
             Mockito.verifyNoInteractions(locationRefDataService);
         }
+    }
+
+    @Test
+    void shouldPropagateReferenceDataFailure_withoutSkippingHearingNotice() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimantFullDefence().build();
+        caseData.setBusinessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_INSTANCE_ID));
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        HearingNoticeVariables inputVariables = new HearingNoticeVariables()
+            .setHearingId(HEARING_ID).setCaseId(CASE_ID);
+        when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingDetails(new HearingDetails().setHearingType(TRIAL_HEARING_TYPE))
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(List.of(
+                new HearingDaySchedule().setHearingVenueId(EPIMS)
+                    .setHearingStartDateTime(LocalDateTime.of(2023, 7, 1, 9, 0))
+                    .setHearingEndDateTime(LocalDateTime.of(2023, 7, 1, 11, 0)))));
+        when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
+        IllegalArgumentException failure = new IllegalArgumentException("Reference data client failed");
+        when(locationRefDataService.getHearingCourtLocations(anyString(), anyString())).thenThrow(failure);
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        params.getRequest().setEventId(GENERATE_HEARING_NOTICE_HMC.name());
+
+        assertThatThrownBy(() -> handler.handle(params)).isSameAs(failure);
+
+        assertThat(inputVariables.getHearingNoticeSkipped()).isNull();
+        verify(camundaService, Mockito.never()).setProcessVariables(anyString(), any());
+        Mockito.verifyNoInteractions(hearingNoticeHmcGenerator, hearingFeesService);
     }
 
     @ParameterizedTest

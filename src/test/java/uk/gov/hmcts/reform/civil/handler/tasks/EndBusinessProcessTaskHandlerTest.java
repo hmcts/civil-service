@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +37,7 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_BUSINESS_PROCESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HEARING_NOTICE;
@@ -55,6 +57,9 @@ class EndBusinessProcessTaskHandlerTest {
     @Mock
     private CoreCaseDataService coreCaseDataService;
 
+    @Mock
+    private RuntimeService runtimeService;
+
     private EndBusinessProcessTaskHandler handler;
 
     @BeforeEach
@@ -66,7 +71,8 @@ class EndBusinessProcessTaskHandlerTest {
             new EventProperties(),
             coreCaseDataService,
             caseDetailsConverter,
-            objectMapper
+            objectMapper,
+            runtimeService
         );
     }
 
@@ -133,6 +139,7 @@ class EndBusinessProcessTaskHandlerTest {
         verify(coreCaseDataService).startUpdate(CASE_ID, END_BUSINESS_PROCESS);
         verify(coreCaseDataService).submitUpdate(CASE_ID, getCaseDataContent(caseDetails, startEventResponse));
         verify(coreCaseDataService, never()).triggerEvent(Long.valueOf(CASE_ID), INVALID_HEARING_NOTICE);
+        verifyNoInteractions(runtimeService);
         verify(externalTaskService).complete(mockExternalTask, null);
     }
 
@@ -155,20 +162,29 @@ class EndBusinessProcessTaskHandlerTest {
 
         handler.execute(mockExternalTask, externalTaskService);
 
-        var ordered = inOrder(coreCaseDataService, externalTaskService);
+        var ordered = inOrder(runtimeService, coreCaseDataService, externalTaskService);
+        ordered.verify(runtimeService).setVariable(PROCESS_INSTANCE_ID, "invalidHearingNoticePending", true);
         ordered.verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
         ordered.verify(coreCaseDataService).triggerEvent(Long.valueOf(CASE_ID), INVALID_HEARING_NOTICE);
+        ordered.verify(runtimeService).setVariable(PROCESS_INSTANCE_ID, "invalidHearingNoticePending", false);
         ordered.verify(externalTaskService).complete(mockExternalTask, null);
     }
 
-    @Test
-    void shouldNotTriggerDuplicateHearingTask_whenSkippedProcessIsAlreadyFinished() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldNotTriggerDuplicateHearingTask_whenSkippedProcessIsAlreadyFinished(boolean pendingFlagAbsent) {
         stubSkippedProcess(BusinessProcessStatus.FINISHED);
+        if (!pendingFlagAbsent) {
+            when(mockExternalTask.getAllVariables()).thenReturn(Map.of(
+                "caseId", CASE_ID, "caseEvent", END_BUSINESS_PROCESS,
+                "hearingNoticeSkipped", true, "invalidHearingNoticePending", false));
+        }
 
         handler.execute(mockExternalTask, externalTaskService);
 
         verify(coreCaseDataService, never()).submitUpdate(anyString(), any(CaseDataContent.class));
         verify(coreCaseDataService, never()).triggerEvent(Long.valueOf(CASE_ID), INVALID_HEARING_NOTICE);
+        verifyNoInteractions(runtimeService);
         verify(externalTaskService).complete(mockExternalTask, null);
     }
 
@@ -197,13 +213,19 @@ class EndBusinessProcessTaskHandlerTest {
         verify(externalTaskService, never()).complete(mockExternalTask, null);
         verify(externalTaskService).handleFailure(eq(mockExternalTask), eq("CCD event failed"),
                                                 anyString(), anyInt(), anyLong());
+        verify(runtimeService).setVariable(PROCESS_INSTANCE_ID, "invalidHearingNoticePending", true);
+        verify(runtimeService, never()).setVariable(PROCESS_INSTANCE_ID, "invalidHearingNoticePending", false);
 
         // The successful END_BUSINESS_PROCESS update is persisted before the failed event call.
         stubSkippedProcess(BusinessProcessStatus.FINISHED);
+        when(mockExternalTask.getAllVariables()).thenReturn(Map.of(
+            "caseId", CASE_ID, "caseEvent", END_BUSINESS_PROCESS,
+            "hearingNoticeSkipped", true, "invalidHearingNoticePending", true));
         handler.execute(mockExternalTask, externalTaskService);
 
         verify(coreCaseDataService, times(1)).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
         verify(coreCaseDataService, times(2)).triggerEvent(Long.valueOf(CASE_ID), INVALID_HEARING_NOTICE);
+        verify(runtimeService).setVariable(PROCESS_INSTANCE_ID, "invalidHearingNoticePending", false);
         verify(externalTaskService).complete(mockExternalTask, null);
     }
 

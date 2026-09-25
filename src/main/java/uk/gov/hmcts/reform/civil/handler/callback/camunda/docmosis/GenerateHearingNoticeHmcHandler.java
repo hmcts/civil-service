@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.DocumentHearingType;
+import uk.gov.hmcts.reform.civil.exceptions.HearingLocationNotFoundException;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -109,7 +110,7 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
                                                     locationRefDataService, false);
 
         if (hearingLocation == null) {
-            log.warn("Skipping hearing notice: venue not assigned for case {} hearing {}",
+            log.warn("Skipping hearing notice: venue missing or unknown for case {} hearing {}",
                      caseData.getCcdCaseReference(), camundaVars.getHearingId());
             camundaVars.setHearingNoticeSkipped(true);
             camundaService.setProcessVariables(processInstanceId, camundaVars);
@@ -192,12 +193,17 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
                                       String bearerToken, String serviceId,
                                       LocationReferenceDataService locationRefDataService,
                                       boolean isWelsh) {
-        LocationRefData hearingLocation = getLocationRefData(
-            hearingId,
-            HmcDataUtils.getHearingStartDay(hearing).getHearingVenueId(),
-            bearerToken,
-            serviceId,
-            locationRefDataService);
+        LocationRefData hearingLocation;
+        try {
+            hearingLocation = getLocationRefData(
+                hearingId,
+                HmcDataUtils.getHearingStartDay(hearing).getHearingVenueId(),
+                bearerToken,
+                serviceId,
+                locationRefDataService);
+        } catch (HearingLocationNotFoundException exception) {
+            return null;
+        }
         if (hearingLocation != null) {
             return isWelsh
                 ? LocationReferenceDataService.getDisplayEntryWelsh(hearingLocation)

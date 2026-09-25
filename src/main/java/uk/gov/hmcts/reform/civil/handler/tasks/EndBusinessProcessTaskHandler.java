@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
+import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
@@ -26,6 +27,9 @@ import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 @Component
 public class EndBusinessProcessTaskHandler extends BaseExternalTaskHandler {
 
+    private static final String INVALID_HEARING_NOTICE_PENDING = "invalidHearingNoticePending";
+
+    private final RuntimeService runtimeService;
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
@@ -35,12 +39,14 @@ public class EndBusinessProcessTaskHandler extends BaseExternalTaskHandler {
         EventProperties eventProperties,
         CoreCaseDataService coreCaseDataService,
         CaseDetailsConverter caseDetailsConverter,
-        ObjectMapper mapper
+        ObjectMapper mapper,
+        RuntimeService runtimeService
     ) {
         super(externalTaskCompletionService, eventProperties);
         this.coreCaseDataService = coreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;
         this.mapper = mapper;
+        this.runtimeService = runtimeService;
     }
 
     @Override
@@ -53,14 +59,22 @@ public class EndBusinessProcessTaskHandler extends BaseExternalTaskHandler {
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, END_BUSINESS_PROCESS);
         CaseData data = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
         BusinessProcess businessProcess = data.getBusinessProcess();
+        boolean hearingNoticeSkipped = Boolean.TRUE.equals(externalTaskInput.getHearingNoticeSkipped());
+        boolean hearingNoticePending = Boolean.TRUE.equals(externalTaskInput.getInvalidHearingNoticePending());
         if (businessProcess.getStatusOrDefault() != BusinessProcessStatus.FINISHED) {
-            coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
-            if (Boolean.TRUE.equals(externalTaskInput.getHearingNoticeSkipped())) {
-                log.info("Triggering manual hearing listing task for case {} after hearing notice was skipped", caseId);
-                coreCaseDataService.triggerEvent(Long.valueOf(caseId), INVALID_HEARING_NOTICE);
+            if (hearingNoticeSkipped) {
+                // Persist before ending the business process so event failures can be recovered on retry.
+                runtimeService.setVariable(externalTask.getProcessInstanceId(), INVALID_HEARING_NOTICE_PENDING, true);
+                hearingNoticePending = true;
             }
+            coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
         } else {
             log.info("Stopping multiple calls, END_BUSINESS_PROCESS already performed for caseid: {}", caseId);
+        }
+        if (hearingNoticeSkipped && hearingNoticePending) {
+            log.info("Triggering manual hearing listing task for case {} after hearing notice was skipped", caseId);
+            coreCaseDataService.triggerEvent(Long.valueOf(caseId), INVALID_HEARING_NOTICE);
+            runtimeService.setVariable(externalTask.getProcessInstanceId(), INVALID_HEARING_NOTICE_PENDING, false);
         }
         return new ExternalTaskData();
     }

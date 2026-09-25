@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
+import uk.gov.hmcts.reform.civil.exceptions.HearingLocationNotFoundException;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -445,7 +446,7 @@ public class HmcDataUtils {
         if (!matchedLocations.isEmpty()) {
             return matchedLocations.getFirst();
         } else {
-            throw new IllegalArgumentException("Hearing location data not available for hearing " + hearingId + " venueId " + venueId);
+            throw new HearingLocationNotFoundException(hearingId, venueId);
         }
     }
 
