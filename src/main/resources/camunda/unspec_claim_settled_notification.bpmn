@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_claim_settled_letter" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.35.0">
-  <bpmn:process id="UNSPEC_CLAIM_SETTLED_LETTER_NOTIFICATION_ID" name="Claim Settled Letter Notification" isExecutable="true" camunda:historyTimeToLive="P90D">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_unspec_claim_settled" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.35.0">
+  <bpmn:process id="UNSPEC_CLAIM_SETTLED_NOTIFICATION_ID" name="Unspec Claim Settled Notification" isExecutable="true" camunda:historyTimeToLive="P90D">
     <bpmn:startEvent id="Event_start" name="Start">
       <bpmn:outgoing>Flow_start_to_startBusiness</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_start" messageRef="Message_claim_settled_letter" />
+      <bpmn:messageEventDefinition id="MessageEventDefinition_start" messageRef="Message_unspec_claim_settled" />
     </bpmn:startEvent>
-    <bpmn:callActivity id="ClaimSettledLetterNotificationProcess" name="Start Business Process" calledElement="StartUnspecClaimSettledLetterBusinessProcess">
+    <bpmn:callActivity id="UnspecClaimSettledNotificationProcess" name="Start Business Process" calledElement="StartUnspecClaimSettledLetterBusinessProcess">
       <bpmn:extensionElements>
         <camunda:in variables="all" />
         <camunda:out variables="all" />
@@ -13,13 +13,13 @@
       <bpmn:incoming>Flow_start_to_startBusiness</bpmn:incoming>
       <bpmn:outgoing>Flow_startBusiness_to_gateway</bpmn:outgoing>
     </bpmn:callActivity>
-    <bpmn:sequenceFlow id="Flow_start_to_startBusiness" sourceRef="Event_start" targetRef="ClaimSettledLetterNotificationProcess" />
+    <bpmn:sequenceFlow id="Flow_start_to_startBusiness" sourceRef="Event_start" targetRef="UnspecClaimSettledNotificationProcess" />
     <bpmn:exclusiveGateway id="Gateway_defendantRepresented" name="Claim settled letter required?" default="Flow_gateway_to_notify">
       <bpmn:incoming>Flow_startBusiness_to_gateway</bpmn:incoming>
       <bpmn:outgoing>Flow_gateway_to_sendLetter</bpmn:outgoing>
       <bpmn:outgoing>Flow_gateway_to_notify</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_startBusiness_to_gateway" sourceRef="ClaimSettledLetterNotificationProcess" targetRef="Gateway_defendantRepresented" />
+    <bpmn:sequenceFlow id="Flow_startBusiness_to_gateway" sourceRef="UnspecClaimSettledNotificationProcess" targetRef="Gateway_defendantRepresented" />
     <bpmn:serviceTask id="SendLetterClaimSettledDefendantLiP" name="Generate, print and post claim settled letter to Defendant LiP" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -56,7 +56,7 @@
       <bpmn:incoming>Flow_endBusiness_to_end</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_endBusiness_to_end" sourceRef="Activity_endBusiness" targetRef="Event_end" />
-    <bpmn:boundaryEvent id="Event_abort" name="Abort" attachedToRef="ClaimSettledLetterNotificationProcess">
+    <bpmn:boundaryEvent id="Event_abort" name="Abort" attachedToRef="UnspecClaimSettledNotificationProcess">
       <bpmn:outgoing>Flow_abort_to_abortEnd</bpmn:outgoing>
       <bpmn:errorEventDefinition id="ErrorEventDefinition_abort" />
     </bpmn:boundaryEvent>
@@ -65,16 +65,16 @@
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_abort_to_abortEnd" sourceRef="Event_abort" targetRef="Event_abortEnd" />
   </bpmn:process>
-  <bpmn:message id="Message_claim_settled_letter" name="UNSPEC_CLAIM_SETTLED_LETTER_NOTIFICATION" />
+  <bpmn:message id="Message_unspec_claim_settled" name="UNSPEC_CLAIM_SETTLED_NOTIFICATION" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="UNSPEC_CLAIM_SETTLED_LETTER_NOTIFICATION_ID">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="UNSPEC_CLAIM_SETTLED_NOTIFICATION_ID">
       <bpmndi:BPMNShape id="Event_start_di" bpmnElement="Event_start">
         <dc:Bounds x="152" y="192" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="159" y="235" width="24" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_startBusiness_di" bpmnElement="ClaimSettledLetterNotificationProcess">
+      <bpmndi:BPMNShape id="Activity_startBusiness_di" bpmnElement="UnspecClaimSettledNotificationProcess">
         <dc:Bounds x="260" y="170" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_defendantRepresented_di" bpmnElement="Gateway_defendantRepresented" isMarkerVisible="true">

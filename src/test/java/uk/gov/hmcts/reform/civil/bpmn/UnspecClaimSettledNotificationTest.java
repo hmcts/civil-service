@@ -13,10 +13,10 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-class ClaimSettledLetterNotificationTest extends BpmnBaseTest {
+class UnspecClaimSettledNotificationTest extends BpmnBaseTest {
 
-    public static final String MESSAGE_NAME = "UNSPEC_CLAIM_SETTLED_LETTER_NOTIFICATION";
-    public static final String PROCESS_ID = "UNSPEC_CLAIM_SETTLED_LETTER_NOTIFICATION_ID";
+    public static final String MESSAGE_NAME = "UNSPEC_CLAIM_SETTLED_NOTIFICATION";
+    public static final String PROCESS_ID = "UNSPEC_CLAIM_SETTLED_NOTIFICATION_ID";
     public static final String SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1_ID = "SendLetterClaimSettledDefendantLiP";
     public static final String SEND_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1_EVENT = "SEND_UNSPEC_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1";
     public static final String NOTIFY_EVENT_ID = "UnspecClaimSettledNotifier";
@@ -27,8 +27,8 @@ class ClaimSettledLetterNotificationTest extends BpmnBaseTest {
     public static final String START_BUSINESS_ACTIVITY = "StartUnspecClaimSettledLetterBusinessProcessTaskId";
     private static final String DIAGRAM_PATH = "camunda/%s";
 
-    public ClaimSettledLetterNotificationTest() {
-        super("unspec_claim_settled_letter_notification.bpmn", PROCESS_ID);
+    public UnspecClaimSettledNotificationTest() {
+        super("unspec_claim_settled_notification.bpmn", PROCESS_ID);
     }
 
     @BeforeEach
