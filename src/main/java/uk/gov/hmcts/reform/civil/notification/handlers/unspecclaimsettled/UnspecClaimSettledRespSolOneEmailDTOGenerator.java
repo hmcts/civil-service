@@ -47,6 +47,7 @@ public class UnspecClaimSettledRespSolOneEmailDTOGenerator extends RespSolOneEma
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         super.addCustomProperties(properties, caseData);
         properties.put(CLAIMANT_NAME, caseData.getApplicant1().getPartyName());
+        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
         properties.put(CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString());
         properties.put(DEFENDANT_REFERENCE_NUMBER, getDefRefNumber(caseData));
         properties.put(LEGAL_REP_NAME, getLegalOrganizationNameForRespondent(caseData, true, organisationService));
