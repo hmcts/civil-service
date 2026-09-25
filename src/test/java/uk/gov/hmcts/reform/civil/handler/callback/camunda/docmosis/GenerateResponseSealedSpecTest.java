@@ -396,6 +396,10 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant2DefenseDirectionsQuestionnaire");
         assertThat(updatedData.getDuplicateSystemGeneratedCaseDocs().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQRespondentTwo");
+        assertThat(updatedData.getRespondent2ClaimResponseDocumentSpec()).isNotNull();
+        assertThat(updatedData.getRespondent2ClaimResponseDocumentSpec().getDocumentName())
+            .isEqualTo(SEALED_FORM.getDocumentName());
+        assertThat(updatedData.getRespondent1ClaimResponseDocumentSpec()).isNull();
     }
 
     @Test
@@ -420,6 +424,58 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant2DefenseDirectionsQuestionnaire");
         assertThat(updatedData.getDuplicateSystemGeneratedCaseDocs().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQRespondentTwo");
+        assertThat(updatedData.getRespondent2ClaimResponseDocumentSpec()).isNotNull();
+        assertThat(updatedData.getRespondent2ClaimResponseDocumentSpec().getDocumentName())
+            .isEqualTo(STITCHED_DOC.getDocumentName());
+        assertThat(updatedData.getRespondent1ClaimResponseDocumentSpec()).isNull();
+    }
+
+    @Test
+    void shouldSetRespondent1ClaimResponseDocumentSpec_whenRespondent1Generated() {
+        ReflectionTestUtils.setField(handler, "stitchEnabled", false);
+        when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
+
+        CaseData localCaseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued().build();
+        localCaseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
+        CallbackParams params = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertThat(updatedData.getRespondent1ClaimResponseDocumentSpec()).isNotNull();
+        assertThat(updatedData.getRespondent1ClaimResponseDocumentSpec().getDocumentName())
+            .isEqualTo(SEALED_FORM.getDocumentName());
+        assertThat(updatedData.getRespondent2ClaimResponseDocumentSpec()).isNull();
+    }
+
+    @Test
+    void shouldKeepBothClaimResponseDocumentSpecs_whenRespondent2GeneratedAfterRespondent1() {
+        ReflectionTestUtils.setField(handler, "stitchEnabled", false);
+        when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString())).thenReturn(SEALED_FORM);
+
+        CaseDocument respondent1Form = new CaseDocument();
+        respondent1Form.setDocumentName("000MC001_defendant_response_sealed_form.pdf");
+        respondent1Form.setDocumentType(SEALED_CLAIM);
+        Document r1Link = new Document();
+        r1Link.setDocumentUrl("r1-url");
+        r1Link.setCategoryID("defendant1DefenseDirectionsQuestionnaire");
+        respondent1Form.setDocumentLink(r1Link);
+
+        CaseData localCaseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued().build();
+        localCaseData.setSystemGeneratedCaseDocuments(wrapElements(respondent1Form));
+        localCaseData.setRespondent1ClaimResponseDocumentSpec(respondent1Form);
+        localCaseData.setRespondent2DocumentGeneration("userRespondent2");
+        CallbackParams params = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertThat(updatedData.getRespondent1ClaimResponseDocumentSpec().getDocumentName())
+            .isEqualTo("000MC001_defendant_response_sealed_form.pdf");
+        assertThat(updatedData.getRespondent2ClaimResponseDocumentSpec()).isNotNull();
+        assertThat(updatedData.getSystemGeneratedCaseDocuments()).hasSize(2);
     }
 
     @Test

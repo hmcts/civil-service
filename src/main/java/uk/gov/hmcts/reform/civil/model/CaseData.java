@@ -744,35 +744,54 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isPayBySetDate() {
-        return defenceAdmitPartPaymentTimeRouteRequired != null
-            && defenceAdmitPartPaymentTimeRouteRequired == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
+        return matchesPaymentTimeRoute(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
     }
 
     @JsonIgnore
     public boolean isPayByInstallment() {
-        return defenceAdmitPartPaymentTimeRouteRequired != null
-            && defenceAdmitPartPaymentTimeRouteRequired
-            == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
+        return matchesPaymentTimeRoute(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN);
     }
 
     @JsonIgnore
     public boolean isPayImmediately() {
-        return RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(getDefenceAdmitPartPaymentTimeRouteRequired());
+        return matchesPaymentTimeRoute(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+    }
+
+    /**
+     * When a defendant solicitor journey is active ({@code isRespondent1}/{@code isRespondent2}),
+     * match that defendant's payment route only. Otherwise (claimant / post-response) match either
+     * defendant's route — preserving historical OR-both behaviour.
+     */
+    @JsonIgnore
+    private boolean matchesPaymentTimeRoute(RespondentResponsePartAdmissionPaymentTimeLRspec expected) {
+        if (YES.equals(getIsRespondent2())) {
+            return expected == getDefenceAdmitPartPaymentTimeRouteRequired2();
+        }
+        if (YES.equals(getIsRespondent1())) {
+            return expected == getDefenceAdmitPartPaymentTimeRouteRequired();
+        }
+        return expected == defenceAdmitPartPaymentTimeRouteRequired
+            || expected == getDefenceAdmitPartPaymentTimeRouteRequired2();
     }
 
     @JsonIgnore
     public boolean hasDefendantPaidTheAmountClaimed() {
         return SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
-            .equals(getDefenceRouteRequired());
+            .equals(getDefenceRouteRequired()) || SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
+                .equals(getDefenceRouteRequired2());
     }
 
     @JsonIgnore
     public boolean isPaidFullAmount() {
         RespondToClaim localRespondToClaim = null;
-        if (getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE) {
+        if (FULL_DEFENCE == getRespondent1ClaimResponseTypeForSpec()) {
             localRespondToClaim = getRespondToClaim();
-        } else if (getRespondent1ClaimResponseTypeForSpec() == PART_ADMISSION) {
+        } else if (PART_ADMISSION == getRespondent1ClaimResponseTypeForSpec()) {
             localRespondToClaim = getRespondToAdmittedClaim();
+        } else if (PART_ADMISSION == getRespondent2ClaimResponseTypeForSpec()) {
+            localRespondToClaim = getRespondToAdmittedClaim2();
+        } else if (FULL_DEFENCE == getRespondent2ClaimResponseTypeForSpec()) {
+            localRespondToClaim = getRespondToClaim2();
         }
 
         return ofNullable(localRespondToClaim)
@@ -784,7 +803,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isClaimBeingDisputed() {
         return SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM
-            .equals(getDefenceRouteRequired());
+            .equals(getDefenceRouteRequired()) || SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM
+                .equals(getDefenceRouteRequired2());
     }
 
     @JsonIgnore
@@ -1233,7 +1253,63 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public RespondToClaim getResponseToClaim() {
-        return getRespondToAdmittedClaim() != null ? getRespondToAdmittedClaim() : getRespondToClaim();
+        // Prefer respondent-specific admitted-claim when the relevant respondent flag is explicitly set to YES.
+        if (YES.equals(getIsRespondent1())) {
+            if (getRespondToAdmittedClaim() != null) {
+                return getRespondToAdmittedClaim();
+            }
+            if (getRespondToClaim() != null) {
+                return getRespondToClaim();
+            }
+            return null;
+        }
+
+        if (YES.equals(getIsRespondent2())) {
+            if (getRespondToAdmittedClaim2() != null) {
+                return getRespondToAdmittedClaim2();
+            }
+            if (getRespondToClaim2() != null) {
+                return getRespondToClaim2();
+            }
+            return null;
+        }
+
+        // Single defendant (or flags not set): use respondent 1 fields only.
+        // Respondent 2 is unset/null on 1v1 cases.
+        if (getRespondToAdmittedClaim() != null) {
+            return getRespondToAdmittedClaim();
+        }
+        return getRespondToClaim();
+    }
+
+    @JsonIgnore
+    public boolean isCurrentDefendantRespondent2() {
+        // isRespondent2 is only YES for the R2 solicitor journey; on 1v1 it is unset/NO.
+        return YES.equals(getIsRespondent2());
+    }
+
+    @JsonIgnore
+    public RespondentResponsePartAdmissionPaymentTimeLRspec getCurrentDefendantPaymentTimeRoute() {
+        if (isCurrentDefendantRespondent2()) {
+            return getDefenceAdmitPartPaymentTimeRouteRequired2();
+        }
+        if (YES.equals(getIsRespondent1()) && getDefenceAdmitPartPaymentTimeRouteRequired() != null) {
+            return getDefenceAdmitPartPaymentTimeRouteRequired();
+        }
+        return ofNullable(getDefenceAdmitPartPaymentTimeRouteGeneric())
+            .orElse(getDefenceAdmitPartPaymentTimeRouteRequired());
+    }
+
+    @JsonIgnore
+    public RespondentResponseTypeSpec getCurrentDefendantClaimResponseTypeForSpec() {
+        if (isCurrentDefendantRespondent2()) {
+            return getRespondent2ClaimResponseTypeForSpec();
+        }
+        if (YES.equals(getIsRespondent1()) && getRespondent1ClaimResponseTypeForSpec() != null) {
+            return getRespondent1ClaimResponseTypeForSpec();
+        }
+        return ofNullable(getRespondentClaimResponseTypeForSpecGeneric())
+            .orElse(getRespondent1ClaimResponseTypeForSpec());
     }
 
     @JsonIgnore

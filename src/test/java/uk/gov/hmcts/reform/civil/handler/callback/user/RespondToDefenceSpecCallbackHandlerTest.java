@@ -413,6 +413,47 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Then
             assertThat(response.getData()).extracting("respondent1ClaimResponseDocumentSpec").isNotNull();
         }
+
+        @Test
+        void shouldPopulateBothResponseDocs_whenSystemGeneratedContainsRespondent1And2SealedForms() {
+            Document r1Link = new Document();
+            r1Link.setDocumentUrl("r1-sealed-url");
+            r1Link.setDocumentFileName("000MC001_defendant_response_sealed_form.pdf");
+            r1Link.setCategoryID("defendant1DefenseDirectionsQuestionnaire");
+            CaseDocument r1Doc = new CaseDocument();
+            r1Doc.setDocumentName("000MC001_defendant_response_sealed_form.pdf");
+            r1Doc.setDocumentType(SEALED_CLAIM);
+            r1Doc.setDocumentLink(r1Link);
+
+            Document r2Link = new Document();
+            r2Link.setDocumentUrl("r2-sealed-url");
+            r2Link.setDocumentFileName("000MC001_defendant2_response_sealed_form.pdf");
+            r2Link.setCategoryID("defendant2DefenseDirectionsQuestionnaire");
+            CaseDocument r2Doc = new CaseDocument();
+            r2Doc.setDocumentName("000MC001_defendant2_response_sealed_form.pdf");
+            r2Doc.setDocumentType(SEALED_CLAIM);
+            r2Doc.setDocumentLink(r2Link);
+
+            List<Element<CaseDocument>> documentList = new ArrayList<>();
+            documentList.add(element(r1Doc));
+            documentList.add(element(r2Doc));
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setSystemGeneratedCaseDocuments(documentList);
+
+            var params = callbackParamsOf(caseData, ABOUT_TO_START);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("respondent1ClaimResponseDocumentSpec").isNotNull();
+            assertThat(response.getData()).extracting("respondent2ClaimResponseDocumentSpec").isNotNull();
+            assertThat(response.getData())
+                .extracting("respondent1ClaimResponseDocumentSpec")
+                .extracting("documentName")
+                .isEqualTo("000MC001_defendant_response_sealed_form.pdf");
+            assertThat(response.getData())
+                .extracting("respondent2ClaimResponseDocumentSpec")
+                .extracting("documentName")
+                .isEqualTo("000MC001_defendant2_response_sealed_form.pdf");
+        }
     }
 
     @Nested

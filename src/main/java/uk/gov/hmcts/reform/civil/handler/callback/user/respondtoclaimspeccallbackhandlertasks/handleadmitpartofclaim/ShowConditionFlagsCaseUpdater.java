@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallba
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -91,11 +90,12 @@ public class ShowConditionFlagsCaseUpdater implements HandleAdmitPartOfClaimCase
 
     private void checkRespondent2FinancialDetails(CaseData caseData, Set<DefendantResponseShowTag> necessary, MultiPartyScenario scenario) {
         log.info("Checking Respondent 2 financial details for caseId: {}", caseData.getCcdCaseReference());
+        // Financial DQ questions are individual-only; why-not-immediate and repayment plan apply to companies too.
         if (isRespondent2Individual(caseData)) {
             checkFinancialInfoForRespondent2(caseData, necessary, scenario);
-            checkImmediatePaymentForRespondent2(caseData, necessary, scenario);
-            checkRepaymentPlanForRespondent2(caseData, necessary);
         }
+        checkImmediatePaymentForRespondent2(caseData, necessary, scenario);
+        checkRepaymentPlanForRespondent2(caseData, necessary);
     }
 
     private boolean isRespondent2Individual(CaseData caseData) {
@@ -169,10 +169,11 @@ public class ShowConditionFlagsCaseUpdater implements HandleAdmitPartOfClaimCase
 
     private boolean needFinancialInfo1(CaseData caseData) {
         log.info("Checking if financial info is needed for Respondent 1 for caseId: {}", caseData.getCcdCaseReference());
+        // Do not gate on COUNTER_ADMIT_OR_ADMIT_PART: full/part admission for the current defendant
+        // sets that multiparty flag, which would otherwise hide NEED_FINANCIAL_DETAILS_1 (AC2 F-04..F-09).
         return isPaymentNotImmediate(caseData)
                 && isNotAdmitted(caseData)
                 && isNotFullDefenceOrCounterClaim(caseData)
-                && isNotCounterAdmitOrAdmitPart(caseData)
                 && isSameSolicitorOrTwoLegalRep(caseData)
                 && isNotSingleResponseToBothClaimants(caseData);
     }
@@ -192,11 +193,6 @@ public class ShowConditionFlagsCaseUpdater implements HandleAdmitPartOfClaimCase
         log.info("Checking if Respondent 1 is not full defence or counter claim for caseId: {}", caseData.getCcdCaseReference());
         return caseData.getRespondentClaimResponseTypeForSpecGeneric() != FULL_DEFENCE
                 && caseData.getRespondentClaimResponseTypeForSpecGeneric() != RespondentResponseTypeSpec.COUNTER_CLAIM;
-    }
-
-    private boolean isNotCounterAdmitOrAdmitPart(CaseData caseData) {
-        log.info("Checking if Respondent 1 is not counter admit or admit part for caseId: {}", caseData.getCcdCaseReference());
-        return caseData.getMultiPartyResponseTypeFlags() != MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART;
     }
 
     private boolean isSameSolicitorOrTwoLegalRep(CaseData caseData) {
