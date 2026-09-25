@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UNSPEC_CLAIM_SETTLED_LETTER_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UNSPEC_CLAIM_SETTLED_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_UNSPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
@@ -80,7 +80,7 @@ class SettleUnspecClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getState()).isEqualTo(CASE_STAYED.name());
             assertThat(updatedData.getBusinessProcess().getCamundaEvent())
-                .isEqualTo(UNSPEC_CLAIM_SETTLED_LETTER_NOTIFICATION.name());
+                .isEqualTo(UNSPEC_CLAIM_SETTLED_NOTIFICATION.name());
 
             assertThat(updatedData.getPreStayState()).isEqualTo(caseData.getCcdState().toString());
         }

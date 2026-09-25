@@ -139,4 +139,15 @@
         <packageUrl regex="true">^pkg:maven/io\.projectreactor\.netty/reactor-netty-.*@1\.2\.18$</packageUrl>
         <cve>CVE-2026-47874</cve>
     </suppress>
+    <suppress until="2026-11-10Z">
+        <notes><![CDATA[
+        NOT a false positive. Real, currently-unpatched CVE. Suppressed under OCCC-354 because
+        there is no released version to upgrade to: org.springframework.security 6.5.11 is the
+        newest release in its line as of 2026-09-25. Clearing this requires a patched 6.5.x
+        release or moving to Spring Boot 4.x (Spring Security 7).
+        Expires 2026-11-10Z - re-check for upstream patches then; do not extend without review.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-.*@6\.5\.11$</packageUrl>
+        <cve>CVE-2026-41707</cve>
+    </suppress>
 </suppressions>
