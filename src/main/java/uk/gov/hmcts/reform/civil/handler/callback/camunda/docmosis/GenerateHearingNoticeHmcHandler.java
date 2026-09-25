@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -10,6 +11,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.enums.DocumentHearingType;
+import uk.gov.hmcts.reform.civil.exceptions.HearingLocationNotFoundException;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -49,6 +52,7 @@ import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getTotalHearingDurati
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.isWelshHearingTemplate;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
 
@@ -92,10 +96,26 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
             camundaVars.getHearingId()
         );
 
-        var hearingStartDay = HmcDataUtils.getHearingStartDay(hearing);
+        final var hearingStartDay = HmcDataUtils.getHearingStartDay(hearing);
+        String hearingType = hearing.getHearingDetails().getHearingType();
+        if (isInvalidHearingType(hearingType)) {
+            log.warn("Skipping hearing notice: invalid hearing type {} for case {} hearing {}",
+                     hearingType, caseData.getCcdCaseReference(), camundaVars.getHearingId());
+            camundaVars.setHearingNoticeSkipped(true);
+            camundaService.setProcessVariables(processInstanceId, camundaVars);
+            return AboutToStartOrSubmitCallbackResponse.builder().data(caseData.toMap(objectMapper)).build();
+        }
         String hearingLocation = getHearingLocation(camundaVars.getHearingId(), hearing,
                                                     bearerToken, getCaseServiceId(caseData.getCaseAccessCategory()),
                                                     locationRefDataService, false);
+
+        if (hearingLocation == null) {
+            log.warn("Skipping hearing notice: venue missing or unknown for case {} hearing {}",
+                     caseData.getCcdCaseReference(), camundaVars.getHearingId());
+            camundaVars.setHearingNoticeSkipped(true);
+            camundaService.setProcessVariables(processInstanceId, camundaVars);
+            return AboutToStartOrSubmitCallbackResponse.builder().data(caseData.toMap(objectMapper)).build();
+        }
 
         buildDocument(callbackParams, hearing, hearingLocation, camundaVars.getHearingId(), HEARING_NOTICE_HMC);
 
@@ -113,6 +133,7 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
 
         var hearingStartDate = convertFromUTC(hearingStartDay.getHearingStartDateTime());
         HearingNoticeVariables updatedVars = new HearingNoticeVariables();
+        updatedVars.setHearingNoticeSkipped(false);
         updatedVars.setHearingId(camundaVars.getHearingId());
         updatedVars.setCaseId(camundaVars.getCaseId());
         updatedVars.setHearingStartDateTime(hearingStartDate);
@@ -172,12 +193,21 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
                                       String bearerToken, String serviceId,
                                       LocationReferenceDataService locationRefDataService,
                                       boolean isWelsh) {
-        LocationRefData hearingLocation = getLocationRefData(
-            hearingId,
-            HmcDataUtils.getHearingStartDay(hearing).getHearingVenueId(),
-            bearerToken,
-            serviceId,
-            locationRefDataService);
+        String venueId = HmcDataUtils.getHearingStartDay(hearing).getHearingVenueId();
+        if (venueId == null || venueId.isBlank()) {
+            return null;
+        }
+        LocationRefData hearingLocation;
+        try {
+            hearingLocation = getLocationRefData(
+                hearingId,
+                venueId,
+                bearerToken,
+                serviceId,
+                locationRefDataService);
+        } catch (HearingLocationNotFoundException exception) {
+            return null;
+        }
         if (hearingLocation != null) {
             return isWelsh
                 ? LocationReferenceDataService.getDisplayEntryWelsh(hearingLocation)
@@ -193,5 +223,17 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
             return caseData.getResponseClaimTrack();
         }
         return null;
+    }
+
+    private boolean isInvalidHearingType(String hearingType) {
+        if (hearingType == null || hearingType.isBlank()) {
+            return true;
+        }
+        try {
+            DocumentHearingType.getType(hearingType);
+            return false;
+        } catch (IllegalArgumentException exception) {
+            return true;
+        }
     }
 }
