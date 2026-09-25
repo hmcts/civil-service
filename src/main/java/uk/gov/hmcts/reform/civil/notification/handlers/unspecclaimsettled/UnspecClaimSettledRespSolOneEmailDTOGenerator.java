@@ -49,9 +49,18 @@ public class UnspecClaimSettledRespSolOneEmailDTOGenerator extends RespSolOneEma
         properties.put(CLAIMANT_NAME, caseData.getApplicant1().getPartyName());
         properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
         properties.put(CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString());
+        properties.put(CLAIMANT_REFERENCE_NUMBER, getClaimantRefNumber(caseData));
         properties.put(DEFENDANT_REFERENCE_NUMBER, getDefRefNumber(caseData));
         properties.put(LEGAL_REP_NAME, getLegalOrganizationNameForRespondent(caseData, true, organisationService));
         return properties;
+    }
+
+    private String getClaimantRefNumber(CaseData caseData) {
+        if (nonNull(caseData.getSolicitorReferences())
+            && nonNull(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())) {
+            return caseData.getSolicitorReferences().getApplicantSolicitor1Reference();
+        }
+        return "Not provided";
     }
 
     private String getDefRefNumber(CaseData caseData) {

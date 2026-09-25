@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_16_DIGIT_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_REP_NAME;
 
@@ -108,7 +109,9 @@ class UnspecClaimSettledRespSolOneEmailDTOGeneratorTest {
             .applicant1(new Party().setType(Party.Type.COMPANY).setCompanyName("Claimant Company Ltd"))
             .ccdCaseReference(1234567890123456L)
             .legacyCaseReference("000KA001")
-            .solicitorReferences(new SolicitorReferences().setRespondentSolicitor1Reference("DEF-REF-123"))
+            .solicitorReferences(new SolicitorReferences()
+                                     .setApplicantSolicitor1Reference("CLM-REF-456")
+                                     .setRespondentSolicitor1Reference("DEF-REF-123"))
             .respondent1OrganisationPolicy(new OrganisationPolicy())
             .build();
 
@@ -123,6 +126,7 @@ class UnspecClaimSettledRespSolOneEmailDTOGeneratorTest {
             .containsEntry(CLAIMANT_NAME, "Claimant Company Ltd")
             .containsEntry(CLAIM_REFERENCE_NUMBER, "000KA001")
             .containsEntry(CLAIM_16_DIGIT_NUMBER, "1234567890123456")
+            .containsEntry(CLAIMANT_REFERENCE_NUMBER, "CLM-REF-456")
             .containsEntry(DEFENDANT_REFERENCE_NUMBER, "DEF-REF-123")
             .containsEntry(LEGAL_REP_NAME, "Test Legal Org");
     }
@@ -142,7 +146,9 @@ class UnspecClaimSettledRespSolOneEmailDTOGeneratorTest {
             properties = emailDTOGenerator.addCustomProperties(new HashMap<>(), caseData);
         }
 
-        assertThat(properties).containsEntry(DEFENDANT_REFERENCE_NUMBER, "Not provided");
+        assertThat(properties)
+            .containsEntry(CLAIMANT_REFERENCE_NUMBER, "Not provided")
+            .containsEntry(DEFENDANT_REFERENCE_NUMBER, "Not provided");
     }
 
     @Test
