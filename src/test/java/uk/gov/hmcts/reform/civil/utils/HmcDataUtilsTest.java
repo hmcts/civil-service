@@ -46,7 +46,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.includesVideoHearing;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.INTER;
@@ -1353,12 +1352,11 @@ class HmcDataUtilsTest {
         @ParameterizedTest
         @NullAndEmptySource
         @ValueSource(strings = {" ", "\t", "\n", "  \t\n  "})
-        void shouldReturnNullWithoutLookup_whenVenueIdIsMissing(String venueId) {
-            LocationRefData location = HmcDataUtils.getLocationRefData(
-                "HER123", venueId, "authToken", "AAA6", locationRefDataService);
-
-            assertNull(location);
-            verifyNoInteractions(locationRefDataService);
+        void shouldRejectMissingLocation_forOtherCallers(String venueId) {
+            when(locationRefDataService.getHearingCourtLocations("authToken", "AAA6"))
+                .thenReturn(List.of(new LocationRefData().setEpimmsId("venue")));
+            assertThrows(IllegalArgumentException.class, () -> HmcDataUtils.getLocationRefData(
+                "HER123", venueId, "authToken", "AAA6", locationRefDataService));
         }
 
         @Test

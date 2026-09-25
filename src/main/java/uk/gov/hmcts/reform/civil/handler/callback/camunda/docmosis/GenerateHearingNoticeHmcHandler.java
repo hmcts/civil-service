@@ -193,11 +193,15 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
                                       String bearerToken, String serviceId,
                                       LocationReferenceDataService locationRefDataService,
                                       boolean isWelsh) {
+        String venueId = HmcDataUtils.getHearingStartDay(hearing).getHearingVenueId();
+        if (venueId == null || venueId.isBlank()) {
+            return null;
+        }
         LocationRefData hearingLocation;
         try {
             hearingLocation = getLocationRefData(
                 hearingId,
-                HmcDataUtils.getHearingStartDay(hearing).getHearingVenueId(),
+                venueId,
                 bearerToken,
                 serviceId,
                 locationRefDataService);

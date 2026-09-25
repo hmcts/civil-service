@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.CoreCaseEventDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 
 import java.util.Map;
@@ -30,6 +31,7 @@ public class EndBusinessProcessTaskHandler extends BaseExternalTaskHandler {
     private static final String INVALID_HEARING_NOTICE_PENDING = "invalidHearingNoticePending";
 
     private final RuntimeService runtimeService;
+    private final CoreCaseEventDataService coreCaseEventDataService;
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
@@ -40,13 +42,15 @@ public class EndBusinessProcessTaskHandler extends BaseExternalTaskHandler {
         CoreCaseDataService coreCaseDataService,
         CaseDetailsConverter caseDetailsConverter,
         ObjectMapper mapper,
-        RuntimeService runtimeService
+        RuntimeService runtimeService,
+        CoreCaseEventDataService coreCaseEventDataService
     ) {
         super(externalTaskCompletionService, eventProperties);
         this.coreCaseDataService = coreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;
         this.mapper = mapper;
         this.runtimeService = runtimeService;
+        this.coreCaseEventDataService = coreCaseEventDataService;
     }
 
     @Override
@@ -73,7 +77,14 @@ public class EndBusinessProcessTaskHandler extends BaseExternalTaskHandler {
         }
         if (hearingNoticeSkipped && hearingNoticePending) {
             log.info("Triggering manual hearing listing task for case {} after hearing notice was skipped", caseId);
-            coreCaseDataService.triggerEvent(Long.valueOf(caseId), INVALID_HEARING_NOTICE);
+            String eventDescription = "Hearing notice skipped: " + externalTask.getProcessInstanceId();
+            boolean eventAlreadySubmitted = coreCaseEventDataService.getEventsForCase(caseId).stream()
+                .anyMatch(event -> INVALID_HEARING_NOTICE.name().equals(event.getId())
+                    && eventDescription.equals(event.getDescription()));
+            if (!eventAlreadySubmitted) {
+                coreCaseDataService.triggerEvent(Long.valueOf(caseId), INVALID_HEARING_NOTICE, Map.of(),
+                                                "Invalid hearing notice", eventDescription);
+            }
             runtimeService.setVariable(externalTask.getProcessInstanceId(), INVALID_HEARING_NOTICE_PENDING, false);
         }
         return new ExternalTaskData();
