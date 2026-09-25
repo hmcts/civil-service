@@ -52,7 +52,7 @@ class UnspecClaimSettledRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnUnspecTemplateId() {
-        when(notificationsProperties.getNotifyDefendantLRClaimantSettleTheClaimUnspecTemplate()).thenReturn("template-id");
+        when(notificationsProperties.getNotifyDefendantLRClaimantSettleTheUnspecClaimTemplate()).thenReturn("template-id");
 
         assertThat(emailDTOGenerator.getEmailTemplateId(CaseData.builder().build())).isEqualTo("template-id");
     }
@@ -153,7 +153,6 @@ class UnspecClaimSettledRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldUseOrganisationIdCopyForLegalRepName_whenOrganisationPolicyIsCleared() {
-        // Before the defendant is notified, the org policy is cleared and the org id is held in the copy field
         CaseData caseData = CaseData.builder()
             .applicant1(new Party().setType(Party.Type.COMPANY).setCompanyName("Claimant Company Ltd"))
             .ccdCaseReference(1234567890123456L)

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -26,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_UNSPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SettleUnspecClaimCallbackHandler extends CallbackHandler {
@@ -57,10 +59,14 @@ public class SettleUnspecClaimCallbackHandler extends CallbackHandler {
             AboutToStartOrSubmitCallbackResponse.builder();
 
         if (isCaseworker(callbackParams)) {
+            log.info("Unspec claim settled by caseworker for caseId {}, no notifications triggered",
+                     caseData.getCcdCaseReference());
             responseBuilder.state(CASE_SETTLED.name());
         } else {
             caseData.setPreStayState(caseData.getCcdState().toString());
             caseData.setBusinessProcess(BusinessProcess.ready(UNSPEC_CLAIM_SETTLED_NOTIFICATION));
+            log.info("Unspec claim settled by claimant for caseId {}, preStayState {}, starting {}",
+                     caseData.getCcdCaseReference(), caseData.getPreStayState(), UNSPEC_CLAIM_SETTLED_NOTIFICATION);
             responseBuilder.state(CASE_STAYED.name());
         }
 

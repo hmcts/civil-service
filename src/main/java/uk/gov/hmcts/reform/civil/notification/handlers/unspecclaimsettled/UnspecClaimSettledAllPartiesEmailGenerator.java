@@ -28,7 +28,6 @@ public class UnspecClaimSettledAllPartiesEmailGenerator extends AllPartiesEmailG
         if (isOneVOne(caseData)) {
             return super.getPartiesToNotify(caseData, taskId);
         }
-        // Multiparty is out of scope for unspec claim settled, keep the existing settle claim notifications
         return settleClaimPaidInFullEmailGenerator.getPartiesToNotify(caseData, taskId);
     }
 }

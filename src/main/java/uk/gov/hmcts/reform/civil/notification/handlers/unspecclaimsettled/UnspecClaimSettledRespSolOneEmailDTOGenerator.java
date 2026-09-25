@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.unspecclaimsettled;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -13,6 +14,7 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
+@Slf4j
 @Component
 public class UnspecClaimSettledRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
@@ -28,14 +30,19 @@ public class UnspecClaimSettledRespSolOneEmailDTOGenerator extends RespSolOneEma
 
     @Override
     public Boolean getShouldNotify(CaseData caseData) {
-        return isOneVOne(caseData)
-            && !caseData.isRespondent1LiP()
-            && StringUtils.isNotEmpty(caseData.getRespondentSolicitor1EmailAddress());
+        boolean oneVOne = isOneVOne(caseData);
+        boolean respondent1LiP = caseData.isRespondent1LiP();
+        boolean hasSolicitorEmail = StringUtils.isNotEmpty(caseData.getRespondentSolicitor1EmailAddress());
+        boolean shouldNotify = oneVOne && !respondent1LiP && hasSolicitorEmail;
+        log.info("Unspec claim settled defendant LR email for caseId {}: shouldNotify {} "
+                     + "(oneVOne {}, respondent1LiP {}, hasSolicitorEmail {})",
+                 caseData.getCcdCaseReference(), shouldNotify, oneVOne, respondent1LiP, hasSolicitorEmail);
+        return shouldNotify;
     }
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getNotifyDefendantLRClaimantSettleTheClaimUnspecTemplate();
+        return notificationsProperties.getNotifyDefendantLRClaimantSettleTheUnspecClaimTemplate();
     }
 
     @Override

@@ -392,7 +392,7 @@ public class NotificationsProperties {
     private String notifyDefendantLRClaimantSettleTheClaimTemplate;
 
     @NotEmpty
-    private String notifyDefendantLRClaimantSettleTheClaimUnspecTemplate;
+    private String notifyDefendantLRClaimantSettleTheUnspecClaimTemplate;
 
     @NotEmpty
     private String  evidenceUploadLipTemplate;
