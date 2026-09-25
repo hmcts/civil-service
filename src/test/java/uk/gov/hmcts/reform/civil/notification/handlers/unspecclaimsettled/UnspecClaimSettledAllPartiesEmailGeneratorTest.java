@@ -8,14 +8,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
-import uk.gov.hmcts.reform.civil.notification.handlers.settleclaimpaidinfullnotification.SettleClaimPaidInFullNotificationAllPartiesEmailGenerator;
 
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,15 +25,11 @@ class UnspecClaimSettledAllPartiesEmailGeneratorTest {
     @Mock
     private UnspecClaimSettledRespSolOneEmailDTOGenerator respSolOneEmailDTOGenerator;
 
-    @Mock
-    private SettleClaimPaidInFullNotificationAllPartiesEmailGenerator settleClaimPaidInFullEmailGenerator;
-
     private UnspecClaimSettledAllPartiesEmailGenerator emailGenerator;
 
     @BeforeEach
     void setUp() {
-        emailGenerator = new UnspecClaimSettledAllPartiesEmailGenerator(respSolOneEmailDTOGenerator,
-                                                                        settleClaimPaidInFullEmailGenerator);
+        emailGenerator = new UnspecClaimSettledAllPartiesEmailGenerator(respSolOneEmailDTOGenerator);
     }
 
     @Test
@@ -47,21 +42,18 @@ class UnspecClaimSettledAllPartiesEmailGeneratorTest {
         Set<EmailDTO> result = emailGenerator.getPartiesToNotify(caseData, TASK_ID);
 
         assertThat(result).containsExactly(emailDTO);
-        verifyNoInteractions(settleClaimPaidInFullEmailGenerator);
     }
 
     @Test
-    void shouldKeepExistingSettleClaimNotifications_whenMultiParty() {
+    void shouldNotSendAnyEmail_whenMultiParty() {
         CaseData caseData = CaseData.builder()
             .respondent2(new Party().setType(Party.Type.COMPANY).setCompanyName("Defendant Two"))
             .build();
-        EmailDTO emailDTO = new EmailDTO();
-        when(settleClaimPaidInFullEmailGenerator.getPartiesToNotify(any(), any())).thenReturn(Set.of(emailDTO));
+        when(respSolOneEmailDTOGenerator.getShouldNotify(caseData)).thenReturn(false);
 
         Set<EmailDTO> result = emailGenerator.getPartiesToNotify(caseData, TASK_ID);
 
-        assertThat(result).containsExactly(emailDTO);
-        verify(settleClaimPaidInFullEmailGenerator).getPartiesToNotify(caseData, TASK_ID);
-        verifyNoInteractions(respSolOneEmailDTOGenerator);
+        assertThat(result).isEmpty();
+        verify(respSolOneEmailDTOGenerator, never()).buildEmailDTO(any(), any());
     }
 }

@@ -19,6 +19,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_UNSPEC_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 
 @RequiredArgsConstructor
 @Service
@@ -62,7 +63,8 @@ public class DefendantLetterHandler extends CallbackHandler {
     }
 
     public static boolean isClaimSettledLetterRequired(CaseData caseData) {
-        return isRespondent1Lip(caseData)
+        return isOneVOne(caseData)
+            && isRespondent1Lip(caseData)
             && AWAITING_CASE_DETAILS_NOTIFICATION.name().equals(caseData.getPreStayState());
     }
 }
