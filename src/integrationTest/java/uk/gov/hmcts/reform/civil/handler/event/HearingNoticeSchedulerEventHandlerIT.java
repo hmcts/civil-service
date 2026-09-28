@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.civil.handler.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -17,6 +20,7 @@ import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.hearingnotice.InvalidHearingNoticeService;
 import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
@@ -34,6 +38,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -138,6 +143,51 @@ class HearingNoticeSchedulerEventHandlerIT {
         verify(hearingsService, never()).updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any());
     }
 
+    @Test
+    void shouldNotDispatchNoticeOrNotifyHmc_whenResponseAlreadyReferredForManualAction() {
+        stubRecordedResponse(createHearing(), HEARING_ID);
+
+        handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
+        handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
+
+        verifyNoInteractions(runtimeService, messageCorrelationBuilder);
+        verify(hearingsService, never()).updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"other-hearing", "new-version", "later-response"})
+    void shouldDispatchNotice_whenResponseDiffersFromRecordedManualReferral(String scenario) {
+        HearingGetResponse hearing = createHearing();
+        String recordedHearingId = HEARING_ID;
+        switch (scenario) {
+            case "other-hearing" -> recordedHearingId = "another-hearing";
+            case "new-version" -> hearing.getRequestDetails().setVersionNumber((long) VERSION + 1);
+            case "later-response" -> hearing.getHearingResponse().setReceivedDateTime(RECEIVED_DATE_TIME.plusDays(1));
+            default -> throw new IllegalArgumentException("Unexpected test scenario: " + scenario);
+        }
+        stubRecordedResponse(hearing, recordedHearingId);
+
+        handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
+
+        verify(runtimeService).createMessageCorrelation("NOTIFY_HEARING_PARTIES");
+        verify(messageCorrelationBuilder).correlateStartMessage();
+        verify(hearingsService, never()).updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any());
+    }
+
+    private void stubRecordedResponse(HearingGetResponse hearing, String recordedHearingId) {
+        when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(hearing);
+        when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID))
+            .thenReturn(new PartiesNotifiedResponses());
+        // Use CCD-shaped data to exercise the real service's timestamp and collection conversion.
+        when(coreCaseDataService.getCase(Long.parseLong(CASE_ID))).thenReturn(
+            CaseDetails.builder().id(Long.parseLong(CASE_ID)).state("CASE_PROGRESSION")
+                .data(Map.of("invalidHearingNoticeProcessed", List.of(Map.of(
+                    "id", "8bf7fc81-eb96-43d0-9cca-18c74d3f7068",
+                    "value", Map.of("hearingId", recordedHearingId, "requestVersion", VERSION,
+                                    "responseReceivedDateTime", RECEIVED_DATE_TIME.toString())))))
+                .build());
+    }
+
     private HearingGetResponse createHearing() {
         return new HearingGetResponse()
             .setHearingDetails(new HearingDetails())
@@ -174,12 +224,12 @@ class HearingNoticeSchedulerEventHandlerIT {
     }
 
     @Configuration
-    @Import(HearingNoticeSchedulerEventHandler.class)
+    @Import({HearingNoticeSchedulerEventHandler.class, InvalidHearingNoticeService.class})
     static class TestConfig {
 
         @Bean
         ObjectMapper objectMapper() {
-            return new ObjectMapper();
+            return new ObjectMapper().registerModule(new JavaTimeModule());
         }
     }
 }
