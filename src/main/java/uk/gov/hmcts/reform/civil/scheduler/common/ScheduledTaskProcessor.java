@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StopWatch;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorChain;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorContext;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorChainFactory;
@@ -65,8 +64,7 @@ public class ScheduledTaskProcessor<T, I> {
             .sequential()
             .limit(maxCasesPerRun(scheduledTask));
 
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
+        long startNanos = System.nanoTime();
         try {
             boolean completed = sequentialStream.allMatch(item -> processItem(
                 eventConfig,
@@ -77,7 +75,7 @@ public class ScheduledTaskProcessor<T, I> {
                 context
             ));
 
-            stopWatch.stop();
+            Duration processingDuration = Duration.ofNanos(System.nanoTime() - startNanos);
             return new ScheduledTaskOutcome<>(
                 context.succeededItems,
                 context.failedItems,
@@ -85,12 +83,10 @@ public class ScheduledTaskProcessor<T, I> {
                 !completed,
                 context.jobAbortReason.get(),
                 Duration.ofMillis(context.cumulativeDelayMillis.get()),
-                Duration.ofNanos(stopWatch.getTotalTimeNanos())
+                processingDuration
             );
         } catch (ScheduledTaskInterruptedException e) {
-            if (stopWatch.isRunning()) {
-                stopWatch.stop();
-            }
+            Duration processingDuration = Duration.ofNanos(System.nanoTime() - startNanos);
             context.jobAbortReason.set(e.getMessage());
             return new ScheduledTaskOutcome<>(
                 context.succeededItems,
@@ -99,7 +95,7 @@ public class ScheduledTaskProcessor<T, I> {
                 true,
                 context.jobAbortReason.get(),
                 Duration.ofMillis(context.cumulativeDelayMillis.get()),
-                Duration.ofNanos(stopWatch.getTotalTimeNanos())
+                processingDuration
             );
         }
     }
