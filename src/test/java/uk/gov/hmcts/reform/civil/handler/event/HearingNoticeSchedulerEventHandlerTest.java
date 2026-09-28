@@ -212,7 +212,9 @@ class HearingNoticeSchedulerEventHandlerTest {
             case "other-hearing" -> recorded.setHearingId("other-hearing");
             case "new-version" -> hearing.getRequestDetails().setVersionNumber(VERSION.longValue() + 1);
             case "later-response" -> hearing.getHearingResponse().setReceivedDateTime(RECEIVED_DATETIME.plusDays(1));
-            default -> { }
+            default -> {
+                // The no-record scenario keeps the hearing unchanged and omits the stored collection below.
+            }
         }
         CaseDetails details = CaseDetails.builder().id(Long.parseLong(CASE_ID)).state("CASE_PROGRESSION")
             .data("no-record".equals(scenario) ? Map.of()

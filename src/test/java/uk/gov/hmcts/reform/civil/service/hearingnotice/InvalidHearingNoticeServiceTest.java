@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.hearingnotice;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.FeignException;
@@ -101,8 +102,8 @@ class InvalidHearingNoticeServiceTest {
         assertThat(content.getEvent().getId()).isEqualTo(INVALID_HEARING_NOTICE.name());
         assertThat(content.getEvent().getSummary()).isEqualTo("Invalid hearing notice");
         assertThat(content.getEvent().getDescription()).isEqualTo("process-1");
-        Map<?, ?> payload = (Map<?, ?>) content.getData();
-        assertThat(payload.get("unrelatedField")).isEqualTo("preserved");
+        Map<String, Object> payload = mapper.convertValue(content.getData(), new TypeReference<>() {});
+        assertThat(payload).containsEntry("unrelatedField", "preserved");
         var data = mapper.convertValue(Map.of(FIELD, payload.get(FIELD)), CaseData.class);
         assertThat(data.getInvalidHearingNoticeProcessed()).hasSize(2);
         assertThat(data.getInvalidHearingNoticeProcessed().getFirst()).isEqualTo(other);
