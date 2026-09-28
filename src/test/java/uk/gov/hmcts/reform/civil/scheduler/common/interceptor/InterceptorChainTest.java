@@ -1,15 +1,14 @@
 package uk.gov.hmcts.reform.civil.scheduler.common.interceptor;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.util.StopWatch;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
+import java.util.function.LongSupplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class InterceptorChainTest {
 
@@ -91,23 +90,15 @@ class InterceptorChainTest {
 
     @Test
     void shouldRecordMetricsForInterceptorsAndFinalTask() {
-        StopWatch interceptor1StopWatch = mock(StopWatch.class);
-        StopWatch finalTaskStopWatch = mock(StopWatch.class);
-
         // Simulate Interceptor1 taking 60ms total, and FinalTask taking 20ms total.
         // Exclusive time for Interceptor1 should be 60 - 20 = 40ms.
-        when(interceptor1StopWatch.getTotalTimeNanos()).thenReturn(60_000_000L);
-        when(finalTaskStopWatch.getTotalTimeNanos()).thenReturn(20_000_000L);
-
-        Function<String, StopWatch> factory = name -> {
-            if ("Interceptor1".equals(name)) {
-                return interceptor1StopWatch;
-            }
-            if ("FinalTask".equals(name)) {
-                return finalTaskStopWatch;
-            }
-            return new StopWatch(name);
-        };
+        Queue<Long> nanoTimes = new LinkedList<>(List.of(
+            0L,
+            5_000_000L,
+            25_000_000L,
+            60_000_000L
+        ));
+        LongSupplier nanoTimeSupplier = nanoTimes::poll;
 
         class Interceptor1 implements SchedulerInterceptor<String> {
             @Override
@@ -123,7 +114,7 @@ class InterceptorChainTest {
             ctx -> {
                 // do nothing
             },
-            factory
+            nanoTimeSupplier
         );
         chain.next(context);
 

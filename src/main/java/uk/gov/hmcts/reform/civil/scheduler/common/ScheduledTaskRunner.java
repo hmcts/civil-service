@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.scheduler.common;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StopWatch;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.SchedulerInterceptor;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.SchedulerInterceptorResolver;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -52,16 +51,22 @@ public class ScheduledTaskRunner<T, I> {
     public void run(ScheduledTaskConfiguration<T, I> config) {
         if (featureToggleService.isSpringSchedulerEnabled(config.getSchedulerName())) {
             log.info("Running {} scheduler", config.getSchedulerName());
-            StopWatch stopWatch = new StopWatch(config.getSchedulerName());
+            long startNanos = System.nanoTime();
 
-            stopWatch.start("search");
+            long searchStartNanos = System.nanoTime();
             TaskResult<T> searchResult = config.getSearchResultSupplier().get();
-            stopWatch.stop();
-            Duration searchDuration = Duration.ofNanos(stopWatch.getLastTaskTimeNanos());
+            Duration searchDuration = Duration.ofNanos(System.nanoTime() - searchStartNanos);
 
             List<SchedulerInterceptor<T>> interceptors = interceptorResolver.resolveInterceptors(config);
 
-            execute(new ScheduledTaskEventConfiguration(config.getSchedulerName()), searchResult, config.getScheduledTask(), interceptors, searchDuration, stopWatch);
+            execute(
+                new ScheduledTaskEventConfiguration(config.getSchedulerName()),
+                searchResult,
+                config.getScheduledTask(),
+                interceptors,
+                searchDuration,
+                startNanos
+            );
         }
     }
 
@@ -74,14 +79,14 @@ public class ScheduledTaskRunner<T, I> {
      * @param scheduledTask  the task to be performed on each item
      * @param interceptors   the list of interceptors to apply
      * @param searchDuration the duration of the search
-     * @param stopWatch      the StopWatch for the job
+     * @param startNanos     the start time of the job in nanoseconds
      */
     private void execute(ScheduledTaskEventConfiguration eventConfig,
                          TaskResult<T> searchResult,
                          ScheduledTask<T, I> scheduledTask,
                          List<SchedulerInterceptor<T>> interceptors,
                          Duration searchDuration,
-                         StopWatch stopWatch) {
+                         long startNanos) {
 
         if (searchResult == null) {
             eventTracker.jobAbortedEvent(eventConfig, "SearchResult cannot be null", searchDuration);
@@ -99,7 +104,7 @@ public class ScheduledTaskRunner<T, I> {
             return;
         }
 
-        processItems(eventConfig, scheduledTask, searchResult, interceptors, searchDuration, stopWatch);
+        processItems(eventConfig, scheduledTask, searchResult, interceptors, searchDuration, startNanos);
     }
 
     /**
@@ -110,41 +115,43 @@ public class ScheduledTaskRunner<T, I> {
      * @param scheduledTask the task to be performed on each item
      * @param searchResult  the result of the search containing the stream of items
      * @param interceptors  the list of interceptors to apply
+     * @param searchDuration the duration of the search
+     * @param startNanos    the start time of the job in nanoseconds
      */
     private void processItems(ScheduledTaskEventConfiguration eventConfig,
                               ScheduledTask<T, I> scheduledTask,
                               TaskResult<T> searchResult,
                               List<SchedulerInterceptor<T>> interceptors,
                               Duration searchDuration,
-                              StopWatch stopWatch) {
+                              long startNanos) {
         int totalCases = searchResult.totalResults();
         eventTracker.jobStartedEvent(eventConfig, totalCases);
         log.info("Running scheduled task: {}, totalCases: {}", eventConfig.getSchedulerName(), totalCases);
 
-        stopWatch.start("process");
         ScheduledTaskOutcome<I> outcome = scheduledTaskProcessor.performProcessing(
             eventConfig,
             scheduledTask,
             searchResult,
             interceptors
         );
-        stopWatch.stop();
 
-        Duration totalDuration = Duration.ofNanos(stopWatch.getTotalTimeNanos());
+        Duration totalDuration = Duration.ofNanos(System.nanoTime() - startNanos);
+
+        ScheduledJobReport.ScheduledJobReportBuilder reportBuilder = ScheduledJobReport.builder()
+            .totalCases(totalCases)
+            .succeededCases(outcome.succeededCases().size())
+            .failedCases(outcome.failedCases().size())
+            .abortedCases(outcome.abortedCases().size())
+            .cumulativeDelay(outcome.cumulativeDelay())
+            .searchDuration(searchDuration)
+            .processingDuration(outcome.processingDuration())
+            .totalDuration(totalDuration);
 
         if (outcome.abortedEarly()) {
             eventTracker.jobAbortedEvent(
                 eventConfig,
-                ScheduledJobReport.builder()
-                    .totalCases(totalCases)
-                    .succeededCases(outcome.succeededCases().size())
-                    .failedCases(outcome.failedCases().size())
-                    .abortedCases(outcome.abortedCases().size())
+                reportBuilder
                     .jobAbortReason(outcome.jobAbortReason())
-                    .cumulativeDelay(outcome.cumulativeDelay())
-                    .searchDuration(searchDuration)
-                    .processingDuration(outcome.processingDuration())
-                    .totalDuration(totalDuration)
                     .build()
             );
             log.info(
@@ -164,16 +171,7 @@ public class ScheduledTaskRunner<T, I> {
         } else {
             eventTracker.jobCompletedEvent(
                 eventConfig,
-                ScheduledJobReport.builder()
-                    .totalCases(totalCases)
-                    .succeededCases(outcome.succeededCases().size())
-                    .failedCases(outcome.failedCases().size())
-                    .abortedCases(outcome.abortedCases().size())
-                    .cumulativeDelay(outcome.cumulativeDelay())
-                    .searchDuration(searchDuration)
-                    .processingDuration(outcome.processingDuration())
-                    .totalDuration(totalDuration)
-                    .build()
+                reportBuilder.build()
             );
             log.info(
                 "Scheduled task completed: {}, totalCases: {}, succeededCases: {}, failedCases: {}, abortedCases: {}, cumulativeDelay: {}, " +
