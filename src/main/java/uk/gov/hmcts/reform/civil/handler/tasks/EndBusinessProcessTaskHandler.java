@@ -13,9 +13,11 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
+import uk.gov.hmcts.reform.civil.model.InvalidHearingNoticeProcessed;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseEventDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
+import uk.gov.hmcts.reform.civil.service.hearingnotice.InvalidHearingNoticeService;
 
 import java.util.Map;
 
@@ -35,6 +37,7 @@ public class EndBusinessProcessTaskHandler extends BaseExternalTaskHandler {
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
+    private final InvalidHearingNoticeService invalidHearingNoticeService;
 
     public EndBusinessProcessTaskHandler(
         ExternalTaskCompletionService externalTaskCompletionService,
@@ -43,7 +46,8 @@ public class EndBusinessProcessTaskHandler extends BaseExternalTaskHandler {
         CaseDetailsConverter caseDetailsConverter,
         ObjectMapper mapper,
         RuntimeService runtimeService,
-        CoreCaseEventDataService coreCaseEventDataService
+        CoreCaseEventDataService coreCaseEventDataService,
+        InvalidHearingNoticeService invalidHearingNoticeService
     ) {
         super(externalTaskCompletionService, eventProperties);
         this.coreCaseDataService = coreCaseDataService;
@@ -51,6 +55,7 @@ public class EndBusinessProcessTaskHandler extends BaseExternalTaskHandler {
         this.mapper = mapper;
         this.runtimeService = runtimeService;
         this.coreCaseEventDataService = coreCaseEventDataService;
+        this.invalidHearingNoticeService = invalidHearingNoticeService;
     }
 
     @Override
@@ -82,8 +87,16 @@ public class EndBusinessProcessTaskHandler extends BaseExternalTaskHandler {
                 .anyMatch(event -> INVALID_HEARING_NOTICE.name().equals(event.getId())
                     && eventDescription.equals(event.getDescription()));
             if (!eventAlreadySubmitted) {
-                coreCaseDataService.triggerEvent(Long.valueOf(caseId), INVALID_HEARING_NOTICE, Map.of(),
-                                                "Invalid hearing notice", eventDescription);
+                if (externalTaskInput.getHearingId() != null && !externalTaskInput.getHearingId().isBlank()
+                    && externalTaskInput.getRequestVersion() != null && externalTaskInput.getResponseDateTime() != null) {
+                    invalidHearingNoticeService.recordAndTriggerEvent(caseId, new InvalidHearingNoticeProcessed(
+                        externalTaskInput.getHearingId(), externalTaskInput.getRequestVersion(),
+                        externalTaskInput.getResponseDateTime()), eventDescription);
+                } else {
+                    // Compatibility for processes already running before response identity was captured.
+                    coreCaseDataService.triggerEvent(Long.valueOf(caseId), INVALID_HEARING_NOTICE, Map.of(),
+                                                    "Invalid hearing notice", eventDescription);
+                }
             }
             runtimeService.setVariable(externalTask.getProcessInstanceId(), INVALID_HEARING_NOTICE_PENDING, false);
         }

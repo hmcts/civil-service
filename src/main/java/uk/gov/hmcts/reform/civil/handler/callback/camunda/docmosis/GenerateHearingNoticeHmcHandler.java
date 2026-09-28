@@ -102,6 +102,8 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
             log.warn("Skipping hearing notice: invalid hearing type {} for case {} hearing {}",
                      hearingType, caseData.getCcdCaseReference(), camundaVars.getHearingId());
             camundaVars.setHearingNoticeSkipped(true);
+            camundaVars.setRequestVersion(hearing.getRequestDetails().getVersionNumber());
+            camundaVars.setResponseDateTime(hearing.getHearingResponse().getReceivedDateTime());
             camundaService.setProcessVariables(processInstanceId, camundaVars);
             return AboutToStartOrSubmitCallbackResponse.builder().data(caseData.toMap(objectMapper)).build();
         }
@@ -113,6 +115,8 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
             log.warn("Skipping hearing notice: venue missing or unknown for case {} hearing {}",
                      caseData.getCcdCaseReference(), camundaVars.getHearingId());
             camundaVars.setHearingNoticeSkipped(true);
+            camundaVars.setRequestVersion(hearing.getRequestDetails().getVersionNumber());
+            camundaVars.setResponseDateTime(hearing.getHearingResponse().getReceivedDateTime());
             camundaService.setProcessVariables(processInstanceId, camundaVars);
             return AboutToStartOrSubmitCallbackResponse.builder().data(caseData.toMap(objectMapper)).build();
         }

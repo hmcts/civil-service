@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 
+import java.time.LocalDateTime;
+
 @Data
 @Accessors(chain = true)
 @NoArgsConstructor
@@ -20,5 +22,8 @@ public class ExternalTaskInput {
     Boolean triggeredViaScheduler;
     Boolean hearingNoticeSkipped;
     Boolean invalidHearingNoticePending;
+    String hearingId;
+    Long requestVersion;
+    LocalDateTime responseDateTime;
     String generalApplicationCaseId;
 }

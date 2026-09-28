@@ -7,6 +7,8 @@ import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -18,6 +20,8 @@ import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeMessageVar
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeSchedulerVars;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.model.InvalidHearingNoticeProcessed;
+import uk.gov.hmcts.reform.civil.service.hearingnotice.InvalidHearingNoticeService;
 import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
@@ -37,6 +41,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -47,10 +52,12 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(SpringExtension.class)
 class HearingNoticeSchedulerEventHandlerTest {
@@ -78,6 +85,9 @@ class HearingNoticeSchedulerEventHandlerTest {
 
     @Mock
     private CoreCaseDataService coreCaseDataService;
+
+    @Mock
+    private InvalidHearingNoticeService invalidHearingNoticeService;
 
     @InjectMocks
     private HearingNoticeSchedulerEventHandler handler;
@@ -172,6 +182,56 @@ class HearingNoticeSchedulerEventHandlerTest {
                 .setHearingId(HEARING_ID)
                 .setTriggeredViaScheduler(true).toMap(mapper));
         verify(messageCorrelationBuilder, times(1)).correlateStartMessage();
+    }
+
+    @Test
+    void shouldNotStartAnotherProcessOrNotifyHmc_whenResponseWasReferredForManualAction() {
+        when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID))
+            .thenReturn(createHearing(ListAssistCaseStatus.LISTED));
+        when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID))
+            .thenReturn(new PartiesNotifiedResponses());
+        CaseDetails details = CaseDetails.builder().id(Long.parseLong(CASE_ID)).state("CASE_PROGRESSION").build();
+        when(coreCaseDataService.getCase(Long.parseLong(CASE_ID))).thenReturn(details);
+        when(invalidHearingNoticeService.hasProcessed(details,
+            new InvalidHearingNoticeProcessed(HEARING_ID, VERSION.longValue(), RECEIVED_DATETIME))).thenReturn(true);
+
+        handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
+        handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
+
+        verifyNoInteractions(runtimeService, messageCorrelationBuilder);
+        verify(hearingsService, never()).updatePartiesNotifiedResponse(
+            anyString(), anyString(), anyInt(), any(), any());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"other-hearing", "new-version", "later-response", "no-record"})
+    void shouldStartProcessWhenCurrentResponseHasNotBeenReferred(String scenario) {
+        var recorded = new InvalidHearingNoticeProcessed(HEARING_ID, VERSION.longValue(), RECEIVED_DATETIME);
+        var hearing = createHearing(ListAssistCaseStatus.LISTED);
+        switch (scenario) {
+            case "other-hearing" -> recorded.setHearingId("other-hearing");
+            case "new-version" -> hearing.getRequestDetails().setVersionNumber(VERSION.longValue() + 1);
+            case "later-response" -> hearing.getHearingResponse().setReceivedDateTime(RECEIVED_DATETIME.plusDays(1));
+            default -> { }
+        }
+        CaseDetails details = CaseDetails.builder().id(Long.parseLong(CASE_ID)).state("CASE_PROGRESSION")
+            .data("no-record".equals(scenario) ? Map.of()
+                      : Map.of("invalidHearingNoticeProcessed", List.of(element(recorded))))
+            .build();
+        when(coreCaseDataService.getCase(Long.parseLong(CASE_ID))).thenReturn(details);
+        when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(hearing);
+        when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID))
+            .thenReturn(new PartiesNotifiedResponses());
+        var realService = new InvalidHearingNoticeService(coreCaseDataService,
+            new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule()));
+        when(invalidHearingNoticeService.hasProcessed(eq(details), any()))
+            .thenAnswer(invocation -> realService.hasProcessed(details, invocation.getArgument(1)));
+
+        handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
+
+        verify(invalidHearingNoticeService).hasProcessed(details, new InvalidHearingNoticeProcessed(
+            HEARING_ID, hearing.getRequestDetails().getVersionNumber(), hearing.getHearingResponse().getReceivedDateTime()));
+        verify(messageCorrelationBuilder).correlateStartMessage();
     }
 
     @Test

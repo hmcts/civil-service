@@ -129,6 +129,8 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @Data
 public class CaseData extends CaseDataParent implements MappableObject {
 
+    private List<Element<InvalidHearingNoticeProcessed>> invalidHearingNoticeProcessed;
+
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private  Long ccdCaseReference;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

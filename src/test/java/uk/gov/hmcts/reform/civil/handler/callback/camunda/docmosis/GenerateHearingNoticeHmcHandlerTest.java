@@ -574,6 +574,8 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         assertThat(actual.getData()).isEqualTo(caseData.toMap(mapper));
         assertThat(unwrapElements(updatedData.getHearingDocuments())).containsExactly(existingEnglish);
         assertThat(inputVariables.getHearingNoticeSkipped()).isTrue();
+        assertThat(inputVariables.getRequestVersion()).isEqualTo(VERSION_NUMBER);
+        assertThat(inputVariables.getResponseDateTime()).isEqualTo(hearingResponseDate);
         verify(camundaService).setProcessVariables(PROCESS_INSTANCE_ID, inputVariables);
         Mockito.verifyNoInteractions(hearingNoticeHmcGenerator, hearingFeesService);
         if (!"unknown-venue".equals(venueId)) {
@@ -627,7 +629,10 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
                 new HearingDaySchedule().setHearingVenueId(EPIMS)
                     .setHearingStartDateTime(LocalDateTime.of(2023, 7, 1, 9, 0))
                     .setHearingEndDateTime(LocalDateTime.of(2023, 7, 1, 11, 0)))))
+            .setRequestDetails(new HearingRequestDetails().setVersionNumber(VERSION_NUMBER))
             .setHearingDetails(new HearingDetails().setHearingType(hearingType));
+        LocalDateTime responseDateTime = LocalDateTime.of(2026, 9, 28, 10, 0);
+        hearing.getHearingResponse().setReceivedDateTime(responseDateTime);
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -637,6 +642,8 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
 
         assertThat(actual.getData()).isEqualTo(caseData.toMap(mapper));
         assertThat(inputVariables.getHearingNoticeSkipped()).isTrue();
+        assertThat(inputVariables.getRequestVersion()).isEqualTo(VERSION_NUMBER);
+        assertThat(inputVariables.getResponseDateTime()).isEqualTo(responseDateTime);
         verify(camundaService).setProcessVariables(PROCESS_INSTANCE_ID, inputVariables);
         Mockito.verifyNoInteractions(hearingNoticeHmcGenerator, hearingFeesService, locationRefDataService);
     }
