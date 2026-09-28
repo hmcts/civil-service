@@ -387,6 +387,7 @@ withNightlyPipeline(type, product, component) {
                 'playwright-allure-bootstrap-history'
               )
             }
+            archiveArtifacts allowEmptyArchive: true, artifacts: "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/**/*"
           }
         }
       }
