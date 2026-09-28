@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
@@ -310,6 +312,36 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
                 .extracting("breathingSpaceActive")
                 .isEqualTo("No");
         }
+
+        @Test
+        public void shouldKeepBreathingSpaceActive_whenExpectedEndIsAfterToday() {
+            LocalDate expectedEnd = LocalDate.now().plusDays(10);
+            BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
+            enterInfo.setStart(LocalDate.now().minusDays(1));
+            BreathingSpaceLiftInfo liftInfo = new BreathingSpaceLiftInfo();
+            liftInfo.setExpectedEnd(expectedEnd);
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            breathingSpaceInfo.setEnter(enterInfo);
+            breathingSpaceInfo.setActive(YesOrNo.YES);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            caseData.setBreathing(breathingSpaceInfo);
+            BreathingSpaceUtils.addEnteredBreathingSpaceToHistory(caseData);
+            breathingSpaceInfo.setLift(liftInfo);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("breathingSpaceActive")
+                .isEqualTo("Yes");
+            assertThat(response.getData().get("businessProcess")).isNull();
+            List<Element<StoredBreathingSpace>> stored = objectMapper.convertValue(
+                response.getData().get("storedBreathingSpace"),
+                new TypeReference<>() {}
+            );
+            assertThat(stored.get(0).getValue().getLift().getExpectedEnd()).isEqualTo(expectedEnd);
+        }
     }
 
     @Nested
@@ -328,6 +360,36 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
             SubmittedCallbackResponse response =
                 (SubmittedCallbackResponse) callbackHandler.handle(params);
             Assertions.assertTrue(response.getConfirmationHeader().contains(claimNumber));
+            Assertions.assertTrue(response.getConfirmationHeader().contains("Breathing Space lifted"));
+            Assertions.assertTrue(response.getConfirmationBody().contains("We have sent you a confirmation email."));
+        }
+
+        @Test
+        public void whenExpectedEndIsAfterToday_thenConfirmItWillLiftOnThatDate() {
+            String claimNumber = "claim number";
+            LocalDate expectedEnd = LocalDate.now().plusDays(10);
+            BreathingSpaceLiftInfo liftInfo = new BreathingSpaceLiftInfo();
+            liftInfo.setExpectedEnd(expectedEnd);
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            breathingSpaceInfo.setLift(liftInfo);
+            CaseData caseData = CaseDataBuilder.builder()
+                .legacyCaseReference(claimNumber)
+                .build();
+            caseData.setBreathing(breathingSpaceInfo);
+
+            CallbackParams params = new CallbackParams()
+                .caseData(caseData)
+                .type(CallbackType.SUBMITTED);
+            SubmittedCallbackResponse response =
+                (SubmittedCallbackResponse) callbackHandler.handle(params);
+
+            Assertions.assertTrue(response.getConfirmationHeader().contains(
+                "Breathing space will lift on " + DateFormatHelper.formatLocalDate(expectedEnd, DateFormatHelper.DATE)
+            ));
+            Assertions.assertTrue(response.getConfirmationHeader().contains(claimNumber));
+            Assertions.assertTrue(response.getConfirmationBody().contains(
+                "We will send you an email to confirm when breathing space has ended"
+            ));
         }
     }
 

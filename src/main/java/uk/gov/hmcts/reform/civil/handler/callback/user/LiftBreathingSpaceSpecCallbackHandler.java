@@ -112,9 +112,11 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
 
     private CallbackResponse prepareLiftBreathingSpaceSubmit(CallbackParams callbackParams) {
         CaseData data = callbackParams.getCaseData();
-        data.setBusinessProcess(BusinessProcess.ready(LIFT_BREATHING_SPACE_SPEC));
         BreathingSpaceUtils.addLiftDetailsToCurrentBreathingSpace(data);
-        data.getBreathing().setActive(NO);
+        if (!isExpectedEndAfterToday(data)) {
+            data.setBusinessProcess(BusinessProcess.ready(LIFT_BREATHING_SPACE_SPEC));
+            data.getBreathing().setActive(NO);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(data.toMap(objectMapper))
@@ -125,12 +127,32 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         String claimNumber = caseData.getLegacyCaseReference();
 
-        String body = "<br>We have sent you a confirmation email.";
-        String header = format("# Breathing Space lifted%n## Claim number%n# %s", claimNumber);
+        String body;
+        String header;
+        if (isExpectedEndAfterToday(caseData)) {
+            String endDate = DateFormatHelper.formatLocalDate(
+                caseData.getBreathing().getLift().getExpectedEnd(),
+                DateFormatHelper.DATE
+            );
+            header = format("# Breathing space will lift on %s%n## Claim number%n# %s", endDate, claimNumber);
+            body = "<br>We will send you an email to confirm when breathing space has ended";
+        } else {
+            body = "<br>We have sent you a confirmation email.";
+            header = format("# Breathing Space lifted%n## Claim number%n# %s", claimNumber);
+        }
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(header)
             .confirmationBody(body)
             .build();
+    }
+
+    private static boolean isExpectedEndAfterToday(CaseData caseData) {
+        if (caseData.getBreathing() == null
+            || caseData.getBreathing().getLift() == null
+            || caseData.getBreathing().getLift().getExpectedEnd() == null) {
+            return false;
+        }
+        return caseData.getBreathing().getLift().getExpectedEnd().isAfter(LocalDate.now());
     }
 }
