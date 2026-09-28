@@ -96,11 +96,20 @@
         <notes><![CDATA[
         NOT a false positive. Real, currently-unpatched CVE(s). Suppressed under DTSCCI-6387
         because there is no released version to upgrade to: org.springframework.security 6.5.11
-        is the newest release in its line as of 2026-09-10. Clearing these requires moving to
-        Spring Boot 4.x (Spring Framework 7 / Spring Security 7), tracked separately.
+        is the newest release in its line, re-confirmed against Maven Central on 2026-09-28.
+        Clearing these requires moving to Spring Boot 4.x (Spring Framework 7 / Spring
+        Security 7), tracked separately.
         Expires 2026-11-10Z - re-check for upstream patches then; do not extend without review.
+
+        CVE-2026-41707 added 2026-09-28 (CVSS 7.4, published 2026-08-25). It is an
+        authentication bypass by capture-replay in DPoPProofJwtDecoderFactory, which ships in
+        spring-security-oauth2-jose and is therefore on the classpath. civil-service does not
+        configure or use DPoP proofs and is not an OAuth2 authorization server, so the affected
+        code path is not reachable in this service. It is suppressed on the same no-upgrade-
+        available basis as the others above, not on the basis of being a false positive.
         ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring-security-.*@6\.5\.11$</packageUrl>
+        <cve>CVE-2026-41707</cve>
         <cve>CVE-2026-47841</cve>
         <cve>CVE-2026-47842</cve>
         <cve>CVE-2026-59270</cve>
