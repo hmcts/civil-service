@@ -17,11 +17,19 @@ public class DocumentDownloadService {
     private final DocumentManagementService documentManagementService;
 
     public DownloadedDocumentResponse downloadDocument(String authorisation, String documentId) {
-        if (documentId == null || documentId.isBlank()) {
-            throw new InvalidDocumentLinkException(String.format("documents/%s", documentId));
+        return downloadDocument(authorisation, documentId, null);
+    }
+
+    public DownloadedDocumentResponse downloadDocument(String authorisation, String documentId, String caseId) {
+        try {
+            if (documentId == null || documentId.isBlank()) {
+                throw new InvalidDocumentLinkException(String.format("documents/%s", documentId));
+            }
+            String documentPath = String.format("documents/%s", documentId);
+            return documentManagementService.downloadDocumentWithMetaData(authorisation, documentPath);
+        } catch (InvalidDocumentLinkException ex) {
+            throw ex.withCaseId(caseId);
         }
-        String documentPath = String.format("documents/%s", documentId);
-        return documentManagementService.downloadDocumentWithMetaData(authorisation, documentPath);
     }
 
     public byte[] downloadDocument(CaseDocument mailableSdoDocument, String authorisation, String caseId, String errorMessage) {
@@ -30,7 +38,7 @@ public class DocumentDownloadService {
         String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
 
         try {
-            letterContent = downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
+            letterContent = downloadDocument(authorisation, documentId, caseId).file().getInputStream().readAllBytes();
         } catch (Exception e) {
             log.error(errorMessage, caseId, e);
             throw new DocumentDownloadException(mailableSdoDocument.getDocumentLink().getDocumentFileName(), e);
