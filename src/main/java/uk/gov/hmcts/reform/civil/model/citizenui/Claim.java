@@ -148,6 +148,10 @@ public interface Claim {
         return false;
     }
 
+    default boolean isClaimUnissuedCancelled() {
+        return false;
+    }
+
     boolean isCaseStayed();
 
     /**

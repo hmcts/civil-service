@@ -73,6 +73,11 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         return caseData.getCcdState() == CaseState.CASE_SETTLED;
     }
 
+    @Override
+    public boolean isClaimUnissuedCancelled() {
+        return caseData.getCcdState() == CaseState.CLAIM_UNISSUED_CANCELLED;
+    }
+
     public boolean isClaimProceedInCaseMan() {
         List<CaseState> caseMovedInCaseManStates = List.of(CaseState.AWAITING_APPLICANT_INTENTION,
                                                            CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT,

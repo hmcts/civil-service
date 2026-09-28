@@ -215,6 +215,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  HelpWithFeesDetails claimIssuedHwfDetails;
     private  HelpWithFeesDetails hearingHwfDetails;
     private  FeeType hwfFeeType;
+    private  String cancelUnissuedClaimSpecReason;
     private  SuperClaimType superClaimType;
     private  String claimTypeOther;
     private  PersonalInjuryType personalInjuryType;

@@ -26,6 +26,7 @@ public enum CaseState {
     CASE_SETTLED("Case Settled"),
     CASE_DISCONTINUED("Case Discontinued"),
     CLOSED("Closed"),
+    CLAIM_UNISSUED_CANCELLED("Claim is unissued and cancelled"),
 
     //General Application states
     PENDING_APPLICATION_ISSUED("General Application Issue Pending"),
