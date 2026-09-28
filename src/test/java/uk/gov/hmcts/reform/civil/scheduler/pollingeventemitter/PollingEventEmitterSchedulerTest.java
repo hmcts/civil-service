@@ -43,6 +43,7 @@ class PollingEventEmitterSchedulerTest {
 
         ScheduledTaskConfiguration<CaseDetails, Long> config = configCaptor.getValue();
         assertThat(config.getSchedulerName()).isEqualTo(SCHEDULER_NAME);
+        assertThat(config.getSearchResultSupplier().get()).isEqualTo(searchService.getElasticSearchResult());
         assertThat(config.getScheduledTask()).isEqualTo(pollingEventEmitterScheduledTask);
         assertThat(config.isUseDefaultInterceptors()).isFalse();
     }
