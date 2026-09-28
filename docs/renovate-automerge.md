@@ -7,7 +7,8 @@
 Repo-level settings:
 
 - `schedule`: after 8am and before 11am every weekday.
-- `automergeSchedule`: after 8am and before 11am every weekday, with most repo package rules overriding to before 4pm every weekday.
+- `automergeSchedule`: after 7am and before 8am, and after 6pm and before 8pm, every weekday.
+- `platformAutomerge`: `false`, so Renovate enforces the configured merge windows instead of queuing GitHub auto-merge.
 - `rebaseWhen`: `behind-base-branch`, so Renovate refreshes branches that fall behind `master`.
 - `automergeStrategy`: `squash`.
 - `prConcurrentLimit`: `5`.
@@ -75,15 +76,17 @@ To enable Slack delivery, add repository secret `RENOVATE_ALERT_SLACK_WEBHOOK_UR
 
 Renovate uses the `Europe/London` timezone inherited from the shared HMCTS preset. PTL Jenkins runs on `cft-ptl-00-aks`, which [`hmcts/auto-shutdown`](https://github.com/hmcts/auto-shutdown) normally stops from 20:00 to 06:30 daily. There is no scheduled weekend startup. An approved exclusion is required for overnight or weekend use; it can postpone shutdown until 23:00 or keep PTL running overnight.
 
-If Renovate updates or rebases a PR while Jenkins is unavailable, the required check cannot complete and automerge remains blocked. Each Renovate merge also advances `master`, which can make developer and other Renovate branches stale and trigger rebases or repeated CI. Keep the merge window short and early in the working day to limit that disruption while Jenkins is available:
+If Renovate updates or rebases a PR while Jenkins is unavailable, the required check cannot complete and automerge remains blocked. Each Renovate merge also advances `master`, which can make developer and other Renovate branches stale and trigger rebases or repeated CI. Branch creation remains between 08:00 and 11:00, while automerge is restricted to periods when Jenkins is online and developer activity is lower:
 
 ```json
-"automergeSchedule": ["after 8am and before 11am every weekday"]
+"automergeSchedule": [
+  "after 7am and before 8am every weekday",
+  "after 6pm and before 8pm every weekday"
+],
+"platformAutomerge": false
 ```
 
-This window keeps Jenkins and support available while limiting disruption to developer PRs from changes to `master`, rebases and CI reruns. It also matches the repository's existing top-level Renovate schedule.
-
-Apply the same window to every automerge-enabled package rule so broader rule-level schedules do not override it. Using only `before 4pm every weekday` also permits merges after midnight. The stalled-queue alert remains the control for updates that cannot merge within the window.
+The 07:00-08:00 and 18:00-20:00 weekday windows avoid the normal PTL outage and reduce disruption to developer PRs. `platformAutomerge` must be `false`; otherwise Renovate enables GitHub auto-merge and GitHub can merge later whenever checks pass, regardless of `automergeSchedule`. Automerge-enabled package rules inherit the repository-level schedule so they cannot widen it. PRs that miss a window wait for a later Renovate run, and the stalled-queue alert remains the control for updates that do not merge.
 
 ## Release freeze
 

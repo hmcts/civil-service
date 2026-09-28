@@ -39,4 +39,34 @@ public class InvalidDocumentLinkException extends DocumentDownloadException {
         super(String.format(CLIENT_ERROR_MESSAGE_TEMPLATE, documentPath, status));
         initCause(cause);
     }
+
+    /**
+     * Rebuilds this exception so the message includes {@code for case <id>} when a case id is
+     * known. {@code getDocumentIdFromSelfHref} keeps throwing the path-only form; callers that
+     * received a case id (for example CUI {@code ?caseId=}) wrap here.
+     */
+    public InvalidDocumentLinkException withCaseId(String caseId) {
+        String originalMessage = getMessage();
+        String rewritten = appendCaseId(originalMessage, caseId);
+        if (rewritten == null || rewritten.equals(originalMessage)) {
+            return this;
+        }
+        return new InvalidDocumentLinkException(this, rewritten);
+    }
+
+    private InvalidDocumentLinkException(Throwable cause, String formattedMessage) {
+        super(formattedMessage);
+        initCause(cause);
+    }
+
+    static String appendCaseId(String message, String caseId) {
+        if (caseId == null || caseId.isBlank() || message == null || message.contains(" for case ")) {
+            return message;
+        }
+        int colon = message.indexOf(": ");
+        if (colon < 0) {
+            return message + " for case " + caseId;
+        }
+        return message.substring(0, colon) + " for case " + caseId + message.substring(colon);
+    }
 }

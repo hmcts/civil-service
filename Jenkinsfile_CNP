@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@2.8.0")
+@Library("Infrastructure@2.9.0")
 
 import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
@@ -101,7 +101,6 @@ withPipeline(type, product, component) {
   disableLegacyDeployment()
   enableAksStagingDeployment()
   syncBranchesWithMaster(branchesToSync)
-  enableBuildCache()
   def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
   env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
@@ -115,7 +114,23 @@ withPipeline(type, product, component) {
   env.BEFTA_S2S_CLIENT_ID = "ccd_data"
   env.DMN_DEFINITION_BRANCH = dmnBranch
   env.WIREMOCK_MAPPINGS_BRANCH = wiremockMappingsBranch
-  env.UNASSIGN_CASES = true
+
+  env.PLAYWRIGHT_TEST_RESULTS_DIR = 'playwright-test-results'
+  env.PLAYWRIGHT_BOOTSTRAP_TEST_RESULTS_DIR = 'civil-service-bootstrap'
+  env.PLAYWRIGHT_SMOKE_TEST_RESULTS_DIR = 'civil-service-smoke'
+  env.PLAYWRIGHT_WORKERS = 8
+  env.PLAYWRIGHT_RETRIES = 1
+  env.PLAYWRIGHT_EXUI_RETRIES = 1
+  env.PLAYWRIGHT_IDAM_RETRIES = 1
+  env.PLAYWRIGHT_TEST_SPEED = 'fast'
+  env.PLAYWRIGHT_RUN_ACCESSIBILITY_TESTS = false
+  env.PLAYWRIGHT_RUN_CUI_USER_SETUP = true
+  env.PLAYWRIGHT_RUN_EXUI_USER_DATA_SETUP = true
+  env.PLAYWRIGHT_RUN_CUI_USER_DATA_SETUP = true
+  env.PLAYWRIGHT_RUN_DATA_SETUP = true
+  env.PLAYWRIGHT_WA_ENABLED = false
+  env.PLAYWRIGHT_ZOD_VALIDATION_ENABLED = false
+  env.PLAYWRIGHT_UNASSIGN_CASES = true
   loadVaultSecrets(secrets)
 
   onPR {
@@ -124,7 +139,10 @@ withPipeline(type, product, component) {
     env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
     env.CCD_DEFINITION_BRANCH = checkForCcdDefinitionBranchLabel()
     env.CAMUNDA_DEFINITION_BRANCH = checkForCamundaDefinitionBranchLabel()
-    env.PR_FT_GROUPS = getFunctionalTestsGroups()
+    env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR = 'civil-service-pr'
+    env.PLAYWRIGHT_PR_FT_GROUPS = getPlaywrightFunctionalTestsGroups()
+    env.PLAYWRIGHT_SKIP_FUNCTIONAL_TESTS = checkForSkipFunctionalTests(env.BRANCH_NAME)
+    env.PLAYWRIGHT_RUN_ALL_FUNCTIONAL_TESTS = checkForRunAllFunctionalTests(env.BRANCH_NAME)
 
     setPreviewUrls(product, component)
 
@@ -142,6 +160,7 @@ withPipeline(type, product, component) {
     env.ENVIRONMENT = "aat"
     env.CCD_DEFINITION_BRANCH = "master"
     env.SKIP_COMMON_AAT_CCD_SETUP = "true"
+    env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR = 'civil-service-master'
 
     afterSuccess('akschartsinstall') {
       runStagingHighLevelDataSetup()
@@ -189,26 +208,28 @@ withPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/**/*'
   }
 
+  before('smoketest:preview') {
+    copyPrevPlaywrightLastRunAndTestFilesReport()
+  }
+
   afterAlways('smoketest:preview') {
-    archiveSmokeTestResults()
+    archiveArtifacts allowEmptyArchive: true, artifacts: "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/**/*"
+    publishPlaywrightSmokeReports(yarnBuilder)
   }
 
   afterAlways('functionalTest:preview') {
-    if(checkForSkipFunctionalTests(env.BRANCH_NAME)) {
-      echo "Skipping publish functional test results due to label: pr-values:skip-functional-tests"
-      return
-    }
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
-    yarnBuilder.yarn('test:generate-report')
-    publishAllureReport('allure-functional-report', 'Allure Functional Report', 'allure-functional-history')
+    archiveArtifacts allowEmptyArchive: true, artifacts: "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/**/*"
+    publishPlaywrightFunctionalReports(yarnBuilder)
   }
 
   before('smoketest:aat') {
     setStagingUrls()
+    copyPrevPlaywrightLastRunAndTestFilesReport()
   }
 
   afterAlways('smoketest:aat') {
-    archiveSmokeTestResults()
+    archiveArtifacts allowEmptyArchive: true, artifacts: "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/**/*"
+    publishPlaywrightSmokeReports(yarnBuilder)
   }
 
   afterSuccess('functionalTest:aat') {
@@ -226,23 +247,13 @@ withPipeline(type, product, component) {
   }
 
   afterAlways('functionalTest:aat') {
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
-    yarnBuilder.yarn('test:generate-report')
-    publishAllureReport('allure-functional-report', 'Allure Functional Report', 'allure-functional-history')
+    archiveArtifacts allowEmptyArchive: true, artifacts: "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/**/*"
+    publishPlaywrightFunctionalReports(yarnBuilder)
   }
+}
 
-  before('functionalTest:preview') {
-    if(checkForSkipFunctionalTests(env.BRANCH_NAME)) {
-      env.SKIP_FUNCTIONAL_TESTS = true
-      return
-    }
-    prepareFunctionalTests(checkForRunAllFunctionalTests(env.BRANCH_NAME))
-  }
-
-  before('functionalTest:aat') {
-    prepareFunctionalTests(false)
-    setStagingUrls()
-  }
+def checkForEnableEmailNotifications(branch_name) {
+  return checkForPrValuesLabel(branch_name, "enableNotifyEmails")
 }
 
 def checkForSkipFunctionalTests(branch_name) {
@@ -253,6 +264,9 @@ def checkForSkipFunctionalTests(branch_name) {
 
 def checkForRunAllFunctionalTests(branch_name) {
   return new GithubAPI(this).getLabelsbyPattern(branch_name, "runAllFunctionalTests").contains("runAllFunctionalTests")
+}
+def checkForPrValuesLabel(branch_name, label) {
+  return new GithubAPI(this).getLabelsbyPattern(branch_name, "pr-values:" + label).contains("pr-values:" + label)
 }
 
 def checkForDisableWiremockLabel(branch_name) {
@@ -275,17 +289,14 @@ def checkForCamundaDefinitionBranchLabel() {
   return "master"
 }
 
-def getFunctionalTestsGroups() {
+def getPlaywrightFunctionalTestsGroups() {
   def githubApi = new GithubAPI(this)
   def functionalTestGroups = []
-  for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr_ft_")) {
-    functionalTestGroups.add(label.substring(6, label.length()))
+  def labelPrefix = "pr_ft_pw_"
+  for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, labelPrefix)) {
+    functionalTestGroups.add(label.substring(labelPrefix.length()))
   }
   return functionalTestGroups.join(",")
-}
-
-def archiveSmokeTestResults() {
-  archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/smokeTest/**/*'
 }
 
 def publishAllureReport(String reportDir, String reportName, String historyArchiveDir) {
@@ -300,29 +311,108 @@ def publishAllureReport(String reportDir, String reportName, String historyArchi
   archiveArtifacts artifacts: "${historyArchiveDir}/**", fingerprint: true
 }
 
-def prepareFunctionalTests(boolean runAllFunctionalTests) {
-  if (runAllFunctionalTests) {
-    env.RUN_ALL_FUNCTIONAL_TESTS = true
-  } else {
-    copyPrevTestFilesReport('test-results/functional/testFilesReport.json')
-  }
-  copyPreviousAllureHistory('allure-functional-history', 'allure-functional-results');
-}
-
-def copyPrevTestFilesReport(String reportFilePath) {
+def copyPrevPlaywrightLastRunAndTestFilesReport() {
   def buildFound = false
   def buildNumber = currentBuild.previousBuild ? currentBuild.previousBuild.number : 0
   def minBuildNumber = ((buildNumber - 8) > 0) ? buildNumber - 8 : 0
+  def lastRunFilePath = "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/${env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR}/.last-run.json"
+  def testFilesReportPath = "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/${env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR}/playwrightTestFilesReport.json"
   while (!buildFound && buildNumber > minBuildNumber) {
     try {
-      copyArtifacts projectName: env.JOB_NAME, selector: specific("${buildNumber}"), filter: reportFilePath
+      sh "rm -f ${lastRunFilePath} ${testFilesReportPath}"
+      copyArtifacts(
+        projectName: env.JOB_NAME,
+        selector: specific("${buildNumber}"),
+        filter: "${lastRunFilePath},${testFilesReportPath}"
+      )
+      if (!fileExists(lastRunFilePath) || !fileExists(testFilesReportPath)) {
+        throw new Exception("Missing one or more Playwright previous run artifacts from build ${buildNumber}")
+      }
+      if (!checkHasPlaywrightLastRunStatus(['passed', 'failed'])) {
+        throw new Exception(
+          "Skipping copied .last-run.json from build ${buildNumber} because status was not 'passed' or 'failed'"
+        )
+      }
       buildFound = true
     } catch (Exception error) {
-      echo "artifact not found: " + error.toString()
+      echo "Previous Playwright artifacts not usable from build ${buildNumber}: " + error.toString()
       buildNumber--
     }
   }
+  return buildFound
 }
+
+def checkHasPlaywrightLastRunStatus(expectedStatuses) {
+  def lastRunStatus = sh(
+    script: "jq -r '.status // empty' ${env.PLAYWRIGHT_TEST_RESULTS_DIR}/${env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR}/.last-run.json",
+    returnStdout: true
+  ).trim()
+  def statuses = expectedStatuses instanceof Collection ? expectedStatuses : [expectedStatuses]
+  return statuses.contains(lastRunStatus)
+}
+
+def publishPlaywrightSmokeReports(yarnBuilder) {
+  def playwrightTestsFlags = "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/playwrightTestsFlags.properties"
+
+  if (fileExists(playwrightTestsFlags)) {
+    def reportFlags = readProperties file: playwrightTestsFlags
+
+    if(!(reportFlags.PLAYWRIGHT_TESTS_SKIPPED == 'true')) {
+
+      if (reportFlags.PLAYWRIGHT_SETUP_TESTS_FAILED == 'true') {
+        copyPreviousAllureHistory('playwright-allure-bootstrap-history', 'playwright-allure-bootstrap-results');
+        sh 'cp playwright-categories.json playwright-allure-bootstrap-results/categories.json'
+        yarnBuilder.yarn('test:playwright:bootstrap:generate-report')
+        publishAllureReport(
+          'playwright-allure-bootstrap-report',
+          'Playwright Allure Bootstrap Report',
+          'playwright-allure-bootstrap-history'
+        )
+      }
+
+      if (reportFlags.PLAYWRIGHT_SMOKE_TESTS_FAILED == 'true') {
+        copyPreviousAllureHistory('playwright-allure-functional-history', 'playwright-allure-functional-results');
+        sh 'cp playwright-categories.json playwright-allure-functional-results/categories.json'
+        yarnBuilder.yarn('test:playwright:functional:generate-report')
+        publishAllureReport(
+          'playwright-allure-functional-report',
+          'Playwright Allure Functional Report',
+          'playwright-allure-functional-history'
+        )
+      }
+    }
+  }
+}
+
+def publishPlaywrightFunctionalReports(yarnBuilder) {
+  def playwrightTestsFlags = "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/playwrightTestsFlags.properties"
+
+  if (fileExists(playwrightTestsFlags)) {
+    def reportFlags = readProperties file: playwrightTestsFlags
+
+    if(!(reportFlags.PLAYWRIGHT_TESTS_SKIPPED == 'true')) {
+
+      copyPreviousAllureHistory('playwright-allure-functional-history', 'playwright-allure-functional-results');
+      sh 'cp playwright-categories.json playwright-allure-functional-results/categories.json'
+      yarnBuilder.yarn('test:playwright:functional:generate-report')
+      publishAllureReport(
+        'playwright-allure-functional-report',
+        'Playwright Allure Functional Report',
+        'playwright-allure-functional-history'
+      )
+
+      copyPreviousAllureHistory('playwright-allure-bootstrap-history', 'playwright-allure-bootstrap-results');
+      sh 'cp playwright-categories.json playwright-allure-bootstrap-results/categories.json'
+      yarnBuilder.yarn('test:playwright:bootstrap:generate-report')
+      publishAllureReport(
+        'playwright-allure-bootstrap-report',
+        'Playwright Allure Bootstrap Report',
+        'playwright-allure-bootstrap-history'
+      )
+    }
+  }
+}
+
 
 def copyPreviousAllureHistory(historyDir, resultsDir) {
   def buildFound = false
