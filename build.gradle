@@ -449,12 +449,17 @@ def sonarExclusions = [
  " **/setasidejudgementrequest/SetAsideJudgementRequestRespSolTwoEmailDTOGenerator.java"
 ]
 
+def sonarCoverageExclusions = [
+  "**/.github/scripts/**"
+]
+
 sonarqube {
   properties {
     property "sonar.projectName", "CIVIL :: service"
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${projectDir}/build/reports/jacoco/test/jacocoTestReport.xml"
     property "sonar.exclusions", sonarExclusions.join(", ")
+    property "sonar.coverage.exclusions", sonarCoverageExclusions.join(", ")
     property "sonar.gradle.skipCompile", "true"
     property "sonar.branch.cache.enabled", "true"
     property "sonar.working.directory", layout.buildDirectory.dir("sonar").get().asFile
