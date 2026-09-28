@@ -291,8 +291,6 @@ withNightlyPipeline(type, product, component) {
         copyPrevPlaywrightLastRunAndTestFilesReport()
       }
 
-      playwrightSetupFailed = false;
-      playwrightSmokeTestsFailed = false;
       boolean flowInterrupted = false;
       boolean lastRunPassed = env.RUN_FAILED_TESTS.toBoolean() && checkHasPlaywrightLastRunStatus('passed');
       boolean playwrightRunSetup =
@@ -326,7 +324,7 @@ withNightlyPipeline(type, product, component) {
             playwrightSmokeTestsFailed = true
             unstable(message: "${STAGE_NAME} is unstable: " + error.toString())
           } finally {
-            archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-smoke-test-results/**/*'
+            //archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-smoke-test-results/**/*'
 
             if (playwrightSmokeTestsFailed && !lastRunPassed) {
               copyPreviousAllureHistory(
@@ -341,7 +339,9 @@ withNightlyPipeline(type, product, component) {
                 'playwright-allure-functional-history'
               )
             }
+            archiveArtifacts allowEmptyArchive: true, artifacts: "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/**/*"
           }
+          archiveArtifacts allowEmptyArchive: true, artifacts: "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/**/*"
         }
       }
 
@@ -404,7 +404,7 @@ withNightlyPipeline(type, product, component) {
 
     if(!forceGreenBuild) {
       before('fullFunctionalTest') {
-        if(playwrightSmokeTestsFailed) {
+        if (playwrightSetupFailed || playwrightSmokeTestsFailed) {
           env.PLAYWRIGHT_NIGHTLY_SETUP_OR_SMOKE_TESTS_FAILED = 'true'
           return
         }
