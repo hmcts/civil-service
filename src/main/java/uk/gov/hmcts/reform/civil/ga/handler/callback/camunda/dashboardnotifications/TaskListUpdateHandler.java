@@ -60,14 +60,14 @@ public abstract class TaskListUpdateHandler extends GaDashboardCallbackHandler {
         APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION,
         LISTING_FOR_A_HEARING,
         AWAITING_RESPONDENT_RESPONSE
-    ).map(CaseState::getDisplayedValue).toList();
+    ).flatMap(TaskListUpdateHandler::getStoredStateLabels).toList();
 
     public static final List<String> RESPONDENT_IN_PROGRESS_GA_STATES = Stream.of(
         APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION,
         ADDITIONAL_RESPONSE_TIME_EXPIRED,
         LISTING_FOR_A_HEARING,
         HEARING_SCHEDULED
-    ).map(CaseState::getDisplayedValue).toList();
+    ).flatMap(TaskListUpdateHandler::getStoredStateLabels).toList();
 
     public TaskListUpdateHandler(DashboardApiClient dashboardApiClient,
                                  GaDashboardNotificationsParamsMapper mapper,
@@ -86,5 +86,13 @@ public abstract class TaskListUpdateHandler extends GaDashboardCallbackHandler {
     protected GeneralApplicationCaseData getParentCaseData(String parentCaseReference) {
         CaseDetails caseDetails = coreCaseDataService.getCase(Long.parseLong(parentCaseReference));
         return caseDetailsConverter.toGeneralApplicationCaseData(caseDetails);
+    }
+
+    private static Stream<String> getStoredStateLabels(CaseState state) {
+        if (state == LISTING_FOR_A_HEARING) {
+            // Parent-case collections can retain the display text saved before DTSCCI-3874.
+            return Stream.of(state.getDisplayedValue(), "Listed for a Hearing");
+        }
+        return Stream.of(state.getDisplayedValue());
     }
 }
