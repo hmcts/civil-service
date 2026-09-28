@@ -277,6 +277,7 @@ withNightlyPipeline(type, product, component) {
 
   boolean forceGreenBuild = env.FORCE_GREEN_BUILD.toBoolean();
   boolean runFailedTests = env.RUN_FAILED_TESTS.toBoolean();
+  boolean playwrightSetupFailed = false;
   boolean playwrightSmokeTestsFailed = false;
 
   if(!forceGreenBuild) {
@@ -290,7 +291,7 @@ withNightlyPipeline(type, product, component) {
         copyPrevPlaywrightLastRunAndTestFilesReport()
       }
 
-      boolean playwrightSetupFailed = false;
+      playwrightSetupFailed = false;
       playwrightSmokeTestsFailed = false;
       boolean flowInterrupted = false;
       boolean lastRunPassed = env.RUN_FAILED_TESTS.toBoolean() && checkHasPlaywrightLastRunStatus('passed');
