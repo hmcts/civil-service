@@ -7,10 +7,8 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
@@ -156,19 +154,8 @@ public class PopulateCaseDataTask implements CaseTask {
             });
         }
         caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
-            CaseDocument caseDocument = document.getValue();
-            if (caseDocument.getDocumentName() == null
-                || !caseDocument.getDocumentName().contains("response_sealed_form.pdf")) {
-                return;
-            }
-            String categoryId = caseDocument.getDocumentLink() != null
-                ? caseDocument.getDocumentLink().getCategoryID()
-                : null;
-            if (DocCategory.DEF2_DEFENSE_DQ.getValue().equals(categoryId)
-                || caseDocument.getDocumentName().contains("defendant2_response_sealed_form")) {
-                caseData.setRespondent2ClaimResponseDocumentSpec(caseDocument);
-            } else {
-                caseData.setRespondent1ClaimResponseDocumentSpec(caseDocument);
+            if (document.getValue().getDocumentName().contains("response_sealed_form.pdf")) {
+                caseData.setRespondent1ClaimResponseDocumentSpec(document.getValue());
             }
         });
     }

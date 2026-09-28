@@ -130,15 +130,6 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             if (Objects.nonNull(copy)) {
                 caseData.getDuplicateSystemGeneratedCaseDocs().add(ElementUtils.element(copy));
             }
-            setClaimResponseDocumentSpec(caseData, sealedForm);
-        }
-    }
-
-    private void setClaimResponseDocumentSpec(CaseData caseData, CaseDocument sealedForm) {
-        if (isRespondent2Document(caseData)) {
-            caseData.setRespondent2ClaimResponseDocumentSpec(sealedForm);
-        } else {
-            caseData.setRespondent1ClaimResponseDocumentSpec(sealedForm);
         }
     }
 
