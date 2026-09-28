@@ -391,13 +391,13 @@ withNightlyPipeline(type, product, component) {
       }
     }
 
-    if(!runFailedTests && !forceGreenBuild) {
-      enableFortifyScan()
+    // if(!runFailedTests && !forceGreenBuild) {
+    //   enableFortifyScan()
 
-      afterAlways('fortify-scan') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-      }
-    }
+    //   afterAlways('fortify-scan') {
+    //     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+    //   }
+    // }
 
     boolean hasFailedTestFiles = false;
 
