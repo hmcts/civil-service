@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_claim_settled_letter" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.35.0">
+  <bpmn:process id="UNSPEC_CLAIM_SETTLED_LETTER_NOTIFICATION_ID" name="Claim Settled Letter Notification" isExecutable="true" camunda:historyTimeToLive="P90D">
+    <bpmn:startEvent id="Event_start" name="Start">
+      <bpmn:outgoing>Flow_start_to_startBusiness</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_start" messageRef="Message_claim_settled_letter" />
+    </bpmn:startEvent>
+    <bpmn:callActivity id="ClaimSettledLetterNotificationProcess" name="Start Business Process" calledElement="StartUnspecClaimSettledLetterBusinessProcess">
+      <bpmn:extensionElements>
+        <camunda:in variables="all" />
+        <camunda:out variables="all" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_start_to_startBusiness</bpmn:incoming>
+      <bpmn:outgoing>Flow_startBusiness_to_gateway</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_start_to_startBusiness" sourceRef="Event_start" targetRef="ClaimSettledLetterNotificationProcess" />
+    <bpmn:exclusiveGateway id="Gateway_defendantRepresented" name="Claim settled letter required?" default="Flow_gateway_to_notify">
+      <bpmn:incoming>Flow_startBusiness_to_gateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_gateway_to_sendLetter</bpmn:outgoing>
+      <bpmn:outgoing>Flow_gateway_to_notify</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_startBusiness_to_gateway" sourceRef="ClaimSettledLetterNotificationProcess" targetRef="Gateway_defendantRepresented" />
+    <bpmn:serviceTask id="SendLetterClaimSettledDefendantLiP" name="Generate, print and post claim settled letter to Defendant LiP" camunda:type="external" camunda:topic="processCaseEvent">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="caseEvent">SEND_UNSPEC_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_gateway_to_sendLetter</bpmn:incoming>
+      <bpmn:outgoing>Flow_sendLetter_to_notify</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_gateway_to_sendLetter" name="Letter required" sourceRef="Gateway_defendantRepresented" targetRef="SendLetterClaimSettledDefendantLiP">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!empty flowFlags.UNREPRESENTED_DEFENDANT_ONE &amp;&amp; flowFlags.UNREPRESENTED_DEFENDANT_ONE &amp;&amp; (empty execution.getVariable('isClaimSettledLetterRequired') || execution.getVariable('isClaimSettledLetterRequired'))}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="SettleClaimPaidInFullNotificationNotifier" name="Notify parties" camunda:type="external" camunda:topic="processCaseEvent">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="caseEvent">NOTIFY_EVENT</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_gateway_to_notify</bpmn:incoming>
+      <bpmn:incoming>Flow_sendLetter_to_notify</bpmn:incoming>
+      <bpmn:outgoing>Flow_notify_to_endBusiness</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_gateway_to_notify" name="No letter" sourceRef="Gateway_defendantRepresented" targetRef="SettleClaimPaidInFullNotificationNotifier" />
+    <bpmn:sequenceFlow id="Flow_sendLetter_to_notify" sourceRef="SendLetterClaimSettledDefendantLiP" targetRef="SettleClaimPaidInFullNotificationNotifier" />
+    <bpmn:callActivity id="Activity_endBusiness" name="End Business Process" calledElement="EndBusinessProcess">
+      <bpmn:extensionElements>
+        <camunda:in variables="all" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_notify_to_endBusiness</bpmn:incoming>
+      <bpmn:outgoing>Flow_endBusiness_to_end</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_notify_to_endBusiness" sourceRef="SettleClaimPaidInFullNotificationNotifier" targetRef="Activity_endBusiness" />
+    <bpmn:endEvent id="Event_end">
+      <bpmn:incoming>Flow_endBusiness_to_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_endBusiness_to_end" sourceRef="Activity_endBusiness" targetRef="Event_end" />
+    <bpmn:boundaryEvent id="Event_abort" name="Abort" attachedToRef="ClaimSettledLetterNotificationProcess">
+      <bpmn:outgoing>Flow_abort_to_abortEnd</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_abort" />
+    </bpmn:boundaryEvent>
+    <bpmn:endEvent id="Event_abortEnd">
+      <bpmn:incoming>Flow_abort_to_abortEnd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_abort_to_abortEnd" sourceRef="Event_abort" targetRef="Event_abortEnd" />
+  </bpmn:process>
+  <bpmn:message id="Message_claim_settled_letter" name="UNSPEC_CLAIM_SETTLED_LETTER_NOTIFICATION" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="UNSPEC_CLAIM_SETTLED_LETTER_NOTIFICATION_ID">
+      <bpmndi:BPMNShape id="Event_start_di" bpmnElement="Event_start">
+        <dc:Bounds x="152" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="159" y="235" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_startBusiness_di" bpmnElement="ClaimSettledLetterNotificationProcess">
+        <dc:Bounds x="260" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_defendantRepresented_di" bpmnElement="Gateway_defendantRepresented" isMarkerVisible="true">
+        <dc:Bounds x="425" y="185" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_sendLetter_di" bpmnElement="SendLetterClaimSettledDefendantLiP">
+        <dc:Bounds x="530" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_notify_di" bpmnElement="SettleClaimPaidInFullNotificationNotifier">
+        <dc:Bounds x="700" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_endBusiness_di" bpmnElement="Activity_endBusiness">
+        <dc:Bounds x="860" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_end_di" bpmnElement="Event_end">
+        <dc:Bounds x="1032" y="192" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_abort_di" bpmnElement="Event_abort">
+        <dc:Bounds x="292" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="327" y="133" width="27" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_abortEnd_di" bpmnElement="Event_abortEnd">
+        <dc:Bounds x="342" y="82" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_start_to_startBusiness_di" bpmnElement="Flow_start_to_startBusiness">
+        <di:waypoint x="188" y="210" />
+        <di:waypoint x="260" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_startBusiness_to_gateway_di" bpmnElement="Flow_startBusiness_to_gateway">
+        <di:waypoint x="360" y="210" />
+        <di:waypoint x="425" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_gateway_to_sendLetter_di" bpmnElement="Flow_gateway_to_sendLetter">
+        <di:waypoint x="450" y="235" />
+        <di:waypoint x="450" y="330" />
+        <di:waypoint x="530" y="330" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="372" y="283" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_gateway_to_notify_di" bpmnElement="Flow_gateway_to_notify">
+        <di:waypoint x="475" y="210" />
+        <di:waypoint x="700" y="210" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="533" y="173" width="74" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_sendLetter_to_notify_di" bpmnElement="Flow_sendLetter_to_notify">
+        <di:waypoint x="630" y="330" />
+        <di:waypoint x="750" y="330" />
+        <di:waypoint x="750" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_notify_to_endBusiness_di" bpmnElement="Flow_notify_to_endBusiness">
+        <di:waypoint x="800" y="210" />
+        <di:waypoint x="860" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_endBusiness_to_end_di" bpmnElement="Flow_endBusiness_to_end">
+        <di:waypoint x="960" y="210" />
+        <di:waypoint x="1032" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_abort_to_abortEnd_di" bpmnElement="Flow_abort_to_abortEnd">
+        <di:waypoint x="310" y="152" />
+        <di:waypoint x="310" y="100" />
+        <di:waypoint x="342" y="100" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
