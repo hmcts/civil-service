@@ -38,6 +38,10 @@ public class CaseAssignmentSupportService {
                 .build()
             ).toList();
 
+        if (userRolesWithOrganisation.isEmpty()) {
+            return;
+        }
+
         CaseAssignmentUserRolesRequest request = CaseAssignmentUserRolesRequest.builder()
             .caseAssignmentUserRolesWithOrganisation(userRolesWithOrganisation).build();
         caseAssignmentApi.removeCaseUserRoles(caaAccessToken, authToken, request);
