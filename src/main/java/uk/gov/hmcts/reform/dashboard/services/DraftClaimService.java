@@ -36,11 +36,12 @@ public class DraftClaimService {
 
         Optional<DraftStoreEntity> existingDraft = draftStoreService.getDraftsForUser(userId, DRAFT_TYPE)
             .stream()
+            .filter(draft -> hasMatchingCaseId(draft.getCaseId(), caseId))
             .findFirst();
         if (existingDraft.isPresent()) {
             DraftStoreEntity draft = existingDraft.get();
             if (draft.getExpiresAt().isAfter(now)) {
-                log.info("Returning existing active draft claim draftId={}", draft.getId());
+                log.info("Returning existing active draft claim draftId={} caseId={}", draft.getId(), draft.getCaseId());
                 return DraftClaimCreationResult.existingDraft(draft);
             }
             draftStoreService.deleteDraftAndFlush(draft);
@@ -51,7 +52,7 @@ public class DraftClaimService {
                 draftStoreService.createDraft(userId, caseId, payload, DRAFT_TYPE)
             );
         } catch (DataIntegrityViolationException ex) {
-            return getActiveDraftClaimForUser(userId)
+            return getMatchingActiveDraft(userId, caseId)
                 .map(DraftClaimCreationResult::existingDraft)
                 .orElseThrow(() -> ex);
         }
@@ -66,7 +67,22 @@ public class DraftClaimService {
     public Optional<DraftStoreEntity> getActiveDraftClaimForUser(String userId) {
         return draftStoreService.getActiveDraftsForUser(userId, DRAFT_TYPE)
             .stream()
+            .filter(draft -> draft.getCaseId() == null)
             .findFirst();
+    }
+
+    private Optional<DraftStoreEntity> getMatchingActiveDraft(String userId, String caseId) {
+        return draftStoreService.getActiveDraftsForUser(userId, DRAFT_TYPE)
+            .stream()
+            .filter(draft -> hasMatchingCaseId(draft.getCaseId(), caseId))
+            .findFirst();
+    }
+
+    private boolean hasMatchingCaseId(String existingCaseId, String requestedCaseId) {
+        if (requestedCaseId == null || requestedCaseId.isBlank()) {
+            return existingCaseId == null || existingCaseId.isBlank();
+        }
+        return requestedCaseId.equals(existingCaseId);
     }
 
     public DraftStoreEntity updateDraftClaim(UUID draftId,

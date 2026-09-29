@@ -22,6 +22,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -63,31 +64,72 @@ class DraftClaimServiceTest {
         }
 
         @Test
-        void shouldReturnExistingDraftWhenActiveDraftIsFound() {
+        void shouldReturnExistingDraftWhenInProgressDraftIsFound() {
             OffsetDateTime createdAt = OffsetDateTime.now().minusDays(1);
-            DraftStoreEntity existingDraft = draft(createdAt, createdAt.plusDays(RETENTION_DAYS));
+            DraftStoreEntity existingDraft = draft(null, createdAt, createdAt.plusDays(RETENTION_DAYS));
             when(draftStoreService.getDraftsForUser(USER_ID, DRAFT_TYPE)).thenReturn(List.of(existingDraft));
 
             DraftClaimCreationResult result = draftClaimService.createDraftClaim(
                 USER_ID,
-                NEW_CASE_ID,
+                null,
                 Map.of("step", "new-payload")
             );
 
             assertThat(result.newlyCreated()).isFalse();
             assertThat(result.draftClaim()).isSameAs(existingDraft);
-            assertThat(existingDraft.getCaseId()).isEqualTo(CASE_ID);
+            assertThat(existingDraft.getCaseId()).isNull();
             assertThat(existingDraft.getPayload()).containsEntry("step", "existing-payload");
             verify(draftStoreService).getDraftsForUser(USER_ID, DRAFT_TYPE);
             verifyNoMoreInteractions(draftStoreService);
         }
 
         @Test
+        void shouldReturnExistingDraftWhenMatchingCaseIdIsFound() {
+            OffsetDateTime createdAt = OffsetDateTime.now().minusDays(1);
+            DraftStoreEntity submittedDraft = draft(createdAt, createdAt.plusDays(RETENTION_DAYS));
+            when(draftStoreService.getDraftsForUser(USER_ID, DRAFT_TYPE)).thenReturn(List.of(submittedDraft));
+
+            DraftClaimCreationResult result = draftClaimService.createDraftClaim(
+                USER_ID,
+                CASE_ID,
+                Map.of("step", "payment")
+            );
+
+            assertThat(result.newlyCreated()).isFalse();
+            assertThat(result.draftClaim()).isSameAs(submittedDraft);
+            verify(draftStoreService).getDraftsForUser(USER_ID, DRAFT_TYPE);
+            verifyNoMoreInteractions(draftStoreService);
+        }
+
+        @Test
+        void shouldCreateInProgressDraftWhenOnlySubmittedDraftExists() {
+            OffsetDateTime createdAt = OffsetDateTime.now().minusDays(1);
+            DraftStoreEntity submittedDraft = draft(createdAt, createdAt.plusDays(RETENTION_DAYS));
+            Map<String, Object> payload = Map.of("step", "new-claim");
+            OffsetDateTime replacementCreatedAt = OffsetDateTime.now();
+            DraftStoreEntity createdDraft = draft(
+                null,
+                replacementCreatedAt,
+                replacementCreatedAt.plusDays(RETENTION_DAYS)
+            );
+            when(draftStoreService.getDraftsForUser(USER_ID, DRAFT_TYPE)).thenReturn(List.of(submittedDraft));
+            when(draftStoreService.createDraft(USER_ID, null, payload, DRAFT_TYPE)).thenReturn(createdDraft);
+
+            DraftClaimCreationResult result = draftClaimService.createDraftClaim(USER_ID, null, payload);
+
+            assertThat(result.newlyCreated()).isTrue();
+            assertThat(result.draftClaim()).isSameAs(createdDraft);
+            verify(draftStoreService).createDraft(USER_ID, null, payload, DRAFT_TYPE);
+            verify(draftStoreService, never()).deleteDraftAndFlush(submittedDraft);
+        }
+
+        @Test
         void shouldReplaceDraftWhenExistingDraftIsExpired() {
             OffsetDateTime createdAt = OffsetDateTime.now().minusDays(RETENTION_DAYS + 1);
-            DraftStoreEntity expiredDraft = draft(createdAt, createdAt.plusDays(RETENTION_DAYS));
+            DraftStoreEntity expiredDraft = draft(NEW_CASE_ID, createdAt, createdAt.plusDays(RETENTION_DAYS));
             OffsetDateTime replacementCreatedAt = OffsetDateTime.now();
             DraftStoreEntity replacementDraft = draft(
+                NEW_CASE_ID,
                 replacementCreatedAt,
                 replacementCreatedAt.plusDays(RETENTION_DAYS)
             );
@@ -174,14 +216,28 @@ class DraftClaimServiceTest {
         }
 
         @Test
-        void shouldReturnActiveDraftWhenActiveDraftExists() {
+        void shouldReturnActiveDraftWhenInProgressDraftExists() {
             OffsetDateTime createdAt = OffsetDateTime.now();
-            DraftStoreEntity draft = draft(createdAt, createdAt.plusDays(RETENTION_DAYS));
-            when(draftStoreService.getActiveDraftsForUser(USER_ID, DRAFT_TYPE)).thenReturn(List.of(draft));
+            DraftStoreEntity inProgressDraft = draft(null, createdAt, createdAt.plusDays(RETENTION_DAYS));
+            DraftStoreEntity submittedDraft = draft(createdAt, createdAt.plusDays(RETENTION_DAYS));
+            when(draftStoreService.getActiveDraftsForUser(USER_ID, DRAFT_TYPE))
+                .thenReturn(List.of(submittedDraft, inProgressDraft));
 
             Optional<DraftStoreEntity> result = draftClaimService.getActiveDraftClaimForUser(USER_ID);
 
-            assertThat(result).contains(draft);
+            assertThat(result).contains(inProgressDraft);
+            verify(draftStoreService).getActiveDraftsForUser(USER_ID, DRAFT_TYPE);
+        }
+
+        @Test
+        void shouldReturnEmptyWhenOnlySubmittedDraftExists() {
+            OffsetDateTime createdAt = OffsetDateTime.now();
+            DraftStoreEntity submittedDraft = draft(createdAt, createdAt.plusDays(RETENTION_DAYS));
+            when(draftStoreService.getActiveDraftsForUser(USER_ID, DRAFT_TYPE)).thenReturn(List.of(submittedDraft));
+
+            Optional<DraftStoreEntity> result = draftClaimService.getActiveDraftClaimForUser(USER_ID);
+
+            assertThat(result).isEmpty();
             verify(draftStoreService).getActiveDraftsForUser(USER_ID, DRAFT_TYPE);
         }
 
@@ -251,10 +307,14 @@ class DraftClaimServiceTest {
     }
 
     private DraftStoreEntity draft(OffsetDateTime createdAt, OffsetDateTime expiresAt) {
+        return draft(CASE_ID, createdAt, expiresAt);
+    }
+
+    private DraftStoreEntity draft(String caseId, OffsetDateTime createdAt, OffsetDateTime expiresAt) {
         return new DraftStoreEntity(
             DRAFT_ID,
             USER_ID,
-            CASE_ID,
+            caseId,
             DRAFT_TYPE,
             new HashMap<>(Map.of("step", "existing-payload")),
             createdAt,
