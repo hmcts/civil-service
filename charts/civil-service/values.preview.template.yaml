@@ -2,8 +2,8 @@ java:
   image: ${IMAGE_NAME}
   imagePullPolicy: Always
   ingressHost: ${SERVICE_NAME}.preview.platform.hmcts.net
-  devcpuRequests: 50m
-  devcpuLimits: 500m
+  devcpuRequests: 300m
+  devcpuLimits: 2000m
   devmemoryRequests: 1536Mi
   devmemoryLimits: 2048Mi
   environment:
@@ -290,10 +290,10 @@ camunda-bpm:
     disableKeyVaults: true
     releaseNameOverride: ${SERVICE_NAME}-camunda
     ingressHost: camunda-${SERVICE_FQDN}
-    devcpuRequests: 50m
-    devmemoryRequests: 1024Mi
-    devcpuLimits: 500m
-    devmemoryLimits: 1Gi
+    devcpuRequests: 200m
+    devmemoryRequests: 1280Mi
+    devcpuLimits: 2000m
+    devmemoryLimits: 2Gi
     environment:
       CAMUNDA_API_AUTH_ENABLED: false
       CAMUNDA_DB_HOST: ${SERVICE_NAME}-postgresql
