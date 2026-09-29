@@ -401,6 +401,8 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         SealedClaimResponseFormForSpec templateData = getTemplateData(caseData, authorization);
         DocmosisTemplates docmosisTemplate = getTemplate(caseData);
 
+        log.info("Sealed claim response form templateData for caseId {}: {}",
+                 caseData.getCcdCaseReference(), templateData);
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData, docmosisTemplate
         );
