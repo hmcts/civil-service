@@ -1,7 +1,7 @@
 #!groovy
 
 properties([
-  pipelineTriggers([cron('H 17 * * 1-5')]),  
+  pipelineTriggers([cron('H 17 * * 1-5')]),
   copyArtifactPermission('/HMCTS_a_to_c_Nightly/civil-service/*'),
   parameters([
     choice(name: 'FORCE_GREEN_BUILD', choices: ['false', 'true'],
@@ -81,7 +81,7 @@ properties([
     choice(name: 'PLAYWRIGHT_RUN_DATA_SETUP', choices: ['true', 'false'],
       description: 'Runs setup projects for caching data before running functional tests'),
     choice(name: 'PLAYWRIGHT_WA_ENABLED', choices: ['true', 'false'],
-      description: 'Will include work allocation functionality in tests when set to \'true\''),     
+      description: 'Will include work allocation functionality in tests when set to \'true\''),
     choice(name: 'PLAYWRIGHT_ZOD_VALIDATION_ENABLED', choices: ['true', 'false'],
       description: 'Enables Zod schema validation in Playwright API steps'),
     string(name: 'WAIT_FOR_TIMEOUT_MS',
@@ -291,8 +291,6 @@ withNightlyPipeline(type, product, component) {
         copyPrevPlaywrightLastRunAndTestFilesReport()
       }
 
-      playwrightSetupFailed = false;
-      playwrightSmokeTestsFailed = false;
       boolean flowInterrupted = false;
       boolean lastRunPassed = env.RUN_FAILED_TESTS.toBoolean() && checkHasPlaywrightLastRunStatus('passed');
       boolean playwrightRunSetup =
@@ -304,7 +302,7 @@ withNightlyPipeline(type, product, component) {
       if(playwrightRunSetup) {
         stage('Playwright test setup') {
           try {
-            sh 'bash ./playwright-e2e/scripts/civil-nightly/civil-service/playwright-run-civil-service-nightly-setup.sh'
+            sh './playwright-e2e/scripts/civil-nightly/civil-service/playwright-run-civil-service-nightly-setup.sh'
           } catch (Exception error) {
             if(error instanceof org.jenkinsci.plugins.workflow.steps.FlowInterruptedException) {
               flowInterrupted = true
@@ -318,7 +316,7 @@ withNightlyPipeline(type, product, component) {
       if(!flowInterrupted && !playwrightSetupFailed) {
         stage('Playwright smoke test') {
           try {
-            sh 'PLAYWRIGHT_FUNCTIONAL=true yarn test:playwright:civil-service-nightly-smoke:ci'
+           sh './playwright-e2e/scripts/civil-nightly/civil-service/playwright-run-civil-service-nightly-smoke.sh'
           } catch (Exception error) {
             if(error instanceof org.jenkinsci.plugins.workflow.steps.FlowInterruptedException) {
               flowInterrupted = true
@@ -326,8 +324,6 @@ withNightlyPipeline(type, product, component) {
             playwrightSmokeTestsFailed = true
             unstable(message: "${STAGE_NAME} is unstable: " + error.toString())
           } finally {
-            archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-smoke-test-results/**/*'
-
             if (playwrightSmokeTestsFailed && !lastRunPassed) {
               copyPreviousAllureHistory(
                 'playwright-allure-functional-history',
@@ -341,14 +337,16 @@ withNightlyPipeline(type, product, component) {
                 'playwright-allure-functional-history'
               )
             }
+            archiveArtifacts allowEmptyArchive: true, artifacts: "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/**/*"
           }
+          archiveArtifacts allowEmptyArchive: true, artifacts: "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/**/*"
         }
       }
 
       if(!flowInterrupted && !playwrightSetupFailed && !playwrightSmokeTestsFailed) {
         stage('Playwright full functional test') {
           try {
-            sh 'bash ./playwright-e2e/scripts/civil-nightly/civil-service/playwright-run-civil-service-nightly-tests.sh'
+            sh './playwright-e2e/scripts/civil-nightly/civil-service/playwright-run-civil-service-nightly-tests.sh'
           } catch (Exception error) {
             if(error instanceof org.jenkinsci.plugins.workflow.steps.FlowInterruptedException) {
               flowInterrupted = true
@@ -373,7 +371,7 @@ withNightlyPipeline(type, product, component) {
       if(playwrightRunSetup) {
         stage('Playwright test teardown') {
           try {
-            sh 'bash ./playwright-e2e/scripts/civil-nightly/civil-service/playwright-run-civil-service-nightly-teardown.sh'
+            sh './playwright-e2e/scripts/civil-nightly/civil-service/playwright-run-civil-service-nightly-teardown.sh'
           } catch (Exception error) {
             unstable(message: "${STAGE_NAME} is unstable: " + error.toString())
           } finally {
@@ -387,24 +385,25 @@ withNightlyPipeline(type, product, component) {
                 'playwright-allure-bootstrap-history'
               )
             }
+            archiveArtifacts allowEmptyArchive: true, artifacts: "${env.PLAYWRIGHT_TEST_RESULTS_DIR}/**/*"
           }
         }
       }
     }
 
-    if(!runFailedTests && !forceGreenBuild) {
-      enableFortifyScan()
+    // if(!runFailedTests && !forceGreenBuild) {
+    //   enableFortifyScan()
 
-      afterAlways('fortify-scan') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-      }
-    }
+    //   afterAlways('fortify-scan') {
+    //     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+    //   }
+    // }
 
     boolean hasFailedTestFiles = false;
 
     if(!forceGreenBuild) {
       before('fullFunctionalTest') {
-        if(playwrightSmokeTestsFailed) {
+        if (playwrightSetupFailed || playwrightSmokeTestsFailed) {
           env.PLAYWRIGHT_NIGHTLY_SETUP_OR_SMOKE_TESTS_FAILED = 'true'
           return
         }
@@ -439,3 +438,4 @@ withNightlyPipeline(type, product, component) {
     }
   }
 }
+
