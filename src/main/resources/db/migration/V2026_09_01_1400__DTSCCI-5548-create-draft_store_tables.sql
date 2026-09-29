@@ -17,5 +17,4 @@ CREATE TABLE dbs.draft_store
 
 CREATE INDEX idx_draft_store_user_type ON dbs.draft_store(user_id, draft_type);
 CREATE INDEX idx_draft_store_expires_at ON dbs.draft_store(expires_at);
-CREATE UNIQUE INDEX  uq_draft_store_active_draft ON dbs.draft_store(user_id) WHERE draft_type = 'DRAFT_CLAIM' AND case_id IS NULL;
-CREATE UNIQUE INDEX  uq_draft_store_user_case ON dbs.draft_store(user_id, case_id) WHERE draft_type = 'DRAFT_CLAIM' AND case_id IS NOT NULL;
+CREATE UNIQUE INDEX uq_draft_store_user_claim_draft ON dbs.draft_store (user_id, claim_id) NULLS NOT DISTINCT WHERE draft_type = 'DRAFT_CLAIM';
