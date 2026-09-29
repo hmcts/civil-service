@@ -41,6 +41,7 @@ cp -r "./${ccdRepoName}/playwright-categories.json" .
 cp -r "./${ccdRepoName}/tsconfig.json" .
 cp -r "./${ccdRepoName}/plugins" .
 cp -r "./${ccdRepoName}/package.json" .
+cp -r "./${ccdRepoName}/bin/run-commands-series.sh" ./bin/run-commands-series.sh
 cp -r "./${ccdRepoName}/yarn.lock" .
 cp -r "./${ccdRepoName}/.yarnrc.yml" .
 cp -r "./${ccdRepoName}/.yarn" .
