@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.payment;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -303,6 +305,54 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             "BEARER_TOKEN",
             new ScenarioRequestParams(scenarioParams)
         );
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "Listed for a Hearing, YES",
+        "Listed for a Hearing, NO",
+        "List for hearing, YES",
+        "List for hearing, NO"
+    })
+    void shouldKeepHearingListingInProgressAfterAdditionalFeeReceived(String storedStatus,
+                                                                    YesOrNo parentClaimantIsApplicant) {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
+        caseData = caseData.copy()
+            .parentCaseReference(PARENT_CASE_REFERENCE)
+            .build();
+        GeneralApplicationCaseData parentCaseData = GeneralApplicationCaseDataBuilder.builder().build();
+        parentCaseData = parentCaseData.copy()
+            .claimantGaAppDetails(List.of(element(new GeneralApplicationsDetails()
+                .setParentClaimantIsApplicant(parentClaimantIsApplicant)
+                .setCaseState(storedStatus))))
+            .respondentSolGaAppDetails(List.of(element(new GADetailsRespondentSol()
+                .setParentClaimantIsApplicant(parentClaimantIsApplicant)
+                .setCaseState(storedStatus))))
+            .build();
+        when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
+            .thenReturn(AWAITING_RESPONDENT_RESPONSE);
+        when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(parentCaseData);
+        when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+        HashMap<String, Object> scenarioParams = new HashMap<>();
+
+        handler.handle(params);
+
+        verify(dashboardApiClient).recordScenario(
+            PARENT_CASE_REFERENCE,
+            SCENARIO_AAA6_GENERAL_APPLICATION_IN_PROGRESS_CLAIMANT.getScenario(),
+            "BEARER_TOKEN",
+            new ScenarioRequestParams(scenarioParams)
+        );
+        verify(dashboardApiClient).recordScenario(
+            PARENT_CASE_REFERENCE,
+            SCENARIO_AAA6_GENERAL_APPLICATION_IN_PROGRESS_DEFENDANT.getScenario(),
+            "BEARER_TOKEN",
+            new ScenarioRequestParams(scenarioParams)
+        );
+        assertThat(parentCaseData.getClaimantGaAppDetails().getFirst().getValue().getCaseState()).isEqualTo(storedStatus);
+        assertThat(parentCaseData.getRespondentSolGaAppDetails().getFirst().getValue().getCaseState()).isEqualTo(storedStatus);
     }
 
     @Test
