@@ -32,7 +32,6 @@ public class UnnotifiedHearingsSearchService {
     public TaskResult<String> getUnnotifiedHearings() {
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         List<String> hearingIds = new ArrayList<>();
-        int totalFound = 0;
 
         for (String serviceId : serviceIds) {
             UnNotifiedHearingResponse response = hearingsService.getUnNotifiedHearingResponses(
@@ -43,7 +42,6 @@ public class UnnotifiedHearingsSearchService {
             );
             List<String> serviceHearingIds = response.getHearingIds() == null ? List.of() : response.getHearingIds();
             hearingIds.addAll(serviceHearingIds);
-            totalFound += Math.toIntExact(response.getTotalFound());
             log.info(
                 "{} scheduler found {} dispatched unnotified hearing(s) for serviceId {} with ids {}",
                 AutomatedHearingNoticeScheduler.SCHEDULER_NAME,

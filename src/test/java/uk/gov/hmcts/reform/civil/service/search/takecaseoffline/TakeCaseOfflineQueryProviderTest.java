@@ -42,10 +42,11 @@ class TakeCaseOfflineQueryProviderTest {
         assertThat(query.getDataToReturn()).containsExactly("reference");
 
         String queryStr = query.getQueryBuilder().toString();
-        assertThat(queryStr).contains("applicant1ResponseDeadline");
-        assertThat(queryStr).contains("addLegalRepDeadlineRes1");
-        assertThat(queryStr).contains("addLegalRepDeadlineRes2");
-        assertThat(queryStr).doesNotContain("data.businessProcess.status");
+        assertThat(queryStr)
+            .contains("applicant1ResponseDeadline")
+            .contains("addLegalRepDeadlineRes1")
+            .contains("addLegalRepDeadlineRes2")
+            .doesNotContain("data.businessProcess.status");
     }
 
     @Test

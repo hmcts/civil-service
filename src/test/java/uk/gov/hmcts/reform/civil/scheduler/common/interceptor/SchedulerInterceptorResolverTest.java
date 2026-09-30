@@ -122,6 +122,7 @@ class SchedulerInterceptorResolverTest {
 
         @Override
         public void accept(InterceptorContext<CaseDetails> context, InterceptorChain<CaseDetails> chain) {
+            //Do nothing
         }
 
         @Override
@@ -139,6 +140,7 @@ class SchedulerInterceptorResolverTest {
 
         @Override
         public void accept(InterceptorContext<String> context, InterceptorChain<String> chain) {
+            //Do nothing
         }
 
         @Override
@@ -150,6 +152,7 @@ class SchedulerInterceptorResolverTest {
     private static class CaseDetailsTask implements ScheduledTask<CaseDetails, Long> {
         @Override
         public void accept(CaseDetails item) {
+            //Do nothing
         }
 
         @Override
