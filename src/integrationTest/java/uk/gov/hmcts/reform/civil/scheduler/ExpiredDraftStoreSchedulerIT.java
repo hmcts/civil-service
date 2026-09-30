@@ -21,6 +21,8 @@ import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -33,7 +35,8 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
     "test.id=ExpiredDraftStoreSchedulerIT",
-    "scheduler.lockAtLeastFor=PT0S"
+    "scheduler.lockAtLeastFor=PT0S",
+    "scheduler.expired-draft-store.batchSize=2"
 })
 @Execution(ExecutionMode.SAME_THREAD)
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -58,7 +61,7 @@ public class ExpiredDraftStoreSchedulerIT {
     }
 
     @Test
-    void shouldPurgeExpiredDraftsAndKeepFutureDrafts() {
+    void shouldDeleteExpiredDraftsAndKeepFutureDrafts() {
         when(featureToggleService.isSpringSchedulerEnabled(ExpiredDraftStoreScheduler.SCHEDULER_NAME))
             .thenReturn(true);
 
@@ -95,11 +98,44 @@ public class ExpiredDraftStoreSchedulerIT {
         assertThat(draftStoreRepository.findById(futureDraft.getId())).isPresent();
 
         verify(eventTracker).jobStartedEvent(argThat(config ->
-            ExpiredDraftStoreScheduler.SCHEDULER_NAME.equals(config.getSchedulerName())
+                                                         ExpiredDraftStoreScheduler.SCHEDULER_NAME.equals(config.getSchedulerName())
         ));
         verify(eventTracker).jobCompletedBulkEvent(
             argThat(config -> ExpiredDraftStoreScheduler.SCHEDULER_NAME.equals(config.getSchedulerName())),
             eq(1)
+        );
+    }
+
+    @Test
+    void shouldPurgeExpiredDraftsAcrossMultipleBatches() {
+        when(featureToggleService.isSpringSchedulerEnabled(ExpiredDraftStoreScheduler.SCHEDULER_NAME))
+            .thenReturn(true);
+
+        OffsetDateTime now = OffsetDateTime.now();
+        List<DraftStoreEntity> expiredDrafts = new ArrayList<>();
+
+        for (int i = 0; i < 5; i++) {
+            expiredDrafts.add(new DraftStoreEntity(
+                UUID.randomUUID(),
+                "user-batch-" + i,
+                null,
+                DraftType.DRAFT_CLAIM,
+                Map.of("data", "batch-expired-" + i),
+                now.minusDays(3),
+                now.minusDays(2),
+                now.minusDays(1)
+            ));
+        }
+
+        draftStoreRepository.saveAll(expiredDrafts);
+
+        scheduler.runScheduledTask();
+
+        assertThat(draftStoreRepository.count()).isZero();
+
+        verify(eventTracker).jobCompletedBulkEvent(
+            argThat(config -> ExpiredDraftStoreScheduler.SCHEDULER_NAME.equals(config.getSchedulerName())),
+            eq(5)
         );
     }
 
