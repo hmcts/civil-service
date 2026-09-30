@@ -157,7 +157,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         boolean isSDOTimeAfterLastNonSdoOrder = lastNonSdoOrderTime.isEmpty()
             || (sdoTime.isPresent() && sdoTime.get().isAfter(lastNonSdoOrderTime.get()));
 
-        return isCaseProgression && isBaseLocationValid && (!isFeatureToggleEnabled
+        return isCaseProgression && isBaseLocationValid && !isDecisionForReconsiderationMade() && (!isFeatureToggleEnabled
             || (isSDOTimeBeforeCPRelease && isSDOTimeAfterLastNonSdoOrder));
     }
 
@@ -214,6 +214,15 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             && !isGeneralOrderAfterDecisionForReconsiderationMade()
             && (lastNonSdoOrderTime.isEmpty()
             || sdoTime.get().isAfter(lastNonSdoOrderTime.get()));
+    }
+
+    @Override
+    public boolean isDecisionForReconsiderationMade() {
+        return caseData.getHearingDate() == null
+            && (caseData.getDecisionOnReconsiderationDocumentFromList().isPresent()
+            || caseData.getDecisionOnRequestReconsiderationOptions() != null)
+            && !isSDODoneAfterDecisionForReconsiderationMade()
+            && !isGeneralOrderAfterDecisionForReconsiderationMade();
     }
 
     protected boolean isSDODoneAfterDecisionForReconsiderationMade() {
