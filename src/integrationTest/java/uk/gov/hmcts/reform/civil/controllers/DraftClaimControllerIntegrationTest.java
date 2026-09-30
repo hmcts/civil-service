@@ -84,7 +84,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
         DraftStoreEntity draftClaim = new DraftStoreEntity();
         draftClaim.setId(draftId);
         draftClaim.setUserId(USER_ID);
-        draftClaim.setCaseId("12345");
+        draftClaim.setCaseId(null); // Set to null so this represents a blank active draft
         draftClaim.setDraftType(DRAFT_TYPE);
         draftClaim.setPayload(new HashMap<>(Map.of("step", "active-test")));
         draftClaim.setCreatedAt(now);
@@ -148,6 +148,36 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    void shouldReturnExistingCaseDraftWhenCaseIdDraftAlreadyExists() throws Exception {
+        draftStoreRepository.deleteAll();
+        OffsetDateTime now = OffsetDateTime.now();
+        DraftStoreEntity caseDraft = draftClaim(draftId, now, now.plusDays(RETENTION_DAYS), "payment-step", "12345");
+        draftStoreRepository.save(caseDraft);
+
+        DraftClaimRequest request = new DraftClaimRequest("12345", PAYLOAD);
+
+        doPost(BEARER_TOKEN, request, DRAFT_CLAIMS_URL)
+            .andExpectAll(
+                status().isOk(), // Expect 200 OK, NOT 201 Created
+                jsonPath("$.draftId").value(draftId.toString()),
+                jsonPath("$.caseId").value("12345"),
+                jsonPath("$.payload.step").value("payment-step")
+            );
+
+        assertThat(draftStoreRepository.count()).isOne();
+    }
+
+    @Test
+    void shouldAllowBlankDraftAndCaseDraftToCoexistForSameUser() throws Exception {
+        DraftClaimRequest caseDraftRequest = new DraftClaimRequest("12345", PAYLOAD);
+
+        doPost(BEARER_TOKEN, caseDraftRequest, DRAFT_CLAIMS_URL)
+            .andExpect(status().isCreated());
+
+        assertThat(draftStoreRepository.findByUserIdAndDraftType(USER_ID, DRAFT_TYPE)).hasSize(2);
+    }
+
+    @Test
     void shouldCreateDraftWhenDifferentUserHasActiveDraft() throws Exception {
         String otherUserToken = "Bearer other-user";
         given(userService.getUserInfo(otherUserToken))
@@ -205,6 +235,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
             "12345"
         );
 
+        draftStoreRepository.saveAndFlush(draftClaim(UUID.randomUUID(), now, now.plusDays(RETENTION_DAYS), "original", "12345"));
         assertThatThrownBy(() -> draftStoreRepository.saveAndFlush(duplicateDraft))
             .isInstanceOf(DataIntegrityViolationException.class);
     }
@@ -238,7 +269,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
         OffsetDateTime initialUpdatedAt = draftClaim.getUpdatedAt();
 
         Map<String, Object> updatedPayload = Map.of("step", "updated-step");
-        DraftClaimRequest updatedRequest = new DraftClaimRequest("12345", updatedPayload);
+        DraftClaimRequest updatedRequest = new DraftClaimRequest(null, updatedPayload);
 
         doDraftPut(BEARER_TOKEN, updatedRequest, draftId)
             .andExpectAll(
@@ -261,7 +292,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
         OffsetDateTime initialExpiresAt = initialDraft.getExpiresAt();
 
         Map<String, Object> updatedPayload = Map.of("step", "updated-step");
-        DraftClaimRequest updatedRequest = new DraftClaimRequest("123", updatedPayload);
+        DraftClaimRequest updatedRequest = new DraftClaimRequest(null, updatedPayload);
 
         doDraftPut(BEARER_TOKEN, updatedRequest, draftId)
             .andExpect(status().isOk());
@@ -320,7 +351,6 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
         assertThat(draftStoreRepository.count()).isOne();
         DraftStoreEntity expiredDraft = draftStoreRepository.findById(draftId)
             .orElseThrow(() -> new AssertionError("Expired draft claim should remain in DB"));
-        assertThat(expiredDraft.getCaseId()).isEqualTo("1234");
         assertThat(expiredDraft.getPayload()).containsEntry("step", "expired-test");
     }
 
@@ -434,7 +464,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     private DraftStoreEntity draftClaim(UUID id,
                                         OffsetDateTime createdAt,
                                         OffsetDateTime expiresAt) {
-        return draftClaim(id, createdAt, expiresAt, "expired-test", "1234");
+        return draftClaim(id, createdAt, expiresAt, "expired-test", null);
     }
 
     private DraftStoreEntity draftClaim(UUID id,

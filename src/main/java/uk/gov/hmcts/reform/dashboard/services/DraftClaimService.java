@@ -34,17 +34,20 @@ public class DraftClaimService {
         Objects.requireNonNull(payload, "payload must not be null");
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
 
-        Optional<DraftStoreEntity> existingDraft = draftStoreService.getDraftsForUser(userId, DRAFT_TYPE)
-            .stream()
-            .filter(draft -> draft.getCaseId() == null)
-            .findFirst();
+        boolean hasCaseId = caseId != null && !caseId.isBlank();
+
+        Optional<DraftStoreEntity> existingDraft = getDraftForUserAndCase(userId, caseId);
+
         if (existingDraft.isPresent()) {
             DraftStoreEntity draft = existingDraft.get();
-            if (draft.getExpiresAt().isAfter(now) && (caseId == null || caseId.isBlank())) {
-                log.info("Returning existing active draft claim draftId={}", draft.getId());
+            if (hasCaseId) {
+                log.info("Returning existing case-linked draft claim draftId={} for caseId={}", draft.getId(), caseId);
                 return DraftClaimCreationResult.existingDraft(draft);
-            }
-            if (caseId == null || caseId.isBlank()) {
+            } else {
+                if (draft.getExpiresAt().isAfter(now)) {
+                    log.info("Returning existing active blank draft claim draftId={}", draft.getId());
+                    return DraftClaimCreationResult.existingDraft(draft);
+                }
                 draftStoreService.deleteDraftAndFlush(draft);
             }
         }
@@ -54,7 +57,7 @@ public class DraftClaimService {
                 draftStoreService.createDraft(userId, caseId, payload, DRAFT_TYPE)
             );
         } catch (DataIntegrityViolationException ex) {
-            return getActiveDraftClaimForUser(userId)
+            return getDraftForUserAndCase(userId, caseId)
                 .map(DraftClaimCreationResult::existingDraft)
                 .orElseThrow(() -> ex);
         }
@@ -70,6 +73,15 @@ public class DraftClaimService {
         return draftStoreService.getActiveDraftsForUser(userId, DRAFT_TYPE)
             .stream()
             .filter(draft -> draft.getCaseId() == null)
+            .findFirst();
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<DraftStoreEntity> getDraftForUserAndCase(String userId, String caseId) {
+        boolean hasCaseId = caseId != null && !caseId.isBlank();
+        return draftStoreService.getDraftsForUser(userId, DRAFT_TYPE)
+            .stream()
+            .filter(draft -> hasCaseId ? Objects.equals(draft.getCaseId(), caseId) : draft.getCaseId() == null)
             .findFirst();
     }
 

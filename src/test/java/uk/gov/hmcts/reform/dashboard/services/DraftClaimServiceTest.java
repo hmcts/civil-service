@@ -84,6 +84,24 @@ class DraftClaimServiceTest {
         }
 
         @Test
+        void shouldReturnExistingCaseDraftWhenCaseIdDraftAlreadyExists() {
+            OffsetDateTime createdAt = OffsetDateTime.now().minusDays(1);
+            DraftStoreEntity existingCaseDraft = draft(CASE_ID, createdAt, createdAt.plusDays(RETENTION_DAYS));
+            when(draftStoreService.getDraftsForUser(USER_ID, DRAFT_TYPE)).thenReturn(List.of(existingCaseDraft));
+
+            DraftClaimCreationResult result = draftClaimService.createDraftClaim(
+                USER_ID,
+                CASE_ID,
+                Map.of("step", "new-payload")
+            );
+
+            assertThat(result.newlyCreated()).isFalse();
+            assertThat(result.draftClaim()).isSameAs(existingCaseDraft);
+            verify(draftStoreService).getDraftsForUser(USER_ID, DRAFT_TYPE);
+            verify(draftStoreService, never()).createDraft(USER_ID, CASE_ID, Map.of("step", "new-payload"), DRAFT_TYPE);
+        }
+
+        @Test
         void shouldCreateSubmittedDraftWithoutDeletingInProgressDraft() {
             OffsetDateTime createdAt = OffsetDateTime.now().minusDays(1);
             DraftStoreEntity inProgressDraft = draft(null, createdAt, createdAt.plusDays(RETENTION_DAYS));
@@ -155,21 +173,44 @@ class DraftClaimServiceTest {
         }
 
         @Test
-        void shouldReturnActiveDraftWhenCreateHitsUniqueConstraint() {
+        void shouldReturnActiveBlankDraftWhenCreateHitsUniqueConstraintForBlankDraft() {
             Map<String, Object> payload = Map.of("step", "claimant-details");
             OffsetDateTime createdAt = OffsetDateTime.now().minusDays(1);
-            DraftStoreEntity existingDraft = draft(null, createdAt, createdAt.plusDays(RETENTION_DAYS));
+            DraftStoreEntity existingBlankDraft = draft(null, createdAt, createdAt.plusDays(RETENTION_DAYS));
             DataIntegrityViolationException uniqueViolation =
-                new DataIntegrityViolationException("uq_draft_store_user_claim_draft");
-            when(draftStoreService.getDraftsForUser(USER_ID, DRAFT_TYPE)).thenReturn(List.of());
+                new DataIntegrityViolationException("uq_draft_store_active_draft");
+
+            // First call returns empty, creation fails, catch fallback queries drafts again and finds existing
+            when(draftStoreService.getDraftsForUser(USER_ID, DRAFT_TYPE))
+                .thenReturn(List.of())
+                .thenReturn(List.of(existingBlankDraft));
             when(draftStoreService.createDraft(USER_ID, null, payload, DRAFT_TYPE)).thenThrow(uniqueViolation);
-            when(draftStoreService.getActiveDraftsForUser(USER_ID, DRAFT_TYPE)).thenReturn(List.of(existingDraft));
 
             DraftClaimCreationResult result = draftClaimService.createDraftClaim(USER_ID, null, payload);
 
             assertThat(result.newlyCreated()).isFalse();
-            assertThat(result.draftClaim()).isSameAs(existingDraft);
-            assertThat(existingDraft.getPayload()).containsEntry("step", "existing-payload");
+            assertThat(result.draftClaim()).isSameAs(existingBlankDraft);
+            assertThat(result.draftClaim().getCaseId()).isNull();
+        }
+
+        @Test
+        void shouldReturnCaseDraftWhenCreateWithCaseIdHitsUniqueConstraint() {
+            Map<String, Object> payload = Map.of("step", "payment");
+            OffsetDateTime createdAt = OffsetDateTime.now().minusDays(1);
+            DraftStoreEntity existingCaseDraft = draft(CASE_ID, createdAt, createdAt.plusDays(RETENTION_DAYS));
+            DataIntegrityViolationException uniqueViolation =
+                new DataIntegrityViolationException("uq_draft_store_user_case");
+
+            when(draftStoreService.getDraftsForUser(USER_ID, DRAFT_TYPE))
+                .thenReturn(List.of())
+                .thenReturn(List.of(existingCaseDraft));
+            when(draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE)).thenThrow(uniqueViolation);
+
+            DraftClaimCreationResult result = draftClaimService.createDraftClaim(USER_ID, CASE_ID, payload);
+
+            assertThat(result.newlyCreated()).isFalse();
+            assertThat(result.draftClaim()).isSameAs(existingCaseDraft);
+            assertThat(result.draftClaim().getCaseId()).isEqualTo(CASE_ID);
         }
 
         @Test
@@ -179,7 +220,6 @@ class DraftClaimServiceTest {
                 new DataIntegrityViolationException("uq_draft_store_user_claim_draft");
             when(draftStoreService.getDraftsForUser(USER_ID, DRAFT_TYPE)).thenReturn(List.of());
             when(draftStoreService.createDraft(USER_ID, null, payload, DRAFT_TYPE)).thenThrow(uniqueViolation);
-            when(draftStoreService.getActiveDraftsForUser(USER_ID, DRAFT_TYPE)).thenReturn(List.of());
 
             assertThatThrownBy(() -> draftClaimService.createDraftClaim(USER_ID, null, payload))
                 .isSameAs(uniqueViolation);
