@@ -2,11 +2,15 @@ package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.businessprocess;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -19,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_JUDGE_BUSINESS_PROCESS_GASPEC;
@@ -43,6 +48,28 @@ class EndJudgeMakesDecisionBusinessProcessCallbackHandlerTest extends GeneralApp
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(END_JUDGE_BUSINESS_PROCESS_GASPEC);
+    }
+
+    @ParameterizedTest
+    @EnumSource(YesOrNo.class)
+    void shouldDisplayListForHearingAfterJudgeDecision(YesOrNo isWithNotice) {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
+            .hearingOrderApplication(NO, isWithNotice)
+            .applicationIsCloaked(isWithNotice == YES ? NO : YES)
+            .isGaRespondentOneLip(NO)
+            .build();
+
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
+        JudicialDecisionHelper decisionHelper = new JudicialDecisionHelper();
+        EndJudgeMakesDecisionBusinessProcessCallbackHandler listingHandler = new EndJudgeMakesDecisionBusinessProcessCallbackHandler(
+            caseDetailsConverter, parentCaseUpdateHelper, new StateGeneratorService(decisionHelper), decisionHelper);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse)
+            listingHandler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+        assertThat(response.getState()).isEqualTo("LISTING_FOR_A_HEARING");
+        verify(parentCaseUpdateHelper).updateParentWithGAState(caseData, "List for hearing");
+        verifyNoMoreInteractions(parentCaseUpdateHelper);
     }
 
     @Test

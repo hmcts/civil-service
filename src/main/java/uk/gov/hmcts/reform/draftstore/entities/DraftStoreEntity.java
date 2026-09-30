@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.draftstore.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -11,6 +13,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import uk.gov.hmcts.reform.draftstore.DraftType;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
@@ -40,8 +43,9 @@ public class DraftStoreEntity implements Serializable {
     private String caseId;
 
     @NotNull
-    @Column(name = "draft_type_id")
-    private Integer draftTypeId;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "draft_type", length = 200)
+    private DraftType draftType;
 
     @NotNull
     @JdbcTypeCode(SqlTypes.JSON)

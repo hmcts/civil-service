@@ -3,11 +3,7 @@ package uk.gov.hmcts.reform.draftstore.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
@@ -28,38 +24,39 @@ public class DraftStoreService {
 
     private static final String USER_ID_NOT_NULL = "userId must not be null";
     private static final String DRAFT_TYPE_NOT_NULL = "draftType must not be null";
+    static final String TTL_DAYS_FIELD = "draftClaimCacheTtlDays";
+    static final long DEFAULT_TTL_DAYS = 30L;
 
     private final DraftStoreRepository draftStoreRepository;
-    private final TransactionTemplate requiresNewTransaction;
+    private final DraftStoreTransactionService draftStoreTransactionService;
 
     public DraftStoreService(DraftStoreRepository draftStoreRepository,
-                             PlatformTransactionManager transactionManager) {
+                             DraftStoreTransactionService draftStoreTransactionService) {
         this.draftStoreRepository = draftStoreRepository;
-        this.requiresNewTransaction = new TransactionTemplate(transactionManager);
-        this.requiresNewTransaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        this.draftStoreTransactionService = draftStoreTransactionService;
     }
 
-    @Transactional(noRollbackFor = DataIntegrityViolationException.class)
     public DraftStoreEntity createDraft(String userId,
                                         String caseId,
                                         Map<String, Object> payload,
                                         DraftType draftType) {
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
+        Map<String, Object> payloadCopy = copyPayload(payload);
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
 
         DraftStoreEntity draft = new DraftStoreEntity(
             UUID.randomUUID(),
             userId,
             caseId,
-            draftType.getId(),
-            copyPayload(payload),
+            draftType,
+            payloadCopy,
             now,
             now,
-            draftType.calculateExpiry(now)
+            now.plusDays(resolveTtlDays(payloadCopy))
         );
         try {
-            return persistDraft(draft, draftType);
+            return draftStoreTransactionService.saveInNewTransaction(draft);
         } catch (DataIntegrityViolationException ex) {
             return getActiveDraftsForUser(userId, draftType).stream()
                 .findFirst()
@@ -71,16 +68,16 @@ public class DraftStoreService {
     public List<DraftStoreEntity> getDraftsForUser(String userId, DraftType draftType) {
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
-        return draftStoreRepository.findByUserIdAndDraftTypeId(userId, draftType.getId());
+        return draftStoreRepository.findByUserIdAndDraftType(userId, draftType);
     }
 
     @Transactional(readOnly = true)
     public List<DraftStoreEntity> getActiveDraftsForUser(String userId, DraftType draftType) {
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
-        return draftStoreRepository.findByUserIdAndDraftTypeIdAndExpiresAtAfter(
+        return draftStoreRepository.findByUserIdAndDraftTypeAndExpiresAtAfter(
             userId,
-            draftType.getId(),
+            draftType,
             OffsetDateTime.now(ZoneOffset.UTC)
         );
     }
@@ -90,10 +87,10 @@ public class DraftStoreService {
         Objects.requireNonNull(draftId, "draftId must not be null");
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
-        return draftStoreRepository.findByIdAndUserIdAndDraftTypeIdAndExpiresAtAfter(
+        return draftStoreRepository.findByIdAndUserIdAndDraftTypeAndExpiresAtAfter(
             draftId,
             userId,
-            draftType.getId(),
+            draftType,
             OffsetDateTime.now(ZoneOffset.UTC)
         );
     }
@@ -112,34 +109,15 @@ public class DraftStoreService {
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
         log.info("Deleting draft type={} draftId={}", draftType, draftId);
-        return draftStoreRepository.deleteByIdAndUserIdAndDraftTypeId(
+        return draftStoreTransactionService.deleteByIdInNewTransaction(
             draftId,
             userId,
-            draftType.getId()
+            draftType
         ) > 0;
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void deleteDraftAndFlush(DraftStoreEntity draft) {
-        Objects.requireNonNull(draft, "draft must not be null");
-        log.info("Deleting expired draft typeId={} draftId={}", draft.getDraftTypeId(), draft.getId());
-        draftStoreRepository.delete(draft);
-        draftStoreRepository.flush();
-    }
-
-    private DraftStoreEntity persistDraft(DraftStoreEntity draft, DraftType draftType) {
-        if (draftType == DraftType.DRAFT_CLAIM) {
-            return persistNewDraft(draft);
-        }
-        log.info("Creating draft typeId={} draftId={}", draft.getDraftTypeId(), draft.getId());
-        return draftStoreRepository.saveAndFlush(draft);
-    }
-
-    private DraftStoreEntity persistNewDraft(DraftStoreEntity draft) {
-        return requiresNewTransaction.execute(status -> {
-            log.info("Creating draft typeId={} draftId={}", draft.getDraftTypeId(), draft.getId());
-            return draftStoreRepository.saveAndFlush(draft);
-        });
+        draftStoreTransactionService.deleteInNewTransaction(draft);
     }
 
     private DraftStoreEntity applyDraftUpdate(DraftStoreEntity existingDraft,
@@ -150,7 +128,27 @@ public class DraftStoreService {
         }
         existingDraft.setPayload(copyPayload(payload));
         existingDraft.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-        return draftStoreRepository.save(existingDraft);
+        return draftStoreTransactionService.saveInNewTransaction(existingDraft);
+    }
+
+    private long resolveTtlDays(Map<String, Object> payload) {
+        Object value = payload.get(TTL_DAYS_FIELD);
+        Long ttlDays = null;
+        if (value instanceof Number number) {
+            ttlDays = number.longValue();
+        } else if (value instanceof String text) {
+            try {
+                ttlDays = Long.parseLong(text.trim());
+            } catch (NumberFormatException ex) {
+                ttlDays = null;
+            }
+        }
+        if (ttlDays == null || ttlDays <= 0) {
+            log.warn("Missing or invalid {} in draft payload (value={}), defaulting to {} days",
+                     TTL_DAYS_FIELD, value, DEFAULT_TTL_DAYS);
+            return DEFAULT_TTL_DAYS;
+        }
+        return ttlDays;
     }
 
     private Map<String, Object> copyPayload(Map<String, Object> payload) {

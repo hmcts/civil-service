@@ -12,9 +12,9 @@ jobs:
     if: "!contains(github.event.pull_request.head.ref, 'renovate') && !contains(github.event.pull_request.head.ref, 'dependabot')"
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Check processes have name
-      uses: mikefarah/yq@1b9b4ac5187171d2e5e3129be0cfa827c7f9d53d # v4.53.3
+      uses: mikefarah/yq@c14f446382944492701b16c1ddb48bb9dbe683e3 # v4.53.6
       with:
         cmd: >
           for file in src/main/resources/camunda/*.bpmn;

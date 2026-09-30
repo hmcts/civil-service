@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.config;
 
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.backoff.BackoffStrategy;
+import org.camunda.bpm.client.backoff.ErrorAwareBackoffStrategy;
+import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -20,6 +22,8 @@ class ExternalTaskListenerConfigurationTest {
 
     private static final List<ExternalTask> NO_TASKS = Collections.emptyList();
     private static final List<ExternalTask> SOME_TASKS = Arrays.asList((ExternalTask) null);
+    private static final ExternalTaskClientException AN_ERROR =
+        new ExternalTaskClientException("gateway returned 502");
 
     ApplicationContextRunner context = new ApplicationContextRunner()
         .withPropertyValues("feign.client.config.processInstance.url=http://localhost")
@@ -32,56 +36,73 @@ class ExternalTaskListenerConfigurationTest {
         context.run(it -> {
             assertThat(it).hasSingleBean(ExternalTaskClient.class);
             assertThat(it).hasSingleBean(BackoffStrategy.class);
+            assertThat(it.getBean(BackoffStrategy.class)).isInstanceOf(ErrorAwareBackoffStrategy.class);
         });
     }
 
     @Test
-    void backoffStrategy_shouldStayZeroWhileFetchesSucceed() {
+    void backoffStrategy_shouldStayZeroWhileFetchesSucceedOrReturnNothing() {
         context.run(it -> {
-            BackoffStrategy strategy = it.getBean(BackoffStrategy.class);
+            ErrorAwareBackoffStrategy strategy = errorAwareStrategy(it.getBean(BackoffStrategy.class));
 
-            strategy.reconfigure(SOME_TASKS);
+            strategy.reconfigure(SOME_TASKS, null);
+            assertThat(strategy.calculateBackoffTime()).isZero();
 
+            strategy.reconfigure(NO_TASKS, null);
             assertThat(strategy.calculateBackoffTime()).isZero();
         });
     }
 
     @Test
-    void backoffStrategy_shouldRampExponentiallyOnConsecutiveEmptyFetchesAndCapAtMax() {
+    void backoffStrategy_shouldRampExponentiallyOnConsecutiveErrorsAndCapAtMax() {
         context.run(it -> {
-            BackoffStrategy strategy = it.getBean(BackoffStrategy.class);
+            ErrorAwareBackoffStrategy strategy = errorAwareStrategy(it.getBean(BackoffStrategy.class));
 
-            strategy.reconfigure(NO_TASKS);
+            strategy.reconfigure(NO_TASKS, AN_ERROR);
             assertThat(strategy.calculateBackoffTime()).isEqualTo(500L);
 
-            strategy.reconfigure(NO_TASKS);
+            strategy.reconfigure(NO_TASKS, AN_ERROR);
             assertThat(strategy.calculateBackoffTime()).isEqualTo(1000L);
 
-            strategy.reconfigure(NO_TASKS);
+            strategy.reconfigure(NO_TASKS, AN_ERROR);
             assertThat(strategy.calculateBackoffTime()).isEqualTo(2000L);
 
-            strategy.reconfigure(NO_TASKS);
+            strategy.reconfigure(NO_TASKS, AN_ERROR);
             assertThat(strategy.calculateBackoffTime()).isEqualTo(4000L);
 
-            // 500 * 2^4 = 8000 -> capped at configured max of 5000
-            strategy.reconfigure(NO_TASKS);
+            // 500 * 2^4 = 8000 -> capped at the configured max of 5000
+            strategy.reconfigure(NO_TASKS, AN_ERROR);
             assertThat(strategy.calculateBackoffTime()).isEqualTo(5000L);
         });
     }
 
     @Test
-    void backoffStrategy_shouldResetToZeroAfterASuccessfulFetch() {
+    void backoffStrategy_shouldResetToZeroAfterANonErrorFetch() {
+        context.run(it -> {
+            ErrorAwareBackoffStrategy strategy = errorAwareStrategy(it.getBean(BackoffStrategy.class));
+
+            strategy.reconfigure(NO_TASKS, AN_ERROR);
+            strategy.reconfigure(NO_TASKS, AN_ERROR);
+            assertThat(strategy.calculateBackoffTime()).isPositive();
+
+            strategy.reconfigure(NO_TASKS, null);
+            assertThat(strategy.calculateBackoffTime()).isZero();
+        });
+    }
+
+    @Test
+    void backoffStrategy_singleArgReconfigureIsTreatedAsANonError() {
         context.run(it -> {
             BackoffStrategy strategy = it.getBean(BackoffStrategy.class);
 
             strategy.reconfigure(NO_TASKS);
-            strategy.reconfigure(NO_TASKS);
-            assertThat(strategy.calculateBackoffTime()).isPositive();
-
-            strategy.reconfigure(SOME_TASKS);
 
             assertThat(strategy.calculateBackoffTime()).isZero();
         });
+    }
+
+    private static ErrorAwareBackoffStrategy errorAwareStrategy(BackoffStrategy strategy) {
+        return (ErrorAwareBackoffStrategy) strategy;
     }
 
     @Configuration

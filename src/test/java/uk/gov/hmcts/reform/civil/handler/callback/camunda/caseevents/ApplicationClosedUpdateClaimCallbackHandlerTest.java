@@ -143,7 +143,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
         latestStatus.put("6789", "Additional Information Require");
         latestStatus.put("7890", "Application Dismissed");
         latestStatus.put("8910", "Proceeds In Heritage");
-        latestStatus.put("1011", "Listed for a Hearing");
+        latestStatus.put("1011", "List for hearing");
 
         return latestStatus;
     }

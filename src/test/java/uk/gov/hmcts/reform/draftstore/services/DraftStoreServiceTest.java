@@ -1,16 +1,16 @@
 package uk.gov.hmcts.reform.draftstore.services;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
@@ -21,14 +21,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -46,39 +45,57 @@ class DraftStoreServiceTest {
     private DraftStoreRepository draftStoreRepository;
 
     @Mock
-    private PlatformTransactionManager transactionManager;
+    private DraftStoreTransactionService draftStoreTransactionService;
 
     @InjectMocks
     private DraftStoreService draftStoreService;
-
-    @BeforeEach
-    void runCallbacksInMockTransactions() {
-        lenient().when(transactionManager.getTransaction(any())).thenReturn(mock(TransactionStatus.class));
-    }
 
     @Nested
     class CreateDraftTests {
 
         @Test
         void shouldCreateDraftWithExpiryWhenRequestIsValid() {
-            Map<String, Object> payload = new HashMap<>(Map.of("step", "claimant-details"));
-            when(draftStoreRepository.saveAndFlush(any(DraftStoreEntity.class)))
+            Map<String, Object> payload = new HashMap<>(Map.of("step", "claimant-details", "draftClaimCacheTtlDays", 14L));
+            when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
             DraftStoreEntity result = draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE);
 
             ArgumentCaptor<DraftStoreEntity> captor = ArgumentCaptor.forClass(DraftStoreEntity.class);
-            verify(draftStoreRepository).saveAndFlush(captor.capture());
+            verify(draftStoreTransactionService).saveInNewTransaction(captor.capture());
             DraftStoreEntity savedDraft = captor.getValue();
             assertThat(result).isSameAs(savedDraft);
             assertThat(savedDraft.getId()).isNotNull();
             assertThat(savedDraft.getUserId()).isEqualTo(USER_ID);
             assertThat(savedDraft.getCaseId()).isEqualTo(CASE_ID);
-            assertThat(savedDraft.getDraftTypeId()).isEqualTo(DRAFT_TYPE.getId());
+            assertThat(savedDraft.getDraftType()).isEqualTo(DRAFT_TYPE);
             assertThat(savedDraft.getPayload()).isEqualTo(payload).isNotSameAs(payload);
             assertThat(savedDraft.getCreatedAt()).isNotNull();
             assertThat(savedDraft.getUpdatedAt()).isEqualTo(savedDraft.getCreatedAt());
-            assertThat(savedDraft.getExpiresAt()).isEqualTo(DRAFT_TYPE.calculateExpiry(savedDraft.getCreatedAt()));
+            assertThat(savedDraft.getExpiresAt()).isEqualTo(savedDraft.getCreatedAt().plusDays(14));
+        }
+
+        @ParameterizedTest
+        @MethodSource("uk.gov.hmcts.reform.draftstore.services.DraftStoreServiceTest#validTtlValues")
+        void shouldCalculateExpiryFromPayloadTtl(Object ttlValue, long expectedDays) {
+            Map<String, Object> payload = new HashMap<>(Map.of("draftClaimCacheTtlDays", ttlValue));
+            when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+            DraftStoreEntity result = draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE);
+
+            assertThat(result.getExpiresAt()).isEqualTo(result.getCreatedAt().plusDays(expectedDays));
+        }
+
+        @ParameterizedTest
+        @MethodSource("uk.gov.hmcts.reform.draftstore.services.DraftStoreServiceTest#invalidTtlValues")
+        void shouldDefaultExpiryTo30DaysWhenPayloadTtlIsMissingOrInvalid(Map<String, Object> payload) {
+            when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+            DraftStoreEntity result = draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE);
+
+            assertThat(result.getExpiresAt()).isEqualTo(result.getCreatedAt().plusDays(30));
         }
 
         @Test
@@ -107,19 +124,19 @@ class DraftStoreServiceTest {
                 DRAFT_ID,
                 USER_ID,
                 CASE_ID,
-                DRAFT_TYPE.getId(),
+                DRAFT_TYPE,
                 new HashMap<>(Map.of("step", "existing-payload")),
                 createdAt,
                 createdAt,
-                DRAFT_TYPE.calculateExpiry(createdAt)
+                createdAt.plusDays(30)
             );
-            when(draftStoreRepository.saveAndFlush(any(DraftStoreEntity.class)))
-                .thenThrow(new DataIntegrityViolationException("uq_draft_store_user_draft_claim"));
-            when(draftStoreRepository.findByUserIdAndDraftTypeIdAndExpiresAtAfter(
+            when(draftStoreRepository.findByUserIdAndDraftTypeAndExpiresAtAfter(
                 eq(USER_ID),
-                eq(DRAFT_TYPE.getId()),
+                eq(DRAFT_TYPE),
                 any(OffsetDateTime.class)
             )).thenReturn(List.of(existingDraft));
+            when(draftStoreTransactionService.saveInNewTransaction(any()))
+                .thenThrow(new DataIntegrityViolationException("uq_draft_store_user_draft_claim"));
 
             DraftStoreEntity result = draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE);
 
@@ -132,10 +149,10 @@ class DraftStoreServiceTest {
             Map<String, Object> payload = new HashMap<>(Map.of("step", "claimant-details"));
             DataIntegrityViolationException uniqueViolation =
                 new DataIntegrityViolationException("uq_draft_store_user_draft_claim");
-            when(draftStoreRepository.saveAndFlush(any(DraftStoreEntity.class))).thenThrow(uniqueViolation);
-            when(draftStoreRepository.findByUserIdAndDraftTypeIdAndExpiresAtAfter(
+            when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class))).thenThrow(uniqueViolation);
+            when(draftStoreRepository.findByUserIdAndDraftTypeAndExpiresAtAfter(
                 eq(USER_ID),
-                eq(DRAFT_TYPE.getId()),
+                eq(DRAFT_TYPE),
                 any(OffsetDateTime.class)
             )).thenReturn(List.of());
 
@@ -159,30 +176,30 @@ class DraftStoreServiceTest {
         @Test
         void shouldReturnDraftsWhenUserHasDraftsOfRequestedType() {
             DraftStoreEntity draft = draft();
-            when(draftStoreRepository.findByUserIdAndDraftTypeId(USER_ID, DRAFT_TYPE.getId()))
+            when(draftStoreRepository.findByUserIdAndDraftType(USER_ID, DRAFT_TYPE))
                 .thenReturn(List.of(draft));
 
             List<DraftStoreEntity> result = draftStoreService.getDraftsForUser(USER_ID, DRAFT_TYPE);
 
             assertThat(result).containsExactly(draft);
-            verify(draftStoreRepository).findByUserIdAndDraftTypeId(USER_ID, DRAFT_TYPE.getId());
+            verify(draftStoreRepository).findByUserIdAndDraftType(USER_ID, DRAFT_TYPE);
         }
 
         @Test
         void shouldReturnActiveDraftsWhenUnexpiredDraftsExist() {
             DraftStoreEntity draft = draft();
-            when(draftStoreRepository.findByUserIdAndDraftTypeIdAndExpiresAtAfter(
+            when(draftStoreRepository.findByUserIdAndDraftTypeAndExpiresAtAfter(
                 eq(USER_ID),
-                eq(DRAFT_TYPE.getId()),
+                eq(DRAFT_TYPE),
                 any(OffsetDateTime.class)
             )).thenReturn(List.of(draft));
 
             List<DraftStoreEntity> result = draftStoreService.getActiveDraftsForUser(USER_ID, DRAFT_TYPE);
 
             assertThat(result).containsExactly(draft);
-            verify(draftStoreRepository).findByUserIdAndDraftTypeIdAndExpiresAtAfter(
+            verify(draftStoreRepository).findByUserIdAndDraftTypeAndExpiresAtAfter(
                 eq(USER_ID),
-                eq(DRAFT_TYPE.getId()),
+                eq(DRAFT_TYPE),
                 any(OffsetDateTime.class)
             );
         }
@@ -190,10 +207,10 @@ class DraftStoreServiceTest {
         @Test
         void shouldReturnDraftWhenOwnedUnexpiredDraftExists() {
             DraftStoreEntity draft = draft();
-            when(draftStoreRepository.findByIdAndUserIdAndDraftTypeIdAndExpiresAtAfter(
+            when(draftStoreRepository.findByIdAndUserIdAndDraftTypeAndExpiresAtAfter(
                 eq(DRAFT_ID),
                 eq(USER_ID),
-                eq(DRAFT_TYPE.getId()),
+                eq(DRAFT_TYPE),
                 any(OffsetDateTime.class)
             )).thenReturn(Optional.of(draft));
 
@@ -219,13 +236,13 @@ class DraftStoreServiceTest {
         void shouldUpdateDraftWhenOwnedUnexpiredDraftExists() {
             DraftStoreEntity existingDraft = draft();
             Map<String, Object> payload = new HashMap<>(Map.of("step", "updated"));
-            when(draftStoreRepository.findByIdAndUserIdAndDraftTypeIdAndExpiresAtAfter(
+            when(draftStoreRepository.findByIdAndUserIdAndDraftTypeAndExpiresAtAfter(
                 eq(DRAFT_ID),
                 eq(USER_ID),
-                eq(DRAFT_TYPE.getId()),
+                eq(DRAFT_TYPE),
                 any(OffsetDateTime.class)
             )).thenReturn(Optional.of(existingDraft));
-            when(draftStoreRepository.save(any(DraftStoreEntity.class)))
+            when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
             Optional<DraftStoreEntity> result = draftStoreService.updateDraft(
@@ -240,19 +257,19 @@ class DraftStoreServiceTest {
             assertThat(existingDraft.getCaseId()).isEqualTo(NEW_CASE_ID);
             assertThat(existingDraft.getPayload()).isEqualTo(payload).isNotSameAs(payload);
             assertThat(existingDraft.getUpdatedAt()).isNotNull();
-            verify(draftStoreRepository).save(existingDraft);
+            verify(draftStoreTransactionService).saveInNewTransaction(existingDraft);
         }
 
         @Test
         void shouldKeepCaseIdWhenUpdateCaseIdIsNull() {
             DraftStoreEntity existingDraft = draft();
-            when(draftStoreRepository.findByIdAndUserIdAndDraftTypeIdAndExpiresAtAfter(
+            when(draftStoreRepository.findByIdAndUserIdAndDraftTypeAndExpiresAtAfter(
                 eq(DRAFT_ID),
                 eq(USER_ID),
-                eq(DRAFT_TYPE.getId()),
+                eq(DRAFT_TYPE),
                 any(OffsetDateTime.class)
             )).thenReturn(Optional.of(existingDraft));
-            when(draftStoreRepository.save(any(DraftStoreEntity.class)))
+            when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
             Optional<DraftStoreEntity> result = draftStoreService.updateDraft(
@@ -269,10 +286,10 @@ class DraftStoreServiceTest {
 
         @Test
         void shouldReturnEmptyWhenUpdatingMissingDraft() {
-            when(draftStoreRepository.findByIdAndUserIdAndDraftTypeIdAndExpiresAtAfter(
+            when(draftStoreRepository.findByIdAndUserIdAndDraftTypeAndExpiresAtAfter(
                 eq(DRAFT_ID),
                 eq(USER_ID),
-                eq(DRAFT_TYPE.getId()),
+                eq(DRAFT_TYPE),
                 any(OffsetDateTime.class)
             )).thenReturn(Optional.empty());
 
@@ -293,28 +310,36 @@ class DraftStoreServiceTest {
 
         @Test
         void shouldReturnTrueWhenDraftIsDeleted() {
-            when(draftStoreRepository.deleteByIdAndUserIdAndDraftTypeId(
+            when(draftStoreTransactionService.deleteByIdInNewTransaction(
                 DRAFT_ID,
                 USER_ID,
-                DRAFT_TYPE.getId()
+                DRAFT_TYPE
             )).thenReturn(1L);
 
             boolean result = draftStoreService.deleteDraft(DRAFT_ID, USER_ID, DRAFT_TYPE);
 
             assertThat(result).isTrue();
+            verify(draftStoreTransactionService).deleteByIdInNewTransaction(
+                DRAFT_ID,
+                USER_ID,
+                DRAFT_TYPE);
         }
 
         @Test
         void shouldReturnFalseWhenDraftDoesNotExist() {
-            when(draftStoreRepository.deleteByIdAndUserIdAndDraftTypeId(
+            when(draftStoreTransactionService.deleteByIdInNewTransaction(
                 DRAFT_ID,
                 USER_ID,
-                DRAFT_TYPE.getId()
+                DRAFT_TYPE
             )).thenReturn(0L);
 
             boolean result = draftStoreService.deleteDraft(DRAFT_ID, USER_ID, DRAFT_TYPE);
 
             assertThat(result).isFalse();
+            verify(draftStoreTransactionService).deleteByIdInNewTransaction(
+                DRAFT_ID,
+                USER_ID,
+                DRAFT_TYPE);
         }
 
         @Test
@@ -323,9 +348,28 @@ class DraftStoreServiceTest {
 
             draftStoreService.deleteDraftAndFlush(draft);
 
-            verify(draftStoreRepository).delete(draft);
-            verify(draftStoreRepository).flush();
+            verify(draftStoreTransactionService).deleteInNewTransaction(draft);
         }
+    }
+
+    static Stream<Arguments> validTtlValues() {
+        return Stream.of(
+            Arguments.of(7L, 7L),
+            Arguments.of(28, 28L),
+            Arguments.of("60", 60L)
+        );
+    }
+
+    static Stream<Arguments> invalidTtlValues() {
+        Map<String, Object> nullTtl = new HashMap<>();
+        nullTtl.put("draftClaimCacheTtlDays", null);
+        return Stream.of(
+            Arguments.of(new HashMap<>(Map.of("step", "no-ttl"))),
+            Arguments.of(nullTtl),
+            Arguments.of(new HashMap<>(Map.of("draftClaimCacheTtlDays", 0L))),
+            Arguments.of(new HashMap<>(Map.of("draftClaimCacheTtlDays", -5L))),
+            Arguments.of(new HashMap<>(Map.of("draftClaimCacheTtlDays", "not-a-number")))
+        );
     }
 
     private DraftStoreEntity draft() {
@@ -334,11 +378,11 @@ class DraftStoreServiceTest {
             DRAFT_ID,
             USER_ID,
             CASE_ID,
-            DRAFT_TYPE.getId(),
+            DRAFT_TYPE,
             new HashMap<>(Map.of("step", "existing")),
             createdAt,
             createdAt,
-            DRAFT_TYPE.calculateExpiry(createdAt)
+            createdAt.plusDays(30)
         );
     }
 }

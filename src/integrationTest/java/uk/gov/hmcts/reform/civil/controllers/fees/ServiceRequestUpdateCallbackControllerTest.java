@@ -39,7 +39,8 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
     private static final String PAID = "Paid";
     private static final String REFERENCE = "reference";
     private static final String ACCOUNT_NUMBER = "123445555";
-    private static final String s2sToken = "s2s AuthToken";
+    private static final String S2S_AUTH_TOKEN = "s2s AuthToken";
+    private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
     @MockBean
     CoreCaseDataApi coreCaseDataApi;
@@ -52,7 +53,7 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
 
     @BeforeEach
     void bareMinimumToMakeAPositiveRequest() {
-        when(authorisationService.isServiceAuthorized(any())).thenReturn(true);
+        when(authorisationService.isPaymentCallbackServiceAuthorized(any())).thenReturn(true);
         CaseData caseData = CaseData.builder().businessProcess(new BusinessProcess().setProcessInstanceId("instance").setCamundaEvent("camunda event")).build();
         CaseDetails caseDetails = CaseDetails.builder().build();
         caseDetails.setData(caseData.toMap(objectMapper));
@@ -80,23 +81,23 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
 
     @Test
     public void whenPaymentCallbackIsReceivedWithServiceAuthorisationButReturnsFalseReturn401() throws Exception {
-        when(authorisationService.isServiceAuthorized(any())).thenReturn(false);
+        when(authorisationService.isPaymentCallbackServiceAuthorized(any())).thenReturn(false);
         mockMvc.perform(
             MockMvcRequestBuilders.put(PAYMENT_CALLBACK_URL, "")
-                .header("ServiceAuthorization", s2sToken)
+                .header(SERVICE_AUTHORIZATION, S2S_AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(buildServiceDto()))).andExpect(status().isUnauthorized());
     }
 
     @Test
-    public void whenInvalidTypeOfRequestMade_ReturnMethodNotAllowed() throws Exception {
+    public void whenInvalidTypeOfRequestMadeThenReturnMethodNotAllowed() throws Exception {
 
         doPost(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
             .andExpect(status().isMethodNotAllowed());
     }
 
     @Test
-    public void whenServiceRequestUpdateRequestAndEverythingIsOk_thenHttp2xx() throws Exception {
+    public void whenServiceRequestUpdateRequestAndEverythingIsOkThenHttp2xx() throws Exception {
         // Given: an existing case in CCD
 
         // When: I call the /service-request-update URL
@@ -106,7 +107,7 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
     }
 
     @Test
-    public void whenServiceRequestUpdateRequestButUnexpectedErrorOccurs_thenHttp5xx() throws Exception {
+    public void whenServiceRequestUpdateRequestButUnexpectedErrorOccursThenHttp5xx() throws Exception {
         // Given: the callback processing throws an unexpected exception
         doThrow(new RuntimeException("Unexpected error"))
             .when(requestUpdateCallbackService)
@@ -154,7 +155,7 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
         return mockMvc.perform(
             MockMvcRequestBuilders.put(urlTemplate, uriVars)
                 .header(HttpHeaders.AUTHORIZATION, BEARER_TOKEN)
-                .header("ServiceAuthorization", "s2s AuthToken")
+                .header(SERVICE_AUTHORIZATION, S2S_AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(content)));
     }
@@ -164,7 +165,7 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
         return mockMvc.perform(
             MockMvcRequestBuilders.post(urlTemplate, uriVars)
                 .header(HttpHeaders.AUTHORIZATION, BEARER_TOKEN)
-                .header("ServiceAuthorization", "s2s AuthToken")
+                .header(SERVICE_AUTHORIZATION, S2S_AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(content)));
     }

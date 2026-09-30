@@ -36,14 +36,17 @@ public class DraftClaimService {
 
         Optional<DraftStoreEntity> existingDraft = draftStoreService.getDraftsForUser(userId, DRAFT_TYPE)
             .stream()
+            .filter(draft -> draft.getCaseId() == null)
             .findFirst();
         if (existingDraft.isPresent()) {
             DraftStoreEntity draft = existingDraft.get();
-            if (draft.getExpiresAt().isAfter(now)) {
+            if (draft.getExpiresAt().isAfter(now) && (caseId == null || caseId.isBlank())) {
                 log.info("Returning existing active draft claim draftId={}", draft.getId());
                 return DraftClaimCreationResult.existingDraft(draft);
             }
-            draftStoreService.deleteDraftAndFlush(draft);
+            if (caseId == null || caseId.isBlank()) {
+                draftStoreService.deleteDraftAndFlush(draft);
+            }
         }
 
         try {
@@ -66,6 +69,7 @@ public class DraftClaimService {
     public Optional<DraftStoreEntity> getActiveDraftClaimForUser(String userId) {
         return draftStoreService.getActiveDraftsForUser(userId, DRAFT_TYPE)
             .stream()
+            .filter(draft -> draft.getCaseId() == null)
             .findFirst();
     }
 
