@@ -9,12 +9,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+
+import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -106,7 +109,7 @@ class CancelUnissuedClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest
     class AboutToSubmitCallback {
 
         @Test
-        void shouldSetPreviousStateAndKeepReason() {
+        void shouldSetPreviousStateCancelledDateBusinessProcessAndKeepReason() {
             CaseData caseData = eligibleCaseData();
             caseData.setCancelUnissuedClaimSpecReason("Settled outside the portal");
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -116,7 +119,9 @@ class CancelUnissuedClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest
 
             assertThat(updated.getPreviousCCDState()).isEqualTo(CaseState.PENDING_CASE_ISSUED);
             assertThat(updated.getCancelUnissuedClaimSpecReason()).isEqualTo("Settled outside the portal");
-            assertThat(updated.getBusinessProcess()).isEqualTo(caseData.getBusinessProcess());
+            assertThat(updated.getCancelUnissuedClaimSpecDate()).isEqualTo(LocalDate.now());
+            assertThat(updated.getBusinessProcess().getCamundaEvent()).isEqualTo(CANCEL_UNISSUED_CLAIM_SPEC.name());
+            assertThat(updated.getBusinessProcess().getStatus()).isEqualTo(BusinessProcessStatus.READY);
         }
     }
 
