@@ -23,6 +23,7 @@ import java.util.Map;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
@@ -99,6 +100,7 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
 
         caseData.setBusinessProcess(BusinessProcess.ready(ENTER_BREATHING_SPACE_SPEC));
         caseData.getBreathing().setActive(YES);
+        caseData.getBreathing().setLiftPending(NO);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))

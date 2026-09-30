@@ -279,6 +279,9 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData())
                 .extracting("breathingSpaceActive")
                 .isEqualTo("No");
+            assertThat(response.getData())
+                .extracting("breathingSpaceLiftPending")
+                .isEqualTo("No");
         }
 
         @Test
@@ -311,6 +314,9 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData())
                 .extracting("breathingSpaceActive")
                 .isEqualTo("No");
+            assertThat(response.getData())
+                .extracting("breathingSpaceLiftPending")
+                .isEqualTo("No");
         }
 
         @Test
@@ -334,6 +340,9 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
 
             assertThat(response.getData())
                 .extracting("breathingSpaceActive")
+                .isEqualTo("Yes");
+            assertThat(response.getData())
+                .extracting("breathingSpaceLiftPending")
                 .isEqualTo("Yes");
             assertThat(response.getData().get("businessProcess")).isNull();
             List<Element<StoredBreathingSpace>> stored = objectMapper.convertValue(
