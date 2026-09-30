@@ -309,6 +309,16 @@ def publishAllureReport(String reportDir, String reportName, String historyArchi
   ])
   sh "cp -r ./${reportDir}/history/ ./${historyArchiveDir}"
   archiveArtifacts artifacts: "${historyArchiveDir}/**", fingerprint: true
+  // Archive the report's machine-readable data as well as its history (DTSCCI-6523).
+  // publishHTML above makes the report browsable in Jenkins, but nothing retrievable as an
+  // artifact, so failure detail died with the build: Jenkins keeps ~10 builds per job, which on
+  // an active PR is under two days. data/categories.json is Allure's computed grouping of
+  // failures by error message and the tests each one hit, which is the file diagnosis needs.
+  // Archiving here rather than in the hooks means it happens where the report is generated, so
+  // no call site can reintroduce the ordering bug by archiving before this runs.
+  // data/** only: the rendered HTML is already published above, and the full tree is thousands
+  // of files of css, js and plugins.
+  archiveArtifacts allowEmptyArchive: true, artifacts: "${reportDir}/data/**"
 }
 
 def copyPrevPlaywrightLastRunAndTestFilesReport() {
