@@ -14,10 +14,25 @@ public class FullAdmitAlreadyPaidConfirmationText implements RespondToClaimConfi
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
-        YesOrNo fullAdmittedRequired = caseData.isCurrentDefendantRespondent2()
-            ? caseData.getSpecDefenceFullAdmitted2Required()
-            : caseData.getSpecDefenceFullAdmittedRequired();
-        if (!RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getCurrentDefendantClaimResponseTypeForSpec())
+        // Match only when defendant explicitly said already paid (YES) on their own field.
+        // Complements FullAdmitSetDateConfirmationText (FULL_ADMISSION + BY_SET_DATE, no admitted flag).
+        boolean respondent2 = caseData.isCurrentDefendantRespondent2();
+        RespondentResponseTypeSpec responseType;
+        YesOrNo fullAdmittedRequired;
+        if (respondent2) {
+            responseType = caseData.getRespondent2ClaimResponseTypeForSpec();
+            fullAdmittedRequired = caseData.getSpecDefenceFullAdmitted2Required();
+        } else if (YesOrNo.YES.equals(caseData.getIsRespondent1())
+            && caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
+            responseType = caseData.getRespondent1ClaimResponseTypeForSpec();
+            fullAdmittedRequired = caseData.getSpecDefenceFullAdmittedRequired();
+        } else {
+            responseType = Optional.ofNullable(caseData.getRespondentClaimResponseTypeForSpecGeneric())
+                .orElse(caseData.getRespondent1ClaimResponseTypeForSpec());
+            fullAdmittedRequired = caseData.getSpecDefenceFullAdmittedRequired();
+        }
+
+        if (!RespondentResponseTypeSpec.FULL_ADMISSION.equals(responseType)
             || !YesOrNo.YES.equals(fullAdmittedRequired)) {
             return Optional.empty();
         }

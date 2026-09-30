@@ -20,19 +20,38 @@ public class FullAdmitSetDateConfirmationText implements RespondToClaimConfirmat
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
-        YesOrNo fullAdmittedRequired = caseData.isCurrentDefendantRespondent2()
-            ? caseData.getSpecDefenceFullAdmitted2Required()
-            : caseData.getSpecDefenceFullAdmittedRequired();
-        if (!RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getCurrentDefendantClaimResponseTypeForSpec())
-            || !YesOrNo.NO.equals(fullAdmittedRequired)
-            || !RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE.equals(
-            caseData.getCurrentDefendantPaymentTimeRoute())) {
+        // Do not gate on SpecDefenceFullAdmitted* — often unset on FULL_ADMISSION.
+        // Already-paid is a separate generator (YES on that flag). Identify set-date by
+        // FULL_ADMISSION + BY_SET_DATE on the current defendant's own populated fields.
+        boolean respondent2 = caseData.isCurrentDefendantRespondent2();
+        RespondentResponseTypeSpec responseType;
+        RespondentResponsePartAdmissionPaymentTimeLRspec paymentTimeRoute;
+        RespondToClaimAdmitPartLRspec admitPart;
+        if (respondent2) {
+            responseType = caseData.getRespondent2ClaimResponseTypeForSpec();
+            paymentTimeRoute = caseData.getDefenceAdmitPartPaymentTimeRouteRequired2();
+            admitPart = caseData.getRespondToClaimAdmitPartLRspec2();
+        } else if (YesOrNo.YES.equals(caseData.getIsRespondent1())
+            && caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
+            // Prefer R1's own response over generic (generic may reflect the other defendant)
+            responseType = caseData.getRespondent1ClaimResponseTypeForSpec();
+            paymentTimeRoute = caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
+                ? caseData.getDefenceAdmitPartPaymentTimeRouteRequired()
+                : caseData.getDefenceAdmitPartPaymentTimeRouteGeneric();
+            admitPart = caseData.getRespondToClaimAdmitPartLRspec();
+        } else {
+            responseType = Optional.ofNullable(caseData.getRespondentClaimResponseTypeForSpecGeneric())
+                .orElse(caseData.getRespondent1ClaimResponseTypeForSpec());
+            paymentTimeRoute = Optional.ofNullable(caseData.getDefenceAdmitPartPaymentTimeRouteGeneric())
+                .orElse(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+            admitPart = caseData.getRespondToClaimAdmitPartLRspec();
+        }
+
+        if (!RespondentResponseTypeSpec.FULL_ADMISSION.equals(responseType)
+            || !RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE.equals(paymentTimeRoute)) {
             return Optional.empty();
         }
 
-        RespondToClaimAdmitPartLRspec admitPart = caseData.isCurrentDefendantRespondent2()
-            ? caseData.getRespondToClaimAdmitPartLRspec2()
-            : caseData.getRespondToClaimAdmitPartLRspec();
         LocalDate whenWillYouPay = Optional.ofNullable(admitPart)
             .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
             .orElse(null);

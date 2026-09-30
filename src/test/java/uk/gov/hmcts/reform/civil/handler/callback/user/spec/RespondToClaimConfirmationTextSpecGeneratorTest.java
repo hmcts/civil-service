@@ -120,6 +120,45 @@ class RespondToClaimConfirmationTextSpecGeneratorTest
     }
 
     @Test
+    void shouldShowFullAdmitSetDateConfirmation_whenSpecDefenceFullAdmittedRequiredIsNull() {
+        CaseData caseData = getFullAdmitPayBySetDate();
+        caseData.setSpecDefenceFullAdmittedRequired(null);
+
+        String paymentDate = DateFormatHelper.formatLocalDate(
+            caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid(),
+            DATE
+        );
+
+        assertThat(new FullAdmitSetDateConfirmationText().generateTextFor(caseData, null)).hasValueSatisfying(text ->
+            assertThat(text).contains("your offer to pay by " + paymentDate)
+        );
+        assertThat(new FullAdmitAlreadyPaidConfirmationText().generateTextFor(caseData, null)).isEmpty();
+    }
+
+    @Test
+    void shouldShowFullAdmitSetDateConfirmation_whenRespondent2FullAdmitted2RequiredIsNull() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .build();
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(
+                RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setIsRespondent2(YesOrNo.YES);
+        caseData.setIsRespondent1(YesOrNo.NO);
+        caseData.setSpecDefenceFullAdmitted2Required(null);
+        RespondToClaimAdmitPartLRspec admitPart = new RespondToClaimAdmitPartLRspec();
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        admitPart.setWhenWillThisAmountBePaid(whenWillPay);
+        caseData.setRespondToClaimAdmitPartLRspec2(admitPart);
+
+        assertThat(new FullAdmitSetDateConfirmationText().generateTextFor(caseData, null)).hasValueSatisfying(text ->
+            assertThat(text).contains("your offer to pay by "
+                                          + DateFormatHelper.formatLocalDate(whenWillPay, DATE))
+        );
+        assertThat(new FullAdmitAlreadyPaidConfirmationText().generateTextFor(caseData, null)).isEmpty();
+    }
+
+    @Test
     void shouldGeneratePartialAdmissionSetDateConfirmationText() {
         CaseData caseData = getPartialAdmitSetDate();
         String applicantName = caseData.getApplicant1().getPartyName();
