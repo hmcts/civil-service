@@ -28,7 +28,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.Send
 public class SendFinalOrderBulkPrintService {
 
     private final BulkPrintService bulkPrintService;
-    private final FeatureToggleService featureToggleService;
     private final CoverLetterAppendService coverLetterAppendService;
     private static final String FINAL_ORDER_PACK_LETTER_TYPE = "final-order-document-pack";
     private static final String TRANSLATED_ORDER_PACK_LETTER_TYPE = "translated-order-document-pack";
@@ -36,8 +35,7 @@ public class SendFinalOrderBulkPrintService {
     public void sendFinalOrderToLIP(String authorisation, CaseData caseData, String task) {
         Language language = LanguageUtils.determineLanguageForBulkPrint(
             caseData,
-            TASK_ID_CLAIMANT.equals(task),
-            featureToggleService.isWelshEnabledForMainCase());
+            TASK_ID_CLAIMANT.equals(task));
         if (checkFinalOrderDocumentAvailable(caseData, language)) {
             List<CaseDocument> caseDocuments = new ArrayList<>();
             switch (language) {

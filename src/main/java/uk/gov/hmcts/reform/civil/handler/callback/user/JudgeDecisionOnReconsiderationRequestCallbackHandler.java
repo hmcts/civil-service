@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UpholdingPreviousOrderReason;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.RequestReconsiderationGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
@@ -49,7 +48,6 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
     protected final ObjectMapper objectMapper;
     private final RequestReconsiderationGeneratorService requestReconsiderationGeneratorService;
     private final AssignCategoryId assignCategoryId;
-    private final FeatureToggleService featureToggleService;
     private static final String CONFIRMATION_HEADER = "# Response has been submitted";
     private static final String CONFIRMATION_BODY_YES = "### Upholding previous order \n" +
         "A notification will be sent to the party applying for the request for reconsideration.";
@@ -92,8 +90,7 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
             Comparator.reverseOrder()
         )).findFirst();
 
-        if (featureToggleService.isWelshEnabledForMainCase()
-            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+        if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
             caseData.setBilingualHint(YesOrNo.YES);
         }
 
@@ -134,8 +131,7 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
                 CaseDocument requestForReconsiderationDocument = caseData.getDecisionOnReconsiderationDocument();
                 List<Element<CaseDocument>> systemGeneratedCaseDocuments =
                     caseData.getSystemGeneratedCaseDocuments();
-                if (featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimantBilingual()
-                    || caseData.isRespondentResponseBilingual())) {
+                if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
                     caseData.setPreTranslationDocuments(List.of(ElementUtils.element(requestForReconsiderationDocument)));
                     caseData.setBilingualHint(YesOrNo.YES);
                     caseData.setPreTranslationDocumentType(DECISION_MADE_ON_APPLICATIONS);

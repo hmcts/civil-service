@@ -224,8 +224,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             populateTrackToggle(caseData);
         }
 
-        if (featureToggleService.isWelshEnabledForMainCase()
-            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+        if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
             caseData.setBilingualHint(YesOrNo.YES);
         }
 
@@ -666,8 +665,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(finalDocument));
-        if (featureToggleService.isWelshEnabledForMainCase()
-                && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+        if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()) {
             List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
             preTranslationDocuments.addAll(finalCaseDocuments);
             caseData.setPreTranslationDocuments(preTranslationDocuments);

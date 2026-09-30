@@ -37,18 +37,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("bulk_claim_enabled");
     }
 
-    public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
-        return
-            // because default value is true
-            locationEpimms != null
-                && featureToggleApi
-                .isFeatureEnabledForLocation(
-                    "case-progression-location-whitelist",
-                    locationEpimms,
-                    true
-                );
-    }
-
     public boolean isCjesServiceAvailable() {
         return featureToggleApi.isFeatureEnabled("isCjesServiceAvailable");
     }
@@ -128,10 +116,6 @@ public class FeatureToggleService {
             return isLipQueryManagementEnabledGa(caseData);
         }
         return true;
-    }
-
-    public boolean isWelshEnabledForMainCase() {
-        return featureToggleApi.isFeatureEnabled("enableWelshForMainCase");
     }
 
     public boolean isLipQueryManagementEnabled(CaseData caseData) {

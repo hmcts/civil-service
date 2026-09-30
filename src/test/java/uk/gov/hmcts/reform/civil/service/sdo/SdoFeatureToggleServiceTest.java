@@ -7,6 +7,8 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -27,21 +29,26 @@ class SdoFeatureToggleServiceTest {
     }
 
     @Test
-    void shouldReturnTrue_whenWelshJourneyEnabledForBilingualParties() {
+    void shouldReturnTrue_whenClaimantIsBilingual() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setClaimantBilingualLanguagePreference(Language.WELSH.name());
-
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
 
         assertThat(sdoFeatureToggleService.isWelshJourneyEnabled(caseData)).isTrue();
     }
 
     @Test
-    void shouldReturnFalse_whenWelshToggleDisabled() {
+    void shouldReturnTrue_whenRespondentIsBilingual() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setClaimantBilingualLanguagePreference(Language.WELSH.name());
+        caseData.setCaseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(
+            new RespondentLiPResponse().setRespondent1ResponseLanguage(Language.WELSH.name())
+        ));
 
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+        assertThat(sdoFeatureToggleService.isWelshJourneyEnabled(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalse_whenNeitherPartyIsBilingual() {
+        CaseData caseData = CaseDataBuilder.builder().build();
 
         assertThat(sdoFeatureToggleService.isWelshJourneyEnabled(caseData)).isFalse();
     }

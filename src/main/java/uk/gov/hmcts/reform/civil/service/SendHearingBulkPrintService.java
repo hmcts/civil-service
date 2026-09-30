@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.docmosis.CoverLetterAppendService;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,14 +34,12 @@ public class SendHearingBulkPrintService {
 
     private static final String DECISION_PACK_LETTER_TYPE = "decision-reconsider-document-pack";
     private final BulkPrintService bulkPrintService;
-    private final DocumentDownloadService documentDownloadService;
     private final CoverLetterAppendService coverLetterAppendService;
     private static final String HEARING_PACK_LETTER_TYPE = "hearing-document-pack";
-    private final FeatureToggleService featureToggleService;
 
-    public void sendHearingToLIP(String authorisation, CaseData caseData, String task, boolean welshDocument) {
+    public void sendHearingToLIP(String authorisation, CaseData caseData, String task) {
         List<CaseDocument> caseDocuments = new ArrayList<>();
-        Language language = determineLanguageForBulkPrint(caseData, task, welshDocument);
+        Language language = determineLanguageForBulkPrint(caseData, task);
         if (checkHearingDocumentAvailable(caseData) || checkWelshHearingDocumentAvailable(caseData)) {
             switch (language) {
                 case ENGLISH -> caseDocuments.add(caseData.getHearingDocuments().get(0).getValue());
@@ -61,7 +58,7 @@ public class SendHearingBulkPrintService {
 
     public void sendDecisionReconsiderationToLip(String authorisation, CaseData caseData, String task) {
         List<CaseDocument> caseDocuments = new ArrayList<>();
-        Language language = determineLanguageForBulkPrint(caseData, task, true);
+        Language language = determineLanguageForBulkPrint(caseData, task);
         switch (language) {
             case ENGLISH -> caseData.getDecisionReconsiderationDocument().map(Element::getValue).ifPresent(caseDocuments::add);
             case WELSH -> caseData.getTranslatedDecisionReconsiderationDocument().map(Element::getValue).ifPresent(caseDocuments::add);
@@ -107,14 +104,7 @@ public class SendHearingBulkPrintService {
         return task.equals(TASK_ID_DEFENDANT) || task.equals(TASK_ID_DEFENDANT_HMC) || task.equals(TASK_ID_DEFENDANT_DRO);
     }
 
-    private Language determineLanguageForBulkPrint(CaseData caseData, String taskId, boolean welshDocument) {
-        //TODO: refactor this method when Welsh feature goes live
-        if (!featureToggleService.isWelshEnabledForMainCase() && !welshDocument) {
-            return ENGLISH;
-        } else if (!featureToggleService.isWelshEnabledForMainCase() && welshDocument) {
-            return BOTH;
-        }
-
+    private Language determineLanguageForBulkPrint(CaseData caseData, String taskId) {
         String languagePreference = (TASK_ID_CLAIMANT.equals(taskId) || TASK_ID_CLAIMANT_HMC.equals(taskId)
                                     || TASK_ID_CLAIMANT_DRO.equals(taskId))
             ? caseData.getClaimantBilingualLanguagePreference()

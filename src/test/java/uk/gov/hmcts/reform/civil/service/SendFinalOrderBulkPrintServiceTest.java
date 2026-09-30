@@ -30,7 +30,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.FINAL_ORDER_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
@@ -44,9 +43,6 @@ class SendFinalOrderBulkPrintServiceTest {
 
     @Mock
     private BulkPrintService bulkPrintService;
-
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private SendFinalOrderBulkPrintService sendFinalOrderBulkPrintService;
@@ -326,7 +322,6 @@ class SendFinalOrderBulkPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintLetterToClaimantLiPInWelshSuccessfully() {
         // given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = new PartyBuilder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, FINAL_ORDER_TRANSLATED_DOCUMENT, true);
         caseData.setClaimantBilingualLanguagePreference("WELSH");
@@ -353,7 +348,6 @@ class SendFinalOrderBulkPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintLetterToClaimantLiPInBothLanguagesSuccessfully() {
         // given
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = new PartyBuilder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant);
         caseData.setClaimantBilingualLanguagePreference("BOTH");

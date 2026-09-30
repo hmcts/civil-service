@@ -268,7 +268,7 @@ public class SetApplicantResponseDeadlineSpec implements CaseTask {
         }
         respondToClaimSpecUtils.assembleResponseDocumentsSpec(caseData);
 
-        if (featureToggleService.isWelshEnabledForMainCase() && caseData.isLipvLROneVOne()
+        if (caseData.isLipvLROneVOne()
             && caseData.isClaimantBilingual()) {
             caseData.setApplicant1ResponseDeadline(null);
             caseData.setNextDeadline(null);

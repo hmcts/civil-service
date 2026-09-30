@@ -9,6 +9,8 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import java.time.LocalDateTime;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -24,6 +26,7 @@ public class EnglishDefendantResponseWelshTranslationScenarioTest extends Dashbo
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
                 .toBuilder()
                 .applicant1Represented(YesOrNo.NO)
+                .respondent1ResponseDeadline(LocalDateTime.MAX)
                 .legacyCaseReference("reference")
                 .ccdCaseReference(Long.valueOf(caseId))
                 .build();

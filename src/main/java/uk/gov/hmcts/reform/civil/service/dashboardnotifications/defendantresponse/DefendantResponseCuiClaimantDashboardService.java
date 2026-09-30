@@ -2,21 +2,17 @@ package uk.gov.hmcts.reform.civil.service.dashboardnotifications.defendantrespon
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 @Service
 public class DefendantResponseCuiClaimantDashboardService {
 
     private final DefendantResponseClaimantDashboardService claimantDashboardService;
     private final DefendantResponseWelshClaimantDashboardService welshClaimantDashboardService;
-    private final FeatureToggleService featureToggleService;
 
     public DefendantResponseCuiClaimantDashboardService(DefendantResponseClaimantDashboardService claimantDashboardService,
-                                                        DefendantResponseWelshClaimantDashboardService welshClaimantDashboardService,
-                                                        FeatureToggleService featureToggleService) {
+                                                        DefendantResponseWelshClaimantDashboardService welshClaimantDashboardService) {
         this.claimantDashboardService = claimantDashboardService;
         this.welshClaimantDashboardService = welshClaimantDashboardService;
-        this.featureToggleService = featureToggleService;
     }
 
     public void notifyDefendantResponse(CaseData caseData, String authToken) {
@@ -29,6 +25,6 @@ public class DefendantResponseCuiClaimantDashboardService {
 
     private boolean isBilingualFlow(CaseData caseData) {
         return caseData.isRespondentResponseBilingual()
-            || (featureToggleService.isWelshEnabledForMainCase() && caseData.isClaimantBilingual());
+            || caseData.isClaimantBilingual();
     }
 }

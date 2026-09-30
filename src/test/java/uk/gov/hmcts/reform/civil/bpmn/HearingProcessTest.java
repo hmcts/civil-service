@@ -541,7 +541,6 @@ class HearingProcessTest extends BpmnBaseTest {
         VariableMap variables = Variables.createVariables();
         variables.putValue("flowState", "MAIN.FULL_DEFENCE_PROCEED");
         variables.put(FLOW_FLAGS, Map.of(
-                WELSH_ENABLED, true,
                 CLAIM_ISSUE_BILINGUAL, true,
                 UNREPRESENTED_DEFENDANT_ONE, false,
                 ONE_RESPONDENT_REPRESENTATIVE, true,

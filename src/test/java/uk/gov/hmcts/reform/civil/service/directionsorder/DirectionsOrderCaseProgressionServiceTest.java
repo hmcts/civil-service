@@ -41,9 +41,9 @@ class DirectionsOrderCaseProgressionServiceTest {
     @Test
     void shouldApplyEaCourtLocationWhenResolverReturnsValue() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        when(journeyToggleService.resolveEaCourtLocation(caseData, true)).thenReturn(YesOrNo.YES);
+        when(journeyToggleService.resolveEaCourtLocation(caseData)).thenReturn(YesOrNo.YES);
 
-        service.applyEaCourtLocation(caseData, true);
+        service.applyEaCourtLocation(caseData);
 
         assertThat(caseData.getEaCourtLocation()).isEqualTo(YesOrNo.YES);
     }
@@ -51,9 +51,9 @@ class DirectionsOrderCaseProgressionServiceTest {
     @Test
     void shouldSkipEaCourtLocationWhenResolverReturnsNull() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        when(journeyToggleService.resolveEaCourtLocation(caseData, true)).thenReturn(null);
+        when(journeyToggleService.resolveEaCourtLocation(caseData)).thenReturn(null);
 
-        service.applyEaCourtLocation(caseData, true);
+        service.applyEaCourtLocation(caseData);
 
         assertThat(caseData.getEaCourtLocation()).isNull();
     }
@@ -93,10 +93,10 @@ class DirectionsOrderCaseProgressionServiceTest {
     @Test
     void shouldApplyRoutingAndUpdateWaMetadata() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        when(journeyToggleService.resolveEaCourtLocation(caseData, true)).thenReturn(YesOrNo.YES);
+        when(journeyToggleService.resolveEaCourtLocation(caseData)).thenReturn(YesOrNo.YES);
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
 
-        service.applyCaseProgressionRouting(caseData, AUTH, true);
+        service.applyCaseProgressionRouting(caseData, AUTH);
 
         verify(locationService).updateWaLocationsIfRequired(caseData, AUTH);
         assertThat(caseData.getEaCourtLocation()).isEqualTo(YesOrNo.YES);
@@ -107,7 +107,7 @@ class DirectionsOrderCaseProgressionServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
 
-        service.applyCaseProgressionRouting(caseData, AUTH, true);
+        service.applyCaseProgressionRouting(caseData, AUTH);
 
         verify(locationService, never()).clearWaLocationMetadata(caseData);
         verify(locationService, never()).updateWaLocationsIfRequired(any(), anyString());
@@ -118,7 +118,7 @@ class DirectionsOrderCaseProgressionServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(false);
 
-        service.applyCaseProgressionRouting(caseData, AUTH, true, true);
+        service.applyCaseProgressionRouting(caseData, AUTH, true);
 
         verify(locationService).clearWaLocationMetadata(caseData);
         verify(locationService, never()).updateWaLocationsIfRequired(any(), anyString());

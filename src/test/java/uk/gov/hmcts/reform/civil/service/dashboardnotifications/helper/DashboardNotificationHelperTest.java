@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
@@ -29,8 +28,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
 class DashboardNotificationHelperTest {
-
-    public static final String BASE_LOCATION = "Base Location";
 
     @Mock
     private FeatureToggleService featureToggleService;
@@ -140,39 +137,6 @@ class DashboardNotificationHelperTest {
 
             assertFalse(dashboardDecisionHelper.isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(
                 caseData));
-        }
-    }
-
-    @Nested
-    class IsSDODrawnPreCPReleaseTests {
-
-        @Test
-        void shouldReturnTrue_whenNotCaseProgressionEnabledAndLocationWhiteListedAndNotWelshEnabledForMainCase() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION))
-                .build();
-
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(false);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-
-            assertTrue(dashboardDecisionHelper.isSDODrawnPreCPRelease(caseData));
-        }
-
-        @Test
-        void shouldReturnFalse_whenEitherCaseProgressionEnabledOrLocationWhiteListedOrWelshEnabledForMainCase() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION))
-                .build();
-
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(true);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-
-            assertFalse(dashboardDecisionHelper.isSDODrawnPreCPRelease(caseData));
-
-            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(BASE_LOCATION)).thenReturn(false);
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-
-            assertFalse(dashboardDecisionHelper.isSDODrawnPreCPRelease(caseData));
         }
     }
 

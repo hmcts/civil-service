@@ -8,14 +8,11 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.ManageCaseBaseUrlConfiguration;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
-import uk.gov.hmcts.reform.civil.exceptions.NotEarlyAdopterCourtException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.EarlyAdoptersService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 
@@ -77,17 +74,11 @@ public class HearingValuesService {
     private final OrganisationService organisationService;
     private final ObjectMapper mapper;
     private final CaseFlagsInitialiser caseFlagInitialiser;
-    private final EarlyAdoptersService earlyAdoptersService;
-    private final FeatureToggleService featuretoggleService;
 
     public ServiceHearingValuesModel getValues(Long caseId, String authToken) throws Exception {
         log.info("Getting hearing values for case id: {}", caseId);
         CaseData caseData = retrieveCaseData(caseId);
         populateMissingFields(caseId, caseData);
-
-        log.info("Checking LR v LR for case id: {}", caseId);
-        isLrVLr(caseData);
-        log.info("Completed LR v LR check for case id: {}", caseId);
 
         ServiceHearingValuesModel hearingValuesModel = buildHearingValues(caseData, authToken, caseId);
         log.info("Returning hearing values for case id: {}", caseId);
@@ -97,7 +88,6 @@ public class HearingValuesService {
     public ServiceHearingValuesModel getValues(CaseData caseData, String authToken) {
         Long caseReference = caseData.getCcdCaseReference();
         log.info("Building hearing values for supplied case data. case reference: {}", caseReference);
-        isLrVLr(caseData);
         ServiceHearingValuesModel hearingValuesModel = buildHearingValues(caseData, authToken, caseReference);
         log.info("Returning hearing values for supplied case data. case reference: {}", caseReference);
         return hearingValuesModel;
@@ -109,20 +99,6 @@ public class HearingValuesService {
         } catch (Exception ex) {
             log.error(String.format("No case found for %d", caseId));
             throw new CaseNotFoundException();
-        }
-    }
-
-    private void isEarlyAdopter(CaseData caseData) throws NotEarlyAdopterCourtException {
-        if (!earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(caseData)) {
-            throw new NotEarlyAdopterCourtException();
-        }
-    }
-
-    private void isLrVLr(CaseData caseData) {
-        if (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP()) {
-            if (!featuretoggleService.isWelshEnabledForMainCase()) {
-                isEarlyAdopter(caseData);
-            }
         }
     }
 

@@ -168,7 +168,7 @@ class SdoPrePopulateServiceTest {
     }
 
     @Test
-    void shouldSetWelshHintWhenWelshJourneyEnabled() {
+    void shouldSetWelshHintWhenCaseIsBilingual() {
         when(featureToggleService.isCarmEnabled(any(CaseData.class))).thenReturn(false);
         when(featureToggleService.isWelshJourneyEnabled(any(CaseData.class))).thenReturn(true);
 

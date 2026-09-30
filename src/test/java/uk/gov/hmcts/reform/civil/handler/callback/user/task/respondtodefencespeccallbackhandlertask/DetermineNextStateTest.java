@@ -157,7 +157,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
                 .build();
         }
 
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         BusinessProcess businessProcess = new BusinessProcess();
 
         String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),

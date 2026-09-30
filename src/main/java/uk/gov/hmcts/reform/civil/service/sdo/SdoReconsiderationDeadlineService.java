@@ -20,7 +20,6 @@ import static java.util.Objects.isNull;
 public class SdoReconsiderationDeadlineService {
 
     private final WorkingDayIndicator workingDayIndicator;
-    private final SdoFeatureToggleService featureToggleService;
     private final Time time;
 
     public LocalDateTime calculateReconsiderationDeadline() {
@@ -46,10 +45,7 @@ public class SdoReconsiderationDeadlineService {
     }
 
     public boolean isEligibleForReconsideration(CaseData caseData) {
-        return (featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(
-            caseData.getCaseManagementLocation().getBaseLocation())
-            || featureToggleService.isWelshEnabledForMainCase())
-            && caseData.isSmallClaim()
+        return caseData.isSmallClaim()
             && caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(10000)) <= 0
             && (isNull(caseData.getDecisionOnRequestReconsiderationOptions())
             || !DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(

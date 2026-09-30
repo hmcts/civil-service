@@ -39,7 +39,6 @@ import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentT
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.settlediscontinue.NoticeOfDiscontinuanceFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
@@ -74,9 +73,6 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
     private NoticeOfDiscontinuanceFormGenerator formGenerator;
     @MockBean
     private RuntimeService runTimeService;
-    @MockBean
-    private FeatureToggleService featureToggleService;
-
     @MockBean
     private OrganisationService organisationService;
     public static final String PROCESS_INSTANCE_ID = "processInstanceId";
@@ -420,7 +416,6 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldGenerateNoticeOfDiscontinueDocForAllParties_whenNoCourtPermissionRequired_1vs2_correspondenceAddress() {
-            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString(), anyString(), anyBoolean())).thenReturn(getCaseDocument());
             when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisation());
             Address serviceAddress = new Address();
@@ -477,7 +472,6 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @Test
     void shouldSetTheValuesInPreTranslationCollectionForWelshTranslation() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         when(formGenerator.generateDocs(
             any(CaseData.class),
             anyString(), any(Address.class), anyString(), anyString(), anyBoolean()
@@ -509,7 +503,6 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @Test
     void shouldUpdateWelshEnabledCamundaVariable_whenWelshConditionsAreMet() {
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         when(formGenerator.generateDocs(
             any(CaseData.class),
             anyString(), any(Address.class), anyString(), anyString(), anyBoolean()

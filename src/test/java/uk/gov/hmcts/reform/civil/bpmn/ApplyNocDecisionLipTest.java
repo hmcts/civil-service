@@ -3,10 +3,7 @@ package uk.gov.hmcts.reform.civil.bpmn;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-
-import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -19,13 +16,9 @@ public class ApplyNocDecisionLipTest extends BpmnBaseTest {
         super("apply_noc_decision_lip.bpmn", PROCESS_ID);
     }
 
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldRunProcess(boolean welshEnabled) {
+    @Test
+    void shouldRunProcess() {
         VariableMap variables = Variables.createVariables();
-        variables.put(FLOW_FLAGS, Map.of(
-            WELSH_ENABLED, welshEnabled
-        ));
 
         //assert process has started
         assertFalse(processInstance.isEnded());
@@ -48,16 +41,14 @@ public class ApplyNocDecisionLipTest extends BpmnBaseTest {
             "UpdateCaseDetailsAfterNoC"
         );
 
-        if (welshEnabled) {
-            //update GA language flag
-            ExternalTask updateGeneralApps = assertNextExternalTask(PROCESS_CASE_EVENT);
-            assertCompleteExternalTask(
-                updateGeneralApps,
-                PROCESS_CASE_EVENT,
-                "UPDATE_GA_LANGUAGE_PREFERENCE",
-                "UpdateGenAppLanguagePreference"
-            );
-        }
+        //update GA language flag
+        ExternalTask updateGeneralApps = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            updateGeneralApps,
+            PROCESS_CASE_EVENT,
+            "UPDATE_GA_LANGUAGE_PREFERENCE",
+            "UpdateGenAppLanguagePreference"
+        );
 
         //complete notify claimant
         ExternalTask notifyParies = assertNextExternalTask(PROCESS_CASE_EVENT);
@@ -68,16 +59,14 @@ public class ApplyNocDecisionLipTest extends BpmnBaseTest {
             "ClaimantLipRepresentedWithNoCNotifier"
         );
 
-        if (welshEnabled) {
-            //update main claim language flag
-            ExternalTask updateLanguage = assertNextExternalTask(PROCESS_CASE_EVENT);
-            assertCompleteExternalTask(
-                updateLanguage,
-                PROCESS_CASE_EVENT,
-                "RESET_LANGUAGE_PREFERENCE",
-                "ResetLanguagePreferenceAfterNoC"
-            );
-        }
+        //update main claim language flag
+        ExternalTask updateLanguage = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(
+            updateLanguage,
+            PROCESS_CASE_EVENT,
+            "RESET_LANGUAGE_PREFERENCE",
+            "ResetLanguagePreferenceAfterNoC"
+        );
 
         //end business process
         ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);

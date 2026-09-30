@@ -58,7 +58,6 @@ public class DefendantResponseDeadlineSchedulerIT {
         coreCaseDataApiMockHelper.setupIdamClient();
         when(featureToggleService.isSpringSchedulerEnabled(DefendantResponseDeadlineScheduler.SCHEDULER_NAME))
             .thenReturn(true);
-        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
     }
 
     @Test
