@@ -420,13 +420,15 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     private DraftStoreEntity saveInProgressDraft(UUID id) {
         draftStoreRepository.deleteAll();
         OffsetDateTime now = OffsetDateTime.now();
-        return draftStoreRepository.save(draftClaim(
+        draftStoreRepository.saveAndFlush(draftClaim(
             id,
             now,
             now.plusDays(RETENTION_DAYS),
             "active-test",
             null
         ));
+        return draftStoreRepository.findById(id)
+            .orElseThrow(() -> new AssertionError("In-progress draft should exist in DB"));
     }
 
     private DraftStoreEntity draftClaim(UUID id,
