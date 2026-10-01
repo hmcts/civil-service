@@ -359,8 +359,18 @@ def awaitApplicationReadiness = tasks.register('awaitApplicationReadiness') {
   dependsOn waitForCivilService, waitForManageCase
 }
 
+def pullCivilTestFiles = tasks.register('pullCivilTestFiles', Exec) {
+  description = 'Fetches civil test files when they have not already been staged by data setup.'
+  onlyIf { !file('playwright-e2e').isDirectory() }
+  mustRunAfter pullLatestCivilCcdDefinitions
+  doFirst {
+    commandLine './bin/pull-latest-civil-ccd-files.sh', dataSetupBranch('CCD_DEFINITION_BRANCH')
+  }
+}
+
 def installSmokeTestDependencies = tasks.register('installSmokeTestDependencies', Exec) {
   description = 'Installs dependencies needed to run smoke tests.'
+  dependsOn pullCivilTestFiles
   commandLine '/usr/bin/yarn', 'install', '--immutable', '--silent'
 }
 
@@ -379,6 +389,7 @@ tasks.register('smoke') {
 // Functional test tasks
 def runApiTests = tasks.register('runApiTests', Exec) {
   description = 'Runs Prod features in functional tests.'
+  dependsOn installSmokeTestDependencies
   onlyIf {
     !isNightlyRun()
   }
