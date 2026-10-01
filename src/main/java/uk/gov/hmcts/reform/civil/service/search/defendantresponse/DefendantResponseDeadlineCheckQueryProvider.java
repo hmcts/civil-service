@@ -23,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.LOCAL_ZONE;
 /**
  * Provides the ElasticSearch query for identifying cases where the defendant response deadline has passed.
  * This identifies cases in 'AWAITING_RESPONDENT_ACKNOWLEDGEMENT' state whose response deadline is in the
- * past, that have not already been checked and have no ongoing business process.
+ * past, that have not already been checked.
  */
 @Component
 @Slf4j
@@ -68,8 +68,7 @@ public class DefendantResponseDeadlineCheckQueryProvider implements PaginatedQue
         BoolQueryBuilder deadlineExpired = boolQuery()
             .must(rangeQuery("data.respondent1ResponseDeadline").lt(timeNow))
             .mustNot(matchQuery("data.respondent1ResponseDeadlineChecked", "Yes"))
-            .must(commonQueryConstructs.beState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
-            .must(commonQueryConstructs.haveNoOngoingBusinessProcess());
+            .must(commonQueryConstructs.beState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT));
 
         if (featureToggleService.isWelshEnabledForMainCase()) {
             deadlineExpired.mustNot(existsQuery("data.respondent1ResponseDate"));
