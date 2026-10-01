@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
 
@@ -223,7 +224,7 @@ public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
                                      + "directionsResponseByDate is not set", a.getId());
                         return false;
                     }
-                    return !LocalDate.now().isBefore(responseByDate);
+                    return !LocalDate.now(ZoneId.systemDefault()).isBefore(responseByDate);
                 } catch (Exception e) {
                     log.error("GAJudgeRevisitTaskHandler failed to evaluate directions order for caseId: {}",
                               a.getId(), e);

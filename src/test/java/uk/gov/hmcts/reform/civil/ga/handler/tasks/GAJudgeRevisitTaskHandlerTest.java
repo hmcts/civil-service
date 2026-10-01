@@ -380,8 +380,7 @@ class GAJudgeRevisitTaskHandlerTest {
                 "GAJudgeRevisitTaskHandler skipping directions order for caseId: 5: "
                     + "directionsResponseByDate is not set");
             assertThat(event.getLevel()).isEqualTo(Level.INFO);
-        });
-        assertThat(listAppender.list).noneMatch(event -> event.getLevel().equals(Level.ERROR));
+        }).noneMatch(event -> event.getLevel().equals(Level.ERROR));
     }
 
     @Test
@@ -399,8 +398,7 @@ class GAJudgeRevisitTaskHandlerTest {
         assertThat(listAppender.list).hasSize(2).allSatisfy(event -> {
             assertThat(event.getLevel()).isEqualTo(Level.ERROR);
             assertThat(event.getThrowableProxy()).isNull();
-        });
-        assertThat(listAppender.list).extracting(ILoggingEvent::getFormattedMessage)
+        }).extracting(ILoggingEvent::getFormattedMessage)
             .containsExactlyInAnyOrder(
                 "GAJudgeRevisitTaskHandler cannot evaluate directions order for caseId: 5: "
                     + "missing judicialDecisionMakeOrder or makeAnOrder",
