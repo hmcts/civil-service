@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.service.search.common.PaginatedQueryProvider;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 
 /**
@@ -54,6 +55,7 @@ public class HearingFeeDueQueryProvider implements PaginatedQueryProvider {
             .minimumShouldMatch(1)
             .should(boolQuery()
                         .must(commonQueryConstructs.beState(HEARING_READINESS))
+                        .must(existsQuery("data.hearingDate"))
             );
     }
 }
