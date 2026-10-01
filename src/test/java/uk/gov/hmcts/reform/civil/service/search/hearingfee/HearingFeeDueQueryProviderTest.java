@@ -46,6 +46,7 @@ class HearingFeeDueQueryProviderTest {
         assertThat(json.get("sort").get(0).get("reference.keyword").asText()).isEqualTo("asc");
 
         assertThat(json.toString()).contains("HEARING_READINESS");
+        assertThat(json.toString()).contains("data.hearingDate");
     }
 
     @Test
@@ -66,5 +67,6 @@ class HearingFeeDueQueryProviderTest {
         assertThat(json.get("sort").get(0).get("reference.keyword").asText()).isEqualTo("asc");
 
         assertThat(json.toString()).contains("HEARING_READINESS");
+        assertThat(json.toString()).contains("data.hearingDate");
     }
 }
