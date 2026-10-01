@@ -144,6 +144,8 @@ scheduler:
     slowCaseThreshold: ${DEFAULT_BACK_PRESSURE_SLOW_CASE_THRESHOLD:PT2S}
   expired-draft-store:
     cronExpression: ${CRON_EXPRESSION_EXPIRED_DRAFT_STORE:0 15 2 * * ?}
+    batchSize: ${EXPIRED_DRAFT_STORE_BATCH_SIZE:500}
+    maxBatchesPerRun: ${EXPIRED_DRAFT_STORE_MAX_BATCHES_PER_RUN:20}
 
 search:
   judgement-buffer:

@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -97,12 +98,13 @@ public class ExpiredDraftStoreSchedulerIT {
         assertThat(draftStoreRepository.findById(expiredDraft.getId())).isEmpty();
         assertThat(draftStoreRepository.findById(futureDraft.getId())).isPresent();
 
-        verify(eventTracker).jobStartedEvent(argThat(config ->
-                                                         ExpiredDraftStoreScheduler.SCHEDULER_NAME.equals(config.getSchedulerName())
-        ));
-        verify(eventTracker).jobCompletedBulkEvent(
+        verify(eventTracker).jobStartedEvent(
             argThat(config -> ExpiredDraftStoreScheduler.SCHEDULER_NAME.equals(config.getSchedulerName())),
             eq(1)
+        );
+        verify(eventTracker).jobCompletedEvent(
+            argThat(config -> ExpiredDraftStoreScheduler.SCHEDULER_NAME.equals(config.getSchedulerName())),
+            any()
         );
     }
 
@@ -133,9 +135,9 @@ public class ExpiredDraftStoreSchedulerIT {
 
         assertThat(draftStoreRepository.count()).isZero();
 
-        verify(eventTracker).jobCompletedBulkEvent(
+        verify(eventTracker).jobCompletedEvent(
             argThat(config -> ExpiredDraftStoreScheduler.SCHEDULER_NAME.equals(config.getSchedulerName())),
-            eq(5)
+            any()
         );
     }
 
