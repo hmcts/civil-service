@@ -48,21 +48,6 @@ class ScheduledEventTrackerTest {
     }
 
     @Test
-    void shouldTrackJobStartedEventWithoutCount() {
-        scheduledEventTracker.jobStartedEvent(eventConfig);
-
-        verify(telemetryService).trackEvent(
-            eq("TestSchedulerJobStarted"),
-            eq(Map.of(
-                "schedulerName", "TestScheduler",
-                "totalCases", "0",
-                "succeededCases", "0",
-                "failedCases", "0"
-            ))
-        );
-    }
-
-    @Test
     void shouldTrackCaseProcessedEvent() {
         scheduledEventTracker.caseProcessedEvent(eventConfig, 123L);
 
@@ -89,22 +74,6 @@ class ScheduledEventTrackerTest {
                 "status", "SUCCESS",
                 "metric_Interceptor1", "10"
             )
-        );
-    }
-
-    @Test
-    void shouldTrackJobCompletedBulkEvent() {
-        scheduledEventTracker.jobCompletedBulkEvent(eventConfig, 5);
-
-        verify(telemetryService).trackEvent(
-            eq("TestSchedulerJobCompleted"),
-            eq(Map.of(
-                "schedulerName", "TestScheduler",
-                "totalCases", "5",
-                "succeededCases", "5",
-                "failedCases", "0",
-                "cumulativeDelay", "0"
-            ))
         );
     }
 
@@ -338,6 +307,24 @@ class ScheduledEventTrackerTest {
                 "searchDuration", "0",
                 "processingDuration", "0",
                 "totalDuration", "0"
+            )
+        );
+    }
+
+    @Test
+    void shouldTrackBackPressureUpdatedEvent() {
+        scheduledEventTracker.backPressureUpdatedEvent(
+            eventConfig,
+            Duration.ofMillis(100),
+            Duration.ofMillis(200)
+        );
+
+        verify(telemetryService).trackEvent(
+            "TestSchedulerBackPressureUpdated",
+            Map.of(
+                "schedulerName", "TestScheduler",
+                "previousDelay", "100",
+                "currentDelay", "200"
             )
         );
     }

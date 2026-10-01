@@ -6,15 +6,19 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
-import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledEventTracker;
-import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.scheduler.common.ListTaskResult;
+import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskConfiguration;
+import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
+import uk.gov.hmcts.reform.civil.scheduler.common.TaskResult;
+import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Component
 @Profile("!contract-test")
@@ -23,23 +27,28 @@ public class ExpiredDraftStoreScheduler implements CivilScheduler {
 
     public static final String SCHEDULER_NAME = "ExpiredDraftStore";
 
-    private final FeatureToggleService featureToggleService;
+    private final DraftStoreRepository draftStoreRepository;
     private final ExpiredDraftStoreTask expiredDraftStoreTask;
-    private final ScheduledEventTracker eventTracker;
+    private final ScheduledTaskRunner<List<UUID>, String> scheduledTaskRunner;
 
     @Setter
     private int batchSize;
 
+    @Setter
+    private int maxBatchesPerRun;
+
     public ExpiredDraftStoreScheduler(
-        FeatureToggleService featureToggleService,
+        DraftStoreRepository draftStoreRepository,
         ExpiredDraftStoreTask expiredDraftStoreTask,
-        ScheduledEventTracker eventTracker,
-        @Value("${scheduler.expired-draft-store.batchSize:500}") int batchSize
+        ScheduledTaskRunner<List<UUID>, String> scheduledTaskRunner,
+        @Value("${scheduler.expired-draft-store.batchSize:500}") int batchSize,
+        @Value("${scheduler.expired-draft-store.maxBatchesPerRun:20}") int maxBatchesPerRun
     ) {
-        this.featureToggleService = featureToggleService;
+        this.draftStoreRepository = draftStoreRepository;
         this.expiredDraftStoreTask = expiredDraftStoreTask;
-        this.eventTracker = eventTracker;
+        this.scheduledTaskRunner = scheduledTaskRunner;
         this.batchSize = batchSize;
+        this.maxBatchesPerRun = maxBatchesPerRun;
     }
 
     @Override
@@ -55,34 +64,33 @@ public class ExpiredDraftStoreScheduler implements CivilScheduler {
     )
     @Override
     public void runScheduledTask() {
-        if (!featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
-            return;
-        }
-        ScheduledTaskEventConfiguration config = new ScheduledTaskEventConfiguration(SCHEDULER_NAME);
-        eventTracker.jobStartedEvent(config);
+        scheduledTaskRunner.run(
+            ScheduledTaskConfiguration.<List<UUID>, String>builder()
+                .schedulerName(SCHEDULER_NAME)
+                .searchResultSupplier(this::getExpiredBatches)
+                .scheduledTask(expiredDraftStoreTask)
+                .useDefaultInterceptors(false)
+                .build()
+        );
+    }
 
-        try {
-            log.info("Running {} scheduler", SCHEDULER_NAME);
-            long totalDeleted = 0;
-            OffsetDateTime now = OffsetDateTime.now();
-            int effectiveBatchSize = Math.max(1, batchSize);
-            Pageable pageRequest = PageRequest.of(0, effectiveBatchSize);
+    private TaskResult<List<UUID>> getExpiredBatches() {
+        OffsetDateTime now = OffsetDateTime.now();
+        int effectiveBatchSize = Math.max(1, batchSize);
+        int effectiveMaxBatches = Math.max(1, maxBatchesPerRun);
 
-            int deletedInBatch;
-            do {
-                deletedInBatch = expiredDraftStoreTask.deleteExpiredBatch(now, pageRequest);
-                totalDeleted += deletedInBatch;
-                if (deletedInBatch > 0) {
-                    log.debug("{} deleted {} expired draft(s) in batch", SCHEDULER_NAME, deletedInBatch);
-                }
-            } while (deletedInBatch >= effectiveBatchSize);
+        List<List<UUID>> batches = new ArrayList<>();
+        int page = 0;
+        List<UUID> pageIds;
 
-            log.info("{} deleted {} expired draft(s)", SCHEDULER_NAME, totalDeleted);
-            eventTracker.jobCompletedBulkEvent(config, (int) totalDeleted);
-        } catch (Exception e) {
-            log.error("Error executing {} scheduler: {}", SCHEDULER_NAME, e.getMessage(), e);
-            eventTracker.jobAbortedEvent(config, e.getMessage());
-            throw e;
-        }
+        do {
+            pageIds = draftStoreRepository.findExpiredIds(now, PageRequest.of(page, effectiveBatchSize));
+            if (!pageIds.isEmpty()) {
+                batches.add(pageIds);
+                page++;
+            }
+        } while (pageIds.size() == effectiveBatchSize && page < effectiveMaxBatches);
+
+        return new ListTaskResult<>(batches);
     }
 }
