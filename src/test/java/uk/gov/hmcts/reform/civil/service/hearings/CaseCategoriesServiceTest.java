@@ -141,6 +141,35 @@ class CaseCategoriesServiceTest {
     }
 
     @Test
+    void shouldIgnoreCategoryWithDifferentCategoryKeyCase_whenSameKeyReturnedTwice() {
+        CategorySearchResult categorySearchResult = new CategorySearchResult();
+        categorySearchResult.setCategories(List.of(
+            new Category()
+                .setCategoryKey("caseType")
+                .setKey("AAA7-FAST_CLAIM")
+                .setParentKey("parent"),
+            new Category()
+                .setCategoryKey("CaseType")
+                .setKey("AAA7-FAST_CLAIM")
+                .setParentKey("other-parent")
+        ));
+        when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any()))
+            .thenReturn(Optional.of(categorySearchResult));
+
+        caseData = caseData.toBuilder().allocatedTrack(FAST_CLAIM).build();
+
+        CaseCategoryModel actual = caseCategoriesService.getCaseCategoriesFor(
+            CategoryType.CASE_TYPE,
+            caseData,
+            AUTH
+        );
+
+        assertThat(actual.getCategoryType()).isEqualTo(CategoryType.CASE_TYPE);
+        assertThat(actual.getCategoryValue()).isEqualTo("AAA7-FAST_CLAIM");
+        assertThat(actual.getCategoryParent()).isEqualTo("parent");
+    }
+
+    @Test
     void shouldReturnCaseType_whenJudgeReallocatedTrack() {
         CategorySearchResult categorySearchResult = new CategorySearchResult();
         categorySearchResult.setCategories(List.of(
