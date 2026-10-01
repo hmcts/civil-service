@@ -132,7 +132,7 @@ allprojects {
       }
 
       dependency 'org.apache.commons:commons-lang3:' + versions.commonsLang3
-
+      dependency 'org.bouncycastle:bcprov-jdk18on:1.85'
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.0.3'
