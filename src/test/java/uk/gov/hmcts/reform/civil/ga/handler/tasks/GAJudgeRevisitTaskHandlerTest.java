@@ -9,6 +9,7 @@ import feign.FeignException;
 import feign.Request;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -251,14 +252,10 @@ class GAJudgeRevisitTaskHandlerTest {
         gaJudgeRevisitTaskHandler.getDirectionOrderCaseReadyToJudgeRevisit();
 
         List<ILoggingEvent> logsList = listAppender.list;
-        assertEquals("Error GAJudgeRevisitTaskHandler::getDirectionOrderCaseReadyToJudgeRevisit : "
-                         + "java.lang.IllegalArgumentException: Cannot deserialize value of type "
-                         + "`uk.gov.hmcts.reform.civil.enums.YesOrNo` from String \"maybe\": "
-                         + "not one of the values accepted for Enum class: [No, Yes]\n"
-                         + " at [Source: UNKNOWN; byte offset: #UNKNOWN] (through reference chain: "
-                         + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData"
-                         + "[\"generalAppConsentOrder\"])",
-                     logsList.getFirst().getMessage());
+        assertEquals("GAJudgeRevisitTaskHandler failed to evaluate directions order for caseId: 1",
+                     logsList.getFirst().getFormattedMessage());
+        assertThat(logsList.getFirst().getThrowableProxy().getClassName())
+            .isEqualTo(IllegalArgumentException.class.getName());
         assertEquals(Level.ERROR, logsList.getFirst().getLevel());
         listAppender.stop();
     }
@@ -267,7 +264,7 @@ class GAJudgeRevisitTaskHandlerTest {
     void shouldCatchException_andProceedFurther_withValidData_directionOrder() {
         listAppender.start();
         logger.addAppender(listAppender);
-        CaseDetails caseDetailsDirectionOrderCase = CaseDetails.builder().data(
+        CaseDetails caseDetailsDirectionOrderCase = CaseDetails.builder().id(5L).data(
                 Map.of("generalAppConsentOrder", "maybe")).state(AWAITING_DIRECTIONS_ORDER_DOCS.toString())
             .build();
 
@@ -279,14 +276,10 @@ class GAJudgeRevisitTaskHandlerTest {
         gaJudgeRevisitTaskHandler.execute(externalTask, externalTaskService);
 
         List<ILoggingEvent> logsList = listAppender.list;
-        assertEquals("Error GAJudgeRevisitTaskHandler::getDirectionOrderCaseReadyToJudgeRevisit : "
-                         + "java.lang.IllegalArgumentException: Cannot deserialize value of type "
-                         + "`uk.gov.hmcts.reform.civil.enums.YesOrNo` from String \"maybe\": "
-                         + "not one of the values accepted for Enum class: [No, Yes]\n"
-                         + " at [Source: UNKNOWN; byte offset: #UNKNOWN] (through reference chain: "
-                         + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData"
-                         + "[\"generalAppConsentOrder\"])",
-                     logsList.get(2).getMessage());
+        assertEquals("GAJudgeRevisitTaskHandler failed to evaluate directions order for caseId: 5",
+                     logsList.get(2).getFormattedMessage());
+        assertThat(logsList.get(2).getThrowableProxy().getClassName())
+            .isEqualTo(IllegalArgumentException.class.getName());
         assertEquals(Level.ERROR, logsList.get(2).getLevel());
 
         verify(caseStateSearchService).getGeneralApplications(AWAITING_DIRECTIONS_ORDER_DOCS);
@@ -357,6 +350,62 @@ class GAJudgeRevisitTaskHandlerTest {
         verify(caseStateSearchService).getGeneralApplications(AWAITING_DIRECTIONS_ORDER_DOCS);
         verifyNoInteractions(coreCaseDataService);
         verify(externalTaskService).complete(any(), any());
+    }
+
+    @AfterEach
+    void detachLogAppender() {
+        logger.detachAppender(listAppender);
+        listAppender.stop();
+    }
+
+    @Test
+    void shouldSkipMissingDirectionsDateAndProgressValidCase() {
+        listAppender.start();
+        logger.addAppender(listAppender);
+        CaseDetails missingDate = caseDetailsDirectionOrder.toBuilder().id(5L).data(
+            Map.of("judicialDecisionMakeOrder", new GAJudicialMakeAnOrder()
+                .setMakeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING))).build();
+        when(caseStateSearchService.getGeneralApplications(AWAITING_WRITTEN_REPRESENTATIONS))
+            .thenReturn(Set.of());
+        when(caseStateSearchService.getGeneralApplications(AWAITING_DIRECTIONS_ORDER_DOCS))
+            .thenReturn(Set.of(missingDate, caseDetailsDirectionOrder));
+
+        gaJudgeRevisitTaskHandler.execute(externalTask, externalTaskService);
+
+        verify(coreCaseDataService).triggerEvent(1L, CHANGE_STATE_TO_ADDITIONAL_RESPONSE_TIME_EXPIRED);
+        verifyNoMoreInteractions(coreCaseDataService);
+        verify(externalTaskService).complete(any(), any());
+        assertThat(listAppender.list).anySatisfy(event -> {
+            assertThat(event.getFormattedMessage()).isEqualTo(
+                "GAJudgeRevisitTaskHandler skipping directions order for caseId: 5: "
+                    + "directionsResponseByDate is not set");
+            assertThat(event.getLevel()).isEqualTo(Level.INFO);
+        });
+        assertThat(listAppender.list).noneMatch(event -> event.getLevel().equals(Level.ERROR));
+    }
+
+    @Test
+    void shouldLogMissingOrderOrOptionWithCaseId() {
+        listAppender.start();
+        logger.addAppender(listAppender);
+        CaseDetails missingOrder = caseDetailsDirectionOrder.toBuilder().id(5L).data(Map.of()).build();
+        CaseDetails missingOption = caseDetailsDirectionOrder.toBuilder().id(6L).data(
+            Map.of("judicialDecisionMakeOrder", new GAJudicialMakeAnOrder())).build();
+        when(caseStateSearchService.getGeneralApplications(AWAITING_DIRECTIONS_ORDER_DOCS))
+            .thenReturn(Set.of(missingOrder, missingOption));
+
+        assertThat(gaJudgeRevisitTaskHandler.getDirectionOrderCaseReadyToJudgeRevisit()).isEmpty();
+
+        assertThat(listAppender.list).hasSize(2).allSatisfy(event -> {
+            assertThat(event.getLevel()).isEqualTo(Level.ERROR);
+            assertThat(event.getThrowableProxy()).isNull();
+        });
+        assertThat(listAppender.list).extracting(ILoggingEvent::getFormattedMessage)
+            .containsExactlyInAnyOrder(
+                "GAJudgeRevisitTaskHandler cannot evaluate directions order for caseId: 5: "
+                    + "missing judicialDecisionMakeOrder or makeAnOrder",
+                "GAJudgeRevisitTaskHandler cannot evaluate directions order for caseId: 6: "
+                    + "missing judicialDecisionMakeOrder or makeAnOrder");
     }
 
     @Test

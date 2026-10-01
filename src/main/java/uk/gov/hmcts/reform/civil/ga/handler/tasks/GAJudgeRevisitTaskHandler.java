@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialMakeAnOrder;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -205,13 +206,27 @@ public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
         return judgeReadyToRevisitDirectionOrderCases.stream()
             .filter(a -> {
                 try {
-                    return (caseDetailsConverter.toGeneralApplicationCaseData(a).getJudicialDecisionMakeOrder().getMakeAnOrder()
-                        .equals(GIVE_DIRECTIONS_WITHOUT_HEARING))
-                        && (!LocalDate.now().isBefore(caseDetailsConverter.toGeneralApplicationCaseData(a)
-                                                          .getJudicialDecisionMakeOrder()
-                                                          .getDirectionsResponseByDate()));
+                    GAJudicialMakeAnOrder order = caseDetailsConverter.toGeneralApplicationCaseData(a)
+                        .getJudicialDecisionMakeOrder();
+                    if (order == null || order.getMakeAnOrder() == null) {
+                        log.error("GAJudgeRevisitTaskHandler cannot evaluate directions order for caseId: {}: "
+                                      + "missing judicialDecisionMakeOrder or makeAnOrder", a.getId());
+                        return false;
+                    }
+                    if (!GIVE_DIRECTIONS_WITHOUT_HEARING.equals(order.getMakeAnOrder())) {
+                        return false;
+                    }
+                    // The judge may leave the referral date unset; no automatic revisit is then scheduled.
+                    LocalDate responseByDate = order.getDirectionsResponseByDate();
+                    if (responseByDate == null) {
+                        log.info("GAJudgeRevisitTaskHandler skipping directions order for caseId: {}: "
+                                     + "directionsResponseByDate is not set", a.getId());
+                        return false;
+                    }
+                    return !LocalDate.now().isBefore(responseByDate);
                 } catch (Exception e) {
-                    log.error("Error GAJudgeRevisitTaskHandler::getDirectionOrderCaseReadyToJudgeRevisit : " + e);
+                    log.error("GAJudgeRevisitTaskHandler failed to evaluate directions order for caseId: {}",
+                              a.getId(), e);
                 }
                 return false;
             }).toList();
