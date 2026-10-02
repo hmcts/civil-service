@@ -7,12 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.search.PageToken;
 import uk.gov.hmcts.reform.civil.model.search.PaginatedQuery;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.search.common.CommonQueryConstructs;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.time.LocalDateTime;
@@ -26,9 +24,6 @@ class BreathingSpaceLiftPendingQueryProviderTest {
     private static final LocalDateTime NOW = LocalDateTime.of(2026, 1, 15, 10, 0);
 
     private final ObjectMapper objectMapper = ObjectMapperFactory.instance();
-
-    @Spy
-    private CommonQueryConstructs commonQueryConstructs;
 
     @Mock
     private Time time;

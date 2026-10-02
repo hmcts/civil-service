@@ -6,13 +6,13 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.search.PageToken;
 import uk.gov.hmcts.reform.civil.model.search.PaginatedQuery;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.search.common.CommonQueryConstructs;
 import uk.gov.hmcts.reform.civil.service.search.common.PaginatedQueryProvider;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
@@ -22,11 +22,9 @@ public class BreathingSpaceLiftPendingQueryProvider implements PaginatedQueryPro
 
     private static final int START_INDEX = 0;
 
-    private final CommonQueryConstructs commonQueryConstructs;
     private final Time time;
 
-    public BreathingSpaceLiftPendingQueryProvider(CommonQueryConstructs commonQueryConstructs, Time time) {
-        this.commonQueryConstructs = commonQueryConstructs;
+    public BreathingSpaceLiftPendingQueryProvider(Time time) {
         this.time = time;
     }
 
@@ -51,6 +49,14 @@ public class BreathingSpaceLiftPendingQueryProvider implements PaginatedQueryPro
                         .must(matchQuery("data.breathingSpaceActive", "Yes"))
                         .must(matchQuery("data.breathingSpaceLiftPending", "Yes"))
                         .must(rangeQuery("data.liftBreathing.expectedEnd").lte(today))
-                        .must(commonQueryConstructs.haveNoOngoingBusinessProcess()));
+                        .must(haveNoOngoingBusinessProcess()));
+    }
+
+    private BoolQueryBuilder haveNoOngoingBusinessProcess() {
+        return boolQuery()
+            .minimumShouldMatch(1)
+            .should(boolQuery().mustNot(existsQuery("data.businessProcess")))
+            .should(boolQuery().mustNot(existsQuery("data.businessProcess.status")))
+            .should(boolQuery().must(matchQuery("data.businessProcess.status", "FINISHED")));
     }
 }
