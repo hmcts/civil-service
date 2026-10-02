@@ -73,7 +73,7 @@ spring:
             readTimeout: ${CORE_CASE_EVENT_API_READ_TIMEOUT:25000}
 
 scheduler:
-  active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:JudgementBuffer}
+  active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:JudgementBuffer, ExpiredDraftStore}
   circuitBreakerThreshold: ${CIRCUIT_BREAKER_THRESHOLD:5}
   lockAtLeastFor: ${LOCK_AT_LEAST_FOR:PT1M}
   lockAtMostFor: ${LOCK_AT_MOST_FOR:PT30M}
@@ -134,6 +134,10 @@ scheduler:
     delayIncreaseOnSlowCase: ${DEFAULT_BACK_PRESSURE_DELAY_INCREASE_ON_SLOW_CASE:PT0.25S}
     delayReductionOnSuccess: ${DEFAULT_BACK_PRESSURE_DELAY_REDUCTION_ON_SUCCESS:PT0.1S}
     slowCaseThreshold: ${DEFAULT_BACK_PRESSURE_SLOW_CASE_THRESHOLD:PT2S}
+  expired-draft-store:
+    cronExpression: ${CRON_EXPRESSION_EXPIRED_DRAFT_STORE:0 15 2 * * ?}
+    batchSize: ${EXPIRED_DRAFT_STORE_BATCH_SIZE:500}
+    maxBatchesPerRun: ${EXPIRED_DRAFT_STORE_MAX_BATCHES_PER_RUN:20}
 
 search:
   judgement-buffer:
