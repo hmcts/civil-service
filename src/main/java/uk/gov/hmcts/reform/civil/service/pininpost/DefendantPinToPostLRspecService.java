@@ -40,7 +40,8 @@ public class DefendantPinToPostLRspecService {
         if (pinInPostData == null || pinInPostData.getAccessCode() == null
             || !pinInPostData.getAccessCode().equals(pin)
             || pinInPostData.getExpiryDate().isBefore(LocalDate.now())) {
-            log.info("Pin does not match or expired for {}", caseData.getLegacyCaseReference());
+            log.info("Pin does not match or expired for {} (CCD case reference {})",
+                     caseData.getLegacyCaseReference(), caseDetails.getId());
             throw new PinNotMatchException();
         }
     }

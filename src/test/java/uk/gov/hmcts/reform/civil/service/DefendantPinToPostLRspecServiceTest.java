@@ -83,14 +83,14 @@ class DefendantPinToPostLRspecServiceTest {
         logger.setLevel(originalLogLevel);
     }
 
-    private void assertPinRejectionLogged(String caseReference, String submittedPin) {
+    private void assertPinRejectionLogged(String expectedMessage, String submittedPin) {
         assertThat(logAppender.list)
             .filteredOn(event -> event.getFormattedMessage().startsWith("Pin does not match or expired for "))
             .singleElement()
             .satisfies(event -> {
                 assertThat(event.getLevel()).isEqualTo(Level.INFO);
                 assertThat(event.getFormattedMessage())
-                    .isEqualTo("Pin does not match or expired for " + caseReference);
+                    .isEqualTo(expectedMessage);
             });
         assertThat(logAppender.list).allSatisfy(event -> {
             assertThat(event.getLevel().isGreaterOrEqual(Level.WARN)).isFalse();
@@ -136,7 +136,9 @@ class DefendantPinToPostLRspecServiceTest {
             when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
 
             assertThrows(PinNotMatchException.class, () -> defendantPinToPostLRspecService.validatePin(caseDetails, "TEST00000"));
-            assertPinRejectionLogged(caseData.getLegacyCaseReference(), "TEST00000");
+            assertPinRejectionLogged(
+                "Pin does not match or expired for " + caseData.getLegacyCaseReference()
+                    + " (CCD case reference 1234567890123456)", "TEST00000");
         }
 
         @Test
@@ -147,7 +149,9 @@ class DefendantPinToPostLRspecServiceTest {
             when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
 
             assertThrows(PinNotMatchException.class, () -> defendantPinToPostLRspecService.validatePin(caseDetails, "TEST00000"));
-            assertPinRejectionLogged(caseData.getLegacyCaseReference(), "TEST00000");
+            assertPinRejectionLogged(
+                "Pin does not match or expired for " + caseData.getLegacyCaseReference()
+                    + " (CCD case reference 1234567890123456)", "TEST00000");
         }
 
         @Test
@@ -158,7 +162,9 @@ class DefendantPinToPostLRspecServiceTest {
             when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
 
             assertThrows(PinNotMatchException.class, () -> defendantPinToPostLRspecService.validatePin(caseDetails, "TEST12342"));
-            assertPinRejectionLogged(caseData.getLegacyCaseReference(), "TEST12342");
+            assertPinRejectionLogged(
+                "Pin does not match or expired for " + caseData.getLegacyCaseReference()
+                    + " (CCD case reference 1234567890123456)", "TEST12342");
         }
 
         @Test
@@ -169,7 +175,9 @@ class DefendantPinToPostLRspecServiceTest {
             when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
 
             assertThrows(PinNotMatchException.class, () -> defendantPinToPostLRspecService.validatePin(caseDetails, "TEST12341"));
-            assertPinRejectionLogged(caseData.getLegacyCaseReference(), "TEST12341");
+            assertPinRejectionLogged(
+                "Pin does not match or expired for " + caseData.getLegacyCaseReference()
+                    + " (CCD case reference 1234567890123456)", "TEST12341");
         }
 
         @Test
@@ -188,7 +196,7 @@ class DefendantPinToPostLRspecServiceTest {
             when(cuiIdamClientService.authenticatePinUser("TEST1234", "620MC123")).thenReturn(response);
 
             assertThrows(PinNotMatchException.class, () -> defendantPinToPostLRspecService.validateOcmcPin("TEST1234", "620MC123"));
-            assertPinRejectionLogged("620MC123", "TEST1234");
+            assertPinRejectionLogged("Pin does not match or expired for 620MC123", "TEST1234");
         }
 
         @Test
@@ -290,7 +298,7 @@ class DefendantPinToPostLRspecServiceTest {
         }
 
         private CaseDetails createCaseDetails(CaseData caseData) {
-            return CaseDetailsBuilder.builder().data(caseData).build();
+            return CaseDetailsBuilder.builder().id(1234567890123456L).data(caseData).build();
         }
 
         private DefendantPinToPostLRspec createPinInPostData(int daysToExpiry) {
