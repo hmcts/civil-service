@@ -62,7 +62,8 @@ public class CaseCategoriesService {
             List<Category> matchingCategories = Optional.ofNullable(categorySearchResult.getCategories())
                 .orElseGet(List::of)
                 .stream()
-                .filter(c -> c.getKey().equals(categoryKey))
+                .filter(c -> categoryType.getStringValueForQuery().equals(c.getCategoryKey()))
+                .filter(c -> categoryKey.equals(c.getKey()))
                 .toList();
             if (matchingCategories.isEmpty()) {
                 log.warn(
