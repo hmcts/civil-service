@@ -19,9 +19,18 @@ public interface DraftStoreRepository extends JpaRepository<DraftStoreEntity, UU
 
     List<DraftStoreEntity> findByUserIdAndDraftType(String userId, DraftType draftType);
 
-    List<DraftStoreEntity> findByUserIdAndDraftTypeAndExpiresAtAfter(
+    Optional<DraftStoreEntity> findByUserIdAndDraftTypeAndCaseIdIsNull(String userId, DraftType draftType);
+
+    Optional<DraftStoreEntity> findByUserIdAndDraftTypeAndCaseIdIsNullAndExpiresAtAfter(
         String userId,
         DraftType draftType,
+        OffsetDateTime now
+    );
+
+    Optional<DraftStoreEntity> findByUserIdAndDraftTypeAndCaseIdAndExpiresAtAfter(
+        String userId,
+        DraftType draftType,
+        String caseId,
         OffsetDateTime now
     );
 

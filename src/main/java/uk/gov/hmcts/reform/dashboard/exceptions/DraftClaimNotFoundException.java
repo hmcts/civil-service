@@ -11,4 +11,8 @@ public class DraftClaimNotFoundException extends RuntimeException {
     public DraftClaimNotFoundException(UUID draftId) {
         super("No active draft claim found for draftId " + draftId);
     }
+
+    public DraftClaimNotFoundException(String caseId) {
+        super("No active draft claim found for caseId " + caseId);
+    }
 }
