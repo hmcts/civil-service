@@ -4,6 +4,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -40,7 +41,7 @@ public class ExpiredDraftStoreScheduler implements CivilScheduler {
     public ExpiredDraftStoreScheduler(
         DraftStoreRepository draftStoreRepository,
         ExpiredDraftStoreTask expiredDraftStoreTask,
-        ScheduledTaskRunner<List<UUID>, String> scheduledTaskRunner,
+        @Lazy ScheduledTaskRunner<List<UUID>, String> scheduledTaskRunner,
         @Value("${scheduler.expired-draft-store.batchSize:500}") int batchSize,
         @Value("${scheduler.expired-draft-store.maxBatchesPerRun:20}") int maxBatchesPerRun
     ) {
