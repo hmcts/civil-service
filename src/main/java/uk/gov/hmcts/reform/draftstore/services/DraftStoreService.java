@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.draftstore.services;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.draftstore.DraftType;
@@ -11,7 +10,6 @@ import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -55,29 +53,36 @@ public class DraftStoreService {
             now,
             now.plusDays(resolveTtlDays(payloadCopy))
         );
-        try {
-            return draftStoreTransactionService.saveInNewTransaction(draft);
-        } catch (DataIntegrityViolationException ex) {
-            return getActiveDraftsForUser(userId, draftType).stream()
-                .findFirst()
-                .orElseThrow(() -> ex);
-        }
+        return draftStoreTransactionService.saveInNewTransaction(draft);
     }
 
     @Transactional(readOnly = true)
-    public List<DraftStoreEntity> getDraftsForUser(String userId, DraftType draftType) {
+    public Optional<DraftStoreEntity> getBlankDraft(String userId, DraftType draftType) {
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
-        return draftStoreRepository.findByUserIdAndDraftType(userId, draftType);
+        return draftStoreRepository.findByUserIdAndDraftTypeAndCaseIdIsNull(userId, draftType);
     }
 
     @Transactional(readOnly = true)
-    public List<DraftStoreEntity> getActiveDraftsForUser(String userId, DraftType draftType) {
+    public Optional<DraftStoreEntity> getActiveBlankDraft(String userId, DraftType draftType) {
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
-        return draftStoreRepository.findByUserIdAndDraftTypeAndExpiresAtAfter(
+        return draftStoreRepository.findByUserIdAndDraftTypeAndCaseIdIsNullAndExpiresAtAfter(
             userId,
             draftType,
+            OffsetDateTime.now(ZoneOffset.UTC)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<DraftStoreEntity> getActiveDraftForCase(String userId, String caseId, DraftType draftType) {
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(caseId, "caseId must not be null");
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
+        return draftStoreRepository.findByUserIdAndDraftTypeAndCaseIdAndExpiresAtAfter(
+            userId,
+            draftType,
+            caseId,
             OffsetDateTime.now(ZoneOffset.UTC)
         );
     }
@@ -133,22 +138,27 @@ public class DraftStoreService {
 
     private long resolveTtlDays(Map<String, Object> payload) {
         Object value = payload.get(TTL_DAYS_FIELD);
-        Long ttlDays = null;
-        if (value instanceof Number number) {
-            ttlDays = number.longValue();
-        } else if (value instanceof String text) {
-            try {
-                ttlDays = Long.parseLong(text.trim());
-            } catch (NumberFormatException ex) {
-                ttlDays = null;
-            }
-        }
+        Long ttlDays = parseTtlDays(value);
         if (ttlDays == null || ttlDays <= 0) {
             log.warn("Missing or invalid {} in draft payload (value={}), defaulting to {} days",
                      TTL_DAYS_FIELD, value, DEFAULT_TTL_DAYS);
             return DEFAULT_TTL_DAYS;
         }
         return ttlDays;
+    }
+
+    private static Long parseTtlDays(Object value) {
+        if (value instanceof Number number) {
+            return number.longValue();
+        }
+        if (value instanceof String text) {
+            try {
+                return Long.parseLong(text.trim());
+            } catch (NumberFormatException ex) {
+                return null;
+            }
+        }
+        return null;
     }
 
     private Map<String, Object> copyPayload(Map<String, Object> payload) {

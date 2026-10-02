@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -117,47 +116,15 @@ class DraftStoreServiceTest {
         }
 
         @Test
-        void shouldReturnActiveDraftWhenCreateHitsUniqueConstraint() {
-            Map<String, Object> payload = new HashMap<>(Map.of("step", "claimant-details"));
-            OffsetDateTime createdAt = OffsetDateTime.now();
-            DraftStoreEntity existingDraft = new DraftStoreEntity(
-                DRAFT_ID,
-                USER_ID,
-                CASE_ID,
-                DRAFT_TYPE,
-                new HashMap<>(Map.of("step", "existing-payload")),
-                createdAt,
-                createdAt,
-                createdAt.plusDays(30)
-            );
-            when(draftStoreRepository.findByUserIdAndDraftTypeAndExpiresAtAfter(
-                eq(USER_ID),
-                eq(DRAFT_TYPE),
-                any(OffsetDateTime.class)
-            )).thenReturn(List.of(existingDraft));
-            when(draftStoreTransactionService.saveInNewTransaction(any()))
-                .thenThrow(new DataIntegrityViolationException("uq_draft_store_user_draft_claim"));
-
-            DraftStoreEntity result = draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE);
-
-            assertThat(result).isSameAs(existingDraft);
-            assertThat(result.getPayload()).containsEntry("step", "existing-payload");
-        }
-
-        @Test
-        void shouldRethrowWhenUniqueConstraintFailsAndNoActiveDraftExists() {
+        void shouldPropagateUniqueConstraintViolationWithoutReturningAnotherDraft() {
             Map<String, Object> payload = new HashMap<>(Map.of("step", "claimant-details"));
             DataIntegrityViolationException uniqueViolation =
-                new DataIntegrityViolationException("uq_draft_store_user_draft_claim");
+                new DataIntegrityViolationException("uq_draft_store_user_case");
             when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class))).thenThrow(uniqueViolation);
-            when(draftStoreRepository.findByUserIdAndDraftTypeAndExpiresAtAfter(
-                eq(USER_ID),
-                eq(DRAFT_TYPE),
-                any(OffsetDateTime.class)
-            )).thenReturn(List.of());
 
             assertThatThrownBy(() -> draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE))
                 .isSameAs(uniqueViolation);
+            verifyNoInteractions(draftStoreRepository);
         }
 
         @Test
@@ -174,34 +141,43 @@ class DraftStoreServiceTest {
     class GetDraftTests {
 
         @Test
-        void shouldReturnDraftsWhenUserHasDraftsOfRequestedType() {
+        void shouldReturnBlankDraftIncludingExpired() {
             DraftStoreEntity draft = draft();
-            when(draftStoreRepository.findByUserIdAndDraftType(USER_ID, DRAFT_TYPE))
-                .thenReturn(List.of(draft));
+            when(draftStoreRepository.findByUserIdAndDraftTypeAndCaseIdIsNull(USER_ID, DRAFT_TYPE))
+                .thenReturn(Optional.of(draft));
 
-            List<DraftStoreEntity> result = draftStoreService.getDraftsForUser(USER_ID, DRAFT_TYPE);
+            Optional<DraftStoreEntity> result = draftStoreService.getBlankDraft(USER_ID, DRAFT_TYPE);
 
-            assertThat(result).containsExactly(draft);
-            verify(draftStoreRepository).findByUserIdAndDraftType(USER_ID, DRAFT_TYPE);
+            assertThat(result).contains(draft);
         }
 
         @Test
-        void shouldReturnActiveDraftsWhenUnexpiredDraftsExist() {
+        void shouldReturnActiveBlankDraft() {
             DraftStoreEntity draft = draft();
-            when(draftStoreRepository.findByUserIdAndDraftTypeAndExpiresAtAfter(
+            when(draftStoreRepository.findByUserIdAndDraftTypeAndCaseIdIsNullAndExpiresAtAfter(
                 eq(USER_ID),
                 eq(DRAFT_TYPE),
                 any(OffsetDateTime.class)
-            )).thenReturn(List.of(draft));
+            )).thenReturn(Optional.of(draft));
 
-            List<DraftStoreEntity> result = draftStoreService.getActiveDraftsForUser(USER_ID, DRAFT_TYPE);
+            Optional<DraftStoreEntity> result = draftStoreService.getActiveBlankDraft(USER_ID, DRAFT_TYPE);
 
-            assertThat(result).containsExactly(draft);
-            verify(draftStoreRepository).findByUserIdAndDraftTypeAndExpiresAtAfter(
+            assertThat(result).contains(draft);
+        }
+
+        @Test
+        void shouldReturnActiveDraftForCase() {
+            DraftStoreEntity draft = draft();
+            when(draftStoreRepository.findByUserIdAndDraftTypeAndCaseIdAndExpiresAtAfter(
                 eq(USER_ID),
                 eq(DRAFT_TYPE),
+                eq(CASE_ID),
                 any(OffsetDateTime.class)
-            );
+            )).thenReturn(Optional.of(draft));
+
+            Optional<DraftStoreEntity> result = draftStoreService.getActiveDraftForCase(USER_ID, CASE_ID, DRAFT_TYPE);
+
+            assertThat(result).contains(draft);
         }
 
         @Test

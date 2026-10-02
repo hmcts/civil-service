@@ -11,7 +11,9 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.dashboard.data.DraftClaimRequest;
 import uk.gov.hmcts.reform.dashboard.data.DraftClaimResponse;
-import uk.gov.hmcts.reform.dashboard.services.DraftClaimCreationResult;
+import org.springframework.web.server.ResponseStatusException;
+import uk.gov.hmcts.reform.dashboard.exceptions.DraftClaimAlreadyExistsException;
+import uk.gov.hmcts.reform.dashboard.exceptions.DraftClaimNotFoundException;
 import uk.gov.hmcts.reform.dashboard.services.DraftClaimService;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -23,8 +25,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,7 +53,8 @@ class DraftClaimControllerTest {
 
     @BeforeEach
     void init() {
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
+        // Lenient: the bad-request and conflict tests never resolve the user
+        lenient().when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
         payload = new HashMap<>();
         draftStoreEntity = new DraftStoreEntity();
         draftStoreEntity.setId(DRAFT_ID);
@@ -60,31 +66,54 @@ class DraftClaimControllerTest {
     @Test
     void shouldReturnCreatedWhenNewDraftIsCreated() {
         payload.put("deadline", OffsetDateTime.now());
-        when(draftClaimService.createDraftClaim(USER_ID, CASE_ID, payload))
-            .thenReturn(DraftClaimCreationResult.newDraft(draftStoreEntity));
+        when(draftClaimService.createDraftClaim(USER_ID, payload)).thenReturn(draftStoreEntity);
 
-        DraftClaimRequest request = new DraftClaimRequest(CASE_ID, payload);
+        DraftClaimRequest request = new DraftClaimRequest(null, payload);
 
         ResponseEntity<DraftClaimResponse> response = controller.createDraftClaim(AUTH, request);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isNotNull();
-        verify(draftClaimService).createDraftClaim(USER_ID, CASE_ID, payload);
+        assertThat(response.getBody().getDraftId()).isEqualTo(DRAFT_ID);
+        verify(draftClaimService).createDraftClaim(USER_ID, payload);
     }
 
     @Test
-    void shouldReturnOkWhenActiveDraftAlreadyExists() {
-        when(draftClaimService.createDraftClaim(USER_ID, CASE_ID, payload))
-            .thenReturn(DraftClaimCreationResult.existingDraft(draftStoreEntity));
-
+    void shouldRejectCreateWhenCaseIdIsProvided() {
         DraftClaimRequest request = new DraftClaimRequest(CASE_ID, payload);
 
-        ResponseEntity<DraftClaimResponse> response = controller.createDraftClaim(AUTH, request);
+        assertThatThrownBy(() -> controller.createDraftClaim(AUTH, request))
+            .isInstanceOf(ResponseStatusException.class)
+            .extracting(ex -> ((ResponseStatusException) ex).getStatusCode())
+            .isEqualTo(HttpStatus.BAD_REQUEST);
+        verifyNoInteractions(draftClaimService);
+    }
+
+    @Test
+    void shouldReturnConflictWhenDraftAlreadyExists() {
+        ResponseEntity<String> response =
+            controller.draftClaimAlreadyExists(new DraftClaimAlreadyExistsException());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    @Test
+    void shouldReturnDraftForCaseWhenItExists() {
+        when(draftClaimService.getDraftClaimForCase(USER_ID, CASE_ID)).thenReturn(Optional.of(draftStoreEntity));
+
+        ResponseEntity<DraftClaimResponse> response = controller.getDraftClaimForCase(CASE_ID, AUTH);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getDraftId()).isEqualTo(DRAFT_ID);
-        verify(draftClaimService).createDraftClaim(USER_ID, CASE_ID, payload);
+        assertThat(response.getBody().getCaseId()).isEqualTo(CASE_ID);
+    }
+
+    @Test
+    void shouldThrowNotFoundWhenNoDraftExistsForCase() {
+        when(draftClaimService.getDraftClaimForCase(USER_ID, CASE_ID)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> controller.getDraftClaimForCase(CASE_ID, AUTH))
+            .isInstanceOf(DraftClaimNotFoundException.class);
     }
 
     @Test
