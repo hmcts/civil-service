@@ -193,7 +193,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         ArrayList<String> errors = new ArrayList<>();
 
-        if (caseData.getBreathing() != null && caseData.getBreathing().getActive() == YesOrNo.YES) {
+        if (caseData.hasBreathingSpace()) {
             errors.add(BREATHING_SPACE);
         }
 

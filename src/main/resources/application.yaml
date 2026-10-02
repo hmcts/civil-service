@@ -140,6 +140,8 @@ search:
     pageSize: ${SEARCH_PAGE_SIZE_JUDGEMENT_BUFFER:50}
   defendant-response:
     pageSize: ${SEARCH_PAGE_SIZE_DEFENDANT_RESPONSE:50}
+  breathing-space-lift-pending:
+    pageSize: ${SEARCH_PAGE_SIZE_BREATHING_SPACE_LIFT_PENDING:50}
   evidence-upload:
     pageSize: ${SEARCH_PAGE_SIZE_EVIDENCE_UPLOAD:50}
   hearing-fee:
