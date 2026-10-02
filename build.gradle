@@ -134,7 +134,6 @@ allprojects {
       dependency 'org.apache.commons:commons-lang3:' + versions.commonsLang3
       dependency 'org.bouncycastle:bcprov-jdk18on:1.85'
       dependency 'io.projectreactor:reactor-core:3.8.7'
-      dependency 'org.apache.tika:tika-core:3.3.2'
       dependency 'io.micrometer:micrometer-core:1.16.7'
     }
     imports {
