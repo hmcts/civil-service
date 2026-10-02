@@ -260,11 +260,15 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         log.info("Getting metadata for file {}", documentPath);
 
         try {
-            return caseDocumentClientApi.getMetadataForDocument(
+            Document metadata = caseDocumentClientApi.getMetadataForDocument(
                 authorisation,
                 authTokenGenerator.generate(),
                 getDocumentIdFromSelfHref(documentPath)
             );
+            if (metadata == null) {
+                throw new IllegalStateException("Document metadata response was empty for " + documentPath);
+            }
+            return metadata;
 
         } catch (DocumentDownloadException ex) {
             throw ex;
