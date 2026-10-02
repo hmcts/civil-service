@@ -25,7 +25,8 @@ public enum EvidenceUploadType {
     WITNESS_REFERRED(" referred to in the statement of ", "%s - Documents referred to in the statement"),
     NOTICE_OF_INTENTION("Notice of Intention", WITNESS_EVIDENCE),
     DOCUMENTS_REFERRED("Documents Referred", WITNESS_EVIDENCE),
-    BUNDLE_EVIDENCE("Bundle evidence", "%s - Bundle");
+    BUNDLE_EVIDENCE("Bundle evidence", "%s - Bundle"),
+    WITHOUT_PREJUDICE("Without prejudice", "%s - Without prejudice");
 
     String documentTypeDisplayName;
     String notifictationTextRegEx;

@@ -98,6 +98,9 @@ public abstract class DocumentUploadTask<L1 extends LegalRepresentativeOneDocume
     private static void clearDocumentCollections(CaseData caseData) {
         caseData.setDisclosureSelectionEvidence(null);
         caseData.setDisclosureSelectionEvidenceRes(null);
+        caseData.setWithoutPrejudiceSelectionEvidence(null);
+        caseData.setWithoutPrejudiceSelectionEvidenceSmallClaim(null);
+        caseData.setWithoutPrejudiceSelectionEvidenceSmallClaimRes(null);
         caseData.setWitnessSelectionEvidence(null);
         caseData.setWitnessSelectionEvidenceSmallClaim(null);
         caseData.setWitnessSelectionEvidenceRes(null);
