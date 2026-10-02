@@ -14,7 +14,13 @@ import uk.gov.hmcts.reform.dashboard.utilities.StringUtility;
 
 import jakarta.persistence.EntityManager;
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 @Service
@@ -175,7 +181,7 @@ public class TaskListService {
             excludedCategories,
             excludedTemplate
         );
-        List<TaskListEntity> tasks = new ArrayList<>();
+        List<TaskListEntity> tasks;
         if (Objects.nonNull(excludedCategories) && !excludedCategories.isEmpty()) {
             List<Long> catIds = excludedCategories.stream()
                 .filter(Objects::nonNull)

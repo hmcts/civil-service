@@ -21,16 +21,21 @@ public class DashboardTasksHelper {
         deleteNotificationAndInactiveTasksForRole(caseData, "CLAIMANT", "Applications");
     }
 
+    public void deleteNotificationAndInactiveTasksForClaimant(CaseData caseData, String categories) {
+        deleteNotificationAndInactiveTasksForRole(caseData, "CLAIMANT",
+                                                  "Applications",
+                                                  categories);
+    }
+
     public void deleteNotificationAndInactiveTasksForDefendant(CaseData caseData) {
         deleteNotificationAndInactiveTasksForRole(caseData, "DEFENDANT", "Applications");
     }
 
-    public void deleteNotificationAndInactiveTasksForClaimant(CaseData caseData, String categories) {
-        deleteNotificationAndInactiveTasksForRole(caseData, "CLAIMANT","Applications", categories);
-    }
-
     public void deleteNotificationAndInactiveTasksForDefendant(CaseData caseData, String categories) {
-        deleteNotificationAndInactiveTasksForRole(caseData, "DEFENDANT","Applications", categories);
+        deleteNotificationAndInactiveTasksForRole(caseData,
+                                                  "DEFENDANT",
+                                                  "Applications",
+                                                  categories);
 
     }
 
