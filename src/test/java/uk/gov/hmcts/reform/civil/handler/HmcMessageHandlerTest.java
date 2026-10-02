@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.hmc.model.messaging.HearingUpdate;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcMessage;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -37,6 +39,19 @@ class HmcMessageHandlerTest {
     @BeforeEach
     void setUp() {
         when(paymentsConfiguration.getSpecSiteId()).thenReturn("AAA6");
+    }
+
+    @Test
+    void shouldPropagateEventFailureSoMessageCanBeAbandoned() {
+        HmcMessage hmcMessage = new HmcMessage()
+            .setCaseId(1234L)
+            .setHearingId("HER1234")
+            .setHmctsServiceCode("AAA6")
+            .setHearingUpdate(new HearingUpdate().setHmcStatus(LISTED));
+        RuntimeException failure = new IllegalStateException("Event failed");
+        doThrow(failure).when(coreCaseDataService).triggerEvent(1234L, UPDATE_NEXT_HEARING_DETAILS);
+
+        assertThatThrownBy(() -> handler.handleMessage(hmcMessage)).isSameAs(failure);
     }
 
     @Test
