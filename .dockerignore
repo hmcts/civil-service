@@ -1,0 +1,6 @@
+# Only send what the Dockerfile COPYs to the build context.
+# az acr build uploads the whole context, so keep it minimal.
+*
+!lib/applicationinsights.json
+!lib/appinsights-connection-string
+!build/libs/civil-service.jar
