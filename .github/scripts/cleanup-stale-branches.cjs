@@ -1,12 +1,24 @@
 'use strict';
 
+const { readFileSync } = require('node:fs');
+const { join } = require('node:path');
+
 const DEFAULT_DAYS_BEFORE_CLEANUP = 90;
 
 function isReleaseOrHotfixBranch(name) {
   return /^(release|hotfix)([/_.-]|$)/i.test(name);
 }
 
-function classifyBranch(branch, { defaultBranch, cutoff }) {
+function parseExceptions(contents) {
+  return new Set(contents.split(/\r?\n/).map(line => line.trim())
+    .filter(line => line && !line.startsWith('#')));
+}
+
+function classifyBranch(branch, { defaultBranch, cutoff, exceptions = new Set() }) {
+  if (exceptions.has(branch.name)) {
+    return { eligible: false, reason: 'exception list' };
+  }
+
   if (branch.name === defaultBranch) {
     return { eligible: false, reason: 'default branch' };
   }
@@ -87,6 +99,7 @@ function parseDays(value) {
 }
 
 async function run({ github, context, core, dryRun, daysBefore }) {
+  const exceptions = parseExceptions(readFileSync(join(__dirname, '../stale-branch-exceptions.txt'), 'utf8'));
   const { owner, repo } = context.repo;
   const repository = await github.rest.repos.get({ owner, repo });
   const days = parseDays(daysBefore);
@@ -96,7 +109,8 @@ async function run({ github, context, core, dryRun, daysBefore }) {
     ...branch,
     classification: classifyBranch(branch, {
       defaultBranch: repository.data.default_branch,
-      cutoff
+      cutoff,
+      exceptions
     })
   }));
   const eligible = classified.filter(branch => branch.classification.eligible);
@@ -134,6 +148,7 @@ async function run({ github, context, core, dryRun, daysBefore }) {
     core.summary.addRaw(`Only the first 500 branch names are listed. Total: ${dryRun ? eligible.length : removed.length}.`);
   }
 
+  core.summary.addHeading('Configured branch exceptions').addList([...exceptions]);
   await core.summary.write();
   core.info(`${dryRun ? 'Would remove' : 'Removed'} ${dryRun ? eligible.length : removed.length} branches from ${owner}/${repo}`);
 }
@@ -141,6 +156,7 @@ async function run({ github, context, core, dryRun, daysBefore }) {
 module.exports = {
   DEFAULT_DAYS_BEFORE_CLEANUP,
   classifyBranch,
+  parseExceptions,
   isReleaseOrHotfixBranch,
   parseDays,
   run
