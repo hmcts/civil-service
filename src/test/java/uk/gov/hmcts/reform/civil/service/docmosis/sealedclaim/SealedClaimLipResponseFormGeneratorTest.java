@@ -151,7 +151,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondToClaimAdmitPartLRspec(
                 new RespondToClaimAdmitPartLRspec()
                     .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+
             );
         String fileName = "someName";
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
@@ -188,7 +188,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondToClaimAdmitPartLRspec(
                 new RespondToClaimAdmitPartLRspec()
                     .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+
             );
 
         SealedClaimLipResponseForm templateData = generator
@@ -273,7 +273,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondToClaimAdmitPartLRspec(
                 new RespondToClaimAdmitPartLRspec()
                     .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+
             );
 
         CaseData caseData = timeline(financialDetails(builder))
@@ -463,7 +463,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondToClaimAdmitPartLRspec(
                 new RespondToClaimAdmitPartLRspec()
                     .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+
             )
             .build();
         generator.getTemplateData(caseData);
@@ -498,7 +498,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondToClaimAdmitPartLRspec(
                 new RespondToClaimAdmitPartLRspec()
                     .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+
             ).build();
         generator.getTemplateData(caseData);
         //When
@@ -516,9 +516,26 @@ class SealedClaimLipResponseFormGeneratorTest {
     }
 
     private static CaseData.CaseDataBuilder<?, ?> timeline(CaseData.CaseDataBuilder<?, ?> builder) {
+        LocalDate sevenDay = LocalDate.now().minusMonths(7);
+        LocalDate fiveDay =  LocalDate.now().minusMonths(5);
         return builder.specResponseTimelineOfEvents(List.of(
-            new TimelineOfEvents(new TimelineOfEventDetails(LocalDate.now().minusMonths(7), "Event 1"), null),
-            new TimelineOfEvents(new TimelineOfEventDetails(LocalDate.now().minusMonths(5), "Event 2"), null)
+            new TimelineOfEvents(
+                new TimelineOfEventDetails(
+                    sevenDay,
+                    String.valueOf(sevenDay.getDayOfMonth()),
+                    String.valueOf(sevenDay.getMonthValue()),
+                    String.valueOf(sevenDay.getDayOfYear()),
+                    "Event 1"),
+                null
+            ),
+            new TimelineOfEvents(
+                new TimelineOfEventDetails(
+                    fiveDay,
+                    String.valueOf(fiveDay.getDayOfMonth()),
+                    String.valueOf(fiveDay.getMonthValue()),
+                    String.valueOf(fiveDay.getDayOfYear()),
+                    "Event 2"),
+                null)
         ));
     }
 
@@ -567,7 +584,7 @@ class SealedClaimLipResponseFormGeneratorTest {
                                          new LoanCardDebtLRspec().setLoanCardDebtDetail("Card 2")
                                              .setTotalOwed(BigDecimal.valueOf(1500))
                                              .setMonthlyPayment(BigDecimal.valueOf(200))
-                                     
+
                                      ))
                                      .setDebtDetails(ElementUtils.wrapElements(
                                          new DebtLRspec()
@@ -672,7 +689,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondToClaimAdmitPartLRspec(
                 new RespondToClaimAdmitPartLRspec()
                     .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+
             );
 
         SealedClaimLipResponseForm templateData = generator
@@ -703,7 +720,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondToClaimAdmitPartLRspec(
                 new RespondToClaimAdmitPartLRspec()
                     .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+
             );
 
         SealedClaimLipResponseForm templateData = generator
@@ -740,7 +757,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondToClaimAdmitPartLRspec(
                 new RespondToClaimAdmitPartLRspec()
                     .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+
             );
 
         SealedClaimLipResponseForm templateData = generator
@@ -779,7 +796,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondToClaimAdmitPartLRspec(
                 new RespondToClaimAdmitPartLRspec()
                     .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+
             );
 
         SealedClaimLipResponseForm templateData = generator
@@ -804,7 +821,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondToClaimAdmitPartLRspec(
                 new RespondToClaimAdmitPartLRspec()
                     .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+
             );
 
         SealedClaimLipResponseForm templateData = generator
@@ -826,7 +843,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondToClaimAdmitPartLRspec(
                 new RespondToClaimAdmitPartLRspec()
                     .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+
             );
 
         SealedClaimLipResponseForm templateData = generator
@@ -849,7 +866,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondToClaimAdmitPartLRspec(
                 new RespondToClaimAdmitPartLRspec()
                     .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+
             );
 
         SealedClaimLipResponseForm templateData = generator
@@ -889,7 +906,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondToClaimAdmitPartLRspec(
                 new RespondToClaimAdmitPartLRspec()
                     .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+
             );
 
         SealedClaimLipResponseForm templateData = generator

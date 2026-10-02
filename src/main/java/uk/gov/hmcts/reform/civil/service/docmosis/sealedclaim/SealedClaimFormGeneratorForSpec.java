@@ -379,11 +379,13 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             List<TimelineOfEvents> timelineOfEvents = caseData.getTimelineOfEvents();
             List<TimelineEventDetailsDocmosis> timelineOfEventDetails = new ArrayList<>();
             for (int index = 0; index < timelineOfEvents.size(); index++) {
-                TimelineOfEventDetails timelineOfEventDetail
-                    = new TimelineOfEventDetails(
-                    timelineOfEvents.get(index).getValue()
-                        .getTimelineDate(),
-                    timelineOfEvents.get(index).getValue().getTimelineDescription()
+                TimelineOfEventDetails eventDetail = timelineOfEvents.get(index).getValue();
+                TimelineOfEventDetails timelineOfEventDetail = new TimelineOfEventDetails(
+                    eventDetail.getTimelineDate(),
+                    eventDetail.getTimelineDay(),
+                    eventDetail.getTimelineMonth(),
+                    eventDetail.getTimelineYear(),
+                    eventDetail.getTimelineDescription()
                 );
                 timelineOfEventDetails.add(index, new TimelineEventDetailsDocmosis(timelineOfEventDetail));
             }
