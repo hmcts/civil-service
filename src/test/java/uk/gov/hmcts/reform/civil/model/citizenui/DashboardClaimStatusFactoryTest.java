@@ -798,6 +798,7 @@ class DashboardClaimStatusFactoryTest {
         FeatureToggleService toggleService = Mockito.mock(FeatureToggleService.class);
         addCaseStayedCases(argumentList, toggleService);
         addCaseDismissCases(argumentList, toggleService);
+        addClaimUnissuedCancelledCases(argumentList, toggleService);
 
         return argumentList.stream();
     }
@@ -821,6 +822,17 @@ class DashboardClaimStatusFactoryTest {
 
         argumentList.add(Arguments.arguments(defendant, DashboardClaimStatus.CASE_STAYED));
         argumentList.add(Arguments.arguments(claimant, DashboardClaimStatus.CASE_STAYED));
+    }
+
+    private static void addClaimUnissuedCancelledCases(List<Arguments> argumentList, FeatureToggleService toggleService) {
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.CLAIM_UNISSUED_CANCELLED)
+            .build();
+        CcdDashboardClaimantClaimMatcher claimant = new CcdDashboardClaimantClaimMatcher(caseData, toggleService,
+                                                                                         Collections.emptyList()
+        );
+
+        argumentList.add(Arguments.arguments(claimant, DashboardClaimStatus.CLAIM_UNISSUED_CANCELLED));
     }
 
     private static void addCaseDismissCases(List<Arguments> argumentList, FeatureToggleService toggleService) {

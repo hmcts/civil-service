@@ -11,6 +11,9 @@ import java.util.function.Predicate;
  */
 public enum DashboardClaimStatus {
 
+    CLAIM_UNISSUED_CANCELLED(
+        Claim::isClaimUnissuedCancelled
+    ),
     CASE_DISMISSED(
         Claim::isCaseDismissed
     ),

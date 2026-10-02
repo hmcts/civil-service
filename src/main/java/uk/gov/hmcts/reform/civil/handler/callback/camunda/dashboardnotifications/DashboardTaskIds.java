@@ -14,6 +14,7 @@ public final class DashboardTaskIds {
         "GenerateDashboardNotificationsTrialArrangementsNotifyParty";
     public static final String BUNDLE_CREATION = "GenerateDashboardNotificationsBundleCreation";
     public static final String CLAIM_SETTLED = "GenerateDashboardNotificationsClaimSettled";
+    public static final String CANCEL_UNISSUED_CLAIM_SPEC = "GenerateDashboardNotificationsCancelUnissuedClaimSpec";
     public static final String APPLY_NOC_DECISION_DEFENDANT_LIP = "GenerateDashboardNotificationsApplyNocDecisionDefendantLip";
     public static final String EVIDENCE_UPLOADED = "GenerateDashboardNotificationsEvidenceUploaded";
     public static final String UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION =
