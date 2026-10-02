@@ -34,7 +34,7 @@ def versions = [
   azureCoreAmqp     : '2.12.1',
   azureCoreHttpNetty: '1.16.7',
   azureJson         : '1.5.1',
-  azureServiceBus   : '7.17.20',
+  azureServiceBus   : '7.8.0',
   cucumber          : '7.34.8',
   elasticsearch     : '9.5.4',
   httpclient5       : '5.6.4',
