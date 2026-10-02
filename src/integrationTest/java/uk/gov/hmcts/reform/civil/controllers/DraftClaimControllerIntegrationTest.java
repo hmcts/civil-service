@@ -40,7 +40,6 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -135,7 +134,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
             .andExpectAll(
                 status().isOk(),
                 jsonPath("$.draftId").value(draftId.toString()),
-                jsonPath("$.caseId").value(nullValue()),
+                jsonPath("$.caseId").doesNotExist(),
                 jsonPath("$.payload.step").value("active-test")
             );
 
