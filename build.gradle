@@ -135,6 +135,7 @@ allprojects {
       dependency 'org.bouncycastle:bcprov-jdk18on:1.85'
       dependency 'io.projectreactor:reactor-core:3.8.7'
       dependency 'io.projectreactor.netty:reactor-netty-http:1.3.7'
+      dependency 'io.projectreactor.netty:reactor-netty-core:1.3.7'
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.0.3'
