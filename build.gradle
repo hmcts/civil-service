@@ -359,12 +359,24 @@ def awaitApplicationReadiness = tasks.register('awaitApplicationReadiness') {
   dependsOn waitForCivilService, waitForManageCase
 }
 
+def civilTestScripts = [
+  'playwright-e2e/scripts/civil-master-pr/civil-service/playwright-run-civil-service-smoke.sh',
+  'playwright-e2e/scripts/civil-master-pr/civil-service/playwright-run-civil-service-master-pr-tests.sh'
+]
+
 def pullCivilTestFiles = tasks.register('pullCivilTestFiles', Exec) {
   description = 'Fetches civil test files when they have not already been staged by data setup.'
-  onlyIf { !file('playwright-e2e').isDirectory() }
+  onlyIf { civilTestScripts.any { !file(it).isFile() } }
   mustRunAfter pullLatestCivilCcdDefinitions
   doFirst {
     commandLine './bin/pull-latest-civil-ccd-files.sh', dataSetupBranch('CCD_DEFINITION_BRANCH')
+  }
+  doLast {
+    def missingScripts = civilTestScripts.findAll { !file(it).isFile() }
+    if (!missingScripts.isEmpty()) {
+      throw new GradleException("Civil test scripts missing after fetching CCD_DEFINITION_BRANCH="
+        + "${dataSetupBranch('CCD_DEFINITION_BRANCH')}: ${missingScripts.join(', ')}")
+    }
   }
 }
 
