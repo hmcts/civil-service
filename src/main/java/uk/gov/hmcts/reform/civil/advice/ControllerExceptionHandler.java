@@ -81,10 +81,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(PinNotMatchException.class)
     public ResponseEntity<Object> pinNotMatchedUnauthorised(PinNotMatchException pinNotMatchException,
                                                             ContentCachingRequestWrapper contentCachingRequestWrapper) {
-        String errorMessage = "Pin not matched unauthorized error with message: %s for case %s run by user %s";
-        log.error(errorMessage.formatted(pinNotMatchException.getMessage(), getCaseId(contentCachingRequestWrapper),
-                                         getUserId(contentCachingRequestWrapper)
-        ));
+        // PIN validation failures are logged by the service with the claim reference.
         return new ResponseEntity<>("BAD_REQUEST", new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 

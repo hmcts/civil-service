@@ -1,16 +1,23 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import feign.FeignException;
 import feign.Request;
 import feign.Response;
 import org.apache.http.HttpStatus;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
@@ -55,6 +62,45 @@ class DefendantPinToPostLRspecServiceTest {
     @Mock
     private ClaimStoreService claimStoreService;
 
+    private Logger logger;
+    private Level originalLogLevel;
+    private ListAppender<ILoggingEvent> logAppender;
+
+    @BeforeEach
+    void captureLogs() {
+        logger = (Logger) LoggerFactory.getLogger(DefendantPinToPostLRspecService.class);
+        originalLogLevel = logger.getLevel();
+        logger.setLevel(Level.INFO);
+        logAppender = new ListAppender<>();
+        logAppender.start();
+        logger.addAppender(logAppender);
+    }
+
+    @AfterEach
+    void stopCapturingLogs() {
+        logger.detachAppender(logAppender);
+        logAppender.stop();
+        logger.setLevel(originalLogLevel);
+    }
+
+    private void assertPinRejectionLogged(String caseReference, String submittedPin) {
+        assertThat(logAppender.list)
+            .filteredOn(event -> event.getFormattedMessage().startsWith("Pin does not match or expired for "))
+            .singleElement()
+            .satisfies(event -> {
+                assertThat(event.getLevel()).isEqualTo(Level.INFO);
+                assertThat(event.getFormattedMessage())
+                    .isEqualTo("Pin does not match or expired for " + caseReference);
+            });
+        assertThat(logAppender.list).allSatisfy(event -> {
+            assertThat(event.getLevel().isGreaterOrEqual(Level.WARN)).isFalse();
+            assertThat(event.getFormattedMessage()).doesNotContain(submittedPin);
+            if (event.getArgumentArray() != null) {
+                assertThat(event.getArgumentArray()).doesNotContain(submittedPin);
+            }
+        });
+    }
+
     @Nested
     class BuildDefendantPinToPost {
 
@@ -90,6 +136,7 @@ class DefendantPinToPostLRspecServiceTest {
             when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
 
             assertThrows(PinNotMatchException.class, () -> defendantPinToPostLRspecService.validatePin(caseDetails, "TEST00000"));
+            assertPinRejectionLogged(caseData.getLegacyCaseReference(), "TEST00000");
         }
 
         @Test
@@ -100,6 +147,7 @@ class DefendantPinToPostLRspecServiceTest {
             when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
 
             assertThrows(PinNotMatchException.class, () -> defendantPinToPostLRspecService.validatePin(caseDetails, "TEST00000"));
+            assertPinRejectionLogged(caseData.getLegacyCaseReference(), "TEST00000");
         }
 
         @Test
@@ -110,6 +158,7 @@ class DefendantPinToPostLRspecServiceTest {
             when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
 
             assertThrows(PinNotMatchException.class, () -> defendantPinToPostLRspecService.validatePin(caseDetails, "TEST12342"));
+            assertPinRejectionLogged(caseData.getLegacyCaseReference(), "TEST12342");
         }
 
         @Test
@@ -120,6 +169,7 @@ class DefendantPinToPostLRspecServiceTest {
             when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
 
             assertThrows(PinNotMatchException.class, () -> defendantPinToPostLRspecService.validatePin(caseDetails, "TEST12341"));
+            assertPinRejectionLogged(caseData.getLegacyCaseReference(), "TEST12341");
         }
 
         @Test
@@ -138,6 +188,7 @@ class DefendantPinToPostLRspecServiceTest {
             when(cuiIdamClientService.authenticatePinUser("TEST1234", "620MC123")).thenReturn(response);
 
             assertThrows(PinNotMatchException.class, () -> defendantPinToPostLRspecService.validateOcmcPin("TEST1234", "620MC123"));
+            assertPinRejectionLogged("620MC123", "TEST1234");
         }
 
         @Test
