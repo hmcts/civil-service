@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +15,7 @@ import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
@@ -36,6 +35,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
@@ -69,10 +69,7 @@ class HearingNoticeSchedulerEventHandlerIT {
     private HearingsService hearingsService;
 
     @MockBean
-    private RuntimeService runtimeService;
-
-    @MockBean
-    private MessageCorrelationBuilder messageCorrelationBuilder;
+    private CamundaRuntimeClient camundaRuntimeClient;
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;
@@ -83,8 +80,6 @@ class HearingNoticeSchedulerEventHandlerIT {
         when(userConfig.getPassword()).thenReturn("password");
         when(userService.getAccessToken(anyString(), anyString())).thenReturn(AUTH_TOKEN);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("system-user-id").build());
-        when(runtimeService.createMessageCorrelation(anyString())).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.setVariables(any())).thenReturn(messageCorrelationBuilder);
     }
 
     @Test
@@ -99,7 +94,7 @@ class HearingNoticeSchedulerEventHandlerIT {
 
         handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
 
-        verify(runtimeService, never()).createMessageCorrelation(anyString());
+        verify(camundaRuntimeClient, never()).correlateStartMessage(anyString(), any(), any());
         verify(hearingsService, never()).updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any());
         verifyNoInteractions(coreCaseDataService);
     }
@@ -120,7 +115,7 @@ class HearingNoticeSchedulerEventHandlerIT {
             RECEIVED_DATE_TIME,
             new PartiesNotified().setServiceData(serviceData)
         );
-        verify(runtimeService, never()).createMessageCorrelation(anyString());
+        verify(camundaRuntimeClient, never()).correlateStartMessage(anyString(), any(), any());
     }
 
     @Test
@@ -133,8 +128,7 @@ class HearingNoticeSchedulerEventHandlerIT {
 
         handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
 
-        verify(runtimeService).createMessageCorrelation("NOTIFY_HEARING_PARTIES");
-        verify(messageCorrelationBuilder).correlateStartMessage();
+        verify(camundaRuntimeClient).correlateStartMessage(eq("NOTIFY_HEARING_PARTIES"), eq(null), any());
         verify(hearingsService, never()).updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any());
     }
 

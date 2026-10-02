@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.helpers;
 import feign.FeignException;
 import feign.Request;
 import feign.RetryableException;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 
@@ -22,45 +21,36 @@ class ExternalTaskExceptionHelperTest {
     }
 
     @Test
-    void shouldReturnFalseForRemoteProcessEngineBadRequest() {
-        Throwable exception = new RemoteProcessEngineException(
-            "REST-CLIENT-001 Error during remote Camunda engine invocation: Bad Request",
-            new FeignException.BadRequest(
-                "Bad request",
-                Request.create(Request.HttpMethod.GET, "url", Map.of(), null, null, null),
-                null,
-                null
-            )
+    void shouldReturnFalseForBadRequest() {
+        Throwable exception = new FeignException.BadRequest(
+            "Bad request",
+            Request.create(Request.HttpMethod.GET, "url", Map.of(), null, null, null),
+            null,
+            null
         );
 
         assertThat(ExternalTaskExceptionHelper.isRetryable(exception)).isFalse();
     }
 
     @Test
-    void shouldReturnTrueForRemoteProcessEngineBadGatewayWithIdempotentMethod() {
-        Throwable exception = new RemoteProcessEngineException(
-            "REST-CLIENT-001 Error during remote Camunda engine invocation: Bad Gateway",
-            new FeignException.BadGateway(
-                "Bad gateway",
-                Request.create(Request.HttpMethod.GET, "url", Map.of(), null, null, null),
-                null,
-                null
-            )
+    void shouldReturnTrueForBadGatewayWithIdempotentMethod() {
+        Throwable exception = new FeignException.BadGateway(
+            "Bad gateway",
+            Request.create(Request.HttpMethod.GET, "url", Map.of(), null, null, null),
+            null,
+            null
         );
 
         assertThat(ExternalTaskExceptionHelper.isRetryable(exception)).isTrue();
     }
 
     @Test
-    void shouldReturnFalseForRemoteProcessEngineBadGatewayWithNonIdempotentMethod() {
-        Throwable exception = new RemoteProcessEngineException(
-            "REST-CLIENT-001 Error during remote Camunda engine invocation: Bad Gateway",
-            new FeignException.BadGateway(
-                "Bad gateway",
-                Request.create(Request.HttpMethod.POST, "url", Map.of(), null, null, null),
-                null,
-                null
-            )
+    void shouldReturnFalseForBadGatewayWithNonIdempotentMethod() {
+        Throwable exception = new FeignException.BadGateway(
+            "Bad gateway",
+            Request.create(Request.HttpMethod.POST, "url", Map.of(), null, null, null),
+            null,
+            null
         );
 
         assertThat(ExternalTaskExceptionHelper.isRetryable(exception)).isFalse();
@@ -108,23 +98,39 @@ class ExternalTaskExceptionHelperTest {
     }
 
     @Test
-    void shouldReturnFalseForRemoteProcessEngineBadRequestMessageWithoutCause() {
-        Throwable exception = new RemoteProcessEngineException(
-            "REST-CLIENT-001 Error during remote Camunda engine invocation of DocmosisApiClient#createDocument(DocmosisRequest): Bad Request",
-            null
+    void shouldReturnTrueForNonFeignFailureRegardlessOfMessage() {
+        Throwable exception = new RuntimeException(
+            "Error during remote invocation of DocmosisApiClient#createDocument(DocmosisRequest): Bad Request"
         );
 
-        assertThat(ExternalTaskExceptionHelper.isRetryable(exception)).isFalse();
+        assertThat(ExternalTaskExceptionHelper.isRetryable(exception)).isTrue();
     }
 
     @Test
-    void shouldReturnTrueForRemoteProcessEngineNonClientErrorMessageWithoutCause() {
-        Throwable exception = new RemoteProcessEngineException(
-            "REST-CLIENT-001 Error during remote Camunda engine invocation: Bad Gateway",
+    void shouldReturnTrueForInternalServerErrorOnNonIdempotentMethod() {
+        Throwable exception = new FeignException.InternalServerError(
+            "Internal server error",
+            Request.create(Request.HttpMethod.POST, "url", Map.of(), null, null, null),
+            null,
             null
         );
 
         assertThat(ExternalTaskExceptionHelper.isRetryable(exception)).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalseForFeignExceptionWrappedInAnotherException() {
+        Throwable exception = new IllegalStateException(
+            "wrapper",
+            new FeignException.BadRequest(
+                "Bad request",
+                Request.create(Request.HttpMethod.GET, "url", Map.of(), null, null, null),
+                null,
+                null
+            )
+        );
+
+        assertThat(ExternalTaskExceptionHelper.isRetryable(exception)).isFalse();
     }
 
     @Test
