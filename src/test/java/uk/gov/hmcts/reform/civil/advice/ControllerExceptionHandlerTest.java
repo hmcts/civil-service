@@ -25,7 +25,7 @@ class ControllerExceptionHandlerTest {
     @Test
     void pinNotMatched_returnsBadRequestWithoutDuplicateLogging() {
         Logger logger = (Logger) LoggerFactory.getLogger(ControllerExceptionHandler.class);
-        Level originalLogLevel = logger.getLevel();
+        final Level originalLogLevel = logger.getLevel();
         ListAppender<ILoggingEvent> appender = new ListAppender<>();
         appender.start();
         logger.setLevel(Level.TRACE);
