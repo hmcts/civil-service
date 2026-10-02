@@ -225,6 +225,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void shouldRejectDuplicateDraftWhenUserAlreadyHasDraftClaim() {
+        draftStoreRepository.deleteAll(); // Clean state before testing
         OffsetDateTime now = OffsetDateTime.now();
         DraftStoreEntity duplicateDraft = draftClaim(
             UUID.randomUUID(),
@@ -237,6 +238,8 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
         draftStoreRepository.saveAndFlush(draftClaim(UUID.randomUUID(), now, now.plusDays(RETENTION_DAYS), "original", "12345"));
         assertThatThrownBy(() -> draftStoreRepository.saveAndFlush(duplicateDraft))
             .isInstanceOf(DataIntegrityViolationException.class);
+
+        draftStoreRepository.deleteAll();
     }
 
     @Test
