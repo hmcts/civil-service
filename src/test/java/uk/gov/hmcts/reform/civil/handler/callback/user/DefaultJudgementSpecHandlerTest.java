@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FixedCosts;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
@@ -108,11 +107,9 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
     class AboutToStartCallback {
 
         @Test
-        void shouldReturnError_WhenAboutToStartIsInvoked() {
-            BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
-            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now().minusDays(5));
+        void shouldReturnError_WhenAboutToStartIsInvoked_AndCaseIsInBreathingSpace() {
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
-            breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
+            breathingSpaceInfo.setActive(YES);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.setBreathing(breathingSpaceInfo);
@@ -123,11 +120,9 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotReturnError_WhenAboutToStartIsInvokedOneDefendant() {
-            BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
-            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now().minusDays(5));
+        void shouldNotReturnError_WhenAboutToStartIsInvoked_AndCaseIsNotInBreathingSpace() {
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
-            breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
+            breathingSpaceInfo.setActive(NO);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.setBreathing(breathingSpaceInfo);
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
@@ -174,10 +169,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_WhenAboutToStartAndInBreathingSpace() {
-            BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
-            breathingSpaceEnterInfo.setStart(LocalDate.now().minusDays(10));
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
-            breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
+            breathingSpaceInfo.setActive(YES);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.setBreathing(breathingSpaceInfo);

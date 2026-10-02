@@ -107,6 +107,13 @@ public class RoboticsNotificationService {
             roboticsCaseDataDTO = getRoboticsCaseDataDTOForSpec(caseData, authToken);
         } else {
             RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData, authToken);
+            if (roboticsCaseData.getBreathingSpace() != null) {
+                log.info(
+                    "RPA breathing space payload for unspec case {}: {}",
+                    caseData.getLegacyCaseReference(),
+                    roboticsCaseData.getBreathingSpace()
+                );
+            }
             roboticsCaseDataDTO = new RoboticsCaseDataDTO(roboticsCaseData.toJsonString().getBytes(), roboticsCaseData.getEvents());
         }
         return roboticsCaseDataDTO;
@@ -115,6 +122,13 @@ public class RoboticsNotificationService {
     private RoboticsCaseDataDTO getRoboticsCaseDataDTOForSpec(CaseData caseData, String authToken) throws JsonProcessingException {
         RoboticsCaseDataDTO roboticsCaseDataDTO;
         RoboticsCaseDataSpec roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData, authToken);
+        if (roboticsCaseDataSpec.getBreathingSpace() != null) {
+            log.info(
+                "RPA breathing space payload for Spec case {}: {}",
+                caseData.getLegacyCaseReference(),
+                roboticsCaseDataSpec.getBreathingSpace()
+            );
+        }
         roboticsCaseDataDTO = new RoboticsCaseDataDTO(roboticsCaseDataSpec.toJsonString().getBytes(), roboticsCaseDataSpec.getEvents());
         return roboticsCaseDataDTO;
     }
