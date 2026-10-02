@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.DraftClaimRequest;
-import uk.gov.hmcts.reform.dashboard.services.DraftClaimCreationResult;
+import uk.gov.hmcts.reform.dashboard.exceptions.DraftClaimAlreadyExistsException;
 import uk.gov.hmcts.reform.dashboard.services.DraftClaimService;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
@@ -53,6 +53,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     private static final String DRAFT_CLAIMS_URL = "/dashboard/draft-claims";
     private static final String DRAFT_CLAIM_BY_ID_URL = "/dashboard/draft-claims/{draft-id}";
     private static final String ACTIVE_DRAFT_CLAIM_URL = "/dashboard/draft-claims/active";
+    private static final String DRAFT_CLAIM_BY_CASE_URL = "/dashboard/draft-claims/case/{case-id}";
     private static final String USER_ID = "user1";
     private static final Map<String, Object> PAYLOAD = Map.of("step", "claimant-details");
     private static final DraftType DRAFT_TYPE = DraftType.DRAFT_CLAIM;
@@ -101,7 +102,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void shouldCreateAndPersistDraftWhenNoActiveDraftExists() throws Exception {
         draftStoreRepository.deleteAll();
-        DraftClaimRequest request = new DraftClaimRequest("123", PAYLOAD);
+        DraftClaimRequest request = new DraftClaimRequest(null, PAYLOAD);
 
         MvcResult result = doPost(BEARER_TOKEN, request, DRAFT_CLAIMS_URL)
             .andExpect(status().isCreated())
@@ -123,57 +124,106 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void shouldReturnExistingDraftWithoutChangesWhenActiveDraftExists() throws Exception {
+    void shouldReturnConflictAndLeaveDraftUnchangedWhenActiveBlankDraftExists() throws Exception {
         DraftStoreEntity originalDraft = saveInProgressDraft(draftId);
         OffsetDateTime originalCreatedAt = originalDraft.getCreatedAt();
         OffsetDateTime originalExpiresAt = originalDraft.getExpiresAt();
 
-        DraftClaimRequest request = new DraftClaimRequest(null, PAYLOAD);
-
-        doPost(BEARER_TOKEN, request, DRAFT_CLAIMS_URL)
-            .andExpectAll(
-                status().isOk(),
-                jsonPath("$.draftId").value(draftId.toString()),
-                jsonPath("$.caseId").doesNotExist(),
-                jsonPath("$.payload.step").value("active-test")
-            );
+        doPost(BEARER_TOKEN, new DraftClaimRequest(null, PAYLOAD), DRAFT_CLAIMS_URL)
+            .andExpect(status().isConflict());
 
         assertThat(draftStoreRepository.count()).isOne();
         DraftStoreEntity unchangedDraft = draftStoreRepository.findById(draftId)
             .orElseThrow(() -> new AssertionError("Draft claim should exist in DB"));
         assertThat(unchangedDraft.getCaseId()).isNull();
+        assertThat(unchangedDraft.getPayload()).containsEntry("step", "active-test");
         assertThat(unchangedDraft.getCreatedAt()).isEqualTo(originalCreatedAt);
         assertThat(unchangedDraft.getExpiresAt()).isEqualTo(originalExpiresAt);
     }
 
     @Test
-    void shouldReturnExistingCaseDraftWhenCaseIdDraftAlreadyExists() throws Exception {
+    void shouldReturnBadRequestAndNotCreateWhenCaseIdIsSentOnCreate() throws Exception {
+        draftStoreRepository.deleteAll();
+
+        doPost(BEARER_TOKEN, new DraftClaimRequest("12345", PAYLOAD), DRAFT_CLAIMS_URL)
+            .andExpect(status().isBadRequest());
+
+        assertThat(draftStoreRepository.count()).isZero();
+    }
+
+    @Test
+    void shouldReturnActiveDraftForCase() throws Exception {
         draftStoreRepository.deleteAll();
         OffsetDateTime now = OffsetDateTime.now();
-        DraftStoreEntity caseDraft = draftClaim(draftId, now, now.plusDays(RETENTION_DAYS), "payment-step", "12345");
-        draftStoreRepository.save(caseDraft);
+        draftStoreRepository.save(draftClaim(draftId, now, now.plusDays(RETENTION_DAYS), "payment-step", "12345"));
 
-        DraftClaimRequest request = new DraftClaimRequest("12345", PAYLOAD);
-
-        doPost(BEARER_TOKEN, request, DRAFT_CLAIMS_URL)
+        doGet(BEARER_TOKEN, DRAFT_CLAIM_BY_CASE_URL, "12345")
             .andExpectAll(
-                status().isOk(), // Expect 200 OK, NOT 201 Created
+                status().isOk(),
                 jsonPath("$.draftId").value(draftId.toString()),
                 jsonPath("$.caseId").value("12345"),
                 jsonPath("$.payload.step").value("payment-step")
             );
-
-        assertThat(draftStoreRepository.count()).isOne();
     }
 
     @Test
-    void shouldAllowBlankDraftAndCaseDraftToCoexistForSameUser() throws Exception {
-        DraftClaimRequest caseDraftRequest = new DraftClaimRequest("12345", PAYLOAD);
+    void shouldAllowNewBlankDraftWhileSubmittedDraftAwaitsPayment() throws Exception {
+        // Submit: the blank draft is linked to the CCD case
+        doDraftPut(BEARER_TOKEN, new DraftClaimRequest("12345", PAYLOAD), draftId)
+            .andExpect(status().isOk());
 
-        doPost(BEARER_TOKEN, caseDraftRequest, DRAFT_CLAIMS_URL)
-            .andExpect(status().isCreated());
+        // The user starts another claim while the first is unpaid
+        doPost(BEARER_TOKEN, new DraftClaimRequest(null, PAYLOAD), DRAFT_CLAIMS_URL)
+            .andExpectAll(
+                status().isCreated(),
+                jsonPath("$.caseId").doesNotExist()
+            );
+
+        // The unpaid draft can still be loaded by its case id
+        doGet(BEARER_TOKEN, DRAFT_CLAIM_BY_CASE_URL, "12345")
+            .andExpectAll(
+                status().isOk(),
+                jsonPath("$.draftId").value(draftId.toString())
+            );
 
         assertThat(draftStoreRepository.findByUserIdAndDraftType(USER_ID, DRAFT_TYPE)).hasSize(2);
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenNoDraftExistsForCase() throws Exception {
+        doGet(BEARER_TOKEN, DRAFT_CLAIM_BY_CASE_URL, "12345")
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenCaseDraftIsExpired() throws Exception {
+        draftStoreRepository.deleteAll();
+        OffsetDateTime expiredDate = OffsetDateTime.now().minusDays(RETENTION_DAYS + 1);
+        draftStoreRepository.save(draftClaim(
+            draftId,
+            expiredDate,
+            expiredDate.plusDays(RETENTION_DAYS),
+            "payment-step",
+            "12345"
+        ));
+
+        doGet(BEARER_TOKEN, DRAFT_CLAIM_BY_CASE_URL, "12345")
+            .andExpect(status().isNotFound());
+
+        assertThat(draftStoreRepository.findById(draftId)).isPresent();
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenDifferentUserRequestsDraftForCase() throws Exception {
+        draftStoreRepository.deleteAll();
+        OffsetDateTime now = OffsetDateTime.now();
+        draftStoreRepository.save(draftClaim(draftId, now, now.plusDays(RETENTION_DAYS), "payment-step", "12345"));
+        String otherUserToken = "Bearer other-user";
+        given(userService.getUserInfo(otherUserToken))
+            .willReturn(UserInfo.builder().uid("user2").build());
+
+        doGet(otherUserToken, DRAFT_CLAIM_BY_CASE_URL, "12345")
+            .andExpect(status().isNotFound());
     }
 
     @Test
@@ -182,29 +232,28 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
         given(userService.getUserInfo(otherUserToken))
             .willReturn(UserInfo.builder().uid("user2").build());
 
-        doPost(otherUserToken, new DraftClaimRequest("case2", PAYLOAD), DRAFT_CLAIMS_URL)
+        doPost(otherUserToken, new DraftClaimRequest(null, PAYLOAD), DRAFT_CLAIMS_URL)
             .andExpect(status().isCreated());
 
         assertThat(draftStoreRepository.count()).isEqualTo(2);
     }
 
     @Test
-    void shouldKeepOneDraftWhenTwoCreatesRunConcurrently() throws Exception {
+    void shouldCreateOneDraftAndRejectTheOtherWhenTwoCreatesRunConcurrently() throws Exception {
         draftStoreRepository.deleteAll();
         CountDownLatch ready = new CountDownLatch(2);
         CountDownLatch start = new CountDownLatch(1);
-        List<DraftClaimCreationResult> results = Collections.synchronizedList(new ArrayList<>());
+        List<DraftStoreEntity> created = Collections.synchronizedList(new ArrayList<>());
+        List<DraftClaimAlreadyExistsException> conflicts = Collections.synchronizedList(new ArrayList<>());
 
         try (ExecutorService executor = Executors.newFixedThreadPool(2)) {
             Runnable createDraft = () -> {
                 try {
                     ready.countDown();
                     start.await();
-                    results.add(draftClaimService.createDraftClaim(
-                        USER_ID,
-                        "123",
-                        new HashMap<>(PAYLOAD)
-                    ));
+                    created.add(draftClaimService.createDraftClaim(USER_ID, new HashMap<>(PAYLOAD)));
+                } catch (DraftClaimAlreadyExistsException ex) {
+                    conflicts.add(ex);
                 } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
                     throw new IllegalStateException(ex);
@@ -218,9 +267,12 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
             second.get(10, TimeUnit.SECONDS);
         }
 
-        assertThat(results).hasSize(2);
-        assertThat(results.get(0).draftClaim().getId()).isEqualTo(results.get(1).draftClaim().getId());
-        assertThat(draftStoreRepository.findByUserIdAndDraftType(USER_ID, DRAFT_TYPE)).hasSize(1);
+        assertThat(created).hasSize(1);
+        assertThat(conflicts).hasSize(1);
+        assertThat(draftStoreRepository.findByUserIdAndDraftType(USER_ID, DRAFT_TYPE))
+            .singleElement()
+            .extracting(DraftStoreEntity::getId)
+            .isEqualTo(created.getFirst().getId());
     }
 
     @Test
@@ -427,7 +479,7 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
         draftStoreRepository.deleteAll();
         Map<String, Object> payload = Map.of("step", "claimant-details", "draftClaimCacheTtlDays", 14);
 
-        MvcResult result = doPost(BEARER_TOKEN, new DraftClaimRequest("123", payload), DRAFT_CLAIMS_URL)
+        MvcResult result = doPost(BEARER_TOKEN, new DraftClaimRequest(null, payload), DRAFT_CLAIMS_URL)
             .andExpect(status().isCreated())
             .andReturn();
 

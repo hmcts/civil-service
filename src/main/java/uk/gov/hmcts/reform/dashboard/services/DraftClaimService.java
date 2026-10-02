@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.hmcts.reform.dashboard.exceptions.DraftClaimAlreadyExistsException;
 import uk.gov.hmcts.reform.dashboard.exceptions.DraftClaimNotFoundException;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
@@ -29,37 +30,24 @@ public class DraftClaimService {
         this.draftStoreService = draftStoreService;
     }
 
-    public DraftClaimCreationResult createDraftClaim(String userId, String caseId, Map<String, Object> payload) {
+    public DraftStoreEntity createDraftClaim(String userId, Map<String, Object> payload) {
         Objects.requireNonNull(userId, "userId must not be null");
         Objects.requireNonNull(payload, "payload must not be null");
-        OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
 
-        boolean hasCaseId = caseId != null && !caseId.isBlank();
-
-        Optional<DraftStoreEntity> existingDraft = getDraftForUserAndCase(userId, caseId);
-
-        if (existingDraft.isPresent()) {
-            DraftStoreEntity draft = existingDraft.get();
-            if (hasCaseId) {
-                log.info("Returning existing case-linked draft claim draftId={} for caseId={}", draft.getId(), caseId);
-                return DraftClaimCreationResult.existingDraft(draft);
-            } else {
-                if (draft.getExpiresAt().isAfter(now)) {
-                    log.info("Returning existing active blank draft claim draftId={}", draft.getId());
-                    return DraftClaimCreationResult.existingDraft(draft);
-                }
-                draftStoreService.deleteDraftAndFlush(draft);
+        Optional<DraftStoreEntity> existingBlankDraft = draftStoreService.getBlankDraft(userId, DRAFT_TYPE);
+        if (existingBlankDraft.isPresent()) {
+            DraftStoreEntity draft = existingBlankDraft.get();
+            if (isActive(draft, OffsetDateTime.now(ZoneOffset.UTC))) {
+                throw new DraftClaimAlreadyExistsException();
             }
+            draftStoreService.deleteDraftAndFlush(draft);
         }
 
         try {
-            return DraftClaimCreationResult.newDraft(
-                draftStoreService.createDraft(userId, caseId, payload, DRAFT_TYPE)
-            );
+            return draftStoreService.createDraft(userId, null, payload, DRAFT_TYPE);
         } catch (DataIntegrityViolationException ex) {
-            return getDraftForUserAndCase(userId, caseId)
-                .map(DraftClaimCreationResult::existingDraft)
-                .orElseThrow(() -> ex);
+            // A concurrent request created the blank draft first
+            throw new DraftClaimAlreadyExistsException(ex);
         }
     }
 
@@ -70,26 +58,23 @@ public class DraftClaimService {
 
     @Transactional(readOnly = true)
     public Optional<DraftStoreEntity> getActiveDraftClaimForUser(String userId) {
-        return draftStoreService.getActiveDraftsForUser(userId, DRAFT_TYPE)
-            .stream()
-            .filter(draft -> draft.getCaseId() == null)
-            .findFirst();
+        return draftStoreService.getActiveBlankDraft(userId, DRAFT_TYPE);
     }
 
     @Transactional(readOnly = true)
-    public Optional<DraftStoreEntity> getDraftForUserAndCase(String userId, String caseId) {
-        boolean hasCaseId = caseId != null && !caseId.isBlank();
-        return draftStoreService.getDraftsForUser(userId, DRAFT_TYPE)
-            .stream()
-            .filter(draft -> hasCaseId ? Objects.equals(draft.getCaseId(), caseId) : draft.getCaseId() == null)
-            .findFirst();
+    public Optional<DraftStoreEntity> getDraftClaimForCase(String userId, String caseId) {
+        String normalisedCaseId = normaliseCaseId(caseId);
+        if (normalisedCaseId == null) {
+            return Optional.empty();
+        }
+        return draftStoreService.getActiveDraftForCase(userId, normalisedCaseId, DRAFT_TYPE);
     }
 
     public DraftStoreEntity updateDraftClaim(UUID draftId,
                                              String userId,
                                              String caseId,
                                              Map<String, Object> payload) {
-        return draftStoreService.updateDraft(draftId, userId, caseId, payload, DRAFT_TYPE)
+        return draftStoreService.updateDraft(draftId, userId, normaliseCaseId(caseId), payload, DRAFT_TYPE)
             .orElseThrow(() -> new DraftClaimNotFoundException(draftId));
     }
 
@@ -97,5 +82,13 @@ public class DraftClaimService {
         if (!draftStoreService.deleteDraft(draftId, userId, DRAFT_TYPE)) {
             throw new DraftClaimNotFoundException(draftId);
         }
+    }
+
+    private static String normaliseCaseId(String caseId) {
+        return caseId == null || caseId.isBlank() ? null : caseId;
+    }
+
+    private static boolean isActive(DraftStoreEntity draft, OffsetDateTime now) {
+        return draft.getExpiresAt().isAfter(now);
     }
 }
