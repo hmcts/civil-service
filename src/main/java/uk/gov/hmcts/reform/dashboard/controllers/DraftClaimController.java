@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.dashboard.controllers;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,16 +16,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.dashboard.data.DraftClaimRequest;
 import uk.gov.hmcts.reform.dashboard.data.DraftClaimResponse;
+import uk.gov.hmcts.reform.dashboard.exceptions.DraftClaimAlreadyExistsException;
 import uk.gov.hmcts.reform.dashboard.exceptions.DraftClaimNotFoundException;
-import uk.gov.hmcts.reform.dashboard.services.DraftClaimCreationResult;
 import uk.gov.hmcts.reform.dashboard.services.DraftClaimService;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping(path = "/dashboard/draft-claims", produces = MediaType.APPLICATION_JSON_VALUE)
 public class DraftClaimController {
@@ -41,13 +45,18 @@ public class DraftClaimController {
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
         @Valid @RequestBody DraftClaimRequest request
     ) {
-        DraftClaimCreationResult result = draftClaimService.createDraftClaim(
+        // New drafts are always blank; a draft is linked to a case by updating it after submission
+        if (request.getCaseId() != null && !request.getCaseId().isBlank()) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "caseId cannot be set when creating a draft claim"
+            );
+        }
+        DraftStoreEntity draftClaim = draftClaimService.createDraftClaim(
             getUserId(authorisation),
-            request.getCaseId(),
             request.getPayload()
         );
-        HttpStatus status = result.newlyCreated() ? HttpStatus.CREATED : HttpStatus.OK;
-        return new ResponseEntity<>(DraftClaimResponse.from(result.draftClaim()), status);
+        return new ResponseEntity<>(DraftClaimResponse.from(draftClaim), HttpStatus.CREATED);
     }
 
     @GetMapping("/active")
@@ -56,6 +65,16 @@ public class DraftClaimController {
     ) {
         DraftStoreEntity draftClaim = draftClaimService.getActiveDraftClaimForUser(getUserId(authorisation))
             .orElseThrow(DraftClaimNotFoundException::new);
+        return ResponseEntity.ok(DraftClaimResponse.from(draftClaim));
+    }
+
+    @GetMapping("/case/{case-id}")
+    public ResponseEntity<DraftClaimResponse> getDraftClaimForCase(
+        @PathVariable("case-id") String caseId,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+    ) {
+        DraftStoreEntity draftClaim = draftClaimService.getDraftClaimForCase(getUserId(authorisation), caseId)
+            .orElseThrow(() -> new DraftClaimNotFoundException(caseId));
         return ResponseEntity.ok(DraftClaimResponse.from(draftClaim));
     }
 
@@ -91,6 +110,12 @@ public class DraftClaimController {
     ) {
         draftClaimService.deleteDraftClaim(draftId, getUserId(authorisation));
         return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(DraftClaimAlreadyExistsException.class)
+    public ResponseEntity<String> draftClaimAlreadyExists(DraftClaimAlreadyExistsException exception) {
+        log.info(exception.getMessage());
+        return new ResponseEntity<>("An active draft claim already exists", HttpStatus.CONFLICT);
     }
 
     private String getUserId(String authorisation) {
