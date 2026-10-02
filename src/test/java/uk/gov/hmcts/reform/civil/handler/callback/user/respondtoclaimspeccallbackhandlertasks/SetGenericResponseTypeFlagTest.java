@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,7 +68,7 @@ class SetGenericResponseTypeFlagTest {
 
     @BeforeEach
     void setUp() {
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
         setGenericResponseTypeFlag = new SetGenericResponseTypeFlag(objectMapper, userService, coreCaseUserService, featureToggleService, respondToClaimSpecUtilsDisputeDetails);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
     }
@@ -440,6 +441,27 @@ class SetGenericResponseTypeFlagTest {
     }
 
     @Test
+    void shouldUseRespondent2PaymentRouteAndFlags_whenRespondent2RespondsAfterRespondent1() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .isRespondent1(NO)
+            .isRespondent2(YES)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .ccdCaseReference(1234L)
+            .build();
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setDefenceAdmitPartPaymentTimeRouteGeneric(
+            RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN);
+
+        AboutToStartOrSubmitCallbackResponse response = executeWithMockedScenario(caseData, ONE_V_TWO_TWO_LEGAL_REP);
+
+        assertEquals("PART_ADMISSION", response.getData().get(RESPONDENT_CLAIM_RESPONSE_TYPE_GENERIC));
+        assertEquals("BY_SET_DATE", response.getData().get(DEFENCE_ADMIT_PART_PAYMENT_TIME_ROUTE_GENERIC));
+        assertEquals("COUNTER_ADMIT_OR_ADMIT_PART", response.getData().get(MULTI_PARTY_RESPONSE_TYPE_FLAGS));
+    }
+
+    @Test
     void shouldSetGenericResponseTypeFlagWhenRespondent1HasFullDefenceAndImmediatePaymentRouteInOneVTwoTwoLegalRepScenario() {
         CaseData caseData = CaseDataBuilder.builder()
                 .isRespondent1(YES)
@@ -463,7 +485,7 @@ class SetGenericResponseTypeFlagTest {
         caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
         caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
-        caseData.setIsRespondent1(YES);
+        caseData.setIsRespondent1(NO);
         caseData.setCcdCaseReference(1234L);
 
         AboutToStartOrSubmitCallbackResponse response = executeWithMockedScenario(caseData, ONE_V_TWO_TWO_LEGAL_REP);
