@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.dashboard.controllers;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -46,7 +47,7 @@ public class DraftClaimController {
         @Valid @RequestBody DraftClaimRequest request
     ) {
         // New drafts are always blank; a draft is linked to a case by updating it after submission
-        if (request.getCaseId() != null && !request.getCaseId().isBlank()) {
+        if (StringUtils.isNotBlank(request.getCaseId())) {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
                 "caseId cannot be set when creating a draft claim"

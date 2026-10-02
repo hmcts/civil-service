@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.dashboard.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,7 +86,7 @@ public class DraftClaimService {
     }
 
     private static String normaliseCaseId(String caseId) {
-        return caseId == null || caseId.isBlank() ? null : caseId;
+        return StringUtils.trimToNull(caseId);
     }
 
     private static boolean isActive(DraftStoreEntity draft, OffsetDateTime now) {

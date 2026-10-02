@@ -178,6 +178,17 @@ class DraftClaimServiceTest {
         }
 
         @Test
+        void shouldTrimCaseIdWhenLookingUpDraftForCase() {
+            OffsetDateTime createdAt = OffsetDateTime.now();
+            DraftStoreEntity caseDraft = draft(CASE_ID, createdAt, createdAt.plusDays(RETENTION_DAYS));
+            when(draftStoreService.getActiveDraftForCase(USER_ID, CASE_ID, DRAFT_TYPE)).thenReturn(Optional.of(caseDraft));
+
+            Optional<DraftStoreEntity> result = draftClaimService.getDraftClaimForCase(USER_ID, "  " + CASE_ID + " ");
+
+            assertThat(result).contains(caseDraft);
+        }
+
+        @Test
         void shouldReturnEmptyWithoutQueryingWhenCaseIdIsBlank() {
             Optional<DraftStoreEntity> result = draftClaimService.getDraftClaimForCase(USER_ID, " ");
 
@@ -206,6 +217,19 @@ class DraftClaimServiceTest {
 
             assertThat(result).isSameAs(updatedDraft);
             verify(draftStoreService).updateDraft(DRAFT_ID, USER_ID, NEW_CASE_ID, payload, DRAFT_TYPE);
+        }
+
+        @Test
+        void shouldTrimCaseIdWhenUpdatingDraft() {
+            Map<String, Object> payload = Map.of("step", "submitted");
+            OffsetDateTime createdAt = OffsetDateTime.now();
+            DraftStoreEntity updatedDraft = draft(createdAt, createdAt.plusDays(RETENTION_DAYS));
+            when(draftStoreService.updateDraft(DRAFT_ID, USER_ID, CASE_ID, payload, DRAFT_TYPE))
+                .thenReturn(Optional.of(updatedDraft));
+
+            draftClaimService.updateDraftClaim(DRAFT_ID, USER_ID, " " + CASE_ID + "  ", payload);
+
+            verify(draftStoreService).updateDraft(DRAFT_ID, USER_ID, CASE_ID, payload, DRAFT_TYPE);
         }
 
         @Test
