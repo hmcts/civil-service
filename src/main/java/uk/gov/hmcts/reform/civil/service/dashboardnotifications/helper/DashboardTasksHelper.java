@@ -18,14 +18,23 @@ public class DashboardTasksHelper {
     }
 
     public void deleteNotificationAndInactiveTasksForClaimant(CaseData caseData) {
-        deleteNotificationAndInactiveTasksForRole(caseData, "CLAIMANT");
+        deleteNotificationAndInactiveTasksForRole(caseData, "CLAIMANT", "Applications");
     }
 
     public void deleteNotificationAndInactiveTasksForDefendant(CaseData caseData) {
-        deleteNotificationAndInactiveTasksForRole(caseData, "DEFENDANT");
+        deleteNotificationAndInactiveTasksForRole(caseData, "DEFENDANT", "Applications");
     }
 
-    private void deleteNotificationAndInactiveTasksForRole(CaseData caseData, String citizenRole) {
+    public void deleteNotificationAndInactiveTasksForClaimant(CaseData caseData, String categories) {
+        deleteNotificationAndInactiveTasksForRole(caseData, "CLAIMANT","Applications", categories);
+    }
+
+    public void deleteNotificationAndInactiveTasksForDefendant(CaseData caseData, String categories) {
+        deleteNotificationAndInactiveTasksForRole(caseData, "DEFENDANT","Applications", categories);
+
+    }
+
+    private void deleteNotificationAndInactiveTasksForRole(CaseData caseData, String citizenRole, String... excludeCategories) {
         dashboardNotificationService.deleteByReferenceAndCitizenRole(
             caseData.getCcdCaseReference().toString(),
             citizenRole
@@ -34,7 +43,7 @@ public class DashboardTasksHelper {
         taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
             caseData.getCcdCaseReference().toString(),
             citizenRole,
-            "Applications"
+            excludeCategories
         );
     }
 }

@@ -21,6 +21,7 @@ class DashboardTasksHelperTest {
 
     @Mock
     private TaskListService taskListService;
+
     @Mock
     private DashboardNotificationService dashboardNotificationService;
 
@@ -28,41 +29,95 @@ class DashboardTasksHelperTest {
     private DashboardTasksHelper dashboardTasksHelper;
 
     @Test
-    void shouldExcludeApplicationsForClaimant() {
-        CaseData caseData = caseData(BASE_LOCATION, CCD_REFERENCE);
+    void shouldExcludeApplicationsForClaimantByDefault() {
+        CaseData caseData = caseData();
 
         dashboardTasksHelper.deleteNotificationAndInactiveTasksForClaimant(caseData);
 
-        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
-            CCD_REFERENCE.toString(),
-            "CLAIMANT",
-            "Applications"
-        );
-        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
-            CCD_REFERENCE.toString(),
-            "CLAIMANT");
+        verify(taskListService)
+            .makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
+                CCD_REFERENCE.toString(),
+                "CLAIMANT",
+                "Applications"
+            );
+
+        verify(dashboardNotificationService)
+            .deleteByReferenceAndCitizenRole(
+                CCD_REFERENCE.toString(),
+                "CLAIMANT"
+            );
     }
 
     @Test
-    void shouldExcludeApplicationsForDefendant() {
-        CaseData caseData = caseData(BASE_LOCATION, CCD_REFERENCE);
+    void shouldExcludeApplicationsForDefendantByDefault() {
+        CaseData caseData = caseData();
 
         dashboardTasksHelper.deleteNotificationAndInactiveTasksForDefendant(caseData);
 
-        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
-            CCD_REFERENCE.toString(),
-            "DEFENDANT",
-            "Applications"
-        );
-        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
-            CCD_REFERENCE.toString(),
-            "DEFENDANT");
+        verify(taskListService)
+            .makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
+                CCD_REFERENCE.toString(),
+                "DEFENDANT",
+                "Applications"
+            );
+
+        verify(dashboardNotificationService)
+            .deleteByReferenceAndCitizenRole(
+                CCD_REFERENCE.toString(),
+                "DEFENDANT"
+            );
     }
 
-    private CaseData caseData(String baseLocation, Long ccdCaseReference) {
+    @Test
+    void shouldExcludeProvidedCategoryForClaimant() {
+        CaseData caseData = caseData();
+        String category = "Hearing";
+
+        dashboardTasksHelper.deleteNotificationAndInactiveTasksForClaimant(caseData, category);
+
+        verify(taskListService)
+            .makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
+                CCD_REFERENCE.toString(),
+                "CLAIMANT",
+                "Applications",
+                category
+            );
+
+        verify(dashboardNotificationService)
+            .deleteByReferenceAndCitizenRole(
+                CCD_REFERENCE.toString(),
+                "CLAIMANT"
+            );
+    }
+
+    @Test
+    void shouldExcludeProvidedCategoryForDefendant() {
+        CaseData caseData = caseData();
+        String category = "Hearing";
+
+        dashboardTasksHelper.deleteNotificationAndInactiveTasksForDefendant(caseData, category);
+
+        verify(taskListService)
+            .makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
+                CCD_REFERENCE.toString(),
+                "DEFENDANT",
+                "Applications",
+                category
+            );
+
+        verify(dashboardNotificationService)
+            .deleteByReferenceAndCitizenRole(
+                CCD_REFERENCE.toString(),
+                "DEFENDANT"
+            );
+    }
+
+    private CaseData caseData() {
         return new CaseDataBuilder()
-            .ccdCaseReference(ccdCaseReference)
-            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(baseLocation))
+            .ccdCaseReference(DashboardTasksHelperTest.CCD_REFERENCE)
+            .caseManagementLocation(
+                new CaseLocationCivil().setBaseLocation(DashboardTasksHelperTest.BASE_LOCATION)
+            )
             .build();
     }
 }

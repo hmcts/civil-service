@@ -18,6 +18,7 @@ public abstract class DashboardScenarioService {
 
     protected static final String DEFENDANT_ROLE = "DEFENDANT";
     protected static final String CLAIMANT_ROLE = "CLAIMANT";
+    public static final String HEARING_TASK_CATEGORY = "Hearing";
 
     protected DashboardScenarioService(DashboardScenariosService dashboardScenariosService,
                                        DashboardNotificationsParamsMapper mapper) {

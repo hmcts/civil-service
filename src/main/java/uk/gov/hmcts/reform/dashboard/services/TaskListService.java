@@ -14,12 +14,8 @@ import uk.gov.hmcts.reform.dashboard.utilities.StringUtility;
 
 import jakarta.persistence.EntityManager;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -171,24 +167,42 @@ public class TaskListService {
         }).orElseThrow(() -> new IllegalArgumentException("Invalid task item identifier " + taskItemIdentifier));
     }
 
-    private void makeProgressAbleTasksInactiveForCaseIdentifierAndRole(String caseIdentifier, String role, String excludedCategory, String excludedTemplate) {
+    private void makeProgressAbleTasksInactiveForCaseIdentifierAndRole(String caseIdentifier, String role, List<String> excludedCategories, String excludedTemplate) {
         log.info(
-            "makeProgressAbleTasksInactiveForCaseIdentifierAndRole caseIdentifier:{} role: {} excludedCategory: {} excludedTemplate: {}",
+            "makeProgressAbleTasksInactiveForCaseIdentifierAndRole caseIdentifier:{} role: {} excludedCategories: {} excludedTemplate: {}",
             caseIdentifier,
             role,
-            excludedCategory,
+            excludedCategories,
             excludedTemplate
         );
         List<TaskListEntity> tasks = new ArrayList<>();
-        if (Objects.nonNull(excludedCategory)) {
-            List<TaskItemTemplateEntity> categories = taskItemTemplateRepository.findByCategoryEnAndRole(
-                excludedCategory,
-                role
-            );
-            if (Objects.nonNull(categories)) {
-                List<Long> catIds = categories.stream().map(TaskItemTemplateEntity::getId).toList();
+        if (Objects.nonNull(excludedCategories) && !excludedCategories.isEmpty()) {
+            List<Long> catIds = excludedCategories.stream()
+                .filter(Objects::nonNull)
+                .flatMap(category -> {
+                    List<TaskItemTemplateEntity> templates = taskItemTemplateRepository.findByCategoryEnAndRole(
+                        category,
+                        role
+                    );
+                    return Objects.nonNull(templates) ? templates.stream() : Stream.of();
+                })
+                .map(TaskItemTemplateEntity::getId)
+                .distinct()
+                .toList();
+            if (!catIds.isEmpty()) {
                 tasks = taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplate_IdNotIn(
-                    caseIdentifier, role, NON_PROGRESSABLE_STATUSES, catIds
+                        caseIdentifier,
+                        role,
+                        NON_PROGRESSABLE_STATUSES,
+                        catIds
+                );
+            } else {
+                log.info("No task templates found for categories {} and role {} - defaulting to all progressable tasks",
+                         excludedCategories, role);
+                tasks = taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
+                    caseIdentifier,
+                    role,
+                    NON_PROGRESSABLE_STATUSES
                 );
             }
         } else if (Objects.nonNull(excludedTemplate)) {
@@ -210,16 +224,16 @@ public class TaskListService {
             caseIdentifier,
             role
         );
-        makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseIdentifier, role, null, null);
+        makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseIdentifier, role, List.of(), null);
     }
 
     @Transactional
-    public void makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(String caseIdentifier, String role, String excludedCategory) {
+    public void makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(String caseIdentifier, String role, String... excludedCategories) {
         log.info(
-            "makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory caseIdentifier:{} role: {} excludedCategory: {}",
-            caseIdentifier, role, excludedCategory
+            "makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory caseIdentifier:{} role: {} excludedCategories: {}",
+            caseIdentifier, role, excludedCategories
         );
-        makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseIdentifier, role, excludedCategory, null);
+        makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseIdentifier, role, normaliseCategories(excludedCategories), null);
     }
 
     @Transactional
@@ -313,5 +327,15 @@ public class TaskListService {
             taskListRepository.save(task);
         });
         log.info("Total {} tasks made inactive for claim = {}", tasks.size(), caseIdentifier);
+    }
+
+    private List<String> normaliseCategories(String... categories) {
+        if (categories == null || categories.length == 0) {
+            return List.of();
+        }
+        return Arrays.stream(categories)
+            .filter(Objects::nonNull)
+            .filter(category -> !category.isBlank())
+            .toList();
     }
 }

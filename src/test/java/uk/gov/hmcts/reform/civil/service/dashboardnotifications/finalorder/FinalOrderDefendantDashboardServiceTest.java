@@ -20,6 +20,7 @@ import java.util.HashMap;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService.HEARING_TASK_CATEGORY;
 
 @ExtendWith(MockitoExtension.class)
 class FinalOrderDefendantDashboardServiceTest {
@@ -56,7 +57,7 @@ class FinalOrderDefendantDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             new ScenarioRequestParams(new HashMap<>())
         );
-        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData, HEARING_TASK_CATEGORY);
     }
 
     @Test
@@ -78,7 +79,7 @@ class FinalOrderDefendantDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             new ScenarioRequestParams(new HashMap<>())
         );
-        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData, HEARING_TASK_CATEGORY);
     }
 
     @Test
@@ -94,7 +95,7 @@ class FinalOrderDefendantDashboardServiceTest {
         finalOrderDefendantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
-        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData, HEARING_TASK_CATEGORY);
     }
 
     @Test
@@ -111,6 +112,6 @@ class FinalOrderDefendantDashboardServiceTest {
         finalOrderDefendantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
-        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData, HEARING_TASK_CATEGORY);
     }
 }
