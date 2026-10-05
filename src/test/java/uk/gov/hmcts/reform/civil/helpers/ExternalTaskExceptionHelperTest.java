@@ -146,4 +146,61 @@ class ExternalTaskExceptionHelperTest {
         assertThat(ExternalTaskExceptionHelper.getStackTrace(new RuntimeException("boom")))
             .contains("ExternalTaskExceptionHelperTest");
     }
+
+    /**
+     * A lost optimistic locking race on CCD. The write did not apply, so a retry cannot duplicate
+     * anything. This must hold for POST, which is the method the submit calls use, so it proves
+     * the 409 branch sits ahead of the idempotency gate rather than relying on it.
+     */
+    @Test
+    void shouldReturnTrueForConflictOnNonIdempotentMethod() {
+        Throwable exception = new FeignException.Conflict(
+            "[409 Conflict] during [POST] to [/cases/1/events]",
+            Request.create(Request.HttpMethod.POST, "url", Map.of(), null, null, null),
+            null,
+            null
+        );
+
+        assertThat(ExternalTaskExceptionHelper.isRetryable(exception)).isTrue();
+    }
+
+    @Test
+    void shouldReturnTrueForConflictOnIdempotentMethod() {
+        Throwable exception = new FeignException.Conflict(
+            "[409 Conflict] during [GET] to [/cases/1]",
+            Request.create(Request.HttpMethod.GET, "url", Map.of(), null, null, null),
+            null,
+            null
+        );
+
+        assertThat(ExternalTaskExceptionHelper.isRetryable(exception)).isTrue();
+    }
+
+    /**
+     * Guards the boundary. 409 is retryable on a POST but 400 next to it must stay non retryable,
+     * so the new branch cannot be read as making 4xx retryable generally.
+     */
+    @Test
+    void shouldStillReturnFalseForOtherClientErrorsOnNonIdempotentMethod() {
+        Throwable exception = new FeignException.NotFound(
+            "[404 Not Found] during [POST] to [/cases/1/events]",
+            Request.create(Request.HttpMethod.POST, "url", Map.of(), null, null, null),
+            null,
+            null
+        );
+
+        assertThat(ExternalTaskExceptionHelper.isRetryable(exception)).isFalse();
+    }
+
+    @Test
+    void shouldReturnTrueForConflictWrappedInACauseChain() {
+        Throwable conflict = new FeignException.Conflict(
+            "[409 Conflict] during [POST] to [/cases/1/events]",
+            Request.create(Request.HttpMethod.POST, "url", Map.of(), null, null, null),
+            null,
+            null
+        );
+
+        assertThat(ExternalTaskExceptionHelper.isRetryable(new RuntimeException("wrapped", conflict))).isTrue();
+    }
 }

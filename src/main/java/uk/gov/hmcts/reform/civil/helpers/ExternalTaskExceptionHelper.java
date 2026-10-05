@@ -11,6 +11,7 @@ import static org.apache.hc.core5.http.Method.isIdempotent;
 public class ExternalTaskExceptionHelper {
 
     private static final int HTTP_REQUEST_TIMEOUT = 408;
+    private static final int HTTP_CONFLICT = 409;
     private static final int HTTP_TOO_MANY_REQUESTS = 429;
     private static final int HTTP_INTERNAL_SERVER_ERROR = 500;
     private static final int HTTP_BAD_GATEWAY = 502;
@@ -49,6 +50,21 @@ public class ExternalTaskExceptionHelper {
             // deliberately; DTSCCI-6393 records the numbers.
             return true;
         }
+        if (status == HTTP_CONFLICT) {
+            // A 409 from CCD means the write did not apply: the case version moved underneath us,
+            // so there is nothing for a retry to duplicate. That is why this sits ahead of the
+            // idempotency gate below, which would otherwise reject it because the submit calls are
+            // POSTs. Retrying a 409 is in fact safer than retrying the 500 above, where the write
+            // may have partially applied.
+            //
+            // Over 30 days in production CCD returned 409 on 260 submitEventForCaseWorker calls.
+            // Roughly 38% of those land within 5s of business process start activity on the same
+            // case, so a lost race on the READY to STARTED flip is one source but not the main
+            // one; the rest are other concurrent edits. Retrying is correct either way.
+            // Measured under DTSCCI-6615, where it gates raising external task concurrency.
+            return true;
+        }
+
         if (status > 0 && !isRetryableStatus(status)) {
             return false;
         }
