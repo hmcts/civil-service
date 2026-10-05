@@ -42,13 +42,18 @@ import java.util.stream.Stream;
  * topic has today, so adding a subscription without touching the configuration cannot change how
  * an existing one is served.
  *
- * <p>Note what more than one case driven client changes behaviourally. Today two case driven tasks
- * never run at the same instant, so two concurrent process instances on the same case are
- * serialised by the single thread. With several clients they can run together, which can produce
- * CCD optimistic locking conflicts on that case where previously it could not. The BPMN keeps tasks
+ * <p>Note what more than one case driven client changes behaviourally. With a single thread two
+ * case driven tasks never ran at the same instant, so two concurrent process instances on the same
+ * case were serialised for free. With several clients they can run together, which can produce CCD
+ * optimistic locking conflicts on that case where previously it could not. The BPMN keeps tasks
  * within one process instance sequential, so this applies only to a case carrying concurrent
- * instances. Conflict rate is the measurement that gates raising the client count, and the
- * production baseline is 8 "Duplicated attempt" lines in 30 days.
+ * instances.
+ *
+ * <p>The two client preview run found none of it: zero overlapping tasks on one process instance,
+ * zero on one case, and no optimistic locking or "Duplicated attempt" lines. That is supporting
+ * evidence rather than proof, because only 93 of 619 task executions could be tied back to a case
+ * from the logs. Conflict rate in production remains the measurement that gates the client count,
+ * against a baseline of 8 "Duplicated attempt" lines in 30 days.
  *
  * @see ExternalTaskListenerConfiguration
  */

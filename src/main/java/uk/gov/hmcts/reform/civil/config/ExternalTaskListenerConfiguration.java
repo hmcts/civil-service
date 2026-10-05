@@ -139,10 +139,13 @@ public class ExternalTaskListenerConfiguration {
     /**
      * One client, so one subscription thread, per configured case driven slot.
      *
-     * <p>Measured justification for more than one: through a functional test run on the PR 8438
-     * preview the single case driven thread reached 95% occupancy in its densest minute, 126 tasks
-     * a minute against a 155 a minute ceiling, while raising {@code maxTasks} to 10 left peak
-     * queue depth unchanged at 8 unlocked tasks. The constraint is the thread, not the batch size.
+     * <p>Measured justification, from functional test runs on the PR 8438 preview. One client
+     * reached 95% occupancy in its densest minute, 126 tasks a minute against a 155 a minute
+     * ceiling, while raising {@code maxTasks} to 10 left peak queue depth unchanged. Two clients
+     * nearly doubled that to 247 tasks a minute, proven by 299.8 seconds of handler work completing
+     * inside 236.6 seconds of wall clock, which one thread cannot do. Both of those threads were
+     * then at 95% as well, so demand exceeded two exactly as it exceeded one, which is what the
+     * third is for. The constraint is thread count, not batch size.
      *
      * <p>Wrapped in {@link CaseDrivenExternalTaskClients} rather than returned as a
      * {@code List<ExternalTaskClient>} bean so Spring's collection injection cannot supply the

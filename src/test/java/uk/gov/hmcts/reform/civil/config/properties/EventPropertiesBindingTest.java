@@ -11,8 +11,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * <p>Worth its own test because the failure is silent in the direction that matters: a misspelled
  * key in {@code application.yaml} leaves the field at its code default, and for
- * {@code caseDrivenClients} the code default is the value we want anyway, so the environment
- * override would simply never take effect and nothing would say so.
+ * {@code caseDrivenClients} the code default is a value we would plausibly want anyway, so the
+ * environment override would simply never take effect and nothing would say so. The bound value
+ * asserted below is deliberately not the default, or the test would pass without binding anything.
  */
 class EventPropertiesBindingTest {
 
@@ -21,14 +22,14 @@ class EventPropertiesBindingTest {
 
     @Test
     void shouldBindTheCaseDrivenClientCount() {
-        context.withPropertyValues("async.event.caseDrivenClients=3").run(it ->
-            assertThat(it.getBean(EventProperties.class).getCaseDrivenClients()).isEqualTo(3));
+        context.withPropertyValues("async.event.caseDrivenClients=5").run(it ->
+            assertThat(it.getBean(EventProperties.class).getCaseDrivenClients()).isEqualTo(5));
     }
 
     @Test
-    void shouldDefaultToTwoCaseDrivenClientsWhenNotConfigured() {
+    void shouldDefaultToThreeCaseDrivenClientsWhenNotConfigured() {
         context.run(it ->
-            assertThat(it.getBean(EventProperties.class).getCaseDrivenClients()).isEqualTo(2));
+            assertThat(it.getBean(EventProperties.class).getCaseDrivenClients()).isEqualTo(3));
     }
 
     @Test

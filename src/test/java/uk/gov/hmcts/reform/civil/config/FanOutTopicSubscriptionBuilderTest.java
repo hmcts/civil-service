@@ -209,6 +209,43 @@ class FanOutTopicSubscriptionBuilderTest {
         }
     }
 
+    /**
+     * The production shape is three case driven clients, so the fan out is exercised beyond the
+     * two-delegate case: an implementation that only ever reached the first and last delegate, or
+     * that stopped after a pair, would pass every test above.
+     */
+    @Test
+    void shouldFanOutToThreeDelegates() {
+        TopicSubscriptionBuilder third = mock(TopicSubscriptionBuilder.class);
+        FanOutTopicSubscriptionBuilder wide =
+            new FanOutTopicSubscriptionBuilder(List.of(first, second, third));
+        ExternalTaskHandler handler = mock(ExternalTaskHandler.class);
+
+        wide.handler(handler).lockDuration(1980000L);
+
+        for (TopicSubscriptionBuilder d : List.of(first, second, third)) {
+            verify(d).handler(handler);
+            verify(d).lockDuration(1980000L);
+        }
+    }
+
+    @Test
+    void shouldOpenAllThreeAndCloseAllThree() {
+        TopicSubscriptionBuilder third = mock(TopicSubscriptionBuilder.class);
+        TopicSubscription s1 = mock(TopicSubscription.class);
+        TopicSubscription s2 = mock(TopicSubscription.class);
+        TopicSubscription s3 = mock(TopicSubscription.class);
+        when(first.open()).thenReturn(s1);
+        when(second.open()).thenReturn(s2);
+        when(third.open()).thenReturn(s3);
+
+        new FanOutTopicSubscriptionBuilder(List.of(first, second, third)).open().close();
+
+        verify(s1).close();
+        verify(s2).close();
+        verify(s3).close();
+    }
+
     @Test
     void shouldRejectNoDelegates() {
         assertThatThrownBy(() -> new FanOutTopicSubscriptionBuilder(List.of()))

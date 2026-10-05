@@ -33,7 +33,11 @@ public class EventProperties {
     // set of tasks. Raise this to add concurrency; 1 restores the previous single threaded
     // behaviour. More than one lets two process instances on the same case run at the same time,
     // so CCD conflict rate is the measurement that gates increasing it.
-    protected int caseDrivenClients = 2;
+    //
+    // At 2 the preview reached 247 tasks a minute, nearly double the 126 one client managed, but
+    // both threads were still at 95% occupancy in the densest minute, so demand exceeded two
+    // just as it exceeded one. 3 is the next step from that measurement, not a guess.
+    protected int caseDrivenClients = 3;
     // tasks fetched per fetchAndLock on the case driven client. maxTasks caps tasks per request
     // across all topics on that client, not per topic, so this is the whole request budget.
     protected int caseDrivenMaxTasks = 1;
