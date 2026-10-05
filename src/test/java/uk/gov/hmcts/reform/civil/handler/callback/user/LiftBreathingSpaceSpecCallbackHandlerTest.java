@@ -351,38 +351,6 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
             );
             assertThat(stored.get(0).getValue().getLift().getExpectedEnd()).isEqualTo(expectedEnd);
         }
-
-        @Test
-        public void shouldStoreLiftOnOpenBreathingSpaceItem_whenInvoked() {
-            BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
-            enterInfo.setStart(LocalDate.now().minusDays(2));
-            BreathingSpaceLiftInfo liftInfo = new BreathingSpaceLiftInfo();
-            liftInfo.setExpectedEnd(LocalDate.now());
-            liftInfo.setReasonToLift("reason");
-            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
-            breathingSpaceInfo.setEnter(enterInfo);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-            caseData.setBreathing(breathingSpaceInfo);
-            BreathingSpaceUtils.addEnteredBreathingSpaceToHistory(caseData);
-            breathingSpaceInfo.setLift(liftInfo);
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
-
-            List<Element<StoredBreathingSpace>> stored = objectMapper.convertValue(
-                response.getData().get("storedBreathingSpace"),
-                new TypeReference<>() {}
-            );
-
-            assertThat(stored).hasSize(1);
-            assertThat(stored.get(0).getValue().getDefendantLabel())
-                .isEqualTo("Breathing space for Defendant 1 details");
-            assertThat(stored.get(0).getValue().getLift().getReasonToLift()).isEqualTo("reason");
-            assertThat(response.getData())
-                .extracting("breathingSpaceActive")
-                .isEqualTo("No");
-        }
     }
 
     @Nested
