@@ -28,6 +28,12 @@ public class EventProperties {
     protected long clientBackoffMax;
     // period of inactivity after which pooled Camunda HTTP connections are validated before reuse.
     protected long httpValidateAfterInactivityMs = 2000;
+    // number of case driven clients, so the number of subscription threads serving case driven
+    // topics. Each one subscribes to every case driven topic and fetchAndLock gives each a disjoint
+    // set of tasks. Raise this to add concurrency; 1 restores the previous single threaded
+    // behaviour. More than one lets two process instances on the same case run at the same time,
+    // so CCD conflict rate is the measurement that gates increasing it.
+    protected int caseDrivenClients = 2;
     // tasks fetched per fetchAndLock on the case driven client. maxTasks caps tasks per request
     // across all topics on that client, not per topic, so this is the whole request budget.
     protected int caseDrivenMaxTasks = 1;

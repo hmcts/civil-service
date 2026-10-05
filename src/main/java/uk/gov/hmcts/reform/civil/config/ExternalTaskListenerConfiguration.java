@@ -19,6 +19,8 @@ import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Configuration
@@ -122,20 +124,42 @@ public class ExternalTaskListenerConfiguration {
     );
 
     /**
-     * The client every listener injects. Routes each subscription to one of the two real clients
-     * below, so none of the 39 listeners needs to know there is more than one.
+     * The client every listener injects. Routes each subscription to the real clients below, so
+     * none of the 39 listeners needs to know there is more than one, or how many.
      */
     @Bean
     @Primary
     public ExternalTaskClient client(
-        @Qualifier("caseDrivenExternalTaskClient") ExternalTaskClient caseDrivenClient,
+        CaseDrivenExternalTaskClients caseDrivenClients,
         @Qualifier("schedulerExternalTaskClient") ExternalTaskClient schedulerClient) {
-        return new TopicRoutingExternalTaskClient(caseDrivenClient, schedulerClient, SCHEDULER_TOPICS);
+        return new TopicRoutingExternalTaskClient(
+            caseDrivenClients.clients(), schedulerClient, SCHEDULER_TOPICS);
     }
 
-    @Bean("caseDrivenExternalTaskClient")
-    public ExternalTaskClient caseDrivenExternalTaskClient() {
-        return buildClient(newBackoffStrategy(), eventProperties.getCaseDrivenMaxTasks());
+    /**
+     * One client, so one subscription thread, per configured case driven slot.
+     *
+     * <p>Measured justification for more than one: through a functional test run on the PR 8438
+     * preview the single case driven thread reached 95% occupancy in its densest minute, 126 tasks
+     * a minute against a 155 a minute ceiling, while raising {@code maxTasks} to 10 left peak
+     * queue depth unchanged at 8 unlocked tasks. The constraint is the thread, not the batch size.
+     *
+     * <p>Wrapped in {@link CaseDrivenExternalTaskClients} rather than returned as a
+     * {@code List<ExternalTaskClient>} bean so Spring's collection injection cannot supply the
+     * router and the scheduler client in its place.
+     */
+    @Bean
+    public CaseDrivenExternalTaskClients caseDrivenExternalTaskClients() {
+        int count = eventProperties.getCaseDrivenClients();
+        if (count < 1) {
+            throw new IllegalStateException(
+                "async.event.caseDrivenClients must be at least 1 but was " + count);
+        }
+        List<ExternalTaskClient> clients = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            clients.add(buildClient(newBackoffStrategy(), eventProperties.getCaseDrivenMaxTasks()));
+        }
+        return new CaseDrivenExternalTaskClients(clients);
     }
 
     @Bean("schedulerExternalTaskClient")

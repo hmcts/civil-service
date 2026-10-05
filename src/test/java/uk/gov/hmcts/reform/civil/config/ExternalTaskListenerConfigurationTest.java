@@ -40,16 +40,16 @@ class ExternalTaskListenerConfigurationTest {
     }
 
     /**
-     * Three clients now: one real client per thread, plus the router the listeners inject. The
-     * router must be the one resolved by type, because all 39 listeners take a bare
-     * {@code ExternalTaskClient} and would otherwise bind to a single underlying client and lose
-     * the split.
+     * Only the router and the scheduler client may be resolvable as an {@code ExternalTaskClient}.
+     * All 39 listeners take a bare {@code ExternalTaskClient}, so the case driven clients are
+     * deliberately held inside {@link CaseDrivenExternalTaskClients}: were they beans of that type,
+     * a listener could bind to one of them and be served by only a share of the threads.
      */
     @Test
-    void shouldExposeTwoRealClientsAndRouteThroughThePrimaryOne() {
+    void shouldExposeOnlyTheRouterAndSchedulerClientByTypeAndRouteThroughThePrimaryOne() {
         context.run(it -> {
             assertThat(it.getBeanNamesForType(ExternalTaskClient.class))
-                .containsExactlyInAnyOrder("client", "caseDrivenExternalTaskClient", "schedulerExternalTaskClient");
+                .containsExactlyInAnyOrder("client", "schedulerExternalTaskClient");
 
             assertThat(it.getBean(ExternalTaskClient.class))
                 .as("the bean injected by type must be the router, not one of the underlying clients")
@@ -62,17 +62,70 @@ class ExternalTaskListenerConfigurationTest {
         context.run(it -> {
             TopicRoutingExternalTaskClient router =
                 (TopicRoutingExternalTaskClient) it.getBean(ExternalTaskClient.class);
-            ExternalTaskClient caseDriven = (ExternalTaskClient) it.getBean("caseDrivenExternalTaskClient");
+            List<ExternalTaskClient> caseDriven = it.getBean(CaseDrivenExternalTaskClients.class).clients();
             ExternalTaskClient scheduler = (ExternalTaskClient) it.getBean("schedulerExternalTaskClient");
 
-            assertThat(router.clientFor("BUNDLE_CREATION_CHECK")).isSameAs(scheduler);
-            assertThat(router.clientFor("AUTOMATED_HEARING_NOTICE")).isSameAs(scheduler);
-            assertThat(router.clientFor("START_BUSINESS_PROCESS")).isSameAs(caseDriven);
-            assertThat(router.clientFor("processCaseEvent")).isSameAs(caseDriven);
+            assertThat(router.clientsFor("BUNDLE_CREATION_CHECK")).containsExactly(scheduler);
+            assertThat(router.clientsFor("AUTOMATED_HEARING_NOTICE")).containsExactly(scheduler);
+            assertThat(router.clientsFor("START_BUSINESS_PROCESS")).isEqualTo(caseDriven);
+            assertThat(router.clientsFor("processCaseEvent")).isEqualTo(caseDriven);
 
             assertThat(caseDriven)
-                .as("the two underlying clients must be distinct, or there is still one thread")
-                .isNotSameAs(scheduler);
+                .as("case driven clients must be distinct from the scheduler one, or there is one thread")
+                .doesNotContain(scheduler);
+        });
+    }
+
+    /**
+     * The default must actually be more than one, since that is the whole point of the change: the
+     * single case driven thread was measured at 95% occupancy through a functional test run.
+     */
+    @Test
+    void shouldBuildTwoDistinctCaseDrivenClientsByDefault() {
+        context.run(it -> {
+            List<ExternalTaskClient> clients = it.getBean(CaseDrivenExternalTaskClients.class).clients();
+
+            assertThat(clients).hasSize(2);
+            assertThat(clients.get(0))
+                .as("two references to one client would still be one subscription thread")
+                .isNotSameAs(clients.get(1));
+        });
+    }
+
+    @Test
+    void shouldHonourAConfiguredCaseDrivenClientCount() {
+        contextWithCaseDrivenClients(4).run(it -> {
+            assertThat(it.getBean(CaseDrivenExternalTaskClients.class).clients()).hasSize(4);
+        });
+    }
+
+    /**
+     * One client restores the previous single threaded behaviour, and must do so without taking a
+     * different code path: the subscription is the client's own builder, not a fan out wrapper.
+     */
+    @Test
+    void shouldRestoreSingleThreadedBehaviourWhenConfiguredWithOneClient() {
+        contextWithCaseDrivenClients(1).run(it -> {
+            TopicRoutingExternalTaskClient router =
+                (TopicRoutingExternalTaskClient) it.getBean(ExternalTaskClient.class);
+
+            assertThat(it.getBean(CaseDrivenExternalTaskClients.class).clients()).hasSize(1);
+            assertThat(router.clientsFor("processCaseEvent")).hasSize(1);
+        });
+    }
+
+    /**
+     * Zero clients would leave every case driven topic unsubscribed, which is a silent loss of all
+     * case processing, so the context must fail to start rather than come up degraded.
+     */
+    @Test
+    void shouldFailToStartWhenConfiguredWithNoCaseDrivenClients() {
+        contextWithCaseDrivenClients(0).run(it -> {
+            assertThat(it).hasFailed();
+            assertThat(it.getStartupFailure())
+                .hasRootCauseInstanceOf(IllegalStateException.class)
+                .rootCause()
+                .hasMessageContaining("caseDrivenClients must be at least 1");
         });
     }
 
@@ -139,6 +192,21 @@ class ExternalTaskListenerConfigurationTest {
 
     private static ErrorAwareBackoffStrategy errorAwareStrategy(BackoffStrategy strategy) {
         return (ErrorAwareBackoffStrategy) strategy;
+    }
+
+    /**
+     * The shared {@code TestConfig} supplies {@link EventProperties} as a hand built bean, so
+     * {@code withPropertyValues} cannot reach it. This overrides that bean instead, which is what
+     * actually varies the client count.
+     */
+    private ApplicationContextRunner contextWithCaseDrivenClients(int count) {
+        EventProperties props = eventProperties();
+        props.setCaseDrivenClients(count);
+        return new ApplicationContextRunner()
+            .withPropertyValues("feign.client.config.processInstance.url=http://localhost")
+            .withUserConfiguration(TestAuthTokenGeneratorImpl.class)
+            .withUserConfiguration(ExternalTaskListenerConfiguration.class)
+            .withBean(EventProperties.class, () -> props);
     }
 
     @Configuration
