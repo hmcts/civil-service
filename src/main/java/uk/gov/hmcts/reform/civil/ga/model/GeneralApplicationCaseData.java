@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -1946,13 +1947,19 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
 
         if (userType.equals(POST_JUDGE_ORDER_LIP_APPLICANT)) {
             return parentClaimantIsApplicant
-                ? civilCaseData.getApplicant1().getPartyName()
-                : civilCaseData.getRespondent1().getPartyName();
+                ? partyName(civilCaseData.getApplicant1())
+                : partyName(civilCaseData.getRespondent1());
         } else {
             return parentClaimantIsApplicant
-                ? civilCaseData.getRespondent1().getPartyName()
-                : civilCaseData.getApplicant1().getPartyName();
+                ? partyName(civilCaseData.getRespondent1())
+                : partyName(civilCaseData.getApplicant1());
         }
+    }
+
+    private String partyName(GeneralApplicationParty party) {
+        return ofNullable(party)
+            .map(GeneralApplicationParty::getPartyName)
+            .orElse(StringUtils.EMPTY);
     }
 
     @JsonIgnore

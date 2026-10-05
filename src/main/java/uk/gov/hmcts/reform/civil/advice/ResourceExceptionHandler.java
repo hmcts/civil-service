@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.civil.advice;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.ClientAbortException;
+import org.slf4j.MDC;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentAccessException;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentNotFoundException;
+import uk.gov.hmcts.reform.civil.documentmanagement.InvalidDocumentLinkException;
+import uk.gov.hmcts.reform.civil.model.CallbackErrorResponse;
 import uk.gov.hmcts.reform.civil.exceptions.UpstreamIdamException;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
@@ -21,6 +27,7 @@ import uk.gov.service.notify.NotificationClientException;
 
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.List;
 
 import static org.springframework.http.HttpStatus.FAILED_DEPENDENCY;
 import static uk.gov.hmcts.reform.civil.utils.ContentCachingRequestWrapperUtil.getCaseId;
@@ -31,6 +38,8 @@ import static uk.gov.hmcts.reform.civil.utils.ContentCachingRequestWrapperUtil.g
 @RequiredArgsConstructor
 @Order(2)
 public class ResourceExceptionHandler {
+
+    private final ObjectMapper objectMapper;
 
     @ExceptionHandler(value = CallbackException.class)
     public ResponseEntity<Object> notFound(Exception exception,
@@ -77,6 +86,36 @@ public class ResourceExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(value = FeignException.UnprocessableEntity.class)
+    public ResponseEntity<Object> unprocessableEntity(FeignException.UnprocessableEntity exception,
+                                             ContentCachingRequestWrapper contentCachingRequestWrapper) {
+
+        CallbackErrorResponse errorResponse = new CallbackErrorResponse();
+        try {
+            errorResponse = objectMapper.readValue(exception.contentUTF8(), CallbackErrorResponse.class);
+            MDC.put("callbackErrors", errorResponse.toString());
+        } catch (Exception parseException) {
+            log.info(parseException.getMessage(), parseException);
+            errorResponse.setCallbackErrors(List.of("Unable to parse error response"));
+
+            return ResponseEntity
+                .internalServerError()
+                .headers(new HttpHeaders())
+                .body(errorResponse);
+        } finally {
+            MDC.remove("callbackErrors");
+        }
+
+        String errorMessage = "Unprocessable Entity error with message: %s for case %s run by user %s";
+        log.info(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
+                                         getUserId(contentCachingRequestWrapper)));
+        log.info("Unprocessable Entity {} ", errorResponse.toString());
+        return ResponseEntity
+            .status(HttpStatus.UNPROCESSABLE_ENTITY)
+            .headers(new HttpHeaders())
+            .body(errorResponse);
+    }
+
     @ExceptionHandler({
         UnknownHostException.class,
         InvalidPaymentRequestException.class
@@ -118,6 +157,28 @@ public class ResourceExceptionHandler {
         log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
                                          getUserId(contentCachingRequestWrapper)));
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({
+        DocumentNotFoundException.class,
+        DocumentAccessException.class,
+        InvalidDocumentLinkException.class
+    })
+    public ResponseEntity<Object> documentManagementError(Exception exception,
+                                                          ContentCachingRequestWrapper contentCachingRequestWrapper) {
+        log.info(exception.getMessage(), exception);
+        String errorMessage = "Document management error with message: %s for case %s run by user %s";
+        log.error(errorMessage.formatted(exception.getMessage(), getCaseId(contentCachingRequestWrapper),
+                                         getUserId(contentCachingRequestWrapper)));
+        HttpStatus status;
+        if (exception instanceof DocumentNotFoundException) {
+            status = HttpStatus.NOT_FOUND;
+        } else if (exception instanceof DocumentAccessException) {
+            status = HttpStatus.FORBIDDEN;
+        } else {
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), status);
     }
 
     @ExceptionHandler(value = NoSuchMethodError.class)

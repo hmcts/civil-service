@@ -23,6 +23,8 @@ import static uk.gov.hmcts.reform.civil.enums.dq.Language.WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.notification.handlers.claimantresponsecui.confirmproceed.ClaimantConfirmProceedDefendantEmailDTOGenerator.NO_EMAIL_OPERATION;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
 class ClaimantConfirmProceedDefendantEmailDTOGeneratorTest {
@@ -120,5 +122,83 @@ class ClaimantConfirmProceedDefendantEmailDTOGeneratorTest {
         assertThat(result)
             .containsEntry(RESPONDENT_NAME, "Ms Jane Smith")
             .containsEntry(CLAIM_REFERENCE_NUMBER, legacyCaseReference);
+    }
+
+    @Test
+    void shouldReturnTrueForShouldNotifyWhenRespondentIsLipApplicantProceedIsNotNoAndClaimantDoesNotSettlePartAdmit() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(NO)
+            .applicant1ProceedWithClaim(YES)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+            .build();
+
+        Boolean shouldNotify = emailDTOGenerator.getShouldNotify(caseData);
+
+        assertThat(shouldNotify).isTrue();
+    }
+
+    @Test
+    void shouldReturnTrueForShouldNotifyWhenRespondentIsLipApplicantProceedIsNullAndClaimantDoesNotSettlePartAdmit() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(NO)
+            .applicant1ProceedWithClaim(null)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+            .build();
+
+        Boolean shouldNotify = emailDTOGenerator.getShouldNotify(caseData);
+
+        assertThat(shouldNotify).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalseForShouldNotifyWhenRespondentIsRepresentedApplicantProceedIsNotNoAndClaimantDoesNotSettlePartAdmit() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(YES)
+            .applicant1ProceedWithClaim(YES)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+            .build();
+
+        Boolean shouldNotify = emailDTOGenerator.getShouldNotify(caseData);
+
+        assertThat(shouldNotify).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalseForShouldNotifyWhenApplicantDoesNotProceedWithClaim() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(NO)
+            .applicant1ProceedWithClaim(NO)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+            .build();
+
+        Boolean shouldNotify = emailDTOGenerator.getShouldNotify(caseData);
+
+        assertThat(shouldNotify).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalseForShouldNotifyWhenClaimantIntentionToSettlePartAdmitIsNotNo() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(NO)
+            .applicant1ProceedWithClaim(YES)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YES)
+            .build();
+
+        Boolean shouldNotify = emailDTOGenerator.getShouldNotify(caseData);
+
+        assertThat(shouldNotify).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalseForShouldNotifyWhenClaimantIntentionToSettlePartAdmitIsNull() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(NO)
+            .applicant1ProceedWithClaim(YES)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(null)
+            .build();
+
+        Boolean shouldNotify = emailDTOGenerator.getShouldNotify(caseData);
+
+        assertThat(shouldNotify).isFalse();
     }
 }

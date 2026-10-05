@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.InvalidDocumentLinkException;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 
@@ -16,8 +17,19 @@ public class DocumentDownloadService {
     private final DocumentManagementService documentManagementService;
 
     public DownloadedDocumentResponse downloadDocument(String authorisation, String documentId) {
-        String documentPath = String.format("documents/%s", documentId);
-        return documentManagementService.downloadDocumentWithMetaData(authorisation, documentPath);
+        return downloadDocument(authorisation, documentId, null);
+    }
+
+    public DownloadedDocumentResponse downloadDocument(String authorisation, String documentId, String caseId) {
+        try {
+            if (documentId == null || documentId.isBlank()) {
+                throw new InvalidDocumentLinkException(String.format("documents/%s", documentId));
+            }
+            String documentPath = String.format("documents/%s", documentId);
+            return documentManagementService.downloadDocumentWithMetaData(authorisation, documentPath);
+        } catch (InvalidDocumentLinkException ex) {
+            throw ex.withCaseId(caseId);
+        }
     }
 
     public byte[] downloadDocument(CaseDocument mailableSdoDocument, String authorisation, String caseId, String errorMessage) {
@@ -26,7 +38,7 @@ public class DocumentDownloadService {
         String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
 
         try {
-            letterContent = downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
+            letterContent = downloadDocument(authorisation, documentId, caseId).file().getInputStream().readAllBytes();
         } catch (Exception e) {
             log.error(errorMessage, caseId, e);
             throw new DocumentDownloadException(mailableSdoDocument.getDocumentLink().getDocumentFileName(), e);

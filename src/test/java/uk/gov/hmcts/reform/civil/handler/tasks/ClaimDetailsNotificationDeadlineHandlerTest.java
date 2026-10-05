@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.event.DismissClaimEvent;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.ClaimDetailsNotificationDeadlineSearchService;
 
 import java.util.Map;
@@ -37,6 +38,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 class ClaimDetailsNotificationDeadlineHandlerTest {
 
+    private static final String SCHEDULER_NAME = "ClaimDetailsNotificationDeadline";
+
     @Mock
     private ExternalTask mockTask;
 
@@ -48,6 +51,8 @@ class ClaimDetailsNotificationDeadlineHandlerTest {
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @Spy
     private EventProperties eventProperties = configuredEventProperties();
@@ -85,6 +90,16 @@ class ClaimDetailsNotificationDeadlineHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verifyNoInteractions(applicationEventPublisher);
+    }
+
+    @Test
+    void shouldNotRunCamundaHandlerWhenSpringSchedulerEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
+
+        handler.execute(mockTask, externalTaskService);
+
+        verifyNoInteractions(searchService, applicationEventPublisher);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test

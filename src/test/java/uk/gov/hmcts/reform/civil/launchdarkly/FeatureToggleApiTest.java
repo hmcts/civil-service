@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.launchdarkly;
 
-import com.google.common.collect.ImmutableList;
-import com.launchdarkly.sdk.LDUser;
+import com.launchdarkly.sdk.ContextKind;
+import com.launchdarkly.sdk.LDContext;
 import com.launchdarkly.sdk.server.interfaces.LDClientInterface;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ class FeatureToggleApiTest {
     private LDClientInterface ldClient;
 
     @Captor
-    private ArgumentCaptor<LDUser> ldUserArgumentCaptor;
+    private ArgumentCaptor<LDContext> ldContextArgumentCaptor;
 
     private FeatureToggleApi featureToggleApi;
 
@@ -45,16 +45,16 @@ class FeatureToggleApiTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectState_whenUserIsProvided(Boolean toggleState) {
-        LDUser ldUSer = new LDUser.Builder("civil-service")
-            .custom("timestamp", String.valueOf(System.currentTimeMillis()))
-            .custom("environment", FAKE_ENVIRONMENT).build();
+        LDContext context = LDContext.builder("civil-service")
+            .set("timestamp", String.valueOf(System.currentTimeMillis()))
+            .set("environment", FAKE_ENVIRONMENT).build();
         givenToggle(FAKE_FEATURE, toggleState);
 
-        assertThat(featureToggleApi.isFeatureEnabled(FAKE_FEATURE, ldUSer)).isEqualTo(toggleState);
+        assertThat(featureToggleApi.isFeatureEnabled(FAKE_FEATURE, context)).isEqualTo(toggleState);
 
         verify(ldClient).boolVariation(
             FAKE_FEATURE,
-            ldUSer,
+            context,
             false
         );
     }
@@ -74,17 +74,17 @@ class FeatureToggleApiTest {
         givenToggle(FAKE_FEATURE, true, toggleState);
 
         assertThat(featureToggleApi.isFeatureEnabled(FAKE_FEATURE, true)).isEqualTo(toggleState);
-        verify(ldClient).boolVariation(eq(FAKE_FEATURE), any(LDUser.class), eq(true));
+        verify(ldClient).boolVariation(eq(FAKE_FEATURE), any(LDContext.class), eq(true));
     }
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldHonourProvidedDefaultValueForCustomUser(boolean toggleState) {
-        LDUser user = new LDUser.Builder("custom").build();
-        when(ldClient.boolVariation(FAKE_FEATURE, user, true)).thenReturn(toggleState);
+        LDContext context = LDContext.create("custom");
+        when(ldClient.boolVariation(FAKE_FEATURE, context, true)).thenReturn(toggleState);
 
-        assertThat(featureToggleApi.isFeatureEnabled(FAKE_FEATURE, user, true)).isEqualTo(toggleState);
-        verify(ldClient).boolVariation(FAKE_FEATURE, user, true);
+        assertThat(featureToggleApi.isFeatureEnabled(FAKE_FEATURE, context, true)).isEqualTo(toggleState);
+        verify(ldClient).boolVariation(FAKE_FEATURE, context, true);
     }
 
     @Test
@@ -93,10 +93,8 @@ class FeatureToggleApiTest {
 
         featureToggleApi.isFeatureEnabledForLocation(FAKE_FEATURE, "LON", true);
 
-        verify(ldClient).boolVariation(eq(FAKE_FEATURE), ldUserArgumentCaptor.capture(), eq(true));
-        assertThat(ImmutableList.copyOf(ldUserArgumentCaptor.getValue().getCustomAttributes()))
-            .extracting("name")
-            .contains("location");
+        verify(ldClient).boolVariation(eq(FAKE_FEATURE), ldContextArgumentCaptor.capture(), eq(true));
+        assertThat(ldContextArgumentCaptor.getValue().getValue("location").stringValue()).isEqualTo("LON");
     }
 
     @Test
@@ -105,10 +103,8 @@ class FeatureToggleApiTest {
 
         featureToggleApi.isFeatureEnabledForDate(FAKE_FEATURE, 123L, false);
 
-        verify(ldClient).boolVariation(eq(FAKE_FEATURE), ldUserArgumentCaptor.capture(), eq(false));
-        assertThat(ImmutableList.copyOf(ldUserArgumentCaptor.getValue().getCustomAttributes()))
-            .extracting("name")
-            .contains("timestamp");
+        verify(ldClient).boolVariation(eq(FAKE_FEATURE), ldContextArgumentCaptor.capture(), eq(false));
+        assertThat(ldContextArgumentCaptor.getValue().getValue("timestamp").longValue()).isEqualTo(123L);
     }
 
     @Test
@@ -122,43 +118,55 @@ class FeatureToggleApiTest {
     }
 
     private void givenToggle(String feature, boolean state) {
-        when(ldClient.boolVariation(eq(feature), any(LDUser.class), anyBoolean()))
+        when(ldClient.boolVariation(eq(feature), any(LDContext.class), anyBoolean()))
             .thenReturn(state);
     }
 
     private void givenToggle(String feature, boolean defaultValue, boolean state) {
-        when(ldClient.boolVariation(eq(feature), any(LDUser.class), eq(defaultValue))).thenReturn(state);
+        when(ldClient.boolVariation(eq(feature), any(LDContext.class), eq(defaultValue))).thenReturn(state);
     }
 
     private void verifyBoolVariationCalled(String feature, List<String> customAttributesKeys) {
         verify(ldClient).boolVariation(
             eq(feature),
-            ldUserArgumentCaptor.capture(),
+            ldContextArgumentCaptor.capture(),
             eq(false)
         );
 
-        var capturedLdUser = ldUserArgumentCaptor.getValue();
-        assertThat(capturedLdUser.getKey()).isEqualTo("civil-service");
-        assertThat(ImmutableList.copyOf(capturedLdUser.getCustomAttributes())).extracting("name")
-            .containsOnlyOnceElementsOf(customAttributesKeys);
+        var capturedContext = ldContextArgumentCaptor.getValue();
+        assertThat(capturedContext.getKey()).isEqualTo("civil-service");
+        assertThat(capturedContext.getKind()).isEqualTo(ContextKind.DEFAULT);
+        assertThat(capturedContext.getCustomAttributeNames()).containsExactlyInAnyOrderElementsOf(customAttributesKeys);
     }
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectState_whenUserWithLocationIsProvided(Boolean toggleState) {
-        LDUser ldUSer = new LDUser.Builder("civil-service")
-            .custom("timestamp", String.valueOf(System.currentTimeMillis()))
-            .custom("environment", FAKE_ENVIRONMENT)
-            .custom("location", "000000")
+        LDContext context = LDContext.builder("civil-service")
+            .set("timestamp", String.valueOf(System.currentTimeMillis()))
+            .set("environment", FAKE_ENVIRONMENT)
+            .set("location", "000000")
             .build();
         givenToggle(FAKE_FEATURE, toggleState);
 
-        assertThat(featureToggleApi.isFeatureEnabled(FAKE_FEATURE, ldUSer)).isEqualTo(toggleState);
+        assertThat(featureToggleApi.isFeatureEnabled(FAKE_FEATURE, context)).isEqualTo(toggleState);
 
         verify(ldClient).boolVariation(
             FAKE_FEATURE,
-            ldUSer,
+            context,
             false
         );
+    }
+
+    @Test
+    void shouldEvaluateFeatureForMultiContext() {
+        LDContext userContext = LDContext.create("civil-service");
+        LDContext organisationContext = LDContext.create(ContextKind.of("organisation"), "hmcts");
+        LDContext multiContext = LDContext.createMulti(userContext, organisationContext);
+        when(ldClient.boolVariation(FAKE_FEATURE, multiContext, false)).thenReturn(true);
+
+        assertThat(featureToggleApi.isFeatureEnabled(FAKE_FEATURE, multiContext)).isTrue();
+
+        verify(ldClient).boolVariation(FAKE_FEATURE, multiContext, false);
     }
 }

@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.EventEmitterService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.CaseReadyBusinessProcessSearchService;
 
 import java.util.Set;
@@ -24,22 +25,27 @@ import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 @ConditionalOnExpression("${polling.event.emitter.enabled:true}")
 public class PollingEventEmitterHandler extends BaseExternalTaskHandler {
 
+    private static final String SCHEDULER_NAME = "PollingEventEmitter";
     public static final int FIFTY_MINUTES = 3000;
+
     private final CaseReadyBusinessProcessSearchService caseSearchService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final EventEmitterService eventEmitterService;
+    private final FeatureToggleService featureToggleService;
 
     public PollingEventEmitterHandler(
         ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         CaseReadyBusinessProcessSearchService caseSearchService,
         CaseDetailsConverter caseDetailsConverter,
-        EventEmitterService eventEmitterService
+        EventEmitterService eventEmitterService,
+        FeatureToggleService featureToggleService
     ) {
         super(externalTaskCompletionService, eventProperties);
         this.caseSearchService = caseSearchService;
         this.caseDetailsConverter = caseDetailsConverter;
         this.eventEmitterService = eventEmitterService;
+        this.featureToggleService = featureToggleService;
     }
 
     @Value("${polling.emitter.multiple.cases.delay.seconds:30}")
@@ -47,6 +53,10 @@ public class PollingEventEmitterHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
+        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
+            return new ExternalTaskData();
+        }
+
         Set<CaseDetails> cases = Set.copyOf(caseSearchService.getCases());
         if (log.isInfoEnabled()) {
             log.info("Job '{}' found {} case(s) with IDs {}", externalTask.getTopicName(), cases.size(),

@@ -14,6 +14,9 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
+import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCSVLrvLipService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCsvServiceFactory;
 import uk.gov.hmcts.reform.civil.service.search.MediationCasesSearchService;
@@ -27,8 +30,11 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 import org.mockito.Spy;
@@ -66,7 +72,16 @@ class GenerateCsvAndTransferHandlerTest {
     private SendGridClient sendGridClient;
 
     @Mock
+    private CoreCaseDataService coreCaseDataService;
+
+    @Mock
+    private CaseTaskTrackingService caseTaskTrackingService;
+
+    @Mock
     private MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @Mock
     private MediationCSVLrvLipService mediationCSVLrvLipService;
@@ -115,6 +130,42 @@ class GenerateCsvAndTransferHandlerTest {
         verify(externalTaskService).complete(externalTask, null);
     }
 
+    @Test
+    void shouldNotGenerateCsvWhenSpringSchedulerFeatureToggleIsEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled("GenerateCsvAndSendToMmt")).thenReturn(true);
+
+        inMediationCsvHandler.execute(externalTask, externalTaskService);
+
+        verifyNoInteractions(searchService, mediationCsvServiceFactory, sendGridClient, caseTaskTrackingService);
+        verify(externalTaskService).complete(externalTask, null);
+    }
+
+    @Test
+    void shouldContinueProcessingOtherCasesWhenCsvGenerationFailsForOneCase() {
+        when(searchService.getInMediationCases(false))
+            .thenReturn(List.of(caseDetailsWithInMediationState, caseDetailsWithInMediationStateNotToProcess));
+        when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
+        when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationStateNotToProcess))
+            .thenReturn(caseDataInMediationNotToProcess);
+        when(mediationCsvServiceFactory.getMediationCSVService(any())).thenReturn(mediationCSVLrvLipService);
+        when(mediationCSVLrvLipService.generateCSVContent(caseDataInMediation))
+            .thenThrow(new RuntimeException("Unable to generate CSV"));
+        when(mediationCSVLrvLipService.generateCSVContent(caseDataInMediationNotToProcess))
+            .thenReturn("row-two\r\n");
+        when(mediationCSVEmailConfiguration.getRecipient()).thenReturn(SENDER);
+        when(mediationCSVEmailConfiguration.getSender()).thenReturn(RECIPIENT);
+
+        inMediationCsvHandler.execute(externalTask, externalTaskService);
+
+        verify(mediationCSVLrvLipService).generateCSVContent(caseDataInMediation);
+        verify(mediationCSVLrvLipService).generateCSVContent(caseDataInMediationNotToProcess);
+        verify(caseTaskTrackingService).trackCaseTask("1", "OCMC Mediation Data", "ocmc_mediation_data.csv", null);
+        verify(sendGridClient, times(1)).sendEmail(anyString(), any());
+        verify(coreCaseDataService, never()).triggerEvent(eq(1L), any(), any(), anyString(), anyString());
+        verify(coreCaseDataService, times(1)).triggerEvent(eq(2L), any(), any(), anyString(), anyString());
+        verify(externalTaskService).complete(externalTask, null);
+    }
+
     private CaseDetails getCaseDetails(Long ccdId, LocalDate claimMovedToMediation) {
 
         return CaseDetails.builder().id(ccdId).data(
@@ -150,4 +201,3 @@ class GenerateCsvAndTransferHandlerTest {
     }
 
 }
-

@@ -8,6 +8,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.InvalidDocumentLinkException;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SETTLE_CLAIM_PAID_IN_FULL_LETTER;
 
@@ -91,5 +93,54 @@ class DocumentDownloadServiceTest {
 
         assertThrows(DocumentDownloadException.class, () ->
             documentDownloadService.downloadDocument(caseDocument, BEARER_TOKEN, documentId, "error"));
+    }
+
+    @Test
+    void shouldThrowInvalidDocumentLink_whenDocumentIdNull() {
+        assertThrows(InvalidDocumentLinkException.class, () ->
+            documentDownloadService.downloadDocument(BEARER_TOKEN, (String) null));
+        verifyNoInteractions(documentManagementService);
+    }
+
+    @Test
+    void shouldThrowInvalidDocumentLink_whenDocumentIdBlank() {
+        assertThrows(InvalidDocumentLinkException.class, () ->
+            documentDownloadService.downloadDocument(BEARER_TOKEN, "   "));
+        verifyNoInteractions(documentManagementService);
+    }
+
+    @Test
+    void shouldIncludeCaseIdOnInvalidDocumentLink_whenDocumentIdNullAndCaseIdProvided() {
+        InvalidDocumentLinkException ex = assertThrows(InvalidDocumentLinkException.class, () ->
+            documentDownloadService.downloadDocument(BEARER_TOKEN, (String) null, "1767636822302602"));
+
+        assertEquals(
+            "Invalid document link 'documents/null' for case 1767636822302602"
+                + ": expected a path of at least 36 characters ending in a document UUID.",
+            ex.getMessage()
+        );
+        verifyNoInteractions(documentManagementService);
+    }
+
+    @Test
+    void shouldRethrowWithCaseId_whenDocumentManagementThrowsInvalidDocumentLink() {
+        when(documentManagementService.downloadDocumentWithMetaData(anyString(), anyString()))
+            .thenThrow(new InvalidDocumentLinkException("documents/undefined"));
+
+        InvalidDocumentLinkException withCaseId = assertThrows(InvalidDocumentLinkException.class, () ->
+            documentDownloadService.downloadDocument(BEARER_TOKEN, "undefined", "1767636822302602"));
+        InvalidDocumentLinkException withoutCaseId = assertThrows(InvalidDocumentLinkException.class, () ->
+            documentDownloadService.downloadDocument(BEARER_TOKEN, "undefined"));
+
+        assertEquals(
+            "Invalid document link 'documents/undefined' for case 1767636822302602"
+                + ": expected a path of at least 36 characters ending in a document UUID.",
+            withCaseId.getMessage()
+        );
+        assertEquals(
+            "Invalid document link 'documents/undefined'"
+                + ": expected a path of at least 36 characters ending in a document UUID.",
+            withoutCaseId.getMessage()
+        );
     }
 }

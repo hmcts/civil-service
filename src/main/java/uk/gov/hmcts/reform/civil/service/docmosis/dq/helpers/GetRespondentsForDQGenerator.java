@@ -54,15 +54,16 @@ public class GetRespondentsForDQGenerator {
             return respondents;
         }
 
-        if (respondent2HasSameLegalRep(caseData)) {
+        if (caseData.respondent2HasSameLegalRep()) {
             return handleRespondentWithSameLegalRep(caseData, defendantIdentifier, legalRepHeading);
         }
 
-        var respondent = isRespondent2(caseData) ? caseData.getRespondent2() : caseData.getRespondent1();
-        var respondentRepresentative = isRespondent2(caseData)
+        var isResp2 = isRespondent2(caseData);
+        var respondent = isResp2 ? caseData.getRespondent2() : caseData.getRespondent1();
+        var respondentRepresentative = isResp2
             ? representativeService.getRespondent2Representative(caseData)
             : representativeService.getRespondent1Representative(caseData);
-        var litigationFriend = isRespondent2(caseData)
+        var litigationFriend = isResp2
             ? caseData.getRespondent2LitigationFriend()
             : caseData.getRespondent1LitigationFriend();
 
@@ -304,11 +305,6 @@ public class GetRespondentsForDQGenerator {
         }
 
         return false;
-    }
-
-    private boolean respondent2HasSameLegalRep(CaseData caseData) {
-        return caseData.getRespondent2SameLegalRepresentative() != null
-            && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
 
     private boolean isProceedingAgainstRespondent2(CaseData caseData) {

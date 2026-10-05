@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import feign.Request;
+import feign.RetryableException;
 import org.apache.tika.Tika;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -303,33 +304,99 @@ class SecuredDocumentManagementServiceTest {
             );
 
             assertEquals(format(MESSAGE_TEMPLATE, documentPath), documentManagementException.getMessage());
+            assertEquals(
+                "Document binary response was empty for " + documentPath,
+                documentManagementException.getCause().getMessage()
+            );
 
             verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
         }
 
         @Test
-        void shouldThrowDocumentTtlExpiredException_whenBinaryDownloadFailsBecauseDocumentTtlExpired() {
-            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b5";
+        void shouldThrowDocumentNotFound_whenDownloadBinaryReturns404() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8aef01";
             UUID documentId = getDocumentIdFromSelfHref(documentPath);
 
-            when(caseDocumentClientApi.getDocumentBinary(
-                     anyString(),
-                     anyString(),
-                     eq(documentId)
-                 )
-            ).thenThrow(forbiddenFeignException(CDAM_TTL_EXPIRED_RESPONSE));
+            when(caseDocumentClientApi.getDocumentBinary(anyString(), anyString(), eq(documentId)))
+                .thenThrow(buildFeignException(404));
 
-            DocumentTtlExpiredException documentManagementException = assertThrows(
-                DocumentTtlExpiredException.class,
+            assertThrows(
+                DocumentNotFoundException.class,
+                () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath)
+            );
+        }
+
+        @Test
+        void shouldThrowDocumentNotFound_whenMetaDataReturns404DuringDownloadWithMetaData() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8aef02";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), eq(documentId)))
+                .thenThrow(buildFeignException(404));
+
+            assertThrows(
+                DocumentNotFoundException.class,
+                () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath)
+            );
+        }
+
+        @Test
+        void shouldThrowInvalidDocumentLink_whenUuidMalformed() {
+            // Long enough to clear the length guard, but the trailing segment is not a UUID, so the
+            // message must describe the malformed id rather than the path length.
+            String documentPath = "documents/zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz";
+
+            InvalidDocumentLinkException ex = assertThrows(
+                InvalidDocumentLinkException.class,
                 () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath)
             );
 
             assertEquals(
-                String.format(DocumentTtlExpiredException.MESSAGE_TEMPLATE, documentPath),
-                documentManagementException.getMessage()
+                format(InvalidDocumentLinkException.MALFORMED_MESSAGE_TEMPLATE, documentPath),
+                ex.getMessage()
+            );
+            assertNotNull(ex.getCause(), "the originating IllegalArgumentException must be preserved");
+        }
+
+        @Test
+        void shouldDescribePathLength_whenSelfHrefShorterThanUuid() {
+            // The other cause of InvalidDocumentLinkException keeps the length-based message.
+            String documentPath = "documents/null";
+
+            InvalidDocumentLinkException ex = assertThrows(
+                InvalidDocumentLinkException.class,
+                () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath)
             );
 
-            verify(caseDocumentClientApi).getDocumentBinary(anyString(), anyString(), eq(documentId));
+            assertEquals(
+                format(InvalidDocumentLinkException.MESSAGE_TEMPLATE, documentPath, DOC_UUID_LENGTH),
+                ex.getMessage()
+            );
+        }
+
+        @Test
+        void shouldThrowInvalidDocumentLink_whenSelfHrefShorterThanUuid() {
+            // EXC-CS-022: a reference shorter than a full document UUID (e.g. documents/null)
+            // previously threw StringIndexOutOfBoundsException in getDocumentIdFromSelfHref and was
+            // retried on every attempt. It is now a classified InvalidDocumentLinkException, excluded from retry.
+            String documentPath = "documents/null"; // 14 chars, no trailing document UUID
+
+            assertThrows(
+                InvalidDocumentLinkException.class,
+                () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath)
+            );
+            verify(caseDocumentClientApi, times(0))
+                .getMetadataForDocument(anyString(), anyString(), any());
+        }
+
+        @Test
+        void shouldThrowInvalidDocumentLink_whenSelfHrefNull() {
+            assertThrows(
+                InvalidDocumentLinkException.class,
+                () -> documentManagementService.getDocumentMetaData(BEARER_TOKEN, null)
+            );
+            verify(caseDocumentClientApi, times(0))
+                .getMetadataForDocument(anyString(), anyString(), any());
         }
 
         @Test
@@ -466,8 +533,141 @@ class SecuredDocumentManagementServiceTest {
             );
 
             assertEquals(format(MESSAGE_TEMPLATE, documentPath), documentManagementException.getMessage());
+            assertEquals(
+                "Document binary response was empty for " + documentPath,
+                documentManagementException.getCause().getMessage()
+            );
 
             verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
+        }
+
+        @Test
+        void shouldThrowDocumentTtlExpiredException_whenBinaryDownloadFailsBecauseDocumentTtlExpired() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b5";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getDocumentBinary(
+                     anyString(),
+                     anyString(),
+                     eq(documentId)
+                 )
+            ).thenThrow(forbiddenFeignException(CDAM_TTL_EXPIRED_RESPONSE));
+
+            DocumentTtlExpiredException documentManagementException = assertThrows(
+                DocumentTtlExpiredException.class,
+                () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath)
+            );
+
+            assertEquals(
+                String.format(DocumentTtlExpiredException.MESSAGE_TEMPLATE, documentPath),
+                documentManagementException.getMessage()
+            );
+
+            verify(caseDocumentClientApi).getDocumentBinary(anyString(), anyString(), eq(documentId));
+        }
+
+        @Test
+        void shouldThrowDocumentAccess_whenDownloadBinaryReturns401() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8aef03";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getDocumentBinary(anyString(), anyString(), eq(documentId)))
+                .thenThrow(buildFeignException(401));
+
+            DocumentAccessException ex = assertThrows(
+                DocumentAccessException.class,
+                () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath)
+            );
+
+            assertEquals(format(DocumentAccessException.MESSAGE_TEMPLATE, documentPath), ex.getMessage());
+        }
+
+        @Test
+        void shouldThrowInvalidDocumentLink_whenDownloadBinaryReturns400() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8aef04";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getDocumentBinary(anyString(), anyString(), eq(documentId)))
+                .thenThrow(buildFeignException(400));
+
+            InvalidDocumentLinkException ex = assertThrows(
+                InvalidDocumentLinkException.class,
+                () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath)
+            );
+
+            assertEquals(
+                format(InvalidDocumentLinkException.CLIENT_ERROR_MESSAGE_TEMPLATE, documentPath, 400),
+                ex.getMessage()
+            );
+        }
+
+        @Test
+        void shouldThrowDocumentDownloadException_whenDownloadBinaryReturns500() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8aef05";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getDocumentBinary(anyString(), anyString(), eq(documentId)))
+                .thenThrow(buildFeignException(500));
+
+            DocumentDownloadException ex = assertThrows(
+                DocumentDownloadException.class,
+                () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath)
+            );
+
+            assertEquals(format(MESSAGE_TEMPLATE, documentPath), ex.getMessage());
+            assertNotNull(ex.getCause());
+        }
+
+        @Test
+        void shouldThrowDocumentDownloadException_whenDownloadBinaryTimesOut() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8aef06";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getDocumentBinary(anyString(), anyString(), eq(documentId)))
+                .thenThrow(buildFeignException(504));
+
+            assertThrows(
+                DocumentDownloadException.class,
+                () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath)
+            );
+        }
+
+        @Test
+        void shouldThrowDocumentDownloadException_whenDownloadBinaryThrowsRetryableException() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8aef07";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getDocumentBinary(anyString(), anyString(), eq(documentId)))
+                .thenThrow(buildRetryableException());
+
+            DocumentDownloadException ex = assertThrows(
+                DocumentDownloadException.class,
+                () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath)
+            );
+
+            assertEquals(format(MESSAGE_TEMPLATE, documentPath), ex.getMessage());
+            assertNotNull(ex.getCause());
+        }
+
+        @Test
+        void shouldThrowDocumentDownloadException_whenBinaryBodyIsNull() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8aef08";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getDocumentBinary(anyString(), anyString(), eq(documentId)))
+                .thenReturn(responseEntity);
+            when(responseEntity.getBody()).thenReturn(null);
+
+            DocumentDownloadException ex = assertThrows(
+                DocumentDownloadException.class,
+                () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath)
+            );
+
+            assertEquals(format(MESSAGE_TEMPLATE, documentPath), ex.getMessage());
+            assertEquals(
+                "Document binary response was empty for " + documentPath,
+                ex.getCause().getMessage()
+            );
         }
     }
 
@@ -522,6 +722,40 @@ class SecuredDocumentManagementServiceTest {
         }
 
         @Test
+        void shouldThrowDocumentNotFound_whenCdamReturns404() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b6";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi
+                     .getMetadataForDocument(anyString(), anyString(), eq(documentId))
+            ).thenThrow(buildFeignException(404));
+
+            assertThrows(
+                DocumentNotFoundException.class,
+                () -> documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath)
+            );
+
+            verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
+        }
+
+        @Test
+        void shouldThrowDocumentAccess_whenCdamReturns403() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b8";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi
+                     .getMetadataForDocument(anyString(), anyString(), eq(documentId))
+            ).thenThrow(buildFeignException(403));
+
+            assertThrows(
+                DocumentAccessException.class,
+                () -> documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath)
+            );
+
+            verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
+        }
+
+        @Test
         void shouldThrowDocumentTtlExpiredException_whenMetadataDownloadFailsBecauseDocumentTtlExpired() {
             String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b5";
             UUID documentId = getDocumentIdFromSelfHref(documentPath);
@@ -566,6 +800,78 @@ class SecuredDocumentManagementServiceTest {
             verify(caseDocumentClientApi)
                 .getMetadataForDocument(anyString(), anyString(), eq(documentId));
         }
+
+        @Test
+        void shouldThrowDocumentAccess_whenCdamReturns401() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b9";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi
+                     .getMetadataForDocument(anyString(), anyString(), eq(documentId))
+            ).thenThrow(buildFeignException(401));
+
+            assertThrows(
+                DocumentAccessException.class,
+                () -> documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath)
+            );
+
+            verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
+        }
+
+        @Test
+        void shouldThrowInvalidDocumentLink_whenCdamReturns400() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1ba";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi
+                     .getMetadataForDocument(anyString(), anyString(), eq(documentId))
+            ).thenThrow(buildFeignException(400));
+
+            InvalidDocumentLinkException ex = assertThrows(
+                InvalidDocumentLinkException.class,
+                () -> documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath)
+            );
+
+            assertEquals(
+                format(InvalidDocumentLinkException.CLIENT_ERROR_MESSAGE_TEMPLATE, documentPath, 400),
+                ex.getMessage()
+            );
+        }
+
+        @Test
+        void shouldThrowDocumentDownloadException_whenCdamReturns500() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1bb";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi
+                     .getMetadataForDocument(anyString(), anyString(), eq(documentId))
+            ).thenThrow(buildFeignException(500));
+
+            assertThrows(
+                DocumentDownloadException.class,
+                () -> documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath)
+            );
+        }
+    }
+
+    private static FeignException buildFeignException(int status) {
+        Request request = Request.create(
+            Request.HttpMethod.GET, "/cases/documents/x", Map.of(), new byte[]{}, StandardCharsets.UTF_8, null);
+        return switch (status) {
+            case 404 -> new FeignException.NotFound("not found", request, new byte[]{}, Map.of());
+            case 403 -> new FeignException.Forbidden("forbidden", request, new byte[]{}, Map.of());
+            case 401 -> new FeignException.Unauthorized("unauthorized", request, new byte[]{}, Map.of());
+            case 400 -> new FeignException.BadRequest("bad request", request, new byte[]{}, Map.of());
+            case 500 -> new FeignException.InternalServerError("server error", request, new byte[]{}, Map.of());
+            default -> new FeignException.GatewayTimeout("timeout", request, new byte[]{}, Map.of());
+        };
+    }
+
+    private static RetryableException buildRetryableException() {
+        Request request = Request.create(
+            Request.HttpMethod.GET, "/cases/documents/x", Map.of(), new byte[]{}, StandardCharsets.UTF_8, null);
+        return new RetryableException(
+            -1, "connect timeout", Request.HttpMethod.GET, null, (Long) null, request);
     }
 
     @Nested
@@ -578,6 +884,69 @@ class SecuredDocumentManagementServiceTest {
 
             documentManagementService.deleteDocument(BEARER_TOKEN, documentPath);
             verify(caseDocumentClientApi, times(1)).deleteDocument(anyString(), any(), any(), anyBoolean());
+        }
+    }
+
+    @Nested
+    class InvalidSelfHref {
+
+        @Test
+        void getDocumentMetaData_shortSelfHref_throwsDescriptiveInvalidDocumentLinkException() {
+            String documentPath = "documents/123"; // 13 chars, no trailing document UUID
+
+            InvalidDocumentLinkException ex = assertThrows(
+                InvalidDocumentLinkException.class,
+                () -> documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath)
+            );
+
+            assertEquals(
+                format(InvalidDocumentLinkException.MESSAGE_TEMPLATE, documentPath, DOC_UUID_LENGTH),
+                ex.getMessage()
+            );
+            verify(caseDocumentClientApi, times(0))
+                .getMetadataForDocument(anyString(), anyString(), any());
+        }
+
+        @Test
+        void getDocumentMetaData_nullSelfHref_throwsDescriptiveInvalidDocumentLinkException() {
+            InvalidDocumentLinkException ex = assertThrows(
+                InvalidDocumentLinkException.class,
+                () -> documentManagementService.getDocumentMetaData(BEARER_TOKEN, null)
+            );
+
+            assertEquals(
+                format(InvalidDocumentLinkException.MESSAGE_TEMPLATE, (Object) null, DOC_UUID_LENGTH),
+                ex.getMessage()
+            );
+            verify(caseDocumentClientApi, times(0))
+                .getMetadataForDocument(anyString(), anyString(), any());
+        }
+
+        @Test
+        void getDocumentMetaData_fullUuidSelfHref_extractsIdAndCallsApi() throws JsonProcessingException {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b3";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), eq(documentId)))
+                .thenReturn(mapper.readValue(
+                    ResourceReader.readString("document-management/metadata.success.json"), Document.class));
+
+            Document metaData = documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath);
+
+            assertEquals("TEST_DOCUMENT_1.pdf", metaData.originalDocumentName);
+            verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
+        }
+
+        @Test
+        void deleteDocument_shortSelfHref_throwsInvalidDocumentLinkExceptionWithoutCallingApi() {
+            String documentPath = "documents/123";
+
+            assertThrows(
+                InvalidDocumentLinkException.class,
+                () -> documentManagementService.deleteDocument(BEARER_TOKEN, documentPath)
+            );
+            verify(caseDocumentClientApi, times(0))
+                .deleteDocument(anyString(), any(), any(), anyBoolean());
         }
     }
 

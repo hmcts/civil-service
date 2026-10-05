@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -69,6 +70,7 @@ class HearingScheduledNotificationServiceTest {
     private static final LocalDate GA_HEARING_DATE_SAMPLE = LocalDate.now().plusDays(10);
     private static final LocalTime GA_HEARING_TIME_SAMPLE = LocalTime.of(15, 30, 0);
     private static final String DUMMY_EMAIL = "hmcts.civil@gmail.com";
+    private static final String LIP_RESPONDENT_EMAIL = "lip.respondent@example.com";
     private static final String PARTY_REFERENCE = "Claimant Reference: Not provided - Defendant Reference: Not provided";
     private static final String CUSTOM_PARTY_REFERENCE = "Claimant Reference: ABC limited - Defendant Reference: Defendant Ltd";
     private Map<String, String> customProp = new HashMap<>();
@@ -233,6 +235,43 @@ class HearingScheduledNotificationServiceTest {
 
         assertSame(caseData, returnedCaseData);
         verify(notificationService, never()).sendMail(any(), any(), any(), any());
+    }
+
+    @Test
+    void notificationShouldSendToLipDefendantWhenRespondentSolicitorsMissing() {
+        when(gaForLipService.isLipApp(any())).thenReturn(false);
+        when(gaForLipService.isLipResp(any())).thenReturn(true);
+        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(gaForLipService.getDefendant1Email(any())).thenReturn(LIP_RESPONDENT_EMAIL);
+        when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                  + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+        when(notificationsProperties.getLipGeneralAppRespondentEmailTemplate())
+            .thenReturn("ga-notice-of-hearing-respondent-template-id");
+
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
+            .isGaApplicantLip(NO)
+            .isGaRespondentOneLip(YES)
+            .parentClaimantIsApplicant(YES)
+            .generalAppRespondentSolicitors(null)
+            .defendant2PartyName(null)
+            .build();
+        GeneralApplicationCaseData civilCaseData = new GeneralApplicationCaseData()
+            .defendantUserDetails(new IdamUserDetails().setEmail(LIP_RESPONDENT_EMAIL))
+            .build();
+
+        when(solicitorEmailValidation
+                 .validateSolicitorEmail(any(), any()))
+            .thenReturn(caseData);
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(civilCaseData);
+
+        hearingScheduledNotificationService.sendNotificationForDefendant(caseData);
+
+        verify(notificationService, times(1)).sendMail(
+            LIP_RESPONDENT_EMAIL,
+            "ga-notice-of-hearing-respondent-template-id",
+            getNotificationDataMapLip(NO, YES),
+            "general-apps-notice-of-hearing-" + CASE_REFERENCE
+        );
     }
 
     @Test

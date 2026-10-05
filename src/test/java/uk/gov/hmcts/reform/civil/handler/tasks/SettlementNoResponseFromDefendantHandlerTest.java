@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.SettlementNoResponseFromDefendantEvent;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.SettlementNoResponseFromDefendantSearchService;
 
 import java.util.Map;
@@ -44,6 +45,11 @@ public class SettlementNoResponseFromDefendantHandlerTest {
     @InjectMocks
     private SettlementNoResponseFromDefendantHandler handler;
 
+    private static final String SCHEDULER_NAME = "SettlementNoResponseFromDefendantCheck";
+
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @Test
     void shouldEmit_SettlementNoResponseFromDefendantEvent_whenCasesFound() {
         // Given: one case found from search service
@@ -54,6 +60,8 @@ public class SettlementNoResponseFromDefendantHandlerTest {
                                                   .build());
 
         given(caseSearchService.getCases()).willReturn(caseDetails);
+
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(false);
 
         // When: handler is called
         handler.execute(mockTask, externalTaskService);
@@ -72,6 +80,17 @@ public class SettlementNoResponseFromDefendantHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         // Then: publish event should not get called
+        verifyNoInteractions(applicationEventPublisher);
+    }
+
+    @Test
+    void shouldReturnImmediatelyWhenSpringSchedulerIsEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
+
+        handler.handleTask(mockTask);
+
+        verify(featureToggleService).isSpringSchedulerEnabled(SCHEDULER_NAME);
+
         verifyNoInteractions(applicationEventPublisher);
     }
 

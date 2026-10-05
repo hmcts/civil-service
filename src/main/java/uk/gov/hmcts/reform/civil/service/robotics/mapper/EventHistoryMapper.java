@@ -93,7 +93,6 @@ public class EventHistoryMapper {
 
         EventHistory eventHistory = eventHistorySequencer.sortEvents(builder);
         log.info("Completed robotics event history for caseId {}", caseData.getCcdCaseReference());
-        log.info("Event history: {}", eventHistory);
         return eventHistory;
     }
 

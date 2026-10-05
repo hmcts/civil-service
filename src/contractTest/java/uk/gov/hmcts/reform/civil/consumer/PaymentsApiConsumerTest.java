@@ -49,6 +49,8 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
     private static final Organisation ORGANISATION = new Organisation()
         .setName("test org")
         .setContactInformation(List.of(new ContactInformation()));
+    private static final String PAYMENT_REFERENCE = "RC-1519-9028-2432-0001";
+    private static final String PAYMENT_REFERENCE_REGEX = "^RC-\\d{4}-\\d{4}-\\d{4}-\\d{4}$";
     protected static final String ACCOUNT_NUMBER = "PBA0077597";
 
     @Autowired
@@ -115,7 +117,7 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
 
     static DslPart getDslPart(String status, String paymentStatus, String errorCode, String errorMessage) {
         return newJsonBody((o) -> {
-            o.stringType("reference", "reference")
+            o.stringMatcher("reference", PAYMENT_REFERENCE_REGEX, PAYMENT_REFERENCE)
                 .stringType("status", status)
                 .minArrayLike("status_histories", 1, 1,
                     (sh) -> {
@@ -134,4 +136,5 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
                     });
         }).build();
     }
+
 }

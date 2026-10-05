@@ -8,7 +8,7 @@
     <bpmn:startEvent id="Event_0gfwkhn">
       <bpmn:outgoing>Flow_1pgjtn8</bpmn:outgoing>
       <bpmn:timerEventDefinition id="TimerEventDefinition_137zsd2">
-        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">0 0 0 1 * ? 2026</bpmn:timeCycle>
+        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">R12/2026-01-01T00:00:00Z/P1M</bpmn:timeCycle>
       </bpmn:timerEventDefinition>
     </bpmn:startEvent>
     <bpmn:endEvent id="Event_0ab9j2t">

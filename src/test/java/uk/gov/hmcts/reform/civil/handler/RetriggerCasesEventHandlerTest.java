@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
@@ -27,6 +28,7 @@ import java.util.UUID;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -140,16 +142,31 @@ class RetriggerCasesEventHandlerTest {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("caseEvent")).thenReturn(null);
 
-        assertThrows(AssertionError.class, () -> handler.handleTask(externalTask));
+        assertThatThrownBy(() -> handler.handleTask(externalTask))
+            .isInstanceOf(InvalidCaseDataException.class)
+            .hasMessageContaining("'caseEvent'");
     }
 
     @Test
     void testHandleTask_RetriggerCasesWithMissingCaseIds() {
         ExternalTask externalTask = mock(ExternalTask.class);
-        when(externalTask.getVariable("caseEvent")).thenReturn("CASE_EVENT");
+        when(externalTask.getVariable("caseEvent")).thenReturn("RETRIGGER_CASES");
         when(externalTask.getVariable("caseIds")).thenReturn(null);
 
-        assertThrows(AssertionError.class, () -> handler.handleTask(externalTask));
+        assertThatThrownBy(() -> handler.handleTask(externalTask))
+            .isInstanceOf(InvalidCaseDataException.class)
+            .hasMessageContaining("'caseIds'");
+    }
+
+    @Test
+    void testHandleTask_RetriggerCasesWithInvalidCaseEvent() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("caseEvent")).thenReturn("NOT_A_REAL_EVENT");
+        when(externalTask.getVariable("caseIds")).thenReturn("1");
+
+        assertThatThrownBy(() -> handler.handleTask(externalTask))
+            .isInstanceOf(InvalidCaseDataException.class)
+            .hasMessageContaining("NOT_A_REAL_EVENT");
     }
 
     @Test

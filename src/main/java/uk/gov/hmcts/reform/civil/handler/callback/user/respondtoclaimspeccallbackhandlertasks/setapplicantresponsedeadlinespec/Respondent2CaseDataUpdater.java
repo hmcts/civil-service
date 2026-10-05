@@ -27,7 +27,7 @@ public class Respondent2CaseDataUpdater implements SetApplicantResponseDeadlineC
         log.info("Updating Respondent2CaseData for caseId: {}", caseData.getCcdCaseReference());
 
         LocalDateTime responseDate = time.now();
-        if (respondToClaimSpecUtils.isRespondent2HasSameLegalRep(caseData)
+        if (caseData.respondent2HasSameLegalRep()
             && caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
             log.info(
                 "Respondent2 has the same legal representative and response is same for caseId: {}",

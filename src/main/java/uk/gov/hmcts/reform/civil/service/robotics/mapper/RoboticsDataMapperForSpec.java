@@ -62,19 +62,19 @@ public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
         log.info("Starting RoboticsCaseData mapping for caseId={}", caseData.getCcdCaseReference());
 
         var header = buildCaseHeader(caseData);
-        log.info("RoboticsCaseDataSpec CaseHeader built: {}", header);
+        log.info("RoboticsCaseDataSpec CaseHeader built for caseId={}", caseData.getCcdCaseReference());
 
         var parties = buildLitigiousParties(caseData);
-        log.info("RoboticsCaseDataSpec LitigiousParties built: {}", parties);
+        log.info("RoboticsCaseDataSpec LitigiousParties built for caseId={}", caseData.getCcdCaseReference());
 
         var solicitors = buildSolicitors(caseData);
-        log.info("RoboticsCaseDataSpec Solicitors built: {}", solicitors);
+        log.info("RoboticsCaseDataSpec Solicitors built for caseId={}", caseData.getCcdCaseReference());
 
         var claimDetails = buildClaimDetails(caseData);
-        log.info("RoboticsCaseDataSpec ClaimDetails built: {}", claimDetails);
+        log.info("RoboticsCaseDataSpec ClaimDetails built for caseId={}", caseData.getCcdCaseReference());
 
         var events = eventHistoryMapper.buildEvents(caseData, authToken);
-        log.info("RoboticsCaseDataSpec Events built: {}", events);
+        log.info("RoboticsCaseDataSpec Events built for caseId={}", caseData.getCcdCaseReference());
 
         RoboticsCaseDataSpec roboticsCaseDataSpec = new RoboticsCaseDataSpec()
             .setHeader(header)

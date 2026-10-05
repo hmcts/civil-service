@@ -6,10 +6,10 @@ import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotific
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardTasksHelper;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoReconsiderationDeadlineService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,7 +25,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 public class CreateSdoClaimantDashboardService extends DashboardScenarioService {
 
     private final DashboardNotificationHelper dashboardDecisionHelper;
-    private final CreateSdoDashboardDate createSdoDashboardDate;
+    private final SdoReconsiderationDeadlineService reconsiderationDeadlineService;
     private final DashboardTasksHelper dashboardTasksHelper;
 
     private String selectedScenario;
@@ -33,11 +33,11 @@ public class CreateSdoClaimantDashboardService extends DashboardScenarioService 
     public CreateSdoClaimantDashboardService(DashboardScenariosService dashboardScenariosService,
                                              DashboardNotificationsParamsMapper mapper,
                                              DashboardNotificationHelper dashboardDecisionHelper,
-                                             CreateSdoDashboardDate createSdoDashboardDate,
+                                             SdoReconsiderationDeadlineService reconsiderationDeadlineService,
                                              DashboardTasksHelper dashboardTasksHelper) {
         super(dashboardScenariosService, mapper);
         this.dashboardDecisionHelper = dashboardDecisionHelper;
-        this.createSdoDashboardDate = createSdoDashboardDate;
+        this.reconsiderationDeadlineService = reconsiderationDeadlineService;
         this.dashboardTasksHelper = dashboardTasksHelper;
     }
 
@@ -48,7 +48,7 @@ public class CreateSdoClaimantDashboardService extends DashboardScenarioService 
     @Override
     protected String getScenario(CaseData caseData) {
 
-        if (dashboardDecisionHelper.isEligibleForReconsideration(caseData)
+        if (reconsiderationDeadlineService.isEligibleForReconsideration(caseData)
             && Objects.isNull(caseData.getIsReferToJudgeClaim())) {
             dashboardTasksHelper.deleteNotificationAndInactiveTasksForClaimant(caseData);
             selectedScenario = SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT.getScenario();
@@ -96,9 +96,8 @@ public class CreateSdoClaimantDashboardService extends DashboardScenarioService 
     @Override
     protected ScenarioRequestParams scenarioRequestParamsFrom(CaseData caseData) {
         if (isNull(caseData.getRequestForReconsiderationDeadline())
-            && dashboardDecisionHelper.isEligibleForReconsideration(caseData)) {
-            caseData.setRequestForReconsiderationDeadline(
-                createSdoDashboardDate.getDateWithoutBankHolidays(LocalDateTime.now()));
+            && reconsiderationDeadlineService.isEligibleForReconsideration(caseData)) {
+            caseData.setRequestForReconsiderationDeadline(reconsiderationDeadlineService.calculateReconsiderationDeadline());
         }
 
         return new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData));

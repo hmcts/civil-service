@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.bpmn;
 
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
-import org.camunda.bpm.engine.impl.calendar.CronExpression;
+import org.springframework.scheduling.support.CronExpression;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -41,13 +41,13 @@ class SpecAutomatedHearingNoticeSchedulerTest extends BpmnBaseTest {
         assertThat(jobDefinitions.get(1).getJobType()).isEqualTo("timer-intermediate-transition");
         assertThat(jobDefinitions.get(2).getJobType()).isEqualTo("timer-transition");
 
-        String cronString = "0 0 0,12 ? * * *";
+        String cronString = "0 0 0,12 ? * *";
         assertThat(jobDefinitions.get(0).getJobConfiguration()).isEqualTo("CYCLE: " + cronString);
         assertThat(jobDefinitions.get(1).getJobConfiguration()).isEqualTo("DURATION: PT300S");
         assertThat(jobDefinitions.get(2).getJobConfiguration()).isEqualTo("DURATION: PT30M");
 
         assertCronTriggerFiresAtExpectedTime(
-            new CronExpression(cronString),
+            CronExpression.parse(cronString),
             LocalDateTime.of(2020, 1, 1, 0, 0, 0),
             LocalDateTime.of(2020, 1, 1, 12, 0, 0)
         );

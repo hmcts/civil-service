@@ -25,12 +25,14 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.time.LocalDate;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.TrialReadinessCallbackHandler.NO_ROLE;
 
 @ExtendWith(MockitoExtension.class)
 class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -152,6 +154,19 @@ class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
             //then: no error is given
             assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnError_WhenNoRoles() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(emptyList());
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).contains(NO_ROLE);
         }
 
         @Test
@@ -438,6 +453,19 @@ class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(CaseEvent.GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT2.name(), "READY");
+        }
+
+        @Test
+        void shouldReturnError_WhenNoRoles() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(emptyList());
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).contains(NO_ROLE);
         }
     }
 

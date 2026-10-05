@@ -14,13 +14,16 @@ import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
+import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCSVService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCsvServiceFactory;
 import uk.gov.hmcts.reform.civil.service.search.MediationCasesSearchService;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +35,8 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
 
     private final MediationCSVEmailConfiguration localMediationCSVEmailConfiguration;
 
+    protected final CaseTaskTrackingService caseTaskTrackingService;
+
     private static final String FILENAME = "ocmc_mediation_data.csv";
 
     protected GenerateCsvAndTransferTaskHandler(ExternalTaskCompletionService externalTaskCompletionService,
@@ -42,7 +47,9 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
                                                 SendGridClient sendGridClient,
                                                 MediationCSVEmailConfiguration mediationCSVEmailConfiguration,
                                                 MediationCsvServiceFactory mediationCsvServiceFactory,
-                                                MediationCSVEmailConfiguration mediationCSVEmailConfiguration1) {
+                                                MediationCSVEmailConfiguration mediationCSVEmailConfiguration1,
+                                                FeatureToggleService featureToggleService,
+                                                CaseTaskTrackingService caseTaskTrackingService) {
         super(
             externalTaskCompletionService,
             eventProperties,
@@ -50,14 +57,19 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
             coreCaseDataService,
             caseDetailsConverter,
             sendGridClient,
-            mediationCSVEmailConfiguration
+            mediationCSVEmailConfiguration,
+            featureToggleService
         );
         this.mediationCsvServiceFactory = mediationCsvServiceFactory;
         this.localMediationCSVEmailConfiguration = mediationCSVEmailConfiguration1;
+        this.caseTaskTrackingService = caseTaskTrackingService;
     }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
+        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
+            return new ExternalTaskData();
+        }
 
         List<CaseDetails> cases = caseSearchService.getInMediationCases(false);
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
@@ -76,8 +88,28 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
         StringBuilder csvColContent = new StringBuilder();
         try {
             if (!inMediationCases.isEmpty()) {
-                inMediationCases.forEach(caseData ->
-                                             csvColContent.append(generateCsvContent(caseData)));
+                List<CaseData> successfulCases = new ArrayList<>();
+                inMediationCases.forEach(
+                    caseData -> {
+                        try {
+                            csvColContent.append(generateCsvContent(caseData));
+                            successfulCases.add(caseData);
+                        } catch (Exception e) {
+                            log.error("Generate mediation CSV failed for case with id: '{}'",
+                                      caseData.getCcdCaseReference(), e);
+                            caseTaskTrackingService.trackCaseTask(
+                                caseData.getCcdCaseReference().toString(),
+                                SUBJECT,
+                                FILENAME,
+                                null
+                            );
+                        }
+                    }
+                );
+
+                if (csvColContent.length() == 0) {
+                    return new ExternalTaskData();
+                }
 
                 String generateCsvData = generateCSVRow(headers) + csvColContent;
                 Optional<EmailData> emailData = prepareEmail(generateCsvData);
@@ -86,7 +118,7 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
                     emailData.ifPresent(data -> sendMediationFileEmail(data));
                 }
 
-                inMediationCases.stream().forEach(this::setMediationFileSent);
+                successfulCases.forEach(this::setMediationFileSent);
             }
         } catch (Exception e) {
             log.error(e.getMessage());

@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.service.mediation.MediationLitigant;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,7 +61,7 @@ class UnrepresentedLitigantPopulatorTest {
         when(mediationLiPCarm.getIsMediationPhoneCorrect()).thenReturn(YES);
         when(mediationLiPCarm.getHasUnavailabilityNextThreeMonths()).thenReturn(YES);
 
-        LocalDate fixedDate = LocalDate.of(2024, 6, 10);
+        LocalDate fixedDate = LocalDate.of(2024, Month.JUNE, 10);
         UnavailableDate unavailableDate = new UnavailableDate()
             .setDate(fixedDate)
             .setUnavailableDateType(SINGLE_DATE);
@@ -85,6 +86,26 @@ class UnrepresentedLitigantPopulatorTest {
         assertThat(litigant.getDateRangeToAvoid()).hasSize(1);
         assertThat(litigant.getDateRangeToAvoid().get(0).getDateFrom()).isEqualTo("2024-06-10");
         assertThat(litigant.getDateRangeToAvoid().get(0).getDateTo()).isEqualTo("2024-06-10");
+    }
+
+    @Test
+    void shouldHandleUnavailableDateWithNullDate() {
+        UnavailableDate unavailableDate = new UnavailableDate()
+            .setUnavailableDateType(SINGLE_DATE);
+        when(mediationLiPCarm.getHasUnavailabilityNextThreeMonths()).thenReturn(YES);
+        when(mediationLiPCarm.getUnavailableDatesForMediation())
+            .thenReturn(List.of(ElementUtils.element(unavailableDate)));
+
+        MediationLitigant litigant = unrepresentedLitigantPopulator.populator(
+            new MediationLitigant(),
+            new Party().setType(Type.INDIVIDUAL),
+            "Contact Person",
+            mediationLiPCarm
+        );
+
+        assertThat(litigant.getDateRangeToAvoid()).hasSize(1);
+        assertThat(litigant.getDateRangeToAvoid().get(0).getDateFrom()).isNull();
+        assertThat(litigant.getDateRangeToAvoid().get(0).getDateTo()).isNull();
     }
 
     @Test

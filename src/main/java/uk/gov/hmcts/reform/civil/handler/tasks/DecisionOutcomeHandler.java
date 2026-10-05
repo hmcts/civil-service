@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.DecisionOutcomeEvent;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.DecisionOutcomeSearchService;
 
 import java.util.Set;
@@ -17,22 +18,31 @@ import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 @Component
 public class DecisionOutcomeHandler extends BaseExternalTaskHandler {
 
+    private static final String SCHEDULER_NAME = "DecisionOutcome";
+
     private final DecisionOutcomeSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final FeatureToggleService featureToggleService;
 
     public DecisionOutcomeHandler(
         ExternalTaskCompletionService externalTaskCompletionService,
         EventProperties eventProperties,
         DecisionOutcomeSearchService caseSearchService,
-        ApplicationEventPublisher applicationEventPublisher
+        ApplicationEventPublisher applicationEventPublisher,
+        FeatureToggleService featureToggleService
     ) {
         super(externalTaskCompletionService, eventProperties);
         this.caseSearchService = caseSearchService;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.featureToggleService = featureToggleService;
     }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
+        if (featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)) {
+            return new ExternalTaskData();
+        }
+
         Set<CaseDetails> cases = caseSearchService.getCases();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 

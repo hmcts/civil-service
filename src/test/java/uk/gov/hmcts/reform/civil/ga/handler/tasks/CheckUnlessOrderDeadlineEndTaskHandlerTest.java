@@ -19,8 +19,9 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialMakeAnOrder;
 import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
-import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.time.LocalDate;
@@ -29,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -55,6 +57,9 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
 
     @Mock
     private GaCoreCaseDataService coreCaseDataService;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     private CheckUnlessOrderDeadlineEndTaskHandler gaUnlessOrderMadeTaskHandler;
 
@@ -91,8 +96,10 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
             searchService,
             coreCaseDataService,
             caseDetailsConverter,
-            mapper
+            mapper,
+            featureToggleService
         );
+        lenient().when(featureToggleService.isSpringSchedulerEnabled("GAUnlessOrderScheduler")).thenReturn(false);
 
         caseDetailsWithTodayDeadlineNotProcessed = getCaseDetails(1L, UNLESS_ORDER, deadLineToday,
                                                                   YesOrNo.NO);
@@ -127,6 +134,17 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
                                                                             deadLineToday, null);
         caseDataWithTodayDeadLineWithOrderProcessedNull = getCaseData(7L, UNLESS_ORDER,
                                                                       deadLineToday, null);
+    }
+
+    @Test
+    void shouldNotProcessLegacyTaskWhenSpringSchedulerIsEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled("GAUnlessOrderScheduler")).thenReturn(true);
+
+        gaUnlessOrderMadeTaskHandler.execute(externalTask, externalTaskService);
+
+        verifyNoInteractions(searchService);
+        verifyNoInteractions(coreCaseDataService);
+        verify(externalTaskService).complete(any(), any());
     }
 
     @Test

@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
-import org.camunda.bpm.engine.impl.calendar.CronExpression;
+import org.springframework.scheduling.support.CronExpression;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +40,7 @@ public class GADocUploadNotifySchedulerTest extends BpmnBaseTest {
         String cronString = "0 0 23 * * ?";
         assertThat(jobDefinitions.get(0).getJobConfiguration()).isEqualTo("CYCLE: " + cronString);
         assertCronTriggerFiresAtExpectedTime(
-                new CronExpression(cronString),
+                CronExpression.parse(cronString),
                 LocalDateTime.of(2024, 1, 1, 23, 0, 0),
                 LocalDateTime.of(2024, 1, 2, 23, 0, 0)
         );

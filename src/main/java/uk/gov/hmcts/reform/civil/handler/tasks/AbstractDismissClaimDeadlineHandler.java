@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.event.DismissClaimEvent;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.ElasticSearchService;
 
 import java.util.Set;
@@ -17,6 +18,8 @@ abstract class AbstractDismissClaimDeadlineHandler extends BaseExternalTaskHandl
 
     private final ElasticSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final FeatureToggleService featureToggleService;
+    private final String springSchedulerName;
 
     protected AbstractDismissClaimDeadlineHandler(
         ExternalTaskCompletionService externalTaskCompletionService,
@@ -27,10 +30,31 @@ abstract class AbstractDismissClaimDeadlineHandler extends BaseExternalTaskHandl
         super(externalTaskCompletionService, eventProperties);
         this.caseSearchService = caseSearchService;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.featureToggleService = null;
+        this.springSchedulerName = null;
+    }
+
+    protected AbstractDismissClaimDeadlineHandler(
+        ExternalTaskCompletionService externalTaskCompletionService,
+        EventProperties eventProperties,
+        ElasticSearchService caseSearchService,
+        ApplicationEventPublisher applicationEventPublisher,
+        FeatureToggleService featureToggleService,
+        String springSchedulerName
+    ) {
+        super(externalTaskCompletionService, eventProperties);
+        this.caseSearchService = caseSearchService;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.featureToggleService = featureToggleService;
+        this.springSchedulerName = springSchedulerName;
     }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
+        if (isSpringSchedulerEnabled()) {
+            return new ExternalTaskData();
+        }
+
         Set<CaseDetails> cases = caseSearchService.getCases();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
@@ -48,5 +72,10 @@ abstract class AbstractDismissClaimDeadlineHandler extends BaseExternalTaskHandl
             // Continue processing the remaining cases even if one case update fails.
             log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
         }
+    }
+
+    private boolean isSpringSchedulerEnabled() {
+        return featureToggleService != null
+            && featureToggleService.isSpringSchedulerEnabled(springSchedulerName);
     }
 }

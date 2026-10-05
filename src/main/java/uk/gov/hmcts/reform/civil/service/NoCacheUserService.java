@@ -11,7 +11,7 @@ public class NoCacheUserService extends UserService {
     private final IdamClient idamClient;
 
     public NoCacheUserService(IdamClient idamClient) {
-        super(idamClient, false);
+        super(idamClient);
         this.idamClient = idamClient;
     }
 

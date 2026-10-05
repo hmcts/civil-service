@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.mediation.MediationUnavailability;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,7 +28,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.SINGLE_DATE
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 
 @ExtendWith(MockitoExtension.class)
-public class RepresentedLitigantPopulatorTest {
+class RepresentedLitigantPopulatorTest {
 
     @Mock
     private OrganisationService organisationService;
@@ -119,7 +120,7 @@ public class RepresentedLitigantPopulatorTest {
         OrganisationPolicy organisationPolicy = new OrganisationPolicy()
             .setOrganisation(organisation);
 
-        LocalDate fixedDate = LocalDate.of(2024, 6, 10);
+        LocalDate fixedDate = LocalDate.of(2024, Month.JUNE, 10);
         UnavailableDate unavailableDate = new UnavailableDate()
             .setDate(fixedDate)
             .setUnavailableDateType(SINGLE_DATE);
@@ -140,8 +141,29 @@ public class RepresentedLitigantPopulatorTest {
         );
 
         assertThat(litigant.getDateRangeToAvoid()).hasSize(1);
-        assertThat(litigant.getDateRangeToAvoid().get(0).getDateFrom()).isEqualTo("2024-06-10");
-        assertThat(litigant.getDateRangeToAvoid().get(0).getDateTo()).isEqualTo("2024-06-10");
+        assertThat(litigant.getDateRangeToAvoid().getFirst().getDateFrom()).isEqualTo("2024-06-10");
+        assertThat(litigant.getDateRangeToAvoid().getFirst().getDateTo()).isEqualTo("2024-06-10");
+    }
+
+    @Test
+    void shouldHandleUnavailableDateWithNullDate() {
+        UnavailableDate unavailableDate = new UnavailableDate()
+            .setUnavailableDateType(SINGLE_DATE);
+        MediationAvailability mediationAvailability = new MediationAvailability();
+        mediationAvailability.setIsMediationUnavailablityExists(YES);
+        mediationAvailability.setUnavailableDatesForMediation(List.of(ElementUtils.element(unavailableDate)));
+
+        MediationLitigant litigant = representedLitigantPopulator.populator(
+            new MediationLitigant(),
+            null,
+            mediationAvailability,
+            new OrganisationPolicy().setOrganisation(new Organisation()),
+            "solicitor@example.com"
+        );
+
+        assertThat(litigant.getDateRangeToAvoid()).hasSize(1);
+        assertThat(litigant.getDateRangeToAvoid().getFirst().getDateFrom()).isNull();
+        assertThat(litigant.getDateRangeToAvoid().getFirst().getDateTo()).isNull();
     }
 
     private MediationLitigant addMediationInfoRepresented(MediationLitigant litigant) {

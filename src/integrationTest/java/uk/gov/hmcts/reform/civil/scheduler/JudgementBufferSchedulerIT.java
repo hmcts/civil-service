@@ -32,7 +32,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_GRA
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=JudgementBufferSchedulerIT",
-    "scheduler.judgement-buffer.enabled=true",
     "search.judgement-buffer.pageSize=50",
     "scheduler.lockAtLeastFor=PT0S"
 })

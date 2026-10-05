@@ -1,0 +1,93 @@
+{
+  "tasks": [
+    {
+      "id": "10000000-0000-4000-8000-000000000001",
+      "categoryEn": "Your claim",
+      "categoryCy": "Eich hawliad",
+      "taskNameEn": "Review your claim",
+      "taskNameCy": "Adolygu eich hawliad",
+      "currentStatusEn": "Action needed",
+      "currentStatusCy": "Mae angen gweithredu",
+      "hintTextEn": "Read the case details",
+      "hintTextCy": "Darllenwch fanylion yr achos"
+    },
+    {
+      "id": "10000000-0000-4000-8000-000000000002",
+      "categoryEn": "Your claim",
+      "categoryCy": "Eich hawliad",
+      "taskNameEn": "Prepare documents",
+      "taskNameCy": "Paratoi dogfennau",
+      "currentStatusEn": "In progress",
+      "currentStatusCy": "Yn mynd rhagddo",
+      "hintTextEn": "Read the case details",
+      "hintTextCy": "Darllenwch fanylion yr achos"
+    },
+    {
+      "id": "10000000-0000-4000-8000-000000000003",
+      "categoryEn": "Hearing",
+      "categoryCy": "Gwrandawiad",
+      "taskNameEn": "View hearing details",
+      "taskNameCy": "Gweld manylion y gwrandawiad",
+      "currentStatusEn": "Done",
+      "currentStatusCy": "Wedi'i wneud",
+      "hintTextEn": "Read the case details",
+      "hintTextCy": "Darllenwch fanylion yr achos"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "10000000-0000-4000-8000-000000000001",
+      "titleEn": "Your case has been updated",
+      "titleCy": "Mae eich achos wedi ei ddiweddaru",
+      "descriptionEn": "<a href=\"/case/1111222233334444\">View your case</a>",
+      "descriptionCy": "<a href=\"/case/1111222233334444\">Gweld eich achos</a>",
+      "timeToLive": "Session",
+      "notificationAction": null,
+      "params": {
+        "orderDocument": "20000000-0000-4000-8000-000000000001"
+      },
+      "createdAt": "2025-02-03T08:00:00Z",
+      "deadline": "2025-02-10T16:00:00"
+    },
+    {
+      "id": "10000000-0000-4000-8000-000000000002",
+      "titleEn": "Your case has been updated",
+      "titleCy": "Mae eich achos wedi ei ddiweddaru",
+      "descriptionEn": "<a href=\"/case/1111222233334444\">View your case</a>",
+      "descriptionCy": "<a href=\"/case/1111222233334444\">Gweld eich achos</a>",
+      "timeToLive": "Click",
+      "notificationAction": {
+        "id": 1,
+        "reference": "1111222233334444",
+        "actionPerformed": "Click",
+        "createdBy": "Alex Example",
+        "createdAt": "2025-02-03T08:30:00Z"
+      },
+      "params": {
+        "orderDocument": "20000000-0000-4000-8000-000000000001"
+      },
+      "createdAt": "2025-02-03T08:00:00Z",
+      "deadline": "2025-02-10T16:00:00"
+    },
+    {
+      "id": "10000000-0000-4000-8000-000000000003",
+      "titleEn": "Your case has been updated",
+      "titleCy": "Mae eich achos wedi ei ddiweddaru",
+      "descriptionEn": "<a href=\"/case/1111222233334444\">View your case</a>",
+      "descriptionCy": "<a href=\"/case/1111222233334444\">Gweld eich achos</a>",
+      "timeToLive": "Session",
+      "notificationAction": {
+        "id": 2,
+        "reference": "1111222233334444",
+        "actionPerformed": "Click",
+        "createdBy": "Sam Example",
+        "createdAt": "2025-02-03T08:30:00Z"
+      },
+      "params": {
+        "orderDocument": "20000000-0000-4000-8000-000000000001"
+      },
+      "createdAt": "2025-02-03T08:00:00Z",
+      "deadline": "2025-02-10T16:00:00"
+    }
+  ]
+}

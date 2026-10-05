@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.bpmn;
 
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
-import org.camunda.bpm.engine.impl.calendar.CronExpression;
+import org.springframework.scheduling.support.CronExpression;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.junit.jupiter.api.Test;
 
@@ -36,10 +36,10 @@ class ManageStayWATaskSchedulerTest extends BpmnBaseTest {
         assertThat(jobDefinitions).hasSize(1);
         assertThat(jobDefinitions.get(0).getJobType()).isEqualTo("timer-start-event");
 
-        String cronString = "0 20 1 ? * * *";
+        String cronString = "0 20 1 ? * *";
         assertThat(jobDefinitions.get(0).getJobConfiguration()).isEqualTo("CYCLE: " + cronString);
         assertCronTriggerFiresAtExpectedTime(
-            new CronExpression(cronString),
+            CronExpression.parse(cronString),
             LocalDateTime.of(2020, 1, 1, 1, 20, 0),
             LocalDateTime.of(2020, 1, 2, 1, 20, 0)
         );

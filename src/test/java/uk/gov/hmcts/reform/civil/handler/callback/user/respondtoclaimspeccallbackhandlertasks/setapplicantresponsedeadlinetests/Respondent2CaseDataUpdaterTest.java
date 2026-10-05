@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
 class Respondent2CaseDataUpdaterTest {
@@ -77,12 +78,12 @@ class Respondent2CaseDataUpdaterTest {
 
     @Test
     void shouldUpdateRespondent2ClaimResponseTypeAndResponseDateWhenConditionsAreMet() {
-        LocalDateTime responseDate = LocalDateTime.now();
         caseData.setRespondentResponseIsSame(YesOrNo.YES);
         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
+        caseData.setRespondent2SameLegalRepresentative(YES);
 
+        LocalDateTime responseDate = LocalDateTime.now();
         when(time.now()).thenReturn(responseDate);
-        when(respondToClaimSpecUtils.isRespondent2HasSameLegalRep(caseData)).thenReturn(true);
 
         updater.update(caseData);
 

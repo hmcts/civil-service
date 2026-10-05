@@ -18,6 +18,9 @@ import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
 @RequiredArgsConstructor
 public class PaymentStatusService {
 
+    private static final int PRECONDITION_FAILED = 412;
+    private static final String SERVICE_REQUEST_ALREADY_PAID = "serviceRequest has already been paid";
+
     private final PaymentsClient paymentsClient;
 
     @Retryable(value = RetryablePaymentException.class, backoff = @Backoff(delay = 500))
@@ -28,10 +31,26 @@ public class PaymentStatusService {
         } catch (FeignException.InternalServerError ex) {
             throw new RetryablePaymentException(ex.contentUTF8(), ex);
         } catch (FeignException ex) {
+            if (isServiceRequestAlreadyPaid(ex)) {
+                log.info("Service request {} has already been paid, treating create payment request as successful",
+                         serviceRequestReference);
+                return new CardPaymentServiceRequestResponse(
+                    serviceRequestReference,
+                    serviceRequestReference,
+                    "Success",
+                    null,
+                    null
+                );
+            }
             log.error("Payments response error \n\tstatus: {} => message: \"{}\"", ex.status(), ex.contentUTF8(), ex);
             log.info("Feign exception caught, payment will not be retried");
             throw new PaymentsApiException(ex.contentUTF8(), ex);
         }
+    }
+
+    private boolean isServiceRequestAlreadyPaid(FeignException ex) {
+        return ex.status() == PRECONDITION_FAILED
+            && ex.contentUTF8().contains(SERVICE_REQUEST_ALREADY_PAID);
     }
 
     @Retryable(value = RetryablePaymentException.class, maxAttempts = 5, backoff = @Backoff(delay = 500))

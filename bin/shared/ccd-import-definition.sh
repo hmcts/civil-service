@@ -20,7 +20,8 @@ else
 fi
 
 if [ -z "${SERVICE_TOKEN:-}" ]; then
-  serviceToken=$(${dir}/idam-lease-service-token.sh ccd_gw $(docker run --rm hmctspublic.azurecr.io/imported/toolbelt/oathtool --totp -b ${CCD_API_GATEWAY_S2S_SECRET:-AAAAAAAAAAAAAAAC}))
+  serviceToken=$(IDAM_SERVICE_SECRET="${CCD_API_GATEWAY_S2S_SECRET:-AAAAAAAAAAAAAAAC}" \
+    "${dir}/idam-lease-service-token.sh" ccd_gw)
 else
   serviceToken=${SERVICE_TOKEN}
 fi

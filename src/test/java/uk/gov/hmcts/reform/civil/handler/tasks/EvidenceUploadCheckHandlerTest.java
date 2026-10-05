@@ -17,6 +17,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.EvidenceUploadNotificationEvent;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.scheduler.evidenceupload.EvidenceUploadScheduler;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.EvidenceUploadNotificationSearchService;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -49,6 +51,10 @@ class EvidenceUploadCheckHandlerTest {
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @Spy
     private EventProperties eventProperties = configuredEventProperties();
 
@@ -62,6 +68,7 @@ class EvidenceUploadCheckHandlerTest {
     void init() {
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
+        when(featureToggleService.isSpringSchedulerEnabled(EvidenceUploadScheduler.SCHEDULER_NAME)).thenReturn(false);
     }
 
     @Test
@@ -171,6 +178,24 @@ class EvidenceUploadCheckHandlerTest {
         verify(applicationEventPublisher, times(2)).publishEvent(any(EvidenceUploadNotificationEvent.class));
         verify(applicationEventPublisher).publishEvent(new EvidenceUploadNotificationEvent(caseId));
         verify(applicationEventPublisher).publishEvent(new EvidenceUploadNotificationEvent(otherId));
+    }
+
+    @Test
+    void shouldNotEmitEvidenceUploadCheckEvent_WhenSpringSchedulerEnabled() {
+        when(featureToggleService.isSpringSchedulerEnabled(EvidenceUploadScheduler.SCHEDULER_NAME)).thenReturn(true);
+        // Given: one case found from search service
+        long caseId = 1L;
+        Map<String, Object> data = Map.of("data", "some data");
+        Set<CaseDetails> caseDetails = Set.of(new CaseDetailsBuilder().id(caseId).data(data).build());
+
+        given(searchService.getCases()).willReturn(caseDetails);
+
+        // When: handler is called
+        handler.execute(mockTask, externalTaskService);
+
+        // Then: task should not be completed
+        verifyNoInteractions(applicationEventPublisher);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     private static EventProperties configuredEventProperties() {

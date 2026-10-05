@@ -84,4 +84,19 @@ class GetRespondentsForDQGeneratorTest {
         assertNotNull(respondents);
         assertEquals(1, respondents.size());
     }
+
+    @Test
+    void shouldReturnRespondent1OnlyWhenResp2IsNull() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondentResponseIsSame(YES)
+            .respondent2SameLegalRepresentative(YES)
+            .respondent1(new PartyBuilder().individual().build())
+            .respondent2(null)
+            .build();
+
+        List<Party> respondents = getRespondentsForDQGenerator.getRespondents(caseData, "ONE");
+
+        assertNotNull(respondents);
+        assertEquals(1, respondents.size());
+    }
 }

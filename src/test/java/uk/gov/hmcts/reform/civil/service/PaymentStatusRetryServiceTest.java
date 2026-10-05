@@ -31,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -76,14 +77,18 @@ class PaymentStatusRetryServiceTest {
 
     @Test
     void shouldUpdatePaymentStatusUsingCaseData() {
+        CaseDetails freshCaseDetails = mock(CaseDetails.class);
+        CaseData freshCaseData = mock(CaseData.class);
         StartEventResponse startEventResponse = StartEventResponse.builder()
             .token("token")
             .eventId("eventId")
+            .caseDetails(freshCaseDetails)
             .build();
 
         when(caseData.isLipvLipOneVOne()).thenReturn(true);
         when(coreCaseDataService.startUpdate(CASE_ID.toString(), CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT))
             .thenReturn(startEventResponse);
+        when(caseDetailsConverter.toCaseData(freshCaseDetails)).thenReturn(freshCaseData);
 
         service.updatePaymentStatus(FeeType.CLAIMISSUED, CASE_ID.toString(), caseData);
 
@@ -100,12 +105,16 @@ class PaymentStatusRetryServiceTest {
         when(caseData.isLipvLROneVOne()).thenReturn(false);
         when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.UNSPEC_CLAIM);
 
+        CaseDetails freshCaseDetails = mock(CaseDetails.class);
+        CaseData freshCaseData = mock(CaseData.class);
         StartEventResponse startEventResponse = StartEventResponse.builder()
             .token("token")
             .eventId("eventId")
+            .caseDetails(freshCaseDetails)
             .build();
         when(coreCaseDataService.startUpdate(CASE_ID.toString(), CaseEvent.CREATE_CLAIM_AFTER_PAYMENT))
             .thenReturn(startEventResponse);
+        when(caseDetailsConverter.toCaseData(freshCaseDetails)).thenReturn(freshCaseData);
 
         CardPaymentStatusResponse response = new CardPaymentStatusResponse()
             .setStatus("success")
@@ -163,13 +172,23 @@ class PaymentStatusRetryServiceTest {
             .setStatus("success")
             .setPaymentReference("ref");
 
-        when(coreCaseDataService.getCase(CASE_ID)).thenThrow(new RuntimeException());
+        RuntimeException cause = new RuntimeException("CCD unavailable");
+        when(coreCaseDataService.getCase(CASE_ID)).thenThrow(cause);
 
         PaymentStatusRetryService spyService = spy(service);
+        String caseReference = CASE_ID.toString();
 
-        assertThrows(CaseDataUpdateException.class, () ->
-            spyService.updatePaymentStatus(FeeType.CLAIMISSUED, CASE_ID.toString(), response)
+        CaseDataUpdateException exception = assertThrows(
+            CaseDataUpdateException.class,
+            () -> spyService.updatePaymentStatus(FeeType.CLAIMISSUED, caseReference, response)
         );
+
+        assertThat(exception)
+            .hasMessage("CCD unavailable")
+            .hasCause(cause);
+        assertThat(listAppender.list).hasSize(1);
+        assertThat(listAppender.list.getFirst().getFormattedMessage())
+            .contains("Payment status update failed for case 123 and fee type CLAIMISSUED. Status: success, ErrorCode: null");
 
         CardPaymentStatusResponse recoverResponse = new CardPaymentStatusResponse()
             .setStatus("FAILED")
@@ -178,12 +197,44 @@ class PaymentStatusRetryServiceTest {
             .setErrorDescription("Payment failed");
 
         CaseDataUpdateException ex = new CaseDataUpdateException("test error", new RuntimeException());
+        listAppender.list.clear();
         service.recover(ex, FeeType.CLAIMISSUED, CASE_ID.toString(), recoverResponse);
 
         assertThat(listAppender.list).hasSize(1);
         assertThat(listAppender.list.getFirst().getLevel()).isEqualTo(Level.ERROR);
         assertThat(listAppender.list.getFirst().getFormattedMessage())
             .contains("Payment status update failed after retries for case 123 and fee type CLAIMISSUED. Status: FAILED, ErrorCode: ERR001");
+    }
+
+    @Test
+    void shouldLogOriginalCauseWhenUpdatePaymentStatusCaseDataFails() {
+        RuntimeException cause = new RuntimeException("CCD submit failed");
+        when(caseData.isLipvLipOneVOne()).thenReturn(true);
+        String caseReference = CASE_ID.toString();
+        when(coreCaseDataService.startUpdate(caseReference, CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT))
+            .thenThrow(cause);
+
+        assertThatThrownBy(() -> service.updatePaymentStatus(FeeType.CLAIMISSUED, caseReference, caseData))
+            .isInstanceOf(CaseDataUpdateException.class)
+            .hasMessage("CCD submit failed")
+            .hasCause(cause);
+
+        assertThat(listAppender.list).hasSize(1);
+        assertThat(listAppender.list.getFirst().getLevel()).isEqualTo(Level.ERROR);
+        assertThat(listAppender.list.getFirst().getFormattedMessage())
+            .contains("Payment status update failed for case 123 and fee type CLAIMISSUED");
+    }
+
+    @Test
+    void shouldNotWrapUnsupportedFeeTypeWhenUpdatePaymentStatusCaseDataFails() {
+        String caseReference = CASE_ID.toString();
+
+        assertThatThrownBy(() -> service.updatePaymentStatus(APPLICATION, caseReference, caseData))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Unsupported fee type for event: APPLICATION");
+
+        assertThat(listAppender.list).isEmpty();
+        verifyNoMoreInteractions(coreCaseDataService);
     }
 
     @Test
@@ -199,7 +250,8 @@ class PaymentStatusRetryServiceTest {
             .setPaymentReference("1234")
             .setStatus("Invalid");
 
-        assertThatThrownBy(() -> service.updatePaymentStatus(FeeType.CLAIMISSUED, CASE_ID.toString(), response))
+        String caseIdStr = CASE_ID.toString();
+        assertThatThrownBy(() -> service.updatePaymentStatus(FeeType.CLAIMISSUED, caseIdStr, response))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Invalid payment status: Invalid");
 
@@ -281,5 +333,72 @@ class PaymentStatusRetryServiceTest {
         assertThat(listAppender.list.getFirst().getFormattedMessage())
             .contains("Payment status update failed after retries for case 12345 and fee type CLAIMISSUED. Status: FAILED, ErrorCode: ERR123");
     }
-}
 
+    @Test
+    void shouldNotUpdatePaymentStatus_whenAlreadyApplied() {
+        CaseDetails freshCaseDetails = mock(CaseDetails.class);
+        CaseData freshCaseData = mock(CaseData.class);
+        StartEventResponse startEventResponse = StartEventResponse.builder()
+            .token("token")
+            .eventId("eventId")
+            .caseDetails(freshCaseDetails)
+            .build();
+
+        PaymentDetails existingPayment = new PaymentDetails()
+            .setStatus(uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS)
+            .setReference("ref");
+
+        // caseData passed to method (intended payment)
+        when(caseData.getClaimIssuedPaymentDetails()).thenReturn(existingPayment);
+        when(caseData.isLipvLipOneVOne()).thenReturn(true);
+
+        // freshCaseData from CCD (already has the payment)
+        when(freshCaseData.getClaimIssuedPaymentDetails()).thenReturn(existingPayment);
+
+        when(coreCaseDataService.startUpdate(CASE_ID.toString(), CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT))
+            .thenReturn(startEventResponse);
+        when(caseDetailsConverter.toCaseData(freshCaseDetails)).thenReturn(freshCaseData);
+
+        service.updatePaymentStatus(FeeType.CLAIMISSUED, CASE_ID.toString(), caseData);
+
+        verify(coreCaseDataService, never()).submitUpdate(any(), any());
+    }
+
+    @Test
+    void shouldNotUpdatePaymentStatusResponse_whenAlreadyApplied() {
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        CaseData staleCaseData = mock(CaseData.class);
+        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(staleCaseData);
+        when(staleCaseData.isLipvLipOneVOne()).thenReturn(false);
+        when(staleCaseData.isLipvLROneVOne()).thenReturn(false);
+        when(staleCaseData.getCaseAccessCategory()).thenReturn(CaseCategory.UNSPEC_CLAIM);
+
+        CaseDetails freshCaseDetails = mock(CaseDetails.class);
+        CaseData freshCaseData = mock(CaseData.class);
+        StartEventResponse startEventResponse = StartEventResponse.builder()
+            .token("token")
+            .eventId("eventId")
+            .caseDetails(freshCaseDetails)
+            .build();
+
+        PaymentDetails existingPayment = new PaymentDetails()
+            .setStatus(uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS)
+            .setReference("ref");
+
+        when(staleCaseData.getClaimIssuedPaymentDetails()).thenReturn(existingPayment);
+        when(freshCaseData.getClaimIssuedPaymentDetails()).thenReturn(existingPayment);
+
+        when(coreCaseDataService.startUpdate(CASE_ID.toString(), CaseEvent.CREATE_CLAIM_AFTER_PAYMENT))
+            .thenReturn(startEventResponse);
+        when(caseDetailsConverter.toCaseData(freshCaseDetails)).thenReturn(freshCaseData);
+
+        CardPaymentStatusResponse response = new CardPaymentStatusResponse()
+            .setStatus("SUCCESS")
+            .setPaymentReference("ref");
+
+        service.updatePaymentStatus(FeeType.CLAIMISSUED, CASE_ID.toString(), response);
+
+        verify(coreCaseDataService, never()).submitUpdate(any(), any());
+    }
+}

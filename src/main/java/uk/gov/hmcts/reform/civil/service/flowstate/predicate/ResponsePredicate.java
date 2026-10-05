@@ -184,7 +184,7 @@ public non-sealed interface ResponsePredicate extends CaseDataPredicate {
                     ? CaseDataPredicate.Respondent.isTypeSpecRespondent1(responseType).test(c)
                     : CaseDataPredicate.Claimant.responseTypeSpecClaimant1(responseType)
                         .and(CaseDataPredicate.Claimant.responseTypeSpecClaimant2(responseType)).test(c);
-                }
+            }
             );
     }
 

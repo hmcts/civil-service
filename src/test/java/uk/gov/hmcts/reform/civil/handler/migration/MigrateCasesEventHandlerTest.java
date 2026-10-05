@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReferenceCsvLoader;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardNotificationTaskCaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardScenarioCaseReference;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.ExcelCaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.ExcelMappable;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.NotificationCaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.NotifyRpaFeedCaseReference;
@@ -35,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -416,6 +418,46 @@ class MigrateCasesEventHandlerTest {
         assertNotNull(result);
         verify(caseReferenceCsvLoader, times(1)).loadFromExcelBytes(ExcelMappableCaseReference.class, excelBytes);
         verify(asyncCaseMigrationService, times(1)).migrateCasesAsync(migrationTask, mockReferences, null, false);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldHandleCmcTaskWithExcelFile() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("taskName")).thenReturn("UpdateSystemTTLTask");
+        when(externalTask.getVariable("caseIds")).thenReturn("");
+        when(externalTask.getVariable("scenario")).thenReturn(null);
+        when(externalTask.getVariable("notificationCamundaProcessIdentifier")).thenReturn(null);
+        when(externalTask.getVariable("caseNoteElementId")).thenReturn(null);
+        when(externalTask.getVariable("notifyEventId")).thenReturn(null);
+        when(externalTask.getVariable("state")).thenReturn(null);
+        when(externalTask.getVariable("isGACase")).thenReturn(null);
+        when(externalTask.getVariable("isCMCCase")).thenReturn("true");
+
+        byte[] excelBytes = "dummy content".getBytes();
+        FileValue fileValue = mock(FileValue.class);
+        when(fileValue.getValue()).thenReturn(new ByteArrayInputStream(excelBytes));
+        when(externalTask.getVariableTyped("excelFile", false)).thenReturn(fileValue);
+
+        MigrationTask<ExcelCaseReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.getType()).thenReturn(ExcelCaseReference.class);
+        when(migrationTaskFactory.<ExcelCaseReference>getMigrationTask("UpdateSystemTTLTask"))
+            .thenReturn(Optional.of(migrationTask));
+
+        ExcelCaseReference firstReference = new ExcelCaseReference();
+        firstReference.setCaseReference("1111222233334444");
+        ExcelCaseReference secondReference = new ExcelCaseReference();
+        secondReference.setCaseReference("5555666677778888");
+        List<ExcelCaseReference> mockReferences = List.of(firstReference, secondReference);
+        when(caseReferenceCsvLoader.loadFromExcelBytes(ExcelCaseReference.class, excelBytes))
+            .thenReturn(mockReferences);
+
+        ExternalTaskData result = handler.handleTask(externalTask);
+
+        assertNotNull(result);
+        verify(caseReferenceCsvLoader).loadFromExcelBytes(ExcelCaseReference.class, excelBytes);
+        verify(asyncCaseMigrationService).migrateCMCCasesAsync(migrationTask, mockReferences);
+        verify(asyncCaseMigrationService, never()).migrateCasesAsync(any(), anyList(), any(), anyBoolean());
     }
 
     @Test

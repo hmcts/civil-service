@@ -9,7 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
@@ -29,18 +28,19 @@ import uk.gov.hmcts.reform.civil.model.StoredObligationData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -53,8 +53,6 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private ConfirmOrderReviewCallbackHandler handler;
 
-    @Mock
-    private FeatureToggleService toggleService;
     @Mock
     private UserService userService;
 
@@ -70,15 +68,12 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
     private static final String TASKS_LEFT_ERROR_3 = "Once you have completed the task you can submit your order review by clicking on the link on your task list.";
     private static final String OBLIGATION_DATE_ERROR = "The obligation date must be in the future";
 
-    @Mock
-    private Time time;
-
     @BeforeEach
     void caseEventsEnabled() {
 
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        handler = new ConfirmOrderReviewCallbackHandler(toggleService, objectMapper, userService, time);
+        handler = new ConfirmOrderReviewCallbackHandler(objectMapper, userService);
     }
 
     @Nested
@@ -187,11 +182,6 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            if (allocatedTrack == AllocatedTrack.SMALL_CLAIM || allocatedTrack == AllocatedTrack.FAST_CLAIM) {
-                assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.NO.getLabel());
-            } else {
-                assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.YES.getLabel());
-            }
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
         }
 
@@ -207,42 +197,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            if (allocatedTrack == AllocatedTrack.SMALL_CLAIM || allocatedTrack == AllocatedTrack.FAST_CLAIM) {
-                assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.NO.getLabel());
-            } else {
-                assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.YES.getLabel());
-            }
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
-        }
-
-        @ParameterizedTest
-        @EnumSource(value = AllocatedTrack.class)
-        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder_spec_v2(AllocatedTrack allocatedTrack) {
-            CaseData caseData = CaseDataBuilder.builder().build();
-            caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
-            caseData.setResponseClaimTrack(allocatedTrack.name());
-            caseData.setEaCourtLocation(YesOrNo.YES);
-            caseData.setIsFinalOrder(NO);
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.YES.getLabel());
-        }
-
-        @ParameterizedTest
-        @EnumSource(value = AllocatedTrack.class)
-        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder_unspec_v3(AllocatedTrack allocatedTrack) {
-            CaseData caseData = CaseDataBuilder.builder().build();
-            caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
-            caseData.setAllocatedTrack(allocatedTrack);
-            caseData.setEaCourtLocation(YesOrNo.YES);
-            caseData.setIsFinalOrder(NO);
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.YES.getLabel());
         }
 
         @Test
@@ -265,15 +220,13 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetStoredObligationData_whenObligationDataIsPresent() {
-            LocalDateTime localDateTime = LocalDateTime.of(2024, 1, 1, 10, 10, 10);
-            Mockito.when(time.now()).thenReturn(localDateTime);
-            Mockito.when(userService.getUserDetails(any())).thenReturn(UserDetails
+            when(userService.getUserDetails(any())).thenReturn(UserDetails
                                                                            .builder()
                                                                            .forename("John")
                                                                            .surname("Smith")
                                                                            .build());
 
-            LocalDate obligationDate = LocalDate.of(2024, 12, 12);
+            LocalDate obligationDate = LocalDate.of(2024, Month.DECEMBER, 12);
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setIsFinalOrder(YesOrNo.YES);
             ObligationData obligationData = new ObligationData();
@@ -288,7 +241,6 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             StoredObligationData expectedData = new StoredObligationData();
             expectedData.setCreatedBy("John Smith");
-            expectedData.setCreatedOn(time.now());
             expectedData.setObligationDate(obligationDate);
             expectedData.setObligationAction("Main text");
             expectedData.setObligationReason(ObligationReason.STAY_A_CASE);
@@ -297,17 +249,22 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
+            LocalDateTime beforeInvocation = LocalDateTime.now(ZoneId.of("Europe/London"));
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            LocalDateTime afterInvocation = LocalDateTime.now(ZoneId.of("Europe/London"));
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+            StoredObligationData actualData = data.getStoredObligationData().getFirst().getValue();
 
-            assertThat(data.getStoredObligationData().getFirst().getValue()).isEqualTo(expectedData);
+            assertThat(actualData)
+                .usingRecursiveComparison()
+                .ignoringFields("createdOn")
+                .isEqualTo(expectedData);
+            assertThat(actualData.getCreatedOn()).isBetween(beforeInvocation, afterInvocation);
         }
 
         @Test
         void shouldSetStoredObligationData_whenObligationDataIsPresent_withOtherReason() {
-            LocalDateTime localDateTime = LocalDateTime.of(2024, 1, 1, 10, 10, 10);
-            Mockito.when(time.now()).thenReturn(localDateTime);
-            Mockito.when(userService.getUserDetails(any())).thenReturn(UserDetails
+            when(userService.getUserDetails(any())).thenReturn(UserDetails
                                                                            .builder()
                                                                            .forename("John")
                                                                            .surname("Smith")
@@ -318,7 +275,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             ObligationData obligationData = new ObligationData();
             obligationData.setObligationReason(ObligationReason.OTHER);
             obligationData.setOtherObligationReason("Reason for othering");
-            LocalDate obligationDate = LocalDate.of(2024, 12, 12);
+            LocalDate obligationDate = LocalDate.of(2024, Month.DECEMBER, 12);
             obligationData.setObligationDate(obligationDate);
             obligationData.setObligationAction("Main text");
             UUID uuid = UUID.fromString("818da749-8920-40c2-a083-722645735e02");
@@ -329,7 +286,6 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             StoredObligationData expectedData = new StoredObligationData();
             expectedData.setCreatedBy("John Smith");
-            expectedData.setCreatedOn(time.now());
             expectedData.setObligationDate(obligationDate);
             expectedData.setObligationAction("Main text");
             expectedData.setObligationReason(ObligationReason.OTHER);
@@ -340,10 +296,17 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
+            LocalDateTime beforeInvocation = LocalDateTime.now(ZoneId.of("Europe/London"));
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            LocalDateTime afterInvocation = LocalDateTime.now(ZoneId.of("Europe/London"));
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+            StoredObligationData actualData = data.getStoredObligationData().getFirst().getValue();
 
-            assertThat(data.getStoredObligationData().getFirst().getValue()).isEqualTo(expectedData);
+            assertThat(actualData)
+                .usingRecursiveComparison()
+                .ignoringFields("createdOn")
+                .isEqualTo(expectedData);
+            assertThat(actualData.getCreatedOn()).isBetween(beforeInvocation, afterInvocation);
         }
     }
 

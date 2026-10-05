@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.ga.service.docmosis;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -34,7 +34,9 @@ public class DocmosisService {
         } else {
             courtLocations = generalAppLocationRefDataService.getCourtLocations(authorisation, serviceId);
         }
-        assert courtLocations != null;
+        if (courtLocations == null) {
+            throw new IllegalArgumentException("Court locations could not be retrieved for service: " + serviceId);
+        }
         var caseLocation = caseData.getCaseManagementLocation();
         var matchingLocations =
             courtLocations

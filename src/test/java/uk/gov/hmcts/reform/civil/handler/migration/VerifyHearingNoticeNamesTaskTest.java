@@ -175,6 +175,25 @@ class VerifyHearingNoticeNamesTaskTest {
         assertFalse(participants.contains("charlie sansom"), "a foreign name must not be a participant");
     }
 
+    @Test
+    void participantNames_includesSoleTraderPlainName_notJustTradingAsForm() {
+        // Reproduces case 1751912156533775: the defendant is a SOLE_TRADER whose getPartyName()
+        // returns "Mr William Beckett Trading as William beckett", but the notice attendee is the
+        // plain "William Beckett". The plain sole trader name must be a participant so it matches.
+        Party soleTrader = new Party()
+            .setType(Party.Type.SOLE_TRADER)
+            .setSoleTraderTitle("Mr")
+            .setSoleTraderFirstName("William")
+            .setSoleTraderLastName("Beckett")
+            .setSoleTraderTradingAs("William beckett");
+        CaseData caseData = CaseData.builder().applicant1(claimant).respondent1(soleTrader).build();
+
+        var participants = task.participantNames(caseData);
+
+        assertTrue(participants.contains("william beckett"),
+                   "plain sole trader first+last name must be a participant");
+    }
+
     private CaseData caseWithNotice() {
         CaseDocument notice = new CaseDocument()
             .setDocumentLink(new Document(

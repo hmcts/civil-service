@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.addAllFooterItems;
 
@@ -153,6 +154,16 @@ public class HearingScheduledNotificationService implements NotificationDataGA {
 
         List<Element<GASolicitorDetailsGAspec>> respondentSolicitor = caseData.getGeneralAppRespondentSolicitors();
         if (respondentSolicitor ==  null || respondentSolicitor.isEmpty()) {
+            if (gaForLipService.isLipResp(caseData)) {
+                String lipRespondentEmail = getLipRespondentEmail(civilCaseData, caseData);
+                if (lipRespondentEmail != null) {
+                    sendNotification(caseData, civilCaseData, lipRespondentEmail,
+                                     getLiPRespondentTemplate(caseData), RESPONDENT);
+                    log.info("Sending hearing scheduled notification for LiP respondent for Case ID: {}",
+                             caseData.getCcdCaseReference());
+                    return caseData;
+                }
+            }
             log.warn("Failed to Send hearing scheduled notification for respondent solicitor for Case ID: {}", caseData.getCcdCaseReference());
             return caseData;
         }
@@ -167,6 +178,12 @@ public class HearingScheduledNotificationService implements NotificationDataGA {
 
         log.info("Sending hearing scheduled notification for respondent solicitor for Case ID: {}", caseData.getCcdCaseReference());
         return caseData;
+    }
+
+    private String getLipRespondentEmail(GeneralApplicationCaseData civilCaseData, GeneralApplicationCaseData caseData) {
+        return YES.equals(caseData.getParentClaimantIsApplicant())
+            ? gaForLipService.getDefendant1Email(civilCaseData)
+            : gaForLipService.getApplicant1Email(civilCaseData);
     }
 
     private String getLiPRespondentTemplate(GeneralApplicationCaseData caseData) {
