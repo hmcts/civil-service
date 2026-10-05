@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Assertions;
@@ -10,15 +11,18 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
+import uk.gov.hmcts.reform.civil.model.breathing.StoredBreathingSpace;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.utils.BreathingSpaceUtils;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,10 +32,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_
 public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-    private final CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
 
     private final LiftBreathingSpaceSpecCallbackHandler callbackHandler =
-        new LiftBreathingSpaceSpecCallbackHandler(objectMapper, caseDetailsConverter);
+        new LiftBreathingSpaceSpecCallbackHandler(objectMapper);
 
     @Nested
     class AboutToStartCallback {
@@ -271,6 +274,38 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
                 .extracting("camundaEvent", "status")
                 .containsOnly(LIFT_BREATHING_SPACE_SPEC.name(), "READY");
 
+            assertThat(response.getData())
+                .extracting("breathingSpaceActive")
+                .isEqualTo("No");
+        }
+
+        @Test
+        public void shouldStoreLiftOnOpenBreathingSpaceItem_whenInvoked() {
+            BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
+            enterInfo.setStart(LocalDate.now().minusDays(2));
+            BreathingSpaceLiftInfo liftInfo = new BreathingSpaceLiftInfo();
+            liftInfo.setExpectedEnd(LocalDate.now());
+            liftInfo.setReasonToLift("reason");
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            breathingSpaceInfo.setEnter(enterInfo);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            caseData.setBreathing(breathingSpaceInfo);
+            BreathingSpaceUtils.addEnteredBreathingSpaceToHistory(caseData);
+            breathingSpaceInfo.setLift(liftInfo);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
+
+            List<Element<StoredBreathingSpace>> stored = objectMapper.convertValue(
+                response.getData().get("storedBreathingSpace"),
+                new TypeReference<>() {}
+            );
+
+            assertThat(stored).hasSize(1);
+            assertThat(stored.get(0).getValue().getDefendantLabel())
+                .isEqualTo("Breathing space for Defendant 1 details");
+            assertThat(stored.get(0).getValue().getLift().getReasonToLift()).isEqualTo("reason");
             assertThat(response.getData())
                 .extracting("breathingSpaceActive")
                 .isEqualTo("No");

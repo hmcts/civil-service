@@ -13,14 +13,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
+import uk.gov.hmcts.reform.civil.utils.BreathingSpaceUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
@@ -42,26 +41,22 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(CallbackType.ABOUT_TO_START), this::checkCanEnter,
-            callbackKey(CallbackType.MID, "enter-info"), this::checkEnterInfo,
-            callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::prepareSubmit,
-            callbackKey(CallbackType.SUBMITTED), this::buildSubmittedText
+            callbackKey(CallbackType.ABOUT_TO_START), this::validateCanEnterBreathingSpace,
+            callbackKey(CallbackType.MID, "enter-info"), this::validateBreathingSpaceEnterInfo,
+            callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::prepareEnterBreathingSpaceSubmit,
+            callbackKey(CallbackType.SUBMITTED), this::buildConfirmationResponse
         );
     }
 
-    private CallbackResponse checkCanEnter(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
-            AboutToStartOrSubmitCallbackResponse.builder();
-        if (caseData.getBreathing() != null && caseData.getBreathing().getEnter() != null) {
-            responseBuilder.errors(Collections.singletonList(
-                "A claim can enter Breathing Space only once."
-            ));
-        }
-        return responseBuilder.build();
+    private CallbackResponse validateCanEnterBreathingSpace(CallbackParams callbackParams) {
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(BreathingSpaceUtils.getCannotEnterBreathingSpaceReason(callbackParams.getCaseData())
+                        .map(Collections::singletonList)
+                        .orElse(null))
+            .build();
     }
 
-    private CallbackResponse checkEnterInfo(CallbackParams callbackParams) {
+    private CallbackResponse validateBreathingSpaceEnterInfo(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         List<String> errors = new ArrayList<>();
@@ -76,7 +71,7 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private CallbackResponse buildSubmittedText(CallbackParams callbackParams) {
+    private CallbackResponse buildConfirmationResponse(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String claimNumber = caseData.getLegacyCaseReference();
 
@@ -92,12 +87,15 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private CallbackResponse prepareSubmit(CallbackParams callbackParams) {
+    private CallbackResponse prepareEnterBreathingSpaceSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        Optional.ofNullable(caseData.getBreathing())
-            .map(BreathingSpaceInfo::getEnter)
-            .filter(enter -> enter.getStart() == null)
-            .ifPresent(enter -> enter.setStart(LocalDate.now()));
+        if (caseData.getBreathing() != null
+            && caseData.getBreathing().getEnter() != null
+            && caseData.getBreathing().getEnter().getStart() == null) {
+            caseData.getBreathing().getEnter().setStart(LocalDate.now());
+        }
+
+        BreathingSpaceUtils.addEnteredBreathingSpaceToHistory(caseData);
 
         caseData.setBusinessProcess(BusinessProcess.ready(ENTER_BREATHING_SPACE_SPEC));
         caseData.getBreathing().setActive(YES);
