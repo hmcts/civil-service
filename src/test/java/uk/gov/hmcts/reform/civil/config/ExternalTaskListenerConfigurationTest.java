@@ -34,9 +34,45 @@ class ExternalTaskListenerConfigurationTest {
     @Test
     void shouldCheckPresenceOfBeans_WhenExternalTaskConfigurationIsLoaded() {
         context.run(it -> {
-            assertThat(it).hasSingleBean(ExternalTaskClient.class);
             assertThat(it).hasSingleBean(BackoffStrategy.class);
             assertThat(it.getBean(BackoffStrategy.class)).isInstanceOf(ErrorAwareBackoffStrategy.class);
+        });
+    }
+
+    /**
+     * Three clients now: one real client per thread, plus the router the listeners inject. The
+     * router must be the one resolved by type, because all 39 listeners take a bare
+     * {@code ExternalTaskClient} and would otherwise bind to a single underlying client and lose
+     * the split.
+     */
+    @Test
+    void shouldExposeTwoRealClientsAndRouteThroughThePrimaryOne() {
+        context.run(it -> {
+            assertThat(it.getBeanNamesForType(ExternalTaskClient.class))
+                .containsExactlyInAnyOrder("client", "caseDrivenExternalTaskClient", "schedulerExternalTaskClient");
+
+            assertThat(it.getBean(ExternalTaskClient.class))
+                .as("the bean injected by type must be the router, not one of the underlying clients")
+                .isInstanceOf(TopicRoutingExternalTaskClient.class);
+        });
+    }
+
+    @Test
+    void shouldRouteSchedulerTopicsAwayFromCaseDrivenTopics() {
+        context.run(it -> {
+            TopicRoutingExternalTaskClient router =
+                (TopicRoutingExternalTaskClient) it.getBean(ExternalTaskClient.class);
+            ExternalTaskClient caseDriven = (ExternalTaskClient) it.getBean("caseDrivenExternalTaskClient");
+            ExternalTaskClient scheduler = (ExternalTaskClient) it.getBean("schedulerExternalTaskClient");
+
+            assertThat(router.clientFor("BUNDLE_CREATION_CHECK")).isSameAs(scheduler);
+            assertThat(router.clientFor("AUTOMATED_HEARING_NOTICE")).isSameAs(scheduler);
+            assertThat(router.clientFor("START_BUSINESS_PROCESS")).isSameAs(caseDriven);
+            assertThat(router.clientFor("processCaseEvent")).isSameAs(caseDriven);
+
+            assertThat(caseDriven)
+                .as("the two underlying clients must be distinct, or there is still one thread")
+                .isNotSameAs(scheduler);
         });
     }
 
