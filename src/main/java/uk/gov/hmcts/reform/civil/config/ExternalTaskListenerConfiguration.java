@@ -135,19 +135,19 @@ public class ExternalTaskListenerConfiguration {
 
     @Bean("caseDrivenExternalTaskClient")
     public ExternalTaskClient caseDrivenExternalTaskClient() {
-        return buildClient(newBackoffStrategy());
+        return buildClient(newBackoffStrategy(), eventProperties.getCaseDrivenMaxTasks());
     }
 
     @Bean("schedulerExternalTaskClient")
     public ExternalTaskClient schedulerExternalTaskClient() {
-        return buildClient(newBackoffStrategy());
+        return buildClient(newBackoffStrategy(), eventProperties.getSchedulerMaxTasks());
     }
 
-    private ExternalTaskClient buildClient(BackoffStrategy externalTaskBackoffStrategy) {
+    private ExternalTaskClient buildClient(BackoffStrategy externalTaskBackoffStrategy, int maxTasks) {
         return ExternalTaskClient.create()
             .addInterceptor(new ServiceAuthProvider())
             .asyncResponseTimeout(eventProperties.getResponseTimeout())
-            .maxTasks(1)
+            .maxTasks(maxTasks)
             .backoffStrategy(externalTaskBackoffStrategy)
             .lockDuration(eventProperties.getLockDuration()) //wait for some time to finish task before it gets picked by another client
             .baseUrl(baseUrl)

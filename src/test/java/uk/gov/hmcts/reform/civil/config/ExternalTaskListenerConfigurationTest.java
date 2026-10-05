@@ -152,6 +152,8 @@ class ExternalTaskListenerConfigurationTest {
             props.setClientBackoffFactor(2);
             props.setClientBackoffMax(5000);
             props.setHttpValidateAfterInactivityMs(2000);
+            props.setCaseDrivenMaxTasks(10);
+            props.setSchedulerMaxTasks(1);
             return props;
         }
     }
@@ -202,6 +204,8 @@ class ExternalTaskListenerConfigurationTest {
         props.setClientBackoffFactor(2);
         props.setClientBackoffMax(5000);
         props.setHttpValidateAfterInactivityMs(2000);
+        props.setCaseDrivenMaxTasks(10);
+        props.setSchedulerMaxTasks(1);
         return props;
     }
 }

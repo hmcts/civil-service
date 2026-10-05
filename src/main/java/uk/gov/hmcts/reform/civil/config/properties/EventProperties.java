@@ -28,4 +28,11 @@ public class EventProperties {
     protected long clientBackoffMax;
     // period of inactivity after which pooled Camunda HTTP connections are validated before reuse.
     protected long httpValidateAfterInactivityMs = 2000;
+    // tasks fetched per fetchAndLock on the case driven client. maxTasks caps tasks per request
+    // across all topics on that client, not per topic, so this is the whole request budget.
+    protected int caseDrivenMaxTasks = 1;
+    // tasks fetched per fetchAndLock on the scheduler client. Left at 1 deliberately: these
+    // handlers pace themselves with Thread.sleep, so fetching several would only queue up more
+    // sequential sleeping on that one thread.
+    protected int schedulerMaxTasks = 1;
 }
