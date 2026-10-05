@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.scheduler.fulladmitpayimmediatelynopayfromdef;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.civil.service.search.fulladmitpayimmediatelynopayfromdef.FullAdmitPayImmediatelyNoPaymentFromDefendantPaginatedSearchService;
 
@@ -33,9 +34,12 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScheduler implements C
     @Override
     public void runScheduledTask() {
         scheduledTaskRunner.run(
-            SCHEDULER_NAME,
-            searchService::getElasticSearchResult,
-            fullAdmitPayImmediatelyNoPaymentFromDefendantScheduledTask
+            ScheduledTaskConfiguration.<CaseDetails, Long>builder()
+                .schedulerName(SCHEDULER_NAME)
+                .searchResultSupplier(searchService::getElasticSearchResult)
+                .scheduledTask(fullAdmitPayImmediatelyNoPaymentFromDefendantScheduledTask)
+                .useDefaultInterceptors(false)
+                .build()
         );
     }
 }
