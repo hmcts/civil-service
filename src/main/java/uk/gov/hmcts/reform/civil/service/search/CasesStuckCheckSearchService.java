@@ -9,15 +9,14 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.math.BigDecimal;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static java.math.RoundingMode.UP;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
 @Service
@@ -29,31 +28,41 @@ public class CasesStuckCheckSearchService {
     protected static final int ES_DEFAULT_SEARCH_LIMIT = 10;
     protected final CoreCaseDataService coreCaseDataService;
 
-    public Set<CaseDetails> getCases(String stuckCasesFromPastDays) {
-        String timeNow = ZonedDateTime.now(ZoneOffset.UTC).toString();
-        SearchResult searchResult = coreCaseDataService.searchCases(query(START_INDEX, timeNow, stuckCasesFromPastDays));
+    public Set<CaseDetails> getCases() {
+        long sweepStarted = System.nanoTime();
+        SearchResult searchResult = searchPage(START_INDEX);
 
         Set<CaseDetails> caseDetailsSet = new HashSet<>(searchResult.getCases());
 
         int pages = calculatePages(searchResult);
         for (int i = 1; i < pages; i++) {
-            SearchResult result = coreCaseDataService.searchCases(query(i * ES_DEFAULT_SEARCH_LIMIT, timeNow, stuckCasesFromPastDays));
+            SearchResult result = searchPage(i * ES_DEFAULT_SEARCH_LIMIT);
             caseDetailsSet.addAll(result.getCases());
         }
 
         List<Long> ids = caseDetailsSet.stream().map(CaseDetails::getId).sorted().toList();
-        log.info("CasesStuckCheckSearchService: Found {} stuck case(s) in the last 7 days with ids {} at time {}", ids.size(), ids, timeNow);
+        log.info("CasesStuckCheckSearchService: Found {} stuck case(s) across all ages with ids {} at time {}",
+                 ids.size(), ids, Instant.now());
+        log.info("CasesStuckCheckSearchService: Sweep completed with total={}, returned={}, requests={}, elapsedMs={}",
+                 searchResult.getTotal(), ids.size(), Math.max(1, pages),
+                 TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - sweepStarted));
 
         return caseDetailsSet;
     }
 
-    public Query query(int startIndex, String timeNow, String stuckCasesFromPastDays) {
-        log.info("Call to CasesStuckCheckSearchService query with index {} and timeNow {}", startIndex, timeNow);
-        String pastDaysExpression = "now-" + stuckCasesFromPastDays + "d";
+    private SearchResult searchPage(int startIndex) {
+        long started = System.nanoTime();
+        SearchResult result = coreCaseDataService.searchCases(query(startIndex));
+        log.info("CasesStuckCheckSearchService: CCD search index={}, total={}, returned={}, elapsedMs={}",
+                 startIndex, result.getTotal(), result.getCases().size(),
+                 TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started));
+        return result;
+    }
 
+    public Query query(int startIndex) {
+        // A stuck process can outlive any modification window; search all ages and page the results.
         return new Query(
             boolQuery()
-                .must(rangeQuery("last_modified").gt(pastDaysExpression).lt(timeNow))
                 .mustNot(termQuery("data.businessProcess.status.keyword", "finished").caseInsensitive(true)),
             List.of("reference"),
             startIndex
