@@ -232,6 +232,35 @@ public class EnterBreathingSpaceSpecCallbackHandlerTest {
     }
 
     @Test
+    void aboutToSubmitStoresEnterDetailsAndClearsLift() {
+        BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
+        enterInfo.setStart(LocalDate.now().minusDays(1));
+        BreathingSpaceInfo breathingInfo = new BreathingSpaceInfo();
+        breathingInfo.setEnter(enterInfo);
+        breathingInfo.setLift(new BreathingSpaceLiftInfo());
+        CaseData caseData = CaseData.builder().build();
+        caseData.setBreathing(breathingInfo);
+
+        CallbackParams params = new CallbackParams()
+            .caseData(caseData)
+            .type(CallbackType.ABOUT_TO_SUBMIT);
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
+
+        List<Element<StoredBreathingSpace>> stored = objectMapper.convertValue(
+            response.getData().get("storedBreathingSpace"),
+            new TypeReference<>() {}
+        );
+        assertThat(stored).hasSize(1);
+        assertThat(stored.get(0).getValue().getDefendantLabel())
+            .isEqualTo("Breathing space for Defendant 1 details");
+        assertThat(stored.get(0).getValue().getEnter().getStart())
+            .isEqualTo(LocalDate.now().minusDays(1));
+        assertThat(stored.get(0).getValue().getLift()).isNull();
+        assertThat(response.getData().get("liftBreathing")).isNull();
+    }
+
+    @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
         assertThat(callbackHandler.handledEvents()).containsOnly(ENTER_BREATHING_SPACE_SPEC);
     }
