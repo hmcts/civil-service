@@ -55,6 +55,17 @@ public class ExternalTaskListenerConfiguration {
      */
     @Bean
     public BackoffStrategy externalTaskBackoffStrategy() {
+        return newBackoffStrategy();
+    }
+
+    /**
+     * A fresh strategy per client. {@link CamundaErrorAwareBackoffStrategy} holds the consecutive
+     * error count in an {@code AtomicInteger}, so sharing one instance between the two clients
+     * would let the scheduler client's errors back off the case driven client and vice versa,
+     * which is the cross contamination the split exists to prevent. Each client therefore gets its
+     * own counter rather than the singleton bean above.
+     */
+    BackoffStrategy newBackoffStrategy() {
         return new CamundaErrorAwareBackoffStrategy(
             eventProperties.getClientBackoffInitial(),
             eventProperties.getClientBackoffFactor(),
@@ -123,13 +134,13 @@ public class ExternalTaskListenerConfiguration {
     }
 
     @Bean("caseDrivenExternalTaskClient")
-    public ExternalTaskClient caseDrivenExternalTaskClient(BackoffStrategy externalTaskBackoffStrategy) {
-        return buildClient(externalTaskBackoffStrategy);
+    public ExternalTaskClient caseDrivenExternalTaskClient() {
+        return buildClient(newBackoffStrategy());
     }
 
     @Bean("schedulerExternalTaskClient")
-    public ExternalTaskClient schedulerExternalTaskClient(BackoffStrategy externalTaskBackoffStrategy) {
-        return buildClient(externalTaskBackoffStrategy);
+    public ExternalTaskClient schedulerExternalTaskClient() {
+        return buildClient(newBackoffStrategy());
     }
 
     private ExternalTaskClient buildClient(BackoffStrategy externalTaskBackoffStrategy) {

@@ -163,4 +163,45 @@ class ExternalTaskListenerConfigurationTest {
             return null;
         }
     }
+
+    /**
+     * Each client must hold its own backoff counter. CamundaErrorAwareBackoffStrategy keeps the
+     * consecutive error count in an AtomicInteger, so a shared instance would let the scheduler
+     * client's errors back off the case driven client, which is precisely the cross contamination
+     * the split exists to prevent.
+     *
+     * <p>A built Camunda client does not expose its strategy, so this asserts the factory the two
+     * client beans call: it must hand back a new instance each time, with an independent counter.
+     */
+    @Test
+    void shouldHandOutAnIndependentBackoffStrategyPerClient() {
+        ExternalTaskListenerConfiguration config =
+            new ExternalTaskListenerConfiguration("http://localhost", () -> null, eventProperties());
+
+        ErrorAwareBackoffStrategy first = errorAwareStrategy(config.newBackoffStrategy());
+        ErrorAwareBackoffStrategy second = errorAwareStrategy(config.newBackoffStrategy());
+
+        assertThat(first).isNotSameAs(second);
+
+        first.reconfigure(NO_TASKS, AN_ERROR);
+        first.reconfigure(NO_TASKS, AN_ERROR);
+
+        assertThat(first.calculateBackoffTime())
+            .as("the strategy that saw the errors backs off")
+            .isPositive();
+        assertThat(second.calculateBackoffTime())
+            .as("the other client's strategy must be unaffected by them")
+            .isZero();
+    }
+
+    private static EventProperties eventProperties() {
+        EventProperties props = new EventProperties();
+        props.setResponseTimeout(29500);
+        props.setLockDuration(1980000);
+        props.setClientBackoffInitial(500);
+        props.setClientBackoffFactor(2);
+        props.setClientBackoffMax(5000);
+        props.setHttpValidateAfterInactivityMs(2000);
+        return props;
+    }
 }
