@@ -170,7 +170,7 @@ public class ShowConditionFlagsCaseUpdater implements HandleAdmitPartOfClaimCase
     private boolean needFinancialInfo1(CaseData caseData) {
         log.info("Checking if financial info is needed for Respondent 1 for caseId: {}", caseData.getCcdCaseReference());
         // Do not gate on COUNTER_ADMIT_OR_ADMIT_PART: full/part admission for the current defendant
-        // sets that multiparty flag, which would otherwise hide NEED_FINANCIAL_DETAILS_1 (AC2 F-04..F-09).
+        // sets that multiparty flag, which would otherwise hide NEED_FINANCIAL_DETAILS_1.
         return isPaymentNotImmediate(caseData)
                 && isNotAdmitted(caseData)
                 && isNotFullDefenceOrCounterClaim(caseData)
