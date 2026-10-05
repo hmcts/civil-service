@@ -12,10 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+
+import java.util.Set;
 
 @Configuration
 @EnableRetry
@@ -65,8 +69,70 @@ public class ExternalTaskListenerConfiguration {
      * {@code NoHttpResponseException}. Do not set a 30s response timeout here: the
      * long-poll {@code asyncResponseTimeout} is 29500ms and would race it (EXC-CS-105).
      */
+    /**
+     * Topics whose handlers are batch dispatchers. They either sleep on the subscription thread
+     * via {@code BaseExternalTaskHandler.throttle()} once a batch exceeds 25, or they process very
+     * large batches. Isolating them stops a paced batch stalling pickup for case driven work.
+     *
+     * <p>Measured in production over 7 days: AUTOMATED_HEARING_NOTICE sleeps roughly 347 minutes a
+     * week, BUNDLE_CREATION_CHECK 185 and HEARING_CVP_LINK 178. HEARING_FEE_CHECK does not sleep
+     * but runs a batch capped at 10,000 for about 13 minutes daily.
+     *
+     * <p>Anything absent from this set routes to the case driven client, which is what every topic
+     * gets today, so adding a subscription cannot silently change how an existing one is served.
+     */
+    private static final Set<String> SCHEDULER_TOPICS = Set.of(
+        "AUTOMATED_HEARING_NOTICE",
+        "BUNDLE_CREATION_CHECK",
+        "CLAIM_DETAILS_NOTIFICATION_DEADLINE",
+        "CLAIM_DISMISSED_DEADLINE",
+        "DEFENDANT_RESPONSE_DEADLINE_CHECK",
+        "EVIDENCE_UPLOAD_CHECK",
+        "FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_CHECK",
+        "GenerateCsvAndSendToMmt",
+        "GenerateJsonAndSendToMmt",
+        "HEARING_CVP_LINK",
+        "HEARING_FEE_CHECK",
+        "HEARING_READINESS_CHECK",
+        "INCIDENT_RETRY_EVENT",
+        "MANAGE_STAY_WA_TASK_SCHEDULER",
+        "MIGRATE_CASES_EVENTS",
+        "MOVE_TO_DECISION_OUTCOME",
+        "ORDER_REVIEW_OBLIGATION_CHECK",
+        "POLLING_EVENT_EMITTER",
+        "REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK",
+        "RETRIGGER_CASES_EVENTS",
+        "RETRIGGER_UPDATE_LOCATION_EVENTS",
+        "SETTLEMENT_NO_RESPONSE_FROM_DEFENDANT_CHECK",
+        "TAKE_CASE_OFFLINE",
+        "TRIAL_READY_CHECK",
+        "TRIAL_READY_NOTIFICATION_CHECK",
+        "TRIGGER_SCHEDULER"
+    );
+
+    /**
+     * The client every listener injects. Routes each subscription to one of the two real clients
+     * below, so none of the 39 listeners needs to know there is more than one.
+     */
     @Bean
-    public ExternalTaskClient client(BackoffStrategy externalTaskBackoffStrategy) {
+    @Primary
+    public ExternalTaskClient client(
+        @Qualifier("caseDrivenExternalTaskClient") ExternalTaskClient caseDrivenClient,
+        @Qualifier("schedulerExternalTaskClient") ExternalTaskClient schedulerClient) {
+        return new TopicRoutingExternalTaskClient(caseDrivenClient, schedulerClient, SCHEDULER_TOPICS);
+    }
+
+    @Bean("caseDrivenExternalTaskClient")
+    public ExternalTaskClient caseDrivenExternalTaskClient(BackoffStrategy externalTaskBackoffStrategy) {
+        return buildClient(externalTaskBackoffStrategy);
+    }
+
+    @Bean("schedulerExternalTaskClient")
+    public ExternalTaskClient schedulerExternalTaskClient(BackoffStrategy externalTaskBackoffStrategy) {
+        return buildClient(externalTaskBackoffStrategy);
+    }
+
+    private ExternalTaskClient buildClient(BackoffStrategy externalTaskBackoffStrategy) {
         return ExternalTaskClient.create()
             .addInterceptor(new ServiceAuthProvider())
             .asyncResponseTimeout(eventProperties.getResponseTimeout())
