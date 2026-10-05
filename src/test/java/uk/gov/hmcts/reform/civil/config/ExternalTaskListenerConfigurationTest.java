@@ -77,15 +77,16 @@ class ExternalTaskListenerConfigurationTest {
     }
 
     /**
-     * The default must actually be more than one, since that is the whole point of the change: one
-     * case driven thread was measured at 95% occupancy, and so were two.
+     * The default must be more than one, since that is the point of the change, and must not drift
+     * upwards without evidence: a third client was measured and gave no throughput gain while
+     * making every task 23% slower, so 2 is a deliberate ceiling rather than a starting point.
      */
     @Test
-    void shouldBuildThreeDistinctCaseDrivenClientsByDefault() {
+    void shouldBuildTwoDistinctCaseDrivenClientsByDefault() {
         context.run(it -> {
             List<ExternalTaskClient> clients = it.getBean(CaseDrivenExternalTaskClients.class).clients();
 
-            assertThat(clients).hasSize(3);
+            assertThat(clients).hasSize(2);
             assertThat(clients)
                 .as("repeated references to one client would still be one subscription thread")
                 .doesNotHaveDuplicates();

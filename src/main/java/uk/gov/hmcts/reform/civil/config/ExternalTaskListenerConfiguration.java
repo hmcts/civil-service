@@ -143,9 +143,10 @@ public class ExternalTaskListenerConfiguration {
      * reached 95% occupancy in its densest minute, 126 tasks a minute against a 155 a minute
      * ceiling, while raising {@code maxTasks} to 10 left peak queue depth unchanged. Two clients
      * nearly doubled that to 247 tasks a minute, proven by 299.8 seconds of handler work completing
-     * inside 236.6 seconds of wall clock, which one thread cannot do. Both of those threads were
-     * then at 95% as well, so demand exceeded two exactly as it exceeded one, which is what the
-     * third is for. The constraint is thread count, not batch size.
+     * inside 236.6 seconds of wall clock, which one thread cannot do, and ran at exactly 100% of
+     * their own ceiling. A third was then tried and gave nothing: 235 tasks a minute against 247,
+     * with every task 23% slower and a thread left idle, so something shared downstream saturates
+     * at two on that environment. Hence a default of 2 rather than more.
      *
      * <p>Wrapped in {@link CaseDrivenExternalTaskClients} rather than returned as a
      * {@code List<ExternalTaskClient>} bean so Spring's collection injection cannot supply the

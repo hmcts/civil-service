@@ -27,9 +27,9 @@ class EventPropertiesBindingTest {
     }
 
     @Test
-    void shouldDefaultToThreeCaseDrivenClientsWhenNotConfigured() {
+    void shouldDefaultToTwoCaseDrivenClientsWhenNotConfigured() {
         context.run(it ->
-            assertThat(it.getBean(EventProperties.class).getCaseDrivenClients()).isEqualTo(3));
+            assertThat(it.getBean(EventProperties.class).getCaseDrivenClients()).isEqualTo(2));
     }
 
     @Test
