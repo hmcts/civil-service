@@ -257,6 +257,81 @@ class DraftClaimServiceTest {
     }
 
     @Nested
+    class UpsertDraftClaimForCaseTests {
+
+        @Test
+        void shouldCreateDraftForCaseWhenNoneExists() {
+            Map<String, Object> payload = Map.of("draftClaimCacheTtlDays", 7);
+            OffsetDateTime createdAt = OffsetDateTime.now();
+            DraftStoreEntity createdDraft = draft(CASE_ID, createdAt, createdAt.plusDays(7));
+            when(draftStoreService.getDraftForCase(USER_ID, CASE_ID, DRAFT_TYPE)).thenReturn(Optional.empty());
+            when(draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE)).thenReturn(createdDraft);
+
+            DraftStoreEntity result = draftClaimService.upsertDraftClaimForCase(USER_ID, " " + CASE_ID + " ", payload);
+
+            assertThat(result).isSameAs(createdDraft);
+            verify(draftStoreService).getDraftForCase(USER_ID, CASE_ID, DRAFT_TYPE);
+            verify(draftStoreService).createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE);
+            verifyNoMoreInteractions(draftStoreService);
+        }
+
+        @Test
+        void shouldUpdateActiveDraftForCase() {
+            Map<String, Object> payload = Map.of("step", "payment");
+            OffsetDateTime createdAt = OffsetDateTime.now().minusDays(1);
+            DraftStoreEntity activeDraft = draft(CASE_ID, createdAt, createdAt.plusDays(RETENTION_DAYS));
+            when(draftStoreService.getDraftForCase(USER_ID, CASE_ID, DRAFT_TYPE)).thenReturn(Optional.of(activeDraft));
+            when(draftStoreService.updateDraft(DRAFT_ID, USER_ID, CASE_ID, payload, DRAFT_TYPE))
+                .thenReturn(Optional.of(activeDraft));
+
+            DraftStoreEntity result = draftClaimService.upsertDraftClaimForCase(USER_ID, CASE_ID, payload);
+
+            assertThat(result).isSameAs(activeDraft);
+            verify(draftStoreService).updateDraft(DRAFT_ID, USER_ID, CASE_ID, payload, DRAFT_TYPE);
+            verifyNoMoreInteractions(draftStoreService);
+        }
+
+        @Test
+        void shouldReplaceExpiredDraftForCase() {
+            Map<String, Object> payload = Map.of("draftClaimCacheTtlDays", 7);
+            OffsetDateTime createdAt = OffsetDateTime.now().minusDays(RETENTION_DAYS + 1);
+            DraftStoreEntity expiredDraft = draft(CASE_ID, createdAt, createdAt.plusDays(RETENTION_DAYS));
+            OffsetDateTime newCreatedAt = OffsetDateTime.now();
+            DraftStoreEntity newDraft = draft(CASE_ID, newCreatedAt, newCreatedAt.plusDays(7));
+            when(draftStoreService.getDraftForCase(USER_ID, CASE_ID, DRAFT_TYPE)).thenReturn(Optional.of(expiredDraft));
+            when(draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE)).thenReturn(newDraft);
+
+            DraftStoreEntity result = draftClaimService.upsertDraftClaimForCase(USER_ID, CASE_ID, payload);
+
+            assertThat(result).isSameAs(newDraft);
+            verify(draftStoreService).deleteDraftAndFlush(expiredDraft);
+            verify(draftStoreService).createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE);
+        }
+
+        @Test
+        void shouldRejectWhenConcurrentRequestCreatesDraftForCaseFirst() {
+            Map<String, Object> payload = Map.of("step", "payment");
+            DataIntegrityViolationException uniqueViolation =
+                new DataIntegrityViolationException("uq_draft_store_user_case");
+            when(draftStoreService.getDraftForCase(USER_ID, CASE_ID, DRAFT_TYPE)).thenReturn(Optional.empty());
+            when(draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE)).thenThrow(uniqueViolation);
+
+            assertThatThrownBy(() -> draftClaimService.upsertDraftClaimForCase(USER_ID, CASE_ID, payload))
+                .isInstanceOf(DraftClaimAlreadyExistsException.class)
+                .hasCause(uniqueViolation);
+        }
+
+        @Test
+        void shouldRejectWhenCaseIdIsBlank() {
+            assertThatNullPointerException()
+                .isThrownBy(() -> draftClaimService.upsertDraftClaimForCase(USER_ID, " ", Map.of()))
+                .withMessage("caseId must not be blank");
+
+            verifyNoInteractions(draftStoreService);
+        }
+    }
+
+    @Nested
     class DeleteDraftClaimTests {
 
         @Test
