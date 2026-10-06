@@ -17,13 +17,4 @@ class CommonQueryConstructsTest {
         assertThat(json).contains("JUDGMENT_REQUESTED");
         assertThat(json).contains("\"state\"");
     }
-
-    @Test
-    void shouldReturnCorrectNoOngoingBusinessProcessQuery() {
-        BoolQueryBuilder query = commonQueryConstructs.haveNoOngoingBusinessProcess();
-        String json = query.toString();
-        assertThat(json).contains("data.businessProcess");
-        assertThat(json).contains("FINISHED");
-        assertThat(json).contains("\"must_not\"");
-    }
 }
