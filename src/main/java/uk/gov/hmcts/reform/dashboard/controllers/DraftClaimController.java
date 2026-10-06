@@ -79,6 +79,20 @@ public class DraftClaimController {
         return ResponseEntity.ok(DraftClaimResponse.from(draftClaim));
     }
 
+    @PutMapping(path = "/case/{case-id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<DraftClaimResponse> upsertDraftClaimForCase(
+        @PathVariable("case-id") String caseId,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
+        @Valid @RequestBody DraftClaimRequest request
+    ) {
+        DraftStoreEntity draftClaim = draftClaimService.upsertDraftClaimForCase(
+            getUserId(authorisation),
+            caseId,
+            request.getPayload()
+        );
+        return ResponseEntity.ok(DraftClaimResponse.from(draftClaim));
+    }
+
     @GetMapping("/{draft-id}")
     public ResponseEntity<DraftClaimResponse> getDraftClaim(
         @PathVariable("draft-id") UUID draftId,

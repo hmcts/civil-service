@@ -109,6 +109,21 @@ class DraftClaimControllerTest {
     }
 
     @Test
+    void shouldReturnOkWhenDraftForCaseIsUpserted() {
+        when(draftClaimService.upsertDraftClaimForCase(USER_ID, CASE_ID, payload)).thenReturn(draftStoreEntity);
+
+        DraftClaimRequest request = new DraftClaimRequest(null, payload);
+
+        ResponseEntity<DraftClaimResponse> response = controller.upsertDraftClaimForCase(CASE_ID, AUTH, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getDraftId()).isEqualTo(DRAFT_ID);
+        assertThat(response.getBody().getCaseId()).isEqualTo(CASE_ID);
+        verify(draftClaimService).upsertDraftClaimForCase(USER_ID, CASE_ID, payload);
+    }
+
+    @Test
     void shouldThrowNotFoundWhenNoDraftExistsForCase() {
         when(draftClaimService.getDraftClaimForCase(USER_ID, CASE_ID)).thenReturn(Optional.empty());
 

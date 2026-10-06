@@ -166,6 +166,17 @@ class DraftStoreServiceTest {
         }
 
         @Test
+        void shouldReturnDraftForCaseIncludingExpired() {
+            DraftStoreEntity draft = draft();
+            when(draftStoreRepository.findByUserIdAndDraftTypeAndCaseId(USER_ID, DRAFT_TYPE, CASE_ID))
+                .thenReturn(Optional.of(draft));
+
+            Optional<DraftStoreEntity> result = draftStoreService.getDraftForCase(USER_ID, CASE_ID, DRAFT_TYPE);
+
+            assertThat(result).contains(draft);
+        }
+
+        @Test
         void shouldReturnActiveDraftForCase() {
             DraftStoreEntity draft = draft();
             when(draftStoreRepository.findByUserIdAndDraftTypeAndCaseIdAndExpiresAtAfter(
