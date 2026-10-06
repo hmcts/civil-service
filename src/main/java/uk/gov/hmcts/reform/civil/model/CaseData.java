@@ -774,25 +774,30 @@ public class CaseData extends CaseDataParent implements MappableObject {
             || expected == getDefenceAdmitPartPaymentTimeRouteRequired2();
     }
 
+    /**
+     * When a defendant solicitor journey is active, match that defendant's defence route only.
+     * Otherwise (claimant / post-response) match either defendant's route.
+     */
+    @JsonIgnore
+    private boolean matchesDefenceRoute(String expected) {
+        if (YES.equals(getIsRespondent2())) {
+            return expected.equals(getDefenceRouteRequired2());
+        }
+        if (YES.equals(getIsRespondent1())) {
+            return expected.equals(getDefenceRouteRequired());
+        }
+        return expected.equals(getDefenceRouteRequired())
+            || expected.equals(getDefenceRouteRequired2());
+    }
+
     @JsonIgnore
     public boolean hasDefendantPaidTheAmountClaimed() {
-        return SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
-            .equals(getDefenceRouteRequired()) || SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED
-                .equals(getDefenceRouteRequired2());
+        return matchesDefenceRoute(SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED);
     }
 
     @JsonIgnore
     public boolean isPaidFullAmount() {
-        RespondToClaim localRespondToClaim = null;
-        if (FULL_DEFENCE == getRespondent1ClaimResponseTypeForSpec()) {
-            localRespondToClaim = getRespondToClaim();
-        } else if (PART_ADMISSION == getRespondent1ClaimResponseTypeForSpec()) {
-            localRespondToClaim = getRespondToAdmittedClaim();
-        } else if (PART_ADMISSION == getRespondent2ClaimResponseTypeForSpec()) {
-            localRespondToClaim = getRespondToAdmittedClaim2();
-        } else if (FULL_DEFENCE == getRespondent2ClaimResponseTypeForSpec()) {
-            localRespondToClaim = getRespondToClaim2();
-        }
+        RespondToClaim localRespondToClaim = resolveRespondToClaimForPaidAmount();
 
         return ofNullable(localRespondToClaim)
             .map(RespondToClaim::getHowMuchWasPaid)
@@ -800,11 +805,57 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .orElse(false);
     }
 
+    /**
+     * Resolve which {@link RespondToClaim} to use for paid-amount checks, scoped to the current
+     * defendant when a solicitor journey is active; otherwise prefer R1 then R2.
+     */
+    @JsonIgnore
+    private RespondToClaim resolveRespondToClaimForPaidAmount() {
+        if (YES.equals(getIsRespondent2())) {
+            return respondToClaimForResponseType(
+                getRespondent2ClaimResponseTypeForSpec(),
+                getRespondToClaim2(),
+                getRespondToAdmittedClaim2()
+            );
+        }
+        if (YES.equals(getIsRespondent1())) {
+            return respondToClaimForResponseType(
+                getRespondent1ClaimResponseTypeForSpec(),
+                getRespondToClaim(),
+                getRespondToAdmittedClaim()
+            );
+        }
+        RespondToClaim respondent1Claim = respondToClaimForResponseType(
+            getRespondent1ClaimResponseTypeForSpec(),
+            getRespondToClaim(),
+            getRespondToAdmittedClaim()
+        );
+        if (respondent1Claim != null) {
+            return respondent1Claim;
+        }
+        return respondToClaimForResponseType(
+            getRespondent2ClaimResponseTypeForSpec(),
+            getRespondToClaim2(),
+            getRespondToAdmittedClaim2()
+        );
+    }
+
+    @JsonIgnore
+    private static RespondToClaim respondToClaimForResponseType(RespondentResponseTypeSpec responseType,
+                                                                RespondToClaim fullDefenceClaim,
+                                                                RespondToClaim partAdmissionClaim) {
+        if (FULL_DEFENCE == responseType) {
+            return fullDefenceClaim;
+        }
+        if (PART_ADMISSION == responseType) {
+            return partAdmissionClaim;
+        }
+        return null;
+    }
+
     @JsonIgnore
     public boolean isClaimBeingDisputed() {
-        return SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM
-            .equals(getDefenceRouteRequired()) || SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM
-                .equals(getDefenceRouteRequired2());
+        return matchesDefenceRoute(SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM);
     }
 
     @JsonIgnore
