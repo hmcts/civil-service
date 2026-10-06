@@ -34,15 +34,22 @@ public class EventProperties {
     // behaviour. More than one lets two process instances on the same case run at the same time,
     // so CCD conflict rate is the measurement that gates increasing it.
     //
-    // 2 is where the measurements stop paying. On the preview: 1 client 126 tasks a minute at a
-    // mean of 387ms, 2 clients 247 at 484ms, 3 clients 235 at 593ms. Two ran at exactly 100% of
-    // their own ceiling; three reached 77% of theirs and left a thread idle at 88% occupancy while
-    // every task got 23% slower. The slowdown is monotonic on every topic across near identical
-    // workloads, so something shared downstream saturates at two, on that environment at least.
+    // 2 is a deliberate conservative default, not a measured optimum. What the preview did
+    // establish is that the mechanism works: max concurrent tasks equals this value (1, 2 and 3
+    // each confirmed), and handler work exceeds one thread's worth of wall clock, so the extra
+    // threads really do run.
     //
-    // 3 is still worth trying in production, where CCD is multi replica rather than the single
-    // pod a preview gets, but it has to be measured there with conflict rate and task duration.
-    // Preview cannot answer it.
+    // What it could not establish is a ranking. Task duration on that environment tracks elapsed
+    // time rather than worker count: four runs over 16 hours gave medians of 292, 388, 475 and
+    // 508ms in chronological order, and the slowest was a 2 client run, slower than the 3 client
+    // one. Two clients measured twice reached 100% and then 70% of their own throughput ceiling.
+    // Each functional run seeds more cases into the preview's single CCD data store, which is the
+    // likely cause. Ranking counts needs interleaved runs or a fresh environment per run, not
+    // sequential ones.
+    //
+    // So 2 is the smallest step that demonstrably adds a working thread. Whether 3 or more pays
+    // off is open, and belongs in a production trial measuring CCD conflict rate and task
+    // duration, where CCD is multi replica rather than the single pod a preview gets.
     protected int caseDrivenClients = 2;
     // tasks fetched per fetchAndLock on the case driven client. maxTasks caps tasks per request
     // across all topics on that client, not per topic, so this is the whole request budget.

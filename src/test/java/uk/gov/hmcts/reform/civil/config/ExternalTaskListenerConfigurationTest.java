@@ -78,8 +78,9 @@ class ExternalTaskListenerConfigurationTest {
 
     /**
      * The default must be more than one, since that is the point of the change, and must not drift
-     * upwards without evidence: a third client was measured and gave no throughput gain while
-     * making every task 23% slower, so 2 is a deliberate ceiling rather than a starting point.
+     * on either side of 2 without evidence. The preview proved the mechanism but could not rank
+     * the counts: its task durations tracked elapsed time rather than worker count. So 2 is a
+     * deliberate conservative choice pending a production trial, and this test pins it.
      */
     @Test
     void shouldBuildTwoDistinctCaseDrivenClientsByDefault() {

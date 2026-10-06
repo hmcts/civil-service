@@ -140,13 +140,15 @@ public class ExternalTaskListenerConfiguration {
      * One client, so one subscription thread, per configured case driven slot.
      *
      * <p>Measured justification, from functional test runs on the PR 8438 preview. One client
-     * reached 95% occupancy in its densest minute, 126 tasks a minute against a 155 a minute
-     * ceiling, while raising {@code maxTasks} to 10 left peak queue depth unchanged. Two clients
-     * nearly doubled that to 247 tasks a minute, proven by 299.8 seconds of handler work completing
-     * inside 236.6 seconds of wall clock, which one thread cannot do, and ran at exactly 100% of
-     * their own ceiling. A third was then tried and gave nothing: 235 tasks a minute against 247,
-     * with every task 23% slower and a thread left idle, so something shared downstream saturates
-     * at two on that environment. Hence a default of 2 rather than more.
+     * reached 95% occupancy in its densest minute while raising {@code maxTasks} to 10 left peak
+     * queue depth unchanged, so the constraint is thread count rather than batch size. Adding
+     * clients demonstrably adds working threads: handler work exceeded one thread's worth of wall
+     * clock once there were two, and observed concurrency matched the configured count every time.
+     *
+     * <p>The preview could not rank the counts, so do not read the default as an optimum. Task
+     * duration there tracks elapsed time rather than worker count, and the slowest of four runs
+     * was a two client one. See {@link uk.gov.hmcts.reform.civil.config.properties.EventProperties}
+     * for the figures and why a production trial is what settles it.
      *
      * <p>Wrapped in {@link CaseDrivenExternalTaskClients} rather than returned as a
      * {@code List<ExternalTaskClient>} bean so Spring's collection injection cannot supply the
