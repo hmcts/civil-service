@@ -25,9 +25,28 @@ import java.util.Map;
  * Camunda's {@code fetchAndLock} hands each one a disjoint set of tasks, which is how an external
  * task topic is scaled horizontally.
  *
- * <p>Each delegate keeps its own builder, so the handler instance is shared between the resulting
- * subscriptions and must be thread safe. The handlers here hold no mutable per task state; they
- * resolve collaborators from the Spring context and operate on the {@code ExternalTask} argument.
+ * <p>This shape is what Camunda prescribes for the Java client, which has no threading of its own:
+ * "you should start as many clients as needed". The client API has no concurrency option at all,
+ * and {@code TopicSubscriptionManager} is a {@code Runnable} with a single thread, so more clients
+ * is the only lever. The usual advice is to scale by running more processes and let the OS balance
+ * them; these clients live in one JVM instead, because the pods were measured under 20% CPU while
+ * tasks queued, so a thread is far cheaper here than another replica.
+ *
+ * <p>The fan out itself is local, not a Camunda concept: the idiom is to loop over your clients and
+ * subscribe each. It exists so that the 39 listeners, which each inject one
+ * {@code ExternalTaskClient} and call {@code subscribe(TOPIC).handler(h).open()}, did not have to
+ * change.
+ *
+ * <p><strong>The obligation it creates.</strong> Each delegate keeps its own builder, so one Spring
+ * singleton handler is shared across the clients and now runs on several threads at once. Mutable
+ * state on a handler would be shared across concurrent tasks, and nothing in the Camunda client
+ * would notice: the failure would be silent and data dependent. The handlers were audited clean,
+ * and {@code ExternalTaskHandlerThreadSafetyTest} asserts the rule so it cannot regress quietly.
+ * {@link uk.gov.hmcts.reform.civil.handler.tasks.IncidentRetryEventHandler} shows the pattern to
+ * follow where a task genuinely needs state: a per invocation context object, not a field.
+ *
+ * <p>Subscriptions are opened from listener constructors during single threaded Spring startup, so
+ * this builder and the subscription it returns are themselves never touched concurrently.
  *
  * @see TopicRoutingExternalTaskClient
  */
