@@ -75,14 +75,6 @@ public class DraftStoreService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<DraftStoreEntity> getDraftForCase(String userId, String caseId, DraftType draftType) {
-        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
-        Objects.requireNonNull(caseId, "caseId must not be null");
-        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
-        return draftStoreRepository.findByUserIdAndDraftTypeAndCaseId(userId, draftType, caseId);
-    }
-
-    @Transactional(readOnly = true)
     public Optional<DraftStoreEntity> getActiveDraftForCase(String userId, String caseId, DraftType draftType) {
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(caseId, "caseId must not be null");
