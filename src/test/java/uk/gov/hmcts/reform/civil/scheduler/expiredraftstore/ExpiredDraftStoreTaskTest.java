@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
+import uk.gov.hmcts.reform.draftstore.services.DraftStoreTransactionService;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,13 +19,13 @@ import static org.mockito.Mockito.when;
 class ExpiredDraftStoreTaskTest {
 
     @Mock
-    private DraftStoreRepository draftStoreRepository;
+    private DraftStoreTransactionService draftStoreTransactionService;
 
     private ExpiredDraftStoreTask task;
 
     @BeforeEach
     void setUp() {
-        task = new ExpiredDraftStoreTask(draftStoreRepository);
+        task = new ExpiredDraftStoreTask(draftStoreTransactionService);
     }
 
     @Test
@@ -47,11 +47,11 @@ class ExpiredDraftStoreTaskTest {
     @Test
     void shouldDeleteBatchWhenNotEmpty() {
         List<UUID> batch = List.of(UUID.randomUUID());
-        when(draftStoreRepository.deleteByIds(batch)).thenReturn(1);
+        when(draftStoreTransactionService.deleteByIdsInNewTransaction(batch)).thenReturn(1);
 
         task.accept(batch);
 
-        verify(draftStoreRepository).deleteByIds(batch);
+        verify(draftStoreTransactionService).deleteByIdsInNewTransaction(batch);
     }
 
     @Test
@@ -59,6 +59,6 @@ class ExpiredDraftStoreTaskTest {
         task.accept(null);
         task.accept(List.of());
 
-        verifyNoInteractions(draftStoreRepository);
+        verifyNoInteractions(draftStoreTransactionService);
     }
 }
