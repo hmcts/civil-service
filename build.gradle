@@ -149,18 +149,24 @@ allprojects {
   }
 
   repositories {
-    mavenLocal()
+    mavenLocal{
+      name = 'MavenLocal'
+    }
     // Jenkins must resolve through Artifactory because Maven Central rate-limits it (HTTP 429).
     // GitHub hosted runners cannot reach Artifactory, so it is skipped there.
     if (!System.getenv('GITHUB_ACTIONS')) {
       maven {
+        name = 'HmctsArtifactory'
         url = uri('https://artifactory.platform.hmcts.net/artifactory/maven-remotes')
       }
     }
     maven {
+      name = 'HmctsAzureArtifacts'
       url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
     }
-    mavenCentral()
+    mavenCentral {
+      name = 'MavenCentral'
+    }
   }
 }
 
