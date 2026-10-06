@@ -94,6 +94,7 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
             log.info("Next Hearing Details Update - Case [{}] Hearing [{}] HmcStatus [{}] - Clearing next hearing details",
                      caseId, latestHearing.getHearingId(), latestHearing.getHmcStatus());
             caseData.setNextHearingDetails(null);
+            clearHearingDateForCancelledHearing(caseData, latestHearing);
         }
 
         Map<String, Object> data = caseData.toMap(objectMapper);
@@ -108,6 +109,13 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder().data(data).build();
+    }
+
+    private void clearHearingDateForCancelledHearing(CaseData caseData, CaseHearing hearing) {
+        if (CANCELLED.name().equals(hearing.getHmcStatus())) {
+            caseData.setHearingDate(null);
+            caseData.setHearingTimeHourMinute(null);
+        }
     }
 
     private HearingsResponse getHearings(Long caseId) {

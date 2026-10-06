@@ -201,6 +201,43 @@ class AsyncCaseMigrationServiceTest {
     }
 
     @Test
+    void shouldStartTheEventSelectedByMigrationTask() {
+        @SuppressWarnings("unchecked")
+        MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
+        CaseReference caseReference = new CaseReference("12345");
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        CaseData caseData = mock(CaseData.class);
+        StartEventResponse startEventResponse = StartEventResponse.builder()
+            .eventId(CaseEvent.CREATE_CASE_FLAGS.name())
+            .token("token")
+            .caseDetails(caseDetails)
+            .build();
+
+        when(migrationTask.getCaseEvent()).thenReturn(CaseEvent.CREATE_CASE_FLAGS);
+        when(coreCaseDataService.startUpdate("12345", CaseEvent.CREATE_CASE_FLAGS))
+            .thenReturn(startEventResponse);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(migrationTask.migrateCaseData(caseData, caseReference)).thenReturn(caseData);
+        when(migrationTask.getUpdatedState(ArgumentMatchers.any())).thenReturn(Optional.empty());
+        when(migrationTask.getEventSummary()).thenReturn("summary");
+        when(migrationTask.getEventDescription()).thenReturn("description");
+        when(caseData.toMap(ArgumentMatchers.any())).thenReturn(Map.of());
+
+        asyncCaseMigrationService.migrateCasesAsync(
+            migrationTask,
+            List.of(caseReference),
+            null,
+            false
+        );
+
+        verify(coreCaseDataService).startUpdate("12345", CaseEvent.CREATE_CASE_FLAGS);
+        verify(coreCaseDataService).submitUpdate(
+            ArgumentMatchers.eq("12345"),
+            ArgumentMatchers.any(CaseDataContent.class)
+        );
+    }
+
+    @Test
     void shouldHandleRuntimeExceptionDuringMigration() {
         @SuppressWarnings("unchecked")
         MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);

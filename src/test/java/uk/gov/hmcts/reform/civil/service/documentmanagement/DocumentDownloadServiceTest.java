@@ -108,4 +108,39 @@ class DocumentDownloadServiceTest {
             documentDownloadService.downloadDocument(BEARER_TOKEN, "   "));
         verifyNoInteractions(documentManagementService);
     }
+
+    @Test
+    void shouldIncludeCaseIdOnInvalidDocumentLink_whenDocumentIdNullAndCaseIdProvided() {
+        InvalidDocumentLinkException ex = assertThrows(InvalidDocumentLinkException.class, () ->
+            documentDownloadService.downloadDocument(BEARER_TOKEN, (String) null, "1767636822302602"));
+
+        assertEquals(
+            "Invalid document link 'documents/null' for case 1767636822302602"
+                + ": expected a path of at least 36 characters ending in a document UUID.",
+            ex.getMessage()
+        );
+        verifyNoInteractions(documentManagementService);
+    }
+
+    @Test
+    void shouldRethrowWithCaseId_whenDocumentManagementThrowsInvalidDocumentLink() {
+        when(documentManagementService.downloadDocumentWithMetaData(anyString(), anyString()))
+            .thenThrow(new InvalidDocumentLinkException("documents/undefined"));
+
+        InvalidDocumentLinkException withCaseId = assertThrows(InvalidDocumentLinkException.class, () ->
+            documentDownloadService.downloadDocument(BEARER_TOKEN, "undefined", "1767636822302602"));
+        InvalidDocumentLinkException withoutCaseId = assertThrows(InvalidDocumentLinkException.class, () ->
+            documentDownloadService.downloadDocument(BEARER_TOKEN, "undefined"));
+
+        assertEquals(
+            "Invalid document link 'documents/undefined' for case 1767636822302602"
+                + ": expected a path of at least 36 characters ending in a document UUID.",
+            withCaseId.getMessage()
+        );
+        assertEquals(
+            "Invalid document link 'documents/undefined'"
+                + ": expected a path of at least 36 characters ending in a document UUID.",
+            withoutCaseId.getMessage()
+        );
+    }
 }

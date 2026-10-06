@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 
@@ -28,7 +29,8 @@ public class HearingFeeDueSearchService extends ElasticSearchService {
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(beState(HEARING_READINESS))),
+                            .must(beState(HEARING_READINESS))
+                            .must(existsQuery("data.hearingDate"))),
             List.of("reference"),
             startIndex
         );
