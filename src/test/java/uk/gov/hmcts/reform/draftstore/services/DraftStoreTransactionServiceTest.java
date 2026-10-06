@@ -14,11 +14,13 @@ import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -84,6 +86,27 @@ class DraftStoreTransactionServiceTest {
         order.verify(draftStoreRepository).deleteByIdAndUserIdAndDraftType(
             draftId, "user", DraftType.DRAFT_CLAIM);
         order.verify(draftStoreRepository).flush();
+    }
+
+    @Test
+    void shouldJoinTransactionBeforeBulkDeleteByIds() {
+        List<UUID> draftIds = List.of(UUID.randomUUID(), UUID.randomUUID());
+        when(draftStoreRepository.deleteByIds(draftIds)).thenReturn(2);
+
+        int deleted = draftStoreTransactionService.deleteByIdsInNewTransaction(draftIds);
+
+        assertThat(deleted).isEqualTo(2);
+        InOrder order = inOrder(entityManager, draftStoreRepository);
+        order.verify(entityManager).joinTransaction();
+        order.verify(draftStoreRepository).deleteByIds(draftIds);
+    }
+
+    @Test
+    void shouldSkipBulkDeleteWhenNoIds() {
+        int deleted = draftStoreTransactionService.deleteByIdsInNewTransaction(List.of());
+
+        assertThat(deleted).isZero();
+        verifyNoInteractions(entityManager, draftStoreRepository);
     }
 
     private DraftStoreEntity draft() {
