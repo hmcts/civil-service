@@ -28,8 +28,6 @@ public interface DraftStoreRepository extends JpaRepository<DraftStoreEntity, UU
         OffsetDateTime now
     );
 
-    Optional<DraftStoreEntity> findByUserIdAndDraftTypeAndCaseId(String userId, DraftType draftType, String caseId);
-
     Optional<DraftStoreEntity> findByUserIdAndDraftTypeAndCaseIdAndExpiresAtAfter(
         String userId,
         DraftType draftType,
