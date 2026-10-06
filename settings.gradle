@@ -1,8 +1,12 @@
 pluginManagement {
   repositories {
     mavenLocal()
-    maven {
-      url = uri('https://artifactory.platform.hmcts.net/artifactory/maven-remotes')
+    // Jenkins must resolve through Artifactory because Maven Central rate-limits it (HTTP 429).
+    // GitHub hosted runners cannot reach Artifactory, so it is skipped there.
+    if (!System.getenv('GITHUB_ACTIONS')) {
+      maven {
+        url = uri('https://artifactory.platform.hmcts.net/artifactory/maven-remotes')
+      }
     }
     gradlePluginPortal()
     maven {
