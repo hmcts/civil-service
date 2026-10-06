@@ -8,9 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
-import java.util.UUID;
-
+import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -60,6 +60,18 @@ public class DraftStoreTransactionService {
             draftType
         );
         draftStoreRepository.flush();
+        return deleted;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public int deleteByIdsInNewTransaction(List<UUID> draftIds) {
+        Objects.requireNonNull(draftIds, "draftIds must not be null");
+        if (draftIds.isEmpty()) {
+            return 0;
+        }
+        entityManager.joinTransaction();
+        int deleted = draftStoreRepository.deleteByIds(draftIds);
+        log.info("Deleted {} expired drafts", deleted);
         return deleted;
     }
 }
