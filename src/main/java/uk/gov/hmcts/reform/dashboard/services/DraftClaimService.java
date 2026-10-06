@@ -79,6 +79,28 @@ public class DraftClaimService {
             .orElseThrow(() -> new DraftClaimNotFoundException(draftId));
     }
 
+    public DraftStoreEntity upsertDraftClaimForCase(String userId, String caseId, Map<String, Object> payload) {
+        Objects.requireNonNull(userId, "userId must not be null");
+        Objects.requireNonNull(payload, "payload must not be null");
+        String normalisedCaseId = Objects.requireNonNull(normaliseCaseId(caseId), "caseId must not be blank");
+
+        Optional<DraftStoreEntity> existingDraft = draftStoreService.getDraftForCase(userId, normalisedCaseId, DRAFT_TYPE);
+        if (existingDraft.isPresent()) {
+            DraftStoreEntity draft = existingDraft.get();
+            if (isActive(draft, OffsetDateTime.now(ZoneOffset.UTC))) {
+                return draftStoreService.updateDraft(draft.getId(), userId, normalisedCaseId, payload, DRAFT_TYPE)
+                    .orElseThrow(() -> new DraftClaimNotFoundException(draft.getId()));
+            }
+            draftStoreService.deleteDraftAndFlush(draft);
+        }
+
+        try {
+            return draftStoreService.createDraft(userId, normalisedCaseId, payload, DRAFT_TYPE);
+        } catch (DataIntegrityViolationException ex) {
+            throw new DraftClaimAlreadyExistsException(ex);
+        }
+    }
+
     public void deleteDraftClaim(UUID draftId, String userId) {
         if (!draftStoreService.deleteDraft(draftId, userId, DRAFT_TYPE)) {
             throw new DraftClaimNotFoundException(draftId);
