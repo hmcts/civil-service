@@ -1,15 +1,20 @@
 pluginManagement {
   repositories {
     mavenLocal()
-    maven {
-      url = uri('https://artifactory.platform.hmcts.net/artifactory/maven-remotes')
-    }
     gradlePluginPortal()
+    mavenCentral()
     maven {
       url = "https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1"
     }
     maven { url = 'https://repo.spring.io/release' }
-    mavenCentral()
+    // Fallback mirror, deliberately LAST. Jenkins agents can reach Artifactory and need it when the
+    // public portals are blocked, but the GitHub Actions `build` job in .github/workflows/ci.yml runs
+    // on GitHub hosted runners, which cannot reach Artifactory and which PlatOps will not grant
+    // access to. Listing it first made plugin resolution attempt an unreachable host before the
+    // public portals, which is what turned that job red while Jenkins stayed green.
+    maven {
+      url = uri('https://artifactory.platform.hmcts.net/artifactory/maven-remotes')
+    }
   }
 }
 rootProject.name = 'civil-service'
