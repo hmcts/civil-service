@@ -60,7 +60,7 @@ public class PostcodeLookupService {
             if (key == null || key.equals("")) {
                 throw new RuntimeException("Postcode API Key is null");
             }
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
             for (Map.Entry<String, String> entry : params.entrySet()) {
                 builder.queryParam(entry.getKey(), entry.getValue());
             }

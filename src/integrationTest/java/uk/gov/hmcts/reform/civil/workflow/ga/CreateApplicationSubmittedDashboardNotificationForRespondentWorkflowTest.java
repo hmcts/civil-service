@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.workflow.ga;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.ga.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.workflow.ga.fixture.CreateApplicationSubmittedDashboardNotificationForRespondentFixtures;
@@ -17,7 +17,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 class CreateApplicationSubmittedDashboardNotificationForRespondentWorkflowTest
     extends GAWorkflowIntegrationTest {
 
-    @MockBean
+    @MockitoBean
     private DashboardApiClient dashboardApiClient;
 
     @Test

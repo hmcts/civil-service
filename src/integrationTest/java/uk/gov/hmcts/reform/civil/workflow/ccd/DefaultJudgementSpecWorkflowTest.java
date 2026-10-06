@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.workflow.ccd;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
@@ -27,13 +27,13 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @SuppressWarnings({"java:S5960", "java:S6813"})
 class DefaultJudgementSpecWorkflowTest extends WorkflowIntegrationTest {
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
-    @MockBean(name = "deadlinesCalculator")
+    @MockitoBean(name = "deadlinesCalculator")
     private DeadlinesCalculator deadlinesCalculator;
 
     @BeforeEach

@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.BaseIntegrationTest;
@@ -30,13 +30,13 @@ public class LinkDefendantToClaimCallbackHandlerTest extends BaseIntegrationTest
     private static final String CALLBACK_URL = "/cases/callbacks/{callback-type}";
     private static final String CALLBACK_PAGE_ID_URL = "/cases/callbacks/{callback-type}/{page-id}";
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     private IdamClient idamClient;
-    @MockBean
+    @MockitoBean
     private CoreCaseUserService coreCaseUserService;
-    @MockBean
+    @MockitoBean
     private SystemUpdateUserConfiguration systemUpdateUserConfiguration;
 
     @BeforeEach

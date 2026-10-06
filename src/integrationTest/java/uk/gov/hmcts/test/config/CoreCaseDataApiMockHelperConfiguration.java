@@ -1,27 +1,24 @@
 package uk.gov.hmcts.test.config;
 
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.test.helper.CoreCaseDataApiMockHelper;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 
+/**
+ * Registers {@link CoreCaseDataApiMockHelper}. The mocks it drives are supplied by
+ * {@link MockCoreCaseDataApiDependencies}, which tests using this configuration must also declare,
+ * because {@code @MockitoBean} is not supported on fields of configuration classes.
+ */
 @TestConfiguration
 public class CoreCaseDataApiMockHelperConfiguration {
 
-    @MockBean
-    private CoreCaseDataApi coreCaseDataApi;
-
-    @MockBean
-    private IdamClient idamClient;
-
-    @MockBean
-    private AuthTokenGenerator authTokenGenerator;
-
     @Bean
-    public CoreCaseDataApiMockHelper coreCaseDataApiMockHelper() {
+    public CoreCaseDataApiMockHelper coreCaseDataApiMockHelper(CoreCaseDataApi coreCaseDataApi,
+                                                               IdamClient idamClient,
+                                                               AuthTokenGenerator authTokenGenerator) {
         return new CoreCaseDataApiMockHelper(coreCaseDataApi, idamClient, authTokenGenerator);
     }
 }

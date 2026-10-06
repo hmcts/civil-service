@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
+import org.springframework.boot.validation.autoconfigure.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -63,7 +63,7 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.RESPONSE_DEAD
     AcknowledgeClaimCallbackHandler.class,
     ExitSurveyConfiguration.class,
     ExitSurveyContentService.class,
-    JacksonAutoConfiguration.class,
+    Jackson2AutoConfiguration.class,
     ValidationAutoConfiguration.class,
     DateOfBirthValidator.class,
     CaseDetailsConverter.class,
@@ -75,10 +75,10 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.RESPONSE_DEAD
 })
 class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
     @Autowired
@@ -90,10 +90,10 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private UserService userService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseUserService coreCaseUserService;
 
     @Nested

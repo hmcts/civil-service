@@ -6,9 +6,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -52,7 +52,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesRefe
 @SpringBootTest(classes = {
     NotifyDefendantSettleClaimMarkedPaidInFullNotificationHandler.class,
     NotificationsProperties.class,
-    JacksonAutoConfiguration.class
+    Jackson2AutoConfiguration.class
 })
 @Ignore
 public class NotifyDefendantSettleClaimMarkedPaidInFullNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -61,19 +61,19 @@ public class NotifyDefendantSettleClaimMarkedPaidInFullNotificationHandlerTest e
     private static final String TASK_ID_RESPONDENT1 = "NotifyDefendantSettleClaimMarkedPaidInFull1";
     private static final String TASK_ID_RESPONDENT2 = "NotifyDefendantSettleClaimMarkedPaidInFull2";
 
-    @MockBean
+    @MockitoBean
     private NotificationService notificationService;
 
-    @MockBean
+    @MockitoBean
     private OrganisationService organisationService;
 
-    @MockBean
+    @MockitoBean
     private NotificationsProperties notificationsProperties;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private NotificationsSignatureConfiguration configuration;
 
     @Autowired

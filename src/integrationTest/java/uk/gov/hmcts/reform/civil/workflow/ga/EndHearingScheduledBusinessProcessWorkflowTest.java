@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.workflow.ga;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.ga.service.ParentCaseUpdateHelper;
@@ -15,7 +15,7 @@ import static org.mockito.Mockito.verify;
 @SuppressWarnings("java:S5960")
 class EndHearingScheduledBusinessProcessWorkflowTest extends GAWorkflowIntegrationTest {
 
-    @MockBean
+    @MockitoBean
     private ParentCaseUpdateHelper parentCaseUpdateHelper;
 
     @Test

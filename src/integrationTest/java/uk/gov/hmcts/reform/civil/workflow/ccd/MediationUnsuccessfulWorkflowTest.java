@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.workflow.ccd;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -17,7 +17,7 @@ import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 @SuppressWarnings({"java:S5960", "java:S6813"})
 class MediationUnsuccessfulWorkflowTest extends WorkflowIntegrationTest {
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @Test

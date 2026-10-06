@@ -20,6 +20,9 @@ spring:
     import: "optional:configtree:/mnt/secrets/civil/"
   application:
     name: civil-service
+  http:
+    converters:
+      preferred-json-mapper: jackson2
   main:
     allow-bean-definition-overriding: true
   cache:

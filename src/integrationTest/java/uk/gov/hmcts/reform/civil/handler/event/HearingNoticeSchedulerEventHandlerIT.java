@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -59,22 +59,22 @@ class HearingNoticeSchedulerEventHandlerIT {
     @Autowired
     private HearingNoticeSchedulerEventHandler handler;
 
-    @MockBean
+    @MockitoBean
     private UserService userService;
 
-    @MockBean
+    @MockitoBean
     private SystemUpdateUserConfiguration userConfig;
 
-    @MockBean
+    @MockitoBean
     private HearingsService hearingsService;
 
-    @MockBean
+    @MockitoBean
     private RuntimeService runtimeService;
 
-    @MockBean
+    @MockitoBean
     private MessageCorrelationBuilder messageCorrelationBuilder;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
 
     @BeforeEach

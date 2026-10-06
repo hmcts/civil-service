@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.workflow.ccd;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -23,13 +23,13 @@ import static org.mockito.Mockito.when;
 @SuppressWarnings("java:S5960")
 class UpdateCaseDetailsAfterNoCWorkflowTest extends WorkflowIntegrationTest {
 
-    @MockBean
+    @MockitoBean
     private CoreCaseUserService coreCaseUserService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private OrganisationService organisationService;
 
     @BeforeEach

@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -31,7 +31,7 @@ import static uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus.ACTIVE;
 
 @SpringBootTest(classes = {
     CheckCoscMarkPaidCallbackHandler.class,
-    JacksonAutoConfiguration.class,
+    Jackson2AutoConfiguration.class,
 })
 @ExtendWith(MockitoExtension.class)
 class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -39,13 +39,13 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private CheckCoscMarkPaidCallbackHandler checkCoscMarkPaidCallbackHandler;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private RuntimeService runTimeService;
 
     private final LocalDateTime nowMock = LocalDateTime.of(2024, 10, 8, 0, 0, 0);

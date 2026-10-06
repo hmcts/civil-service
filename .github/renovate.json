@@ -33,17 +33,7 @@
     {
       "matchPackageNames": ["com.github.hmcts:core-case-data-store-client"],
       "allowedVersions": "<6.0.0",
-      "description": "Version 6 requires Spring Boot 4 and Jackson 3; retain the compatible client until the service migrates"
-    },
-    {
-      "matchPackageNames": ["com.github.hmcts:auth-checker-lib"],
-      "allowedVersions": "<3.2.0",
-      "description": "Version 3.2 requires Spring Boot 4; retain the compatible client until the service migrates"
-    },
-    {
-      "matchPackageNames": ["com.github.hmcts:ccd-case-document-am-client"],
-      "allowedVersions": "<1.60.0",
-      "description": "Version 1.60.0 requires Spring Boot 4; retain the compatible client until the service migrates"
+      "description": "5.4+ is the Spring Boot 4 / Jackson 2 line; 6.x model classes only deserialise with Jackson 3, and civil-service uses Jackson 2"
     },
     {
       "matchPackagePatterns": ["pact"],
@@ -57,7 +47,7 @@
         "com.github.hmcts:core-case-data-store-client"
       ],
       "matchUpdateTypes": ["minor", "patch"],
-      "description": "Restrict HMCTS library upgrades to minor/patch versions. Major versions may introduce incompatibilities with Spring Boot or other core dependencies (e.g., ccd-case-document-am-client v1.60.0 requires Spring Boot 4.0.6, incompatible with project's Spring Boot 3.3.7)"
+      "description": "Restrict HMCTS library upgrades to minor/patch versions. Major versions may introduce incompatibilities with Spring Boot or other core dependencies"
     },
     {
       "matchUpdateTypes": ["minor", "patch"],

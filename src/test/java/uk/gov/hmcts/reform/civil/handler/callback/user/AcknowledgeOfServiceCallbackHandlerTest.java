@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
@@ -56,15 +56,15 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
     private AcknowledgeOfServiceCallbackHandler handler;
     @Autowired
     ObjectMapper objectMapper;
-    @MockBean
+    @MockitoBean
     private PostcodeValidator postcodeValidator;
-    @MockBean
+    @MockitoBean
     private ExitSurveyContentService exitSurveyContentService;
-    @MockBean
+    @MockitoBean
     private DateOfBirthValidator dateOfBirthValidator;
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
-    @MockBean
+    @MockitoBean
     private Time time;
 
     public static final String REFERENCE_NUMBER = "000MC001";

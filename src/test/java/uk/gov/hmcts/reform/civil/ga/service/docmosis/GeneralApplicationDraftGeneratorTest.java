@@ -22,8 +22,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -78,7 +78,7 @@ import java.util.UUID;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
         classes = {
-            JacksonAutoConfiguration.class,
+            Jackson2AutoConfiguration.class,
             CaseDetailsConverter.class,
             GeneralApplicationDraftGenerator.class
         })
@@ -91,11 +91,11 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
     private static final Long PARENT_CCD_REF = 1645779506193000L;
     private static final String DUMMY_EMAIL = "hmcts.civil@gmail.com";
     private static final String DUMMY_TELEPHONE_NUM = "234345435435";
-    @MockBean private SecuredDocumentManagementService documentManagementService;
-    @MockBean private DocumentGeneratorService documentGeneratorService;
-    @MockBean ListGeneratorService listGeneratorService;
-    @MockBean private CoreCaseDataService coreCaseDataService;
-    @MockBean private GaForLipService gaForLipService;
+    @MockitoBean private SecuredDocumentManagementService documentManagementService;
+    @MockitoBean private DocumentGeneratorService documentGeneratorService;
+    @MockitoBean ListGeneratorService listGeneratorService;
+    @MockitoBean private CoreCaseDataService coreCaseDataService;
+    @MockitoBean private GaForLipService gaForLipService;
     @Autowired ObjectMapper objectMapper;
 
     @Autowired GeneralApplicationDraftGenerator generalApplicationDraftGenerator;
