@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.dashboardnotifications.cancelunissuedclaimspec;
+package uk.gov.hmcts.reform.civil.service.dashboardnotifications.cancelunissuedclaim;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -6,23 +6,23 @@ import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotific
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CANCEL_UNISSUED_CLAIM_SPEC_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CANCEL_UNISSUED_CLAIM_CLAIMANT;
 
 @Service
-public class CancelUnissuedClaimSpecClaimantDashboardService extends DashboardScenarioService {
+public class CancelUnissuedClaimClaimantDashboardService extends DashboardScenarioService {
 
-    public CancelUnissuedClaimSpecClaimantDashboardService(DashboardScenariosService dashboardScenariosService,
+    public CancelUnissuedClaimClaimantDashboardService(DashboardScenariosService dashboardScenariosService,
                                                            DashboardNotificationsParamsMapper mapper) {
         super(dashboardScenariosService, mapper);
     }
 
-    public void notifyCancelUnissuedClaimSpec(CaseData caseData, String authToken) {
+    public void notifyCancelUnissuedClaim(CaseData caseData, String authToken) {
         recordScenario(caseData, authToken);
     }
 
     @Override
     protected String getScenario(CaseData caseData) {
-        return SCENARIO_AAA6_CANCEL_UNISSUED_CLAIM_SPEC_CLAIMANT.getScenario();
+        return SCENARIO_AAA6_CANCEL_UNISSUED_CLAIM_CLAIMANT.getScenario();
     }
 
     @Override

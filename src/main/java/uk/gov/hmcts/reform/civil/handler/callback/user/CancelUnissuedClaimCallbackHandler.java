@@ -21,12 +21,12 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CANCEL_UNISSUED_CLAIM_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CANCEL_UNISSUED_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @Service
 @RequiredArgsConstructor
-public class CancelUnissuedClaimSpecCallbackHandler extends CallbackHandler {
+public class CancelUnissuedClaimCallbackHandler extends CallbackHandler {
 
     static final String EVENT_NOT_ALLOWED = "Event Not Allowed";
 
@@ -44,7 +44,7 @@ public class CancelUnissuedClaimSpecCallbackHandler extends CallbackHandler {
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return Collections.singletonList(CANCEL_UNISSUED_CLAIM_SPEC);
+        return Collections.singletonList(CANCEL_UNISSUED_CLAIM);
     }
 
     private CallbackResponse aboutToStartValidation(CallbackParams callbackParams) {
@@ -60,8 +60,8 @@ public class CancelUnissuedClaimSpecCallbackHandler extends CallbackHandler {
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         caseData.setPreviousCCDState(caseData.getCcdState());
-        caseData.setCancelUnissuedClaimSpecDate(LocalDate.now());
-        caseData.setBusinessProcess(BusinessProcess.ready(CANCEL_UNISSUED_CLAIM_SPEC));
+        caseData.setCancelUnissuedClaimDate(LocalDate.now());
+        caseData.setBusinessProcess(BusinessProcess.ready(CANCEL_UNISSUED_CLAIM));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();

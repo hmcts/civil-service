@@ -8,20 +8,20 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Map;
 
-class CancelUnissuedClaimSpecTest extends BpmnBaseTest {
+class CancelUnissuedClaimTest extends BpmnBaseTest {
 
-    private static final String FILE_NAME = "cancel_unissued_claim_spec.bpmn";
-    private static final String MESSAGE_NAME = "CANCEL_UNISSUED_CLAIM_SPEC";
-    private static final String PROCESS_ID = "CANCEL_UNISSUED_CLAIM_SPEC_PROCESS_ID";
-    private static final String DASHBOARD_NOTIFICATION_ACTIVITY_ID = "GenerateDashboardNotificationsCancelUnissuedClaimSpec";
+    private static final String FILE_NAME = "cancel_unissued_claim.bpmn";
+    private static final String MESSAGE_NAME = "CANCEL_UNISSUED_CLAIM";
+    private static final String PROCESS_ID = "CANCEL_UNISSUED_CLAIM_PROCESS_ID";
+    private static final String DASHBOARD_NOTIFICATION_ACTIVITY_ID = "GenerateDashboardNotificationsCancelUnissuedClaim";
 
-    CancelUnissuedClaimSpecTest() {
+    CancelUnissuedClaimTest() {
         super(FILE_NAME, PROCESS_ID);
     }
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldSuccessfullyCompleteCancelUnissuedClaimSpec(boolean dashboardServiceEnabled) {
+    void shouldSuccessfullyCompleteCancelUnissuedClaim(boolean dashboardServiceEnabled) {
         assertProcessStartedWithMessage(MESSAGE_NAME, PROCESS_ID);
         VariableMap variables = Variables.createVariables();
         variables.put(FLOW_FLAGS, Map.of(DASHBOARD_SERVICE_ENABLED, dashboardServiceEnabled));

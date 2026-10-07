@@ -148,7 +148,7 @@ public interface Claim {
         return false;
     }
 
-    default boolean isClaimUnissuedCancelled() {
+    default boolean isUnissuedClaimCancelled() {
         return false;
     }
 

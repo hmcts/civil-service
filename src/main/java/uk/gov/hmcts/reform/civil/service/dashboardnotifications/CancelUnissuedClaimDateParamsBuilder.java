@@ -10,14 +10,14 @@ import java.util.HashMap;
 import static java.util.Objects.nonNull;
 
 @Component
-public class CancelUnissuedClaimSpecDateParamsBuilder extends DashboardNotificationsParamsBuilder {
+public class CancelUnissuedClaimDateParamsBuilder extends DashboardNotificationsParamsBuilder {
 
     @Override
     public void addParams(CaseData caseData, HashMap<String, Object> params) {
-        LocalDate cancelledDate = caseData.getCancelUnissuedClaimSpecDate();
+        LocalDate cancelledDate = caseData.getCancelUnissuedClaimDate();
         if (nonNull(cancelledDate)) {
-            params.put("cancelUnissuedClaimSpecDateEn", DateUtils.formatDate(cancelledDate));
-            params.put("cancelUnissuedClaimSpecDateCy", DateUtils.formatDateInWelsh(cancelledDate, false));
+            params.put("cancelUnissuedClaimDateEn", DateUtils.formatDate(cancelledDate));
+            params.put("cancelUnissuedClaimDateCy", DateUtils.formatDateInWelsh(cancelledDate, false));
         }
     }
 }

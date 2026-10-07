@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.dashboardnotifications.cancelunissuedclaimspec;
+package uk.gov.hmcts.reform.civil.service.dashboardnotifications.cancelunissuedclaim;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,10 +19,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CANCEL_UNISSUED_CLAIM_SPEC_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CANCEL_UNISSUED_CLAIM_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
-class CancelUnissuedClaimSpecClaimantDashboardServiceTest {
+class CancelUnissuedClaimClaimantDashboardServiceTest {
 
     private static final String AUTH_TOKEN = "Bearer";
 
@@ -32,7 +32,7 @@ class CancelUnissuedClaimSpecClaimantDashboardServiceTest {
     private DashboardNotificationsParamsMapper mapper;
 
     @InjectMocks
-    private CancelUnissuedClaimSpecClaimantDashboardService service;
+    private CancelUnissuedClaimClaimantDashboardService service;
 
     @Test
     void shouldRecordScenarioForLipClaimant() {
@@ -42,11 +42,11 @@ class CancelUnissuedClaimSpecClaimantDashboardServiceTest {
             .ccdCaseReference(1234L)
             .build();
 
-        service.notifyCancelUnissuedClaimSpec(caseData, AUTH_TOKEN);
+        service.notifyCancelUnissuedClaim(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService).recordScenarios(
             eq(AUTH_TOKEN),
-            eq(SCENARIO_AAA6_CANCEL_UNISSUED_CLAIM_SPEC_CLAIMANT.getScenario()),
+            eq(SCENARIO_AAA6_CANCEL_UNISSUED_CLAIM_CLAIMANT.getScenario()),
             eq("1234"),
             any(ScenarioRequestParams.class)
         );
@@ -60,7 +60,7 @@ class CancelUnissuedClaimSpecClaimantDashboardServiceTest {
             .ccdCaseReference(1234L)
             .build();
 
-        service.notifyCancelUnissuedClaimSpec(caseData, AUTH_TOKEN);
+        service.notifyCancelUnissuedClaim(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService, never()).recordScenarios(any(), any(), any(), any());
     }
