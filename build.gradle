@@ -34,7 +34,7 @@ def versions = [
   azureCoreHttpNetty: '1.16.7',
   azureJson         : '1.5.1',
   azureServiceBus   : '7.17.20',
-  cucumber          : '7.34.8',
+  cucumber          : '8.0.4',
   elasticsearch     : '9.5.4',
   httpclient5       : '5.6.4',
   httpcore5         : '5.4.3',
@@ -152,18 +152,24 @@ allprojects {
   }
 
   repositories {
-    mavenLocal()
+    mavenLocal{
+      name = 'MavenLocal'
+    }
     // Jenkins must resolve through Artifactory because Maven Central rate-limits it (HTTP 429).
     // GitHub hosted runners cannot reach Artifactory, so it is skipped there.
     if (!System.getenv('GITHUB_ACTIONS')) {
       maven {
+        name = 'HmctsArtifactory'
         url = uri('https://artifactory.platform.hmcts.net/artifactory/maven-remotes')
       }
     }
     maven {
+      name = 'HmctsAzureArtifacts'
       url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
     }
-    mavenCentral()
+    mavenCentral {
+      name = 'MavenCentral'
+    }
   }
 }
 
