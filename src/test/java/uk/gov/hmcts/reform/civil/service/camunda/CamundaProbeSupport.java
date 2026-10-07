@@ -46,6 +46,15 @@ class CamundaProbeSupport {
         return get("/process-instance/" + processInstanceId + "/variables/" + name + "?deserializeValues=false");
     }
 
+    /**
+     * Raw response body for an engine path, so a caller can deserialise it into a type of its own
+     * choosing rather than this class's {@code Map}. Used to read variables back through the model
+     * shapes a revert would restore.
+     */
+    String rawJson(String path) {
+        return send(HttpRequest.newBuilder(URI.create(baseUrl + path)).GET().build());
+    }
+
     CamundaRuntimeApi api() {
         return new ProbeApi();
     }
