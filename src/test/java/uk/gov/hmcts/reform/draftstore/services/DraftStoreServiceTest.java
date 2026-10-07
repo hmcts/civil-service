@@ -354,6 +354,93 @@ class DraftStoreServiceTest {
 
             verifyNoInteractions(draftStoreRepository);
         }
+
+        @Test
+        void shouldReturnDraftIncludingExpiredWhenOwnedDraftExists() {
+            DraftStoreEntity draft = draft();
+            when(draftStoreRepository.findByIdAndUserIdAndDraftType(DRAFT_ID, USER_ID, DRAFT_TYPE))
+                .thenReturn(Optional.of(draft));
+
+            Optional<DraftStoreEntity> result =
+                draftStoreService.getDraftIncludingExpired(DRAFT_ID, USER_ID, DRAFT_TYPE);
+
+            assertThat(result).contains(draft);
+            verify(draftStoreRepository).findByIdAndUserIdAndDraftType(DRAFT_ID, USER_ID, DRAFT_TYPE);
+        }
+
+        @Test
+        void shouldRejectIncludingExpiredLookupWhenDraftIdIsNull() {
+            assertThatNullPointerException()
+                .isThrownBy(() -> draftStoreService.getDraftIncludingExpired(null, USER_ID, DRAFT_TYPE))
+                .withMessage("draftId must not be null");
+
+            verifyNoInteractions(draftStoreRepository);
+        }
+    }
+
+    @Nested
+    class ExpireDraftTests {
+
+        @Test
+        void shouldExpireDraftWhenOwnedDraftExists() {
+            DraftStoreEntity expiredDraft = draft();
+            when(draftStoreRepository.updateExpiresAt(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                any(OffsetDateTime.class),
+                any(OffsetDateTime.class)
+            )).thenReturn(1);
+            when(draftStoreRepository.findByIdAndUserIdAndDraftType(DRAFT_ID, USER_ID, DRAFT_TYPE))
+                .thenReturn(Optional.of(expiredDraft));
+
+            Optional<DraftStoreEntity> result = draftStoreService.expireDraft(DRAFT_ID, USER_ID, DRAFT_TYPE);
+
+            assertThat(result).contains(expiredDraft);
+            ArgumentCaptor<OffsetDateTime> expiresAtCaptor = ArgumentCaptor.forClass(OffsetDateTime.class);
+            ArgumentCaptor<OffsetDateTime> updatedAtCaptor = ArgumentCaptor.forClass(OffsetDateTime.class);
+            verify(draftStoreRepository).updateExpiresAt(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                expiresAtCaptor.capture(),
+                updatedAtCaptor.capture()
+            );
+            assertThat(expiresAtCaptor.getValue()).isBefore(updatedAtCaptor.getValue());
+            verify(draftStoreRepository).findByIdAndUserIdAndDraftType(DRAFT_ID, USER_ID, DRAFT_TYPE);
+        }
+
+        @Test
+        void shouldReturnEmptyWhenExpiringMissingDraft() {
+            when(draftStoreRepository.updateExpiresAt(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                any(OffsetDateTime.class),
+                any(OffsetDateTime.class)
+            )).thenReturn(0);
+
+            Optional<DraftStoreEntity> result = draftStoreService.expireDraft(DRAFT_ID, USER_ID, DRAFT_TYPE);
+
+            assertThat(result).isEmpty();
+            verify(draftStoreRepository).updateExpiresAt(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                any(OffsetDateTime.class),
+                any(OffsetDateTime.class)
+            );
+            verifyNoInteractions(draftStoreTransactionService);
+        }
+
+        @Test
+        void shouldRejectExpireWhenDraftIdIsNull() {
+            assertThatNullPointerException()
+                .isThrownBy(() -> draftStoreService.expireDraft(null, USER_ID, DRAFT_TYPE))
+                .withMessage("draftId must not be null");
+
+            verifyNoInteractions(draftStoreRepository);
+        }
     }
 
     @Nested

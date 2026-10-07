@@ -97,4 +97,14 @@ public class DraftClaimService {
     private static boolean isActive(DraftStoreEntity draft, OffsetDateTime now) {
         return draft.getExpiresAt().isAfter(now);
     }
+
+    @Transactional(readOnly = true)
+    public Optional<DraftStoreEntity> getDraftClaimIncludingExpired(UUID draftId, String userId) {
+        return draftStoreService.getDraftIncludingExpired(draftId, userId, DRAFT_TYPE);
+    }
+
+    public DraftStoreEntity expireDraftClaim(UUID draftId, String userId) {
+        return draftStoreService.expireDraft(draftId, userId, DRAFT_TYPE)
+            .orElseThrow(() -> new DraftClaimNotFoundException(draftId));
+    }
 }

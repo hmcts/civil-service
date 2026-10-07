@@ -195,6 +195,45 @@ class DraftClaimServiceTest {
             assertThat(result).isEmpty();
             verifyNoInteractions(draftStoreService);
         }
+
+        @Test
+        void shouldReturnDraftIncludingExpiredWhenDraftExists() {
+            OffsetDateTime createdAt = OffsetDateTime.now().minusDays(RETENTION_DAYS + 1);
+            DraftStoreEntity expiredDraft = draft(createdAt, createdAt.plusDays(RETENTION_DAYS));
+            when(draftStoreService.getDraftIncludingExpired(DRAFT_ID, USER_ID, DRAFT_TYPE))
+                .thenReturn(Optional.of(expiredDraft));
+
+            Optional<DraftStoreEntity> result =
+                draftClaimService.getDraftClaimIncludingExpired(DRAFT_ID, USER_ID);
+
+            assertThat(result).contains(expiredDraft);
+            verify(draftStoreService).getDraftIncludingExpired(DRAFT_ID, USER_ID, DRAFT_TYPE);
+        }
+    }
+
+    @Nested
+    class ExpireDraftClaimTests {
+
+        @Test
+        void shouldExpireDraftWhenDraftExists() {
+            OffsetDateTime createdAt = OffsetDateTime.now();
+            DraftStoreEntity expiredDraft = draft(createdAt, createdAt.minusMinutes(1));
+            when(draftStoreService.expireDraft(DRAFT_ID, USER_ID, DRAFT_TYPE))
+                .thenReturn(Optional.of(expiredDraft));
+
+            DraftStoreEntity result = draftClaimService.expireDraftClaim(DRAFT_ID, USER_ID);
+
+            assertThat(result).isSameAs(expiredDraft);
+            verify(draftStoreService).expireDraft(DRAFT_ID, USER_ID, DRAFT_TYPE);
+        }
+
+        @Test
+        void shouldThrowNotFoundWhenExpiringMissingDraft() {
+            when(draftStoreService.expireDraft(DRAFT_ID, USER_ID, DRAFT_TYPE)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> draftClaimService.expireDraftClaim(DRAFT_ID, USER_ID))
+                .isInstanceOf(DraftClaimNotFoundException.class);
+        }
     }
 
     @Nested
