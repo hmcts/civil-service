@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -111,7 +111,7 @@ class OrderReviewObligationCheckHandlerTest {
         when(coreCaseDataService.getCase(Long.valueOf("1"))).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         when(caseData.getStoredObligationData()).thenReturn(storedObligationData);
-        when(obligationData.getObligationDate()).thenReturn(LocalDate.now().minusDays(1));
+        when(obligationData.getObligationDate()).thenReturn(LocalDate.now().plusDays(1));
         when(obligationData.getObligationWATaskRaised()).thenReturn(YesOrNo.NO);
 
         handler.handleTask(mock(ExternalTask.class));

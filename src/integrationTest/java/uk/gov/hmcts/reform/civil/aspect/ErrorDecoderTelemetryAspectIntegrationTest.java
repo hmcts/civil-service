@@ -6,7 +6,7 @@ import feign.codec.ErrorDecoder;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -30,7 +30,7 @@ class ErrorDecoderTelemetryAspectIntegrationTest {
     public static final String METHOD_KEY = "TestClient#getAnything";
     public static final String DECODED = "decoded";
 
-    @MockBean
+    @MockitoBean
     private FeignErrorTelemetryService telemetryService;
 
     @Autowired

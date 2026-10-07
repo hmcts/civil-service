@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.scheduler.casedismissed.CaseDismissedScheduler;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
 import uk.gov.hmcts.test.config.CoreCaseDataApiMockHelperConfiguration;
+import uk.gov.hmcts.test.config.MockCoreCaseDataApiDependencies;
 import uk.gov.hmcts.test.helper.CoreCaseDataApiMockHelper;
 
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 
 @ActiveProfiles("integration-test")
+@MockCoreCaseDataApiDependencies
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=CaseDismissedSchedulerIT",
     "scheduler.lockAtLeastFor=PT0S"

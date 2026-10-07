@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.civil.service.documentmanagement;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -13,8 +11,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGen
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Configuration
-@ComponentScan("uk.gov.hmcts.reform")
 public class ClaimFormService {
 
     private final DocumentDownloadService documentDownloadService;

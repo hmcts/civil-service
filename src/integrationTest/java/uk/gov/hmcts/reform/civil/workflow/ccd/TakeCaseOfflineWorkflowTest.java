@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.workflow.ccd;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -19,7 +19,7 @@ class TakeCaseOfflineWorkflowTest extends WorkflowIntegrationTest {
 
     private static final LocalDateTime TAKEN_OFFLINE_AT = LocalDateTime.of(2026, 5, 19, 13, 0);
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
     @Test
