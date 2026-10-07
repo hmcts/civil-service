@@ -25,6 +25,9 @@ public class ConfirmOrderReviewFinalOrderTest extends BpmnBaseTest {
     private static final String UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT_ACTIVITY_ID
         = "UpdateTaskListConfirmOrderReviewDefendant";
 
+    private static final String GENERATE_DASHBOARD_NOTIFICATION_FINAL_ORDER
+        = "GenerateDashboardNotificationFinalOrder";
+
     public ConfirmOrderReviewFinalOrderTest() {
         super("confirm_order_review_final_order.bpmn", PROCESS_ID);
     }
@@ -60,6 +63,15 @@ public class ConfirmOrderReviewFinalOrderTest extends BpmnBaseTest {
         assertCompleteExternalTask(notificationTask, PROCESS_CASE_EVENT,
                                    UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT,
                                    UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT_ACTIVITY_ID,
+                                   variables
+        );
+
+        //Generate the Dashboard notifications
+        ExternalTask dashboardTask = assertNextExternalTask(PROCESS_CASE_EVENT);
+        assertCompleteExternalTask(dashboardTask,
+                                   PROCESS_CASE_EVENT,
+                                   DASHBOARD_NOTIFICATION_EVENT,
+                                   GENERATE_DASHBOARD_NOTIFICATION_FINAL_ORDER,
                                    variables
         );
 
