@@ -15,6 +15,7 @@ plugins {
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.6"
+  id 'hmcts.ccd.sdk' version '7.9.0'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -35,7 +36,7 @@ def versions = [
   azureCoreHttpNetty: '1.16.7',
   azureJson         : '1.5.1',
   azureServiceBus   : '7.17.20',
-  cucumber          : '7.34.8',
+  cucumber          : '8.0.4',
   elasticsearch     : '9.5.4',
   httpclient5       : '5.6.4',
   httpcore5         : '5.4.3',
@@ -149,10 +150,23 @@ allprojects {
   }
 
   repositories {
-    mavenLocal()
-    mavenCentral()
+    mavenLocal{
+      name = 'MavenLocal'
+    }
+    // Jenkins must resolve through Artifactory because Maven Central rate-limits it (HTTP 429).
+    // GitHub hosted runners cannot reach Artifactory, so it is skipped there.
+    if (!System.getenv('GITHUB_ACTIONS')) {
+      maven {
+        name = 'HmctsArtifactory'
+        url = uri('https://artifactory.platform.hmcts.net/artifactory/maven-remotes')
+      }
+    }
     maven {
+      name = 'HmctsAzureArtifacts'
       url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
+    }
+    mavenCentral {
+      name = 'MavenCentral'
     }
   }
 }
@@ -449,12 +463,17 @@ def sonarExclusions = [
  " **/setasidejudgementrequest/SetAsideJudgementRequestRespSolTwoEmailDTOGenerator.java"
 ]
 
+def sonarCoverageExclusions = [
+  "**/.github/scripts/**"
+]
+
 sonarqube {
   properties {
     property "sonar.projectName", "CIVIL :: service"
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${projectDir}/build/reports/jacoco/test/jacocoTestReport.xml"
     property "sonar.exclusions", sonarExclusions.join(", ")
+    property "sonar.coverage.exclusions", sonarCoverageExclusions.join(", ")
     property "sonar.gradle.skipCompile", "true"
     property "sonar.branch.cache.enabled", "true"
     property "sonar.working.directory", layout.buildDirectory.dir("sonar").get().asFile
@@ -550,6 +569,7 @@ dependencies {
   implementation "org.springframework.boot:spring-boot-starter-json"
   implementation "org.springframework.boot:spring-boot-starter-validation"
   implementation "org.springframework.boot:spring-boot-starter-jdbc"
+  implementation 'com.github.hmcts:ccd-data-migration-support'
   implementation "org.springframework.statemachine:spring-statemachine-core:$versions.springStatemachine"
   implementation "commons-beanutils:commons-beanutils:1.11.0"
   implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.17"

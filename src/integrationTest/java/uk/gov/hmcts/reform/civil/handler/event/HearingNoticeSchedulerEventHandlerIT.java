@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
@@ -178,6 +179,7 @@ class HearingNoticeSchedulerEventHandlerIT {
     static class TestConfig {
 
         @Bean
+        @Primary
         ObjectMapper objectMapper() {
             return new ObjectMapper();
         }
