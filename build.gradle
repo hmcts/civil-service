@@ -15,6 +15,7 @@ plugins {
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.6"
+  id 'hmcts.ccd.sdk' version '7.9.0'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -24,7 +25,7 @@ def versions = [
   junit             : '6.1.3',
   junitPlatform     : '6.1.3',
   springBoot        : springBoot.class.package.implementationVersion,
-  springStatemachine: '4.0.0',
+  springStatemachine: '4.0.2',
   lombok            : '1.18.38',
   camunda           : '7.24.0',
   camundaRestClient : '2026.04.2',
@@ -34,7 +35,7 @@ def versions = [
   azureCoreAmqp     : '2.12.1',
   azureCoreHttpNetty: '1.16.7',
   azureJson         : '1.5.1',
-  azureServiceBus   : '7.17.20',
+  azureServiceBus   : '7.18.0',
   cucumber          : '8.0.4',
   elasticsearch     : '9.5.4',
   httpclient5       : '5.6.4',
@@ -132,7 +133,10 @@ allprojects {
       }
 
       dependency 'org.apache.commons:commons-lang3:' + versions.commonsLang3
-
+      dependency 'org.bouncycastle:bcprov-jdk18on:1.85'
+      dependency 'io.projectreactor:reactor-core:3.8.7'
+      dependency 'io.micrometer:micrometer-core:1.16.7'
+      dependency 'ch.qos.logback:logback-core:1.5.38'
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.0.3'
@@ -467,12 +471,17 @@ def sonarExclusions = [
  " **/setasidejudgementrequest/SetAsideJudgementRequestRespSolTwoEmailDTOGenerator.java"
 ]
 
+def sonarCoverageExclusions = [
+  "**/.github/scripts/**"
+]
+
 sonarqube {
   properties {
     property "sonar.projectName", "CIVIL :: service"
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${projectDir}/build/reports/jacoco/test/jacocoTestReport.xml"
     property "sonar.exclusions", sonarExclusions.join(", ")
+    property "sonar.coverage.exclusions", sonarCoverageExclusions.join(", ")
     property "sonar.gradle.skipCompile", "true"
     property "sonar.branch.cache.enabled", "true"
     property "sonar.working.directory", layout.buildDirectory.dir("sonar").get().asFile
@@ -568,6 +577,7 @@ dependencies {
   implementation "org.springframework.boot:spring-boot-starter-json"
   implementation "org.springframework.boot:spring-boot-starter-validation"
   implementation "org.springframework.boot:spring-boot-starter-jdbc"
+  implementation 'com.github.hmcts:ccd-data-migration-support'
   implementation "org.springframework.statemachine:spring-statemachine-core:$versions.springStatemachine"
   implementation "commons-beanutils:commons-beanutils:1.11.0"
   implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.17"
