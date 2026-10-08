@@ -89,4 +89,18 @@ public class WaTaskManagementService {
             log.info("Claim task - WA integration is disabled");
         }
     }
+
+    public void completeTask(String authorization, String taskId) {
+        if (taskManagementEnabled) {
+            try {
+                taskManagementClient.completeTask(authTokenGenerator.generate(), authorization, taskId);
+            } catch (FeignException e) {
+                log.error("There was an issue completing the task [{}] from task management api: {}", taskId, e.getMessage());
+                throw new InternalServerErrorException(e.getMessage());
+            }
+
+        } else {
+            log.info("Complete task - WA integration is disabled");
+        }
+    }
 }

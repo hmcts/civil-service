@@ -143,6 +143,29 @@ class WaTaskManagementServiceTest {
 
             assertThrows(InternalServerErrorException.class, () -> taskManagementService.claimTask(USER_TOKEN, taskId));
         }
+
+        @Test
+        void completeTask_shouldCallTaskClient_withExpectedTaskId() {
+            String taskId = "TaskId";
+            taskManagementService.completeTask(USER_TOKEN, taskId);
+
+            verify(taskManagementClient).completeTask(S2S_TOKEN, USER_TOKEN, taskId);
+        }
+
+        @Test
+        void completeTask_shouldThrowInternalServerErrorException_whenFeignExceptionIsThrown() {
+            String taskId = "TaskId";
+            doThrow(new FeignException.InternalServerError(
+                "Task management error",
+                Request.create(Request.HttpMethod.POST, "url", java.util.Map.of(), null, null, null),
+                null,
+                null
+            ))
+                .when(taskManagementClient)
+                .completeTask(anyString(), anyString(), anyString());
+
+            assertThrows(InternalServerErrorException.class, () -> taskManagementService.completeTask(USER_TOKEN, taskId));
+        }
     }
 
     @Nested
@@ -176,6 +199,14 @@ class WaTaskManagementServiceTest {
             taskManagementService.claimTask(USER_TOKEN, taskId);
 
             verify(taskManagementClient, never()).claimTask(S2S_TOKEN, USER_TOKEN, taskId);
+        }
+
+        @Test
+        void completeTask_shouldNotCallClient_whenDisabled() {
+            String taskId = "TaskId";
+            taskManagementService.completeTask(USER_TOKEN, taskId);
+
+            verify(taskManagementClient, never()).completeTask(S2S_TOKEN, USER_TOKEN, taskId);
         }
     }
 
