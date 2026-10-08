@@ -7,8 +7,6 @@ import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import org.apache.http.HttpStatus;
-import org.camunda.community.rest.client.model.IncidentDto;
-import org.camunda.community.rest.client.model.ProcessInstanceDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +16,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.civil.model.camunda.CamundaIncident;
+import uk.gov.hmcts.reform.civil.model.camunda.CamundaProcessInstance;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 
@@ -151,7 +151,7 @@ public class CamundaRuntimeApiConsumerTest extends BaseContractTest {
     @Test
     @PactTestFor(pactMethod = "queryProcessInstances")
     public void verifyQueryProcessInstances() {
-        List<ProcessInstanceDto> response = camundaRuntimeApi.queryProcessInstances(
+        List<CamundaProcessInstance> response = camundaRuntimeApi.queryProcessInstances(
             SERVICE_AUTH_TOKEN,
             null,
             50,
@@ -174,7 +174,7 @@ public class CamundaRuntimeApiConsumerTest extends BaseContractTest {
     @Test
     @PactTestFor(pactMethod = "getLatestIncident")
     public void verifyGetLatestIncident() {
-        List<IncidentDto> response = camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
+        List<CamundaIncident> response = camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
             SERVICE_AUTH_TOKEN,
             true,
             PROCESS_INSTANCE_ID,
