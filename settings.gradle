@@ -1,19 +1,28 @@
 pluginManagement {
   repositories {
-    mavenLocal()
+    mavenLocal {
+      name = 'MavenLocal'
+    }
     // Jenkins must resolve through Artifactory because Maven Central rate-limits it (HTTP 429).
     // GitHub hosted runners cannot reach Artifactory, so it is skipped there.
     if (!System.getenv('GITHUB_ACTIONS')) {
       maven {
+        name = 'HmctsArtifactory'
         url = uri('https://artifactory.platform.hmcts.net/artifactory/maven-remotes')
       }
     }
     gradlePluginPortal()
     maven {
+      name = 'HmctsAzureArtifacts'
       url = "https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1"
     }
-    maven { url = 'https://repo.spring.io/release' }
-    mavenCentral()
+    maven {
+      name = 'SpringRelease'
+      url = 'https://repo.spring.io/release'
+    }
+    mavenCentral {
+      name = 'MavenCentral'
+    }
   }
 }
 rootProject.name = 'civil-service'

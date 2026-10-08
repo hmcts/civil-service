@@ -337,7 +337,20 @@ dashboard:
   api:
     url: ${CIVIL_SERVICE_URL:http://localhost:4000}
 
+ccd:
+  data-migration:
+    enabled: ${CIVIL_CCD_DATA_MIGRATION_ENABLED:false}
+    task-name: ${CIVIL_CCD_DATA_MIGRATION_TASK_NAME:civil-ccd-data-migration}
+    mode: ${CIVIL_CCD_DATA_MIGRATION_MODE:PRELOAD_EVENTS}
+    case-type-ids: ${CIVIL_CCD_DATA_MIGRATION_CASE_TYPE_IDS:CIVIL,GENERALAPPLICATION}
+    source-jurisdiction: ${CIVIL_CCD_DATA_MIGRATION_SOURCE_JURISDICTION:CIVIL}
+    max-batches-per-run: ${CIVIL_CCD_DATA_MIGRATION_MAX_BATCHES_PER_RUN:100}
+    max-run-time: ${CIVIL_CCD_DATA_MIGRATION_MAX_RUN_TIME:2h}
+
 migration:
+  ccd-data:
+    enabled: ${CIVIL_CCD_DATA_MIGRATION_ENABLED:false}
+    cron: ${CIVIL_CCD_DATA_MIGRATION_CRON:0 0 15,17 * * *}
   batchsize: 100
   wait-time-mins: 5
   csvFile:
@@ -790,6 +803,16 @@ feign:
         loggerLevel: basic
       document-management-metadata-download-api:
         loggerLevel: basic
+
+camunda:
+  rest:
+    client:
+      # Holunda registers a global Feign ErrorDecoder that wraps every Feign client's
+      # errors in RemoteProcessEngineException, losing the HTTP status. Disabling it
+      # restores Feign's default decoder so FeignException carries the real status,
+      # which the retry classification in ExternalTaskExceptionHelper depends on.
+      error-decoding:
+        enabled: false
 
 docStore:
   doc:
