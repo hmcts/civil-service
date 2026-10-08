@@ -25,7 +25,7 @@ def versions = [
   junit             : '6.1.3',
   junitPlatform     : '6.1.3',
   springBoot        : springBoot.class.package.implementationVersion,
-  springStatemachine: '4.0.0',
+  springStatemachine: '4.0.2',
   lombok            : '1.18.38',
   camunda           : '7.24.0',
   camundaRestClient : '2026.04.2',
@@ -35,7 +35,7 @@ def versions = [
   azureCoreAmqp     : '2.12.1',
   azureCoreHttpNetty: '1.16.7',
   azureJson         : '1.5.1',
-  azureServiceBus   : '7.17.20',
+  azureServiceBus   : '7.18.0',
   cucumber          : '8.0.4',
   elasticsearch     : '9.5.4',
   httpclient5       : '5.6.4',
@@ -133,7 +133,10 @@ allprojects {
       }
 
       dependency 'org.apache.commons:commons-lang3:' + versions.commonsLang3
-
+      dependency 'org.bouncycastle:bcprov-jdk18on:1.85'
+      dependency 'io.projectreactor:reactor-core:3.8.7'
+      dependency 'io.micrometer:micrometer-core:1.16.7'
+      dependency 'ch.qos.logback:logback-core:1.5.38'
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.0.3'
@@ -219,6 +222,11 @@ tasks.withType(Copy).configureEach {
 
 tasks.withType(Test).configureEach {
   dependsOn preparePatchedMigrations
+  // forwarded so the Camunda wire-format test can target a running engine; the test
+  // stays disabled when this is absent, which is the case in CI
+  if (System.getProperty('camunda.probe.url')) {
+    systemProperty 'camunda.probe.url', System.getProperty('camunda.probe.url')
+  }
   systemProperty 'spring.flyway.locations', "filesystem:${layout.buildDirectory.get().asFile.absolutePath}/tmp/patched-migrations"
 }
 
@@ -619,7 +627,6 @@ dependencies {
   implementation "org.camunda.bpm:camunda-external-task-client:${versions.camunda}"
   implementation "io.holunda.c7:c7-rest-client-spring-boot-starter-provided:${versions.camundaRestClient}"
   implementation "org.camunda.bpm:camunda-engine:${versions.camunda}"
-  implementation "org.camunda.bpm:camunda-engine-rest-core:${versions.camunda}"
   implementation "org.apiguardian:apiguardian-api:1.1.2"
   implementation "jakarta.xml.bind:jakarta.xml.bind-api:4.0.5"
   implementation "org.glassfish.jaxb:jaxb-runtime:4.0.9"
@@ -797,6 +804,13 @@ tasks.withType(Test).configureEach { t ->
   minHeapSize = "256m"
   jvmArgs "-XX:MaxMetaspaceSize=512m"
   jvmArgs '-XX:ReservedCodeCacheSize=512m'
+  // JDK 21.0.10 on Apple Silicon crashes the test worker (SIGSEGV in C2, BoolNode::Ideal)
+  // while compiling this Jackson method about 40s into the unit suite. The surviving
+  // forks still report a green run, so the failure is easy to miss: a full run shows
+  // ~17,400 tests, a truncated one ~12,700. Excluding the one method from JIT sidesteps
+  // the bug at no measurable cost; remove once the JDK is upgraded past it.
+  jvmArgs '-XX:CompileCommand=quiet'
+  jvmArgs '-XX:CompileCommand=exclude,com.fasterxml.jackson.databind.introspect.POJOPropertiesCollector::_addFields'
   // Docker Desktop 29 (Engine API 1.54) rejects docker-java's older default API version.
   systemProperty 'api.version', System.getProperty('api.version', '1.40')
 
