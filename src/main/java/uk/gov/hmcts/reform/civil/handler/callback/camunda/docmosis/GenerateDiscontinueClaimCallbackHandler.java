@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -23,6 +22,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import uk.gov.hmcts.reform.civil.service.docmosis.settlediscontinue.NoticeOfDiscontinuanceFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
@@ -51,7 +51,7 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final AssignCategoryId assignCategoryId;
     private final NoticeOfDiscontinuanceFormGenerator formGenerator;
-    private final RuntimeService runTimeService;
+    private final CamundaRuntimeClient camundaRuntimeClient;
     private final OrganisationService organisationService;
     private final FeatureToggleService featureToggleService;
 
@@ -266,12 +266,12 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
     }
 
     private void updateCamundaVars(CaseData caseData) {
-        runTimeService.setVariable(
+        camundaRuntimeClient.setProcessVariable(
             caseData.getBusinessProcess().getProcessInstanceId(),
             "JUDGE_ORDER_VERIFICATION_REQUIRED",
             caseData.isJudgeOrderVerificationRequired()
         );
-        runTimeService.setVariable(
+        camundaRuntimeClient.setProcessVariable(
             caseData.getBusinessProcess().getProcessInstanceId(),
             "WELSH_ENABLED",
             featureToggleService.isWelshEnabledForMainCase()
