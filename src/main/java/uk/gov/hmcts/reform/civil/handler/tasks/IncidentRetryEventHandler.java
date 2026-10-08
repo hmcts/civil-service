@@ -150,8 +150,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
         log.info("Call cases stuck check search service to log cases being stuck in app insights");
 
-        String stuckCasesFromPastDays = externalTask.getVariable("stuckCasesFromPastDays");
-        Set<CaseDetails> stuckCases = casesStuckCheckSearchService.getCases(stuckCasesFromPastDays != null ? stuckCasesFromPastDays : "7");
+        Set<CaseDetails> stuckCases = casesStuckCheckSearchService.getCases();
         trackStuckCasesFromSearchResults(stuckCases, retryContext);
 
         trackDailyStuckCasesSummary(
@@ -217,20 +216,24 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     ) {
         log.info("Retrying {} incidents across process instances", incidents.size());
         int poolSize = Math.min(MAX_THREADS, incidents.size());
-        ForkJoinPool customThreadPool = new ForkJoinPool(poolSize);
+        try (ForkJoinPool customThreadPool = new ForkJoinPool(poolSize)) {
 
-        try {
-            customThreadPool.submit(() ->
-                                        incidents.parallelStream().forEach(incident ->
-                                                                               handleIncidentRetry(incident, retryContext))
-            ).get();
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-            log.error("Incident retry execution was interrupted", ie);
-        } catch (ExecutionException ee) {
-            log.error("Error during parallel incident retries", ee.getCause());
-        } finally {
-            customThreadPool.shutdown();
+            try {
+                customThreadPool.submit(() ->
+                                            incidents.parallelStream().forEach(incident ->
+                                                                                   handleIncidentRetry(
+                                                                                       incident,
+                                                                                       retryContext
+                                                                                   ))
+                ).get();
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+                log.error("Incident retry execution was interrupted", ie);
+            } catch (ExecutionException ee) {
+                log.error("Error during parallel incident retries", ee.getCause());
+            } finally {
+                customThreadPool.shutdown();
+            }
         }
     }
 
