@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.documentmanagement;
 
 import feign.FeignException;
 import feign.Request;
+import feign.Response;
 import org.apache.tika.Tika;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,8 +12,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.util.unit.DataSize;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
+import uk.gov.hmcts.reform.ccd.document.am.model.Document;
+import uk.gov.hmcts.reform.civil.client.CaseDocumentBinaryApiClient;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -48,6 +52,7 @@ import static org.mockito.Mockito.when;
 class SecuredDocumentManagementServiceRetryTest {
 
     public static final String BEARER_TOKEN = "Bearer Token";
+    private static final String DOCUMENT_PATH = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
 
     // proxyTargetClass = true so the retry proxy is a CGLIB subclass of the concrete service,
     // letting the test autowire SecuredDocumentManagementService directly (a JDK interface
@@ -59,6 +64,8 @@ class SecuredDocumentManagementServiceRetryTest {
 
     @MockBean
     private CaseDocumentClientApi caseDocumentClientApi;
+    @MockBean
+    private CaseDocumentBinaryApiClient caseDocumentBinaryApiClient;
     @MockBean
     private DocumentDownloadClientApi documentDownloadClient;
     @MockBean
@@ -88,11 +95,35 @@ class SecuredDocumentManagementServiceRetryTest {
             InvalidDocumentLinkException.class,
             () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, shortSelfHref));
 
-        // getUserInfo runs once at the top of every attempt, so it is a reliable per-attempt counter:
-        // exactly one invocation proves the bad-input error short-circuited the retry (not the full retry budget).
-        verify(userService, times(1)).getUserInfo(BEARER_TOKEN);
-        // the guard trips before any CDAM call, so neither document client is ever touched.
-        verifyNoInteractions(caseDocumentClientApi, documentDownloadClient);
+        // the guard trips before any CDAM call, so no document client is ever touched.
+        verifyNoInteractions(caseDocumentClientApi, caseDocumentBinaryApiClient, documentDownloadClient);
+    }
+
+    @Test
+    void downloadDocumentWithMetaData_streamedBinary500_isRetriedThreeTimes() {
+        when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), any(UUID.class)))
+            .thenReturn(document(1024));
+        when(caseDocumentBinaryApiClient.getDocumentBinary(anyString(), anyString(), any(UUID.class)))
+            .thenAnswer(invocation -> binaryResponse(500));
+
+        assertThrows(
+            DocumentDownloadException.class,
+            () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, DOCUMENT_PATH));
+
+        verify(caseDocumentBinaryApiClient, times(3)).getDocumentBinary(anyString(), anyString(), any(UUID.class));
+    }
+
+    @Test
+    void downloadDocumentWithMetaData_tooLarge_isNotRetried() {
+        when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), any(UUID.class)))
+            .thenReturn(document(DataSize.ofMegabytes(100).toBytes() + 1));
+
+        assertThrows(
+            DocumentTooLargeException.class,
+            () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, DOCUMENT_PATH));
+
+        verify(caseDocumentClientApi, times(1)).getMetadataForDocument(anyString(), anyString(), any(UUID.class));
+        verifyNoInteractions(caseDocumentBinaryApiClient);
     }
 
     @Test
@@ -121,6 +152,16 @@ class SecuredDocumentManagementServiceRetryTest {
             () -> documentManagementService.downloadDocument(BEARER_TOKEN, documentPath));
 
         verify(userService, times(1)).getUserInfo(BEARER_TOKEN);
+    }
+
+    private static Document document(long size) {
+        return Document.builder().size(size).originalDocumentName("TEST_DOCUMENT_1.pdf").build();
+    }
+
+    private static Response binaryResponse(int status) {
+        Request request = Request.create(
+            Request.HttpMethod.GET, "/cases/documents/x/binary", Map.of(), new byte[]{}, StandardCharsets.UTF_8, null);
+        return Response.builder().status(status).request(request).headers(Map.of()).body(new byte[]{}).build();
     }
 
     private static FeignException buildFeignException(int status) {

@@ -283,6 +283,8 @@ auth:
 
 document_management:
   userRoles: "caseworker-civil,caseworker-civil-solicitor"
+  # Upper bound on a single document download. Matches the upload limit (spring.servlet.multipart.max-file-size).
+  maxDownloadSize: ${DOCUMENT_MANAGEMENT_MAX_DOWNLOAD_SIZE:100MB}
 
 bankHolidays:
   api:

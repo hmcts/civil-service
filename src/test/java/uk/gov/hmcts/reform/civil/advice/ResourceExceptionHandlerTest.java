@@ -18,6 +18,7 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentAccessException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentNotFoundException;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentTooLargeException;
 import uk.gov.hmcts.reform.civil.documentmanagement.InvalidDocumentLinkException;
 import uk.gov.hmcts.reform.civil.model.CallbackErrorResponse;
 import uk.gov.hmcts.reform.civil.exceptions.UpstreamIdamException;
@@ -259,6 +260,18 @@ public class ResourceExceptionHandlerTest {
                 contentCachingRequestWrapper
             ),
             HttpStatus.FORBIDDEN
+        );
+    }
+
+    @Test
+    void shouldReturnPayloadTooLarge_whenDocumentTooLargeExceptionThrown() {
+        testTemplate(
+            "exceeds the download limit",
+            handler.documentManagementError(
+                new DocumentTooLargeException("documents/abc", 200L, 100L),
+                contentCachingRequestWrapper
+            ),
+            HttpStatus.PAYLOAD_TOO_LARGE
         );
     }
 
