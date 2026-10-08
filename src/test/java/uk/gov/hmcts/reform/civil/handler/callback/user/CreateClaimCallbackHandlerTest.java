@@ -1357,6 +1357,22 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("No");
         }
 
+        @Test
+        void shouldLeaveRespondent2SameLegalRepUnset_WhenRespondent1RepresentationIsMissing() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .addRespondent2(YES)
+                .respondent1Represented(null)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "setRespondent2SameLegalRepresentativeToNo");
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).doesNotContainKey("respondent2SameLegalRepresentative");
+        }
+
     }
 
     @Nested

@@ -46,6 +46,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW_DASHBOARD_UPDATE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @ExtendWith(MockitoExtension.class)
@@ -216,6 +217,23 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getState()).isEqualTo(CaseState.CASE_PROGRESSION.name());
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(CONFIRM_ORDER_REVIEW_DASHBOARD_UPDATE.name(), "READY");
+        }
+
+        @Test
+        void shouldNotSetBusinessProcess_whenOrderIsNotFinalOrder_andCaseIsNotReturningFromDecisionOutcome() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setIsFinalOrder(NO);
+            caseData.setObligationDatePresent(NO);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, CaseState.CASE_PROGRESSION);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getState()).isNull();
+            assertThat(response.getData().get("businessProcess")).isNull();
         }
 
         @Test
