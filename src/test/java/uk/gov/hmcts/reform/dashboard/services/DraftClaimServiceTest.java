@@ -257,6 +257,35 @@ class DraftClaimServiceTest {
     }
 
     @Nested
+    class ApplyPaymentRetentionTests {
+
+        @Test
+        void shouldReturnDraftWhenPaymentRetentionApplied() {
+            OffsetDateTime createdAt = OffsetDateTime.now();
+            DraftStoreEntity shortened = draft(
+                createdAt,
+                DraftStoreService.calculateExpiresAt(createdAt, DRAFT_TYPE.getPaymentRetentionDays())
+            );
+            when(draftStoreService.applyPaymentRetention(DRAFT_ID, USER_ID, DRAFT_TYPE))
+                .thenReturn(Optional.of(shortened));
+
+            DraftStoreEntity result = draftClaimService.applyPaymentRetention(DRAFT_ID, USER_ID);
+
+            assertThat(result).isSameAs(shortened);
+            verify(draftStoreService).applyPaymentRetention(DRAFT_ID, USER_ID, DRAFT_TYPE);
+        }
+
+        @Test
+        void shouldThrowNotFoundWhenDraftMissing() {
+            when(draftStoreService.applyPaymentRetention(DRAFT_ID, USER_ID, DRAFT_TYPE))
+                .thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> draftClaimService.applyPaymentRetention(DRAFT_ID, USER_ID))
+                .isInstanceOf(DraftClaimNotFoundException.class);
+        }
+    }
+
+    @Nested
     class DeleteDraftClaimTests {
 
         @Test

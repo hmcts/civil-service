@@ -79,6 +79,11 @@ public class DraftClaimService {
             .orElseThrow(() -> new DraftClaimNotFoundException(draftId));
     }
 
+    public DraftStoreEntity applyPaymentRetention(UUID draftId, String userId) {
+        return draftStoreService.applyPaymentRetention(draftId, userId, DRAFT_TYPE)
+            .orElseThrow(() -> new DraftClaimNotFoundException(draftId));
+    }
+
     public void deleteDraftClaim(UUID draftId, String userId) {
         if (!draftStoreService.deleteDraft(draftId, userId, DRAFT_TYPE)) {
             throw new DraftClaimNotFoundException(draftId);
