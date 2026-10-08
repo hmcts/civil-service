@@ -335,7 +335,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData caseData = callbackParams.getCaseData();
 
         // only default this to NO if respondent 1 isn't represented
-        if (caseData.getRespondent1Represented().equals(NO)) {
+        if (NO.equals(caseData.getRespondent1Represented())) {
             caseData.setRespondent2SameLegalRepresentative(NO);
         }
 
@@ -571,7 +571,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         log.info("Case management equals: " + caseData.getCaseManagementCategory());
         log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
 
-        if (caseData.getRespondent1Represented().equals(NO)) {
+        if (NO.equals(caseData.getRespondent1Represented())) {
             caseData.setDefendant1LIPAtClaimIssued(YES);
         } else {
             caseData.setDefendant1LIPAtClaimIssued(NO);
