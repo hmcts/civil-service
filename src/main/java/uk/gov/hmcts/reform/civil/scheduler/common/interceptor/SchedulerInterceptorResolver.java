@@ -32,6 +32,7 @@ public class SchedulerInterceptorResolver {
         List<SchedulerInterceptor<T>> merged = new ArrayList<>();
         if (config.isUseDefaultInterceptors()) {
             allInterceptors.stream()
+                .filter(DefaultSchedulerInterceptor.class::isInstance)
                 .filter(interceptor -> isCompatible(interceptor, config.getScheduledTask()))
                 .map(interceptor -> (SchedulerInterceptor<T>) interceptor)
                 .forEach(merged::add);
