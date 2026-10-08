@@ -6,6 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -23,6 +25,7 @@ import uk.gov.hmcts.reform.dashboard.services.DraftClaimService;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
+import uk.gov.hmcts.reform.draftstore.services.DraftStoreService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.OffsetDateTime;
@@ -52,12 +55,15 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
 
     private static final String DRAFT_CLAIMS_URL = "/dashboard/draft-claims";
     private static final String DRAFT_CLAIM_BY_ID_URL = "/dashboard/draft-claims/{draft-id}";
+    private static final String DRAFT_CLAIM_PAYMENT_RETENTION_URL =
+        "/dashboard/draft-claims/{draft-id}/payment-retention";
     private static final String ACTIVE_DRAFT_CLAIM_URL = "/dashboard/draft-claims/active";
     private static final String DRAFT_CLAIM_BY_CASE_URL = "/dashboard/draft-claims/case/{case-id}";
     private static final String USER_ID = "user1";
     private static final Map<String, Object> PAYLOAD = Map.of("step", "claimant-details");
     private static final DraftType DRAFT_TYPE = DraftType.DRAFT_CLAIM;
     private static final long RETENTION_DAYS = 30L;
+    private static final long PAYMENT_RETENTION_DAYS = DRAFT_TYPE.getPaymentRetentionDays();
 
     @Autowired
     private DraftStoreRepository draftStoreRepository;
@@ -120,7 +126,9 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
 
         assertThat(draftInDb.getPayload()).extracting("step").isEqualTo("claimant-details");
         assertThat(draftInDb.getUserId()).isEqualTo(USER_ID);
-        assertThat(draftInDb.getExpiresAt()).isEqualTo(draftInDb.getCreatedAt().plusDays(RETENTION_DAYS));
+        assertThat(draftInDb.getExpiresAt()).isEqualTo(
+            DraftStoreService.calculateExpiresAt(draftInDb.getCreatedAt(), RETENTION_DAYS)
+        );
     }
 
     @Test
@@ -435,7 +443,9 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
 
         DraftStoreEntity newDraft = draftStoreRepository.findById(newDraftId)
             .orElseThrow(() -> new AssertionError("New draft claim should exist in DB"));
-        assertThat(newDraft.getExpiresAt()).isEqualTo(newDraft.getCreatedAt().plusDays(RETENTION_DAYS));
+        assertThat(newDraft.getExpiresAt()).isEqualTo(
+            DraftStoreService.calculateExpiresAt(newDraft.getCreatedAt(), RETENTION_DAYS)
+        );
     }
 
     @Test
@@ -475,9 +485,12 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void shouldCalculateExpiryFromPayloadTtlWhenDraftIsCreated() throws Exception {
+    void shouldCalculateExpiryFromDraftTypeRetentionWhenDraftIsCreated() throws Exception {
         draftStoreRepository.deleteAll();
-        Map<String, Object> payload = Map.of("step", "claimant-details", "draftClaimCacheTtlDays", 14);
+        Map<String, Object> payload = Map.of(
+            "step", "claimant-details",
+            "draftClaimCacheTtlDays", RETENTION_DAYS
+        );
 
         MvcResult result = doPost(BEARER_TOKEN, new DraftClaimRequest(null, payload), DRAFT_CLAIMS_URL)
             .andExpect(status().isCreated())
@@ -488,7 +501,46 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
             .orElseThrow(() -> new AssertionError("Draft claim should be persisted in database"));
 
         assertThat(draftInDb.getDraftType()).isEqualTo(DRAFT_TYPE);
-        assertThat(draftInDb.getExpiresAt()).isEqualTo(draftInDb.getCreatedAt().plusDays(14));
+        assertThat(((Number) draftInDb.getPayload().get("draftClaimCacheTtlDays")).longValue())
+            .isEqualTo(RETENTION_DAYS);
+        assertThat(draftInDb.getExpiresAt()).isEqualTo(
+            DraftStoreService.calculateExpiresAt(draftInDb.getCreatedAt(), RETENTION_DAYS)
+        );
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {1L, 14L, 9999L})
+    void shouldRejectOutOfPolicyPayloadTtlWhenDraftIsCreated(long payloadTtlDays) throws Exception {
+        draftStoreRepository.deleteAll();
+        Map<String, Object> payload = Map.of(
+            "step", "claimant-details",
+            "draftClaimCacheTtlDays", payloadTtlDays
+        );
+
+        doPost(BEARER_TOKEN, new DraftClaimRequest(null, payload), DRAFT_CLAIMS_URL)
+            .andExpect(status().isBadRequest());
+
+        assertThat(draftStoreRepository.count()).isZero();
+    }
+
+    @Test
+    void shouldShortenExpiryToPaymentRetentionWhenRequested() throws Exception {
+        DraftStoreEntity before = draftStoreRepository.findById(draftId)
+            .orElseThrow(() -> new AssertionError("Draft claim should exist in DB"));
+        OffsetDateTime originalExpiry = before.getExpiresAt();
+
+        MvcResult result = doPut(BEARER_TOKEN, null, DRAFT_CLAIM_PAYMENT_RETENTION_URL, draftId)
+            .andExpect(status().isOk())
+            .andReturn();
+
+        DraftStoreEntity after = draftStoreRepository.findById(draftId)
+            .orElseThrow(() -> new AssertionError("Draft claim should still exist in DB"));
+        assertThat(after.getExpiresAt()).isBefore(originalExpiry);
+        assertThat(after.getExpiresAt()).isEqualTo(
+            DraftStoreService.calculateExpiresAt(after.getUpdatedAt(), PAYMENT_RETENTION_DAYS)
+        );
+        assertThat(JsonPath.<String>read(result.getResponse().getContentAsString(), "$.expiresAt"))
+            .isNotBlank();
     }
 
     private ResultActions doDraftPut(String authorisation, DraftClaimRequest request, UUID draftClaimId)

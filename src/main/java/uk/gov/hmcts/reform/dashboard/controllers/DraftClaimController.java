@@ -104,6 +104,18 @@ public class DraftClaimController {
         return ResponseEntity.ok(DraftClaimResponse.from(draftClaim));
     }
 
+    @PutMapping("/{draft-id}/payment-retention")
+    public ResponseEntity<DraftClaimResponse> applyPaymentRetention(
+        @PathVariable("draft-id") UUID draftId,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+    ) {
+        DraftStoreEntity draftClaim = draftClaimService.applyPaymentRetention(
+            draftId,
+            getUserId(authorisation)
+        );
+        return ResponseEntity.ok(DraftClaimResponse.from(draftClaim));
+    }
+
     @DeleteMapping("/{draft-id}")
     public ResponseEntity<Void> deleteDraftClaim(
         @PathVariable("draft-id") UUID draftId,
