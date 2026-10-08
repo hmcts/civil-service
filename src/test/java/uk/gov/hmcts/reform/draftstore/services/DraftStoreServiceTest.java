@@ -15,7 +15,9 @@ import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
 
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -71,7 +73,9 @@ class DraftStoreServiceTest {
             assertThat(savedDraft.getPayload()).isEqualTo(payload).isNotSameAs(payload);
             assertThat(savedDraft.getCreatedAt()).isNotNull();
             assertThat(savedDraft.getUpdatedAt()).isEqualTo(savedDraft.getCreatedAt());
-            assertThat(savedDraft.getExpiresAt()).isEqualTo(savedDraft.getCreatedAt().plusDays(14));
+            assertThat(savedDraft.getExpiresAt()).isEqualTo(
+                DraftStoreService.calculateExpiresAt(savedDraft.getCreatedAt(), 14)
+            );
         }
 
         @ParameterizedTest
@@ -83,7 +87,9 @@ class DraftStoreServiceTest {
 
             DraftStoreEntity result = draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE);
 
-            assertThat(result.getExpiresAt()).isEqualTo(result.getCreatedAt().plusDays(expectedDays));
+            assertThat(result.getExpiresAt()).isEqualTo(
+                DraftStoreService.calculateExpiresAt(result.getCreatedAt(), expectedDays)
+            );
         }
 
         @ParameterizedTest
@@ -94,7 +100,9 @@ class DraftStoreServiceTest {
 
             DraftStoreEntity result = draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE);
 
-            assertThat(result.getExpiresAt()).isEqualTo(result.getCreatedAt().plusDays(30));
+            assertThat(result.getExpiresAt()).isEqualTo(
+                DraftStoreService.calculateExpiresAt(result.getCreatedAt(), 30)
+            );
         }
 
         @Test
@@ -134,6 +142,50 @@ class DraftStoreServiceTest {
                 .withMessage("draftType must not be null");
 
             verifyNoInteractions(draftStoreRepository);
+        }
+    }
+
+    @Nested
+    class CalculateExpiresAtTests {
+
+        private static final ZoneId LONDON = ZoneId.of("Europe/London");
+
+        @Test
+        void shouldExpireAtLondonStartOfDayAfterTtlPlusOneDay() {
+            // 12:00 BST on 1 Oct 2026
+            OffsetDateTime createdAt = OffsetDateTime.parse("2026-10-01T11:00:00Z");
+
+            OffsetDateTime expiresAt = DraftStoreService.calculateExpiresAt(createdAt, 30);
+
+            // Displayed deadline day is 31 Oct; access until end of that day → 1 Nov 00:00 London (GMT)
+            assertThat(expiresAt).isEqualTo(OffsetDateTime.parse("2026-11-01T00:00:00Z"));
+            assertThat(expiresAt.atZoneSameInstant(LONDON).toLocalTime()).isEqualTo(LocalTime.MIDNIGHT);
+        }
+
+        @Test
+        void shouldExpireAtLondonMidnightAcrossSpringDstTransition() {
+            // UK clocks go forward on 29 Mar 2026; creation still on GMT
+            OffsetDateTime createdAt = OffsetDateTime.parse("2026-03-28T12:00:00Z");
+
+            OffsetDateTime expiresAt = DraftStoreService.calculateExpiresAt(createdAt, 1);
+
+            // 28 Mar + 2 days = 30 Mar 00:00 Europe/London (BST, UTC+1)
+            assertThat(expiresAt.atZoneSameInstant(LONDON).toLocalDate().toString()).isEqualTo("2026-03-30");
+            assertThat(expiresAt.atZoneSameInstant(LONDON).toLocalTime()).isEqualTo(LocalTime.MIDNIGHT);
+            assertThat(expiresAt).isEqualTo(OffsetDateTime.parse("2026-03-29T23:00:00Z"));
+        }
+
+        @Test
+        void shouldExpireAtLondonMidnightAcrossAutumnDstTransition() {
+            // UK clocks go back on 25 Oct 2026
+            OffsetDateTime createdAt = OffsetDateTime.parse("2026-10-24T12:00:00+01:00");
+
+            OffsetDateTime expiresAt = DraftStoreService.calculateExpiresAt(createdAt, 1);
+
+            // 24 Oct + 2 days = 26 Oct 00:00 Europe/London (GMT)
+            assertThat(expiresAt.atZoneSameInstant(LONDON).toLocalDate().toString()).isEqualTo("2026-10-26");
+            assertThat(expiresAt.atZoneSameInstant(LONDON).toLocalTime()).isEqualTo(LocalTime.MIDNIGHT);
+            assertThat(expiresAt).isEqualTo(OffsetDateTime.parse("2026-10-26T00:00:00Z"));
         }
     }
 
