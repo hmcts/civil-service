@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 @Component
-public class OnGoingBusinessProcessCheck implements SchedulerInterceptor<CaseDetails> {
+public class OnGoingBusinessProcessCheck implements DefaultSchedulerInterceptor<CaseDetails> {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
