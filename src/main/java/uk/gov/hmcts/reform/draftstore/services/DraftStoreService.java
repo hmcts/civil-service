@@ -7,8 +7,7 @@ import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -22,6 +21,7 @@ public class DraftStoreService {
 
     private static final String USER_ID_NOT_NULL = "userId must not be null";
     private static final String DRAFT_TYPE_NOT_NULL = "draftType must not be null";
+    private static final ZoneId EXPIRY_ZONE = ZoneId.of("Europe/London");
     static final String TTL_DAYS_FIELD = "draftClaimCacheTtlDays";
     static final long DEFAULT_TTL_DAYS = 30L;
 
@@ -51,7 +51,7 @@ public class DraftStoreService {
             payloadCopy,
             now,
             now,
-            now.plusDays(resolveTtlDays(payloadCopy))
+            calculateExpiresAt(now, resolveTtlDays(payloadCopy))
         );
         return draftStoreTransactionService.saveInNewTransaction(draft);
     }
@@ -163,5 +163,13 @@ public class DraftStoreService {
 
     private Map<String, Object> copyPayload(Map<String, Object> payload) {
         return new HashMap<>(Objects.requireNonNull(payload, "payload must not be null"));
+    }
+
+    static OffsetDateTime calculateExpiresAt(OffsetDateTime createdAt, long ttlDays) {
+        LocalDate expiryDate = createdAt
+            .atZoneSameInstant(EXPIRY_ZONE)
+            .toLocalDate()
+            .plusDays(ttlDays + 1);
+        return expiryDate.atStartOfDay(EXPIRY_ZONE).toOffsetDateTime();
     }
 }
