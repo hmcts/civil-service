@@ -1,13 +1,18 @@
 package uk.gov.hmcts.reform.draftstore.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
 
-import java.time.*;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -23,7 +28,6 @@ public class DraftStoreService {
     private static final String DRAFT_TYPE_NOT_NULL = "draftType must not be null";
     private static final ZoneId EXPIRY_ZONE = ZoneId.of("Europe/London");
     static final String TTL_DAYS_FIELD = "draftClaimCacheTtlDays";
-    static final long DEFAULT_TTL_DAYS = 30L;
 
     private final DraftStoreRepository draftStoreRepository;
     private final DraftStoreTransactionService draftStoreTransactionService;
@@ -41,7 +45,9 @@ public class DraftStoreService {
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
         Map<String, Object> payloadCopy = copyPayload(payload);
+        validatePayloadRetention(payloadCopy, draftType);
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
+        long retentionDays = draftType.getRetentionDays();
 
         DraftStoreEntity draft = new DraftStoreEntity(
             UUID.randomUUID(),
@@ -51,7 +57,7 @@ public class DraftStoreService {
             payloadCopy,
             now,
             now,
-            calculateExpiresAt(now, resolveTtlDays(payloadCopy))
+            calculateExpiresAt(now, retentionDays)
         );
         return draftStoreTransactionService.saveInNewTransaction(draft);
     }
@@ -105,8 +111,36 @@ public class DraftStoreService {
                                                   String caseId,
                                                   Map<String, Object> payload,
                                                   DraftType draftType) {
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
         return getDraft(draftId, userId, draftType)
-            .map(existingDraft -> applyDraftUpdate(existingDraft, caseId, payload));
+            .map(existingDraft -> {
+                validatePayloadRetention(payload, draftType);
+                return applyDraftUpdate(existingDraft, caseId, payload);
+            });
+    }
+
+    public Optional<DraftStoreEntity> applyPaymentRetention(UUID draftId, String userId, DraftType draftType) {
+        Objects.requireNonNull(draftId, "draftId must not be null");
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
+
+        return getDraft(draftId, userId, draftType).map(draft -> {
+            OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
+            OffsetDateTime paymentExpiresAt = calculateExpiresAt(now, draftType.getPaymentRetentionDays());
+            if (!paymentExpiresAt.isBefore(draft.getExpiresAt())) {
+                return draft;
+            }
+            draftStoreTransactionService.updateExpiresAtInNewTransaction(
+                draftId,
+                userId,
+                draftType,
+                paymentExpiresAt,
+                now
+            );
+            draft.setExpiresAt(paymentExpiresAt);
+            draft.setUpdatedAt(now);
+            return draft;
+        });
     }
 
     public boolean deleteDraft(UUID draftId, String userId, DraftType draftType) {
@@ -136,15 +170,24 @@ public class DraftStoreService {
         return draftStoreTransactionService.saveInNewTransaction(existingDraft);
     }
 
-    private long resolveTtlDays(Map<String, Object> payload) {
+    private Map<String, Object> copyPayload(Map<String, Object> payload) {
+        return new HashMap<>(Objects.requireNonNull(payload, "payload must not be null"));
+    }
+
+    private static void validatePayloadRetention(Map<String, Object> payload, DraftType draftType) {
+        Objects.requireNonNull(payload, "payload must not be null");
+        if (!payload.containsKey(TTL_DAYS_FIELD)) {
+            return;
+        }
         Object value = payload.get(TTL_DAYS_FIELD);
         Long ttlDays = parseTtlDays(value);
-        if (ttlDays == null || ttlDays <= 0) {
-            log.warn("Missing or invalid {} in draft payload (value={}), defaulting to {} days",
-                     TTL_DAYS_FIELD, value, DEFAULT_TTL_DAYS);
-            return DEFAULT_TTL_DAYS;
+        long expectedDays = draftType.getRetentionDays();
+        if (ttlDays == null || ttlDays != expectedDays) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                TTL_DAYS_FIELD + " must be " + expectedDays + " for draft type " + draftType
+            );
         }
-        return ttlDays;
     }
 
     private static Long parseTtlDays(Object value) {
@@ -161,11 +204,7 @@ public class DraftStoreService {
         return null;
     }
 
-    private Map<String, Object> copyPayload(Map<String, Object> payload) {
-        return new HashMap<>(Objects.requireNonNull(payload, "payload must not be null"));
-    }
-
-    static OffsetDateTime calculateExpiresAt(OffsetDateTime createdAt, long ttlDays) {
+    public static OffsetDateTime calculateExpiresAt(OffsetDateTime createdAt, long ttlDays) {
         LocalDate expiryDate = createdAt
             .atZoneSameInstant(EXPIRY_ZONE)
             .toLocalDate()

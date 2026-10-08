@@ -49,4 +49,18 @@ public interface DraftStoreRepository extends JpaRepository<DraftStoreEntity, UU
     @Modifying
     @Query("DELETE FROM DraftStoreEntity d WHERE d.id IN :ids")
     int deleteByIds(@Param("ids") List<UUID> ids);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        UPDATE DraftStoreEntity d
+        SET d.expiresAt = :expiresAt, d.updatedAt = :updatedAt
+        WHERE d.id = :id AND d.userId = :userId AND d.draftType = :draftType
+        """)
+    int updateExpiresAt(
+        @Param("id") UUID id,
+        @Param("userId") String userId,
+        @Param("draftType") DraftType draftType,
+        @Param("expiresAt") OffsetDateTime expiresAt,
+        @Param("updatedAt") OffsetDateTime updatedAt
+    );
 }

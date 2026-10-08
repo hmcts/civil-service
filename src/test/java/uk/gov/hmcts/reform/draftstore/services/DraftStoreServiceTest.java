@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
@@ -32,6 +33,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @ExtendWith(MockitoExtension.class)
 class DraftStoreServiceTest {
@@ -41,6 +43,7 @@ class DraftStoreServiceTest {
     private static final String NEW_CASE_ID = "ccd2";
     private static final UUID DRAFT_ID = UUID.randomUUID();
     private static final DraftType DRAFT_TYPE = DraftType.DRAFT_CLAIM;
+    private static final long RETENTION_DAYS = DRAFT_TYPE.getRetentionDays();
 
     @Mock
     private DraftStoreRepository draftStoreRepository;
@@ -55,8 +58,11 @@ class DraftStoreServiceTest {
     class CreateDraftTests {
 
         @Test
-        void shouldCreateDraftWithExpiryWhenRequestIsValid() {
-            Map<String, Object> payload = new HashMap<>(Map.of("step", "claimant-details", "draftClaimCacheTtlDays", 14L));
+        void shouldCreateDraftWithExpiryFromDraftTypeRetention() {
+            Map<String, Object> payload = new HashMap<>(Map.of(
+                "step", "claimant-details",
+                "draftClaimCacheTtlDays", RETENTION_DAYS
+            ));
             when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -74,35 +80,40 @@ class DraftStoreServiceTest {
             assertThat(savedDraft.getCreatedAt()).isNotNull();
             assertThat(savedDraft.getUpdatedAt()).isEqualTo(savedDraft.getCreatedAt());
             assertThat(savedDraft.getExpiresAt()).isEqualTo(
-                DraftStoreService.calculateExpiresAt(savedDraft.getCreatedAt(), 14)
+                DraftStoreService.calculateExpiresAt(savedDraft.getCreatedAt(), RETENTION_DAYS)
             );
         }
 
-        @ParameterizedTest
-        @MethodSource("uk.gov.hmcts.reform.draftstore.services.DraftStoreServiceTest#validTtlValues")
-        void shouldCalculateExpiryFromPayloadTtl(Object ttlValue, long expectedDays) {
-            Map<String, Object> payload = new HashMap<>(Map.of("draftClaimCacheTtlDays", ttlValue));
+        @Test
+        void shouldCreateDraftWhenPayloadOmitsTtlField() {
+            Map<String, Object> payload = new HashMap<>(Map.of("step", "claimant-details"));
             when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
             DraftStoreEntity result = draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE);
 
             assertThat(result.getExpiresAt()).isEqualTo(
-                DraftStoreService.calculateExpiresAt(result.getCreatedAt(), expectedDays)
+                DraftStoreService.calculateExpiresAt(result.getCreatedAt(), RETENTION_DAYS)
             );
         }
 
         @ParameterizedTest
-        @MethodSource("uk.gov.hmcts.reform.draftstore.services.DraftStoreServiceTest#invalidTtlValues")
-        void shouldDefaultExpiryTo30DaysWhenPayloadTtlIsMissingOrInvalid(Map<String, Object> payload) {
-            when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+        @MethodSource("uk.gov.hmcts.reform.draftstore.services.DraftStoreServiceTest#outOfPolicyPayloadTtlValues")
+        void shouldRejectOutOfPolicyPayloadDraftClaimCacheTtlDays(Object payloadTtl) {
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("step", "claimant-details");
+            payload.put("draftClaimCacheTtlDays", payloadTtl);
 
-            DraftStoreEntity result = draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE);
+            assertThatThrownBy(() -> draftStoreService.createDraft(USER_ID, CASE_ID, payload, DRAFT_TYPE))
+                .isInstanceOf(ResponseStatusException.class)
+                .satisfies(ex -> {
+                    ResponseStatusException statusEx = (ResponseStatusException) ex;
+                    assertThat(statusEx.getStatusCode()).isEqualTo(BAD_REQUEST);
+                    assertThat(statusEx.getReason()).contains("draftClaimCacheTtlDays must be " + RETENTION_DAYS);
+                });
 
-            assertThat(result.getExpiresAt()).isEqualTo(
-                DraftStoreService.calculateExpiresAt(result.getCreatedAt(), 30)
-            );
+            verifyNoInteractions(draftStoreTransactionService);
+            verifyNoInteractions(draftStoreRepository);
         }
 
         @Test
@@ -258,6 +269,103 @@ class DraftStoreServiceTest {
     }
 
     @Nested
+    class ApplyPaymentRetentionTests {
+
+        @Test
+        void shouldShortenExpiryToPaymentRetentionWhenDraftExists() {
+            DraftStoreEntity existingDraft = draft();
+            OffsetDateTime originalExpiry = existingDraft.getExpiresAt();
+            when(draftStoreRepository.findByIdAndUserIdAndDraftTypeAndExpiresAtAfter(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                any(OffsetDateTime.class)
+            )).thenReturn(Optional.of(existingDraft));
+            when(draftStoreTransactionService.updateExpiresAtInNewTransaction(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                any(OffsetDateTime.class),
+                any(OffsetDateTime.class)
+            )).thenReturn(1);
+
+            Optional<DraftStoreEntity> result = draftStoreService.applyPaymentRetention(
+                DRAFT_ID,
+                USER_ID,
+                DRAFT_TYPE
+            );
+
+            assertThat(result).isPresent();
+            assertThat(result.get().getExpiresAt()).isBefore(originalExpiry);
+            assertThat(result.get().getExpiresAt()).isEqualTo(
+                DraftStoreService.calculateExpiresAt(
+                    result.get().getUpdatedAt(),
+                    DRAFT_TYPE.getPaymentRetentionDays()
+                )
+            );
+            verify(draftStoreTransactionService).updateExpiresAtInNewTransaction(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                eq(result.get().getExpiresAt()),
+                eq(result.get().getUpdatedAt())
+            );
+        }
+
+        @Test
+        void shouldNotExtendExpiryWhenPaymentWindowIsLaterThanCurrentExpiry() {
+            OffsetDateTime createdAt = OffsetDateTime.now(java.time.ZoneOffset.UTC).minusDays(1);
+            // Still active, but ends sooner than the 7-day payment window from now
+            OffsetDateTime soonExpiry = OffsetDateTime.now(java.time.ZoneOffset.UTC).plusDays(2);
+            DraftStoreEntity existingDraft = new DraftStoreEntity(
+                DRAFT_ID,
+                USER_ID,
+                CASE_ID,
+                DRAFT_TYPE,
+                new HashMap<>(Map.of("step", "existing")),
+                createdAt,
+                createdAt,
+                soonExpiry
+            );
+            when(draftStoreRepository.findByIdAndUserIdAndDraftTypeAndExpiresAtAfter(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                any(OffsetDateTime.class)
+            )).thenReturn(Optional.of(existingDraft));
+
+            Optional<DraftStoreEntity> result = draftStoreService.applyPaymentRetention(
+                DRAFT_ID,
+                USER_ID,
+                DRAFT_TYPE
+            );
+
+            assertThat(result).contains(existingDraft);
+            assertThat(existingDraft.getExpiresAt()).isEqualTo(soonExpiry);
+            verifyNoInteractions(draftStoreTransactionService);
+        }
+
+        @Test
+        void shouldReturnEmptyWhenDraftMissing() {
+            when(draftStoreRepository.findByIdAndUserIdAndDraftTypeAndExpiresAtAfter(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                any(OffsetDateTime.class)
+            )).thenReturn(Optional.empty());
+
+            Optional<DraftStoreEntity> result = draftStoreService.applyPaymentRetention(
+                DRAFT_ID,
+                USER_ID,
+                DRAFT_TYPE
+            );
+
+            assertThat(result).isEmpty();
+            verifyNoInteractions(draftStoreTransactionService);
+        }
+    }
+
+    @Nested
     class UpdateDraftTests {
 
         @Test
@@ -380,23 +488,15 @@ class DraftStoreServiceTest {
         }
     }
 
-    static Stream<Arguments> validTtlValues() {
+    static Stream<Arguments> outOfPolicyPayloadTtlValues() {
         return Stream.of(
-            Arguments.of(7L, 7L),
-            Arguments.of(28, 28L),
-            Arguments.of("60", 60L)
-        );
-    }
-
-    static Stream<Arguments> invalidTtlValues() {
-        Map<String, Object> nullTtl = new HashMap<>();
-        nullTtl.put("draftClaimCacheTtlDays", null);
-        return Stream.of(
-            Arguments.of(new HashMap<>(Map.of("step", "no-ttl"))),
-            Arguments.of(nullTtl),
-            Arguments.of(new HashMap<>(Map.of("draftClaimCacheTtlDays", 0L))),
-            Arguments.of(new HashMap<>(Map.of("draftClaimCacheTtlDays", -5L))),
-            Arguments.of(new HashMap<>(Map.of("draftClaimCacheTtlDays", "not-a-number")))
+            Arguments.of(1L),
+            Arguments.of(14),
+            Arguments.of(9999L),
+            Arguments.of("60"),
+            Arguments.of("not-a-number"),
+            Arguments.of(0L),
+            Arguments.of(-5L)
         );
     }
 
