@@ -63,7 +63,7 @@ public class HearingNoticeSchedulerEventHandler {
         try {
             processHearing(hearingId);
         } catch (Exception e) {
-            log.error("Processing hearingId [{}] failed due to error: {}", hearingId, e.getMessage());
+            log.error("Processing hearingId [{}] failed due to error: {}", hearingId, e.getMessage(), e);
         }
     }
 
