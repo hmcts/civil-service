@@ -256,6 +256,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         }
     }
 
+    @Override
     public Document getDocumentMetaData(String authorisation, String documentPath) {
         log.info("Getting metadata for file {}", documentPath);
 
