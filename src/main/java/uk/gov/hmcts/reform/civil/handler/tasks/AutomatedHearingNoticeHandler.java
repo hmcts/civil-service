@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
-import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
@@ -14,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingResponse;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
@@ -31,7 +31,7 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
     private final UserService userService;
     private final SystemUpdateUserConfiguration userConfig;
     private final HearingsService hearingsService;
-    private final RuntimeService runtimeService;
+    private final CamundaRuntimeClient camundaRuntimeClient;
     private final ObjectMapper mapper;
     private final FeatureToggleService featureToggleService;
 
@@ -43,7 +43,7 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
         UserService userService,
         SystemUpdateUserConfiguration userConfig,
         HearingsService hearingsService,
-        RuntimeService runtimeService,
+        CamundaRuntimeClient camundaRuntimeClient,
         ObjectMapper mapper,
         ApplicationEventPublisher applicationEventPublisher,
         FeatureToggleService featureToggleService
@@ -52,7 +52,7 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
         this.userService = userService;
         this.userConfig = userConfig;
         this.hearingsService = hearingsService;
-        this.runtimeService = runtimeService;
+        this.camundaRuntimeClient = camundaRuntimeClient;
         this.mapper = mapper;
         this.applicationEventPublisher = applicationEventPublisher;
         this.featureToggleService = featureToggleService;
@@ -79,7 +79,7 @@ public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
                 throttle(unnotifiedHearings.getTotalFound());
             });
 
-        runtimeService.setVariables(
+        camundaRuntimeClient.setProcessVariables(
             externalTask.getProcessInstanceId(),
             new HearingNoticeSchedulerVars()
                 .setDispatchedHearingIds(dispatchedHearingIds)

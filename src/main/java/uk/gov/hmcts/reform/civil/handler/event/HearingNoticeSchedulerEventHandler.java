@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.event;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -16,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.InvalidHearingNoticeProcessed;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.InvalidHearingNoticeService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 import uk.gov.hmcts.reform.civil.utils.HmcDataUtils;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
@@ -45,7 +45,7 @@ public class HearingNoticeSchedulerEventHandler {
     private final UserService userService;
     private final SystemUpdateUserConfiguration userConfig;
     private final HearingsService hearingsService;
-    private final RuntimeService runtimeService;
+    private final CamundaRuntimeClient camundaRuntimeClient;
     private final ObjectMapper mapper;
     private final CoreCaseDataService coreCaseDataService;
     private final InvalidHearingNoticeService invalidHearingNoticeService;
@@ -178,10 +178,8 @@ public class HearingNoticeSchedulerEventHandler {
 
     private void triggerHearingNoticeEvent(HearingNoticeMessageVars messageVars) {
         String hearingNoticeMessage = "NOTIFY_HEARING_PARTIES";
-        runtimeService
-            .createMessageCorrelation(hearingNoticeMessage)
-            .setVariables(messageVars.toMap(mapper))
-            .correlateStartMessage();
+        camundaRuntimeClient.correlateStartMessage(
+            hearingNoticeMessage, null, messageVars.toMap(mapper));
     }
 
     private UserAuthContent getSystemUpdateUser() {
