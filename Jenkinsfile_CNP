@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@2.9.0")
+@Library("Infrastructure@2.12.1")
 
 import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
@@ -508,7 +508,9 @@ def runStagingHighLevelDataSetup() {
     'CCD_DEF_CASE_SERVICE_BASE_URL=http://civil-service-staging-java',
     'CCD_DEF_GEN_APP_SERVICE_BASE_URL=http://civil-service-staging-java'
   ]) {
-    sh './gradlew --rerun-tasks highLevelDataSetup --args=aat'
+    // Keep the staging import on the same Maven mirror as the normal HLD stage.
+    new uk.gov.hmcts.contino.GradleBuilder(this, 'civil')
+      .gradle('--rerun-tasks highLevelDataSetup --args=aat')
   }
 }
 
