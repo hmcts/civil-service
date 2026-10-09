@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.civil.ga.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -96,13 +99,15 @@ public class StateGeneratorServiceTest {
         assertThat(caseState).isEqualTo(AWAITING_WRITTEN_REPRESENTATIONS);
     }
 
-    @Test
-    public void shouldReturn_Awaiting_Directions_Order_Docs_WhenMakeOrderSelectedAndTextProvided() {
+    @ParameterizedTest
+    @ValueSource(ints = {-1, 0, 7})
+    void shouldAwaitDirectionsWhenReferralDateIsProvided(int daysFromToday) {
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .judicialDecision(new GAJudicialDecision(MAKE_AN_ORDER))
             .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                            .setDirectionsText("test")
+                                           .setDirectionsResponseByDate(LocalDate.now().plusDays(daysFromToday))
                                            .setMakeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING))
             .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YesOrNo.YES))
@@ -113,6 +118,35 @@ public class StateGeneratorServiceTest {
         CaseState caseState = stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData);
 
         assertThat(caseState).isEqualTo(AWAITING_DIRECTIONS_ORDER_DOCS);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CaseState.class, names = {
+        "APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION", "AWAITING_DIRECTIONS_ORDER_DOCS"
+    })
+    void shouldReturnOrderMadeWhenDirectionsHaveNoReferralDate(CaseState initialState) {
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .ccdState(initialState)
+            .judicialDecision(new GAJudicialDecision(MAKE_AN_ORDER))
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                .setMakeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING)
+                .setDirectionsText("Directions without further referral"))
+            .build();
+
+        assertThat(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData)).isEqualTo(ORDER_MADE);
+    }
+
+    @Test
+    void shouldReturnOrderMadeWhenFinalOrderReplacesDatedDirections() {
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .ccdState(AWAITING_DIRECTIONS_ORDER_DOCS)
+            .judicialDecision(new GAJudicialDecision(FREE_FORM_ORDER))
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                .setMakeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING)
+                .setDirectionsResponseByDate(LocalDate.now().plusDays(7)))
+            .build();
+
+        assertThat(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData)).isEqualTo(ORDER_MADE);
     }
 
     @Test
@@ -227,6 +261,7 @@ public class StateGeneratorServiceTest {
             .judicialDecision(new GAJudicialDecision(MAKE_AN_ORDER))
             .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                            .setDirectionsText("test")
+                                           .setDirectionsResponseByDate(LocalDate.now().plusDays(7))
                                            .setMakeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING))
             .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YesOrNo.NO))
             .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.NO))
