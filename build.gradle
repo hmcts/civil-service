@@ -28,7 +28,7 @@ def versions = [
   springStatemachine: '4.0.2',
   lombok            : '1.18.38',
   camunda           : '7.24.0',
-  camundaRestClient : '2026.04.2',
+  swaggerAnnotations: '2.2.48',
   testcontainers    : '1.21.4',
   assertj           : '3.27.7',
   azureCore         : '1.59.1',
@@ -568,7 +568,10 @@ dependencies {
 
   implementation "org.springframework.boot:spring-boot-starter-data-jpa"
   implementation "jakarta.inject:jakarta.inject-api:2.0.1"
-  implementation "io.swagger.core.v3:swagger-annotations"
+  // Version was supplied transitively by io.holunda.c7:c7-rest-client-spring-boot-openapi,
+  // removed in DTSCCI-6513. Pinned to the version that resolved before the removal so the
+  // removal stays a no-op for this dependency.
+  implementation "io.swagger.core.v3:swagger-annotations:${versions.swaggerAnnotations}"
   implementation "org.springframework.data:spring-data-jpa"
   implementation "org.springframework.boot:spring-boot-starter-web"
   implementation "org.springframework.boot:spring-boot-starter-actuator"
@@ -625,7 +628,6 @@ dependencies {
   implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
   implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv"
   implementation "org.camunda.bpm:camunda-external-task-client:${versions.camunda}"
-  implementation "io.holunda.c7:c7-rest-client-spring-boot-starter-provided:${versions.camundaRestClient}"
   implementation "org.camunda.bpm:camunda-engine:${versions.camunda}"
   implementation "org.apiguardian:apiguardian-api:1.1.2"
   implementation "jakarta.xml.bind:jakarta.xml.bind-api:4.0.5"

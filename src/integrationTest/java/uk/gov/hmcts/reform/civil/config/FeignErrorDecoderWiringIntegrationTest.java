@@ -35,11 +35,12 @@ import static org.mockito.Mockito.verify;
  *       it, {@code ErrorDecoderTelemetryAspect} never fires and
  *       {@code httpclient.feign.error.classified} is never emitted. Nothing fails; the events
  *       simply never arrive, which reads as "no errors occurred".</li>
- *   <li><b>Two.</b> Holunda's {@code FeignErrorDecoderConfiguration} contributes one unless
- *       {@code camunda.rest.client.error-decoding.enabled} is false, and its condition is
- *       {@code matchIfMissing = true}. If that property is lost while the dependency is still on
- *       the classpath, the external-task retry classification silently reverts to wrapping 400 and
- *       500 in {@code RemoteProcessEngineException}.</li>
+ *   <li><b>Two.</b> Holunda's {@code FeignErrorDecoderConfiguration} used to contribute one, held
+ *       off only by {@code camunda.rest.client.error-decoding.enabled} being false against a
+ *       {@code matchIfMissing = true} condition. DTSCCI-6513 removed that dependency and the
+ *       property with it, so that particular source is gone. This assertion stays because the
+ *       failure mode does not depend on Holunda: any starter contributing a second decoder would
+ *       silently take over the retry classification, and nothing else would report it.</li>
  * </ul>
  *
  * @see HttpClientFeignConfiguration#feignErrorDecoder()
