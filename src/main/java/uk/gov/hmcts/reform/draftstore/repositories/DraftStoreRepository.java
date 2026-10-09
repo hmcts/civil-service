@@ -47,7 +47,7 @@ public interface DraftStoreRepository extends JpaRepository<DraftStoreEntity, UU
         DraftType draftType
     );
 
-    @Modifying(clearAutomatically = true)
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
         UPDATE DraftStoreEntity d
         SET d.expiresAt = :expiresAt, d.updatedAt = :updatedAt
