@@ -278,7 +278,7 @@ def checkForCcdDefinitionBranchLabel() {
   for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "civilDefinitionBranch:")) {
     return label.minus("civilDefinitionBranch:").trim()
   }
-  return "master"
+  return "DTSCCI-5483"
 }
 
 def checkForCamundaDefinitionBranchLabel() {
