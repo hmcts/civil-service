@@ -786,6 +786,9 @@ async:
     clientBackoffFactor: ${EVENT_CLIENT_BACKOFF_FACTOR:2}
     clientBackoffMax: ${EVENT_CLIENT_BACKOFF_MAX:60000}
     httpValidateAfterInactivityMs: ${EVENT_HTTP_VALIDATE_AFTER_INACTIVITY_MS:2000}
+    caseDrivenClients: ${EVENT_CASE_DRIVEN_CLIENTS:2}
+    caseDrivenMaxTasks: ${EVENT_CASE_DRIVEN_MAX_TASKS:10}
+    schedulerMaxTasks: ${EVENT_SCHEDULER_MAX_TASKS:1}
 
 feign:
   client:
