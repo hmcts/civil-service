@@ -1,12 +1,24 @@
 package uk.gov.hmcts.reform.civil.handler.event;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.ThrowableProxy;
+import ch.qos.logback.classic.spi.ThrowableProxyUtil;
+import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import feign.Request;
+import feign.codec.DecodeException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.slf4j.LoggerFactory;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
@@ -17,6 +29,7 @@ import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeSchedulerV
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
+import uk.gov.hmcts.reform.hmc.exception.HmcException;
 import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
@@ -39,6 +52,7 @@ import java.util.List;
 
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -168,14 +182,15 @@ class HearingNoticeSchedulerEventHandlerTest {
         verify(camundaRuntimeClient, times(1)).correlateStartMessage(MESSAGE_ID, null, expectedVars);
     }
 
-    @Test
-    void shouldNotDispatchCamundaMessage_whenHearingIsNotInListedStatus() {
+    @ParameterizedTest
+    @EnumSource(value = ListAssistCaseStatus.class, names = "LISTED", mode = EnumSource.Mode.EXCLUDE)
+    void shouldNotDispatchCamundaMessage_whenHearingIsNotInListedStatus(ListAssistCaseStatus hearingStatus) {
         HearingNoticeSchedulerVars hearingNoticeSchedulerVars = new HearingNoticeSchedulerVars();
         hearingNoticeSchedulerVars.setServiceId(SERVICE_ID);
         hearingNoticeSchedulerVars.setDispatchedHearingIds(List.of());
         when(mapper.convertValue(any(), eq(HearingNoticeSchedulerVars.class))).thenReturn(hearingNoticeSchedulerVars);
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
-            createHearing(ListAssistCaseStatus.CASE_CLOSED));
+            createHearing(hearingStatus));
         when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
             new PartiesNotifiedResponses().setResponses(List.of()));
 
@@ -191,6 +206,74 @@ class HearingNoticeSchedulerEventHandlerTest {
                     .setServiceData(new PartiesNotifiedServiceData().setHearingNoticeGenerated(false))
             );
         verify(camundaRuntimeClient, times(0)).correlateStartMessage(eq(MESSAGE_ID), any(), any());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ListAssistCaseStatus.class, names = "LISTED", mode = EnumSource.Mode.EXCLUDE)
+    void shouldSkipPartiesNotifiedPut_whenNonListedHearingAlreadyNotified(ListAssistCaseStatus hearingStatus) {
+        when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(createHearing(hearingStatus));
+        when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
+            new PartiesNotifiedResponses().setResponses(List.of(
+                new PartiesNotifiedResponse()
+                    .setRequestVersion(VERSION)
+                    .setResponseReceivedDateTime(RECEIVED_DATETIME),
+                new PartiesNotifiedResponse()
+                    .setRequestVersion(VERSION + 1)
+                    .setResponseReceivedDateTime(RECEIVED_DATETIME.plusDays(1)))));
+
+        handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
+
+        verify(hearingsService, times(0)).updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any());
+        verifyNoInteractions(camundaRuntimeClient, coreCaseDataService);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ListAssistCaseStatus.class, names = "LISTED", mode = EnumSource.Mode.EXCLUDE)
+    void shouldAcknowledgeNonListedHearing_whenResponseIsNewer(ListAssistCaseStatus hearingStatus) {
+        when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(createHearing(hearingStatus));
+        when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
+            new PartiesNotifiedResponses().setResponses(List.of(
+                new PartiesNotifiedResponse()
+                    .setRequestVersion(VERSION)
+                    .setResponseReceivedDateTime(RECEIVED_DATETIME.minusDays(1)))));
+
+        handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
+
+        verify(hearingsService).updatePartiesNotifiedResponse(
+            AUTH_TOKEN, HEARING_ID, VERSION, RECEIVED_DATETIME,
+            new PartiesNotified().setServiceData(new PartiesNotifiedServiceData()));
+        verifyNoInteractions(camundaRuntimeClient, coreCaseDataService);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ListAssistCaseStatus.class, names = "LISTED", mode = EnumSource.Mode.EXCLUDE)
+    void shouldAcknowledgeNonListedHearing_whenOnlyDifferentVersionWasNotified(ListAssistCaseStatus hearingStatus) {
+        when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(createHearing(hearingStatus));
+        when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
+            new PartiesNotifiedResponses().setResponses(List.of(
+                new PartiesNotifiedResponse()
+                    .setRequestVersion(VERSION - 1)
+                    .setResponseReceivedDateTime(RECEIVED_DATETIME.plusDays(1)))));
+
+        handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
+
+        verify(hearingsService).updatePartiesNotifiedResponse(
+            AUTH_TOKEN, HEARING_ID, VERSION, RECEIVED_DATETIME,
+            new PartiesNotified().setServiceData(new PartiesNotifiedServiceData()));
+        verifyNoInteractions(camundaRuntimeClient, coreCaseDataService);
+    }
+
+    @Test
+    void shouldNotAcknowledgeNonListedHearing_whenExistingAcknowledgementsCannotBeRetrieved() {
+        when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID))
+            .thenReturn(createHearing(ListAssistCaseStatus.CLOSED));
+        when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID))
+            .thenThrow(new HmcException(new RuntimeException("HMC unavailable")));
+
+        assertDoesNotThrow(() -> handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID)));
+
+        verify(hearingsService, times(0)).updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any());
+        verifyNoInteractions(camundaRuntimeClient, coreCaseDataService);
     }
 
     @Test
@@ -483,6 +566,42 @@ class HearingNoticeSchedulerEventHandlerTest {
 
         // handle() must not propagate the exception; the catch block should absorb it.
         assertDoesNotThrow(() -> handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID)));
+    }
+
+    @Test
+    void shouldLogFullCauseChain_whenHmcResponseCannotBeDecoded() {
+        InvalidFormatException jacksonCause = InvalidFormatException.from(
+            null, "Invalid listing status", "UNRECOGNISED", ListAssistCaseStatus.class);
+        jacksonCause.prependPath(HearingResponse.class, "laCaseStatus");
+        jacksonCause.prependPath(HearingGetResponse.class, "hearingResponse");
+        Request request = Request.create(
+            Request.HttpMethod.GET, "/hearings/" + HEARING_ID, Map.of(), null, null, null);
+        HmcException failure = new HmcException(new DecodeException(
+            200, "Error decoding HMC response", request, jacksonCause));
+        when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenThrow(failure);
+
+        Logger logger = (Logger) LoggerFactory.getLogger(HearingNoticeSchedulerEventHandler.class);
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+        try {
+            assertDoesNotThrow(() -> handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID)));
+
+            assertThat(appender.list).hasSize(1);
+            ILoggingEvent logEvent = appender.list.getFirst();
+            assertThat(logEvent.getLevel()).isEqualTo(Level.ERROR);
+            assertThat(logEvent.getFormattedMessage()).isEqualTo(
+                "Processing hearingId [" + HEARING_ID + "] failed due to error: " + HmcException.MESSAGE_TEMPLATE);
+            assertThat(logEvent.getThrowableProxy()).isInstanceOf(ThrowableProxy.class);
+            assertThat(((ThrowableProxy) logEvent.getThrowableProxy()).getThrowable()).isSameAs(failure);
+            assertThat(ThrowableProxyUtil.asString(logEvent.getThrowableProxy()))
+                .contains(DecodeException.class.getName(), InvalidFormatException.class.getName(),
+                          "through reference chain", "[\"hearingResponse\"]", "[\"laCaseStatus\"]");
+            verifyNoInteractions(camundaRuntimeClient, coreCaseDataService);
+        } finally {
+            logger.detachAppender(appender);
+            appender.stop();
+        }
     }
 
     @Test
