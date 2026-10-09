@@ -153,8 +153,8 @@ public class CaseFlagUtils {
 
     /**
      * Rebuilds expert/witness party flag shells from DQ while preserving existing FlagDetail entries
-     * (and Element IDs) matched by partyID. Required for 1v2 two-legal-rep where a later defendant
-     * response re-runs flag initialisation for the first defendant's DQ parties.
+     * (and Element IDs). Matches by partyID first, then by first/last name when Spec re-entry
+     * regenerates partyIDs (1v2 two-legal-rep second defendant response).
      */
     private static Element<PartyFlagStructure> createOrMergePartyFlagStructure(
         String partyId,
@@ -164,11 +164,8 @@ public class CaseFlagUtils {
         String phone,
         String roleOnCase,
         List<Element<PartyFlagStructure>> existingParties) {
-        Optional<Element<PartyFlagStructure>> existing = Optional.ofNullable(existingParties)
-            .orElse(Collections.emptyList())
-            .stream()
-            .filter(party -> party.getValue() != null && Objects.equals(party.getValue().getPartyID(), partyId))
-            .findFirst();
+        Optional<Element<PartyFlagStructure>> existing = findExistingPartyFlagStructure(
+            partyId, firstName, lastName, existingParties);
 
         if (existing.isPresent()) {
             Element<PartyFlagStructure> existingElement = existing.get();
@@ -183,6 +180,7 @@ public class CaseFlagUtils {
                 : createFlags(partyName, roleOnCase);
 
             PartyFlagStructure merged = existingParty.copy()
+                .setPartyID(partyId != null ? partyId : existingParty.getPartyID())
                 .setFirstName(firstName)
                 .setLastName(lastName)
                 .setEmail(email)
@@ -198,6 +196,29 @@ public class CaseFlagUtils {
         return element(createPartiesCaseFlagsField(partyId, firstName, lastName, email, phone, roleOnCase));
     }
 
+    private static Optional<Element<PartyFlagStructure>> findExistingPartyFlagStructure(
+        String partyId,
+        String firstName,
+        String lastName,
+        List<Element<PartyFlagStructure>> existingParties) {
+        List<Element<PartyFlagStructure>> parties = Optional.ofNullable(existingParties)
+            .orElse(Collections.emptyList());
+
+        Optional<Element<PartyFlagStructure>> byPartyId = parties.stream()
+            .filter(party -> party.getValue() != null && partyId != null
+                && Objects.equals(party.getValue().getPartyID(), partyId))
+            .findFirst();
+        if (byPartyId.isPresent()) {
+            return byPartyId;
+        }
+
+        return parties.stream()
+            .filter(party -> party.getValue() != null
+                && Objects.equals(party.getValue().getFirstName(), firstName)
+                && Objects.equals(party.getValue().getLastName(), lastName))
+            .findFirst();
+    }
+
     public static void addRespondentDQPartiesFlagStructure(CaseData caseData) {
         addRespondent1ExpertAndWitnessFlagsStructure(caseData);
         if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData)) || (
@@ -210,38 +231,41 @@ public class CaseFlagUtils {
 
     private static void addRespondent2ExpertAndWitnessFlagsStructure(CaseData caseData) {
         if (caseData.getRespondent2DQ() != null) {
-            List<Witness> respondent2Witnesses = new ArrayList<>();
-            if (caseData.getRespondent2DQ().getWitnesses() != null) {
-                respondent2Witnesses = unwrapElements(caseData.getRespondent2DQ().getWitnesses().getDetails());
+            if (caseData.getRespondent2DQ().getWitnesses() != null
+                && caseData.getRespondent2DQ().getWitnesses().getDetails() != null) {
+                List<Witness> respondent2Witnesses = unwrapElements(
+                    caseData.getRespondent2DQ().getWitnesses().getDetails());
+                caseData.setRespondent2Witnesses(getTopLevelFieldForWitnessesWithFlagsStructure(
+                    respondent2Witnesses, RESPONDENT_SOLICITOR_TWO_WITNESS, caseData.getRespondent2Witnesses()));
             }
 
-            List<Expert> respondent2Experts = new ArrayList<>();
-            if (caseData.getRespondent2DQ().getExperts() != null) {
-                respondent2Experts = unwrapElements(caseData.getRespondent2DQ().getExperts().getDetails());
+            if (caseData.getRespondent2DQ().getExperts() != null
+                && caseData.getRespondent2DQ().getExperts().getDetails() != null) {
+                List<Expert> respondent2Experts = unwrapElements(
+                    caseData.getRespondent2DQ().getExperts().getDetails());
+                caseData.setRespondent2Experts(getTopLevelFieldForExpertsWithFlagsStructure(
+                    respondent2Experts, RESPONDENT_SOLICITOR_TWO_EXPERT, caseData.getRespondent2Experts()));
             }
-
-            caseData.setRespondent2Witnesses(getTopLevelFieldForWitnessesWithFlagsStructure(
-                respondent2Witnesses, RESPONDENT_SOLICITOR_TWO_WITNESS, caseData.getRespondent2Witnesses()));
-            caseData.setRespondent2Experts(getTopLevelFieldForExpertsWithFlagsStructure(
-                respondent2Experts, RESPONDENT_SOLICITOR_TWO_EXPERT, caseData.getRespondent2Experts()));
         }
     }
 
     private static void addRespondent1ExpertAndWitnessFlagsStructure(CaseData caseData) {
         if (caseData.getRespondent1DQ() != null) {
-            List<Witness> respondent1Witnesses = new ArrayList<>();
-            if (caseData.getRespondent1DQ().getWitnesses() != null) {
-                respondent1Witnesses = unwrapElements(caseData.getRespondent1DQ().getWitnesses().getDetails());
+            if (caseData.getRespondent1DQ().getWitnesses() != null
+                && caseData.getRespondent1DQ().getWitnesses().getDetails() != null) {
+                List<Witness> respondent1Witnesses = unwrapElements(
+                    caseData.getRespondent1DQ().getWitnesses().getDetails());
+                caseData.setRespondent1Witnesses(getTopLevelFieldForWitnessesWithFlagsStructure(
+                    respondent1Witnesses, RESPONDENT_SOLICITOR_ONE_WITNESS, caseData.getRespondent1Witnesses()));
             }
 
-            List<Expert> respondent1Experts = new ArrayList<>();
-            if (caseData.getRespondent1DQ().getExperts() != null) {
-                respondent1Experts = unwrapElements(caseData.getRespondent1DQ().getExperts().getDetails());
+            if (caseData.getRespondent1DQ().getExperts() != null
+                && caseData.getRespondent1DQ().getExperts().getDetails() != null) {
+                List<Expert> respondent1Experts = unwrapElements(
+                    caseData.getRespondent1DQ().getExperts().getDetails());
+                caseData.setRespondent1Experts(getTopLevelFieldForExpertsWithFlagsStructure(
+                    respondent1Experts, RESPONDENT_SOLICITOR_ONE_EXPERT, caseData.getRespondent1Experts()));
             }
-            caseData.setRespondent1Witnesses(getTopLevelFieldForWitnessesWithFlagsStructure(
-                respondent1Witnesses, RESPONDENT_SOLICITOR_ONE_WITNESS, caseData.getRespondent1Witnesses()));
-            caseData.setRespondent1Experts(getTopLevelFieldForExpertsWithFlagsStructure(
-                respondent1Experts, RESPONDENT_SOLICITOR_ONE_EXPERT, caseData.getRespondent1Experts()));
         }
     }
 

@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.withPreservedPartyId;
 
 @Component
 @Slf4j
@@ -24,7 +25,10 @@ public class Respondent1ExpertsCaseDataUpdaters implements ExpertsAndWitnessesCa
             if (YES.equals(caseData.getResponseClaimExpertSpecRequired())
                     && caseData.getRespondent1DQ().getSmallClaimExperts() != null) {
                 log.info("Setting respondent1DQExperts with expert details for caseId: {}", caseData.getCcdCaseReference());
-                Expert expert = fromSmallClaimExpertDetails(caseData.getRespondent1DQ().getSmallClaimExperts());
+                Expert expert = withPreservedPartyId(
+                    fromSmallClaimExpertDetails(caseData.getRespondent1DQ().getSmallClaimExperts()),
+                    caseData.getRespondent1DQ().getExperts()
+                );
                 Experts experts = new Experts();
                 experts.setExpertRequired(caseData.getResponseClaimExpertSpecRequired());
                 experts.setDetails(wrapElements(expert));

@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.withPreservedPartyId;
 
 @Component
 @Slf4j
@@ -23,7 +24,10 @@ public class Respondent2ExpertsCaseDataUpdater implements ExpertsAndWitnessesCas
             if (YES.equals(caseData.getResponseClaimExpertSpecRequired2())
                     && caseData.getRespondent2DQ().getSmallClaimExperts() != null) {
                 log.info("Setting respondent2DQExperts with expert details for caseId: {}", caseData.getCcdCaseReference());
-                Expert expert = fromSmallClaimExpertDetails(caseData.getRespondent2DQ().getSmallClaimExperts());
+                Expert expert = withPreservedPartyId(
+                    fromSmallClaimExpertDetails(caseData.getRespondent2DQ().getSmallClaimExperts()),
+                    caseData.getRespondent2DQ().getExperts()
+                );
                 Experts experts = new Experts();
                 experts.setExpertRequired(caseData.getResponseClaimExpertSpecRequired2());
                 experts.setDetails(wrapElements(expert));

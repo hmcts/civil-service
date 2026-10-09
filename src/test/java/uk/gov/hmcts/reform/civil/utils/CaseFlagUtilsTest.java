@@ -336,6 +336,53 @@ class CaseFlagUtilsTest {
         }
 
         @Test
+        void shouldPreserveRespondent1FlagsWhenDqPartyIdsRegenerated_matchingByName() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
+
+            Expert respondent1Expert = new Expert().setPartyID("oldExpertId").setFirstName("R1").setLastName("Expert");
+            Witness respondent1Witness = new Witness().setPartyID("oldWitnessId").setFirstName("R1").setLastName("Witness");
+
+            CaseData afterRespondent1 = caseData.toBuilder()
+                .respondent1DQ(new Respondent1DQ()
+                                   .setRespondent1DQExperts(new Experts().setDetails(wrapElements(respondent1Expert)))
+                                   .setRespondent1DQWitnesses(new Witnesses().setDetails(wrapElements(respondent1Witness))))
+                .build();
+
+            addRespondentDQPartiesFlagStructure(afterRespondent1);
+
+            FlagDetail expertFlag = new FlagDetail().setName("Vulnerable user").setFlagCode("RA001").setStatus("Active");
+            FlagDetail witnessFlag = new FlagDetail().setName("Hearing loop").setFlagCode("RA004").setStatus("Active");
+            afterRespondent1.getRespondent1Experts().get(0).getValue().getFlags()
+                .setDetails(wrapElements(expertFlag));
+            afterRespondent1.getRespondent1Witnesses().get(0).getValue().getFlags()
+                .setDetails(wrapElements(witnessFlag));
+
+            CaseData afterPartyIdChurn = afterRespondent1.toBuilder()
+                .respondent1DQ(new Respondent1DQ()
+                                   .setRespondent1DQExperts(new Experts().setDetails(wrapElements(
+                                       new Expert().setPartyID("newExpertId").setFirstName("R1").setLastName("Expert"))))
+                                   .setRespondent1DQWitnesses(new Witnesses().setDetails(wrapElements(
+                                       new Witness().setPartyID("newWitnessId").setFirstName("R1").setLastName("Witness")))))
+                .respondent1Experts(afterRespondent1.getRespondent1Experts())
+                .respondent1Witnesses(afterRespondent1.getRespondent1Witnesses())
+                .build();
+
+            addRespondentDQPartiesFlagStructure(afterPartyIdChurn);
+
+            assertThat(afterPartyIdChurn.getRespondent1Experts().get(0).getValue().getPartyID()).isEqualTo("newExpertId");
+            assertThat(afterPartyIdChurn.getRespondent1Experts().get(0).getValue().getFlags().getDetails())
+                .extracting(Element::getValue)
+                .containsExactly(expertFlag);
+            assertThat(afterPartyIdChurn.getRespondent1Witnesses().get(0).getValue().getPartyID()).isEqualTo("newWitnessId");
+            assertThat(afterPartyIdChurn.getRespondent1Witnesses().get(0).getValue().getFlags().getDetails())
+                .extracting(Element::getValue)
+                .containsExactly(witnessFlag);
+        }
+
+        @Test
         void shouldCreateFlagsStructureForApplicantWitness() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateBothApplicantsRespondToDefenceAndProceed_2v1()

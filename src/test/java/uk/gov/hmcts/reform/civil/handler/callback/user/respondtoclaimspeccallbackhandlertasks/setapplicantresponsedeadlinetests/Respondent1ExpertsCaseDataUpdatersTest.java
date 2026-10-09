@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks.setapplicantresponsedeadlinespec.Respondent1ExpertsCaseDataUpdaters;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
 class Respondent1ExpertsCaseDataUpdatersTest {
@@ -79,5 +81,21 @@ class Respondent1ExpertsCaseDataUpdatersTest {
 
         assertThat(updatedData).isNotNull();
         assertThat(updatedData.getRespondent1DQ()).isNull();
+    }
+
+    @Test
+    void shouldPreserveExistingDqExpertPartyIdWhenRebuildingFromSmallClaimDetails() {
+        Expert existingExpert = new Expert()
+            .setPartyID("existing-party-id")
+            .setFirstName("Expert")
+            .setLastName("Name");
+        caseData.getRespondent1DQ().setRespondent1DQExperts(
+            new Experts().setExpertRequired(YES).setDetails(wrapElements(existingExpert)));
+
+        CaseData updatedData = updater.update(caseData);
+
+        Expert updatedExpert = updatedData.getRespondent1DQ().getRespondent1DQExperts().getDetails().get(0).getValue();
+        assertThat(updatedExpert.getPartyID()).isEqualTo("existing-party-id");
+        assertThat(updatedExpert.getName()).isEqualTo("Expert Name");
     }
 }
