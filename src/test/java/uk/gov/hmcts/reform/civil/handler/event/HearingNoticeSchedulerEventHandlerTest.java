@@ -14,6 +14,8 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.slf4j.LoggerFactory;
@@ -180,14 +182,15 @@ class HearingNoticeSchedulerEventHandlerTest {
         verify(camundaRuntimeClient, times(1)).correlateStartMessage(MESSAGE_ID, null, expectedVars);
     }
 
-    @Test
-    void shouldNotDispatchCamundaMessage_whenHearingIsNotInListedStatus() {
+    @ParameterizedTest
+    @EnumSource(value = ListAssistCaseStatus.class, names = "LISTED", mode = EnumSource.Mode.EXCLUDE)
+    void shouldNotDispatchCamundaMessage_whenHearingIsNotInListedStatus(ListAssistCaseStatus hearingStatus) {
         HearingNoticeSchedulerVars hearingNoticeSchedulerVars = new HearingNoticeSchedulerVars();
         hearingNoticeSchedulerVars.setServiceId(SERVICE_ID);
         hearingNoticeSchedulerVars.setDispatchedHearingIds(List.of());
         when(mapper.convertValue(any(), eq(HearingNoticeSchedulerVars.class))).thenReturn(hearingNoticeSchedulerVars);
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
-            createHearing(ListAssistCaseStatus.CASE_CLOSED));
+            createHearing(hearingStatus));
         when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
             new PartiesNotifiedResponses().setResponses(List.of()));
 
@@ -203,6 +206,74 @@ class HearingNoticeSchedulerEventHandlerTest {
                     .setServiceData(new PartiesNotifiedServiceData().setHearingNoticeGenerated(false))
             );
         verify(camundaRuntimeClient, times(0)).correlateStartMessage(eq(MESSAGE_ID), any(), any());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ListAssistCaseStatus.class, names = "LISTED", mode = EnumSource.Mode.EXCLUDE)
+    void shouldSkipPartiesNotifiedPut_whenNonListedHearingAlreadyNotified(ListAssistCaseStatus hearingStatus) {
+        when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(createHearing(hearingStatus));
+        when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
+            new PartiesNotifiedResponses().setResponses(List.of(
+                new PartiesNotifiedResponse()
+                    .setRequestVersion(VERSION)
+                    .setResponseReceivedDateTime(RECEIVED_DATETIME),
+                new PartiesNotifiedResponse()
+                    .setRequestVersion(VERSION + 1)
+                    .setResponseReceivedDateTime(RECEIVED_DATETIME.plusDays(1)))));
+
+        handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
+
+        verify(hearingsService, times(0)).updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any());
+        verifyNoInteractions(camundaRuntimeClient, coreCaseDataService);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ListAssistCaseStatus.class, names = "LISTED", mode = EnumSource.Mode.EXCLUDE)
+    void shouldAcknowledgeNonListedHearing_whenResponseIsNewer(ListAssistCaseStatus hearingStatus) {
+        when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(createHearing(hearingStatus));
+        when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
+            new PartiesNotifiedResponses().setResponses(List.of(
+                new PartiesNotifiedResponse()
+                    .setRequestVersion(VERSION)
+                    .setResponseReceivedDateTime(RECEIVED_DATETIME.minusDays(1)))));
+
+        handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
+
+        verify(hearingsService).updatePartiesNotifiedResponse(
+            AUTH_TOKEN, HEARING_ID, VERSION, RECEIVED_DATETIME,
+            new PartiesNotified().setServiceData(new PartiesNotifiedServiceData()));
+        verifyNoInteractions(camundaRuntimeClient, coreCaseDataService);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ListAssistCaseStatus.class, names = "LISTED", mode = EnumSource.Mode.EXCLUDE)
+    void shouldAcknowledgeNonListedHearing_whenOnlyDifferentVersionWasNotified(ListAssistCaseStatus hearingStatus) {
+        when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(createHearing(hearingStatus));
+        when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
+            new PartiesNotifiedResponses().setResponses(List.of(
+                new PartiesNotifiedResponse()
+                    .setRequestVersion(VERSION - 1)
+                    .setResponseReceivedDateTime(RECEIVED_DATETIME.plusDays(1)))));
+
+        handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
+
+        verify(hearingsService).updatePartiesNotifiedResponse(
+            AUTH_TOKEN, HEARING_ID, VERSION, RECEIVED_DATETIME,
+            new PartiesNotified().setServiceData(new PartiesNotifiedServiceData()));
+        verifyNoInteractions(camundaRuntimeClient, coreCaseDataService);
+    }
+
+    @Test
+    void shouldNotAcknowledgeNonListedHearing_whenExistingAcknowledgementsCannotBeRetrieved() {
+        when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID))
+            .thenReturn(createHearing(ListAssistCaseStatus.CLOSED));
+        when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID))
+            .thenThrow(new HmcException(new RuntimeException("HMC unavailable")));
+
+        assertDoesNotThrow(() -> handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID)));
+
+        verify(hearingsService, times(0)).updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any());
+        verifyNoInteractions(camundaRuntimeClient, coreCaseDataService);
     }
 
     @Test
