@@ -24,8 +24,12 @@ public class HandleRespondentResponseTypeForSpec implements CaseTask {
         CaseData caseData = callbackParams.getCaseData();
         log.info("Executing HandleRespondentResponseTypeForSpec for caseId: {}", caseData.getCcdCaseReference());
 
-        if (caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION
-                || caseData.getRespondent2ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION) {
+        if (caseData.isCurrentDefendantRespondent2()) {
+            if (caseData.getRespondent2ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION) {
+                log.info("CaseId {}: Setting specDefenceFullAdmitted2Required to NO", caseData.getCcdCaseReference());
+                caseData.setSpecDefenceFullAdmitted2Required(NO);
+            }
+        } else if (caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION) {
             log.info("CaseId {}: Setting specDefenceFullAdmittedRequired to NO", caseData.getCcdCaseReference());
             caseData.setSpecDefenceFullAdmittedRequired(NO);
         }

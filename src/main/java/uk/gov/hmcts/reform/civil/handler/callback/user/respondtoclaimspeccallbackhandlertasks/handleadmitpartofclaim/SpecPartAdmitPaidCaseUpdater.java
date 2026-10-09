@@ -15,6 +15,15 @@ public class SpecPartAdmitPaidCaseUpdater implements HandleAdmitPartOfClaimCaseU
     public void update(CaseData caseData) {
         log.info("Updating SpecPartAdmitPaidCase for caseId: {}", caseData.getCcdCaseReference());
 
+        if (caseData.isCurrentDefendantRespondent2()) {
+            if (caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+                && caseData.getSpecDefenceAdmitted2Required() == NO) {
+                log.debug("Setting specPartAdmitPaid to NO for Respondent 2 caseId: {}", caseData.getCcdCaseReference());
+                caseData.setSpecPartAdmitPaid(NO);
+            }
+            return;
+        }
+
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
                 && caseData.getSpecDefenceAdmittedRequired() == NO) {
             log.debug("Setting specPartAdmitPaid to NO for caseId: {}", caseData.getCcdCaseReference());
