@@ -33,6 +33,9 @@ public class ClaimStoreService {
     public List<DashboardClaimInfo> getClaimsForClaimant(String authorisation, String claimantId) {
         try {
             return translateCmcClaimToClaimInfo(claimStoreApi.getClaimsForClaimant(authorisation, claimantId));
+        } catch (FeignException.Unauthorized e) {
+            logUnauthorized("claimant", claimantId);
+            return Collections.emptyList();
         } catch (FeignException.GatewayTimeout | FeignException.BadGateway | FeignException.ServiceUnavailable e) {
             throw new RetryableClaimStoreException(e.getMessage(), e);
         } catch (Exception e) {
@@ -45,12 +48,24 @@ public class ClaimStoreService {
     public List<DashboardClaimInfo> getClaimsForDefendant(String authorisation, String defendantId) {
         try {
             return translateCmcClaimToClaimInfo(claimStoreApi.getClaimsForDefendant(authorisation, defendantId));
+        } catch (FeignException.Unauthorized e) {
+            logUnauthorized("defendant", defendantId);
+            return Collections.emptyList();
         } catch (FeignException.GatewayTimeout | FeignException.BadGateway | FeignException.ServiceUnavailable e) {
             throw new RetryableClaimStoreException(e.getMessage(), e);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return Collections.emptyList();
         }
+    }
+
+    /*
+     * Claim store resolves the user via IDAM /o/userinfo, which rejects some tokens that CCD still
+     * accepts, so a 401 here is not proof the session is dead. Degrade to no OCMC claims and leave
+     * the CCD lookup to decide; log without the stack trace, as this is not a civil-service fault.
+     */
+    private void logUnauthorized(String role, String submitterId) {
+        log.warn("Claim store returned 401 for {} {}; returning no OCMC claims", role, submitterId);
     }
 
     @Recover
