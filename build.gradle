@@ -15,7 +15,7 @@ plugins {
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.6"
-  id 'hmcts.ccd.sdk' version '7.10.0'
+  id 'hmcts.ccd.sdk' version '7.13.0'
 }
 
 group = 'uk.gov.hmcts.reform'
