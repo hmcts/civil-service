@@ -66,6 +66,17 @@ class Respondent1WitnessesCaseDataUpdaterTest {
     }
 
     @Test
+    void shouldNotThrowWhenRespondent1DqIsNullAndSmallClaimWitnessesPresent() {
+        caseData.setRespondent1DQ(null);
+        caseData.setRespondent1DQWitnessesSmallClaim(
+            new Witnesses().setWitnessesToAppear(YES).setDetails(wrapElements(new Witness().setFirstName("A"))));
+
+        updater.update(caseData);
+
+        assertThat(caseData.getRespondent1DQ()).isNull();
+    }
+
+    @Test
     void shouldPreserveExistingDqWitnessPartyIdsWhenCopyingSmallClaimWitnesses() {
         Witness existingWitness = new Witness()
             .setPartyID("existing-witness-id")
