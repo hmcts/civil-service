@@ -125,6 +125,15 @@ The project is dependent on other Civil repositories:
 
 Camunda BPMN definitions are included in this repository under `src/main/resources/camunda/`.
 
+The `Render BPMN diagrams` GitHub Action renders changed BPMNs and commits their PNGs
+under `docs/bpmn-diagrams/` to the same repository's PR branch. Renderer or dependency
+changes render all BPMNs. Fork PRs and protected branches receive the `bpmn-diagrams`
+artifact only. To regenerate everything, run `workflow_dispatch` on an unprotected
+working branch and include the resulting commit in a PR. If the branch advances while
+rendering, the workflow leaves the output in the artifact and the newer PR run handles
+it. Commit-back uses `GITHUB_TOKEN`; confirm the required Jenkins check runs on the
+resulting diagram commit before merging.
+
 To set up complete local environment for Civil check [civil-sdk](https://github.com/hmcts/civil-sdk)
 
 ### Building the application
