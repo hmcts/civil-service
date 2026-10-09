@@ -6,6 +6,10 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.StoredBreathingSpace;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
@@ -19,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.InterestCalculator.INTEREST_AMOUNT_MUST_NOT_BE_NEGATIVE;
 import static uk.gov.hmcts.reform.civil.utils.InterestCalculator.INTEREST_RATE_MUST_NOT_BE_NEGATIVE;
 
@@ -322,6 +327,87 @@ class InterestCalculatorTest {
     }
 
     @Test
+    void shouldPauseInterestWhenCaseIsInBreathingSpace() {
+        CaseData caseData = sameRateInterestUntilJudgement(LocalDate.now().minusDays(6), BigDecimal.valueOf(5000));
+        caseData = caseData.toBuilder()
+            .breathing(storedBreathingSpace(
+                new BreathingSpaceEnterInfo().setStart(LocalDate.now().minusDays(3)),
+                null
+            ))
+            .build();
+
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
+
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(2.20).setScale(2, RoundingMode.UNNECESSARY));
+    }
+
+    @Test
+    void shouldResumeInterestAfterBreathingSpaceLifted_excludingPausedDays() {
+        CaseData caseData = sameRateInterestUntilJudgement(LocalDate.now().minusDays(6), BigDecimal.valueOf(5000));
+        caseData = caseData.toBuilder()
+            .breathing(storedBreathingSpace(
+                new BreathingSpaceEnterInfo().setStart(LocalDate.now().minusDays(4)),
+                new BreathingSpaceLiftInfo().setExpectedEnd(LocalDate.now().minusDays(1))
+            ))
+            .build();
+
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
+
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(2.20).setScale(2, RoundingMode.UNNECESSARY));
+    }
+
+    @Test
+    void shouldPauseInterestAcrossAllStoredBreathingSpaceCycles() {
+        CaseData caseData = sameRateInterestUntilJudgement(LocalDate.now().minusDays(10), BigDecimal.valueOf(5000));
+        caseData = caseData.toBuilder()
+            .breathing(new BreathingSpaceInfo()
+                           .setStoredBreathingSpace(wrapElements(
+                               new StoredBreathingSpace()
+                                   .setEnter(new BreathingSpaceEnterInfo().setStart(LocalDate.now().minusDays(9)))
+                                   .setLift(new BreathingSpaceLiftInfo().setExpectedEnd(LocalDate.now().minusDays(7))),
+                               new StoredBreathingSpace()
+                                   .setEnter(new BreathingSpaceEnterInfo().setStart(LocalDate.now().minusDays(4)))
+                                   .setLift(new BreathingSpaceLiftInfo().setExpectedEnd(LocalDate.now().minusDays(2)))
+                           )))
+            .build();
+
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
+
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(4.40).setScale(2, RoundingMode.UNNECESSARY));
+    }
+
+    @Test
+    void shouldNotChangeBreakdownInterestWhenCaseIsInBreathingSpace() {
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .claimInterest(YesOrNo.YES)
+            .caseReference(123456789L)
+            .interestClaimOptions(InterestClaimOptions.BREAK_DOWN_INTEREST)
+            .breakDownInterestTotal(BigDecimal.valueOf(500))
+            .build();
+        caseData = caseData.toBuilder()
+            .breathing(new BreathingSpaceInfo()
+                           .setEnter(new BreathingSpaceEnterInfo().setStart(LocalDate.now().minusDays(3))))
+            .build();
+
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
+
+        assertThat(actual).isEqualByComparingTo(BigDecimal.valueOf(500));
+    }
+
+    private CaseData sameRateInterestUntilJudgement(LocalDate interestFromDate, BigDecimal totalClaimAmount) {
+        return new CaseDataBuilder().atStateClaimDraft()
+            .claimInterest(YesOrNo.YES)
+            .caseReference(123456789L)
+            .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
+            .sameRateInterestSelection(buildSameRateSelection(SameRateInterestType.SAME_RATE_INTEREST_8_PC, null, null))
+            .interestClaimFrom(InterestClaimFromType.FROM_A_SPECIFIC_DATE)
+            .interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
+            .interestFromSpecificDate(interestFromDate)
+            .totalClaimAmount(totalClaimAmount)
+            .build();
+    }
+
+    @Test
     void shouldReturnValidationErrorAndZeroInterestWhenDifferentRateIsNegative() {
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .claimInterest(YesOrNo.YES)
@@ -397,5 +483,11 @@ class InterestCalculatorTest {
         selection.setDifferentRate(rate);
         selection.setDifferentRateReason(reason);
         return selection;
+    }
+
+    private static BreathingSpaceInfo storedBreathingSpace(BreathingSpaceEnterInfo enter,
+                                                           BreathingSpaceLiftInfo lift) {
+        return new BreathingSpaceInfo()
+            .setStoredBreathingSpace(wrapElements(new StoredBreathingSpace().setEnter(enter).setLift(lift)));
     }
 }

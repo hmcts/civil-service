@@ -4,14 +4,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDate;
-
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class BreathingSpaceLiftInfo {
+public class StoredBreathingSpace {
 
-    private LocalDate expectedEnd;
+    private String defendantLabel;
 
-    private String reasonToLift;
+    private Integer defendantNumber;
+
+    private BreathingSpaceEnterInfo enter;
+
+    private BreathingSpaceLiftInfo lift;
 }

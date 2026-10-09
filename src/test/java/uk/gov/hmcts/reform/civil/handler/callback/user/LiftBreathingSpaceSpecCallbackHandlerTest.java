@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -9,26 +11,30 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
+import uk.gov.hmcts.reform.civil.model.breathing.StoredBreathingSpace;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.utils.BreathingSpaceUtils;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 
 public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private final CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     private final LiftBreathingSpaceSpecCallbackHandler callbackHandler =
-        new LiftBreathingSpaceSpecCallbackHandler(objectMapper, caseDetailsConverter);
+        new LiftBreathingSpaceSpecCallbackHandler(objectMapper);
 
     @Nested
     class AboutToStartCallback {
@@ -75,17 +81,62 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
                 (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
             Assertions.assertFalse(response.getErrors().isEmpty());
         }
+
+        @Test
+        public void prePopulateEndDateToToday_WhenMentalHealthBSType() {
+            BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
+            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceEnterInfo.setType(BreathingSpaceType.MENTAL_HEALTH);
+
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
+
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setBreathing(breathingSpaceInfo);
+
+            CallbackParams params = new CallbackParams()
+                .caseData(caseData)
+                .type(CallbackType.ABOUT_TO_START);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
+            LocalDate expectedEndDate = LocalDate.now();
+            assertEquals(caseData.getBreathing().getLift().getExpectedEnd(), expectedEndDate);
+        }
+
+        @Test
+        public void prePopulateEndDateToStartDatePlus60_WhenStandardBSType() {
+            BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
+            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceEnterInfo.setType(BreathingSpaceType.STANDARD);
+
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
+
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setBreathing(breathingSpaceInfo);
+
+            CallbackParams params = new CallbackParams()
+                .caseData(caseData)
+                .type(CallbackType.ABOUT_TO_START);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
+            LocalDate expectedEndDate = LocalDate.now().plusDays(60);
+            assertEquals(caseData.getBreathing().getLift().getExpectedEnd(), expectedEndDate);
+        }
     }
 
     @Nested
     class MidCallback {
 
         @Test
-        public void whenEndDateIsFuture_thenReturnError() {
+        public void whenEndDateExceeds60DaysForStandardBS_thenReturnError() {
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
-            breathingSpaceInfo.setEnter(new BreathingSpaceEnterInfo());
+            BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
+            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceEnterInfo.setType(BreathingSpaceType.STANDARD);
+            breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
             BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
-            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now().plusDays(1));
+            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now().plusDays(61));
             breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setBreathing(breathingSpaceInfo);
@@ -96,15 +147,18 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
                 .pageId("enter-info");
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
-            Assertions.assertFalse(response.getErrors().isEmpty());
+            assertThat(response.getErrors().getFirst()).isEqualTo("Standard breathing space cannot last for longer than 60 days");
         }
 
         @Test
-        public void whenEndDateIsNotFuture_thenReturnNoError() {
+        public void whenEndDateExceeds60DaysForMentalHealthBS_thenReturnNoError() {
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
-            breathingSpaceInfo.setEnter(new BreathingSpaceEnterInfo());
+            BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
+            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceEnterInfo.setType(BreathingSpaceType.MENTAL_HEALTH);
+            breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
             BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
-            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now());
+            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now().plusDays(61));
             breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setBreathing(breathingSpaceInfo);
@@ -119,7 +173,7 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
         }
 
         @Test
-        public void whenDatesDoNotMatch_thenReturnError() {
+        public void whenEndDateIsNotAfterStartDate_thenReturnError() {
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
             BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
             breathingSpaceEnterInfo.setStart(LocalDate.now().minusDays(30));
@@ -138,6 +192,71 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
                 (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
             Assertions.assertFalse(response.getErrors().isEmpty());
         }
+
+        @Test
+        public void whenEndDateIsSameDateAsStartDateForStandardBS_thenReturnError() {
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
+            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceEnterInfo.setType(BreathingSpaceType.STANDARD);
+            breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
+            BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
+            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now());
+            breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setBreathing(breathingSpaceInfo);
+
+            CallbackParams params = new CallbackParams()
+                .caseData(caseData)
+                .type(CallbackType.MID)
+                .pageId("enter-info");
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
+            Assertions.assertFalse(response.getErrors().isEmpty());
+        }
+
+        @Test
+        public void whenEndDateIsSameDateAsStartDateForMentalHealthBS_thenReturnError() {
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
+            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceEnterInfo.setType(BreathingSpaceType.MENTAL_HEALTH);
+            breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
+            BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
+            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now());
+            breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setBreathing(breathingSpaceInfo);
+
+            CallbackParams params = new CallbackParams()
+                .caseData(caseData)
+                .type(CallbackType.MID)
+                .pageId("enter-info");
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
+            Assertions.assertFalse(response.getErrors().isEmpty());
+        }
+
+        @Test
+        public void whenEndDateIsAfterStartDate_thenReturnNoError() {
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            BreathingSpaceEnterInfo breathingSpaceEnterInfo = new BreathingSpaceEnterInfo();
+            breathingSpaceEnterInfo.setStart(LocalDate.now());
+            breathingSpaceInfo.setEnter(breathingSpaceEnterInfo);
+            BreathingSpaceLiftInfo breathingSpaceLiftInfo = new BreathingSpaceLiftInfo();
+            breathingSpaceLiftInfo.setExpectedEnd(LocalDate.now().plusDays(1));
+            breathingSpaceInfo.setLift(breathingSpaceLiftInfo);
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setBreathing(breathingSpaceInfo);
+
+            CallbackParams params = new CallbackParams()
+                .caseData(caseData)
+                .type(CallbackType.MID)
+                .pageId("enter-info");
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
+            Assertions.assertTrue(response.getErrors().isEmpty());
+        }
     }
 
     @Nested
@@ -154,6 +273,42 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
                 .extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(LIFT_BREATHING_SPACE_SPEC.name(), "READY");
+
+            assertThat(response.getData())
+                .extracting("breathingSpaceActive")
+                .isEqualTo("No");
+        }
+
+        @Test
+        public void shouldStoreLiftOnOpenBreathingSpaceItem_whenInvoked() {
+            BreathingSpaceEnterInfo enterInfo = new BreathingSpaceEnterInfo();
+            enterInfo.setStart(LocalDate.now().minusDays(2));
+            BreathingSpaceLiftInfo liftInfo = new BreathingSpaceLiftInfo();
+            liftInfo.setExpectedEnd(LocalDate.now());
+            liftInfo.setReasonToLift("reason");
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            breathingSpaceInfo.setEnter(enterInfo);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            caseData.setBreathing(breathingSpaceInfo);
+            BreathingSpaceUtils.addEnteredBreathingSpaceToHistory(caseData);
+            breathingSpaceInfo.setLift(liftInfo);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
+
+            List<Element<StoredBreathingSpace>> stored = objectMapper.convertValue(
+                response.getData().get("storedBreathingSpace"),
+                new TypeReference<>() {}
+            );
+
+            assertThat(stored).hasSize(1);
+            assertThat(stored.get(0).getValue().getDefendantLabel())
+                .isEqualTo("Breathing space for Defendant 1 details");
+            assertThat(stored.get(0).getValue().getLift().getReasonToLift()).isEqualTo("reason");
+            assertThat(response.getData())
+                .extracting("breathingSpaceActive")
+                .isEqualTo("No");
         }
     }
 

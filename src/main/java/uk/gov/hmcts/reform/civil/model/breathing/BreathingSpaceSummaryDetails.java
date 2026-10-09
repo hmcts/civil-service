@@ -9,7 +9,13 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class BreathingSpaceLiftInfo {
+public class BreathingSpaceSummaryDetails {
+
+    private String reference;
+
+    private LocalDate start;
+
+    private BreathingSpaceType type;
 
     private LocalDate expectedEnd;
 
