@@ -76,7 +76,9 @@ class DraftStoreServiceTest {
             assertThat(savedDraft.getUserId()).isEqualTo(USER_ID);
             assertThat(savedDraft.getCaseId()).isEqualTo(CASE_ID);
             assertThat(savedDraft.getDraftType()).isEqualTo(DRAFT_TYPE);
-            assertThat(savedDraft.getPayload()).isEqualTo(payload).isNotSameAs(payload);
+            assertThat(savedDraft.getPayload()).isNotSameAs(payload);
+            assertThat(savedDraft.getPayload()).containsEntry("step", "claimant-details");
+            assertThat(savedDraft.getPayload()).containsKey("draftClaimCreatedAt");
             assertThat(savedDraft.getCreatedAt()).isNotNull();
             assertThat(savedDraft.getUpdatedAt()).isEqualTo(savedDraft.getCreatedAt());
             assertThat(savedDraft.getExpiresAt()).isEqualTo(
@@ -95,6 +97,92 @@ class DraftStoreServiceTest {
             assertThat(result.getExpiresAt()).isEqualTo(
                 DraftStoreService.calculateExpiresAt(result.getCreatedAt(), RETENTION_DAYS)
             );
+        }
+
+        @Test
+        void shouldPreserveOriginalCreatedAtAndExpiryWhenMigratingWithDraftClaimCreatedAt() {
+            OffsetDateTime originalCreatedAt = OffsetDateTime.now(java.time.ZoneOffset.UTC).minusDays(10);
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("step", "claimant-details");
+            payload.put("draftClaimCacheTtlDays", RETENTION_DAYS);
+            payload.put("draftClaimCreatedAt", originalCreatedAt.toString());
+            when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+            DraftStoreEntity result = draftStoreService.createDraft(USER_ID, null, payload, DRAFT_TYPE);
+
+            assertThat(result.getCreatedAt()).isEqualTo(originalCreatedAt.withOffsetSameInstant(java.time.ZoneOffset.UTC));
+            assertThat(result.getExpiresAt()).isEqualTo(
+                DraftStoreService.calculateExpiresAt(result.getCreatedAt(), RETENTION_DAYS)
+            );
+            assertThat(result.getUpdatedAt()).isAfter(result.getCreatedAt());
+            assertThat(result.getPayload().get("draftClaimCreatedAt")).isEqualTo(result.getCreatedAt().toString());
+        }
+
+        @Test
+        void shouldRejectCreateWhenDraftClaimCreatedAtIsAlreadyExpiredUnderRetentionPolicy() {
+            OffsetDateTime originalCreatedAt = OffsetDateTime.now(java.time.ZoneOffset.UTC).minusDays(RETENTION_DAYS + 5);
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("step", "claimant-details");
+            payload.put("draftClaimCacheTtlDays", RETENTION_DAYS);
+            payload.put("draftClaimCreatedAt", originalCreatedAt.toString());
+
+            assertThatThrownBy(() -> draftStoreService.createDraft(USER_ID, null, payload, DRAFT_TYPE))
+                .isInstanceOf(ResponseStatusException.class)
+                .satisfies(ex -> {
+                    ResponseStatusException statusEx = (ResponseStatusException) ex;
+                    assertThat(statusEx.getStatusCode()).isEqualTo(BAD_REQUEST);
+                    assertThat(statusEx.getReason()).contains("already expired");
+                });
+
+            verifyNoInteractions(draftStoreTransactionService);
+        }
+
+        @Test
+        void shouldKeepOriginalLegacyExpiryWhenMigratingDraftOlderThanRetentionPolicy() {
+            OffsetDateTime originalCreatedAt = OffsetDateTime.now(java.time.ZoneOffset.UTC).minusDays(60);
+            OffsetDateTime originalExpiresAt = OffsetDateTime.now(java.time.ZoneOffset.UTC).plusDays(120);
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("draftClaimCacheTtlDays", RETENTION_DAYS);
+            payload.put("draftClaimCreatedAt", originalCreatedAt.toString());
+            payload.put("draftClaimExpiresAt", originalExpiresAt.toString());
+            when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+            DraftStoreEntity result = draftStoreService.createDraft(USER_ID, null, payload, DRAFT_TYPE);
+
+            assertThat(result.getCreatedAt()).isEqualTo(originalCreatedAt);
+            assertThat(result.getExpiresAt()).isEqualTo(originalExpiresAt);
+            assertThat(result.getPayload()).doesNotContainKey("draftClaimExpiresAt");
+        }
+
+        @Test
+        void shouldCapOriginalExpiryAtLegacyRetentionPolicy() {
+            OffsetDateTime originalCreatedAt = OffsetDateTime.now(java.time.ZoneOffset.UTC).minusDays(60);
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("draftClaimCreatedAt", originalCreatedAt.toString());
+            payload.put("draftClaimExpiresAt", originalCreatedAt.plusDays(365).toString());
+            when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+            DraftStoreEntity result = draftStoreService.createDraft(USER_ID, null, payload, DRAFT_TYPE);
+
+            assertThat(result.getExpiresAt()).isEqualTo(
+                DraftStoreService.calculateExpiresAt(originalCreatedAt, DRAFT_TYPE.getLegacyRetentionDays())
+            );
+        }
+
+        @Test
+        void shouldRejectCreateWhenOriginalExpiryHasPassed() {
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("draftClaimCreatedAt", OffsetDateTime.now(java.time.ZoneOffset.UTC).minusDays(60).toString());
+            payload.put("draftClaimExpiresAt", OffsetDateTime.now(java.time.ZoneOffset.UTC).minusMinutes(1).toString());
+
+            assertThatThrownBy(() -> draftStoreService.createDraft(USER_ID, null, payload, DRAFT_TYPE))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("already expired");
+
+            verifyNoInteractions(draftStoreTransactionService);
         }
 
         @ParameterizedTest

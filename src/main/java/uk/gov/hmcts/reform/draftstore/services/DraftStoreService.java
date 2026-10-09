@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -28,6 +29,8 @@ public class DraftStoreService {
     private static final String DRAFT_TYPE_NOT_NULL = "draftType must not be null";
     private static final ZoneId EXPIRY_ZONE = ZoneId.of("Europe/London");
     static final String TTL_DAYS_FIELD = "draftClaimCacheTtlDays";
+    static final String CREATED_AT_FIELD = "draftClaimCreatedAt";
+    static final String EXPIRES_AT_FIELD = "draftClaimExpiresAt";
 
     private final DraftStoreRepository draftStoreRepository;
     private final DraftStoreTransactionService draftStoreTransactionService;
@@ -47,7 +50,12 @@ public class DraftStoreService {
         Map<String, Object> payloadCopy = copyPayload(payload);
         validatePayloadRetention(payloadCopy, draftType);
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
-        long retentionDays = draftType.getRetentionDays();
+        OffsetDateTime createdAt = resolveCreatedAt(payloadCopy, now);
+        OffsetDateTime expiresAt = resolveExpiresAt(payloadCopy.remove(EXPIRES_AT_FIELD), createdAt, draftType);
+        if (!expiresAt.isAfter(now)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "draft claim has already expired");
+        }
+        payloadCopy.put(CREATED_AT_FIELD, createdAt.toString());
 
         DraftStoreEntity draft = new DraftStoreEntity(
             UUID.randomUUID(),
@@ -55,9 +63,9 @@ public class DraftStoreService {
             caseId,
             draftType,
             payloadCopy,
+            createdAt,
             now,
-            now,
-            calculateExpiresAt(now, retentionDays)
+            expiresAt
         );
         return draftStoreTransactionService.saveInNewTransaction(draft);
     }
@@ -198,6 +206,46 @@ public class DraftStoreService {
             try {
                 return Long.parseLong(text.trim());
             } catch (NumberFormatException ex) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    static OffsetDateTime resolveCreatedAt(Map<String, Object> payload, OffsetDateTime now) {
+        Object raw = payload.get(CREATED_AT_FIELD);
+        if (raw == null) {
+            return now;
+        }
+        OffsetDateTime parsed = parseDateTime(raw);
+        if (parsed == null || parsed.isAfter(now)) {
+            return now;
+        }
+        return parsed.withOffsetSameInstant(ZoneOffset.UTC);
+    }
+
+    static OffsetDateTime resolveExpiresAt(Object originalExpiresAt, OffsetDateTime createdAt, DraftType draftType) {
+        OffsetDateTime original = parseDateTime(originalExpiresAt);
+        if (original == null) {
+            return calculateExpiresAt(createdAt, draftType.getRetentionDays());
+        }
+        OffsetDateTime legacyMaximum = calculateExpiresAt(createdAt, draftType.getLegacyRetentionDays());
+        OffsetDateTime expiresAt = original.isAfter(legacyMaximum) ? legacyMaximum : original;
+        return expiresAt.withOffsetSameInstant(ZoneOffset.UTC);
+    }
+
+    private static OffsetDateTime parseDateTime(Object value) {
+        if (value instanceof OffsetDateTime offsetDateTime) {
+            return offsetDateTime;
+        }
+        if (value instanceof String text) {
+            String trimmed = text.trim();
+            if (trimmed.isEmpty()) {
+                return null;
+            }
+            try {
+                return OffsetDateTime.parse(trimmed);
+            } catch (DateTimeParseException ignored) {
                 return null;
             }
         }
