@@ -23,6 +23,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -65,19 +66,39 @@ public class ClaimDetailsNotificationDeadlineSchedulerIT {
 
     @Test
     void shouldExecuteClaimDetailsNotificationDeadlineScheduler() {
-        CaseDetails searchCase = CaseDetailsBuilder.builder().id(CASE_ID).build();
+        CaseDetails searchCase = CaseDetailsBuilder.builder().atStateAwaitingRespondentAcknowledgement().id(CASE_ID).build();
         SearchResult searchResult = SearchResult.builder()
             .total(1)
             .cases(List.of(searchCase))
             .build();
 
         coreCaseDataApiMockHelper.mockElasticSearchResult(searchResult);
+        coreCaseDataApiMockHelper.mockGetCaseAnyCase(searchCase);
 
         scheduler.runScheduledTask();
 
         verify(caseDismissedScheduledTask).accept(searchCase);
         verify(telemetryService).trackEvent(eq("ClaimDetailsNotificationDeadlineJobStarted"), anyMap());
         verify(telemetryService).trackEvent(eq("ClaimDetailsNotificationDeadlineCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("ClaimDetailsNotificationDeadlineJobCompleted"), anyMap());
+    }
+
+    @Test
+    void shouldAbortClaimDetailsNotificationDeadlineScheduler_whenDismissClaimEventNotAllowed() {
+        CaseDetails searchCase = CaseDetailsBuilder.builder().atStatePendingClaimIssued().id(CASE_ID).build();
+        SearchResult searchResult = SearchResult.builder()
+            .total(1)
+            .cases(List.of(searchCase))
+            .build();
+
+        coreCaseDataApiMockHelper.mockElasticSearchResult(searchResult);
+        coreCaseDataApiMockHelper.mockGetCaseAnyCase(searchCase);
+
+        scheduler.runScheduledTask();
+
+        verify(caseDismissedScheduledTask, never()).accept(searchCase);
+        verify(telemetryService).trackEvent(eq("ClaimDetailsNotificationDeadlineJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("ClaimDetailsNotificationDeadlineCaseAborted"), anyMap());
         verify(telemetryService).trackEvent(eq("ClaimDetailsNotificationDeadlineJobCompleted"), anyMap());
     }
 }
