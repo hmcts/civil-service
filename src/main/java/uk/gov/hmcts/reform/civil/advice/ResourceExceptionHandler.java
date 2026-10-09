@@ -17,6 +17,7 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentAccessException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentNotFoundException;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentTooLargeException;
 import uk.gov.hmcts.reform.civil.documentmanagement.InvalidDocumentLinkException;
 import uk.gov.hmcts.reform.civil.model.CallbackErrorResponse;
 import uk.gov.hmcts.reform.civil.exceptions.UpstreamIdamException;
@@ -162,6 +163,7 @@ public class ResourceExceptionHandler {
     @ExceptionHandler({
         DocumentNotFoundException.class,
         DocumentAccessException.class,
+        DocumentTooLargeException.class,
         InvalidDocumentLinkException.class
     })
     public ResponseEntity<Object> documentManagementError(Exception exception,
@@ -175,6 +177,8 @@ public class ResourceExceptionHandler {
             status = HttpStatus.NOT_FOUND;
         } else if (exception instanceof DocumentAccessException) {
             status = HttpStatus.FORBIDDEN;
+        } else if (exception instanceof DocumentTooLargeException) {
+            status = HttpStatus.PAYLOAD_TOO_LARGE;
         } else {
             status = HttpStatus.BAD_REQUEST;
         }

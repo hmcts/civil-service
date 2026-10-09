@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import feign.Request;
+import feign.Response;
 import feign.RetryableException;
 import org.apache.tika.Tika;
 import org.junit.jupiter.api.Assertions;
@@ -20,19 +21,23 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.util.unit.DataSize;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 import uk.gov.hmcts.reform.ccd.document.am.model.DocumentUploadRequest;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
+import uk.gov.hmcts.reform.civil.client.CaseDocumentBinaryApiClient;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.StreamingDocumentResource;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ResourceReader;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -42,12 +47,14 @@ import static feign.Request.HttpMethod.GET;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -71,6 +78,8 @@ class SecuredDocumentManagementServiceTest {
 
     @MockBean
     private CaseDocumentClientApi caseDocumentClientApi;
+    @MockBean
+    private CaseDocumentBinaryApiClient caseDocumentBinaryApiClient;
     @MockBean
     private DocumentDownloadClientApi documentDownloadClient;
     @MockBean
@@ -400,8 +409,7 @@ class SecuredDocumentManagementServiceTest {
         }
 
         @Test
-        void shouldDownloadDocumentByDocumentPathMetaData() throws JsonProcessingException {
-            //Given
+        void shouldStreamDocumentByDocumentPathMetaData() throws IOException {
             Document document = mapper.readValue(
                 ResourceReader.readString("document-management/download.success.json"),
                 Document.class
@@ -409,34 +417,24 @@ class SecuredDocumentManagementServiceTest {
             String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
             UUID documentId = getDocumentIdFromSelfHref(documentPath);
 
-            when(caseDocumentClientApi.getMetadataForDocument(
-                     anyString(),
-                     anyString(),
-                     eq(documentId)
-                 )
-            ).thenReturn(document);
+            when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), eq(documentId)))
+                .thenReturn(document);
+            when(caseDocumentBinaryApiClient.getDocumentBinary(anyString(), anyString(), eq(documentId)))
+                .thenReturn(binaryResponse(200, "test".getBytes()));
 
-            when(caseDocumentClientApi.getDocumentBinary(
-                     anyString(),
-                     anyString(),
-                     eq(documentId)
-                 )
-            ).thenReturn(responseEntity);
+            DownloadedDocumentResponse result =
+                documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath);
 
-            when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
-
-            //When
-            DownloadedDocumentResponse expectedResult =
-                new DownloadedDocumentResponse(new ByteArrayResource("test".getBytes()), "TEST_DOCUMENT_1.pdf",
-                                               "application/pdf");
-
-            //Then
-            assertEquals(expectedResult, documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath));
+            assertInstanceOf(StreamingDocumentResource.class, result.file());
+            assertEquals(4, result.file().contentLength());
+            assertArrayEquals("test".getBytes(), result.file().getInputStream().readAllBytes());
+            assertEquals("TEST_DOCUMENT_1.pdf", result.fileName());
+            assertEquals("application/pdf", result.mimeType());
+            verify(caseDocumentClientApi, never()).getDocumentBinary(anyString(), anyString(), any());
         }
 
         @Test
-        void shouldDownloadDocumentByDocumentPathMetaDataWithInvalidMimeType() throws JsonProcessingException {
-            //Given
+        void shouldDetectMimeTypeFromFileName_whenMetaDataMimeTypeIsGeneric() throws IOException {
             Document document = mapper.readValue(
                 ResourceReader.readString("document-management/download.success.json"),
                 Document.class
@@ -445,100 +443,127 @@ class SecuredDocumentManagementServiceTest {
             String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
             UUID documentId = getDocumentIdFromSelfHref(documentPath);
 
-            when(caseDocumentClientApi.getMetadataForDocument(
-                     anyString(),
-                     anyString(),
-                     eq(documentId)
-                 )
-            ).thenReturn(document);
+            when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), eq(documentId)))
+                .thenReturn(document);
+            when(caseDocumentBinaryApiClient.getDocumentBinary(anyString(), anyString(), eq(documentId)))
+                .thenReturn(binaryResponse(200, "test".getBytes()));
 
-            when(caseDocumentClientApi.getDocumentBinary(
-                     anyString(),
-                     anyString(),
-                     eq(documentId)
-                 )
-            ).thenReturn(responseEntity);
+            DownloadedDocumentResponse result =
+                documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath);
 
-            when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
-
-            //When
-            DownloadedDocumentResponse expectedResult =
-                new DownloadedDocumentResponse(new ByteArrayResource("test".getBytes()), "TEST_DOCUMENT_1.pdf",
-                                               "application/pdf");
-
-            //Then
-            assertEquals(expectedResult, documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath));
+            assertEquals("application/pdf", result.mimeType());
         }
 
         @Test
-        void shouldDownloadDocumentFromDocumentManagementIfNullCdam() throws JsonProcessingException {
-
+        void shouldRejectDocumentLargerThanMaxDownloadSize_withoutFetchingBinary() throws JsonProcessingException {
             Document document = mapper.readValue(
                 ResourceReader.readString("document-management/download.success.json"),
                 Document.class
             );
-            String documentPath = URI.create(document.links.self.href).getPath();
-            String documentBinary = URI.create(document.links.binary.href).getPath().replaceFirst("/", "");
+            document.size = DataSize.ofMegabytes(100).toBytes() + 1;
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
             UUID documentId = getDocumentIdFromSelfHref(documentPath);
 
-            when(caseDocumentClientApi.getMetadataForDocument(
-                     anyString(),
-                     anyString(),
-                     eq(documentId)
-                 )
-            ).thenReturn(document);
+            when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), eq(documentId)))
+                .thenReturn(document);
 
-            when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
+            DocumentTooLargeException ex = assertThrows(
+                DocumentTooLargeException.class,
+                () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath)
+            );
 
-            when(documentDownloadClient.downloadBinary(
-                     anyString(),
-                     anyString(),
-                     eq(USER_ROLES_JOINED),
-                     anyString(),
-                     eq(documentBinary)
-                 )
-            ).thenReturn(responseEntity);
-
-            DownloadedDocumentResponse expectedResult =
-                new DownloadedDocumentResponse(new ByteArrayResource("test".getBytes()), "TEST_DOCUMENT_1.pdf",
-                                               "application/pdf");
-
-            assertEquals(expectedResult, documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath));
+            assertEquals(
+                format(DocumentTooLargeException.MESSAGE_TEMPLATE, documentPath, document.size,
+                       DataSize.ofMegabytes(100).toBytes()),
+                ex.getMessage()
+            );
+            verify(caseDocumentBinaryApiClient, never()).getDocumentBinary(anyString(), anyString(), any());
         }
 
         @Test
-        void shouldThrow_whenDocumentDownloadMetaDataFails() throws JsonProcessingException {
+        void shouldThrowDocumentNotFound_whenStreamedBinaryReturns404() throws JsonProcessingException {
             Document document = mapper.readValue(
                 ResourceReader.readString("document-management/download.success.json"),
                 Document.class
             );
             String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
-            String documentBinary = "documents/85d97996-22a5-40d7-882e-3a382c8ae1b7/binary";
             UUID documentId = getDocumentIdFromSelfHref(documentPath);
 
-            when(caseDocumentClientApi.getMetadataForDocument(
-                     anyString(),
-                     anyString(),
-                     eq(documentId)
-                 )
-            ).thenReturn(document);
+            when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), eq(documentId)))
+                .thenReturn(document);
+            when(caseDocumentBinaryApiClient.getDocumentBinary(anyString(), anyString(), eq(documentId)))
+                .thenReturn(binaryResponse(404, new byte[]{}));
 
-            when(documentDownloadClient
-                     .downloadBinary(anyString(), anyString(), eq(USER_ROLES_JOINED), anyString(), eq(documentBinary))
-            ).thenReturn(null);
+            assertThrows(
+                DocumentNotFoundException.class,
+                () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath)
+            );
+        }
 
-            DocumentDownloadException documentManagementException = assertThrows(
+        @Test
+        void shouldThrowDocumentTtlExpiredException_whenStreamedBinaryReturns403TtlExpired()
+            throws JsonProcessingException {
+            Document document = mapper.readValue(
+                ResourceReader.readString("document-management/download.success.json"),
+                Document.class
+            );
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), eq(documentId)))
+                .thenReturn(document);
+            when(caseDocumentBinaryApiClient.getDocumentBinary(anyString(), anyString(), eq(documentId)))
+                .thenReturn(binaryResponse(403, CDAM_TTL_EXPIRED_RESPONSE.getBytes(StandardCharsets.UTF_8)));
+
+            assertThrows(
+                DocumentTtlExpiredException.class,
+                () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath)
+            );
+        }
+
+        @Test
+        void shouldThrowDocumentDownloadException_whenStreamedBinaryReturns500() throws JsonProcessingException {
+            Document document = mapper.readValue(
+                ResourceReader.readString("document-management/download.success.json"),
+                Document.class
+            );
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), eq(documentId)))
+                .thenReturn(document);
+            when(caseDocumentBinaryApiClient.getDocumentBinary(anyString(), anyString(), eq(documentId)))
+                .thenReturn(binaryResponse(500, new byte[]{}));
+
+            assertThrows(
+                DocumentDownloadException.class,
+                () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath)
+            );
+        }
+
+        @Test
+        void shouldThrowDocumentDownloadException_whenStreamedBinaryBodyIsNull() throws JsonProcessingException {
+            Document document = mapper.readValue(
+                ResourceReader.readString("document-management/download.success.json"),
+                Document.class
+            );
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
+            UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+            when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), eq(documentId)))
+                .thenReturn(document);
+            when(caseDocumentBinaryApiClient.getDocumentBinary(anyString(), anyString(), eq(documentId)))
+                .thenReturn(binaryResponse(200, null));
+
+            DocumentDownloadException ex = assertThrows(
                 DocumentDownloadException.class,
                 () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath)
             );
 
-            assertEquals(format(MESSAGE_TEMPLATE, documentPath), documentManagementException.getMessage());
             assertEquals(
                 "Document binary response was empty for " + documentPath,
-                documentManagementException.getCause().getMessage()
+                ex.getCause().getMessage()
             );
-
-            verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
         }
 
         @Test
@@ -852,6 +877,18 @@ class SecuredDocumentManagementServiceTest {
                 () -> documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath)
             );
         }
+    }
+
+    private static Response binaryResponse(int status, byte[] body) {
+        Request request = Request.create(
+            Request.HttpMethod.GET, "/cases/documents/x/binary", Map.of(), new byte[]{}, StandardCharsets.UTF_8, null);
+        return Response.builder()
+            .status(status)
+            .reason("reason")
+            .request(request)
+            .headers(Map.of())
+            .body(body)
+            .build();
     }
 
     private static FeignException buildFeignException(int status) {

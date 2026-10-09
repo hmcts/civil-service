@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.controllers.cases;
 
+import feign.Request;
+import feign.Response;
 import lombok.SneakyThrows;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,16 +12,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.util.unit.DataSize;
 import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
+import uk.gov.hmcts.reform.civil.client.CaseDocumentBinaryApiClient;
 import uk.gov.hmcts.reform.civil.client.DocmosisApiClient;
 import uk.gov.hmcts.reform.civil.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.config.JacksonConfiguration;
@@ -39,10 +41,12 @@ import uk.gov.hmcts.reform.civil.service.documentmanagement.ClaimFormService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static java.lang.String.format;
@@ -51,8 +55,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
@@ -76,6 +82,9 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
     @MockBean
     private CaseDocumentClientApi caseDocumentClientApi;
+
+    @MockBean
+    private CaseDocumentBinaryApiClient caseDocumentBinaryApiClient;
 
     @Autowired
     private UserService userService;
@@ -107,9 +116,6 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
     @MockBean
     private DocmosisApiClient docmosisApiClient;
-
-    @Mock
-    private ResponseEntity<Resource> responseEntity;
 
     private final UserInfo userInfo = UserInfo.builder()
         .roles(List.of("citizen"))
@@ -143,19 +149,34 @@ public class DocumentControllerTest extends BaseIntegrationTest {
             )
         ).thenReturn(document);
 
-        when(caseDocumentClientApi.getDocumentBinary(
+        when(caseDocumentBinaryApiClient.getDocumentBinary(
                 anyString(),
                 anyString(),
                 eq(documentId)
             )
-        ).thenReturn(responseEntity);
-
-        when(responseEntity.getBody()).thenReturn(new ByteArrayResource(file));
+        ).thenReturn(binaryResponse(file));
 
         //then
         doGet(BEARER_TOKEN, DOWNLOAD_FILE_URL, documentId)
             .andExpect(content().bytes(file))
+            .andExpect(header().longValue(HttpHeaders.CONTENT_LENGTH, file.length))
+            .andExpect(header().string("original-file-name", "TEST_DOCUMENT_1.pdf"))
             .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturnPayloadTooLarge_whenDocumentExceedsMaxDownloadSize() throws Exception {
+        Document document = document();
+        document.size = DataSize.ofMegabytes(100).toBytes() + 1;
+        String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
+        UUID documentId = getDocumentIdFromSelfHref(documentPath);
+
+        when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), eq(documentId)))
+            .thenReturn(document);
+
+        doGet(BEARER_TOKEN, DOWNLOAD_FILE_URL, documentId)
+            .andExpect(status().isPayloadTooLarge());
+        verifyNoInteractions(caseDocumentBinaryApiClient);
     }
 
     @Test
@@ -321,6 +342,17 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
     private UUID getDocumentIdFromSelfHref(String selfHref) {
         return UUID.fromString(selfHref.substring(selfHref.length() - DOC_UUID_LENGTH));
+    }
+
+    private static Response binaryResponse(byte[] body) {
+        Request request = Request.create(
+            Request.HttpMethod.GET, DOCUMENT_URL + "/binary", Map.of(), new byte[]{}, StandardCharsets.UTF_8, null);
+        return Response.builder()
+            .status(200)
+            .request(request)
+            .headers(Map.of())
+            .body(body)
+            .build();
     }
 
     private static Document document() {
