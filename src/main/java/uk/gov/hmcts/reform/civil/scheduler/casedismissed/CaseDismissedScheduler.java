@@ -7,8 +7,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.AllowedEventFlowStateCheckFactory;
 import uk.gov.hmcts.reform.civil.service.search.CaseDismissedSearchService;
+
+import java.util.List;
+
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 
 @Component
 @RequiredArgsConstructor
@@ -20,6 +26,7 @@ public class CaseDismissedScheduler implements CivilScheduler {
     private final CaseDismissedSearchService searchService;
     private final ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
     private final CaseDismissedScheduledTask caseDismissedScheduledTask;
+    private final AllowedEventFlowStateCheckFactory allowedEventFlowStateCheckFactory;
 
     @Override
     public String getName() {
@@ -33,9 +40,12 @@ public class CaseDismissedScheduler implements CivilScheduler {
     @Override
     public void runScheduledTask() {
         scheduledTaskRunner.run(
-            SCHEDULER_NAME,
-            searchService::getElasticSearchResult,
-            caseDismissedScheduledTask
+            ScheduledTaskConfiguration.<CaseDetails, Long>builder()
+                .schedulerName(SCHEDULER_NAME)
+                .searchResultSupplier(searchService::getElasticSearchResult)
+                .scheduledTask(caseDismissedScheduledTask)
+                .interceptors(List.of(allowedEventFlowStateCheckFactory.forEvent(DISMISS_CLAIM)))
+                .build()
         );
     }
 }
