@@ -15,6 +15,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.Map;
@@ -27,6 +28,7 @@ import java.util.UUID;
 @Table(name = "draft_store", schema = "dbs")
 public class DraftStoreEntity implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 8404428249109945073L;
 
     @Id
@@ -61,6 +63,6 @@ public class DraftStoreEntity implements Serializable {
     private OffsetDateTime updatedAt;
 
     @NotNull
-    @Column(name = "expires_at", updatable = false)
+    @Column(name = "expires_at")
     private OffsetDateTime expiresAt;
 }
