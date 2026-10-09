@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.enums.ReconsiderationParties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -171,15 +172,29 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
         List<String> roles = getUserRole(callbackParams);
 
         Optional<String> party = Optional.empty();
-        if (isApplicantSolicitor(roles)) {
+        Optional<ReconsiderationParties> reconsiderationParty = Optional.empty();
+        if (isApplicantSolicitor(roles) || isLIPClaimant(roles)) {
             party = Optional.of("Applicant");
-        } else if (isRespondentSolicitorOne(roles)) {
+            reconsiderationParty = Optional.of(ReconsiderationParties.APPLICANT);
+        } else if (isRespondentSolicitorOne(roles) || isLIPDefendant(roles)) {
             party = Optional.of("Respondent1");
+            reconsiderationParty = Optional.of(ReconsiderationParties.RESPONDENT1);
         } else if (isRespondentSolicitorTwo(roles)) {
             party = Optional.of("Respondent2");
+            reconsiderationParty = Optional.of(ReconsiderationParties.RESPONDENT2);
         }
 
         party.ifPresent(caseData::setCasePartyRequestForReconsideration);
+        reconsiderationParty.ifPresent(rp -> addPartyRequestingReconsideration(caseData, rp));
+    }
+
+    private void addPartyRequestingReconsideration(CaseData caseData, ReconsiderationParties rp) {
+        List<ReconsiderationParties> parties = new ArrayList<>(Optional.ofNullable(caseData.getCasePartiesRequestingReconsideration())
+                                                                   .orElse(Collections.emptyList()));
+        if (!parties.contains(rp)) {
+            parties.add(rp);
+            caseData.setCasePartiesRequestingReconsideration(parties);
+        }
     }
 
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {

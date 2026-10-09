@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.ReconsiderationParties;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
@@ -674,6 +675,7 @@ public class CaseDataBuilder {
     private ReasonForReconsideration reasonForReconsiderationApplicant;
     private ReasonForReconsideration reasonForReconsiderationRespondent1;
     private ReasonForReconsideration reasonForReconsiderationRespondent2;
+    private List<ReconsiderationParties> casePartiesRequestingReconsideration;
     private LocalDateTime respondent1RespondToSettlementAgreementDeadline;
 
     private UploadMediationDocumentsForm uploadDocumentsForm;
@@ -5851,6 +5853,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder casePartiesRequestingReconsideration(List<ReconsiderationParties> casePartiesRequestingReconsideration) {
+        this.casePartiesRequestingReconsideration = casePartiesRequestingReconsideration;
+        return this;
+    }
+
     public CaseData buildMakePaymentsCaseData() {
         Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
@@ -7887,6 +7894,7 @@ public class CaseDataBuilder {
             .reasonForReconsiderationApplicant(reasonForReconsiderationApplicant)
             .reasonForReconsiderationRespondent1(reasonForReconsiderationRespondent1)
             .reasonForReconsiderationRespondent2(reasonForReconsiderationRespondent2)
+            .casePartiesRequestingReconsideration(casePartiesRequestingReconsideration)
             .eaCourtLocation(eaCourtLocation)
             .upholdingPreviousOrderReason(upholdingPreviousOrderReason)
             .decisionOnRequestReconsiderationOptions(decisionOnRequestReconsiderationOptions)

@@ -452,7 +452,7 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         }
 
         @Test
-        void shouldNotGenerateDocAndCallBusinessProcessIfDecisionUpheld() {
+        void shouldCallBusinessProcessIfDecisionIsCreateGeneralOrder() {
             //Given : Casedata
             UpholdingPreviousOrderReason upholdingPreviousOrderReason = new UpholdingPreviousOrderReason();
             upholdingPreviousOrderReason.setReasonForReconsiderationTxtYes("Reason1");
@@ -470,7 +470,33 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getSystemGeneratedCaseDocuments()).isNull();
             assertThat(response.getData())
-                .extracting("businessProcess").isNull();
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(DECISION_ON_RECONSIDERATION_REQUEST.name(), "READY");
+        }
+
+        @Test
+        void shouldCallBusinessProcessIfDecisionIsCreateSDO() {
+            //Given : Casedata
+            UpholdingPreviousOrderReason upholdingPreviousOrderReason = new UpholdingPreviousOrderReason();
+            upholdingPreviousOrderReason.setReasonForReconsiderationTxtYes("Reason1");
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .systemGeneratedCaseDocuments(null).build();
+            caseData.setDecisionOnReconsiderationDocument(null);
+            caseData.setUpholdingPreviousOrderReason(upholdingPreviousOrderReason);
+            caseData.setDecisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: should generate doc and start business process
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getSystemGeneratedCaseDocuments()).isNull();
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(DECISION_ON_RECONSIDERATION_REQUEST.name(), "READY");
         }
     }
 
