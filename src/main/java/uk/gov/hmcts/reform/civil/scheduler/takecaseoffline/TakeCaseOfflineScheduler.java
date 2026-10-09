@@ -9,9 +9,12 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.AllowedEventFlowStateCheckFactory;
 import uk.gov.hmcts.reform.civil.service.search.takecaseoffline.TakeCaseOfflineSchedulerSearchService;
 
 import java.util.List;
+
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 
 @Component
 @RequiredArgsConstructor
@@ -23,7 +26,7 @@ public class TakeCaseOfflineScheduler implements CivilScheduler {
     private final TakeCaseOfflineSchedulerSearchService searchService;
     private final ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
     private final TakeCaseOfflineScheduledTask takeCaseOfflineScheduledTask;
-    private final TakeCaseOfflineFlowStateInterceptor takeCaseOfflineFlowStateInterceptor;
+    private final AllowedEventFlowStateCheckFactory allowedEventFlowStateCheckFactory;
 
     @Override
     public String getName() {
@@ -41,7 +44,7 @@ public class TakeCaseOfflineScheduler implements CivilScheduler {
                 .schedulerName(SCHEDULER_NAME)
                 .searchResultSupplier(searchService::getElasticSearchResult)
                 .scheduledTask(takeCaseOfflineScheduledTask)
-                .interceptors(List.of(takeCaseOfflineFlowStateInterceptor))
+                .interceptors(List.of(allowedEventFlowStateCheckFactory.forEvent(TAKE_CASE_OFFLINE)))
                 .build()
         );
     }
