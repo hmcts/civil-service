@@ -83,7 +83,7 @@ class AllowedEventServiceTest {
         when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
 
         StateFlow stateFlow = mock(StateFlow.class);
-        when(engine.evaluateSpec(caseDetails)).thenReturn(stateFlow);
+        when(engine.evaluateSpec(caseData)).thenReturn(stateFlow);
 
         State state = mock(State.class);
         when(stateFlow.getState()).thenReturn(state);
@@ -94,8 +94,8 @@ class AllowedEventServiceTest {
         boolean allowed = service.isAllowed(caseDetails, caseEvent);
         assertThat(allowed).isTrue();
 
-        verify(engine).evaluateSpec(caseDetails);
-        verify(engine, never()).evaluate(any(CaseDetails.class));
+        verify(engine).evaluateSpec(caseData);
+        verify(engine, never()).evaluate(any(CaseData.class));
     }
 
     @Test
@@ -115,7 +115,7 @@ class AllowedEventServiceTest {
         when(caseData.getCaseAccessCategory()).thenReturn(null);
 
         StateFlow stateFlow = mock(StateFlow.class);
-        when(engine.evaluate(caseDetails)).thenReturn(stateFlow);
+        when(engine.evaluate(caseData)).thenReturn(stateFlow);
 
         State state = mock(State.class);
         when(stateFlow.getState()).thenReturn(state);
@@ -126,8 +126,8 @@ class AllowedEventServiceTest {
         boolean allowed = service.isAllowed(caseDetails, caseEvent);
         assertThat(allowed).isTrue();
 
-        verify(engine).evaluate(caseDetails);
-        verify(engine, never()).evaluateSpec(any(CaseDetails.class));
+        verify(engine).evaluate(caseData);
+        verify(engine, never()).evaluateSpec(any(CaseData.class));
     }
 
     @Test
@@ -147,7 +147,7 @@ class AllowedEventServiceTest {
         when(caseData.getCaseAccessCategory()).thenReturn(UNSPEC_CLAIM);
 
         StateFlow stateFlow = mock(StateFlow.class);
-        when(engine.evaluateSpec(caseDetails)).thenReturn(stateFlow);
+        when(engine.evaluateSpec(caseData)).thenReturn(stateFlow);
 
         State state = mock(State.class);
         when(stateFlow.getState()).thenReturn(state);
@@ -158,8 +158,8 @@ class AllowedEventServiceTest {
         boolean allowed = service.isAllowed(caseDetails, caseEvent);
         assertThat(allowed).isTrue();
 
-        verify(engine).evaluateSpec(caseDetails);
-        verify(engine, never()).evaluate(any(CaseDetails.class));
+        verify(engine).evaluateSpec(caseData);
+        verify(engine, never()).evaluate(any(CaseData.class));
     }
 
     @Test
@@ -179,7 +179,7 @@ class AllowedEventServiceTest {
         when(caseData.getCaseAccessCategory()).thenReturn(UNSPEC_CLAIM);
 
         StateFlow stateFlow = mock(StateFlow.class);
-        when(engine.evaluate(caseDetails)).thenReturn(stateFlow);
+        when(engine.evaluate(caseData)).thenReturn(stateFlow);
 
         State state = mock(State.class);
         when(stateFlow.getState()).thenReturn(state);
@@ -190,8 +190,8 @@ class AllowedEventServiceTest {
         boolean allowed = service.isAllowed(caseDetails, caseEvent);
         assertThat(allowed).isTrue();
 
-        verify(engine).evaluate(caseDetails);
-        verify(engine, never()).evaluateSpec(any(CaseDetails.class));
+        verify(engine).evaluate(caseData);
+        verify(engine, never()).evaluateSpec(any(CaseData.class));
     }
 
     @Test
@@ -211,7 +211,7 @@ class AllowedEventServiceTest {
         when(caseData.getCaseAccessCategory()).thenReturn(UNSPEC_CLAIM);
 
         StateFlow stateFlow = mock(StateFlow.class);
-        when(engine.evaluateSpec(caseDetails)).thenReturn(stateFlow);
+        when(engine.evaluateSpec(caseData)).thenReturn(stateFlow);
 
         State state = mock(State.class);
         when(stateFlow.getState()).thenReturn(state);
@@ -222,8 +222,89 @@ class AllowedEventServiceTest {
         boolean allowed = service.isAllowed(caseDetails, caseEvent);
         assertThat(allowed).isTrue();
 
-        verify(engine).evaluateSpec(caseDetails);
-        verify(engine, never()).evaluate(any(CaseDetails.class));
+        verify(engine).evaluateSpec(caseData);
+        verify(engine, never()).evaluate(any(CaseData.class));
+    }
+
+    @Test
+    void caseDataOverload_returnsTrue_whenWhitelistEvent() {
+        AllowedEventRepository repo = mock(AllowedEventRepository.class);
+        IStateFlowEngine engine = mock(IStateFlowEngine.class);
+        CaseDetailsConverter converter = mock(CaseDetailsConverter.class);
+        AllowedEventScenario scenario = mock(AllowedEventScenario.class);
+        AllowedEventService service = new AllowedEventService(repo, engine, converter, List.of(scenario));
+
+        when(repo.getWhitelist()).thenReturn(Set.of(ADD_CASE_NOTE));
+
+        assertThat(service.isAllowed(mock(CaseData.class), ADD_CASE_NOTE)).isTrue();
+
+        verifyNoInteractions(engine, scenario, converter);
+    }
+
+    @Test
+    void caseDataOverload_returnsFalse_whenNoScenarioApplies() {
+        AllowedEventRepository repo = mock(AllowedEventRepository.class);
+        IStateFlowEngine engine = mock(IStateFlowEngine.class);
+        CaseDetailsConverter converter = mock(CaseDetailsConverter.class);
+        AllowedEventScenario scenario = mock(AllowedEventScenario.class);
+        AllowedEventService service = new AllowedEventService(repo, engine, converter, List.of(scenario));
+
+        CaseData caseData = mock(CaseData.class);
+        when(scenario.appliesTo(false)).thenReturn(false);
+
+        assertThat(service.isAllowed(caseData, DEFENDANT_RESPONSE)).isFalse();
+
+        verifyNoInteractions(engine, converter);
+    }
+
+    @Test
+    void caseDataOverload_usesEvaluateSpecWithoutConversion_whenCaseIsSpec() {
+        AllowedEventRepository repo = mock(AllowedEventRepository.class);
+        IStateFlowEngine engine = mock(IStateFlowEngine.class);
+        CaseDetailsConverter converter = mock(CaseDetailsConverter.class);
+        AllowedEventScenario scenario = mock(AllowedEventScenario.class);
+        AllowedEventService service = new AllowedEventService(repo, engine, converter, List.of(scenario));
+        CaseEvent caseEvent = DEFENDANT_RESPONSE;
+
+        CaseData caseData = mock(CaseData.class);
+        when(scenario.appliesTo(true)).thenReturn(true);
+        when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
+
+        StateFlow stateFlow = mock(StateFlow.class);
+        when(engine.evaluateSpec(caseData)).thenReturn(stateFlow);
+        State state = mock(State.class);
+        when(stateFlow.getState()).thenReturn(state);
+        when(state.getName()).thenReturn(FlowState.Main.DRAFT.fullName());
+        when(scenario.loadBaseEvents(FlowState.Main.DRAFT.fullName())).thenReturn(Set.of(caseEvent));
+
+        assertThat(service.isAllowed(caseData, caseEvent)).isTrue();
+
+        verify(engine, never()).evaluate(any(CaseData.class));
+        verifyNoInteractions(converter);
+    }
+
+    @Test
+    void caseDataOverload_usesEvaluateAndReturnsFalse_whenEventNotInBaseEvents() {
+        AllowedEventRepository repo = mock(AllowedEventRepository.class);
+        IStateFlowEngine engine = mock(IStateFlowEngine.class);
+        CaseDetailsConverter converter = mock(CaseDetailsConverter.class);
+        AllowedEventScenario scenario = mock(AllowedEventScenario.class);
+        AllowedEventService service = new AllowedEventService(repo, engine, converter, List.of(scenario));
+
+        CaseData caseData = mock(CaseData.class);
+        when(scenario.appliesTo(false)).thenReturn(true);
+        when(caseData.getCaseAccessCategory()).thenReturn(UNSPEC_CLAIM);
+
+        StateFlow stateFlow = mock(StateFlow.class);
+        when(engine.evaluate(caseData)).thenReturn(stateFlow);
+        State state = mock(State.class);
+        when(stateFlow.getState()).thenReturn(state);
+        when(state.getName()).thenReturn(FlowState.Main.DRAFT.fullName());
+        when(scenario.loadBaseEvents(FlowState.Main.DRAFT.fullName())).thenReturn(Set.of());
+
+        assertThat(service.isAllowed(caseData, DEFENDANT_RESPONSE)).isFalse();
+
+        verify(engine, never()).evaluateSpec(any(CaseData.class));
     }
 
 }

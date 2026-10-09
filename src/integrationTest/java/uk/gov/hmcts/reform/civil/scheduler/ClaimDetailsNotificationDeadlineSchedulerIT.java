@@ -4,8 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.Application;
@@ -23,6 +23,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,13 +41,13 @@ public class ClaimDetailsNotificationDeadlineSchedulerIT {
     @Autowired
     private ClaimDetailsNotificationDeadlineScheduler scheduler;
 
-    @MockBean
+    @MockitoBean
     private TelemetryService telemetryService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private CaseDismissedScheduledTask caseDismissedScheduledTask;
 
     @Autowired
@@ -65,19 +66,39 @@ public class ClaimDetailsNotificationDeadlineSchedulerIT {
 
     @Test
     void shouldExecuteClaimDetailsNotificationDeadlineScheduler() {
-        CaseDetails searchCase = CaseDetailsBuilder.builder().id(CASE_ID).build();
+        CaseDetails searchCase = CaseDetailsBuilder.builder().atStateAwaitingRespondentAcknowledgement().id(CASE_ID).build();
         SearchResult searchResult = SearchResult.builder()
             .total(1)
             .cases(List.of(searchCase))
             .build();
 
         coreCaseDataApiMockHelper.mockElasticSearchResult(searchResult);
+        coreCaseDataApiMockHelper.mockGetCaseAnyCase(searchCase);
 
         scheduler.runScheduledTask();
 
         verify(caseDismissedScheduledTask).accept(searchCase);
         verify(telemetryService).trackEvent(eq("ClaimDetailsNotificationDeadlineJobStarted"), anyMap());
         verify(telemetryService).trackEvent(eq("ClaimDetailsNotificationDeadlineCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("ClaimDetailsNotificationDeadlineJobCompleted"), anyMap());
+    }
+
+    @Test
+    void shouldAbortClaimDetailsNotificationDeadlineScheduler_whenDismissClaimEventNotAllowed() {
+        CaseDetails searchCase = CaseDetailsBuilder.builder().atStatePendingClaimIssued().id(CASE_ID).build();
+        SearchResult searchResult = SearchResult.builder()
+            .total(1)
+            .cases(List.of(searchCase))
+            .build();
+
+        coreCaseDataApiMockHelper.mockElasticSearchResult(searchResult);
+        coreCaseDataApiMockHelper.mockGetCaseAnyCase(searchCase);
+
+        scheduler.runScheduledTask();
+
+        verify(caseDismissedScheduledTask, never()).accept(searchCase);
+        verify(telemetryService).trackEvent(eq("ClaimDetailsNotificationDeadlineJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("ClaimDetailsNotificationDeadlineCaseAborted"), anyMap());
         verify(telemetryService).trackEvent(eq("ClaimDetailsNotificationDeadlineJobCompleted"), anyMap());
     }
 }

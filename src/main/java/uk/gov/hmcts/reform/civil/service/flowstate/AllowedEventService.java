@@ -33,12 +33,18 @@ public class AllowedEventService {
     }
 
     public boolean isAllowed(CaseDetails caseDetails, CaseEvent event) {
+        return isWhitelisted(event) || evaluate(caseDetailsConverter.toCaseData(caseDetails), event);
+    }
 
-        if (repo.getWhitelist().contains(event)) {
-            return true;
-        }
+    public boolean isAllowed(CaseData caseData, CaseEvent event) {
+        return isWhitelisted(event) || evaluate(caseData, event);
+    }
 
-        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+    private boolean isWhitelisted(CaseEvent event) {
+        return repo.getWhitelist().contains(event);
+    }
+
+    private boolean evaluate(CaseData caseData, CaseEvent event) {
         boolean specOrLip = isSpecOrLip(caseData, event);
         AllowedEventScenario scenario = scenarios.stream()
             .filter(s -> s.appliesTo(specOrLip))
@@ -54,8 +60,8 @@ public class AllowedEventService {
             return false;
         }
 
-        StateFlow stateFlow = specOrLip ? stateFlowEngine.evaluateSpec(caseDetails)
-            : stateFlowEngine.evaluate(caseDetails);
+        StateFlow stateFlow = specOrLip ? stateFlowEngine.evaluateSpec(caseData)
+            : stateFlowEngine.evaluate(caseData);
         return scenario.loadBaseEvents(stateFlow.getState().getName()).contains(event);
     }
 

@@ -4,8 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.Application;
@@ -23,6 +23,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,13 +41,13 @@ public class TrialReadyNotificationSchedulerIT {
     @Autowired
     private TrialReadyNotificationScheduler scheduler;
 
-    @MockBean
+    @MockitoBean
     private TelemetryService telemetryService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private TrialReadyNotificationScheduledTask trialReadyNotificationScheduledTask;
 
     @Autowired
@@ -65,19 +66,39 @@ public class TrialReadyNotificationSchedulerIT {
 
     @Test
     void shouldExecuteTrialReadyNotificationScheduler() {
-        CaseDetails searchCase = CaseDetailsBuilder.builder().id(CASE_ID).build();
+        CaseDetails searchCase = CaseDetailsBuilder.builder().atStateAwaitingRespondentAcknowledgement().id(CASE_ID).build();
         SearchResult searchResult = SearchResult.builder()
             .total(1)
             .cases(List.of(searchCase))
             .build();
 
         coreCaseDataApiMockHelper.mockElasticSearchResult(searchResult);
+        coreCaseDataApiMockHelper.mockGetCase(CASE_ID.toString(), searchCase);
 
         scheduler.runScheduledTask();
 
         verify(trialReadyNotificationScheduledTask).accept(searchCase);
         verify(telemetryService).trackEvent(eq("TrialReadyNotificationJobStarted"), anyMap());
         verify(telemetryService).trackEvent(eq("TrialReadyNotificationCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("TrialReadyNotificationJobCompleted"), anyMap());
+    }
+
+    @Test
+    void shouldAbortTrialReadyNotificationScheduler_whenTrialReadyNotificationEventNotAllowed() {
+        CaseDetails searchCase = CaseDetailsBuilder.builder().atStatePendingClaimIssued().id(CASE_ID).build();
+        SearchResult searchResult = SearchResult.builder()
+            .total(1)
+            .cases(List.of(searchCase))
+            .build();
+
+        coreCaseDataApiMockHelper.mockElasticSearchResult(searchResult);
+        coreCaseDataApiMockHelper.mockGetCase(CASE_ID.toString(), searchCase);
+
+        scheduler.runScheduledTask();
+
+        verify(trialReadyNotificationScheduledTask, never()).accept(searchCase);
+        verify(telemetryService).trackEvent(eq("TrialReadyNotificationJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("TrialReadyNotificationCaseAborted"), anyMap());
         verify(telemetryService).trackEvent(eq("TrialReadyNotificationJobCompleted"), anyMap());
     }
 }
