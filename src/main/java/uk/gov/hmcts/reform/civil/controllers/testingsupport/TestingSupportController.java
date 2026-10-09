@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,46 +28,51 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.controllers.testingsupport.model.TestCamundaProcess;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.TrialReadyNotificationEvent;
+import uk.gov.hmcts.reform.civil.ga.handler.tasks.CheckStayOrderDeadlineEndTaskHandler;
+import uk.gov.hmcts.reform.civil.ga.handler.tasks.CheckUnlessOrderDeadlineEndTaskHandler;
+import uk.gov.hmcts.reform.civil.ga.handler.tasks.GAJudgeRevisitTaskHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
 import uk.gov.hmcts.reform.civil.ga.stateflow.GaStateFlow;
+import uk.gov.hmcts.reform.civil.handler.event.BundleCreationTriggerEventHandler;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeePaidEventHandler;
 import uk.gov.hmcts.reform.civil.handler.event.HearingFeeUnpaidEventHandler;
-import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
-import uk.gov.hmcts.reform.civil.handler.event.BundleCreationTriggerEventHandler;
 import uk.gov.hmcts.reform.civil.handler.event.TrialReadyNotificationEventHandler;
-import uk.gov.hmcts.reform.civil.ga.handler.tasks.CheckStayOrderDeadlineEndTaskHandler;
-import uk.gov.hmcts.reform.civil.ga.handler.tasks.CheckUnlessOrderDeadlineEndTaskHandler;
 import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDetailsNotificationDeadlineHandler;
 import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDismissedHandler;
-import uk.gov.hmcts.reform.civil.ga.handler.tasks.GAJudgeRevisitTaskHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BaseCaseData;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.scheduler.common.SchedulerRegistry;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.civil.service.hearings.HearingValuesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.hearings.HearingValuesService;
 import uk.gov.hmcts.reform.civil.service.judgments.CjesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.dashboard.data.DraftClaimResponse;
+import uk.gov.hmcts.reform.dashboard.exceptions.DraftClaimNotFoundException;
+import uk.gov.hmcts.reform.dashboard.services.DraftClaimService;
+import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 
 import java.util.List;
+import java.util.UUID;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
 
@@ -104,6 +110,7 @@ public class TestingSupportController {
     private final CoreCaseUserService coreCaseUserService;
     private final GAJudgeRevisitTaskHandler gaJudgeRevisitTaskHandler;
     private final SchedulerRegistry civilSchedulerRepository;
+    private final DraftClaimService draftClaimService;
 
     private static final String SUCCESS = "success";
     private static final String FAILED = "failed";
@@ -143,6 +150,33 @@ public class TestingSupportController {
     @GetMapping("/testing-support/schedulers")
     public ResponseEntity<List<String>> getSchedulers() {
         return new ResponseEntity<>(civilSchedulerRepository.getSchedulerNames(), HttpStatus.OK);
+    }
+
+    @PutMapping("/testing-support/draft-claims/{draft-id}/expire")
+    public ResponseEntity<DraftClaimResponse> expireDraftClaim(
+        @PathVariable("draft-id") UUID draftId,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+    ) {
+        log.info("Testing support: expire draft claim {}", draftId);
+        DraftStoreEntity draft = draftClaimService.expireDraftClaim(
+            draftId,
+            userService.getUserInfo(authorisation).getUid()
+        );
+        return ResponseEntity.ok(DraftClaimResponse.from(draft));
+    }
+
+    @GetMapping("/testing-support/draft-claims/{draft-id}")
+    public ResponseEntity<DraftClaimResponse> getDraftClaimIncludingExpired(
+        @PathVariable("draft-id") UUID draftId,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+    ) {
+        log.info("Testing support: get draft claim including expired {}", draftId);
+        DraftStoreEntity draft = draftClaimService.getDraftClaimIncludingExpired(
+                draftId,
+                userService.getUserInfo(authorisation).getUid()
+            )
+            .orElseThrow(() -> new DraftClaimNotFoundException(draftId));
+        return ResponseEntity.ok(DraftClaimResponse.from(draft));
     }
 
     @SuppressWarnings("ClassEscapesDefinedScope")

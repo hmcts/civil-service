@@ -259,4 +259,35 @@ public class DraftStoreService {
             .plusDays(ttlDays + 1);
         return expiryDate.atStartOfDay(EXPIRY_ZONE).toOffsetDateTime();
     }
+
+    @Transactional(readOnly = true)
+    public Optional<DraftStoreEntity> getDraftIncludingExpired(UUID draftId,
+                                                               String userId,
+                                                               DraftType draftType) {
+        Objects.requireNonNull(draftId, "draftId must not be null");
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
+        return draftStoreRepository.findByIdAndUserIdAndDraftType(draftId, userId, draftType);
+    }
+
+    public Optional<DraftStoreEntity> expireDraft(UUID draftId,
+                                                  String userId,
+                                                  DraftType draftType) {
+        Objects.requireNonNull(draftId, "draftId must not be null");
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
+
+        OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
+        int updated = draftStoreRepository.updateExpiresAt(
+            draftId,
+            userId,
+            draftType,
+            now.minusMinutes(1),
+            now
+        );
+        if (updated == 0) {
+            return Optional.empty();
+        }
+        return getDraftIncludingExpired(draftId, userId, draftType);
+    }
 }

@@ -32,14 +32,31 @@ import uk.gov.hmcts.reform.civil.service.judgments.CjesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
+import uk.gov.hmcts.reform.dashboard.data.DraftClaimResponse;
+import uk.gov.hmcts.reform.dashboard.exceptions.DraftClaimNotFoundException;
+import uk.gov.hmcts.reform.dashboard.services.DraftClaimService;
+import uk.gov.hmcts.reform.draftstore.DraftType;
+import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
+import java.time.OffsetDateTime;
+import java.util.HashMap;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TestingSupportControllerTest {
+
+    private static final String USER_ID = "user-1";
+    private static final String AUTH = "Bearer token";
+    private static final UUID DRAFT_ID = UUID.randomUUID();
 
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
@@ -91,6 +108,8 @@ class TestingSupportControllerTest {
     private GAJudgeRevisitTaskHandler gaJudgeRevisitTaskHandler;
     @Mock
     private SchedulerRegistry civilSchedulerRepository;
+    @Mock
+    private DraftClaimService draftClaimService;
 
     @InjectMocks
     private TestingSupportController controller;
@@ -114,5 +133,60 @@ class TestingSupportControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo("failed");
         verify(claimDetailsNotificationDeadlineHandler).handleTask(any(ExternalTask.class));
+    }
+
+    @Test
+    void shouldExpireDraftClaim() {
+        DraftStoreEntity draft = draft();
+        when(userService.getUserInfo(AUTH)).thenReturn(UserInfo.builder().uid(USER_ID).build());
+        when(draftClaimService.expireDraftClaim(DRAFT_ID, USER_ID)).thenReturn(draft);
+
+        ResponseEntity<DraftClaimResponse> response = controller.expireDraftClaim(DRAFT_ID, AUTH);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getDraftId()).isEqualTo(DRAFT_ID);
+        assertThat(response.getBody().getExpiresAt()).isEqualTo(draft.getExpiresAt());
+        verify(draftClaimService).expireDraftClaim(DRAFT_ID, USER_ID);
+    }
+
+    @Test
+    void shouldGetDraftClaimIncludingExpired() {
+        DraftStoreEntity draft = draft();
+        when(userService.getUserInfo(AUTH)).thenReturn(UserInfo.builder().uid(USER_ID).build());
+        when(draftClaimService.getDraftClaimIncludingExpired(DRAFT_ID, USER_ID))
+            .thenReturn(Optional.of(draft));
+
+        ResponseEntity<DraftClaimResponse> response =
+            controller.getDraftClaimIncludingExpired(DRAFT_ID, AUTH);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getDraftId()).isEqualTo(DRAFT_ID);
+        verify(draftClaimService).getDraftClaimIncludingExpired(DRAFT_ID, USER_ID);
+    }
+
+    @Test
+    void shouldThrowNotFoundWhenDraftClaimIncludingExpiredIsMissing() {
+        when(userService.getUserInfo(AUTH)).thenReturn(UserInfo.builder().uid(USER_ID).build());
+        when(draftClaimService.getDraftClaimIncludingExpired(DRAFT_ID, USER_ID))
+            .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> controller.getDraftClaimIncludingExpired(DRAFT_ID, AUTH))
+            .isInstanceOf(DraftClaimNotFoundException.class);
+    }
+
+    private DraftStoreEntity draft() {
+        OffsetDateTime now = OffsetDateTime.now();
+        return new DraftStoreEntity(
+            DRAFT_ID,
+            USER_ID,
+            null,
+            DraftType.DRAFT_CLAIM,
+            new HashMap<>(),
+            now.minusDays(1),
+            now,
+            now.minusMinutes(1)
+        );
     }
 }

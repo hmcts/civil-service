@@ -41,14 +41,11 @@ public interface DraftStoreRepository extends JpaRepository<DraftStoreEntity, UU
         OffsetDateTime now
     );
 
-    long deleteByIdAndUserIdAndDraftType(UUID id, String userId, DraftType draftType);
-
-    @Query("SELECT d.id FROM DraftStoreEntity d WHERE d.expiresAt < :now ORDER BY d.id ASC")
-    List<UUID> findExpiredIds(@Param("now") OffsetDateTime now, Pageable pageable);
-
-    @Modifying
-    @Query("DELETE FROM DraftStoreEntity d WHERE d.id IN :ids")
-    int deleteByIds(@Param("ids") List<UUID> ids);
+    Optional<DraftStoreEntity> findByIdAndUserIdAndDraftType(
+        UUID id,
+        String userId,
+        DraftType draftType
+    );
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
@@ -63,4 +60,13 @@ public interface DraftStoreRepository extends JpaRepository<DraftStoreEntity, UU
         @Param("expiresAt") OffsetDateTime expiresAt,
         @Param("updatedAt") OffsetDateTime updatedAt
     );
+
+    long deleteByIdAndUserIdAndDraftType(UUID id, String userId, DraftType draftType);
+
+    @Query("SELECT d.id FROM DraftStoreEntity d WHERE d.expiresAt < :now ORDER BY d.id ASC")
+    List<UUID> findExpiredIds(@Param("now") OffsetDateTime now, Pageable pageable);
+
+    @Modifying
+    @Query("DELETE FROM DraftStoreEntity d WHERE d.id IN :ids")
+    int deleteByIds(@Param("ids") List<UUID> ids);
 }
