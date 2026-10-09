@@ -11,15 +11,19 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -161,6 +165,29 @@ class HttpClientFeignConfigurationTest {
             .isEqualTo(exception);
 
         verify(telemetryClient).trackMetric(eq("httpclient.request.duration_ms"), anyDouble());
+    }
+
+    @Test
+    @ExtendWith(OutputCaptureExtension.class)
+    void shouldLogReadTimeoutWithoutTelemetryAndPreserveException(CapturedOutput output) throws Exception {
+        Client delegate = mock(Client.class);
+        Client client = (Client) newInnerInstance(
+            new Class<?>[]{Client.class, TelemetryClient.class, long.class},
+            new Object[]{delegate, null, 15000L});
+        Request request = Request.create(Request.HttpMethod.POST,
+            "http://ccd-data-store-api/cases/123?token=secret", Collections.emptyMap(), null,
+            StandardCharsets.UTF_8, null);
+        Request.Options options = new Request.Options(5, TimeUnit.SECONDS, 25, TimeUnit.SECONDS, true);
+        SocketTimeoutException exception = new SocketTimeoutException("Read timed out");
+        when(delegate.execute(request, options)).thenThrow(exception);
+
+        assertThatThrownBy(() -> client.execute(request, options)).isSameAs(exception);
+
+        assertThat(output.getOut())
+            .contains("targetHost=ccd-data-store-api", "method=POST", "connectTimeoutMs=5000",
+                "readTimeoutMs=25000", "exceptionType=java.net.SocketTimeoutException")
+            .containsPattern("elapsedMs=\\d+")
+            .doesNotContain("/cases/123", "token=secret");
     }
 
     private Object newInnerInstance(Class<?>[] parameterTypes, Object[] args) throws Exception {
