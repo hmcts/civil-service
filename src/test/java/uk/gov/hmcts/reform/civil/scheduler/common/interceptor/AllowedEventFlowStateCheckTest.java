@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.scheduler.takecaseoffline;
+package uk.gov.hmcts.reform.civil.scheduler.common.interceptor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,10 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.CaseInterceptorAttributes;
-import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorChain;
-import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorContext;
-import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.TaskAbortedException;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.flowstate.AllowedEventService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -31,7 +27,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 
 @ExtendWith(MockitoExtension.class)
-class TakeCaseOfflineFlowStateInterceptorTest {
+class AllowedEventFlowStateCheckTest {
 
     @Mock
     private AllowedEventService allowedEventService;
@@ -44,15 +40,16 @@ class TakeCaseOfflineFlowStateInterceptorTest {
     @Mock
     private InterceptorChain<CaseDetails> chain;
 
-    private TakeCaseOfflineFlowStateInterceptor interceptor;
+    private AllowedEventFlowStateCheck interceptor;
 
     @BeforeEach
     void setUp() {
-        interceptor = new TakeCaseOfflineFlowStateInterceptor(
+        interceptor = new AllowedEventFlowStateCheck(
             allowedEventService,
             stateFlowEngine,
             caseDetailsConverter,
-            coreCaseDataService
+            coreCaseDataService,
+            TAKE_CASE_OFFLINE
         );
     }
 
