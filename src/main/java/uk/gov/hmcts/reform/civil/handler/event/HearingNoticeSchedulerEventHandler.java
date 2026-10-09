@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeMessageVars;
+import uk.gov.hmcts.reform.civil.model.InvalidHearingNoticeProcessed;
+import uk.gov.hmcts.reform.civil.service.hearingnotice.InvalidHearingNoticeService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
@@ -46,6 +48,7 @@ public class HearingNoticeSchedulerEventHandler {
     private final CamundaRuntimeClient camundaRuntimeClient;
     private final ObjectMapper mapper;
     private final CoreCaseDataService coreCaseDataService;
+    private final InvalidHearingNoticeService invalidHearingNoticeService;
     static final CaseState[] DISALLOWED_CASE_STATES = {
         CASE_SETTLED,
         PROCEEDS_IN_HERITAGE_SYSTEM,
@@ -120,6 +123,11 @@ public class HearingNoticeSchedulerEventHandler {
         String caseReference = hearing.getCaseDetails().getCaseRef();
         CaseDetails caseDetails = coreCaseDataService.getCase(Long.parseLong(caseReference));
         if (isAllowedState(caseDetails.getState(), caseReference)) {
+            if (invalidHearingNoticeService.hasProcessed(caseDetails, new InvalidHearingNoticeProcessed(
+                hearingId, hearing.getRequestDetails().getVersionNumber(), hearingRxDateTime))) {
+                log.info("Skipping hearing [{}]: this response has already been referred for manual action", hearingId);
+                return;
+            }
             log.info("Dispatching hearing notice task for hearing [{}].", hearingId);
             // Initiate the automated hearing notice generation and notification workflow when a valid, new,
             // or updated hearing is detected

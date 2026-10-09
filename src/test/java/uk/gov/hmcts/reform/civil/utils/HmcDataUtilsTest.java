@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -1347,6 +1348,16 @@ class HmcDataUtilsTest {
 
         @MockBean
         private LocationReferenceDataService locationRefDataService;
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {" ", "\t", "\n", "  \t\n  "})
+        void shouldRejectMissingLocation_forOtherCallers(String venueId) {
+            when(locationRefDataService.getHearingCourtLocations("authToken", "AAA6"))
+                .thenReturn(List.of(new LocationRefData().setEpimmsId("venue")));
+            assertThrows(IllegalArgumentException.class, () -> HmcDataUtils.getLocationRefData(
+                "HER123", venueId, "authToken", "AAA6", locationRefDataService));
+        }
 
         @Test
         void shouldReturnLocation_whenInvoked() {
