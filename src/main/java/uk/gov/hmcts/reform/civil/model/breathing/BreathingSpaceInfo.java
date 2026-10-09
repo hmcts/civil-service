@@ -23,6 +23,9 @@ public class BreathingSpaceInfo {
     @JsonProperty("breathingSpaceActive")
     private YesOrNo active;
 
+    @JsonProperty("breathingSpaceLiftPending")
+    private YesOrNo liftPending;
+
     @JsonProperty("storedBreathingSpace")
     private List<Element<StoredBreathingSpace>> storedBreathingSpace;
 
