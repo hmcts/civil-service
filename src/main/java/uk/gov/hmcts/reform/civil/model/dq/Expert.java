@@ -30,6 +30,7 @@ public class Expert {
 
     public static Expert fromSmallClaimExpertDetails(ExpertDetails expertDetails) {
         return new Expert()
+            .setPartyID(expertDetails.getPartyID())
             .setName(expertDetails.getExpertName())
             .setFirstName(expertDetails.getFirstName())
             .setLastName(expertDetails.getLastName())

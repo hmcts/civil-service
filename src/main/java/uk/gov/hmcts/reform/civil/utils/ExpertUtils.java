@@ -23,6 +23,24 @@ public class ExpertUtils {
         //NO-OP
     }
 
+    /**
+     * Spec small-claim expert rebuild creates a new Expert without a stable partyID. When DQ experts
+     * already exist (e.g. first defendant already responded), reuse that partyID so case flags merge.
+     */
+    public static Expert withPreservedPartyId(Expert expert, Experts existingExperts) {
+        if (expert == null || expert.getPartyID() != null) {
+            return expert;
+        }
+        if (existingExperts == null || existingExperts.getDetails() == null || existingExperts.getDetails().isEmpty()) {
+            return expert;
+        }
+        Expert existing = existingExperts.getDetails().get(0).getValue();
+        if (existing != null && existing.getPartyID() != null) {
+            return expert.copy().setPartyID(existing.getPartyID());
+        }
+        return expert;
+    }
+
     private static Experts addEventAndDateToExperts(Experts experts, LocalDate dateAdded, String eventAdded) {
         List<Expert> expertList = unwrapElements(experts.getDetails());
         List<Element<Expert>> updatedExpertDetails = new ArrayList<>();

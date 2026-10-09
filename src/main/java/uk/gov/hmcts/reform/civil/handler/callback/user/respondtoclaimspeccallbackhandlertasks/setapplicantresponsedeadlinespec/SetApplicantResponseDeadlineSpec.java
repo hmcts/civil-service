@@ -107,7 +107,7 @@ public class SetApplicantResponseDeadlineSpec implements CaseTask {
 
         setApplicantResponseDeadlineCaseDataUpdaters.forEach(updater -> updater.update(caseData));
         handleSolicitorRepresentation(callbackParams, caseData, responseDate);
-        handleExpertsAndWitnesses(caseData);
+        handleExpertsAndWitnesses(callbackParams, caseData);
 
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(caseData);
 
@@ -211,8 +211,39 @@ public class SetApplicantResponseDeadlineSpec implements CaseTask {
         caseData.setUiStatementOfTruth(new StatementOfTruth());
     }
 
-    private void handleExpertsAndWitnesses(CaseData caseData) {
-        expertsAndWitnessesCaseDataUpdaters.forEach(updater -> updater.update(caseData));
+    private void handleExpertsAndWitnesses(CallbackParams callbackParams, CaseData caseData) {
+        // In 1v2 DS only update the responding solicitor's experts/witnesses. Re-running the first
+        // defendant's Spec updaters on the second response rebuilds DQ without stable partyIDs and
+        // causes case flags (FlagDetails) on experts/witnesses to be wiped.
+        boolean respondent2Only = solicitorRepresentsOnlyOneOfRespondents(callbackParams);
+        boolean respondent1Only = isRespondentSolicitorOneOnly(callbackParams);
+
+        expertsAndWitnessesCaseDataUpdaters.forEach(updater -> {
+            if (respondent2Only && !isRespondent2ExpertsOrWitnessesUpdater(updater)) {
+                return;
+            }
+            if (respondent1Only && !isRespondent1ExpertsOrWitnessesUpdater(updater)) {
+                return;
+            }
+            updater.update(caseData);
+        });
+    }
+
+    private boolean isRespondentSolicitorOneOnly(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        return stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
+            && solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORONE)
+            && !solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWO);
+    }
+
+    private static boolean isRespondent1ExpertsOrWitnessesUpdater(ExpertsAndWitnessesCaseDataUpdater updater) {
+        return updater instanceof Respondent1ExpertsCaseDataUpdaters
+            || updater instanceof Respondent1WitnessesCaseDataUpdater;
+    }
+
+    private static boolean isRespondent2ExpertsOrWitnessesUpdater(ExpertsAndWitnessesCaseDataUpdater updater) {
+        return updater instanceof Respondent2ExpertsCaseDataUpdater
+            || updater instanceof Respondent2WitnessesCaseDataUpdater;
     }
 
     private void handleDocumentGeneration(CallbackParams callbackParams,
