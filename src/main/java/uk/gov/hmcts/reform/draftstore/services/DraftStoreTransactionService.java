@@ -92,4 +92,41 @@ public class DraftStoreTransactionService {
         log.info("Updating expiresAt for draft type={} draftId={}", draftType, draftId);
         return draftStoreRepository.updateExpiresAt(draftId, userId, draftType, expiresAt, updatedAt);
     }
+
+    /**
+     * Atomically claims a blank draft for the given submission ID. Returns 1 when this caller
+     * won the claim and may proceed to CCD create; 0 when another submission already claimed
+     * or the draft is already linked.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public int claimSubmissionInNewTransaction(UUID draftId,
+                                               String userId,
+                                               DraftType draftType,
+                                               String submissionId,
+                                               OffsetDateTime updatedAt) {
+        Objects.requireNonNull(draftId, "draftId must not be null");
+        Objects.requireNonNull(userId, "userId must not be null");
+        Objects.requireNonNull(draftType, "draftType must not be null");
+        Objects.requireNonNull(submissionId, "submissionId must not be null");
+        Objects.requireNonNull(updatedAt, "updatedAt must not be null");
+        entityManager.joinTransaction();
+        log.info("Claiming submission for draft type={} draftId={}", draftType, draftId);
+        return draftStoreRepository.claimSubmission(draftId, userId, draftType, submissionId, updatedAt);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public int linkCaseIdInNewTransaction(UUID draftId,
+                                          String userId,
+                                          DraftType draftType,
+                                          String caseId,
+                                          OffsetDateTime updatedAt) {
+        Objects.requireNonNull(draftId, "draftId must not be null");
+        Objects.requireNonNull(userId, "userId must not be null");
+        Objects.requireNonNull(draftType, "draftType must not be null");
+        Objects.requireNonNull(caseId, "caseId must not be null");
+        Objects.requireNonNull(updatedAt, "updatedAt must not be null");
+        entityManager.joinTransaction();
+        log.info("Linking caseId for draft type={} draftId={} caseId={}", draftType, draftId, caseId);
+        return draftStoreRepository.linkCaseId(draftId, userId, draftType, caseId, updatedAt);
+    }
 }

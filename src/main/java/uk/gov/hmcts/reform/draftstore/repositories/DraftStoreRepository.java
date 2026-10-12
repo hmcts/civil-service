@@ -63,4 +63,39 @@ public interface DraftStoreRepository extends JpaRepository<DraftStoreEntity, UU
         @Param("expiresAt") OffsetDateTime expiresAt,
         @Param("updatedAt") OffsetDateTime updatedAt
     );
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        UPDATE DraftStoreEntity d
+        SET d.submissionId = :submissionId, d.updatedAt = :updatedAt
+        WHERE d.id = :id
+          AND d.userId = :userId
+          AND d.draftType = :draftType
+          AND d.caseId IS NULL
+          AND d.submissionId IS NULL
+        """)
+    int claimSubmission(
+        @Param("id") UUID id,
+        @Param("userId") String userId,
+        @Param("draftType") DraftType draftType,
+        @Param("submissionId") String submissionId,
+        @Param("updatedAt") OffsetDateTime updatedAt
+    );
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        UPDATE DraftStoreEntity d
+        SET d.caseId = :caseId, d.updatedAt = :updatedAt
+        WHERE d.id = :id
+          AND d.userId = :userId
+          AND d.draftType = :draftType
+          AND d.caseId IS NULL
+        """)
+    int linkCaseId(
+        @Param("id") UUID id,
+        @Param("userId") String userId,
+        @Param("draftType") DraftType draftType,
+        @Param("caseId") String caseId,
+        @Param("updatedAt") OffsetDateTime updatedAt
+    );
 }

@@ -76,7 +76,8 @@ public class ExpiredDraftStoreSchedulerIT {
             Map.of("data", "expired"),
             now.minusDays(3),
             now.minusDays(2),
-            now.minusDays(1)
+            now.minusDays(1),
+            null
         );
 
         DraftStoreEntity futureDraft = new DraftStoreEntity(
@@ -87,7 +88,8 @@ public class ExpiredDraftStoreSchedulerIT {
             Map.of("data", "future"),
             now.minusDays(1),
             now,
-            now.plusHours(1)
+            now.plusHours(1),
+            null
         );
 
         draftStoreRepository.save(expiredDraft);
@@ -125,7 +127,8 @@ public class ExpiredDraftStoreSchedulerIT {
                 Map.of("data", "batch-expired-" + i),
                 now.minusDays(3),
                 now.minusDays(2),
-                now.minusDays(1)
+                now.minusDays(1),
+                null
             ));
         }
 
@@ -156,7 +159,8 @@ public class ExpiredDraftStoreSchedulerIT {
             Map.of("data", "expired"),
             now.minusDays(3),
             now.minusDays(2),
-            now.minusDays(1)
+            now.minusDays(1),
+            null
         );
 
         draftStoreRepository.save(expiredDraft);

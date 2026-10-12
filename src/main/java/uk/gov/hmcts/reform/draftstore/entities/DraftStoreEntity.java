@@ -65,4 +65,8 @@ public class DraftStoreEntity implements Serializable {
     @NotNull
     @Column(name = "expires_at")
     private OffsetDateTime expiresAt;
+
+    @Size(max = 200)
+    @Column(name = "submission_id")
+    private String submissionId;
 }

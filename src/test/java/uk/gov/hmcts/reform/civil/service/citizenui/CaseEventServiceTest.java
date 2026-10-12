@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -36,6 +37,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -45,6 +47,7 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
 import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataContentFromStartEventResponse;
@@ -162,9 +165,11 @@ public class CaseEventServiceTest {
     }
 
     @Test
-    void shouldCreateAndLinkDraftOnFirstSubmitWithSubmissionId() {
+    void shouldClaimThenCreateAndLinkOnFirstSubmitWithSubmissionId() {
         DraftStoreEntity draft = blankDraft();
         given(draftStoreService.getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM)).willReturn(Optional.of(draft));
+        given(draftStoreService.claimSubmission(DRAFT_ID, USER_ID, SUBMISSION_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(true);
         given(draftStoreService.linkCaseId(DRAFT_ID, USER_ID, "1", DraftType.DRAFT_CLAIM))
             .willReturn(Optional.of(draft));
 
@@ -177,8 +182,10 @@ public class CaseEventServiceTest {
                                                               .setSubmissionId(SUBMISSION_ID));
 
         assertThat(result).isEqualTo(CASE_DETAILS);
-        verify(coreCaseDataApi).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
-        verify(draftStoreService).linkCaseId(DRAFT_ID, USER_ID, "1", DraftType.DRAFT_CLAIM);
+        InOrder order = inOrder(draftStoreService, coreCaseDataApi);
+        order.verify(draftStoreService).claimSubmission(DRAFT_ID, USER_ID, SUBMISSION_ID, DraftType.DRAFT_CLAIM);
+        order.verify(coreCaseDataApi).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
+        order.verify(draftStoreService).linkCaseId(DRAFT_ID, USER_ID, "1", DraftType.DRAFT_CLAIM);
     }
 
     @Test
@@ -199,16 +206,71 @@ public class CaseEventServiceTest {
 
         assertThat(result).isEqualTo(existing);
         verify(coreCaseDataApi, never()).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
+        verify(draftStoreService, never()).claimSubmission(any(), any(), any(), any());
+        verify(draftStoreService, never()).linkCaseId(any(), any(), any(), any());
+    }
+
+    @Test
+    void shouldNotCreateCcdWhenSubmissionAlreadyClaimed() {
+        DraftStoreEntity inProgress = blankDraft();
+        inProgress.setSubmissionId(SUBMISSION_ID);
+        given(draftStoreService.getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.of(inProgress));
+        given(draftStoreService.claimSubmission(DRAFT_ID, USER_ID, SUBMISSION_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(false);
+
+        assertThatThrownBy(() -> caseEventService.submitEvent(new EventSubmissionParams()
+                                                                  .setUpdates(Maps.newHashMap())
+                                                                  .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+                                                                  .setCaseId(DRAFT)
+                                                                  .setUserId(USER_ID)
+                                                                  .setAuthorisation(AUTHORISATION)
+                                                                  .setSubmissionId(SUBMISSION_ID)))
+            .isInstanceOf(ResponseStatusException.class)
+            .extracting(ex -> ((ResponseStatusException) ex).getStatusCode())
+            .isEqualTo(CONFLICT);
+
+        verify(coreCaseDataApi, never()).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
+        verify(draftStoreService, never()).linkCaseId(any(), any(), any(), any());
+    }
+
+    @Test
+    void shouldReturnExistingCaseWhenClaimLostButDraftAlreadyLinked() {
+        DraftStoreEntity blank = blankDraft();
+        DraftStoreEntity linked = blankDraft();
+        linked.setCaseId("99");
+        linked.setSubmissionId(SUBMISSION_ID);
+        CaseDetails existing = CaseDetails.builder().id(99L).build();
+        given(draftStoreService.getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.of(blank))
+            .willReturn(Optional.of(linked));
+        given(draftStoreService.claimSubmission(DRAFT_ID, USER_ID, SUBMISSION_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(false);
+        given(coreCaseDataService.getCase(99L, AUTHORISATION)).willReturn(existing);
+
+        CaseDetails result = caseEventService.submitEvent(new EventSubmissionParams()
+                                                              .setUpdates(Maps.newHashMap())
+                                                              .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+                                                              .setCaseId(DRAFT)
+                                                              .setUserId(USER_ID)
+                                                              .setAuthorisation(AUTHORISATION)
+                                                              .setSubmissionId(SUBMISSION_ID));
+
+        assertThat(result).isEqualTo(existing);
+        verify(coreCaseDataApi, never()).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
         verify(draftStoreService, never()).linkCaseId(any(), any(), any(), any());
     }
 
     @Test
     void shouldCreateNewCaseForDifferentDraftSubmissionId() {
         UUID otherDraftId = UUID.fromString("11111111-2222-3333-4444-555555555555");
+        final String otherSubmissionId = USER_ID + ":" + otherDraftId + ":2026-10-12T10:00:00Z";
         DraftStoreEntity otherDraft = blankDraft();
         otherDraft.setId(otherDraftId);
         given(draftStoreService.getDraft(otherDraftId, USER_ID, DraftType.DRAFT_CLAIM))
             .willReturn(Optional.of(otherDraft));
+        given(draftStoreService.claimSubmission(otherDraftId, USER_ID, otherSubmissionId, DraftType.DRAFT_CLAIM))
+            .willReturn(true);
         given(draftStoreService.linkCaseId(eq(otherDraftId), eq(USER_ID), eq("1"), eq(DraftType.DRAFT_CLAIM)))
             .willReturn(Optional.of(otherDraft));
 
@@ -218,11 +280,10 @@ public class CaseEventServiceTest {
                                                               .setCaseId(DRAFT)
                                                               .setUserId(USER_ID)
                                                               .setAuthorisation(AUTHORISATION)
-                                                              .setSubmissionId(
-                                                                  USER_ID + ":" + otherDraftId + ":2026-10-12T10:00:00Z"
-                                                              ));
+                                                              .setSubmissionId(otherSubmissionId));
 
         assertThat(result).isEqualTo(CASE_DETAILS);
+        verify(draftStoreService).claimSubmission(otherDraftId, USER_ID, otherSubmissionId, DraftType.DRAFT_CLAIM);
         verify(draftStoreService).linkCaseId(otherDraftId, USER_ID, "1", DraftType.DRAFT_CLAIM);
     }
 
@@ -267,7 +328,8 @@ public class CaseEventServiceTest {
             new HashMap<>(Map.of("step", "ready")),
             now,
             now,
-            now.plusDays(30)
+            now.plusDays(30),
+            null
         );
     }
 }

@@ -57,7 +57,8 @@ public class DraftStoreService {
             payloadCopy,
             now,
             now,
-            calculateExpiresAt(now, retentionDays)
+            calculateExpiresAt(now, retentionDays),
+            null
         );
         return draftStoreTransactionService.saveInNewTransaction(draft);
     }
@@ -124,11 +125,35 @@ public class DraftStoreService {
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(caseId, "caseId must not be null");
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
-        return getDraft(draftId, userId, draftType).map(draft -> {
-            draft.setCaseId(caseId);
-            draft.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
-            return draftStoreTransactionService.saveInNewTransaction(draft);
-        });
+        int linked = draftStoreTransactionService.linkCaseIdInNewTransaction(
+            draftId,
+            userId,
+            draftType,
+            caseId,
+            OffsetDateTime.now(ZoneOffset.UTC)
+        );
+        if (linked == 0) {
+            return Optional.empty();
+        }
+        return getDraft(draftId, userId, draftType);
+    }
+
+    /**
+     * Claims the draft for this submission before CCD create. Returns true only for the
+     * caller that successfully set {@code submission_id} while {@code case_id} was still null.
+     */
+    public boolean claimSubmission(UUID draftId, String userId, String submissionId, DraftType draftType) {
+        Objects.requireNonNull(draftId, "draftId must not be null");
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(submissionId, "submissionId must not be null");
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
+        return draftStoreTransactionService.claimSubmissionInNewTransaction(
+            draftId,
+            userId,
+            draftType,
+            submissionId,
+            OffsetDateTime.now(ZoneOffset.UTC)
+        ) == 1;
     }
 
     public Optional<DraftStoreEntity> applyPaymentRetention(UUID draftId, String userId, DraftType draftType) {

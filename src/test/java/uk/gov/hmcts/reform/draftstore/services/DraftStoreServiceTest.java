@@ -325,7 +325,8 @@ class DraftStoreServiceTest {
                 new HashMap<>(Map.of("step", "existing")),
                 createdAt,
                 createdAt,
-                soonExpiry
+                soonExpiry,
+                null
             );
             when(draftStoreRepository.findByIdAndUserIdAndDraftTypeAndExpiresAtAfter(
                 eq(DRAFT_ID),
@@ -500,6 +501,105 @@ class DraftStoreServiceTest {
         );
     }
 
+    @Nested
+    class ClaimSubmissionTests {
+
+        private static final String SUBMISSION_ID = "user1:draft:2026-10-12T10:00:00Z";
+
+        @Test
+        void shouldReturnTrueWhenClaimWins() {
+            when(draftStoreTransactionService.claimSubmissionInNewTransaction(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                eq(SUBMISSION_ID),
+                any(OffsetDateTime.class)
+            )).thenReturn(1);
+
+            boolean claimed = draftStoreService.claimSubmission(
+                DRAFT_ID,
+                USER_ID,
+                SUBMISSION_ID,
+                DRAFT_TYPE
+            );
+
+            assertThat(claimed).isTrue();
+        }
+
+        @Test
+        void shouldReturnFalseWhenClaimLoses() {
+            when(draftStoreTransactionService.claimSubmissionInNewTransaction(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                eq(SUBMISSION_ID),
+                any(OffsetDateTime.class)
+            )).thenReturn(0);
+
+            boolean claimed = draftStoreService.claimSubmission(
+                DRAFT_ID,
+                USER_ID,
+                SUBMISSION_ID,
+                DRAFT_TYPE
+            );
+
+            assertThat(claimed).isFalse();
+        }
+    }
+
+    @Nested
+    class LinkCaseIdTests {
+
+        @Test
+        void shouldReturnDraftWhenLinkSucceeds() {
+            DraftStoreEntity linked = draft();
+            linked.setCaseId(CASE_ID);
+            when(draftStoreTransactionService.linkCaseIdInNewTransaction(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                eq(CASE_ID),
+                any(OffsetDateTime.class)
+            )).thenReturn(1);
+            when(draftStoreRepository.findByIdAndUserIdAndDraftTypeAndExpiresAtAfter(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                any(OffsetDateTime.class)
+            )).thenReturn(Optional.of(linked));
+
+            Optional<DraftStoreEntity> result = draftStoreService.linkCaseId(
+                DRAFT_ID,
+                USER_ID,
+                CASE_ID,
+                DRAFT_TYPE
+            );
+
+            assertThat(result).contains(linked);
+        }
+
+        @Test
+        void shouldReturnEmptyWhenLinkDoesNotUpdate() {
+            when(draftStoreTransactionService.linkCaseIdInNewTransaction(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                eq(CASE_ID),
+                any(OffsetDateTime.class)
+            )).thenReturn(0);
+
+            Optional<DraftStoreEntity> result = draftStoreService.linkCaseId(
+                DRAFT_ID,
+                USER_ID,
+                CASE_ID,
+                DRAFT_TYPE
+            );
+
+            assertThat(result).isEmpty();
+            verifyNoInteractions(draftStoreRepository);
+        }
+    }
+
     private DraftStoreEntity draft() {
         OffsetDateTime createdAt = OffsetDateTime.now().minusDays(1);
         return new DraftStoreEntity(
@@ -510,7 +610,8 @@ class DraftStoreServiceTest {
             new HashMap<>(Map.of("step", "existing")),
             createdAt,
             createdAt,
-            createdAt.plusDays(30)
+            createdAt.plusDays(30),
+            null
         );
     }
 }

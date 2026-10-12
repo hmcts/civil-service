@@ -319,7 +319,8 @@ class DraftClaimServiceTest {
             new HashMap<>(Map.of("step", "existing-payload")),
             createdAt,
             createdAt,
-            expiresAt
+            expiresAt,
+            null
         );
     }
 }

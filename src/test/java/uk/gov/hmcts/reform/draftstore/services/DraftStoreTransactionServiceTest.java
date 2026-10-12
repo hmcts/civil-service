@@ -109,9 +109,45 @@ class DraftStoreTransactionServiceTest {
         verifyNoInteractions(entityManager, draftStoreRepository);
     }
 
+    @Test
+    void shouldJoinTransactionBeforeClaimSubmission() {
+        UUID draftId = UUID.randomUUID();
+        OffsetDateTime updatedAt = OffsetDateTime.now();
+        when(draftStoreRepository.claimSubmission(
+            draftId, "user", DraftType.DRAFT_CLAIM, "submission-1", updatedAt))
+            .thenReturn(1);
+
+        int claimed = draftStoreTransactionService.claimSubmissionInNewTransaction(
+            draftId, "user", DraftType.DRAFT_CLAIM, "submission-1", updatedAt);
+
+        assertThat(claimed).isEqualTo(1);
+        InOrder order = inOrder(entityManager, draftStoreRepository);
+        order.verify(entityManager).joinTransaction();
+        order.verify(draftStoreRepository).claimSubmission(
+            draftId, "user", DraftType.DRAFT_CLAIM, "submission-1", updatedAt);
+    }
+
+    @Test
+    void shouldJoinTransactionBeforeLinkCaseId() {
+        UUID draftId = UUID.randomUUID();
+        OffsetDateTime updatedAt = OffsetDateTime.now();
+        when(draftStoreRepository.linkCaseId(
+            draftId, "user", DraftType.DRAFT_CLAIM, "99", updatedAt))
+            .thenReturn(1);
+
+        int linked = draftStoreTransactionService.linkCaseIdInNewTransaction(
+            draftId, "user", DraftType.DRAFT_CLAIM, "99", updatedAt);
+
+        assertThat(linked).isEqualTo(1);
+        InOrder order = inOrder(entityManager, draftStoreRepository);
+        order.verify(entityManager).joinTransaction();
+        order.verify(draftStoreRepository).linkCaseId(
+            draftId, "user", DraftType.DRAFT_CLAIM, "99", updatedAt);
+    }
+
     private DraftStoreEntity draft() {
         OffsetDateTime now = OffsetDateTime.now();
         return new DraftStoreEntity(UUID.randomUUID(), "user", null, DraftType.DRAFT_CLAIM,
-                                    new HashMap<>(), now, now, now.plusDays(30));
+                                    new HashMap<>(), now, now, now.plusDays(30), null);
     }
 }

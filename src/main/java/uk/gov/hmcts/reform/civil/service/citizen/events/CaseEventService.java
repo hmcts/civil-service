@@ -3,7 +3,9 @@ package uk.gov.hmcts.reform.civil.service.citizen.events;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -109,31 +111,68 @@ public class CaseEventService {
 
     public CaseDetails submitEventForNewClaim(EventSubmissionParams params) {
         Optional<UUID> draftId = parseDbDraftId(params);
-        if (draftId.isPresent()) {
-            Optional<DraftStoreEntity> draft = draftStoreService.getDraft(
-                draftId.get(),
-                params.getUserId(),
-                DraftType.DRAFT_CLAIM
-            );
-            if (draft.isPresent() && draft.get().getCaseId() != null) {
-                log.info(
-                    "Returning existing caseId={} for submissionId={}",
-                    draft.get().getCaseId(),
-                    params.getSubmissionId()
-                );
-                return coreCaseDataService.getCase(Long.valueOf(draft.get().getCaseId()), params.getAuthorisation());
-            }
-
-            CaseDetails created = createNewClaim(params);
-            draftStoreService.linkCaseId(
-                draftId.get(),
-                params.getUserId(),
-                created.getId().toString(),
-                DraftType.DRAFT_CLAIM
-            );
-            return created;
+        if (draftId.isEmpty()) {
+            return createNewClaim(params);
         }
-        return createNewClaim(params);
+
+        Optional<DraftStoreEntity> draft = draftStoreService.getDraft(
+            draftId.get(),
+            params.getUserId(),
+            DraftType.DRAFT_CLAIM
+        );
+        if (draft.isPresent() && draft.get().getCaseId() != null) {
+            log.info(
+                "Returning existing caseId={} for submissionId={}",
+                draft.get().getCaseId(),
+                params.getSubmissionId()
+            );
+            return coreCaseDataService.getCase(Long.valueOf(draft.get().getCaseId()), params.getAuthorisation());
+        }
+
+        boolean claimed = draftStoreService.claimSubmission(
+            draftId.get(),
+            params.getUserId(),
+            params.getSubmissionId(),
+            DraftType.DRAFT_CLAIM
+        );
+        if (!claimed) {
+            return resolveExistingOrConflict(draftId.get(), params);
+        }
+
+        CaseDetails created = createNewClaim(params);
+        draftStoreService.linkCaseId(
+            draftId.get(),
+            params.getUserId(),
+            created.getId().toString(),
+            DraftType.DRAFT_CLAIM
+        );
+        return created;
+    }
+
+    private CaseDetails resolveExistingOrConflict(UUID draftId, EventSubmissionParams params) {
+        DraftStoreEntity draft = draftStoreService
+            .getDraft(draftId, params.getUserId(), DraftType.DRAFT_CLAIM)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Draft not found"));
+
+        if (draft.getCaseId() != null) {
+            log.info(
+                "Returning existing caseId={} after lost claim race for submissionId={}",
+                draft.getCaseId(),
+                params.getSubmissionId()
+            );
+            return coreCaseDataService.getCase(Long.valueOf(draft.getCaseId()), params.getAuthorisation());
+        }
+
+        log.warn(
+            "Submission already claimed for draftId={} submissionId={} existingSubmissionId={}",
+            draftId,
+            params.getSubmissionId(),
+            draft.getSubmissionId()
+        );
+        throw new ResponseStatusException(
+            HttpStatus.CONFLICT,
+            "Claim submission already in progress for draft " + draftId
+        );
     }
 
     private CaseDetails createNewClaim(EventSubmissionParams params) {
