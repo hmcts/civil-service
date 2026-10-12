@@ -139,5 +139,8 @@
         ]]></notes>
         <packageUrl regex="true">^pkg:maven/io\.projectreactor\.netty/reactor-netty-.*@1\.2\.18$</packageUrl>
         <cve>CVE-2026-47874</cve>
+        <cve>CVE-2026-103005</cve>
+        <cve>CVE-2026-103008</cve>
+        <cve>CVE-2026-103009</cve>
     </suppress>
 </suppressions>
