@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.draftstore.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -107,6 +108,21 @@ public class DraftStoreService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public Optional<DraftStoreEntity> getDraftBySubmissionId(String submissionId,
+                                                             String userId,
+                                                             DraftType draftType) {
+        Objects.requireNonNull(submissionId, "submissionId must not be null");
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
+        return draftStoreRepository.findBySubmissionIdAndUserIdAndDraftTypeAndExpiresAtAfter(
+            submissionId,
+            userId,
+            draftType,
+            OffsetDateTime.now(ZoneOffset.UTC)
+        );
+    }
+
     public Optional<DraftStoreEntity> updateDraft(UUID draftId,
                                                   String userId,
                                                   String caseId,
@@ -154,6 +170,36 @@ public class DraftStoreService {
             submissionId,
             OffsetDateTime.now(ZoneOffset.UTC)
         ) == 1;
+    }
+
+    public Optional<DraftStoreEntity> claimLegacySubmission(String userId,
+                                                            String submissionId,
+                                                            DraftType draftType) {
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(submissionId, "submissionId must not be null");
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
+        OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
+        DraftStoreEntity claimRow = new DraftStoreEntity(
+            UUID.randomUUID(),
+            userId,
+            null,
+            draftType,
+            new HashMap<>(),
+            now,
+            now,
+            calculateExpiresAt(now, draftType.getRetentionDays()),
+            submissionId
+        );
+        try {
+            return Optional.of(draftStoreTransactionService.saveInNewTransaction(claimRow));
+        } catch (DataIntegrityViolationException ex) {
+            log.info(
+                "Lost legacy submission claim for userId={} submissionId={}",
+                userId,
+                submissionId
+            );
+            return Optional.empty();
+        }
     }
 
     public Optional<DraftStoreEntity> applyPaymentRetention(UUID draftId, String userId, DraftType draftType) {

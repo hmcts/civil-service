@@ -41,6 +41,13 @@ public interface DraftStoreRepository extends JpaRepository<DraftStoreEntity, UU
         OffsetDateTime now
     );
 
+    Optional<DraftStoreEntity> findBySubmissionIdAndUserIdAndDraftTypeAndExpiresAtAfter(
+        String submissionId,
+        String userId,
+        DraftType draftType,
+        OffsetDateTime now
+    );
+
     long deleteByIdAndUserIdAndDraftType(UUID id, String userId, DraftType draftType);
 
     @Query("SELECT d.id FROM DraftStoreEntity d WHERE d.expiresAt < :now ORDER BY d.id ASC")

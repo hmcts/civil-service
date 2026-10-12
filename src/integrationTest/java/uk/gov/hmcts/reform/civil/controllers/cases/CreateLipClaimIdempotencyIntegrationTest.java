@@ -258,10 +258,100 @@ class CreateLipClaimIdempotencyIntegrationTest extends BaseIntegrationTest {
         assertThat(draft.getSubmissionId()).isEqualTo(submissionId);
     }
 
+    @Test
+    void shouldCreateClaimRowAndReturnExistingCaseOnRedisRetry() throws Exception {
+        draftStoreRepository.deleteAll();
+        final String redisSubmissionId = USER_ID + ":" + USER_ID + ":2026-10-12T10:00:00Z";
+
+        doPost(BEARER_TOKEN, createLipClaimEvent(redisSubmissionId), SUBMIT_EVENT_URL, "draft", USER_ID)
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(CREATED_CASE_ID));
+
+        List<DraftStoreEntity> claimRows = draftStoreRepository.findAll();
+        assertThat(claimRows).hasSize(1);
+        assertThat(claimRows.getFirst().getSubmissionId()).isEqualTo(redisSubmissionId);
+        assertThat(claimRows.getFirst().getCaseId()).isEqualTo(String.valueOf(CREATED_CASE_ID));
+
+        doPost(BEARER_TOKEN, createLipClaimEvent(redisSubmissionId), SUBMIT_EVENT_URL, "draft", USER_ID)
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(CREATED_CASE_ID));
+
+        verify(coreCaseDataApi, times(1)).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
+        assertThat(draftStoreRepository.findAll()).hasSize(1);
+    }
+
+    @Test
+    void shouldReturnConflictWhenRedisSubmissionAlreadyInProgress() throws Exception {
+        draftStoreRepository.deleteAll();
+        final String redisSubmissionId = USER_ID + ":" + USER_ID + ":2026-10-12T10:00:00Z";
+        CountDownLatch enteredCcd = new CountDownLatch(1);
+        CountDownLatch releaseCcd = new CountDownLatch(1);
+        AtomicInteger ccdCreates = new AtomicInteger();
+
+        given(coreCaseDataApi.submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any()))
+            .willAnswer(invocation -> {
+                ccdCreates.incrementAndGet();
+                enteredCcd.countDown();
+                if (!releaseCcd.await(10, TimeUnit.SECONDS)) {
+                    throw new IllegalStateException("Timed out waiting to release CCD create");
+                }
+                return CaseDetails.builder().id(CREATED_CASE_ID).data(Map.of()).build();
+            });
+
+        List<Integer> statuses = Collections.synchronizedList(new ArrayList<>());
+        try (ExecutorService executor = Executors.newFixedThreadPool(2)) {
+            final Future<?> first = executor.submit(() -> {
+                try {
+                    MvcResult result = doPost(
+                        BEARER_TOKEN,
+                        createLipClaimEvent(redisSubmissionId),
+                        SUBMIT_EVENT_URL,
+                        "draft",
+                        USER_ID
+                    ).andReturn();
+                    statuses.add(result.getResponse().getStatus());
+                } catch (Exception ex) {
+                    throw new IllegalStateException(ex);
+                }
+            });
+
+            assertThat(enteredCcd.await(10, TimeUnit.SECONDS)).isTrue();
+
+            final Future<?> second = executor.submit(() -> {
+                try {
+                    MvcResult result = doPost(
+                        BEARER_TOKEN,
+                        createLipClaimEvent(redisSubmissionId),
+                        SUBMIT_EVENT_URL,
+                        "draft",
+                        USER_ID
+                    ).andReturn();
+                    statuses.add(result.getResponse().getStatus());
+                } catch (Exception ex) {
+                    throw new IllegalStateException(ex);
+                }
+            });
+
+            second.get(10, TimeUnit.SECONDS);
+            releaseCcd.countDown();
+            first.get(10, TimeUnit.SECONDS);
+        }
+
+        assertThat(statuses).containsExactlyInAnyOrder(200, 409);
+        assertThat(ccdCreates.get()).isEqualTo(1);
+        assertThat(draftStoreRepository.findAll()).hasSize(1);
+        assertThat(draftStoreRepository.findAll().getFirst().getCaseId())
+            .isEqualTo(String.valueOf(CREATED_CASE_ID));
+    }
+
     private EventDto createLipClaimEvent() {
+        return createLipClaimEvent(submissionId);
+    }
+
+    private EventDto createLipClaimEvent(String id) {
         return new EventDto()
             .setEvent(CaseEvent.CREATE_LIP_CLAIM)
             .setCaseDataUpdate(Map.of())
-            .setSubmissionId(submissionId);
+            .setSubmissionId(id);
     }
 }

@@ -545,6 +545,62 @@ class DraftStoreServiceTest {
 
             assertThat(claimed).isFalse();
         }
+
+        @Test
+        void shouldInsertClaimRowForLegacySubmission() {
+            when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+            Optional<DraftStoreEntity> result = draftStoreService.claimLegacySubmission(
+                USER_ID,
+                SUBMISSION_ID,
+                DRAFT_TYPE
+            );
+
+            assertThat(result).isPresent();
+            ArgumentCaptor<DraftStoreEntity> captor = ArgumentCaptor.forClass(DraftStoreEntity.class);
+            verify(draftStoreTransactionService).saveInNewTransaction(captor.capture());
+            DraftStoreEntity saved = captor.getValue();
+            assertThat(saved.getUserId()).isEqualTo(USER_ID);
+            assertThat(saved.getSubmissionId()).isEqualTo(SUBMISSION_ID);
+            assertThat(saved.getCaseId()).isNull();
+            assertThat(saved.getDraftType()).isEqualTo(DRAFT_TYPE);
+            assertThat(saved.getPayload()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnEmptyWhenLegacySubmissionClaimLosesUniqueRace() {
+            when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class)))
+                .thenThrow(new DataIntegrityViolationException("uq_draft_store_submission_id"));
+
+            Optional<DraftStoreEntity> result = draftStoreService.claimLegacySubmission(
+                USER_ID,
+                SUBMISSION_ID,
+                DRAFT_TYPE
+            );
+
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        void shouldFindDraftBySubmissionId() {
+            DraftStoreEntity draft = draft();
+            draft.setSubmissionId(SUBMISSION_ID);
+            when(draftStoreRepository.findBySubmissionIdAndUserIdAndDraftTypeAndExpiresAtAfter(
+                eq(SUBMISSION_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                any(OffsetDateTime.class)
+            )).thenReturn(Optional.of(draft));
+
+            Optional<DraftStoreEntity> result = draftStoreService.getDraftBySubmissionId(
+                SUBMISSION_ID,
+                USER_ID,
+                DRAFT_TYPE
+            );
+
+            assertThat(result).contains(draft);
+        }
     }
 
     @Nested

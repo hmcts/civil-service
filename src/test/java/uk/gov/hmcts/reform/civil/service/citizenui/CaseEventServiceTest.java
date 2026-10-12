@@ -167,6 +167,8 @@ public class CaseEventServiceTest {
     @Test
     void shouldClaimThenCreateAndLinkOnFirstSubmitWithSubmissionId() {
         DraftStoreEntity draft = blankDraft();
+        given(draftStoreService.getDraftBySubmissionId(SUBMISSION_ID, USER_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.empty());
         given(draftStoreService.getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM)).willReturn(Optional.of(draft));
         given(draftStoreService.claimSubmission(DRAFT_ID, USER_ID, SUBMISSION_ID, DraftType.DRAFT_CLAIM))
             .willReturn(true);
@@ -192,8 +194,10 @@ public class CaseEventServiceTest {
     void shouldReturnExistingCaseOnSecondSubmitWithSameSubmissionId() {
         DraftStoreEntity linked = blankDraft();
         linked.setCaseId("99");
+        linked.setSubmissionId(SUBMISSION_ID);
         CaseDetails existing = CaseDetails.builder().id(99L).build();
-        given(draftStoreService.getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM)).willReturn(Optional.of(linked));
+        given(draftStoreService.getDraftBySubmissionId(SUBMISSION_ID, USER_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.of(linked));
         given(coreCaseDataService.getCase(99L, AUTHORISATION)).willReturn(existing);
 
         CaseDetails result = caseEventService.submitEvent(new EventSubmissionParams()
@@ -214,6 +218,8 @@ public class CaseEventServiceTest {
     void shouldNotCreateCcdWhenSubmissionAlreadyClaimed() {
         DraftStoreEntity inProgress = blankDraft();
         inProgress.setSubmissionId(SUBMISSION_ID);
+        given(draftStoreService.getDraftBySubmissionId(SUBMISSION_ID, USER_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.of(inProgress));
         given(draftStoreService.getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM))
             .willReturn(Optional.of(inProgress));
         given(draftStoreService.claimSubmission(DRAFT_ID, USER_ID, SUBMISSION_ID, DraftType.DRAFT_CLAIM))
@@ -236,11 +242,13 @@ public class CaseEventServiceTest {
 
     @Test
     void shouldReturnExistingCaseWhenClaimLostButDraftAlreadyLinked() {
-        DraftStoreEntity blank = blankDraft();
+        final DraftStoreEntity blank = blankDraft();
         DraftStoreEntity linked = blankDraft();
         linked.setCaseId("99");
         linked.setSubmissionId(SUBMISSION_ID);
-        CaseDetails existing = CaseDetails.builder().id(99L).build();
+        final CaseDetails existing = CaseDetails.builder().id(99L).build();
+        given(draftStoreService.getDraftBySubmissionId(SUBMISSION_ID, USER_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.empty());
         given(draftStoreService.getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM))
             .willReturn(Optional.of(blank))
             .willReturn(Optional.of(linked));
@@ -267,6 +275,8 @@ public class CaseEventServiceTest {
         final String otherSubmissionId = USER_ID + ":" + otherDraftId + ":2026-10-12T10:00:00Z";
         DraftStoreEntity otherDraft = blankDraft();
         otherDraft.setId(otherDraftId);
+        given(draftStoreService.getDraftBySubmissionId(otherSubmissionId, USER_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.empty());
         given(draftStoreService.getDraft(otherDraftId, USER_ID, DraftType.DRAFT_CLAIM))
             .willReturn(Optional.of(otherDraft));
         given(draftStoreService.claimSubmission(otherDraftId, USER_ID, otherSubmissionId, DraftType.DRAFT_CLAIM))
@@ -285,6 +295,87 @@ public class CaseEventServiceTest {
         assertThat(result).isEqualTo(CASE_DETAILS);
         verify(draftStoreService).claimSubmission(otherDraftId, USER_ID, otherSubmissionId, DraftType.DRAFT_CLAIM);
         verify(draftStoreService).linkCaseId(otherDraftId, USER_ID, "1", DraftType.DRAFT_CLAIM);
+    }
+
+    @Test
+    void shouldClaimLegacyRedisDraftThenCreateAndLink() {
+        final String redisSubmissionId = USER_ID + ":" + USER_ID + ":2026-10-12T10:00:00Z";
+        UUID claimRowId = UUID.fromString("99999999-aaaa-bbbb-cccc-dddddddddddd");
+        DraftStoreEntity claimRow = blankDraft();
+        claimRow.setId(claimRowId);
+        claimRow.setSubmissionId(redisSubmissionId);
+        given(draftStoreService.getDraftBySubmissionId(redisSubmissionId, USER_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.empty());
+        given(draftStoreService.claimLegacySubmission(USER_ID, redisSubmissionId, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.of(claimRow));
+        given(draftStoreService.linkCaseId(claimRowId, USER_ID, "1", DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.of(claimRow));
+
+        CaseDetails result = caseEventService.submitEvent(new EventSubmissionParams()
+                                                              .setUpdates(Maps.newHashMap())
+                                                              .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+                                                              .setCaseId(DRAFT)
+                                                              .setUserId(USER_ID)
+                                                              .setAuthorisation(AUTHORISATION)
+                                                              .setSubmissionId(redisSubmissionId));
+
+        assertThat(result).isEqualTo(CASE_DETAILS);
+        InOrder order = inOrder(draftStoreService, coreCaseDataApi);
+        order.verify(draftStoreService).claimLegacySubmission(USER_ID, redisSubmissionId, DraftType.DRAFT_CLAIM);
+        order.verify(coreCaseDataApi).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
+        order.verify(draftStoreService).linkCaseId(claimRowId, USER_ID, "1", DraftType.DRAFT_CLAIM);
+        verify(draftStoreService, never()).claimSubmission(any(), any(), any(), any());
+    }
+
+    @Test
+    void shouldReturnExistingCaseOnRedisRetryWithSameSubmissionId() {
+        final String redisSubmissionId = USER_ID + ":" + USER_ID + ":2026-10-12T10:00:00Z";
+        DraftStoreEntity linked = blankDraft();
+        linked.setCaseId("99");
+        linked.setSubmissionId(redisSubmissionId);
+        CaseDetails existing = CaseDetails.builder().id(99L).build();
+        given(draftStoreService.getDraftBySubmissionId(redisSubmissionId, USER_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.of(linked));
+        given(coreCaseDataService.getCase(99L, AUTHORISATION)).willReturn(existing);
+
+        CaseDetails result = caseEventService.submitEvent(new EventSubmissionParams()
+                                                              .setUpdates(Maps.newHashMap())
+                                                              .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+                                                              .setCaseId(DRAFT)
+                                                              .setUserId(USER_ID)
+                                                              .setAuthorisation(AUTHORISATION)
+                                                              .setSubmissionId(redisSubmissionId));
+
+        assertThat(result).isEqualTo(existing);
+        verify(coreCaseDataApi, never()).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
+        verify(draftStoreService, never()).claimLegacySubmission(any(), any(), any());
+        verify(draftStoreService, never()).linkCaseId(any(), any(), any(), any());
+    }
+
+    @Test
+    void shouldNotCreateCcdWhenRedisSubmissionAlreadyClaimed() {
+        final String redisSubmissionId = USER_ID + ":" + USER_ID + ":2026-10-12T10:00:00Z";
+        DraftStoreEntity inProgress = blankDraft();
+        inProgress.setSubmissionId(redisSubmissionId);
+        given(draftStoreService.getDraftBySubmissionId(redisSubmissionId, USER_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.of(inProgress));
+        given(draftStoreService.getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.of(inProgress));
+
+        assertThatThrownBy(() -> caseEventService.submitEvent(new EventSubmissionParams()
+                                                                  .setUpdates(Maps.newHashMap())
+                                                                  .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+                                                                  .setCaseId(DRAFT)
+                                                                  .setUserId(USER_ID)
+                                                                  .setAuthorisation(AUTHORISATION)
+                                                                  .setSubmissionId(redisSubmissionId)))
+            .isInstanceOf(ResponseStatusException.class)
+            .extracting(ex -> ((ResponseStatusException) ex).getStatusCode())
+            .isEqualTo(CONFLICT);
+
+        verify(coreCaseDataApi, never()).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
+        verify(draftStoreService, never()).claimLegacySubmission(any(), any(), any());
+        verify(draftStoreService, never()).linkCaseId(any(), any(), any(), any());
     }
 
     @Test
