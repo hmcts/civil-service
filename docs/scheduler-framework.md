@@ -18,6 +18,9 @@ The service includes a common framework for implementing scheduled tasks. This f
 - **`PaginatedQueryProvider`**: An interface for providing dynamic Elasticsearch queries for each page during a paginated search.
 - **`ElasticSearchResult`**: An implementation of `TaskResult` that provides a lazy-loading stream of `CaseDetails`, fetching new pages only as the stream is consumed.
 - **`SchedulerInterceptor<T>`**: An ordered interface for cross-cutting item interception before task execution (e.g., `OnGoingBusinessProcessCheck`).
+- **`DefaultSchedulerInterceptor<T>`**: A marker interface extending `SchedulerInterceptor<T>` for interceptors that are automatically applied to every compatible scheduled task when default interceptors are enabled.
+- **`AllowedEventFlowStateCheck`**: A task-specific interceptor that verifies whether a configured `CaseEvent` is allowed in the claim's current flow state before task execution.
+- **`AllowedEventFlowStateCheckFactory`**: A Spring component factory to instantiate `AllowedEventFlowStateCheck` interceptors for specific `CaseEvent`s.
 - **`InterceptorChain<T>` & `InterceptorContext<T>`**: Thread-confined pipeline components managing ordered interceptor execution, attribute sharing via type-safe `AttributeKey<V>`, and StopWatch metric recording per interceptor.
 
 ## Creating a New Scheduler
@@ -43,12 +46,13 @@ The service includes a common framework for implementing scheduled tasks. This f
         scheduledTask
     );
 
-    // Option B: Configuration-driven (recommended when customizing interceptors)
+    // Option B: Configuration-driven (recommended when customizing interceptors or flow state checks)
     scheduledTaskRunner.run(
         ScheduledTaskConfiguration.<CaseDetails, Long>builder()
             .schedulerName(SCHEDULER_NAME)
             .searchResultSupplier(searchService::getElasticSearchResult)
             .scheduledTask(scheduledTask)
+            .interceptors(List.of(allowedEventFlowStateCheckFactory.forEvent(CaseEvent.DISMISS_CLAIM)))
             .useDefaultInterceptors(true) // or false to disable default interceptors
             .build()
     );
@@ -119,11 +123,15 @@ When implementing `ScheduledTask`, prefer using `CaseDetails` as the item type (
 The framework supports an interceptor pipeline that executes before scheduled task processing for each item. Interceptors implement `SchedulerInterceptor<T>` and participate in an ordered chain.
 
 #### Key Features:
-- **`SchedulerInterceptorResolver`**: Automatically discovers and merges compatible default interceptors (matching generic type `T`) with task-specific interceptors.
-- **`OnGoingBusinessProcessCheck`**: The standard interceptor (order: 1) for `CaseDetails`. It checks whether an ongoing business process is active (e.g., an unfinished Camunda task) for both standard Civil (`CaseData`) and General Application (`GeneralApplicationCaseData`) cases using `CaseTypeIdentifier`.
-- **Attribute Caching & Context Sharing**: `InterceptorContext` allows sharing data between interceptors and tasks via type-safe `AttributeKey<V>` (e.g., `CaseInterceptorAttributes.CIVIL_CASE_DATA`, `GA_CASE_DATA`, `BASE_CASE_DATA`). If `CaseDetails` contains sufficient data, unnecessary CCD remote calls are avoided.
-- **Task Abortion via `TaskAbortedException`**: If an interceptor throws `TaskAbortedException` (e.g. `Ongoing business process`), the item is skipped gracefully as aborted without triggering circuit breaker failures.
-- **Execution Timing Metrics**: `InterceptorChain` tracks exclusive execution time per interceptor and the final task using `StopWatch`, recording them in `InterceptorContext.getMetrics()` (e.g. `metric_OnGoingBusinessProcessCheck`, `metric_FinalTask`).
+- **`SchedulerInterceptorResolver`**: Automatically discovers and merges compatible default interceptors (beans implementing `DefaultSchedulerInterceptor<T>`) with task-specific interceptors configured on `ScheduledTaskConfiguration`.
+- **Default vs. Custom Interceptors**: 
+  - **Default Interceptors**: Implement `DefaultSchedulerInterceptor<T>` (e.g., `OnGoingBusinessProcessCheck`) and are automatically injected into all compatible tasks unless `useDefaultInterceptors(false)` is set.
+  - **Custom Interceptors**: Implement `SchedulerInterceptor<T>` and are supplied explicitly per task configuration via `.interceptors(List.of(...))`.
+- **`OnGoingBusinessProcessCheck`**: The standard default interceptor (order: 1) for `CaseDetails`. It checks whether an ongoing business process is active (e.g., an unfinished Camunda task) for both standard Civil (`CaseData`) and General Application (`GeneralApplicationCaseData`) cases using `CaseTypeIdentifier`.
+- **`AllowedEventFlowStateCheck`**: A task-specific interceptor (order: 100) for Civil claims (`CaseData`). It uses `AllowedEventService` to check whether the target `CaseEvent` is permitted in the case's current flow state before the scheduled task runs. If not allowed, it logs the event, case ID, evaluated `FlowState`, and state flow history, and throws a `TaskAbortedException` so the case is skipped gracefully without incrementing the circuit breaker failure counter. Instances are created using `AllowedEventFlowStateCheckFactory.forEvent(CaseEvent)`.
+- **Attribute Caching & Context Sharing**: `InterceptorContext` allows sharing data between interceptors and tasks via type-safe `AttributeKey<V>` (e.g., `CaseInterceptorAttributes.CIVIL_CASE_DATA`, `GA_CASE_DATA`, `BASE_CASE_DATA`). If `CaseDetails` contains sufficient data or is fetched/converted by an interceptor (such as `AllowedEventFlowStateCheck` or `OnGoingBusinessProcessCheck`), cached `CIVIL_CASE_DATA` is stored in the context to avoid redundant CCD remote calls and duplicate conversions.
+- **Task Abortion via `TaskAbortedException`**: If an interceptor throws `TaskAbortedException` (e.g. `Ongoing business process` or event not allowed in current flow state), the item is skipped gracefully as aborted without triggering circuit breaker failures.
+- **Execution Timing Metrics**: `InterceptorChain` tracks exclusive execution time per interceptor and the final task using `StopWatch`, recording them in `InterceptorContext.getMetrics()` (e.g. `metric_OnGoingBusinessProcessCheck`, `metric_AllowedEventFlowStateCheck`, `metric_FinalTask`).
 - **Disabling Default Interceptors**: If a scheduled task handles cases with active business processes intentionally (e.g., `PollingEventEmitterScheduler`), default interceptors can be disabled via `ScheduledTaskConfiguration.builder().useDefaultInterceptors(false).build()`.
 
 ### Date, Time, Timezones, and Performance Handling
