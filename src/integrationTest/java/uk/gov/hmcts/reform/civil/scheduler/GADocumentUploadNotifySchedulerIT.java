@@ -74,8 +74,8 @@ public class GADocumentUploadNotifySchedulerIT {
         scheduler.runScheduledTask();
 
         verify(gaDocumentUploadNotifyScheduledTask).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("GADocUploadNotifySchedulerJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("GADocUploadNotifySchedulerCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("GADocUploadNotifySchedulerJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 }

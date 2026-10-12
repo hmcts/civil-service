@@ -76,8 +76,8 @@ public class DecisionOutcomeSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(decisionOutcomeScheduledTask).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("DecisionOutcomeJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("DecisionOutcomeCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("DecisionOutcomeJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 }

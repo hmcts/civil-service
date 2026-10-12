@@ -80,8 +80,8 @@ public class BundleCreationSchedulerIT {
 
         // Then
         verify(bundleCreationScheduledTask).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("BundleCreationJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("BundleCreationCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("BundleCreationJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 }

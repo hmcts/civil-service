@@ -82,8 +82,8 @@ public class JudgementBufferSchedulerIT {
         scheduler.runScheduledTask();
 
         // Then
-        verify(telemetryService).trackEvent(eq("JudgementBufferJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("JudgementBufferJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
         coreCaseDataApiMockHelper.verifySubmitEvent(51);
     }
 

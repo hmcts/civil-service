@@ -94,8 +94,8 @@ public class GAOrderMadeSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(gaOrderMadeScheduledTask).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("GAOrderMadeSchedulerJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("GAOrderMadeSchedulerCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("GAOrderMadeSchedulerJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 }

@@ -85,9 +85,9 @@ public class CaseDismissedSchedulerIT {
         scheduler.runScheduledTask();
 
         coreCaseDataApiMockHelper.verifySubmitEvent(1);
-        verify(telemetryService).trackEvent(eq("CaseDismissedJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("CaseDismissedCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("CaseDismissedJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 
     @Test
@@ -114,9 +114,9 @@ public class CaseDismissedSchedulerIT {
         scheduler.runScheduledTask();
 
         coreCaseDataApiMockHelper.verifySubmitEvent(0);
-        verify(telemetryService).trackEvent(eq("CaseDismissedJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("CaseDismissedCaseAborted"), anyMap());
-        verify(telemetryService).trackEvent(eq("CaseDismissedJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseAborted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 
     @Test
@@ -133,8 +133,8 @@ public class CaseDismissedSchedulerIT {
         scheduler.runScheduledTask();
 
         coreCaseDataApiMockHelper.verifySubmitEvent(0);
-        verify(telemetryService).trackEvent(eq("CaseDismissedJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("CaseDismissedCaseAborted"), anyMap());
-        verify(telemetryService).trackEvent(eq("CaseDismissedJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseAborted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 }

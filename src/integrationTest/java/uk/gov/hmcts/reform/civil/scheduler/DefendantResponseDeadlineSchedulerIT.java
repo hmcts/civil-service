@@ -82,9 +82,9 @@ public class DefendantResponseDeadlineSchedulerIT {
         scheduler.runScheduledTask();
 
         // Then
-        verify(telemetryService).trackEvent(eq("DefendantResponseDeadlineJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("DefendantResponseDeadlineCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("DefendantResponseDeadlineJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
         coreCaseDataApiMockHelper.verifySubmitEvent(1);
     }
 
@@ -108,8 +108,8 @@ public class DefendantResponseDeadlineSchedulerIT {
         scheduler.runScheduledTask();
 
         // Then every case on both pages is processed
-        verify(telemetryService).trackEvent(eq("DefendantResponseDeadlineJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("DefendantResponseDeadlineJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
         coreCaseDataApiMockHelper.verifySubmitEvent(51);
     }
 

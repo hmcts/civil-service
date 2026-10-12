@@ -78,9 +78,9 @@ public class TrialReadyNotificationSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(trialReadyNotificationScheduledTask).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("TrialReadyNotificationJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("TrialReadyNotificationCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("TrialReadyNotificationJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 
     @Test
@@ -97,8 +97,8 @@ public class TrialReadyNotificationSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(trialReadyNotificationScheduledTask, never()).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("TrialReadyNotificationJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("TrialReadyNotificationCaseAborted"), anyMap());
-        verify(telemetryService).trackEvent(eq("TrialReadyNotificationJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseAborted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 }

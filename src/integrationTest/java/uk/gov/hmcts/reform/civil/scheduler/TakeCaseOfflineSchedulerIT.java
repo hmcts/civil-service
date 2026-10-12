@@ -78,9 +78,9 @@ public class TakeCaseOfflineSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(takeCaseOfflineScheduledTask).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("TakeCaseOfflineJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("TakeCaseOfflineCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("TakeCaseOfflineJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 
     @Test
@@ -97,8 +97,8 @@ public class TakeCaseOfflineSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(takeCaseOfflineScheduledTask, never()).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("TakeCaseOfflineJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("TakeCaseOfflineCaseAborted"), anyMap());
-        verify(telemetryService).trackEvent(eq("TakeCaseOfflineJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseAborted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 }
