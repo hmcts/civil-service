@@ -19,7 +19,9 @@ import static uk.gov.hmcts.reform.civil.scheduler.common.interceptor.CaseInterce
 
 /**
  * Aborts the task when the configured event is not allowed in the current flow state of the case.
- * Instances are created via {@link AllowedEventFlowStateCheckFactory}.
+ *
+ * <p>Operates exclusively on Civil claims ({@link CaseData}).
+ * Instances are created via {@link AllowedEventFlowStateCheckFactory}.</p>
  */
 @Slf4j
 @RequiredArgsConstructor
