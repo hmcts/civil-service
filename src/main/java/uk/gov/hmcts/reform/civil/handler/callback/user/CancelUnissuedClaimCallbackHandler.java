@@ -41,6 +41,8 @@ public class CancelUnissuedClaimCallbackHandler extends CallbackHandler {
         + "No further action can be taken on this case. You can start a new claim by going to your account.";
 
     private static final int REASON_MAX_LENGTH = 200;
+    // EXUI hides empty fields on Check your answers; a single space keeps the row and its Change link
+    private static final String BLANK_REASON_PLACEHOLDER = " ";
     // Same allowed characters as the citizen UI cancellation reason
     private static final Pattern ALLOWED_CHARACTERS = Pattern.compile(
         "^[A-Za-z0-9 \\t\\r\\n.,!?'\"()&:;@#/$%+=\\u00A3\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026-]*$");
@@ -81,7 +83,8 @@ public class CancelUnissuedClaimCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateCancelReason(CallbackParams callbackParams) {
-        String reason = callbackParams.getCaseData().getCancelUnissuedClaimReason();
+        CaseData caseData = callbackParams.getCaseData();
+        String reason = caseData.getCancelUnissuedClaimReason();
         List<String> errors = new ArrayList<>();
         if (reason != null) {
             if (reason.length() > REASON_MAX_LENGTH) {
@@ -91,6 +94,12 @@ public class CancelUnissuedClaimCallbackHandler extends CallbackHandler {
                 errors.add(REASON_INVALID_CHARACTERS);
             }
         }
+        if (errors.isEmpty() && (reason == null || reason.isBlank())) {
+            caseData.setCancelUnissuedClaimReason(BLANK_REASON_PLACEHOLDER);
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseData.toMap(objectMapper))
+                .build();
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
@@ -98,6 +107,10 @@ public class CancelUnissuedClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        if (!caseData.isApplicantLiP()) {
+            String reason = caseData.getCancelUnissuedClaimReason();
+            caseData.setCancelUnissuedClaimReason(reason == null || reason.isBlank() ? null : reason.strip());
+        }
         caseData.setPreviousCCDState(caseData.getCcdState());
         caseData.setCancelUnissuedClaimDate(LocalDate.now());
         caseData.setBusinessProcess(BusinessProcess.ready(CANCEL_UNISSUED_CLAIM));

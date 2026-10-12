@@ -161,8 +161,27 @@ class CancelUnissuedClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnNoError_whenReasonNotProvided() {
-            assertThat(validate(null).getErrors()).isEmpty();
+        void shouldReturnSpacePlaceholder_whenReasonNotProvided() {
+            var response = validate(null);
+
+            assertThat(response.getErrors()).isNullOrEmpty();
+            assertThat(response.getData()).containsEntry("cancelUnissuedClaimReason", " ");
+        }
+
+        @Test
+        void shouldReturnSpacePlaceholder_whenReasonIsBlank() {
+            var response = validate("   ");
+
+            assertThat(response.getErrors()).isNullOrEmpty();
+            assertThat(response.getData()).containsEntry("cancelUnissuedClaimReason", " ");
+        }
+
+        @Test
+        void shouldNotReturnData_whenReasonProvided() {
+            var response = validate("Settled outside the portal");
+
+            assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getData()).isNull();
         }
 
         @Test
@@ -174,6 +193,14 @@ class CancelUnissuedClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnNoError_whenReasonHasStandardPunctuation() {
             assertThat(validate("Settled outside the portal: paid £100 (in full) - 'agreed' & \"signed\"; @#/$%+=?!\r\n—…")
                            .getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNotReturnData_whenReasonHasErrors() {
+            var response = validate("Settled <script>");
+
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getData()).isNull();
         }
 
         @Test
@@ -239,6 +266,40 @@ class CancelUnissuedClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updated.getCancelUnissuedClaimDate()).isEqualTo(LocalDate.now());
             assertThat(updated.getBusinessProcess().getCamundaEvent()).isEqualTo(CANCEL_UNISSUED_CLAIM.name());
             assertThat(updated.getBusinessProcess().getStatus()).isEqualTo(BusinessProcessStatus.READY);
+        }
+    }
+
+    @Nested
+    class AboutToSubmitReasonCleanup {
+
+        private CaseData submit(CaseData caseData) {
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            return objectMapper.convertValue(response.getData(), CaseData.class);
+        }
+
+        @Test
+        void shouldClearSpacePlaceholder_whenLrClaimant() {
+            CaseData caseData = eligibleLrCaseData(CaseCategory.UNSPEC_CLAIM);
+            caseData.setCancelUnissuedClaimReason(" ");
+
+            assertThat(submit(caseData).getCancelUnissuedClaimReason()).isNull();
+        }
+
+        @Test
+        void shouldStripReason_whenLrClaimant() {
+            CaseData caseData = eligibleLrCaseData(CaseCategory.SPEC_CLAIM);
+            caseData.setCancelUnissuedClaimReason(" Settled outside the portal ");
+
+            assertThat(submit(caseData).getCancelUnissuedClaimReason()).isEqualTo("Settled outside the portal");
+        }
+
+        @Test
+        void shouldKeepReasonUnchanged_whenLipClaimant() {
+            CaseData caseData = eligibleCaseData();
+            caseData.setCancelUnissuedClaimReason(" Settled outside the portal ");
+
+            assertThat(submit(caseData).getCancelUnissuedClaimReason()).isEqualTo(" Settled outside the portal ");
         }
     }
 
