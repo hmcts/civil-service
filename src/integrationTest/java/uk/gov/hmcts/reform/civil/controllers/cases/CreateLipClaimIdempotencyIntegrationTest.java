@@ -281,6 +281,27 @@ class CreateLipClaimIdempotencyIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    void shouldCreateClaimRowForRedisDraftWhenUserIdIsUuid() throws Exception {
+        draftStoreRepository.deleteAll();
+        final String uuidUserId = "550e8400-e29b-41d4-a716-446655440000";
+        final String redisSubmissionId = uuidUserId + ":" + uuidUserId + ":2026-10-12T10:00:00Z";
+
+        given(userService.getUserInfo(anyString()))
+            .willReturn(UserInfo.builder().uid(uuidUserId).sub("lip-uuid@test.com").build());
+
+        doPost(BEARER_TOKEN, createLipClaimEvent(redisSubmissionId), SUBMIT_EVENT_URL, "draft", uuidUserId)
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(CREATED_CASE_ID));
+
+        List<DraftStoreEntity> claimRows = draftStoreRepository.findAll();
+        assertThat(claimRows).hasSize(1);
+        assertThat(claimRows.getFirst().getUserId()).isEqualTo(uuidUserId);
+        assertThat(claimRows.getFirst().getSubmissionId()).isEqualTo(redisSubmissionId);
+        assertThat(claimRows.getFirst().getCaseId()).isEqualTo(String.valueOf(CREATED_CASE_ID));
+        verify(coreCaseDataApi, times(1)).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
+    }
+
+    @Test
     void shouldReturnConflictWhenRedisSubmissionAlreadyInProgress() throws Exception {
         draftStoreRepository.deleteAll();
         final String redisSubmissionId = USER_ID + ":" + USER_ID + ":2026-10-12T10:00:00Z";

@@ -252,6 +252,9 @@ public class CaseEventService {
         if (parts.length < 3 || !parts[0].equals(params.getUserId())) {
             return Optional.empty();
         }
+        if (parts[1].equals(params.getUserId())) {
+            return Optional.empty();
+        }
         try {
             return Optional.of(UUID.fromString(parts[1]));
         } catch (IllegalArgumentException ex) {

@@ -328,6 +328,36 @@ public class CaseEventServiceTest {
     }
 
     @Test
+    void shouldClaimLegacyRedisDraftWhenUserIdIsUuid() {
+        final String uuidUserId = "550e8400-e29b-41d4-a716-446655440000";
+        final String redisSubmissionId = uuidUserId + ":" + uuidUserId + ":2026-10-12T10:00:00Z";
+        UUID claimRowId = UUID.fromString("99999999-aaaa-bbbb-cccc-dddddddddddd");
+        DraftStoreEntity claimRow = blankDraft();
+        claimRow.setId(claimRowId);
+        claimRow.setUserId(uuidUserId);
+        claimRow.setSubmissionId(redisSubmissionId);
+        given(draftStoreService.getDraftBySubmissionId(redisSubmissionId, uuidUserId, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.empty());
+        given(draftStoreService.claimLegacySubmission(uuidUserId, redisSubmissionId, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.of(claimRow));
+        given(draftStoreService.linkCaseId(claimRowId, uuidUserId, "1", DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.of(claimRow));
+
+        CaseDetails result = caseEventService.submitEvent(new EventSubmissionParams()
+                                                              .setUpdates(Maps.newHashMap())
+                                                              .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+                                                              .setCaseId(DRAFT)
+                                                              .setUserId(uuidUserId)
+                                                              .setAuthorisation(AUTHORISATION)
+                                                              .setSubmissionId(redisSubmissionId));
+
+        assertThat(result).isEqualTo(CASE_DETAILS);
+        verify(draftStoreService).claimLegacySubmission(uuidUserId, redisSubmissionId, DraftType.DRAFT_CLAIM);
+        verify(draftStoreService, never()).claimSubmission(any(), any(), any(), any());
+        verify(draftStoreService, never()).getDraft(any(), any(), any());
+    }
+
+    @Test
     void shouldReturnExistingCaseOnRedisRetryWithSameSubmissionId() {
         final String redisSubmissionId = USER_ID + ":" + USER_ID + ":2026-10-12T10:00:00Z";
         DraftStoreEntity linked = blankDraft();
