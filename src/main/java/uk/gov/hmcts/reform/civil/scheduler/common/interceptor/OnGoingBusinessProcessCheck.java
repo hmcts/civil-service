@@ -54,7 +54,7 @@ public class OnGoingBusinessProcessCheck implements DefaultSchedulerInterceptor<
             return;
         }
 
-        throw new TaskAbortedException("Ongoing business process");
+        throw new TaskAbortedException(AbortCategory.ONGOING_BUSINESS_PROCESS, "Ongoing business process");
     }
 
     private CaseDataHandler<?> getHandler(CaseDetails caseDetails) {
