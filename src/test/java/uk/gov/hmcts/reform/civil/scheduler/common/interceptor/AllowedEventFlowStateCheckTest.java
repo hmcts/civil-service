@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @ExtendWith(MockitoExtension.class)
 class AllowedEventFlowStateCheckTest {
@@ -70,6 +71,22 @@ class AllowedEventFlowStateCheckTest {
     }
 
     @Test
+    void shouldCallNext_whenTakeCaseOfflineEventIsAllowed_forSpecClaim() {
+        CaseDetails searchResultDetails = CaseDetails.builder().id(123L).build();
+        CaseData caseData = CaseData.builder().ccdCaseReference(123L).caseAccessCategory(SPEC_CLAIM).build();
+
+        InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", searchResultDetails);
+        context.setAttribute(CaseInterceptorAttributes.CIVIL_CASE_DATA, caseData);
+
+        when(allowedEventService.isAllowed(caseData, TAKE_CASE_OFFLINE)).thenReturn(true);
+
+        interceptor.accept(context, chain);
+
+        verify(chain).next(context);
+        verifyNoInteractions(coreCaseDataService, caseDetailsConverter);
+    }
+
+    @Test
     void shouldCallNext_whenTakeCaseOfflineEventIsAllowed_withoutCachedCaseData() {
         CaseData caseData = CaseData.builder().ccdCaseReference(123L).build();
         CaseDetails fullCaseDetails = CaseDetails.builder().id(123L).build();
@@ -92,6 +109,30 @@ class AllowedEventFlowStateCheckTest {
     void shouldThrowTaskAbortedExceptionAndLog_whenTakeCaseOfflineEventIsNotAllowed() {
         CaseDetails searchResultDetails = CaseDetails.builder().id(123L).build();
         CaseData caseData = CaseData.builder().ccdCaseReference(123L).build();
+
+        InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", searchResultDetails);
+        context.setAttribute(CaseInterceptorAttributes.CIVIL_CASE_DATA, caseData);
+
+        when(allowedEventService.isAllowed(caseData, TAKE_CASE_OFFLINE)).thenReturn(false);
+
+        StateFlow stateFlow = mock(StateFlow.class);
+        State state = mock(State.class);
+        when(state.getName()).thenReturn("MAIN.DRAFT");
+        when(stateFlow.getState()).thenReturn(state);
+        when(stateFlow.getStateHistory()).thenReturn(List.of(state));
+        when(stateFlowEngine.evaluate(caseData)).thenReturn(stateFlow);
+
+        TaskAbortedException exception = assertThrows(TaskAbortedException.class, () -> interceptor.accept(context, chain));
+
+        assertThat(exception.getReason()).isEqualTo("TAKE_CASE_OFFLINE not allowed in current flow state");
+        verify(chain, never()).next(context);
+        verify(stateFlowEngine).evaluate(caseData);
+    }
+
+    @Test
+    void shouldThrowTaskAbortedExceptionAndLog_whenTakeCaseOfflineEventIsNotAllowed_forSpecClaim() {
+        CaseDetails searchResultDetails = CaseDetails.builder().id(123L).build();
+        CaseData caseData = CaseData.builder().ccdCaseReference(123L).caseAccessCategory(SPEC_CLAIM).build();
 
         InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", searchResultDetails);
         context.setAttribute(CaseInterceptorAttributes.CIVIL_CASE_DATA, caseData);

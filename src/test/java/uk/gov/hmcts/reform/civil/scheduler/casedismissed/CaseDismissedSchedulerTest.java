@@ -53,5 +53,6 @@ class CaseDismissedSchedulerTest {
         assertThat(config.getSearchResultSupplier()).isNotNull();
         assertThat(config.getInterceptors()).containsExactly(flowStateCheck);
         assertThat(config.isUseDefaultInterceptors()).isTrue();
+        verify(allowedEventFlowStateCheckFactory).forEvent(DISMISS_CLAIM);
     }
 }
