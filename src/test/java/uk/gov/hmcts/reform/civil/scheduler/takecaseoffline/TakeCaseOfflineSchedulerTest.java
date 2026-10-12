@@ -52,5 +52,6 @@ class TakeCaseOfflineSchedulerTest {
         assertThat(config.getSearchResultSupplier()).isNotNull();
         assertThat(config.getInterceptors()).containsExactly(flowStateCheck);
         assertThat(config.isUseDefaultInterceptors()).isTrue();
+        verify(allowedEventFlowStateCheckFactory).forEvent(TAKE_CASE_OFFLINE);
     }
 }
