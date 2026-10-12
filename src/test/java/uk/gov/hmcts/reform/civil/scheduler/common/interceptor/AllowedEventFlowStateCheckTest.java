@@ -144,13 +144,13 @@ class AllowedEventFlowStateCheckTest {
         when(state.getName()).thenReturn("MAIN.DRAFT");
         when(stateFlow.getState()).thenReturn(state);
         when(stateFlow.getStateHistory()).thenReturn(List.of(state));
-        when(stateFlowEngine.evaluate(caseData)).thenReturn(stateFlow);
+        when(stateFlowEngine.evaluateSpec(caseData)).thenReturn(stateFlow);
 
         TaskAbortedException exception = assertThrows(TaskAbortedException.class, () -> interceptor.accept(context, chain));
 
         assertThat(exception.getReason()).isEqualTo("TAKE_CASE_OFFLINE not allowed in current flow state");
         verify(chain, never()).next(context);
-        verify(stateFlowEngine).evaluate(caseData);
+        verify(stateFlowEngine).evaluateSpec(caseData);
     }
 
     @Test

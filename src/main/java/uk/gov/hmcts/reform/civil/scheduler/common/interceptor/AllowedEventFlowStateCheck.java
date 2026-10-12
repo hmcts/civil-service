@@ -11,7 +11,10 @@ import uk.gov.hmcts.reform.civil.service.flowstate.AllowedEventService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
+import static java.util.stream.Collectors.joining;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.scheduler.common.interceptor.CaseInterceptorAttributes.CIVIL_CASE_DATA;
 
 /**
@@ -36,7 +39,7 @@ public class AllowedEventFlowStateCheck implements SchedulerInterceptor<CaseDeta
             return;
         }
 
-        logNotAllowed(caseData);
+        logNotAllowed(caseData, context.getItem().getId());
         throw new TaskAbortedException(event.name() + " not allowed in current flow state");
     }
 
@@ -54,21 +57,20 @@ public class AllowedEventFlowStateCheck implements SchedulerInterceptor<CaseDeta
             });
     }
 
-    private void logNotAllowed(CaseData caseData) {
+    private void logNotAllowed(CaseData caseData, Long caseId) {
         try {
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-            StringBuilder stateHistoryBuilder = new StringBuilder();
-            stateFlow.getStateHistory().forEach(s -> {
-                stateHistoryBuilder.append(s.getName());
-                stateHistoryBuilder.append(", ");
-            });
+            boolean isSpec = SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
+            StateFlow stateFlow = isSpec ? stateFlowEngine.evaluateSpec(caseData) : stateFlowEngine.evaluate(caseData);
+            String stateFlowHistory = stateFlow.getStateHistory().stream()
+                .map(State::getName)
+                .collect(joining(", "));
 
             log.info(
                 "{} is not allowed on the case id {}, current FlowState: {}, stateFlowHistory: {}",
                 event.name(),
-                caseData.getCcdCaseReference(),
+                caseId,
                 FlowState.fromFullName(stateFlow.getState().getName()),
-                stateHistoryBuilder
+                stateFlowHistory
             );
         } catch (Exception e) {
             log.warn("Error during state flow evaluation.", e);
