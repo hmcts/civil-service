@@ -50,7 +50,7 @@ class TrialReadyNotificationSchedulerTest {
         ScheduledTaskConfiguration<CaseDetails, Long> config = captor.getValue();
         assertThat(config.getSchedulerName()).isEqualTo(TrialReadyNotificationScheduler.SCHEDULER_NAME);
         assertThat(config.getScheduledTask()).isSameAs(trialReadyNotificationScheduledTask);
-        assertThat(config.getSearchResultSupplier()).isNotNull();
+        assertThat(config.getSearchResultSupplier().get()).isEqualTo(searchService.getElasticSearchResult());
         assertThat(config.getInterceptors()).containsExactly(flowStateCheck);
         assertThat(config.isUseDefaultInterceptors()).isTrue();
         verify(allowedEventFlowStateCheckFactory).forEvent(TRIAL_READY_NOTIFICATION);
