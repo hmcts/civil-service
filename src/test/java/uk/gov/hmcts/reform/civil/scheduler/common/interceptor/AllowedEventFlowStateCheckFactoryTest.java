@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.flowstate.AllowedEventService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -58,7 +59,7 @@ class AllowedEventFlowStateCheckFactoryTest {
 
     @Test
     void shouldCreateCheckConfiguredWithEventAndDependencies() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
         InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", caseDetails);
         context.setAttribute(CaseInterceptorAttributes.CIVIL_CASE_DATA, caseData);
@@ -74,7 +75,7 @@ class AllowedEventFlowStateCheckFactoryTest {
 
     @Test
     void shouldCreateCheckThatAbortsWhenEventNotAllowed() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
         InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", caseDetails);
         context.setAttribute(CaseInterceptorAttributes.CIVIL_CASE_DATA, caseData);

@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.flowstate.AllowedEventService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -57,7 +58,7 @@ class AllowedEventFlowStateCheckTest {
     @Test
     void shouldCallNext_whenTakeCaseOfflineEventIsAllowed_withCachedCaseData() {
         CaseDetails searchResultDetails = CaseDetails.builder().id(123L).build();
-        CaseData caseData = CaseData.builder().ccdCaseReference(123L).build();
+        CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(123L).build();
 
         InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", searchResultDetails);
         context.setAttribute(CaseInterceptorAttributes.CIVIL_CASE_DATA, caseData);
@@ -73,7 +74,7 @@ class AllowedEventFlowStateCheckTest {
     @Test
     void shouldCallNext_whenTakeCaseOfflineEventIsAllowed_forSpecClaim() {
         CaseDetails searchResultDetails = CaseDetails.builder().id(123L).build();
-        CaseData caseData = CaseData.builder().ccdCaseReference(123L).caseAccessCategory(SPEC_CLAIM).build();
+        CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(123L).caseAccessCategory(SPEC_CLAIM).build();
 
         InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", searchResultDetails);
         context.setAttribute(CaseInterceptorAttributes.CIVIL_CASE_DATA, caseData);
@@ -88,7 +89,7 @@ class AllowedEventFlowStateCheckTest {
 
     @Test
     void shouldCallNext_whenTakeCaseOfflineEventIsAllowed_withoutCachedCaseData() {
-        CaseData caseData = CaseData.builder().ccdCaseReference(123L).build();
+        CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(123L).build();
         CaseDetails fullCaseDetails = CaseDetails.builder().id(123L).build();
 
         when(coreCaseDataService.getCase(123L)).thenReturn(fullCaseDetails);
@@ -108,7 +109,7 @@ class AllowedEventFlowStateCheckTest {
     @Test
     void shouldThrowTaskAbortedExceptionAndLog_whenTakeCaseOfflineEventIsNotAllowed() {
         CaseDetails searchResultDetails = CaseDetails.builder().id(123L).build();
-        CaseData caseData = CaseData.builder().ccdCaseReference(123L).build();
+        CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(123L).build();
 
         InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", searchResultDetails);
         context.setAttribute(CaseInterceptorAttributes.CIVIL_CASE_DATA, caseData);
@@ -132,7 +133,7 @@ class AllowedEventFlowStateCheckTest {
     @Test
     void shouldThrowTaskAbortedExceptionAndLog_whenTakeCaseOfflineEventIsNotAllowed_forSpecClaim() {
         CaseDetails searchResultDetails = CaseDetails.builder().id(123L).build();
-        CaseData caseData = CaseData.builder().ccdCaseReference(123L).caseAccessCategory(SPEC_CLAIM).build();
+        CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(123L).caseAccessCategory(SPEC_CLAIM).build();
 
         InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", searchResultDetails);
         context.setAttribute(CaseInterceptorAttributes.CIVIL_CASE_DATA, caseData);
@@ -156,7 +157,7 @@ class AllowedEventFlowStateCheckTest {
     @Test
     void shouldThrowTaskAbortedException_whenStateFlowEngineThrowsExceptionDuringLogging() {
         CaseDetails searchResultDetails = CaseDetails.builder().id(123L).build();
-        CaseData caseData = CaseData.builder().ccdCaseReference(123L).build();
+        CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(123L).build();
 
         InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", searchResultDetails);
         context.setAttribute(CaseInterceptorAttributes.CIVIL_CASE_DATA, caseData);
