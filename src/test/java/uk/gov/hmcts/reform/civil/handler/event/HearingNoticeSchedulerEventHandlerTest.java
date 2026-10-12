@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.client.task.ExternalTask;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +16,7 @@ import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeMessageVar
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeSchedulerVars;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
@@ -37,6 +36,8 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -62,13 +63,10 @@ class HearingNoticeSchedulerEventHandlerTest {
     private UserService userService;
 
     @Mock
-    private RuntimeService runtimeService;
+    private CamundaRuntimeClient camundaRuntimeClient;
 
     @Mock
     private HearingsService hearingsService;
-
-    @Mock
-    private MessageCorrelationBuilder messageCorrelationBuilder;
 
     @Mock
     private ObjectMapper mapper;
@@ -95,8 +93,6 @@ class HearingNoticeSchedulerEventHandlerTest {
 
     @BeforeEach
     void init() {
-        when(runtimeService.createMessageCorrelation(any())).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.setVariables(any())).thenReturn(messageCorrelationBuilder);
         when(mockTask.getVariable(SERVICE_ID_KEY)).thenReturn(SERVICE_ID);
         when(userService.getAccessToken(anyString(), anyString())).thenReturn(AUTH_TOKEN);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("test-id").build());
@@ -165,13 +161,11 @@ class HearingNoticeSchedulerEventHandlerTest {
 
         handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
 
-        verify(runtimeService, times(1)).createMessageCorrelation(MESSAGE_ID);
-        verify(messageCorrelationBuilder, times(1)).setVariables(
-            new HearingNoticeMessageVars()
-                .setCaseId(CASE_ID)
-                .setHearingId(HEARING_ID)
-                .setTriggeredViaScheduler(true).toMap(mapper));
-        verify(messageCorrelationBuilder, times(1)).correlateStartMessage();
+        Map<String, Object> expectedVars = new HearingNoticeMessageVars()
+            .setCaseId(CASE_ID)
+            .setHearingId(HEARING_ID)
+            .setTriggeredViaScheduler(true).toMap(mapper);
+        verify(camundaRuntimeClient, times(1)).correlateStartMessage(MESSAGE_ID, null, expectedVars);
     }
 
     @Test
@@ -196,8 +190,7 @@ class HearingNoticeSchedulerEventHandlerTest {
                 new PartiesNotified()
                     .setServiceData(new PartiesNotifiedServiceData().setHearingNoticeGenerated(false))
             );
-        verify(runtimeService, times(0)).createMessageCorrelation(MESSAGE_ID);
-        verifyNoInteractions(messageCorrelationBuilder);
+        verify(camundaRuntimeClient, times(0)).correlateStartMessage(eq(MESSAGE_ID), any(), any());
     }
 
     @Test
@@ -230,10 +223,9 @@ class HearingNoticeSchedulerEventHandlerTest {
 
         handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
 
-        verify(runtimeService, times(1)).createMessageCorrelation(MESSAGE_ID);
-        verify(messageCorrelationBuilder, times(1)).setVariables(
-            new HearingNoticeMessageVars().setCaseId(CASE_ID).setHearingId(HEARING_ID).setTriggeredViaScheduler(true).toMap(mapper));
-        verify(messageCorrelationBuilder, times(1)).correlateStartMessage();
+        Map<String, Object> expectedVars = new HearingNoticeMessageVars().setCaseId(CASE_ID)
+            .setHearingId(HEARING_ID).setTriggeredViaScheduler(true).toMap(mapper);
+        verify(camundaRuntimeClient, times(1)).correlateStartMessage(MESSAGE_ID, null, expectedVars);
     }
 
     @Test
@@ -266,13 +258,11 @@ class HearingNoticeSchedulerEventHandlerTest {
 
         handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
 
-        verify(runtimeService, times(1)).createMessageCorrelation(MESSAGE_ID);
-        verify(messageCorrelationBuilder, times(1)).setVariables(
-            new HearingNoticeMessageVars()
-                .setCaseId(CASE_ID)
-                .setHearingId(HEARING_ID)
-                .setTriggeredViaScheduler(true).toMap(mapper));
-        verify(messageCorrelationBuilder, times(1)).correlateStartMessage();
+        Map<String, Object> expectedVars = new HearingNoticeMessageVars()
+            .setCaseId(CASE_ID)
+            .setHearingId(HEARING_ID)
+            .setTriggeredViaScheduler(true).toMap(mapper);
+        verify(camundaRuntimeClient, times(1)).correlateStartMessage(MESSAGE_ID, null, expectedVars);
     }
 
     @Test
@@ -310,7 +300,7 @@ class HearingNoticeSchedulerEventHandlerTest {
                     .setHearingLocation(VENUE_ID)
             )
         );
-        verify(runtimeService, times(0)).createMessageCorrelation(MESSAGE_ID);
+        verify(camundaRuntimeClient, times(0)).correlateStartMessage(eq(MESSAGE_ID), any(), any());
     }
 
     @Test
@@ -339,8 +329,7 @@ class HearingNoticeSchedulerEventHandlerTest {
         handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
 
         verify(hearingsService, times(0)).updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any());
-        verify(runtimeService, times(0)).createMessageCorrelation(any());
-        verifyNoInteractions(messageCorrelationBuilder);
+        verify(camundaRuntimeClient, times(0)).correlateStartMessage(any(), any(), any());
     }
 
     @Test
@@ -361,8 +350,7 @@ class HearingNoticeSchedulerEventHandlerTest {
         handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
 
         verify(hearingsService, times(0)).updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any());
-        verify(runtimeService, times(0)).createMessageCorrelation(any());
-        verifyNoInteractions(messageCorrelationBuilder);
+        verify(camundaRuntimeClient, times(0)).correlateStartMessage(any(), any(), any());
     }
 
     @Test
@@ -392,9 +380,8 @@ class HearingNoticeSchedulerEventHandlerTest {
         handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
 
         verify(hearingsService, times(0)).updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any());
-        verify(runtimeService, times(0)).createMessageCorrelation(any());
+        verify(camundaRuntimeClient, times(0)).correlateStartMessage(any(), any(), any());
         verifyNoInteractions(coreCaseDataService);
-        verifyNoInteractions(messageCorrelationBuilder);
     }
 
     @Test
@@ -427,8 +414,7 @@ class HearingNoticeSchedulerEventHandlerTest {
                     .setHearingLocation(VENUE_ID)
             )
         );
-        verify(runtimeService, times(0)).createMessageCorrelation(any());
-        verifyNoInteractions(messageCorrelationBuilder);
+        verify(camundaRuntimeClient, times(0)).correlateStartMessage(any(), any(), any());
     }
 
     @Test
@@ -461,8 +447,7 @@ class HearingNoticeSchedulerEventHandlerTest {
                     .setHearingLocation(VENUE_ID)
             )
         );
-        verify(runtimeService, times(0)).createMessageCorrelation(any());
-        verifyNoInteractions(messageCorrelationBuilder);
+        verify(camundaRuntimeClient, times(0)).correlateStartMessage(any(), any(), any());
     }
 
     @Test
@@ -488,7 +473,7 @@ class HearingNoticeSchedulerEventHandlerTest {
             RECEIVED_DATETIME,
             new PartiesNotified().setServiceData(new PartiesNotifiedServiceData())
         );
-        verify(runtimeService, times(0)).createMessageCorrelation(MESSAGE_ID);
+        verify(camundaRuntimeClient, times(0)).correlateStartMessage(eq(MESSAGE_ID), any(), any());
     }
 
     @Test
@@ -527,7 +512,7 @@ class HearingNoticeSchedulerEventHandlerTest {
         handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
 
         verify(hearingsService, times(0)).updatePartiesNotifiedResponse(any(), any(), anyInt(), any(), any());
-        verify(runtimeService, times(0)).createMessageCorrelation(any());
+        verify(camundaRuntimeClient, times(0)).correlateStartMessage(any(), any(), any());
     }
 
     @Test
@@ -565,7 +550,7 @@ class HearingNoticeSchedulerEventHandlerTest {
             RECEIVED_DATETIME,
             new PartiesNotified().setServiceData(existingServiceData)
         );
-        verify(runtimeService, times(0)).createMessageCorrelation(any());
+        verify(camundaRuntimeClient, times(0)).correlateStartMessage(any(), any(), any());
     }
 
     private HearingGetResponse createHearing(ListAssistCaseStatus hearingStatus) {

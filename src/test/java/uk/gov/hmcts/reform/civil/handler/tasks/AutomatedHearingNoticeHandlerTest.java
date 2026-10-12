@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +20,7 @@ import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeSchedulerV
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingResponse;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -54,13 +53,10 @@ class AutomatedHearingNoticeHandlerTest {
     private UserService userService;
 
     @Mock
-    private RuntimeService runtimeService;
+    private CamundaRuntimeClient camundaRuntimeClient;
 
     @Mock
     private HearingsService hearingsService;
-
-    @Mock
-    private MessageCorrelationBuilder messageCorrelationBuilder;
 
     @Mock
     private ObjectMapper mapper;
@@ -95,8 +91,6 @@ class AutomatedHearingNoticeHandlerTest {
 
     @BeforeEach
     void init() {
-        when(runtimeService.createMessageCorrelation(any())).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.setVariables(any())).thenReturn(messageCorrelationBuilder);
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
         when(mockTask.getVariable(SERVICE_ID_KEY)).thenReturn(SERVICE_ID);
@@ -105,7 +99,6 @@ class AutomatedHearingNoticeHandlerTest {
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("test-id").build());
         when(userConfig.getUserName()).thenReturn("");
         when(userConfig.getPassword()).thenReturn("");
-        when(runtimeService.getVariable(PROCESS_INSTANCE_ID, SERVICE_ID_KEY)).thenReturn(new ArrayList<>());
     }
 
     @Test
@@ -138,7 +131,7 @@ class AutomatedHearingNoticeHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verify(applicationEventPublisher, times(0)).publishEvent(any());
-        verify(runtimeService).setVariables(
+        verify(camundaRuntimeClient).setProcessVariables(
                 PROCESS_INSTANCE_ID,
                 new HearingNoticeSchedulerVars()
                         .setTotalNumberOfUnnotifiedHearings(0)
@@ -169,7 +162,7 @@ class AutomatedHearingNoticeHandlerTest {
 
         verify(applicationEventPublisher, times(dispatchedHearingIds.size())).publishEvent(
             new HearingNoticeSchedulerTaskEvent(HEARING_ID));
-        verify(runtimeService).setVariables(
+        verify(camundaRuntimeClient).setProcessVariables(
             PROCESS_INSTANCE_ID,
             new HearingNoticeSchedulerVars()
                     .setTotalNumberOfUnnotifiedHearings(1)
@@ -208,7 +201,7 @@ class AutomatedHearingNoticeHandlerTest {
         verify(applicationEventPublisher, times(1)).publishEvent(
             new HearingNoticeSchedulerTaskEvent(hearingIds.get(2)));
 
-        verify(runtimeService).setVariables(
+        verify(camundaRuntimeClient).setProcessVariables(
                 PROCESS_INSTANCE_ID,
                 new HearingNoticeSchedulerVars()
                         .setTotalNumberOfUnnotifiedHearings(3)
@@ -234,14 +227,13 @@ class AutomatedHearingNoticeHandlerTest {
         handler.execute(mockTask, externalTaskService);
 
         verifyNoInteractions(applicationEventPublisher);
-        verify(runtimeService).setVariables(
+        verify(camundaRuntimeClient).setProcessVariables(
                 PROCESS_INSTANCE_ID,
                 new HearingNoticeSchedulerVars()
                         .setTotalNumberOfUnnotifiedHearings(1)
                         .setDispatchedHearingIds(List.of(HEARING_ID))
                         .toMap(mapper)
         );
-        verifyNoInteractions(messageCorrelationBuilder);
         verify(externalTaskService).complete(mockTask, null);
     }
 
