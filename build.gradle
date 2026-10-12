@@ -16,6 +16,7 @@ plugins {
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.6"
   id 'hmcts.ccd.sdk' version '7.10.0'
+  id 'net.ltgt.errorprone' version '5.1.1'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -210,6 +211,61 @@ tasks.register('preparePatchedMigrations', Copy) {
 
 tasks.withType(JavaCompile).configureEach {
   options.compilerArgs << "-Xlint:unchecked" << "-Xlint:-removal" << "-Werror"
+}
+
+// Keep normal compilation strict; the baseline compiles into a separate directory
+// without -Werror so NullAway warnings cannot gate the build.
+tasks.withType(JavaCompile).configureEach {
+  options.errorprone.enabled = false
+}
+
+def nullAwayDiagnostics = layout.buildDirectory.file('reports/nullaway/diagnostics.txt')
+def nullAwayCompile = tasks.register('nullAwayCompile', JavaCompile) {
+  description = 'Reports the production NullAway warning baseline without gating on warnings.'
+  group = 'verification'
+  source = sourceSets.main.java
+  classpath = sourceSets.main.compileClasspath
+  destinationDirectory = layout.buildDirectory.dir('classes/nullaway')
+  options.annotationProcessorPath = configurations.annotationProcessor
+  options.compilerArgs.remove('-Werror')
+  options.compilerArgs += ['-Xmaxwarns', '1000000']
+  outputs.file(nullAwayDiagnostics)
+  def diagnostics = new StringBuffer()
+  def diagnosticListener = { CharSequence output -> diagnostics.append(output) } as StandardOutputListener
+  doFirst {
+    diagnostics.setLength(0)
+    logging.addStandardErrorListener(diagnosticListener)
+  }
+  doLast {
+    logging.removeStandardErrorListener(diagnosticListener)
+    def report = nullAwayDiagnostics.get().asFile
+    report.parentFile.mkdirs()
+    report.text = diagnostics.toString()
+  }
+  options.incremental = false
+  options.errorprone {
+    enabled = true
+    disableAllChecks = true
+    warn('NullAway')
+    option('NullAway:AnnotatedPackages', 'uk.gov.hmcts')
+  }
+}
+
+def nullAwayBaseline = tasks.register('nullAwayBaseline') {
+  description = 'Prints the NullAway warning count, including on cached or up-to-date builds.'
+  group = 'verification'
+  dependsOn nullAwayCompile
+  inputs.file(nullAwayDiagnostics)
+  doLast {
+    def diagnostics = nullAwayDiagnostics.get().asFile.text
+    def warningCount = diagnostics.readLines().count { it.contains('warning: [NullAway]') }
+    logger.lifecycle('NullAway warning count (src/main/java): {}', warningCount)
+    logger.lifecycle('NullAway diagnostics: {}', nullAwayDiagnostics.get().asFile)
+  }
+}
+
+tasks.named('check') {
+  dependsOn nullAwayBaseline
 }
 
 tasks.named('test', Test) {
@@ -557,6 +613,8 @@ allprojects {
 }
 
 dependencies {
+  errorprone 'com.google.errorprone:error_prone_core:2.50.0'
+  errorprone 'com.uber.nullaway:nullaway:0.14.2'
   def withoutJunit4 = {
     exclude group: 'junit', module: 'junit'
   }
