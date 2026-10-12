@@ -86,8 +86,8 @@ public class HearingFeeSchedulerIT {
         scheduler.runScheduledTask();
 
         // Then
-        verify(telemetryService).trackEvent(eq("HearingFeeJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("HearingFeeJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
         coreCaseDataApiMockHelper.verifySubmitEvent(1);
     }
 
@@ -114,8 +114,8 @@ public class HearingFeeSchedulerIT {
         scheduler.runScheduledTask();
 
         // Then
-        verify(telemetryService).trackEvent(eq("HearingFeeJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("HearingFeeJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
         coreCaseDataApiMockHelper.verifySubmitEvent(1);
     }
 
@@ -142,8 +142,8 @@ public class HearingFeeSchedulerIT {
         scheduler.runScheduledTask();
 
         // Then
-        verify(telemetryService).trackEvent(eq("HearingFeeJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("HearingFeeJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
         coreCaseDataApiMockHelper.verifySubmitEvent(1);
     }
 
@@ -169,8 +169,8 @@ public class HearingFeeSchedulerIT {
         scheduler.runScheduledTask();
 
         // Then every case on both pages is processed
-        verify(telemetryService).trackEvent(eq("HearingFeeJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("HearingFeeJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
         coreCaseDataApiMockHelper.verifySubmitEvent(51);
     }
 

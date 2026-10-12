@@ -96,8 +96,8 @@ public class GAUnlessOrderSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(gaUnlessOrderScheduledTask).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("GAUnlessOrderSchedulerJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("GAUnlessOrderSchedulerCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("GAUnlessOrderSchedulerJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 }

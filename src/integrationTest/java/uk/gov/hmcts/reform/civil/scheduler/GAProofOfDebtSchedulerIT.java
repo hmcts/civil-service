@@ -76,8 +76,8 @@ public class GAProofOfDebtSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(gaProofOfDebtScheduledTask).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("CoscApplicationProcessorJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("CoscApplicationProcessorCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("CoscApplicationProcessorJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 }

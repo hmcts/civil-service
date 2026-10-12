@@ -85,8 +85,8 @@ public class AutomatedHearingNoticeSchedulerIT {
             eq(ACCESS_TOKEN), eq(UNSPEC_SERVICE_ID), any(LocalDateTime.class), isNull()
         );
         verify(automatedHearingNoticeScheduledTask).accept(HEARING_ID);
-        verify(telemetryService).trackEvent(eq("AutomatedHearingNoticeJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("AutomatedHearingNoticeCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("AutomatedHearingNoticeJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 }

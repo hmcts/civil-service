@@ -78,9 +78,9 @@ public class ClaimDetailsNotificationDeadlineSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(caseDismissedScheduledTask).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("ClaimDetailsNotificationDeadlineJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("ClaimDetailsNotificationDeadlineCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("ClaimDetailsNotificationDeadlineJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 
     @Test
@@ -97,8 +97,8 @@ public class ClaimDetailsNotificationDeadlineSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(caseDismissedScheduledTask, never()).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("ClaimDetailsNotificationDeadlineJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("ClaimDetailsNotificationDeadlineCaseAborted"), anyMap());
-        verify(telemetryService).trackEvent(eq("ClaimDetailsNotificationDeadlineJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseAborted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 }

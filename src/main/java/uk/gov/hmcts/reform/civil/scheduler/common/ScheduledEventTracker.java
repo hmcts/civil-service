@@ -8,6 +8,14 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration.SCHEDULER_BACK_PRESSURE_UPDATED;
+import static uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration.SCHEDULER_CASE_ABORTED;
+import static uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration.SCHEDULER_CASE_FAILED;
+import static uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration.SCHEDULER_CASE_PROCESSED;
+import static uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration.SCHEDULER_JOB_ABORTED;
+import static uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration.SCHEDULER_JOB_COMPLETED;
+import static uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration.SCHEDULER_JOB_STARTED;
+
 @Component
 @AllArgsConstructor
 public class ScheduledEventTracker {
@@ -41,7 +49,7 @@ public class ScheduledEventTracker {
 
     public void jobStartedEvent(ScheduledTaskEventConfiguration eventConfig, int casesSize) {
         telemetryService.trackEvent(
-            eventConfig.getJobStartedEvent(),
+            SCHEDULER_JOB_STARTED,
             Map.of(
                 SCHEDULER_NAME, eventConfig.getSchedulerName(),
                 TOTAL_CASES, String.valueOf(casesSize),
@@ -66,7 +74,7 @@ public class ScheduledEventTracker {
         properties.put(STATUS, SUCCESS);
         metrics.forEach((key, value) -> properties.put(METRIC_PREFIX + key, String.valueOf(value)));
 
-        telemetryService.trackEvent(eventConfig.getCaseProcessedEvent(), properties);
+        telemetryService.trackEvent(SCHEDULER_CASE_PROCESSED, properties);
     }
 
     public void caseFailedEvent(ScheduledTaskEventConfiguration eventConfig, Long caseId, Exception e) {
@@ -86,7 +94,7 @@ public class ScheduledEventTracker {
         properties.put(ERROR_CATEGORY, errorCategorizer.categorizeError(e));
         metrics.forEach((key, value) -> properties.put(METRIC_PREFIX + key, String.valueOf(value)));
 
-        telemetryService.trackEvent(eventConfig.getCaseFailedEvent(), properties);
+        telemetryService.trackEvent(SCHEDULER_CASE_FAILED, properties);
     }
 
     public void caseAbortedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, String errorMessage) {
@@ -101,12 +109,12 @@ public class ScheduledEventTracker {
         properties.put(STATUS, ABORTED);
         metrics.forEach((key, value) -> properties.put(METRIC_PREFIX + key, String.valueOf(value)));
 
-        telemetryService.trackEvent(eventConfig.getCaseAbortedEvent(), properties);
+        telemetryService.trackEvent(SCHEDULER_CASE_ABORTED, properties);
     }
 
     public void jobCompletedEvent(ScheduledTaskEventConfiguration eventConfig, ScheduledJobReport report) {
         telemetryService.trackEvent(
-            eventConfig.getJobCompletedEvent(),
+            SCHEDULER_JOB_COMPLETED,
             Map.of(
                 SCHEDULER_NAME, eventConfig.getSchedulerName(),
                 TOTAL_CASES, String.valueOf(report.totalCases()),
@@ -123,7 +131,7 @@ public class ScheduledEventTracker {
 
     public void jobCompletedNoCasesEvent(ScheduledTaskEventConfiguration eventConfig, Duration searchDuration) {
         telemetryService.trackEvent(
-            eventConfig.getJobCompletedEvent(),
+            SCHEDULER_JOB_COMPLETED,
             Map.of(
                 SCHEDULER_NAME, eventConfig.getSchedulerName(),
                 TOTAL_CASES, ZERO,
@@ -140,7 +148,7 @@ public class ScheduledEventTracker {
 
     public void jobAbortedEvent(ScheduledTaskEventConfiguration eventConfig, ScheduledJobReport report) {
         telemetryService.trackEvent(
-            eventConfig.getJobAbortedEvent(),
+            SCHEDULER_JOB_ABORTED,
             Map.of(
                 SCHEDULER_NAME, eventConfig.getSchedulerName(),
                 TOTAL_CASES, String.valueOf(report.totalCases()),
@@ -158,7 +166,7 @@ public class ScheduledEventTracker {
 
     public void jobAbortedEvent(ScheduledTaskEventConfiguration eventConfig, String reason, Duration searchDuration) {
         telemetryService.trackEvent(
-            eventConfig.getJobAbortedEvent(),
+            SCHEDULER_JOB_ABORTED,
             Map.of(
                 SCHEDULER_NAME, eventConfig.getSchedulerName(),
                 TOTAL_CASES, ZERO,
@@ -176,7 +184,7 @@ public class ScheduledEventTracker {
 
     public void backPressureUpdatedEvent(ScheduledTaskEventConfiguration eventConfig, Duration oldDelay, Duration newDelay) {
         telemetryService.trackEvent(
-            eventConfig.getBackPressureUpdatedEvent(),
+            SCHEDULER_BACK_PRESSURE_UPDATED,
             Map.of(
                 SCHEDULER_NAME, eventConfig.getSchedulerName(),
                 PREVIOUS_DELAY, String.valueOf(oldDelay.toMillis()),

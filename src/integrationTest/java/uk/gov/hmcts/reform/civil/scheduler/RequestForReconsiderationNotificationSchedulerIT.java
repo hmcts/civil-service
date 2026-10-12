@@ -76,8 +76,8 @@ public class RequestForReconsiderationNotificationSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(requestForReconsiderationNotificationScheduledTask).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("RequestForReconsiderationNotificationJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("RequestForReconsiderationNotificationCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("RequestForReconsiderationNotificationJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 }

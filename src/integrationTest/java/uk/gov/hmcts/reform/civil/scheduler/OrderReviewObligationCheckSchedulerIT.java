@@ -76,8 +76,8 @@ public class OrderReviewObligationCheckSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(orderReviewObligationCheckScheduledTask).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("OrderReviewObligationCheckJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("OrderReviewObligationCheckCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("OrderReviewObligationCheckJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 }
