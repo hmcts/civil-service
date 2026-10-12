@@ -49,7 +49,7 @@ class TakeCaseOfflineSchedulerTest {
         ScheduledTaskConfiguration<CaseDetails, Long> config = captor.getValue();
         assertThat(config.getSchedulerName()).isEqualTo(TakeCaseOfflineScheduler.SCHEDULER_NAME);
         assertThat(config.getScheduledTask()).isSameAs(takeCaseOfflineScheduledTask);
-        assertThat(config.getSearchResultSupplier()).isNotNull();
+        assertThat(config.getSearchResultSupplier().get()).isEqualTo(searchService.getElasticSearchResult());
         assertThat(config.getInterceptors()).containsExactly(flowStateCheck);
         assertThat(config.isUseDefaultInterceptors()).isTrue();
         verify(allowedEventFlowStateCheckFactory).forEvent(TAKE_CASE_OFFLINE);

@@ -50,7 +50,7 @@ class ClaimDetailsNotificationDeadlineSchedulerTest {
         ScheduledTaskConfiguration<CaseDetails, Long> config = captor.getValue();
         assertThat(config.getSchedulerName()).isEqualTo(ClaimDetailsNotificationDeadlineScheduler.SCHEDULER_NAME);
         assertThat(config.getScheduledTask()).isSameAs(caseDismissedScheduledTask);
-        assertThat(config.getSearchResultSupplier()).isNotNull();
+        assertThat(config.getSearchResultSupplier().get()).isEqualTo(searchService.getElasticSearchResult());
         assertThat(config.getInterceptors()).containsExactly(flowStateCheck);
         assertThat(config.isUseDefaultInterceptors()).isTrue();
         verify(allowedEventFlowStateCheckFactory).forEvent(DISMISS_CLAIM);
