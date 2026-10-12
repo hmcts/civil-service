@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.callback;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,25 +11,24 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.exceptions.InternalServerErrorException;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.callback.TaskCompletionSubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.ClientContext;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.Task;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.UserTask;
-import uk.gov.hmcts.reform.civil.service.taskmanagement.WaTaskManagementService;
+import uk.gov.hmcts.reform.civil.service.http.HttpResponseHeadersService;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
@@ -45,14 +46,14 @@ class DecentralisedCallbackHandlerTest {
     private CallbackHandlerFactory callbackHandlerFactory;
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
-    @Mock
-    private WaTaskManagementService taskManagementService;
+    private final HttpResponseHeadersService responseHeadersService =
+        new HttpResponseHeadersService(new ObjectMapper().registerModule(new JavaTimeModule()));
 
     private DecentralisedCallbackHandler handler;
 
     @BeforeEach
     void setUp() {
-        handler = new DecentralisedCallbackHandler(callbackHandlerFactory, caseDetailsConverter, taskManagementService);
+        handler = new DecentralisedCallbackHandler(callbackHandlerFactory, caseDetailsConverter, responseHeadersService);
     }
 
     @ParameterizedTest
@@ -107,34 +108,28 @@ class DecentralisedCallbackHandlerTest {
     }
 
     @Test
-    void completesTheTaskASubmittedCallbackAsksExUiToComplete() {
-        when(callbackHandlerFactory.dispatch(any())).thenReturn(taskCompletion(true));
-
-        handler.handle("/cases/callbacks/submitted", request(CASE_TYPE, "SEND_AND_REPLY"), headers());
-
-        assertThat(dispatchedParams().getType()).isEqualTo(SUBMITTED);
-        verify(taskManagementService).completeTask(AUTHORISATION, "task-1");
-    }
-
-    @Test
-    void leavesTheTaskWhenTheCallbackDoesNotAskForItToBeCompleted() {
-        when(callbackHandlerFactory.dispatch(any())).thenReturn(taskCompletion(false));
-
-        handler.handle("/cases/callbacks/submitted", request(CASE_TYPE, "SEND_AND_REPLY"), headers());
-
-        verifyNoInteractions(taskManagementService);
-    }
-
-    @Test
-    void keepsTheConfirmationWhenTheTaskCannotBeCompleted() {
-        TaskCompletionSubmittedCallbackResponse expected = taskCompletion(true);
-        when(callbackHandlerFactory.dispatch(any())).thenReturn(expected);
-        doThrow(new InternalServerErrorException("task already completed"))
-            .when(taskManagementService).completeTask(AUTHORISATION, "task-1");
+    void returnsTheClientContextHeaderCallbackControllerWouldReturn() {
+        TaskCompletionSubmittedCallbackResponse submitted = taskCompletion();
+        when(callbackHandlerFactory.dispatch(any())).thenReturn(submitted);
 
         Object response = handler.handle("/cases/callbacks/submitted", request(CASE_TYPE, "SEND_AND_REPLY"), headers());
 
-        assertThat(response).isSameAs(expected);
+        assertThat(dispatchedParams().getType()).isEqualTo(SUBMITTED);
+        assertThat(response).isInstanceOf(ResponseEntity.class);
+        ResponseEntity<?> entity = (ResponseEntity<?>) response;
+        assertThat(entity.getBody()).isSameAs(submitted);
+        assertThat(entity.getHeaders().getFirst("client-context"))
+            .isEqualTo(responseHeadersService.clientContextHeader(submitted).orElseThrow());
+    }
+
+    @Test
+    void returnsTheBareResponseWhenTheCallbackNamesNoTask() {
+        CallbackResponse submitted = SubmittedCallbackResponse.builder().confirmationHeader("# Sent").build();
+        when(callbackHandlerFactory.dispatch(any())).thenReturn(submitted);
+
+        Object response = handler.handle("/cases/callbacks/submitted", request(CASE_TYPE, "SEND_AND_REPLY"), headers());
+
+        assertThat(response).isSameAs(submitted);
     }
 
     private CallbackParams dispatchedParams() {
@@ -157,10 +152,10 @@ class DecentralisedCallbackHandlerTest {
         return headers;
     }
 
-    private static TaskCompletionSubmittedCallbackResponse taskCompletion(boolean completeTask) {
+    private static TaskCompletionSubmittedCallbackResponse taskCompletion() {
         Task task = new Task().setId("task-1");
         return new TaskCompletionSubmittedCallbackResponse()
             .setConfirmationHeader("# Your reply has been sent")
-            .setClientContext(new ClientContext().setUserTask(new UserTask(task, completeTask)));
+            .setClientContext(new ClientContext().setUserTask(new UserTask(task, true)));
     }
 }

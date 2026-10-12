@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.callback;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.PathContainer;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.pattern.PathPattern;
@@ -12,11 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.callback.TaskCompletionSubmittedCallbackResponse;
-import uk.gov.hmcts.reform.civil.model.taskmanagement.ClientContext;
-import uk.gov.hmcts.reform.civil.model.taskmanagement.Task;
-import uk.gov.hmcts.reform.civil.model.taskmanagement.UserTask;
-import uk.gov.hmcts.reform.civil.service.taskmanagement.WaTaskManagementService;
+import uk.gov.hmcts.reform.civil.service.http.HttpResponseHeadersService;
 
 import java.util.List;
 import java.util.Map;
@@ -48,7 +45,7 @@ public class DecentralisedCallbackHandler implements JsonCallbackHandler {
 
     private final CallbackHandlerFactory callbackHandlerFactory;
     private final CaseDetailsConverter caseDetailsConverter;
-    private final WaTaskManagementService taskManagementService;
+    private final HttpResponseHeadersService responseHeadersService;
 
     @Override
     public boolean handles(String callbackPath) {
@@ -80,8 +77,12 @@ public class DecentralisedCallbackHandler implements JsonCallbackHandler {
             .isCivilCaseType(!generalApplicationCaseType);
 
         CallbackResponse response = callbackHandlerFactory.dispatch(callbackParams);
-        completeRequestedTask(response, authorisation);
-        return response;
+        // As CallbackController does, ask ExUI to complete the WA task a submitted callback names.
+        return responseHeadersService.clientContextHeader(response)
+            .<Object>map(clientContext -> ResponseEntity.ok()
+                .header(HttpResponseHeadersService.CLIENT_CONTEXT, clientContext)
+                .body(response))
+            .orElse(response);
     }
 
     private Optional<PathPattern.PathMatchInfo> match(String callbackPath) {
@@ -90,28 +91,5 @@ public class DecentralisedCallbackHandler implements JsonCallbackHandler {
             .map(pattern -> pattern.matchAndExtract(path))
             .filter(Objects::nonNull)
             .findFirst();
-    }
-
-    /**
-     * Over HTTP, a submitted callback asks ExUI to complete a task through the client-context response header. The
-     * decentralised runtime has no way to return that header, so the task is completed here instead. A failure is
-     * logged rather than thrown: the event has already been saved, and throwing would lose its confirmation.
-     */
-    private void completeRequestedTask(CallbackResponse response, String authorisation) {
-        if (!(response instanceof TaskCompletionSubmittedCallbackResponse taskCompletion)) {
-            return;
-        }
-        Optional.ofNullable(taskCompletion.getClientContext())
-            .map(ClientContext::getUserTask)
-            .filter(UserTask::isCompleteTask)
-            .map(UserTask::getTaskData)
-            .map(Task::getId)
-            .ifPresent(taskId -> {
-                try {
-                    taskManagementService.completeTask(authorisation, taskId);
-                } catch (RuntimeException e) {
-                    log.warn("Unable to complete task {} after a decentralised submitted callback", taskId, e);
-                }
-            });
     }
 }

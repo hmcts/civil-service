@@ -25,11 +25,4 @@ public interface WaTaskManagementApiClient {
         @RequestHeader("Authorization") String authorization,
         @PathVariable("task-id") String taskId
     );
-
-    @PostMapping(value = "/task/{task-id}/complete", consumes = "application/json")
-    void completeTask(
-        @RequestHeader("ServiceAuthorization") String serviceAuthorisation,
-        @RequestHeader("Authorization") String authorization,
-        @PathVariable("task-id") String taskId
-    );
 }
