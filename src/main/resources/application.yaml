@@ -22,6 +22,14 @@ spring:
     name: civil-service
   main:
     allow-bean-definition-overriding: true
+  task:
+    scheduling:
+      thread-name-prefix: civil-scheduler-
+      pool:
+        size: ${SCHEDULER_THREAD_POOL_SIZE:5}
+      shutdown:
+        await-termination: true
+        await-termination-period: 20s
   cache:
     cache-names: userInfoCache, accessTokenCache
     caffeine:
@@ -802,6 +810,16 @@ feign:
         loggerLevel: basic
       document-management-metadata-download-api:
         loggerLevel: basic
+
+camunda:
+  rest:
+    client:
+      # Holunda registers a global Feign ErrorDecoder that wraps every Feign client's
+      # errors in RemoteProcessEngineException, losing the HTTP status. Disabling it
+      # restores Feign's default decoder so FeignException carries the real status,
+      # which the retry classification in ExternalTaskExceptionHelper depends on.
+      error-decoding:
+        enabled: false
 
 docStore:
   doc:

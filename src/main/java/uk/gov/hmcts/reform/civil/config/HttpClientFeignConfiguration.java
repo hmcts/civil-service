@@ -4,6 +4,7 @@ import com.microsoft.applicationinsights.TelemetryClient;
 import feign.Client;
 import feign.Request;
 import feign.Response;
+import feign.codec.ErrorDecoder;
 import feign.httpclient.ApacheHttpClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.config.RequestConfig;
@@ -40,6 +41,19 @@ public class HttpClientFeignConfiguration {
         connectionManager.setMaxTotal(maxTotal);
         connectionManager.setDefaultMaxPerRoute(maxPerRoute);
         return connectionManager;
+    }
+
+    /**
+     * Feign's own default decoder, registered as a bean so that every client shares it and
+     * {@code ErrorDecoderTelemetryAspect} can advise it. Spring AOP only sees Spring beans:
+     * when Feign instantiates {@code ErrorDecoder.Default} internally (which it does once
+     * Holunda's global decoder is disabled) the aspect never fires and the
+     * {@code httpclient.feign.error.classified} event is never emitted. Behaviour of the
+     * clients is unchanged; this is the decoder they would use anyway.
+     */
+    @Bean
+    public ErrorDecoder feignErrorDecoder() {
+        return new ErrorDecoder.Default();
     }
 
     @Bean

@@ -58,8 +58,9 @@ class ApplicationSubmittedRespondentDashboardServiceTest {
     }
 
     @Test
-    void shouldRecordNonUrgentScenarioWhenWithConsent() {
+    void shouldRecordNonUrgentScenarioWhenWithConsentAndInformOtherPartyIsNull() {
         GeneralApplicationCaseData caseData = baseCase()
+            .generalAppInformOtherParty(null)
             .generalAppConsentOrder(YesOrNo.YES)
             .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YesOrNo.NO))
             .build();
