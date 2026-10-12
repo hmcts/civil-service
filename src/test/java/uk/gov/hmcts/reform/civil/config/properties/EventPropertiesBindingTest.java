@@ -70,6 +70,11 @@ class EventPropertiesBindingTest {
                     .isEqualTo(fieldDefaults.getCaseDrivenClients())
                     .isEqualTo(2);
 
+                assertThat(bound.getCaseDrivenMaxTasks())
+                    .as("async.event.caseDrivenMaxTasks in application.yaml must match the field default")
+                    .isEqualTo(fieldDefaults.getCaseDrivenMaxTasks())
+                    .isEqualTo(1);
+
                 assertThat(bound.getSchedulerMaxTasks())
                     .as("the scheduler client is deliberately kept at one task per fetch")
                     .isEqualTo(1);
