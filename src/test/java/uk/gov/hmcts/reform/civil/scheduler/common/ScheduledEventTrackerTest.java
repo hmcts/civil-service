@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.AbortCategory;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
 
 import java.time.Duration;
@@ -239,7 +240,7 @@ class ScheduledEventTrackerTest {
 
     @Test
     void shouldTrackCaseAbortedEvent() {
-        scheduledEventTracker.caseAbortedEvent(eventConfig, "789", "Ongoing business process");
+        scheduledEventTracker.caseAbortedEvent(eventConfig, "789", AbortCategory.ONGOING_BUSINESS_PROCESS, "Ongoing business process");
 
         verify(telemetryService).trackEvent(
             ScheduledTaskEventConfiguration.SCHEDULER_CASE_ABORTED,
@@ -247,6 +248,7 @@ class ScheduledEventTrackerTest {
                 "schedulerName", "TestScheduler",
                 "caseId", "789",
                 "abortReason", "Ongoing business process",
+                "abortCategory", "ONGOING_BUSINESS_PROCESS",
                 "status", "ABORTED"
             )
         );
@@ -255,7 +257,7 @@ class ScheduledEventTrackerTest {
     @Test
     void shouldTrackCaseAbortedEventWithMetrics() {
         Map<String, Long> metrics = Map.of("Interceptor1", 10L);
-        scheduledEventTracker.caseAbortedEvent(eventConfig, "789", "Ongoing business process", metrics);
+        scheduledEventTracker.caseAbortedEvent(eventConfig, "789", AbortCategory.ONGOING_BUSINESS_PROCESS, "Ongoing business process", metrics);
 
         verify(telemetryService).trackEvent(
             ScheduledTaskEventConfiguration.SCHEDULER_CASE_ABORTED,
@@ -263,8 +265,41 @@ class ScheduledEventTrackerTest {
                 "schedulerName", "TestScheduler",
                 "caseId", "789",
                 "abortReason", "Ongoing business process",
+                "abortCategory", "ONGOING_BUSINESS_PROCESS",
                 "status", "ABORTED",
                 "metric_Interceptor1", "10"
+            )
+        );
+    }
+
+    @Test
+    void shouldTrackCaseAbortedEventDefaultingToOtherCategory_whenNoCategoryProvided() {
+        scheduledEventTracker.caseAbortedEvent(eventConfig, "789", "Custom reason");
+
+        verify(telemetryService).trackEvent(
+            ScheduledTaskEventConfiguration.SCHEDULER_CASE_ABORTED,
+            Map.of(
+                "schedulerName", "TestScheduler",
+                "caseId", "789",
+                "abortReason", "Custom reason",
+                "abortCategory", "OTHER",
+                "status", "ABORTED"
+            )
+        );
+    }
+
+    @Test
+    void shouldTrackCaseAbortedEventWithNullCategoryDefaultingToOther() {
+        scheduledEventTracker.caseAbortedEvent(eventConfig, "789", null, "Custom reason");
+
+        verify(telemetryService).trackEvent(
+            ScheduledTaskEventConfiguration.SCHEDULER_CASE_ABORTED,
+            Map.of(
+                "schedulerName", "TestScheduler",
+                "caseId", "789",
+                "abortReason", "Custom reason",
+                "abortCategory", "OTHER",
+                "status", "ABORTED"
             )
         );
     }

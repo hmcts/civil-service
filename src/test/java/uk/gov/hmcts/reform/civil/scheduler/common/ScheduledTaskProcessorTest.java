@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.AbortCategory;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorChain;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.InterceptorChainFactory;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.TaskAbortedException;
@@ -364,7 +365,7 @@ class ScheduledTaskProcessorTest {
         when(interceptorChainFactory.buildChain(any(), any())).thenAnswer(invocation ->
             new InterceptorChain<CaseDetails>(
                 List.of((context, chain) -> {
-                    throw new TaskAbortedException("Ongoing business process");
+                    throw new TaskAbortedException(AbortCategory.ONGOING_BUSINESS_PROCESS, "Ongoing business process");
                 }),
                 ctx -> scheduledTask.accept(ctx.getItem())
             )
@@ -377,7 +378,7 @@ class ScheduledTaskProcessorTest {
         assertThat(outcome.abortedCases()).containsExactly(1L);
         assertThat(outcome.abortedEarly()).isFalse();
 
-        verify(scheduledEventTracker).caseAbortedEvent(eq(eventConfig), eq("1"), eq("Ongoing business process"), anyMap());
+        verify(scheduledEventTracker).caseAbortedEvent(eq(eventConfig), eq("1"), eq(AbortCategory.ONGOING_BUSINESS_PROCESS), eq("Ongoing business process"), anyMap());
         verify(scheduledTask, never()).accept(any());
     }
 
@@ -403,7 +404,7 @@ class ScheduledTaskProcessorTest {
         assertThat(outcome.abortedCases()).containsExactly(1L);
         assertThat(outcome.abortedEarly()).isFalse();
 
-        verify(scheduledEventTracker).caseAbortedEvent(eq(eventConfig), eq("1"), eq("Silent abortion"), anyMap());
+        verify(scheduledEventTracker).caseAbortedEvent(eq(eventConfig), eq("1"), eq(AbortCategory.SILENT_ABORTION), eq("Silent abortion"), anyMap());
         verify(scheduledTask, never()).accept(any());
     }
 
