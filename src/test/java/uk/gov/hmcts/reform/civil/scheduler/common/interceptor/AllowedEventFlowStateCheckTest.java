@@ -85,6 +85,7 @@ class AllowedEventFlowStateCheckTest {
 
         verify(chain).next(context);
         verify(coreCaseDataService).getCase(123L);
+        assertThat(context.getAttribute(CaseInterceptorAttributes.CIVIL_CASE_DATA)).contains(caseData);
     }
 
     @Test
