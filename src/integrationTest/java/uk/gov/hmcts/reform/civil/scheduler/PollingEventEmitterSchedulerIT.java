@@ -72,8 +72,8 @@ public class PollingEventEmitterSchedulerIT {
 
         verify(coreCaseDataService).searchCases(any(Query.class));
         verify(pollingEventEmitterScheduledTask).accept(caseDetails);
-        verify(telemetryService).trackEvent(eq("PollingEventEmitterJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("PollingEventEmitterCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("PollingEventEmitterJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 }

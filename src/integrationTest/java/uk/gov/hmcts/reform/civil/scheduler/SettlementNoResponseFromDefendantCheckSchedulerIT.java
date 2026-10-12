@@ -87,8 +87,8 @@ class SettlementNoResponseFromDefendantCheckSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(scheduledTask).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("SettlementNoResponseFromDefendantCheckJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("SettlementNoResponseFromDefendantCheckCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("SettlementNoResponseFromDefendantCheckJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 }

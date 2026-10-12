@@ -94,8 +94,8 @@ public class EvidenceUploadSchedulerIT {
         scheduler.runScheduledTask();
 
         // Then
-        verify(telemetryService).trackEvent(eq("EvidenceUploadJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("EvidenceUploadJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
         coreCaseDataApiMockHelper.verifySubmitEvent(1);
     }
 
@@ -120,8 +120,8 @@ public class EvidenceUploadSchedulerIT {
         scheduler.runScheduledTask();
 
         // Then every case on both pages is processed
-        verify(telemetryService).trackEvent(eq("EvidenceUploadJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("EvidenceUploadJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
         coreCaseDataApiMockHelper.verifySubmitEvent(51);
     }
 

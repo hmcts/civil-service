@@ -76,8 +76,8 @@ public class ManageStayWATaskSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(manageStayWATaskScheduledTask).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("ManageStayWATaskJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("ManageStayWATaskCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("ManageStayWATaskJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 }

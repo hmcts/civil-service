@@ -80,8 +80,8 @@ public class HearingCvpLinkSchedulerIT {
 
         // Then
         verify(hearingCvpLinkScheduledTask).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("HearingCvpLinkJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("HearingCvpLinkCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("HearingCvpLinkJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 }

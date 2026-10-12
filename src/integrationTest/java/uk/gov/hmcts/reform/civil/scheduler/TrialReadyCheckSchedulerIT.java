@@ -76,8 +76,8 @@ public class TrialReadyCheckSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(trialReadyCheckScheduledTask).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("TrialReadyCheckJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("TrialReadyCheckCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("TrialReadyCheckJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
     }
 }

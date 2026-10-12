@@ -90,15 +90,15 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantSchedulerIT {
 
         verify(scheduledTask).accept(searchCase);
         verify(telemetryService).trackEvent(
-            eq("FullAdmitPayImmediatelyNoPaymentFromDefendantJobStarted"),
+            eq("SchedulerJobStarted"),
             anyMap()
         );
         verify(telemetryService).trackEvent(
-            eq("FullAdmitPayImmediatelyNoPaymentFromDefendantCaseProcessed"),
+            eq("SchedulerCaseProcessed"),
             anyMap()
         );
         verify(telemetryService).trackEvent(
-            eq("FullAdmitPayImmediatelyNoPaymentFromDefendantJobCompleted"),
+            eq("SchedulerJobCompleted"),
             anyMap()
         );
     }
@@ -118,11 +118,11 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantSchedulerIT {
         // Then every case on both pages is processed
         verify(scheduledTask, times(51)).accept(any(CaseDetails.class));
         verify(telemetryService).trackEvent(
-            eq("FullAdmitPayImmediatelyNoPaymentFromDefendantJobStarted"),
+            eq("SchedulerJobStarted"),
             anyMap()
         );
         verify(telemetryService).trackEvent(
-            eq("FullAdmitPayImmediatelyNoPaymentFromDefendantJobCompleted"),
+            eq("SchedulerJobCompleted"),
             anyMap()
         );
     }
