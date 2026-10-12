@@ -126,6 +126,7 @@ class AllowedEventFlowStateCheckTest {
         TaskAbortedException exception = assertThrows(TaskAbortedException.class, () -> interceptor.accept(context, chain));
 
         assertThat(exception.getReason()).isEqualTo("TAKE_CASE_OFFLINE not allowed in current flow state");
+        assertThat(exception.getCategory()).isEqualTo(AbortCategory.FLOW_STATE_DISALLOWED);
         verify(chain, never()).next(context);
         verify(stateFlowEngine).evaluate(caseData);
     }
@@ -150,6 +151,7 @@ class AllowedEventFlowStateCheckTest {
         TaskAbortedException exception = assertThrows(TaskAbortedException.class, () -> interceptor.accept(context, chain));
 
         assertThat(exception.getReason()).isEqualTo("TAKE_CASE_OFFLINE not allowed in current flow state");
+        assertThat(exception.getCategory()).isEqualTo(AbortCategory.FLOW_STATE_DISALLOWED);
         verify(chain, never()).next(context);
         verify(stateFlowEngine).evaluateSpec(caseData);
     }
@@ -168,6 +170,7 @@ class AllowedEventFlowStateCheckTest {
         TaskAbortedException exception = assertThrows(TaskAbortedException.class, () -> interceptor.accept(context, chain));
 
         assertThat(exception.getReason()).isEqualTo("TAKE_CASE_OFFLINE not allowed in current flow state");
+        assertThat(exception.getCategory()).isEqualTo(AbortCategory.FLOW_STATE_DISALLOWED);
         verify(chain, never()).next(context);
     }
 

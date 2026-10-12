@@ -42,7 +42,7 @@ public class AllowedEventFlowStateCheck implements SchedulerInterceptor<CaseDeta
         }
 
         logNotAllowed(caseData, context.getItem().getId());
-        throw new TaskAbortedException(event.name() + " not allowed in current flow state");
+        throw new TaskAbortedException(AbortCategory.FLOW_STATE_DISALLOWED, event.name() + " not allowed in current flow state");
     }
 
     @Override
