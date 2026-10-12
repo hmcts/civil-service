@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.civil.scheduler.gadocumentuploadnotify.GADocumentUplo
 import uk.gov.hmcts.reform.civil.scheduler.gadocumentuploadnotify.GADocumentUploadNotifyScheduler;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
+import uk.gov.hmcts.test.config.CoreCaseDataApiMockHelperConfiguration;
+import uk.gov.hmcts.test.helper.CoreCaseDataApiMockHelper;
 
 import java.util.Set;
 
@@ -26,7 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
-@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
+@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=GADocumentUploadNotifySchedulerIT",
     "scheduler.lockAtLeastFor=PT0S"
 })
@@ -50,9 +52,14 @@ public class GADocumentUploadNotifySchedulerIT {
     @MockBean
     private GADocumentUploadNotifyScheduledTask gaDocumentUploadNotifyScheduledTask;
 
+    @Autowired
+    private CoreCaseDataApiMockHelper coreCaseDataApiMockHelper;
+
     @BeforeEach
     void setUp() {
         reset(telemetryService, featureToggleService, searchService, gaDocumentUploadNotifyScheduledTask);
+        coreCaseDataApiMockHelper.resetMocks();
+        coreCaseDataApiMockHelper.setupIdamClient();
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         when(gaDocumentUploadNotifyScheduledTask.maxCasesPerRun()).thenReturn(Long.MAX_VALUE);
         when(gaDocumentUploadNotifyScheduledTask.getItemId(any(CaseDetails.class))).thenAnswer(invocation ->

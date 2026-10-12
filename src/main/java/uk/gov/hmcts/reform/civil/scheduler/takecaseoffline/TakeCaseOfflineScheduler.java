@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
-import uk.gov.hmcts.reform.civil.service.search.TakeCaseOfflineSearchService;
+import uk.gov.hmcts.reform.civil.service.search.takecaseoffline.TakeCaseOfflineSchedulerSearchService;
 
 @Component
 @RequiredArgsConstructor
@@ -17,7 +17,7 @@ public class TakeCaseOfflineScheduler implements CivilScheduler {
 
     public static final String SCHEDULER_NAME = "TakeCaseOffline";
 
-    private final TakeCaseOfflineSearchService searchService;
+    private final TakeCaseOfflineSchedulerSearchService searchService;
     private final ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
     private final TakeCaseOfflineScheduledTask takeCaseOfflineScheduledTask;
 

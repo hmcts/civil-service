@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.user;
 
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
+import feign.Request;
+import feign.FeignException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -66,7 +67,12 @@ class UserInformationServiceTest {
 
     @Test
     public void should_getUserCaseRoles_throw_upstream_unavailable_for_ccd_case_users_failure() {
-        RemoteProcessEngineException cause = new RemoteProcessEngineException("CCD failed", new Throwable());
+        FeignException cause = new FeignException.InternalServerError(
+            "CCD failed",
+            Request.create(Request.HttpMethod.GET, "url", java.util.Map.of(), null, null, null),
+            null,
+            null
+        );
 
         when(userService.getUserInfo(AUTHORIZATION)).thenReturn(USER_INFO);
         when(coreCaseUserService.getUserCaseRoles(CASE_ID, USER_INFO.getUid())).thenThrow(cause);
