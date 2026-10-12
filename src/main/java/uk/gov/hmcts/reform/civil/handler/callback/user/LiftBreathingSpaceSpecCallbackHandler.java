@@ -115,10 +115,12 @@ public class LiftBreathingSpaceSpecCallbackHandler extends CallbackHandler {
         CaseData data = callbackParams.getCaseData();
         BreathingSpaceUtils.addLiftDetailsToCurrentBreathingSpace(data);
         if (!isExpectedEndAfterToday(data)) {
+            // End date is today or earlier, so lift straight away.
             data.setBusinessProcess(BusinessProcess.ready(LIFT_BREATHING_SPACE_SPEC));
             data.getBreathing().setActive(NO);
             data.getBreathing().setLiftPending(NO);
         } else {
+            // Future end date. Leave breathing space active and let the scheduler lift it when the date arrives.
             data.getBreathing().setLiftPending(YES);
         }
 

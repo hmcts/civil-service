@@ -18,6 +18,6 @@ public class BreathingSpaceLiftPendingEventHandler {
 
     @EventListener
     public void applyPendingBreathingSpaceLift(BreathingSpaceLiftPendingEvent event) {
-        coreCaseDataService.triggerEvent(event.getCaseId(), APPLY_PENDING_BREATHING_SPACE_LIFT);
+        coreCaseDataService.triggerEvent(event.caseId(), APPLY_PENDING_BREATHING_SPACE_LIFT);
     }
 }

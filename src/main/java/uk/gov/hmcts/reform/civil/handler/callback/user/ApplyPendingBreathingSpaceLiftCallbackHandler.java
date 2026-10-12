@@ -47,7 +47,7 @@ public class ApplyPendingBreathingSpaceLiftCallbackHandler extends CallbackHandl
 
     private CallbackResponse applyPendingLift(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (isPendingLiftDue(caseData)) {
+        if (shouldBreathingSpaceBeLifted(caseData)) {
             caseData.getBreathing().setActive(NO);
             caseData.getBreathing().setLiftPending(NO);
             caseData.setBusinessProcess(BusinessProcess.ready(LIFT_BREATHING_SPACE_SPEC));
@@ -58,12 +58,13 @@ public class ApplyPendingBreathingSpaceLiftCallbackHandler extends CallbackHandl
             .build();
     }
 
-    private static boolean isPendingLiftDue(CaseData caseData) {
+    private static boolean shouldBreathingSpaceBeLifted(CaseData caseData) {
         BreathingSpaceInfo breathing = caseData.getBreathing();
         if (breathing == null || breathing.getLift() == null || breathing.getLift().getExpectedEnd() == null) {
             return false;
         }
 
+        // All three: still active, lift was requested, and the end date is today or earlier.
         boolean breathingSpaceStillActive = breathing.getActive() == YES;
         boolean liftIsPending = breathing.getLiftPending() == YES;
         boolean endDateReached = !breathing.getLift().getExpectedEnd().isAfter(LocalDate.now());

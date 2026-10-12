@@ -42,6 +42,7 @@ public class BreathingSpaceLiftPendingQueryProvider implements PaginatedQueryPro
         );
     }
 
+    // Cases still in breathing space where a lift was booked and the saved end date has been reached.
     private BoolQueryBuilder buildDueLiftQuery(String today) {
         return boolQuery()
             .minimumShouldMatch(1)
