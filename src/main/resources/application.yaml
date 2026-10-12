@@ -22,6 +22,14 @@ spring:
     name: civil-service
   main:
     allow-bean-definition-overriding: true
+  task:
+    scheduling:
+      thread-name-prefix: civil-scheduler-
+      pool:
+        size: ${SCHEDULER_THREAD_POOL_SIZE:5}
+      shutdown:
+        await-termination: true
+        await-termination-period: 20s
   cache:
     cache-names: userInfoCache, accessTokenCache
     caffeine:
