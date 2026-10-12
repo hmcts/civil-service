@@ -119,6 +119,18 @@ public class DraftStoreService {
             });
     }
 
+    public Optional<DraftStoreEntity> linkCaseId(UUID draftId, String userId, String caseId, DraftType draftType) {
+        Objects.requireNonNull(draftId, "draftId must not be null");
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(caseId, "caseId must not be null");
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
+        return getDraft(draftId, userId, draftType).map(draft -> {
+            draft.setCaseId(caseId);
+            draft.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
+            return draftStoreTransactionService.saveInNewTransaction(draft);
+        });
+    }
+
     public Optional<DraftStoreEntity> applyPaymentRetention(UUID draftId, String userId, DraftType draftType) {
         Objects.requireNonNull(draftId, "draftId must not be null");
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);

@@ -14,9 +14,15 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.draftstore.DraftType;
+import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
+import uk.gov.hmcts.reform.draftstore.services.DraftStoreService;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
@@ -31,6 +37,8 @@ public class CaseEventService {
     private final CoreCaseDataApi coreCaseDataApi;
     private final AuthTokenGenerator authTokenGenerator;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final DraftStoreService draftStoreService;
+    private final CoreCaseDataService coreCaseDataService;
     @Value("${case-flags.logging.enabled:false}")
     private boolean caseFlagsLoggingEnabled;
 
@@ -71,8 +79,8 @@ public class CaseEventService {
         }
         CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(eventResponse, params.getUpdates());
         if (caseFlagsLoggingEnabled) {
-            var payload = new HashMap((Map) caseDataContent.getData());
-            var respondent1 = new HashMap((Map) payload.get("respondent1"));
+            Map<String, Object> payload = new HashMap<>((Map<String, Object>) caseDataContent.getData());
+            Map<String, Object> respondent1 = new HashMap<>((Map<String, Object>) payload.get("respondent1"));
             log.info(
                 "caseid: {}, respondent flags after civil commons call: {}",
                 params.getCaseId(),
@@ -100,6 +108,35 @@ public class CaseEventService {
     }
 
     public CaseDetails submitEventForNewClaim(EventSubmissionParams params) {
+        Optional<UUID> draftId = parseDbDraftId(params);
+        if (draftId.isPresent()) {
+            Optional<DraftStoreEntity> draft = draftStoreService.getDraft(
+                draftId.get(),
+                params.getUserId(),
+                DraftType.DRAFT_CLAIM
+            );
+            if (draft.isPresent() && draft.get().getCaseId() != null) {
+                log.info(
+                    "Returning existing caseId={} for submissionId={}",
+                    draft.get().getCaseId(),
+                    params.getSubmissionId()
+                );
+                return coreCaseDataService.getCase(Long.valueOf(draft.get().getCaseId()), params.getAuthorisation());
+            }
+
+            CaseDetails created = createNewClaim(params);
+            draftStoreService.linkCaseId(
+                draftId.get(),
+                params.getUserId(),
+                created.getId().toString(),
+                DraftType.DRAFT_CLAIM
+            );
+            return created;
+        }
+        return createNewClaim(params);
+    }
+
+    private CaseDetails createNewClaim(EventSubmissionParams params) {
         StartEventResponse eventResponse = startEvent(params.getAuthorisation(), params.getUserId(), params.getEvent());
         CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(eventResponse, params.getUpdates());
         return coreCaseDataApi.submitForCitizen(params.getAuthorisation(),
@@ -116,5 +153,20 @@ public class CaseEventService {
             return submitEventForNewClaim(params);
         }
         return submitEventForClaim(params, false);
+    }
+
+    private Optional<UUID> parseDbDraftId(EventSubmissionParams params) {
+        if (!params.hasSubmissionId()) {
+            return Optional.empty();
+        }
+        String[] parts = params.getSubmissionId().trim().split(":", 3);
+        if (parts.length < 3 || !parts[0].equals(params.getUserId())) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(UUID.fromString(parts[1]));
+        } catch (IllegalArgumentException ex) {
+            return Optional.empty();
+        }
     }
 }

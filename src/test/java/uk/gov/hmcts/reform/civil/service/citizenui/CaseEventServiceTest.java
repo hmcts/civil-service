@@ -20,18 +20,31 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
+import uk.gov.hmcts.reform.draftstore.DraftType;
+import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
+import uk.gov.hmcts.reform.draftstore.services.DraftStoreService;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
 import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataContentFromStartEventResponse;
@@ -48,6 +61,12 @@ public class CaseEventServiceTest {
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
 
+    @Mock
+    private DraftStoreService draftStoreService;
+
+    @Mock
+    private CoreCaseDataService coreCaseDataService;
+
     @InjectMocks
     private CaseEventService caseEventService;
 
@@ -61,6 +80,8 @@ public class CaseEventServiceTest {
     private static final String CASE_ID = "123";
     private static final String DRAFT = "draft";
     private static final String EVENT_ID = "1";
+    private static final UUID DRAFT_ID = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+    private static final String SUBMISSION_ID = USER_ID + ":" + DRAFT_ID + ":2026-10-12T10:00:00Z";
     private static final StartEventResponse RESPONSE = StartEventResponse
         .builder()
         .eventId(EVENT_ID)
@@ -108,6 +129,7 @@ public class CaseEventServiceTest {
                                                                         Map.of()
                                                                     )
         );
+        verifyNoInteractions(draftStoreService, coreCaseDataService);
     }
 
     @Test
@@ -136,6 +158,72 @@ public class CaseEventServiceTest {
                                                                    Map.of()
                                                                )
         );
+        verifyNoInteractions(draftStoreService, coreCaseDataService);
+    }
+
+    @Test
+    void shouldCreateAndLinkDraftOnFirstSubmitWithSubmissionId() {
+        DraftStoreEntity draft = blankDraft();
+        given(draftStoreService.getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM)).willReturn(Optional.of(draft));
+        given(draftStoreService.linkCaseId(DRAFT_ID, USER_ID, "1", DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.of(draft));
+
+        CaseDetails result = caseEventService.submitEvent(new EventSubmissionParams()
+                                                              .setUpdates(Maps.newHashMap())
+                                                              .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+                                                              .setCaseId(DRAFT)
+                                                              .setUserId(USER_ID)
+                                                              .setAuthorisation(AUTHORISATION)
+                                                              .setSubmissionId(SUBMISSION_ID));
+
+        assertThat(result).isEqualTo(CASE_DETAILS);
+        verify(coreCaseDataApi).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
+        verify(draftStoreService).linkCaseId(DRAFT_ID, USER_ID, "1", DraftType.DRAFT_CLAIM);
+    }
+
+    @Test
+    void shouldReturnExistingCaseOnSecondSubmitWithSameSubmissionId() {
+        DraftStoreEntity linked = blankDraft();
+        linked.setCaseId("99");
+        CaseDetails existing = CaseDetails.builder().id(99L).build();
+        given(draftStoreService.getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM)).willReturn(Optional.of(linked));
+        given(coreCaseDataService.getCase(99L, AUTHORISATION)).willReturn(existing);
+
+        CaseDetails result = caseEventService.submitEvent(new EventSubmissionParams()
+                                                              .setUpdates(Maps.newHashMap())
+                                                              .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+                                                              .setCaseId(DRAFT)
+                                                              .setUserId(USER_ID)
+                                                              .setAuthorisation(AUTHORISATION)
+                                                              .setSubmissionId(SUBMISSION_ID));
+
+        assertThat(result).isEqualTo(existing);
+        verify(coreCaseDataApi, never()).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
+        verify(draftStoreService, never()).linkCaseId(any(), any(), any(), any());
+    }
+
+    @Test
+    void shouldCreateNewCaseForDifferentDraftSubmissionId() {
+        UUID otherDraftId = UUID.fromString("11111111-2222-3333-4444-555555555555");
+        DraftStoreEntity otherDraft = blankDraft();
+        otherDraft.setId(otherDraftId);
+        given(draftStoreService.getDraft(otherDraftId, USER_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.of(otherDraft));
+        given(draftStoreService.linkCaseId(eq(otherDraftId), eq(USER_ID), eq("1"), eq(DraftType.DRAFT_CLAIM)))
+            .willReturn(Optional.of(otherDraft));
+
+        CaseDetails result = caseEventService.submitEvent(new EventSubmissionParams()
+                                                              .setUpdates(Maps.newHashMap())
+                                                              .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+                                                              .setCaseId(DRAFT)
+                                                              .setUserId(USER_ID)
+                                                              .setAuthorisation(AUTHORISATION)
+                                                              .setSubmissionId(
+                                                                  USER_ID + ":" + otherDraftId + ":2026-10-12T10:00:00Z"
+                                                              ));
+
+        assertThat(result).isEqualTo(CASE_DETAILS);
+        verify(draftStoreService).linkCaseId(otherDraftId, USER_ID, "1", DraftType.DRAFT_CLAIM);
     }
 
     @Test
@@ -167,5 +255,19 @@ public class CaseEventServiceTest {
                                                                    .setUserId(USER_ID)
                                                                    .setAuthorisation(AUTHORISATION));
         assertThat(response).isEqualTo(CASE_DETAILS);
+    }
+
+    private static DraftStoreEntity blankDraft() {
+        OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
+        return new DraftStoreEntity(
+            DRAFT_ID,
+            USER_ID,
+            null,
+            DraftType.DRAFT_CLAIM,
+            new HashMap<>(Map.of("step", "ready")),
+            now,
+            now,
+            now.plusDays(30)
+        );
     }
 }
