@@ -47,7 +47,11 @@ public class AllowedEventFlowStateCheck implements SchedulerInterceptor<CaseDeta
 
     private CaseData getCaseData(InterceptorContext<CaseDetails> context) {
         return context.getAttribute(CIVIL_CASE_DATA)
-            .orElseGet(() -> caseDetailsConverter.toCaseData(coreCaseDataService.getCase(context.getItem().getId())));
+            .orElseGet(() -> {
+                CaseData data = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(context.getItem().getId()));
+                context.setAttribute(CIVIL_CASE_DATA, data);
+                return data;
+            });
     }
 
     private void logNotAllowed(CaseData caseData) {
