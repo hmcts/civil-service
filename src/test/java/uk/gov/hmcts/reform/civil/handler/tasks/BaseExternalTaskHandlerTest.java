@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import feign.FeignException;
 import feign.Request;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.delegate.BpmnError;
@@ -123,15 +122,12 @@ class BaseExternalTaskHandlerTest {
         }
 
         @Test
-        void shouldCallHandleTaskFailureNotRetryable_whenHandleTaskThrowsRemoteProcessEngineClientError() {
-            handler.throwRetryable(new RemoteProcessEngineException(
-                "REST-CLIENT-001 Error during remote Camunda engine invocation of DocmosisApiClient#createDocument(DocmosisRequest): Bad Request",
-                new FeignException.BadRequest(
-                    "Bad request",
-                    Request.create(Request.HttpMethod.GET, "url", java.util.Map.of(), null, null, null),
-                    null,
-                    null
-                )
+        void shouldCallHandleTaskFailureNotRetryable_whenHandleTaskThrowsFeignClientError() {
+            handler.throwRetryable(new FeignException.BadRequest(
+                "Error during remote invocation of DocmosisApiClient#createDocument(DocmosisRequest): Bad Request",
+                Request.create(Request.HttpMethod.GET, "url", java.util.Map.of(), null, null, null),
+                null,
+                null
             ));
 
             handler.execute(externalTask, externalTaskService);
@@ -147,16 +143,13 @@ class BaseExternalTaskHandlerTest {
         }
 
         @Test
-        void shouldCallHandleTaskFailure_whenHandleTaskThrowsRemoteProcessEngineServerError() {
+        void shouldCallHandleTaskFailure_whenHandleTaskThrowsFeignServerError() {
             when(externalTask.getRetries()).thenReturn(null);
-            handler.throwRetryable(new RemoteProcessEngineException(
-                "REST-CLIENT-001 Error during remote Camunda engine invocation: Bad Gateway",
-                new FeignException.BadGateway(
-                    "Bad gateway",
-                    Request.create(Request.HttpMethod.GET, "url", java.util.Map.of(), null, null, null),
-                    null,
-                    null
-                )
+            handler.throwRetryable(new FeignException.BadGateway(
+                "Error during remote invocation: Bad Gateway",
+                Request.create(Request.HttpMethod.GET, "url", java.util.Map.of(), null, null, null),
+                null,
+                null
             ));
 
             handler.execute(externalTask, externalTaskService);
