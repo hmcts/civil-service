@@ -1,13 +1,14 @@
 java:
+  replicas: 2
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   memoryRequests: 2Gi
   cpuRequests: 2000m
   cpuLimits: 3500m
-  devmemoryRequests: 6Gi
-  devcpuRequests: 2000m
-  devmemoryLimits: 8Gi
-  devcpuLimits: 4500m
+  devmemoryRequests: 2Gi
+  devcpuRequests: 1000m
+  devmemoryLimits: 2Gi
+  devcpuLimits: 3500m
   environment:
     CORE_CASE_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
     OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
@@ -124,12 +125,6 @@ java:
     auth:
       username: ${POSTGRES_USER}
       password: ${POSTGRES_PASSWORD}
-idam-pr:
-  releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
-  enabled: true
-  redirect_uris:
-    XUI:
-      - https://civil-service-xui-staging.aat.platform.hmcts.net/oauth2/callback
 
 xui-webapp:
   enabled: true
