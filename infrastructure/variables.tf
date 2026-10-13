@@ -58,15 +58,16 @@ variable "monitor_action_group" {
   description = "Map of monitor action groups to create"
 }
 
-variable "monitor_scheduler_alerts" {
-  type = map(object({
-    frequency_in_minutes   = optional(number)
-    time_window_in_minutes = optional(number)
-    enabled                = optional(bool)
-    action_group           = string
-  }))
-  default     = {}
-  description = "Map of scheduler alerts to create, with action_group mapping"
+variable "scheduler_alerts_enabled" {
+  type        = bool
+  default     = false
+  description = "Whether fleet-wide scheduled task alerts are enabled"
+}
+
+variable "expected_schedulers" {
+  type        = list(string)
+  default     = []
+  description = "List of expected scheduler names that should run at least once within the job_not_run_threshold window"
 }
 
 variable "civil_service_alert_slack_email_secret_name" {
