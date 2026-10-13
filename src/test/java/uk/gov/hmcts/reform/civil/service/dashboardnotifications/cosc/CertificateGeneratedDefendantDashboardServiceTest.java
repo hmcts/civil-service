@@ -159,6 +159,38 @@ class CertificateGeneratedDefendantDashboardServiceTest {
     }
 
     @Test
+    void shouldRecordScenarioWhenCoscApplicationHasNoCaseLink() {
+        HashMap<String, Object> scenarioParams = new HashMap<>();
+        when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+        when(coscDashboardHelper.isMarkedPaidInFull(any())).thenReturn(true);
+
+        GAApplicationType gaApplicationType = new GAApplicationType();
+        gaApplicationType.setTypes(singletonList(CONFIRM_CCJ_DEBT_PAID));
+        GeneralApplication generalApplication = new GeneralApplication();
+        generalApplication.setGeneralAppType(gaApplicationType);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
+            .respondent1Represented(YesOrNo.NO).build();
+        caseData.setGeneralApplications(wrapElements(generalApplication));
+
+        dashboardService.notifyCertificateGenerated(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardNotificationService);
+        verify(dashboardScenariosService).recordScenarios(
+            AUTH_TOKEN,
+            SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_PROCESSED_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
+            new ScenarioRequestParams(scenarioParams)
+        );
+        verify(dashboardScenariosService).recordScenarios(
+            AUTH_TOKEN,
+            SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
+            new ScenarioRequestParams(scenarioParams)
+        );
+    }
+
+    @Test
     void shouldNotRecordScenario_whenRespondentRepresented() {
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
