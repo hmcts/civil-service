@@ -70,11 +70,12 @@ public class ScheduledEventTracker {
     }
 
     public void caseProcessedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, Map<String, Long> metrics) {
-        Map<String, String> properties = new HashMap<>();
-        properties.put(SCHEDULER_NAME, eventConfig.getSchedulerName());
-        properties.put(CASE_ID, caseId);
+        caseProcessedEvent(eventConfig, caseId, metrics, Map.of());
+    }
+
+    public void caseProcessedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, Map<String, Long> metrics, Map<String, String> customProperties) {
+        Map<String, String> properties = createCaseProperties(eventConfig, caseId, metrics, customProperties);
         properties.put(STATUS, SUCCESS);
-        metrics.forEach((key, value) -> properties.put(METRIC_PREFIX + key, String.valueOf(value)));
 
         telemetryService.trackEvent(SCHEDULER_CASE_PROCESSED, properties);
     }
@@ -88,35 +89,58 @@ public class ScheduledEventTracker {
     }
 
     public void caseFailedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, Exception e, Map<String, Long> metrics) {
-        Map<String, String> properties = new HashMap<>();
-        properties.put(SCHEDULER_NAME, eventConfig.getSchedulerName());
-        properties.put(CASE_ID, caseId);
+        caseFailedEvent(eventConfig, caseId, e, metrics, Map.of());
+    }
+
+    public void caseFailedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, Exception e, Map<String, Long> metrics, Map<String, String> customProperties) {
+        Map<String, String> properties = createCaseProperties(eventConfig, caseId, metrics, customProperties);
         properties.put(STATUS, FAILURE);
         properties.put(ERROR, e.getMessage());
         properties.put(ERROR_CATEGORY, errorCategorizer.categorizeError(e));
-        metrics.forEach((key, value) -> properties.put(METRIC_PREFIX + key, String.valueOf(value)));
 
         telemetryService.trackEvent(SCHEDULER_CASE_FAILED, properties);
     }
 
     public void caseAbortedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, String errorMessage) {
-        caseAbortedEvent(eventConfig, caseId, AbortCategory.OTHER, errorMessage, Map.of());
+        caseAbortedEvent(eventConfig, caseId, AbortCategory.OTHER, errorMessage, Map.of(), Map.of());
     }
 
     public void caseAbortedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, AbortCategory category, String errorMessage) {
-        caseAbortedEvent(eventConfig, caseId, category, errorMessage, Map.of());
+        caseAbortedEvent(eventConfig, caseId, category, errorMessage, Map.of(), Map.of());
     }
 
     public void caseAbortedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, AbortCategory category, String errorMessage, Map<String, Long> metrics) {
-        Map<String, String> properties = new HashMap<>();
-        properties.put(SCHEDULER_NAME, eventConfig.getSchedulerName());
-        properties.put(CASE_ID, caseId);
+        caseAbortedEvent(eventConfig, caseId, category, errorMessage, metrics, Map.of());
+    }
+
+    public void caseAbortedEvent(ScheduledTaskEventConfiguration eventConfig,
+                                 String caseId,
+                                 AbortCategory category,
+                                 String errorMessage,
+                                 Map<String, Long> metrics,
+                                 Map<String, String> customProperties) {
+        Map<String, String> properties = createCaseProperties(eventConfig, caseId, metrics, customProperties);
         properties.put(ABORT_REASON, errorMessage);
         properties.put(ABORT_CATEGORY, category != null ? category.name() : AbortCategory.OTHER.name());
         properties.put(STATUS, ABORTED);
-        metrics.forEach((key, value) -> properties.put(METRIC_PREFIX + key, String.valueOf(value)));
 
         telemetryService.trackEvent(SCHEDULER_CASE_ABORTED, properties);
+    }
+
+    private Map<String, String> createCaseProperties(ScheduledTaskEventConfiguration eventConfig,
+                                                     String caseId,
+                                                     Map<String, Long> metrics,
+                                                     Map<String, String> customProperties) {
+        Map<String, String> properties = new HashMap<>();
+        if (customProperties != null) {
+            properties.putAll(customProperties);
+        }
+        if (metrics != null) {
+            metrics.forEach((key, value) -> properties.put(METRIC_PREFIX + key, String.valueOf(value)));
+        }
+        properties.put(SCHEDULER_NAME, eventConfig.getSchedulerName());
+        properties.put(CASE_ID, caseId);
+        return properties;
     }
 
     public void jobCompletedEvent(ScheduledTaskEventConfiguration eventConfig, ScheduledJobReport report) {
