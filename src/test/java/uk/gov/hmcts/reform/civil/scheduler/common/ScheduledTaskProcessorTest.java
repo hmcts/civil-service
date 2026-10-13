@@ -94,9 +94,9 @@ class ScheduledTaskProcessorTest {
         verify(scheduledTask, times(3)).getItemId(any());
         verifyNoMoreInteractions(scheduledTask);
 
-        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq(String.valueOf(case1.getId())), anyMap());
-        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq(String.valueOf(case2.getId())), anyMap());
-        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq(String.valueOf(case3.getId())), anyMap());
+        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq(String.valueOf(case1.getId())), anyMap(), anyMap());
+        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq(String.valueOf(case2.getId())), anyMap(), anyMap());
+        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq(String.valueOf(case3.getId())), anyMap(), anyMap());
         verifyNoMoreInteractions(scheduledEventTracker);
     }
 
@@ -134,9 +134,9 @@ class ScheduledTaskProcessorTest {
         assertThat(outcome.failedCases()).isEmpty();
         assertThat(task.processedCases()).containsExactly(1L, 2L);
 
-        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq("1"), anyMap());
-        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq("2"), anyMap());
-        verify(scheduledEventTracker, never()).caseProcessedEvent(eq(eventConfig), eq("3"), anyMap());
+        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq("1"), anyMap(), anyMap());
+        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq("2"), anyMap(), anyMap());
+        verify(scheduledEventTracker, never()).caseProcessedEvent(eq(eventConfig), eq("3"), anyMap(), anyMap());
         verifyNoMoreInteractions(scheduledEventTracker);
     }
 
@@ -174,9 +174,9 @@ class ScheduledTaskProcessorTest {
         assertThat(processor.delays()).containsExactly(Duration.ofMillis(10), Duration.ofMillis(5));
         assertThat(outcome.cumulativeDelay()).isEqualTo(Duration.ofMillis(15));
 
-        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq("1"), eq(error), anyMap());
-        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq("2"), anyMap());
-        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq("3"), anyMap());
+        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq("1"), eq(error), anyMap(), anyMap());
+        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq("2"), anyMap(), anyMap());
+        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq("3"), anyMap(), anyMap());
         verify(scheduledEventTracker).backPressureUpdatedEvent(eventConfig, Duration.ZERO, Duration.ofMillis(10));
         verify(scheduledEventTracker).backPressureUpdatedEvent(eventConfig, Duration.ofMillis(10), Duration.ofMillis(5));
         verify(scheduledEventTracker).backPressureUpdatedEvent(eventConfig, Duration.ofMillis(5), Duration.ZERO);
@@ -251,8 +251,8 @@ class ScheduledTaskProcessorTest {
         verify(scheduledTask).accept(case1);
         verify(scheduledTask).accept(case2);
 
-        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq("1"), eq(error1), anyMap());
-        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq("2"), eq(error2), anyMap());
+        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq("1"), eq(error1), anyMap(), anyMap());
+        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq("2"), eq(error2), anyMap(), anyMap());
         verifyNoMoreInteractions(scheduledEventTracker);
     }
 
@@ -281,9 +281,9 @@ class ScheduledTaskProcessorTest {
         assertThat(outcome.succeededCases()).containsExactly(102L);
         assertThat(outcome.failedCases()).containsExactly(101L, 103L);
 
-        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq("101"), eq(error1), anyMap());
-        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq("102"), anyMap());
-        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq("103"), eq(error3), anyMap());
+        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq("101"), eq(error1), anyMap(), anyMap());
+        verify(scheduledEventTracker).caseProcessedEvent(eq(eventConfig), eq("102"), anyMap(), anyMap());
+        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq("103"), eq(error3), anyMap(), anyMap());
     }
 
     @Test
@@ -351,9 +351,9 @@ class ScheduledTaskProcessorTest {
 
         // Verify that case 2 was NEVER even attempted
         verify(scheduledTask, never()).accept(case2);
-        verify(scheduledEventTracker, never()).caseProcessedEvent(any(), anyString(), anyMap());
-        verify(scheduledEventTracker, never()).caseFailedEvent(any(), eq("2"), any(), anyMap());
-        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq("1"), eq(error1), anyMap());
+        verify(scheduledEventTracker, never()).caseProcessedEvent(any(), anyString(), anyMap(), anyMap());
+        verify(scheduledEventTracker, never()).caseFailedEvent(any(), eq("2"), any(), anyMap(), anyMap());
+        verify(scheduledEventTracker).caseFailedEvent(eq(eventConfig), eq("1"), eq(error1), anyMap(), anyMap());
     }
 
     @Test
@@ -378,7 +378,7 @@ class ScheduledTaskProcessorTest {
         assertThat(outcome.abortedCases()).containsExactly(1L);
         assertThat(outcome.abortedEarly()).isFalse();
 
-        verify(scheduledEventTracker).caseAbortedEvent(eq(eventConfig), eq("1"), eq(AbortCategory.ONGOING_BUSINESS_PROCESS), eq("Ongoing business process"), anyMap());
+        verify(scheduledEventTracker).caseAbortedEvent(eq(eventConfig), eq("1"), eq(AbortCategory.ONGOING_BUSINESS_PROCESS), eq("Ongoing business process"), anyMap(), anyMap());
         verify(scheduledTask, never()).accept(any());
     }
 
@@ -404,7 +404,7 @@ class ScheduledTaskProcessorTest {
         assertThat(outcome.abortedCases()).containsExactly(1L);
         assertThat(outcome.abortedEarly()).isFalse();
 
-        verify(scheduledEventTracker).caseAbortedEvent(eq(eventConfig), eq("1"), eq(AbortCategory.SILENT_ABORTION), eq("Silent abortion"), anyMap());
+        verify(scheduledEventTracker).caseAbortedEvent(eq(eventConfig), eq("1"), eq(AbortCategory.SILENT_ABORTION), eq("Silent abortion"), anyMap(), anyMap());
         verify(scheduledTask, never()).accept(any());
     }
 

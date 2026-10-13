@@ -127,6 +127,7 @@ class AllowedEventFlowStateCheckTest {
 
         assertThat(exception.getReason()).isEqualTo("TAKE_CASE_OFFLINE not allowed in current flow state");
         assertThat(exception.getCategory()).isEqualTo(AbortCategory.FLOW_STATE_DISALLOWED);
+        assertThat(context.getProperties()).containsEntry("flowState", "MAIN.DRAFT");
         verify(chain, never()).next(context);
         verify(stateFlowEngine).evaluate(caseData);
     }
@@ -152,6 +153,7 @@ class AllowedEventFlowStateCheckTest {
 
         assertThat(exception.getReason()).isEqualTo("TAKE_CASE_OFFLINE not allowed in current flow state");
         assertThat(exception.getCategory()).isEqualTo(AbortCategory.FLOW_STATE_DISALLOWED);
+        assertThat(context.getProperties()).containsEntry("flowState", "MAIN.DRAFT");
         verify(chain, never()).next(context);
         verify(stateFlowEngine).evaluateSpec(caseData);
     }
