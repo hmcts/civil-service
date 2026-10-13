@@ -15,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -31,14 +30,12 @@ import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.services.DraftStoreService;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -193,7 +190,7 @@ public class CaseEventServiceTest {
         order.verify(draftStoreService).claimSubmission(DRAFT_ID, USER_ID, SUBMISSION_ID, DraftType.DRAFT_CLAIM);
         order.verify(coreCaseDataApi).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
         order.verify(draftStoreService).linkCaseId(DRAFT_ID, USER_ID, "1", DraftType.DRAFT_CLAIM);
-        verify(draftStoreService, never()).releaseSubmission(any(), any(), any());
+        verify(draftStoreService, never()).releaseFailedSubmissionClaim(any(), any(), any());
     }
 
     @Test
@@ -230,9 +227,6 @@ public class CaseEventServiceTest {
             .willReturn(Optional.of(inProgress));
         given(draftStoreService.claimSubmission(DRAFT_ID, USER_ID, SUBMISSION_ID, DraftType.DRAFT_CLAIM))
             .willReturn(false);
-        given(draftStoreService.getLinkedCaseIds(USER_ID, DraftType.DRAFT_CLAIM)).willReturn(Set.of());
-        given(coreCaseDataService.getCCDClaimsForLipClaimant(AUTHORISATION, 0))
-            .willReturn(SearchResult.builder().cases(List.of()).total(0).build());
 
         assertThatThrownBy(() -> caseEventService.submitEvent(new EventSubmissionParams()
                                                                   .setUpdates(Maps.newHashMap())
@@ -247,47 +241,12 @@ public class CaseEventServiceTest {
 
         verify(coreCaseDataApi, never()).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
         verify(draftStoreService, never()).linkCaseId(any(), any(), any(), any());
-        verify(draftStoreService, never()).releaseSubmission(any(), any(), any());
+        verify(draftStoreService, never()).releaseFailedSubmissionClaim(any(), any(), any());
+        verify(coreCaseDataService, never()).getCCDClaimsForLipClaimant(any(), any(Integer.class));
     }
 
     @Test
-    void shouldRecoverAndLinkExistingCcdCaseWhenRetryAfterLostResponse() {
-        DraftStoreEntity inProgress = blankDraft();
-        inProgress.setSubmissionId(SUBMISSION_ID);
-        CaseDetails orphaned = CaseDetails.builder()
-            .id(77L)
-            .createdDate(LocalDateTime.now(ZoneOffset.UTC))
-            .build();
-        CaseDetails fetched = CaseDetails.builder().id(77L).data(Map.of()).build();
-        given(draftStoreService.getDraftBySubmissionId(SUBMISSION_ID, USER_ID, DraftType.DRAFT_CLAIM))
-            .willReturn(Optional.of(inProgress));
-        given(draftStoreService.getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM))
-            .willReturn(Optional.of(inProgress));
-        given(draftStoreService.claimSubmission(DRAFT_ID, USER_ID, SUBMISSION_ID, DraftType.DRAFT_CLAIM))
-            .willReturn(false);
-        given(draftStoreService.getLinkedCaseIds(USER_ID, DraftType.DRAFT_CLAIM)).willReturn(Set.of());
-        given(coreCaseDataService.getCCDClaimsForLipClaimant(AUTHORISATION, 0))
-            .willReturn(SearchResult.builder().cases(List.of(orphaned)).total(1).build());
-        given(draftStoreService.linkCaseId(DRAFT_ID, USER_ID, "77", DraftType.DRAFT_CLAIM))
-            .willReturn(Optional.of(inProgress));
-        given(coreCaseDataService.getCase(77L, AUTHORISATION)).willReturn(fetched);
-
-        CaseDetails result = caseEventService.submitEvent(new EventSubmissionParams()
-                                                              .setUpdates(Maps.newHashMap())
-                                                              .setEvent(CaseEvent.CREATE_LIP_CLAIM)
-                                                              .setCaseId(DRAFT)
-                                                              .setUserId(USER_ID)
-                                                              .setAuthorisation(AUTHORISATION)
-                                                              .setSubmissionId(SUBMISSION_ID));
-
-        assertThat(result).isEqualTo(fetched);
-        verify(coreCaseDataApi, never()).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
-        verify(draftStoreService).linkCaseId(DRAFT_ID, USER_ID, "77", DraftType.DRAFT_CLAIM);
-        verify(draftStoreService, never()).releaseSubmission(any(), any(), any());
-    }
-
-    @Test
-    void shouldReleaseSubmissionClaimWhenCcdCreateReturns422() {
+    void shouldReleaseFailedSubmissionClaimWhenCcdCreateReturns422() {
         DraftStoreEntity draft = blankDraft();
         FeignException validationFailure = new FeignException.UnprocessableEntity(
             "validation failed",
@@ -312,7 +271,7 @@ public class CaseEventServiceTest {
                                                                   .setSubmissionId(SUBMISSION_ID)))
             .isSameAs(validationFailure);
 
-        verify(draftStoreService).releaseSubmission(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM);
+        verify(draftStoreService).releaseFailedSubmissionClaim(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM);
         verify(draftStoreService, never()).linkCaseId(any(), any(), any(), any());
     }
 
@@ -342,7 +301,7 @@ public class CaseEventServiceTest {
                                                                   .setSubmissionId(SUBMISSION_ID)))
             .isSameAs(timeout);
 
-        verify(draftStoreService, never()).releaseSubmission(any(), any(), any());
+        verify(draftStoreService, never()).releaseFailedSubmissionClaim(any(), any(), any());
         verify(draftStoreService, never()).linkCaseId(any(), any(), any(), any());
     }
 
@@ -497,9 +456,6 @@ public class CaseEventServiceTest {
             .willReturn(Optional.of(inProgress));
         given(draftStoreService.getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM))
             .willReturn(Optional.of(inProgress));
-        given(draftStoreService.getLinkedCaseIds(USER_ID, DraftType.DRAFT_CLAIM)).willReturn(Set.of());
-        given(coreCaseDataService.getCCDClaimsForLipClaimant(AUTHORISATION, 0))
-            .willReturn(SearchResult.builder().cases(List.of()).total(0).build());
 
         assertThatThrownBy(() -> caseEventService.submitEvent(new EventSubmissionParams()
                                                                   .setUpdates(Maps.newHashMap())

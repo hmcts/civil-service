@@ -20,7 +20,6 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -576,6 +576,98 @@ class DraftStoreServiceTest {
         }
 
         @Test
+        void shouldClearSubmissionIdWhenReleasingFailedRealDraft() {
+            DraftStoreEntity draft = draft();
+            draft.setCaseId(null);
+            draft.setSubmissionId(SUBMISSION_ID);
+            when(draftStoreRepository.findByIdAndUserIdAndDraftTypeAndExpiresAtAfter(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                any(OffsetDateTime.class)
+            )).thenReturn(Optional.of(draft));
+            when(draftStoreTransactionService.releaseSubmissionInNewTransaction(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                any(OffsetDateTime.class)
+            )).thenReturn(1);
+
+            draftStoreService.releaseFailedSubmissionClaim(DRAFT_ID, USER_ID, DRAFT_TYPE);
+
+            verify(draftStoreTransactionService).releaseSubmissionInNewTransaction(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                any(OffsetDateTime.class)
+            );
+            verify(draftStoreTransactionService, never()).deleteByIdInNewTransaction(any(), any(), any());
+        }
+
+        @Test
+        void shouldDeleteLegacyClaimReceiptWhenReleasingFailedSubmission() {
+            DraftStoreEntity receipt = draft();
+            receipt.setCaseId(null);
+            receipt.setPayload(new HashMap<>());
+            receipt.setSubmissionId(SUBMISSION_ID);
+            when(draftStoreRepository.findByIdAndUserIdAndDraftTypeAndExpiresAtAfter(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                any(OffsetDateTime.class)
+            )).thenReturn(Optional.of(receipt));
+            when(draftStoreTransactionService.deleteByIdInNewTransaction(DRAFT_ID, USER_ID, DRAFT_TYPE))
+                .thenReturn(1L);
+
+            draftStoreService.releaseFailedSubmissionClaim(DRAFT_ID, USER_ID, DRAFT_TYPE);
+
+            verify(draftStoreTransactionService).deleteByIdInNewTransaction(DRAFT_ID, USER_ID, DRAFT_TYPE);
+            verify(draftStoreTransactionService, never()).releaseSubmissionInNewTransaction(
+                any(), any(), any(), any()
+            );
+        }
+
+        @Test
+        void shouldReuseBlankDraftWhenLegacyInsertHitsActiveDraftUniqueConstraint() {
+            DraftStoreEntity blank = draft();
+            blank.setCaseId(null);
+            blank.setSubmissionId(null);
+            blank.setPayload(new HashMap<>());
+            when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class)))
+                .thenThrow(new DataIntegrityViolationException("uq_draft_store_active_draft"));
+            when(draftStoreRepository.findByUserIdAndDraftTypeAndCaseIdIsNull(USER_ID, DRAFT_TYPE))
+                .thenReturn(Optional.of(blank));
+            when(draftStoreTransactionService.claimSubmissionInNewTransaction(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                eq(SUBMISSION_ID),
+                any(OffsetDateTime.class)
+            )).thenReturn(1);
+            when(draftStoreRepository.findByIdAndUserIdAndDraftTypeAndExpiresAtAfter(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                any(OffsetDateTime.class)
+            )).thenReturn(Optional.of(blank));
+
+            Optional<DraftStoreEntity> result = draftStoreService.claimLegacySubmission(
+                USER_ID,
+                SUBMISSION_ID,
+                DRAFT_TYPE
+            );
+
+            assertThat(result).contains(blank);
+            verify(draftStoreTransactionService).claimSubmissionInNewTransaction(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                eq(SUBMISSION_ID),
+                any(OffsetDateTime.class)
+            );
+        }
+
+        @Test
         void shouldInsertClaimRowForLegacySubmission() {
             when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -631,21 +723,12 @@ class DraftStoreServiceTest {
             assertThat(result).contains(draft);
         }
 
-        @Test
-        void shouldReturnLinkedCaseIdsForUser() {
-            DraftStoreEntity linked = draft();
-            linked.setCaseId(CASE_ID);
-            DraftStoreEntity blank = draft();
-            blank.setId(UUID.randomUUID());
-            when(draftStoreRepository.findByUserIdAndDraftType(USER_ID, DRAFT_TYPE))
-                .thenReturn(List.of(linked, blank));
-
-            assertThat(draftStoreService.getLinkedCaseIds(USER_ID, DRAFT_TYPE)).containsExactly(CASE_ID);
-        }
     }
 
     @Nested
     class LinkCaseIdTests {
+
+        private static final String SUBMISSION_ID = "user1:draft:2026-10-12T10:00:00Z";
 
         @Test
         void shouldReturnDraftWhenLinkSucceeds() {
@@ -694,6 +777,107 @@ class DraftStoreServiceTest {
 
             assertThat(result).isEmpty();
             verifyNoInteractions(draftStoreRepository);
+        }
+
+        @Test
+        void shouldLinkClaimedBlankDraftToCase() {
+            DraftStoreEntity blank = draft();
+            blank.setCaseId(null);
+            blank.setSubmissionId(SUBMISSION_ID);
+            DraftStoreEntity linked = draft();
+            linked.setCaseId(CASE_ID);
+            linked.setSubmissionId(SUBMISSION_ID);
+            when(draftStoreRepository.findByUserIdAndDraftTypeAndCaseIdIsNull(USER_ID, DRAFT_TYPE))
+                .thenReturn(Optional.of(blank));
+            when(draftStoreTransactionService.linkCaseIdInNewTransaction(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                eq(CASE_ID),
+                any(OffsetDateTime.class)
+            )).thenReturn(1);
+            when(draftStoreRepository.findByIdAndUserIdAndDraftTypeAndExpiresAtAfter(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                any(OffsetDateTime.class)
+            )).thenReturn(Optional.of(linked));
+
+            Optional<DraftStoreEntity> result = draftStoreService.linkClaimedBlankDraftToCase(
+                USER_ID,
+                CASE_ID,
+                DRAFT_TYPE
+            );
+
+            assertThat(result).contains(linked);
+            verify(draftStoreTransactionService).linkCaseIdInNewTransaction(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                eq(CASE_ID),
+                any(OffsetDateTime.class)
+            );
+        }
+
+        @Test
+        void shouldSkipLinkWhenBlankDraftHasNoSubmissionId() {
+            DraftStoreEntity blank = draft();
+            blank.setCaseId(null);
+            blank.setSubmissionId(null);
+            when(draftStoreRepository.findByUserIdAndDraftTypeAndCaseIdIsNull(USER_ID, DRAFT_TYPE))
+                .thenReturn(Optional.of(blank));
+
+            Optional<DraftStoreEntity> result = draftStoreService.linkClaimedBlankDraftToCase(
+                USER_ID,
+                CASE_ID,
+                DRAFT_TYPE
+            );
+
+            assertThat(result).isEmpty();
+            verify(draftStoreTransactionService, never()).linkCaseIdInNewTransaction(
+                any(), any(), any(), any(), any()
+            );
+        }
+
+        @Test
+        void shouldSkipLinkWhenNoBlankDraftExists() {
+            when(draftStoreRepository.findByUserIdAndDraftTypeAndCaseIdIsNull(USER_ID, DRAFT_TYPE))
+                .thenReturn(Optional.empty());
+
+            Optional<DraftStoreEntity> result = draftStoreService.linkClaimedBlankDraftToCase(
+                USER_ID,
+                CASE_ID,
+                DRAFT_TYPE
+            );
+
+            assertThat(result).isEmpty();
+            verify(draftStoreTransactionService, never()).linkCaseIdInNewTransaction(
+                any(), any(), any(), any(), any()
+            );
+        }
+
+        @Test
+        void shouldReturnEmptyWhenClaimedBlankDraftAlreadyLinked() {
+            DraftStoreEntity blank = draft();
+            blank.setCaseId(null);
+            blank.setSubmissionId(SUBMISSION_ID);
+            when(draftStoreRepository.findByUserIdAndDraftTypeAndCaseIdIsNull(USER_ID, DRAFT_TYPE))
+                .thenReturn(Optional.of(blank));
+            when(draftStoreTransactionService.linkCaseIdInNewTransaction(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                eq(CASE_ID),
+                any(OffsetDateTime.class)
+            )).thenReturn(0);
+
+            Optional<DraftStoreEntity> result = draftStoreService.linkClaimedBlankDraftToCase(
+                USER_ID,
+                CASE_ID,
+                DRAFT_TYPE
+            );
+
+            assertThat(result).isEmpty();
         }
     }
 

@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -23,14 +22,9 @@ import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.services.DraftStoreService;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
@@ -42,8 +36,6 @@ import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataC
 @Slf4j
 @SuppressWarnings("unchecked")
 public class CaseEventService {
-
-    private static final int CLAIM_CREATED_SKEW_MINUTES = 2;
 
     private final CoreCaseDataApi coreCaseDataApi;
     private final AuthTokenGenerator authTokenGenerator;
@@ -187,7 +179,11 @@ public class CaseEventService {
                     draftId,
                     params.getSubmissionId()
                 );
-                draftStoreService.releaseSubmission(draftId, params.getUserId(), DraftType.DRAFT_CLAIM);
+                draftStoreService.releaseFailedSubmissionClaim(
+                    draftId,
+                    params.getUserId(),
+                    DraftType.DRAFT_CLAIM
+                );
             }
             throw ex;
         }
@@ -226,7 +222,16 @@ public class CaseEventService {
             return existingCase(draft, params);
         }
 
-        return reconcileOrConflict(draft, params);
+        log.warn(
+            "Submission already claimed for draftId={} submissionId={} existingSubmissionId={}",
+            draftId,
+            params.getSubmissionId(),
+            draft.getSubmissionId()
+        );
+        throw new ResponseStatusException(
+            HttpStatus.CONFLICT,
+            "Claim submission already in progress for draft " + draftId
+        );
     }
 
     private CaseDetails resolveExistingOrConflictBySubmissionId(EventSubmissionParams params) {
@@ -238,77 +243,15 @@ public class CaseEventService {
             return existingCase(draft, params);
         }
 
-        return reconcileOrConflict(draft, params);
-    }
-
-    private CaseDetails reconcileOrConflict(DraftStoreEntity draft, EventSubmissionParams params) {
-        if (params.getSubmissionId().equals(draft.getSubmissionId())) {
-            Optional<CaseDetails> recovered = recoverUnlinkedCcdCase(draft, params);
-            if (recovered.isPresent()) {
-                return recovered.get();
-            }
-        }
-
         log.warn(
-            "Submission already claimed for draftId={} submissionId={} existingSubmissionId={}",
-            draft.getId(),
+            "Submission already claimed for submissionId={} draftId={}",
             params.getSubmissionId(),
-            draft.getSubmissionId()
+            draft.getId()
         );
         throw new ResponseStatusException(
             HttpStatus.CONFLICT,
-            "Claim submission already in progress for draft " + draft.getId()
+            "Claim submission already in progress for submission " + params.getSubmissionId()
         );
-    }
-
-    private Optional<CaseDetails> recoverUnlinkedCcdCase(DraftStoreEntity draft, EventSubmissionParams params) {
-        Set<String> linkedCaseIds = draftStoreService.getLinkedCaseIds(
-            params.getUserId(),
-            DraftType.DRAFT_CLAIM
-        );
-        SearchResult searchResult = coreCaseDataService.getCCDClaimsForLipClaimant(params.getAuthorisation(), 0);
-        if (searchResult == null || searchResult.getCases() == null) {
-            return Optional.empty();
-        }
-
-        OffsetDateTime claimedAt = draft.getUpdatedAt() != null
-            ? draft.getUpdatedAt()
-            : draft.getCreatedAt();
-        List<CaseDetails> candidates = searchResult.getCases().stream()
-            .filter(caseDetails -> caseDetails.getId() != null)
-            .filter(caseDetails -> !linkedCaseIds.contains(caseDetails.getId().toString()))
-            .filter(caseDetails -> wasCreatedAtOrAfterClaim(caseDetails, claimedAt))
-            .toList();
-
-        if (candidates.size() != 1) {
-            log.info(
-                "Could not uniquely recover CCD case for draftId={} submissionId={} candidates={}",
-                draft.getId(),
-                params.getSubmissionId(),
-                candidates.size()
-            );
-            return Optional.empty();
-        }
-
-        CaseDetails recovered = candidates.getFirst();
-        String caseId = recovered.getId().toString();
-        log.info(
-            "Recovered CCD caseId={} for draftId={} submissionId={} after lost create response",
-            caseId,
-            draft.getId(),
-            params.getSubmissionId()
-        );
-        draftStoreService.linkCaseId(draft.getId(), params.getUserId(), caseId, DraftType.DRAFT_CLAIM);
-        return Optional.of(coreCaseDataService.getCase(recovered.getId(), params.getAuthorisation()));
-    }
-
-    private static boolean wasCreatedAtOrAfterClaim(CaseDetails caseDetails, OffsetDateTime claimedAt) {
-        LocalDateTime createdDate = caseDetails.getCreatedDate();
-        if (createdDate == null || claimedAt == null) {
-            return false;
-        }
-        OffsetDateTime createdAt = createdDate.atZone(ZoneOffset.UTC).toOffsetDateTime();
-        return !createdAt.isBefore(claimedAt.minusMinutes(CLAIM_CREATED_SKEW_MINUTES));
     }
 
     private CaseDetails createNewClaim(EventSubmissionParams params) {

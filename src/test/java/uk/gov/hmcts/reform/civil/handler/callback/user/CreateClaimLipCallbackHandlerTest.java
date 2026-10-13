@@ -8,9 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.CasemanReferenceNumberRepository;
@@ -37,18 +39,25 @@ import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
+import uk.gov.hmcts.reform.draftstore.DraftType;
+import uk.gov.hmcts.reform.draftstore.services.DraftStoreService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 
 @SpringBootTest(classes = {
@@ -67,37 +76,41 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
     properties = {"reference.database.enabled=false"})
 class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService toggleService;
 
-    @MockBean
+    @MockitoBean
     private CasemanReferenceNumberRepository casemanReferenceNumberRepository;
 
-    @MockBean
+    @MockitoBean
     private CaseFlagsInitialiser caseFlagInitialiser;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
-    @MockBean
+    @MockitoBean
     private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
 
-    @MockBean
+    @MockitoBean
     private HelpWithFeesForTabService hwfForTabService;
 
-    @MockBean
+    @MockitoBean
     CoreCaseEventDataService coreCaseEventDataService;
 
     @Autowired
     private CreateClaimLipCallBackHandler handler;
 
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationReferenceDataService;
 
+    @MockitoBean
+    private DraftStoreService draftStoreService;
+
     public static final String REFERENCE_NUMBER = "000MC001";
+    private static final String CLAIMANT_USER_ID = "f5e5cc53-e065-43dd-8cec-2ad005a6b9a9";
 
     @Autowired
     private ObjectMapper mapper;
@@ -121,7 +134,6 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
 
-        private CallbackParams params;
         private CaseData caseData;
         private static final String DEFENDANT_EMAIL_ADDRESS = "defendantmail@hmcts.net";
         private static final String DEFENDANT_PARTY_NAME = "Dave Indent";
@@ -132,7 +144,6 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             caseData = CaseDataBuilder.builder().atStateClaimDraft().applicant1OrganisationPolicy(null).build();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             given(time.now()).willReturn(submittedDate);
             given(casemanReferenceNumberRepository.next("spec")).willReturn(REFERENCE_NUMBER);
             given(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).willReturn(submittedDate);
@@ -290,6 +301,67 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             assertThat(response.getData().get("claimantLanguagePreferenceDisplay")).isEqualTo("ENGLISH_AND_WELSH");
+        }
+    }
+
+    @Nested
+    class SubmittedCallback {
+
+        @Test
+        void shouldLinkClaimedBlankDraftWhenClaimantUserPresent() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .claimantUserDetails(new IdamUserDetails().setId(CLAIMANT_USER_ID).setEmail("claimant@hmcts.net"))
+                .build();
+            when(draftStoreService.linkClaimedBlankDraftToCase(
+                eq(CLAIMANT_USER_ID),
+                eq(CASE_ID.toString()),
+                eq(DraftType.DRAFT_CLAIM)
+            )).thenReturn(Optional.empty());
+
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response).isNotNull();
+            verify(draftStoreService).linkClaimedBlankDraftToCase(
+                CLAIMANT_USER_ID,
+                CASE_ID.toString(),
+                DraftType.DRAFT_CLAIM
+            );
+        }
+
+        @Test
+        void shouldSkipLinkWhenClaimantUserDetailsMissing() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response).isNotNull();
+            verify(draftStoreService, never()).linkClaimedBlankDraftToCase(any(), any(), any());
+        }
+
+        @Test
+        void shouldStillReturnResponseWhenLinkThrows() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .claimantUserDetails(new IdamUserDetails().setId(CLAIMANT_USER_ID).setEmail("claimant@hmcts.net"))
+                .build();
+            when(draftStoreService.linkClaimedBlankDraftToCase(
+                eq(CLAIMANT_USER_ID),
+                eq(CASE_ID.toString()),
+                eq(DraftType.DRAFT_CLAIM)
+            )).thenThrow(new RuntimeException("draft store unavailable"));
+
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response).isNotNull();
+            verify(draftStoreService).linkClaimedBlankDraftToCase(
+                CLAIMANT_USER_ID,
+                CASE_ID.toString(),
+                DraftType.DRAFT_CLAIM
+            );
         }
     }
 }

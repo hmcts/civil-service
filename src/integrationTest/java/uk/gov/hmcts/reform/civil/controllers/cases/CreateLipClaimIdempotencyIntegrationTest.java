@@ -12,11 +12,16 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
@@ -41,10 +46,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
@@ -52,6 +59,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CreateLipClaimIdempotencyIntegrationTest extends BaseIntegrationTest {
 
     private static final String SUBMIT_EVENT_URL = "/cases/{caseId}/citizen/{submitterId}/event";
+    private static final String CALLBACK_URL = "/cases/callbacks/{callback-type}";
     private static final String USER_ID = "lip-user-1";
     private static final String SERVICE_TOKEN = "service-token";
     private static final long CREATED_CASE_ID = 99_001L;
@@ -278,6 +286,45 @@ class CreateLipClaimIdempotencyIntegrationTest extends BaseIntegrationTest {
 
         verify(coreCaseDataApi, times(1)).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
         assertThat(draftStoreRepository.findAll()).hasSize(1);
+    }
+
+    @Test
+    void shouldLinkClaimedDraftViaSubmittedCallbackAndReturnExistingCaseOnRetryAfterLostCreateResponse()
+        throws Exception {
+        DraftStoreEntity claimed = draftStoreRepository.findById(draftId).orElseThrow();
+        claimed.setSubmissionId(submissionId);
+        claimed.setCaseId(null);
+        draftStoreRepository.saveAndFlush(claimed);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimDraft()
+            .caseReference(CREATED_CASE_ID)
+            .claimantUserDetails(new IdamUserDetails().setId(USER_ID).setEmail("lip@test.com"))
+            .build();
+
+        doPost(
+            BEARER_TOKEN,
+            CallbackRequest.builder()
+                .eventId(CaseEvent.CREATE_LIP_CLAIM.name())
+                .caseDetails(CaseDetailsBuilder.builder()
+                                 .data(caseData.toMap(objectMapper))
+                                 .id(CREATED_CASE_ID)
+                                 .build())
+                .build(),
+            CALLBACK_URL,
+            SUBMITTED.getValue()
+        ).andExpect(status().isOk());
+
+        DraftStoreEntity linked = draftStoreRepository.findById(draftId).orElseThrow();
+        assertThat(linked.getSubmissionId()).isEqualTo(submissionId);
+        assertThat(linked.getCaseId()).isEqualTo(String.valueOf(CREATED_CASE_ID));
+
+        doPost(BEARER_TOKEN, createLipClaimEvent(), SUBMIT_EVENT_URL, "draft", USER_ID)
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(CREATED_CASE_ID));
+
+        verify(coreCaseDataApi, never()).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
+        verify(coreCaseDataApi, times(1)).getCase(any(), any(), any());
     }
 
     @Test

@@ -18,9 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -125,16 +123,6 @@ public class DraftStoreService {
         );
     }
 
-    @Transactional(readOnly = true)
-    public Set<String> getLinkedCaseIds(String userId, DraftType draftType) {
-        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
-        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
-        return draftStoreRepository.findByUserIdAndDraftType(userId, draftType).stream()
-            .map(DraftStoreEntity::getCaseId)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toSet());
-    }
-
     public Optional<DraftStoreEntity> updateDraft(UUID draftId,
                                                   String userId,
                                                   String caseId,
@@ -167,6 +155,33 @@ public class DraftStoreService {
     }
 
     /**
+     * Links the user's blank draft that is mid-submission ({@code submission_id} set,
+     * {@code case_id} null) to the CCD case just created for that claimant.
+     * Used from CREATE_LIP_CLAIM submitted callback so a lost create response can still
+     * be recovered on retry via {@code submission_id}. No-ops when there is no claimed blank draft.
+     */
+    public Optional<DraftStoreEntity> linkClaimedBlankDraftToCase(String userId,
+                                                                  String caseId,
+                                                                  DraftType draftType) {
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(caseId, "caseId must not be null");
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
+
+        Optional<DraftStoreEntity> blank = getBlankDraft(userId, draftType);
+        if (blank.isEmpty() || blank.get().getSubmissionId() == null) {
+            return Optional.empty();
+        }
+        DraftStoreEntity draft = blank.get();
+        log.info(
+            "Linking claimed blank draftId={} submissionId={} to caseId={}",
+            draft.getId(),
+            draft.getSubmissionId(),
+            caseId
+        );
+        return linkCaseId(draft.getId(), userId, caseId, draftType);
+    }
+
+    /**
      * Claims the draft for this submission before CCD create. Returns true only for the
      * caller that successfully set {@code submission_id} while {@code case_id} was still null.
      */
@@ -196,6 +211,28 @@ public class DraftStoreService {
         ) == 1;
     }
 
+    /**
+     * After a definitive CCD create failure, free the submission so retry can proceed.
+     * Real drafts clear {@code submission_id}. Empty legacy Redis claim receipts are deleted so
+     * they do not block the unique active-draft index on the next attempt.
+     */
+    public void releaseFailedSubmissionClaim(UUID draftId, String userId, DraftType draftType) {
+        Objects.requireNonNull(draftId, "draftId must not be null");
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
+
+        Optional<DraftStoreEntity> draft = getDraft(draftId, userId, draftType);
+        if (draft.isEmpty() || draft.get().getCaseId() != null) {
+            return;
+        }
+        if (isLegacyClaimReceipt(draft.get())) {
+            log.info("Deleting legacy claim receipt after failed CCD create draftId={}", draftId);
+            deleteDraft(draftId, userId, draftType);
+            return;
+        }
+        releaseSubmission(draftId, userId, draftType);
+    }
+
     public Optional<DraftStoreEntity> claimLegacySubmission(String userId,
                                                             String submissionId,
                                                             DraftType draftType) {
@@ -217,13 +254,42 @@ public class DraftStoreService {
         try {
             return Optional.of(draftStoreTransactionService.saveInNewTransaction(claimRow));
         } catch (DataIntegrityViolationException ex) {
-            log.info(
-                "Lost legacy submission claim for userId={} submissionId={}",
-                userId,
-                submissionId
-            );
+            return reuseBlankDraftForLegacySubmission(userId, submissionId, draftType)
+                .or(() -> {
+                    log.info(
+                        "Lost legacy submission claim for userId={} submissionId={}",
+                        userId,
+                        submissionId
+                    );
+                    return Optional.empty();
+                });
+        }
+    }
+
+    private Optional<DraftStoreEntity> reuseBlankDraftForLegacySubmission(String userId,
+                                                                          String submissionId,
+                                                                          DraftType draftType) {
+        Optional<DraftStoreEntity> blank = getBlankDraft(userId, draftType);
+        if (blank.isEmpty() || blank.get().getCaseId() != null) {
             return Optional.empty();
         }
+        UUID draftId = blank.get().getId();
+        if (submissionId.equals(blank.get().getSubmissionId())) {
+            return getDraft(draftId, userId, draftType);
+        }
+        if (blank.get().getSubmissionId() != null) {
+            return Optional.empty();
+        }
+        if (!claimSubmission(draftId, userId, submissionId, draftType)) {
+            return Optional.empty();
+        }
+        log.info("Reused blank draft receipt draftId={} for legacy submissionId={}", draftId, submissionId);
+        return getDraft(draftId, userId, draftType);
+    }
+
+    private static boolean isLegacyClaimReceipt(DraftStoreEntity draft) {
+        Map<String, Object> payload = draft.getPayload();
+        return payload == null || payload.isEmpty();
     }
 
     public Optional<DraftStoreEntity> applyPaymentRetention(UUID draftId, String userId, DraftType draftType) {
