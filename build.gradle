@@ -195,6 +195,45 @@ sourceSets {
   }
 }
 
+// Stopgap until the CCD definitions move into this repository: the decentralised runtime reads the CIVIL and
+// GENERALAPPLICATION JSON definitions from the classpath, so every build packages civil-ccd-definition's
+// CCD_DEFINITION_BRANCH (master by default), or a local checkout named by CIVIL_CCD_DEFINITIONS_DIR.
+def civilCcdDefinitionsDir = layout.buildDirectory.dir('generated/civil-ccd-definitions')
+def fetchCivilCcdDefinitions = tasks.register('fetchCivilCcdDefinitions') {
+  description = 'Packages the civil-ccd-definition JSON definitions read by the decentralised runtime.'
+  outputs.dir civilCcdDefinitionsDir
+  outputs.upToDateWhen { false }
+  doLast {
+    def output = civilCcdDefinitionsDir.get().dir('ccd-definitions').asFile
+    project.delete(output)
+    def localDefinitions = System.getenv('CIVIL_CCD_DEFINITIONS_DIR')
+    if (localDefinitions) {
+      project.copy {
+        from(localDefinitions) { include 'civil/**', 'generalapplication/**' }
+        into output
+      }
+      return
+    }
+
+    def branch = dataSetupBranch('CCD_DEFINITION_BRANCH')
+    def archive = new File(temporaryDir, 'civil-ccd-definition.tar.gz')
+    new URL("https://codeload.github.com/hmcts/civil-ccd-definition/tar.gz/refs/heads/${branch}")
+      .withInputStream { input -> archive.withOutputStream { it << input } }
+    project.copy {
+      from(project.tarTree(project.resources.gzip(archive))) {
+        include '*/ccd-definition/civil/**', '*/ccd-definition/generalapplication/**'
+        eachFile { it.relativePath = new RelativePath(true, it.relativePath.segments.drop(2) as String[]) }
+        includeEmptyDirs = false
+      }
+      into output
+    }
+    if (!new File(output, 'civil/CaseType.json').exists()) {
+      throw new GradleException("civil-ccd-definition ${branch} has no ccd-definition/civil/CaseType.json")
+    }
+  }
+}
+sourceSets.main.resources.srcDir(files(civilCcdDefinitionsDir).builtBy(fetchCivilCcdDefinitions))
+
 tasks.register('preparePatchedMigrations', Copy) {
   from 'src/main/resources/db/migration'
   into "${layout.buildDirectory.get().asFile.absolutePath}/tmp/patched-migrations"

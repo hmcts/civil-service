@@ -325,7 +325,10 @@ civil:
   payment-callback-authorised-services: ${CIVIL_PAYMENT_CALLBACK_S2S_AUTHORISED_SERVICES:payment_app,civil_service}
   decentralised:
     enabled: ${CIVIL_DECENTRALISED_ENABLED:false}
-    definitions-root: ${CIVIL_DECENTRALISED_DEFINITIONS_ROOT:file:ccd-definitions}
+    definitions-root: ${CIVIL_DECENTRALISED_DEFINITIONS_ROOT:classpath:ccd-definitions}
+    # The definition files an environment leaves out, as civil-ccd-definition's build-release-ccd-definition.sh
+    # does: non-prod environments drop *-prod.json; aat drops *-nonprod.json; prod and staging also drop *-testing*.json.
+    excluded-files: ${CIVIL_DECENTRALISED_DEFINITIONS_EXCLUDED:*-prod.json}
 
 decentralisation:
   local-callback-placeholder: CCD_DEF_CASE_SERVICE_BASE_URL
