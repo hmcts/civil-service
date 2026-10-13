@@ -111,6 +111,8 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String REFERENCE_NUMBER = "000MC001";
     private static final String CLAIMANT_USER_ID = "f5e5cc53-e065-43dd-8cec-2ad005a6b9a9";
+    private static final String LIP_CLAIM_SUBMISSION_ID =
+        "f5e5cc53-e065-43dd-8cec-2ad005a6b9a9:draft-123:2026-10-12T10:00:00Z";
 
     @Autowired
     private ObjectMapper mapper;
@@ -308,14 +310,16 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
     class SubmittedCallback {
 
         @Test
-        void shouldLinkClaimedBlankDraftWhenClaimantUserPresent() {
+        void shouldLinkDraftBySubmissionIdWhenClaimantUserAndSubmissionIdPresent() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .claimantUserDetails(new IdamUserDetails().setId(CLAIMANT_USER_ID).setEmail("claimant@hmcts.net"))
                 .build();
-            when(draftStoreService.linkClaimedBlankDraftToCase(
+            caseData.setLipClaimSubmissionId(LIP_CLAIM_SUBMISSION_ID);
+            when(draftStoreService.linkDraftBySubmissionId(
                 eq(CLAIMANT_USER_ID),
                 eq(CASE_ID.toString()),
+                eq(LIP_CLAIM_SUBMISSION_ID),
                 eq(DraftType.DRAFT_CLAIM)
             )).thenReturn(Optional.empty());
 
@@ -323,9 +327,10 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             assertThat(response).isNotNull();
-            verify(draftStoreService).linkClaimedBlankDraftToCase(
+            verify(draftStoreService).linkDraftBySubmissionId(
                 CLAIMANT_USER_ID,
                 CASE_ID.toString(),
+                LIP_CLAIM_SUBMISSION_ID,
                 DraftType.DRAFT_CLAIM
             );
         }
@@ -333,12 +338,27 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSkipLinkWhenClaimantUserDetailsMissing() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setLipClaimSubmissionId(LIP_CLAIM_SUBMISSION_ID);
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             assertThat(response).isNotNull();
-            verify(draftStoreService, never()).linkClaimedBlankDraftToCase(any(), any(), any());
+            verify(draftStoreService, never()).linkDraftBySubmissionId(any(), any(), any(), any());
+        }
+
+        @Test
+        void shouldSkipLinkWhenSubmissionIdMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .claimantUserDetails(new IdamUserDetails().setId(CLAIMANT_USER_ID).setEmail("claimant@hmcts.net"))
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response).isNotNull();
+            verify(draftStoreService, never()).linkDraftBySubmissionId(any(), any(), any(), any());
         }
 
         @Test
@@ -347,9 +367,11 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDraft()
                 .claimantUserDetails(new IdamUserDetails().setId(CLAIMANT_USER_ID).setEmail("claimant@hmcts.net"))
                 .build();
-            when(draftStoreService.linkClaimedBlankDraftToCase(
+            caseData.setLipClaimSubmissionId(LIP_CLAIM_SUBMISSION_ID);
+            when(draftStoreService.linkDraftBySubmissionId(
                 eq(CLAIMANT_USER_ID),
                 eq(CASE_ID.toString()),
+                eq(LIP_CLAIM_SUBMISSION_ID),
                 eq(DraftType.DRAFT_CLAIM)
             )).thenThrow(new RuntimeException("draft store unavailable"));
 
@@ -357,9 +379,10 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             assertThat(response).isNotNull();
-            verify(draftStoreService).linkClaimedBlankDraftToCase(
+            verify(draftStoreService).linkDraftBySubmissionId(
                 CLAIMANT_USER_ID,
                 CASE_ID.toString(),
+                LIP_CLAIM_SUBMISSION_ID,
                 DraftType.DRAFT_CLAIM
             );
         }

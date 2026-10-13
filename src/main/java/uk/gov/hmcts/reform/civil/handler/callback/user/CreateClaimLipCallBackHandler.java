@@ -80,7 +80,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
             .put(callbackKey(V_1, ABOUT_TO_START), this::lipClaimInitialState)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
-            .put(callbackKey(SUBMITTED), this::linkClaimedDraftOnSubmitted)
+            .put(callbackKey(SUBMITTED), this::linkDraftBySubmissionIdOnSubmitted)
             .build();
     }
 
@@ -160,29 +160,37 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
     }
 
-    private CallbackResponse linkClaimedDraftOnSubmitted(CallbackParams callbackParams) {
+    private CallbackResponse linkDraftBySubmissionIdOnSubmitted(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String userId = Optional.ofNullable(caseData.getClaimantUserDetails())
             .map(IdamUserDetails::getId)
             .orElse(null);
         String caseId = resolveCaseId(callbackParams, caseData);
+        String submissionId = caseData.getLipClaimSubmissionId();
 
-        if (userId == null || caseId == null) {
+        if (userId == null || caseId == null || submissionId == null || submissionId.isBlank()) {
             log.warn(
-                "Skipping draft link on CREATE_LIP_CLAIM submitted: missing userId={} or caseId={}",
+                "Skipping draft link on CREATE_LIP_CLAIM submitted: missing userId={} caseId={} or submissionId={}",
                 userId,
-                caseId
+                caseId,
+                submissionId
             );
             return SubmittedCallbackResponse.builder().build();
         }
 
         try {
-            draftStoreService.linkClaimedBlankDraftToCase(userId, caseId, DraftType.DRAFT_CLAIM);
-        } catch (RuntimeException ex) {
-            log.warn(
-                "Failed to link claimed blank draft for userId={} caseId={} on CREATE_LIP_CLAIM submitted",
+            draftStoreService.linkDraftBySubmissionId(
                 userId,
                 caseId,
+                submissionId,
+                DraftType.DRAFT_CLAIM
+            );
+        } catch (RuntimeException ex) {
+            log.warn(
+                "Failed to link draft by submissionId for userId={} caseId={} submissionId={} on CREATE_LIP_CLAIM submitted",
+                userId,
+                caseId,
+                submissionId,
                 ex
             );
         }

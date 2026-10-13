@@ -256,7 +256,14 @@ public class CaseEventService {
 
     private CaseDetails createNewClaim(EventSubmissionParams params) {
         StartEventResponse eventResponse = startEvent(params.getAuthorisation(), params.getUserId(), params.getEvent());
-        CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(eventResponse, params.getUpdates());
+        Map<String, Object> updates = new HashMap<>();
+        if (params.getUpdates() != null) {
+            updates.putAll(params.getUpdates());
+        }
+        if (params.getSubmissionId() != null) {
+            updates.put("lipClaimSubmissionId", params.getSubmissionId());
+        }
+        CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(eventResponse, updates);
         return coreCaseDataApi.submitForCitizen(params.getAuthorisation(),
                                                 authTokenGenerator.generate(),
                                                 params.getUserId(),

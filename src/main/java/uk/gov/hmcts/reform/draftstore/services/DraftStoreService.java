@@ -155,25 +155,27 @@ public class DraftStoreService {
     }
 
     /**
-     * Links the user's blank draft that is mid-submission ({@code submission_id} set,
-     * {@code case_id} null) to the CCD case just created for that claimant.
-     * Used from CREATE_LIP_CLAIM submitted callback so a lost create response can still
-     * be recovered on retry via {@code submission_id}. No-ops when there is no claimed blank draft.
+     * Links the draft reserved for {@code submissionId} to the created CCD case.
+     * Exact match on submission id and user so a delayed callback cannot attach a newer draft.
      */
-    public Optional<DraftStoreEntity> linkClaimedBlankDraftToCase(String userId,
-                                                                  String caseId,
-                                                                  DraftType draftType) {
+    public Optional<DraftStoreEntity> linkDraftBySubmissionId(String userId,
+                                                              String caseId,
+                                                              String submissionId,
+                                                              DraftType draftType) {
         Objects.requireNonNull(userId, USER_ID_NOT_NULL);
         Objects.requireNonNull(caseId, "caseId must not be null");
         Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
-
-        Optional<DraftStoreEntity> blank = getBlankDraft(userId, draftType);
-        if (blank.isEmpty() || blank.get().getSubmissionId() == null) {
+        if (submissionId == null || submissionId.isBlank()) {
             return Optional.empty();
         }
-        DraftStoreEntity draft = blank.get();
+
+        Optional<DraftStoreEntity> claimed = getDraftBySubmissionId(submissionId, userId, draftType);
+        if (claimed.isEmpty() || claimed.get().getCaseId() != null) {
+            return Optional.empty();
+        }
+        DraftStoreEntity draft = claimed.get();
         log.info(
-            "Linking claimed blank draftId={} submissionId={} to caseId={}",
+            "Linking claimed draftId={} submissionId={} to caseId={}",
             draft.getId(),
             draft.getSubmissionId(),
             caseId

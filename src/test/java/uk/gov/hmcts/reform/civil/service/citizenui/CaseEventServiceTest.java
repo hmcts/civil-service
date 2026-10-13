@@ -6,6 +6,7 @@ import feign.Request;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -14,6 +15,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -191,6 +193,14 @@ public class CaseEventServiceTest {
         order.verify(coreCaseDataApi).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
         order.verify(draftStoreService).linkCaseId(DRAFT_ID, USER_ID, "1", DraftType.DRAFT_CLAIM);
         verify(draftStoreService, never()).releaseFailedSubmissionClaim(any(), any(), any());
+
+        ArgumentCaptor<CaseDataContent> contentCaptor = ArgumentCaptor.forClass(CaseDataContent.class);
+        verify(coreCaseDataApi).submitForCitizen(
+            any(), any(), any(), any(), any(), anyBoolean(), contentCaptor.capture()
+        );
+        @SuppressWarnings("unchecked")
+        Map<String, Object> submittedData = (Map<String, Object>) contentCaptor.getValue().getData();
+        assertThat(submittedData).containsEntry("lipClaimSubmissionId", SUBMISSION_ID);
     }
 
     @Test
