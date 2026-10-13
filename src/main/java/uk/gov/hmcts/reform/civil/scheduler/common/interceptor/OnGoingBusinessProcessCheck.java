@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.CaseTypeIdentifier;
 import uk.gov.hmcts.reform.civil.model.BaseCaseData;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
@@ -54,9 +55,25 @@ public class OnGoingBusinessProcessCheck implements DefaultSchedulerInterceptor<
             return;
         }
 
-        context.recordProperty("businessProcessStatus", handler.getBusinessProcessStatus(caseData));
+        recordBusinessProcessProperties(context, handler.getBusinessProcess(caseData));
 
         throw new TaskAbortedException(AbortCategory.ONGOING_BUSINESS_PROCESS, "Ongoing business process");
+    }
+
+    private void recordBusinessProcessProperties(InterceptorContext<CaseDetails> context,
+                                                 BusinessProcess businessProcess) {
+        if (businessProcess == null) {
+            return;
+        }
+
+        context.recordProperty("businessProcessStatus",
+            businessProcess.getStatus() != null ? businessProcess.getStatus().name() : "UNKNOWN");
+        context.recordProperty("camundaEvent", businessProcess.getCamundaEvent());
+        context.recordProperty("activityId", businessProcess.getActivityId());
+        context.recordProperty("processInstanceId", businessProcess.getProcessInstanceId());
+        if (businessProcess.getReadyOn() != null) {
+            context.recordProperty("businessProcessReadyOn", businessProcess.getReadyOn().toString());
+        }
     }
 
     private CaseDataHandler<?> getHandler(CaseDetails caseDetails) {
@@ -74,7 +91,7 @@ public class OnGoingBusinessProcessCheck implements DefaultSchedulerInterceptor<
 
         boolean hasNoOngoingBusinessProcess(B caseData);
 
-        String getBusinessProcessStatus(B caseData);
+        BusinessProcess getBusinessProcess(B caseData);
     }
 
     private class CivilCaseDataHandler implements CaseDataHandler<CaseData> {
@@ -95,10 +112,8 @@ public class OnGoingBusinessProcessCheck implements DefaultSchedulerInterceptor<
         }
 
         @Override
-        public String getBusinessProcessStatus(CaseData caseData) {
-            return caseData.getBusinessProcess() != null && caseData.getBusinessProcess().getStatus() != null
-                ? caseData.getBusinessProcess().getStatus().name()
-                : "UNKNOWN";
+        public BusinessProcess getBusinessProcess(CaseData caseData) {
+            return caseData.getBusinessProcess();
         }
     }
 
@@ -120,10 +135,8 @@ public class OnGoingBusinessProcessCheck implements DefaultSchedulerInterceptor<
         }
 
         @Override
-        public String getBusinessProcessStatus(GeneralApplicationCaseData caseData) {
-            return caseData.getBusinessProcess() != null && caseData.getBusinessProcess().getStatus() != null
-                ? caseData.getBusinessProcess().getStatus().name()
-                : "UNKNOWN";
+        public BusinessProcess getBusinessProcess(GeneralApplicationCaseData caseData) {
+            return caseData.getBusinessProcess();
         }
     }
 }
