@@ -1,12 +1,13 @@
 package uk.gov.hmcts.reform.civil.scheduler;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.Application;
@@ -25,7 +26,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("integration-test")
@@ -48,13 +48,13 @@ class SettlementNoResponseFromDefendantCheckSchedulerIT {
     @Autowired
     private SettlementNoResponseFromDefendantCheckScheduler scheduler;
 
-    @MockBean
+    @MockitoBean
     private TelemetryService telemetryService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private SettlementNoResponseFromDefendantCheckScheduledTask scheduledTask;
 
     @Autowired
@@ -87,8 +87,8 @@ class SettlementNoResponseFromDefendantCheckSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(scheduledTask).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
     }
 }

@@ -2,13 +2,14 @@ package uk.gov.hmcts.reform.civil.scheduler;
 
 import static java.util.stream.IntStream.rangeClosed;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.Application;
@@ -28,7 +29,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("integration-test")
@@ -49,13 +49,13 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantSchedulerIT {
     @Autowired
     private FullAdmitPayImmediatelyNoPaymentFromDefendantScheduler scheduler;
 
-    @MockBean
+    @MockitoBean
     private TelemetryService telemetryService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private FullAdmitPayImmediatelyNoPaymentFromDefendantScheduledTask scheduledTask;
 
     @Autowired
@@ -91,15 +91,15 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantSchedulerIT {
         verify(scheduledTask).accept(searchCase);
         verify(telemetryService).trackEvent(
             eq("SchedulerJobStarted"),
-            anyMap()
+            argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName")))
         );
         verify(telemetryService).trackEvent(
             eq("SchedulerCaseProcessed"),
-            anyMap()
+            argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName")))
         );
         verify(telemetryService).trackEvent(
             eq("SchedulerJobCompleted"),
-            anyMap()
+            argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName")))
         );
     }
 
@@ -119,11 +119,11 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantSchedulerIT {
         verify(scheduledTask, times(51)).accept(any(CaseDetails.class));
         verify(telemetryService).trackEvent(
             eq("SchedulerJobStarted"),
-            anyMap()
+            argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName")))
         );
         verify(telemetryService).trackEvent(
             eq("SchedulerJobCompleted"),
-            anyMap()
+            argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName")))
         );
     }
 
