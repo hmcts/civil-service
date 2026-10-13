@@ -137,7 +137,7 @@ public class ScheduledTaskProcessor<T, I> {
                                ProcessingContext context,
                                InterceptorContext<T> interceptorContext) {
         backPressure.afterSuccess(duration);
-        eventTracker.caseProcessedEvent(eventConfig, itemId.toString(), interceptorContext.getMetrics());
+        eventTracker.caseProcessedEvent(eventConfig, itemId.toString(), interceptorContext.getMetrics(), interceptorContext.getProperties());
         context.succeededItems.add(itemId);
         context.consecutiveFailures.set(0);
     }
@@ -150,7 +150,7 @@ public class ScheduledTaskProcessor<T, I> {
                                 ProcessingContext context) {
         log.info("Scheduled task: {}, ItemId: {}, Aborted: {}",
                  eventConfig.getSchedulerName(), itemId, reason);
-        eventTracker.caseAbortedEvent(eventConfig, itemId.toString(), category, reason, interceptorContext.getMetrics());
+        eventTracker.caseAbortedEvent(eventConfig, itemId.toString(), category, reason, interceptorContext.getMetrics(), interceptorContext.getProperties());
         context.abortedItems.add(itemId);
     }
 
@@ -162,7 +162,7 @@ public class ScheduledTaskProcessor<T, I> {
                                   InterceptorContext<T> interceptorContext) {
         backPressure.afterFailure();
         context.failedItems.add(itemId);
-        eventTracker.caseFailedEvent(eventConfig, itemId.toString(), e, interceptorContext.getMetrics());
+        eventTracker.caseFailedEvent(eventConfig, itemId.toString(), e, interceptorContext.getMetrics(), interceptorContext.getProperties());
         log.error("Error processing item {}: {}", itemId, e.getMessage(), e);
         int failures = context.consecutiveFailures.incrementAndGet();
 

@@ -41,7 +41,7 @@ public class AllowedEventFlowStateCheck implements SchedulerInterceptor<CaseDeta
             return;
         }
 
-        logNotAllowed(caseData, context.getItem().getId());
+        logNotAllowed(caseData, context);
         throw new TaskAbortedException(AbortCategory.FLOW_STATE_DISALLOWED, event.name() + " not allowed in current flow state");
     }
 
@@ -59,21 +59,27 @@ public class AllowedEventFlowStateCheck implements SchedulerInterceptor<CaseDeta
             });
     }
 
-    private void logNotAllowed(CaseData caseData, Long caseId) {
+    private void logNotAllowed(CaseData caseData, InterceptorContext<CaseDetails> context) {
         try {
             boolean isSpec = SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
             StateFlow stateFlow = isSpec ? stateFlowEngine.evaluateSpec(caseData) : stateFlowEngine.evaluate(caseData);
-            String stateFlowHistory = stateFlow.getStateHistory().stream()
-                .map(State::getName)
-                .collect(joining(", "));
+            if (stateFlow != null && stateFlow.getState() != null) {
+                FlowState flowState = FlowState.fromFullName(stateFlow.getState().getName());
+                context.recordProperty("flowState", flowState.fullName());
+                String stateFlowHistory = stateFlow.getStateHistory() != null
+                    ? stateFlow.getStateHistory().stream()
+                        .map(State::getName)
+                        .collect(joining(", "))
+                    : "";
 
-            log.info(
-                "{} is not allowed on the case id {}, current FlowState: {}, stateFlowHistory: {}",
-                event.name(),
-                caseId,
-                FlowState.fromFullName(stateFlow.getState().getName()),
-                stateFlowHistory
-            );
+                log.info(
+                    "{} is not allowed on the case id {}, current FlowState: {}, stateFlowHistory: {}",
+                    event.name(),
+                    context.getItem().getId(),
+                    flowState,
+                    stateFlowHistory
+                );
+            }
         } catch (Exception e) {
             log.warn("Error during state flow evaluation.", e);
         }

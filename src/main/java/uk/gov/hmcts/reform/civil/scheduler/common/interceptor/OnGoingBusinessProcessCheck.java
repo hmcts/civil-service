@@ -54,6 +54,8 @@ public class OnGoingBusinessProcessCheck implements DefaultSchedulerInterceptor<
             return;
         }
 
+        context.recordProperty("businessProcessStatus", handler.getBusinessProcessStatus(caseData));
+
         throw new TaskAbortedException(AbortCategory.ONGOING_BUSINESS_PROCESS, "Ongoing business process");
     }
 
@@ -71,6 +73,8 @@ public class OnGoingBusinessProcessCheck implements DefaultSchedulerInterceptor<
         B toCaseData(CaseDetails caseDetails);
 
         boolean hasNoOngoingBusinessProcess(B caseData);
+
+        String getBusinessProcessStatus(B caseData);
     }
 
     private class CivilCaseDataHandler implements CaseDataHandler<CaseData> {
@@ -89,6 +93,13 @@ public class OnGoingBusinessProcessCheck implements DefaultSchedulerInterceptor<
         public boolean hasNoOngoingBusinessProcess(CaseData caseData) {
             return caseData.hasNoOngoingBusinessProcess();
         }
+
+        @Override
+        public String getBusinessProcessStatus(CaseData caseData) {
+            return caseData.getBusinessProcess() != null && caseData.getBusinessProcess().getStatus() != null
+                ? caseData.getBusinessProcess().getStatus().name()
+                : "UNKNOWN";
+        }
     }
 
     private class GACaseDataHandler implements CaseDataHandler<GeneralApplicationCaseData> {
@@ -106,6 +117,13 @@ public class OnGoingBusinessProcessCheck implements DefaultSchedulerInterceptor<
         @Override
         public boolean hasNoOngoingBusinessProcess(GeneralApplicationCaseData caseData) {
             return caseData.hasNoOngoingBusinessProcess();
+        }
+
+        @Override
+        public String getBusinessProcessStatus(GeneralApplicationCaseData caseData) {
+            return caseData.getBusinessProcess() != null && caseData.getBusinessProcess().getStatus() != null
+                ? caseData.getBusinessProcess().getStatus().name()
+                : "UNKNOWN";
         }
     }
 }

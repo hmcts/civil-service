@@ -88,6 +88,7 @@ class OnGoingBusinessProcessCheckTest {
         TaskAbortedException exception = assertThrows(TaskAbortedException.class, () -> check.accept(context, chain));
         assertThat(exception.getReason()).isEqualTo("Ongoing business process");
         assertThat(exception.getCategory()).isEqualTo(AbortCategory.ONGOING_BUSINESS_PROCESS);
+        assertThat(context.getProperties()).containsEntry("businessProcessStatus", "STARTED");
         verify(chain, never()).next(context);
     }
 
@@ -104,6 +105,7 @@ class OnGoingBusinessProcessCheckTest {
         TaskAbortedException exception = assertThrows(TaskAbortedException.class, () -> check.accept(context, chain));
         assertThat(exception.getReason()).isEqualTo("Ongoing business process");
         assertThat(exception.getCategory()).isEqualTo(AbortCategory.ONGOING_BUSINESS_PROCESS);
+        assertThat(context.getProperties()).containsEntry("businessProcessStatus", "STARTED");
         verify(chain, never()).next(context);
     }
 
