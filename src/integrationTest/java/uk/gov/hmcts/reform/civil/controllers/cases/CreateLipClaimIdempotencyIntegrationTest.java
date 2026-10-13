@@ -301,6 +301,7 @@ class CreateLipClaimIdempotencyIntegrationTest extends BaseIntegrationTest {
             .caseReference(CREATED_CASE_ID)
             .claimantUserDetails(new IdamUserDetails().setId(USER_ID).setEmail("lip@test.com"))
             .build();
+        caseData.setLipClaimSubmissionId(submissionId);
 
         doPost(
             BEARER_TOKEN,
