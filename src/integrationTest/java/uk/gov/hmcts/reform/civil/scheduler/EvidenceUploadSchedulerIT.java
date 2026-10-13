@@ -4,8 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.IntStream.rangeClosed;
-import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -41,23 +41,24 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_CHECK
 public class EvidenceUploadSchedulerIT {
 
     private static final Long CASE_ID = 123L;
+    private static final String SCHEDULER_NAME = EvidenceUploadScheduler.SCHEDULER_NAME;
 
     @Autowired
     private EvidenceUploadScheduler scheduler;
 
-    @MockBean
+    @MockitoBean
     private TelemetryService telemetryService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @Autowired
     private EvidenceUploadNotificationEventHandler evidenceUploadNotificationEventHandler;
 
-    @MockBean
+    @MockitoBean
     private EvidenceUploadApplicantNotificationHandler evidenceUploadApplicantNotificationHandler;
 
-    @MockBean
+    @MockitoBean
     private EvidenceUploadRespondentNotificationHandler evidenceUploadRespondentNotificationHandler;
 
     @Autowired
@@ -94,8 +95,8 @@ public class EvidenceUploadSchedulerIT {
         scheduler.runScheduledTask();
 
         // Then
-        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
         coreCaseDataApiMockHelper.verifySubmitEvent(1);
     }
 
@@ -120,8 +121,8 @@ public class EvidenceUploadSchedulerIT {
         scheduler.runScheduledTask();
 
         // Then every case on both pages is processed
-        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
         coreCaseDataApiMockHelper.verifySubmitEvent(51);
     }
 
