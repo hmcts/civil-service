@@ -18,7 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -123,6 +125,16 @@ public class DraftStoreService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public Set<String> getLinkedCaseIds(String userId, DraftType draftType) {
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
+        return draftStoreRepository.findByUserIdAndDraftType(userId, draftType).stream()
+            .map(DraftStoreEntity::getCaseId)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+    }
+
     public Optional<DraftStoreEntity> updateDraft(UUID draftId,
                                                   String userId,
                                                   String caseId,
@@ -168,6 +180,18 @@ public class DraftStoreService {
             userId,
             draftType,
             submissionId,
+            OffsetDateTime.now(ZoneOffset.UTC)
+        ) == 1;
+    }
+
+    public boolean releaseSubmission(UUID draftId, String userId, DraftType draftType) {
+        Objects.requireNonNull(draftId, "draftId must not be null");
+        Objects.requireNonNull(userId, USER_ID_NOT_NULL);
+        Objects.requireNonNull(draftType, DRAFT_TYPE_NOT_NULL);
+        return draftStoreTransactionService.releaseSubmissionInNewTransaction(
+            draftId,
+            userId,
+            draftType,
             OffsetDateTime.now(ZoneOffset.UTC)
         ) == 1;
     }

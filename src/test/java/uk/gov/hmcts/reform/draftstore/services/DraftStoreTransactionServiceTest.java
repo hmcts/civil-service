@@ -145,6 +145,24 @@ class DraftStoreTransactionServiceTest {
             draftId, "user", DraftType.DRAFT_CLAIM, "99", updatedAt);
     }
 
+    @Test
+    void shouldJoinTransactionBeforeReleaseSubmission() {
+        UUID draftId = UUID.randomUUID();
+        OffsetDateTime updatedAt = OffsetDateTime.now();
+        when(draftStoreRepository.releaseSubmission(
+            draftId, "user", DraftType.DRAFT_CLAIM, updatedAt))
+            .thenReturn(1);
+
+        int released = draftStoreTransactionService.releaseSubmissionInNewTransaction(
+            draftId, "user", DraftType.DRAFT_CLAIM, updatedAt);
+
+        assertThat(released).isEqualTo(1);
+        InOrder order = inOrder(entityManager, draftStoreRepository);
+        order.verify(entityManager).joinTransaction();
+        order.verify(draftStoreRepository).releaseSubmission(
+            draftId, "user", DraftType.DRAFT_CLAIM, updatedAt);
+    }
+
     private DraftStoreEntity draft() {
         OffsetDateTime now = OffsetDateTime.now();
         return new DraftStoreEntity(UUID.randomUUID(), "user", null, DraftType.DRAFT_CLAIM,

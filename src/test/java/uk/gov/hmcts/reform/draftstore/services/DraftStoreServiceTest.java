@@ -20,6 +20,7 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -547,6 +548,34 @@ class DraftStoreServiceTest {
         }
 
         @Test
+        void shouldReturnTrueWhenReleaseSubmissionSucceeds() {
+            when(draftStoreTransactionService.releaseSubmissionInNewTransaction(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                any(OffsetDateTime.class)
+            )).thenReturn(1);
+
+            boolean released = draftStoreService.releaseSubmission(DRAFT_ID, USER_ID, DRAFT_TYPE);
+
+            assertThat(released).isTrue();
+        }
+
+        @Test
+        void shouldReturnFalseWhenReleaseSubmissionDoesNotUpdate() {
+            when(draftStoreTransactionService.releaseSubmissionInNewTransaction(
+                eq(DRAFT_ID),
+                eq(USER_ID),
+                eq(DRAFT_TYPE),
+                any(OffsetDateTime.class)
+            )).thenReturn(0);
+
+            boolean released = draftStoreService.releaseSubmission(DRAFT_ID, USER_ID, DRAFT_TYPE);
+
+            assertThat(released).isFalse();
+        }
+
+        @Test
         void shouldInsertClaimRowForLegacySubmission() {
             when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -600,6 +629,18 @@ class DraftStoreServiceTest {
             );
 
             assertThat(result).contains(draft);
+        }
+
+        @Test
+        void shouldReturnLinkedCaseIdsForUser() {
+            DraftStoreEntity linked = draft();
+            linked.setCaseId(CASE_ID);
+            DraftStoreEntity blank = draft();
+            blank.setId(UUID.randomUUID());
+            when(draftStoreRepository.findByUserIdAndDraftType(USER_ID, DRAFT_TYPE))
+                .thenReturn(List.of(linked, blank));
+
+            assertThat(draftStoreService.getLinkedCaseIds(USER_ID, DRAFT_TYPE)).containsExactly(CASE_ID);
         }
     }
 

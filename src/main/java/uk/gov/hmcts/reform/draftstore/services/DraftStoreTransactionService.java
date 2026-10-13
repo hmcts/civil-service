@@ -129,4 +129,18 @@ public class DraftStoreTransactionService {
         log.info("Linking caseId for draft type={} draftId={} caseId={}", draftType, draftId, caseId);
         return draftStoreRepository.linkCaseId(draftId, userId, draftType, caseId, updatedAt);
     }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public int releaseSubmissionInNewTransaction(UUID draftId,
+                                                 String userId,
+                                                 DraftType draftType,
+                                                 OffsetDateTime updatedAt) {
+        Objects.requireNonNull(draftId, "draftId must not be null");
+        Objects.requireNonNull(userId, "userId must not be null");
+        Objects.requireNonNull(draftType, "draftType must not be null");
+        Objects.requireNonNull(updatedAt, "updatedAt must not be null");
+        entityManager.joinTransaction();
+        log.info("Releasing submission claim for draft type={} draftId={}", draftType, draftId);
+        return draftStoreRepository.releaseSubmission(draftId, userId, draftType, updatedAt);
+    }
 }

@@ -105,4 +105,21 @@ public interface DraftStoreRepository extends JpaRepository<DraftStoreEntity, UU
         @Param("caseId") String caseId,
         @Param("updatedAt") OffsetDateTime updatedAt
     );
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        UPDATE DraftStoreEntity d
+        SET d.submissionId = null, d.updatedAt = :updatedAt
+        WHERE d.id = :id
+          AND d.userId = :userId
+          AND d.draftType = :draftType
+          AND d.caseId IS NULL
+          AND d.submissionId IS NOT NULL
+        """)
+    int releaseSubmission(
+        @Param("id") UUID id,
+        @Param("userId") String userId,
+        @Param("draftType") DraftType draftType,
+        @Param("updatedAt") OffsetDateTime updatedAt
+    );
 }
