@@ -586,7 +586,8 @@ public class DraftClaimControllerIntegrationTest extends BaseIntegrationTest {
             new HashMap<>(Map.of("step", step)),
             createdAt,
             createdAt,
-            expiresAt
+            expiresAt,
+            null
         );
     }
 }
