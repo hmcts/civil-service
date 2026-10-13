@@ -108,7 +108,7 @@ class AllowedEventFlowStateCheckTest {
 
     @Test
     void shouldThrowTaskAbortedExceptionAndLog_whenTakeCaseOfflineEventIsNotAllowed() {
-        CaseDetails searchResultDetails = CaseDetails.builder().id(123L).build();
+        CaseDetails searchResultDetails = CaseDetails.builder().id(123L).state("CASE_ISSUED").build();
         CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(123L).build();
 
         InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", searchResultDetails);
@@ -117,24 +117,30 @@ class AllowedEventFlowStateCheckTest {
         when(allowedEventService.isAllowed(caseData, TAKE_CASE_OFFLINE)).thenReturn(false);
 
         StateFlow stateFlow = mock(StateFlow.class);
-        State state = mock(State.class);
-        when(state.getName()).thenReturn("MAIN.DRAFT");
-        when(stateFlow.getState()).thenReturn(state);
-        when(stateFlow.getStateHistory()).thenReturn(List.of(state));
+        State state1 = mock(State.class);
+        State state2 = mock(State.class);
+        when(state1.getName()).thenReturn("MAIN.DRAFT");
+        when(state2.getName()).thenReturn("MAIN.CLAIM_SUBMITTED");
+        when(stateFlow.getState()).thenReturn(state2);
+        when(stateFlow.getStateHistory()).thenReturn(List.of(state1, state2));
         when(stateFlowEngine.evaluate(caseData)).thenReturn(stateFlow);
 
         TaskAbortedException exception = assertThrows(TaskAbortedException.class, () -> interceptor.accept(context, chain));
 
         assertThat(exception.getReason()).isEqualTo("TAKE_CASE_OFFLINE not allowed in current flow state");
         assertThat(exception.getCategory()).isEqualTo(AbortCategory.FLOW_STATE_DISALLOWED);
-        assertThat(context.getProperties()).containsEntry("flowState", "MAIN.DRAFT");
+        assertThat(context.getProperties()).containsEntry("targetEvent", "TAKE_CASE_OFFLINE");
+        assertThat(context.getProperties()).containsEntry("ccdState", "CASE_ISSUED");
+        assertThat(context.getProperties()).containsEntry("multiPartyScenario", "ONE_V_ONE");
+        assertThat(context.getProperties()).containsEntry("flowState", "MAIN.CLAIM_SUBMITTED");
+        assertThat(context.getProperties()).containsEntry("stateFlowHistory", "MAIN.DRAFT, MAIN.CLAIM_SUBMITTED");
         verify(chain, never()).next(context);
         verify(stateFlowEngine).evaluate(caseData);
     }
 
     @Test
     void shouldThrowTaskAbortedExceptionAndLog_whenTakeCaseOfflineEventIsNotAllowed_forSpecClaim() {
-        CaseDetails searchResultDetails = CaseDetails.builder().id(123L).build();
+        CaseDetails searchResultDetails = CaseDetails.builder().id(123L).state("AWAITING_RESPONDENT_ACKNOWLEDGEMENT").build();
         CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(123L).caseAccessCategory(SPEC_CLAIM).build();
 
         InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", searchResultDetails);
@@ -144,7 +150,7 @@ class AllowedEventFlowStateCheckTest {
 
         StateFlow stateFlow = mock(StateFlow.class);
         State state = mock(State.class);
-        when(state.getName()).thenReturn("MAIN.DRAFT");
+        when(state.getName()).thenReturn("MAIN.SPEC_DRAFT");
         when(stateFlow.getState()).thenReturn(state);
         when(stateFlow.getStateHistory()).thenReturn(List.of(state));
         when(stateFlowEngine.evaluateSpec(caseData)).thenReturn(stateFlow);
@@ -153,14 +159,19 @@ class AllowedEventFlowStateCheckTest {
 
         assertThat(exception.getReason()).isEqualTo("TAKE_CASE_OFFLINE not allowed in current flow state");
         assertThat(exception.getCategory()).isEqualTo(AbortCategory.FLOW_STATE_DISALLOWED);
-        assertThat(context.getProperties()).containsEntry("flowState", "MAIN.DRAFT");
+        assertThat(context.getProperties()).containsEntry("targetEvent", "TAKE_CASE_OFFLINE");
+        assertThat(context.getProperties()).containsEntry("caseAccessCategory", "SPEC_CLAIM");
+        assertThat(context.getProperties()).containsEntry("ccdState", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
+        assertThat(context.getProperties()).containsEntry("multiPartyScenario", "ONE_V_ONE");
+        assertThat(context.getProperties()).containsEntry("flowState", "MAIN.SPEC_DRAFT");
+        assertThat(context.getProperties()).containsEntry("stateFlowHistory", "MAIN.SPEC_DRAFT");
         verify(chain, never()).next(context);
         verify(stateFlowEngine).evaluateSpec(caseData);
     }
 
     @Test
     void shouldThrowTaskAbortedException_whenStateFlowEngineThrowsExceptionDuringLogging() {
-        CaseDetails searchResultDetails = CaseDetails.builder().id(123L).build();
+        CaseDetails searchResultDetails = CaseDetails.builder().id(123L).state("CASE_ISSUED").build();
         CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(123L).build();
 
         InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", searchResultDetails);
@@ -173,7 +184,41 @@ class AllowedEventFlowStateCheckTest {
 
         assertThat(exception.getReason()).isEqualTo("TAKE_CASE_OFFLINE not allowed in current flow state");
         assertThat(exception.getCategory()).isEqualTo(AbortCategory.FLOW_STATE_DISALLOWED);
+        assertThat(context.getProperties()).containsEntry("targetEvent", "TAKE_CASE_OFFLINE");
+        assertThat(context.getProperties()).containsEntry("ccdState", "CASE_ISSUED");
+        assertThat(context.getProperties()).containsEntry("multiPartyScenario", "ONE_V_ONE");
+        assertThat(context.getProperties()).doesNotContainKeys("flowState", "stateFlowHistory");
         verify(chain, never()).next(context);
+    }
+
+    @Test
+    void shouldThrowTaskAbortedExceptionAndLog_whenTakeCaseOfflineEventIsNotAllowed_forTwoVOne() {
+        CaseDetails searchResultDetails = CaseDetails.builder().id(123L).state("CASE_ISSUED").build();
+        CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(123L).multiPartyClaimTwoApplicants().build();
+
+        InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", searchResultDetails);
+        context.setAttribute(CaseInterceptorAttributes.CIVIL_CASE_DATA, caseData);
+
+        when(allowedEventService.isAllowed(caseData, TAKE_CASE_OFFLINE)).thenReturn(false);
+
+        StateFlow stateFlow = mock(StateFlow.class);
+        State state = mock(State.class);
+        when(state.getName()).thenReturn("MAIN.CLAIM_ISSUED");
+        when(stateFlow.getState()).thenReturn(state);
+        when(stateFlow.getStateHistory()).thenReturn(List.of(state));
+        when(stateFlowEngine.evaluate(caseData)).thenReturn(stateFlow);
+
+        TaskAbortedException exception = assertThrows(TaskAbortedException.class, () -> interceptor.accept(context, chain));
+
+        assertThat(exception.getReason()).isEqualTo("TAKE_CASE_OFFLINE not allowed in current flow state");
+        assertThat(exception.getCategory()).isEqualTo(AbortCategory.FLOW_STATE_DISALLOWED);
+        assertThat(context.getProperties()).containsEntry("targetEvent", "TAKE_CASE_OFFLINE");
+        assertThat(context.getProperties()).containsEntry("ccdState", "CASE_ISSUED");
+        assertThat(context.getProperties()).containsEntry("multiPartyScenario", "TWO_V_ONE");
+        assertThat(context.getProperties()).containsEntry("flowState", "MAIN.CLAIM_ISSUED");
+        assertThat(context.getProperties()).containsEntry("stateFlowHistory", "MAIN.CLAIM_ISSUED");
+        verify(chain, never()).next(context);
+        verify(stateFlowEngine).evaluate(caseData);
     }
 
     @Test
