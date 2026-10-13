@@ -1,4 +1,6 @@
 java:
+  autoscaling:
+    enabled: false
   replicas: 2
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
