@@ -704,6 +704,29 @@ class DraftStoreServiceTest {
         }
 
         @Test
+        void shouldReturnEmptyWhenLegacyInsertLosesToSameSubmissionAlreadyClaimed() {
+            DraftStoreEntity claimed = draft();
+            claimed.setCaseId(null);
+            claimed.setSubmissionId(SUBMISSION_ID);
+            claimed.setPayload(new HashMap<>());
+            when(draftStoreTransactionService.saveInNewTransaction(any(DraftStoreEntity.class)))
+                .thenThrow(new DataIntegrityViolationException("uq_draft_store_submission_id"));
+            when(draftStoreRepository.findByUserIdAndDraftTypeAndCaseIdIsNull(USER_ID, DRAFT_TYPE))
+                .thenReturn(Optional.of(claimed));
+
+            Optional<DraftStoreEntity> result = draftStoreService.claimLegacySubmission(
+                USER_ID,
+                SUBMISSION_ID,
+                DRAFT_TYPE
+            );
+
+            assertThat(result).isEmpty();
+            verify(draftStoreTransactionService, never()).claimSubmissionInNewTransaction(
+                any(), any(), any(), any(), any()
+            );
+        }
+
+        @Test
         void shouldFindDraftBySubmissionId() {
             DraftStoreEntity draft = draft();
             draft.setSubmissionId(SUBMISSION_ID);

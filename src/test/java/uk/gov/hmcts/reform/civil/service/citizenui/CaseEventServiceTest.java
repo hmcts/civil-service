@@ -474,6 +474,59 @@ public class CaseEventServiceTest {
     }
 
     @Test
+    void shouldReturnConflictWhenLegacyClaimLosesRaceToInProgressSubmission() {
+        final String redisSubmissionId = USER_ID + ":" + USER_ID + ":2026-10-12T10:00:00Z";
+        DraftStoreEntity inProgress = blankDraft();
+        inProgress.setSubmissionId(redisSubmissionId);
+        given(draftStoreService.getDraftBySubmissionId(redisSubmissionId, USER_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.empty())
+            .willReturn(Optional.of(inProgress));
+        given(draftStoreService.claimLegacySubmission(USER_ID, redisSubmissionId, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> caseEventService.submitEvent(new EventSubmissionParams()
+                                                                  .setUpdates(Maps.newHashMap())
+                                                                  .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+                                                                  .setCaseId(DRAFT)
+                                                                  .setUserId(USER_ID)
+                                                                  .setAuthorisation(AUTHORISATION)
+                                                                  .setSubmissionId(redisSubmissionId)))
+            .isInstanceOf(ResponseStatusException.class)
+            .extracting(ex -> ((ResponseStatusException) ex).getStatusCode())
+            .isEqualTo(CONFLICT);
+
+        verify(coreCaseDataApi, never()).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
+        verify(draftStoreService, never()).linkCaseId(any(), any(), any(), any());
+    }
+
+    @Test
+    void shouldReturnExistingCaseWhenLegacyClaimLosesRaceAfterOtherRequestLinked() {
+        final String redisSubmissionId = USER_ID + ":" + USER_ID + ":2026-10-12T10:00:00Z";
+        DraftStoreEntity linked = blankDraft();
+        linked.setCaseId("99");
+        linked.setSubmissionId(redisSubmissionId);
+        CaseDetails existing = CaseDetails.builder().id(99L).build();
+        given(draftStoreService.getDraftBySubmissionId(redisSubmissionId, USER_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.empty())
+            .willReturn(Optional.of(linked));
+        given(draftStoreService.claimLegacySubmission(USER_ID, redisSubmissionId, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.empty());
+        given(coreCaseDataService.getCase(99L, AUTHORISATION)).willReturn(existing);
+
+        CaseDetails result = caseEventService.submitEvent(new EventSubmissionParams()
+                                                              .setUpdates(Maps.newHashMap())
+                                                              .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+                                                              .setCaseId(DRAFT)
+                                                              .setUserId(USER_ID)
+                                                              .setAuthorisation(AUTHORISATION)
+                                                              .setSubmissionId(redisSubmissionId));
+
+        assertThat(result).isEqualTo(existing);
+        verify(coreCaseDataApi, never()).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
+        verify(draftStoreService, never()).linkCaseId(any(), any(), any(), any());
+    }
+
+    @Test
     void shouldSubmitEventForExistingClaimSuccessfully_whenCaseFlagsLoggingIsEnabled() {
         ReflectionTestUtils.setField(caseEventService, "caseFlagsLoggingEnabled", true);
         CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()

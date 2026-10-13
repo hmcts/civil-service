@@ -275,7 +275,7 @@ public class DraftStoreService {
         }
         UUID draftId = blank.get().getId();
         if (submissionId.equals(blank.get().getSubmissionId())) {
-            return getDraft(draftId, userId, draftType);
+            return Optional.empty();
         }
         if (blank.get().getSubmissionId() != null) {
             return Optional.empty();
