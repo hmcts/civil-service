@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARENT_CLAIM_SETTLED;
 
 @Slf4j
 @Service
@@ -34,6 +36,7 @@ public class LIPClaimSettledCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
     private final FeatureToggleService featureToggleService;
+    private final GenAppStateHelperService genAppStateHelperService;
 
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_START), this::aboutToStartValidationAndSetup,
@@ -75,6 +78,7 @@ public class LIPClaimSettledCallbackHandler extends CallbackHandler {
             log.info("Clearing JO fields for caseId {}", caseDataUpdated.getCcdCaseReference());
             JudgmentsOnlineHelper.clearJOCaseData(caseDataUpdated);
         }
+        genAppStateHelperService.triggerEvent(caseDataUpdated, PARENT_CLAIM_SETTLED);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.toMap(objectMapper))
             .build();
