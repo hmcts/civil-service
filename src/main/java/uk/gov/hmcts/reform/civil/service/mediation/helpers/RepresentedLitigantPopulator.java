@@ -111,6 +111,8 @@ public class RepresentedLitigantPopulator {
     }
 
     private String formatDate(LocalDate unavailableDate) {
-        return unavailableDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK));
+        return unavailableDate == null
+            ? null
+            : unavailableDate.format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK));
     }
 }

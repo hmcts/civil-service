@@ -1,0 +1,21 @@
+{
+  "ccdCaseReference": 1234567890123461,
+  "ccdState": "CASE_PROGRESSION",
+  "submittedDate": "2026-01-15T10:00:00",
+  "caseAccessCategory": "UNSPEC_CLAIM",
+  "legacyCaseReference": "reference",
+  "applicant1": {
+    "type": "INDIVIDUAL",
+    "individualFirstName": "Claimant",
+    "individualLastName": "Tester"
+  },
+  "respondent1": {
+    "type": "INDIVIDUAL",
+    "individualFirstName": "Defendant",
+    "individualLastName": "Tester"
+  },
+  "caseManagementLocation": {
+    "region": "1",
+    "baseLocation": "123456"
+  }
+}

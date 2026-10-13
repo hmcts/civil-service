@@ -26,4 +26,30 @@ class NoticeOfChangeRequestWorkflowTest extends WorkflowIntegrationTest {
             .then(result -> assertThat(result.response().getErrors())
                 .containsExactly("Invalid case state for NoC"));
     }
+
+    @Test
+    void shouldRejectNoticeOfChangeForPendingCaseIssuedState() throws Exception {
+        startWorkflow(NoticeOfChangeRequestFixtures.pendingCaseIssuedData())
+            .eventId(CaseEvent.NOC_REQUEST)
+            .aboutToSubmit()
+            .then(result -> assertThat(result.response().getErrors())
+                .containsExactly("Invalid case state for NoC"));
+    }
+
+    @Test
+    void shouldRejectNoticeOfChangeForCaseDismissedState() throws Exception {
+        startWorkflow(NoticeOfChangeRequestFixtures.caseDismissedData())
+            .eventId(CaseEvent.NOC_REQUEST)
+            .aboutToSubmit()
+            .then(result -> assertThat(result.response().getErrors())
+                .containsExactly("Invalid case state for NoC"));
+    }
+
+    @Test
+    void shouldAllowNoticeOfChangeForAwaitingRespondentAcknowledgementState() throws Exception {
+        startWorkflow(NoticeOfChangeRequestFixtures.awaitingRespondentAcknowledgementData())
+            .eventId(CaseEvent.NOC_REQUEST)
+            .aboutToSubmit()
+            .then(result -> assertThat(result.response().getErrors()).isNullOrEmpty());
+    }
 }

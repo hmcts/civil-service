@@ -1,0 +1,28 @@
+{
+  "ccdCaseReference": 1234567890123470,
+  "ccdState": "IN_MEDIATION",
+  "submittedDate": "2026-01-15T10:00:00",
+  "caseAccessCategory": "SPEC_CLAIM",
+  "legacyCaseReference": "reference",
+  "applicant1": {
+    "type": "INDIVIDUAL",
+    "individualFirstName": "Claimant",
+    "individualLastName": "Tester",
+    "partyID": "app-1-party-id"
+  },
+  "respondent1": {
+    "type": "INDIVIDUAL",
+    "individualFirstName": "Defendant",
+    "individualLastName": "Tester",
+    "partyID": "res-1-party-id"
+  },
+  "applicant1Represented": "Yes",
+  "respondent1Represented": "Yes",
+  "addRespondent2": "No",
+  "addApplicant2": "No",
+  "caseManagementLocation": {
+    "region": "1",
+    "baseLocation": "123456"
+  },
+  "responseClaimTrack": "SMALL_CLAIM"
+}

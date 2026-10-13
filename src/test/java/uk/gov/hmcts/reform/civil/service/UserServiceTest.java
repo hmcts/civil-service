@@ -53,7 +53,7 @@ class UserServiceTest {
 
     @BeforeEach
     public void setup() {
-        userService = new UserService(idamClient, false);
+        userService = new UserService(idamClient);
     }
 
     @Test

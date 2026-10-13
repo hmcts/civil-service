@@ -1,18 +1,19 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.claimantresponsecui.confirmproceed;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.DefendantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class ClaimantConfirmProceedDefendantEmailDTOGenerator extends DefendantEmailDTOGenerator {
 
@@ -44,5 +45,13 @@ public class ClaimantConfirmProceedDefendantEmailDTOGenerator extends DefendantE
         properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
         properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
         return properties;
+    }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return caseData.isRespondent1LiP()
+            && (!NO.equals(caseData.getApplicant1ProceedWithClaim()) && caseData.isClaimantIntentionNotSettlePartAdmit())
+            ? Boolean.TRUE
+            : Boolean.FALSE;
     }
 }

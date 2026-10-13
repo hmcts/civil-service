@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.bpmn;
 
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
-import org.camunda.bpm.engine.impl.calendar.CronExpression;
+import org.springframework.scheduling.support.CronExpression;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ class HearingFeeCheckSchedulerTest extends BpmnBaseTest {
         String cronString = "0 0 0 * * ?";
         assertThat(jobDefinitions.get(0).getJobConfiguration()).isEqualTo("CYCLE: " + cronString);
         assertCronTriggerFiresAtExpectedTime(
-            new CronExpression(cronString),
+            CronExpression.parse(cronString),
             LocalDateTime.of(2024, 11, 30, 0, 0, 0),
             LocalDateTime.of(2024, 12, 1, 0, 0, 0)
         );

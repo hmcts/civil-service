@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.civil.service.FeignErrorTelemetryService;
 
@@ -22,10 +23,20 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
-@ActiveProfiles("integration-test")
+@ActiveProfiles({"integration-test", ErrorDecoderTelemetryAspectIntegrationTest.PROFILE})
 @SpringBootTest(classes = ErrorDecoderTelemetryAspectIntegrationTest.TestConfig.class)
 @SuppressWarnings({"java:S6813", "java:S5960"})
 class ErrorDecoderTelemetryAspectIntegrationTest {
+
+    /**
+     * {@code Application} declares {@code @ComponentScan("uk.gov.hmcts.reform")} without Spring
+     * Boot's test-type exclude filter, so every full-application context would otherwise scan the
+     * nested {@link TestConfig} in and its {@code ErrorDecoder} bean would sit alongside the
+     * production one from {@code HttpClientFeignConfiguration}. Gating the config on a profile that
+     * only this test activates keeps it out of those contexts. Same fix as
+     * {@code FeignFailureHandlingTest}.
+     */
+    static final String PROFILE = "error-decoder-telemetry-aspect-test";
 
     public static final String METHOD_KEY = "TestClient#getAnything";
     public static final String DECODED = "decoded";
@@ -66,6 +77,7 @@ class ErrorDecoderTelemetryAspectIntegrationTest {
     }
 
     @Configuration
+    @Profile(PROFILE)
     @EnableAspectJAutoProxy
     @Import(ErrorDecoderTelemetryAspect.class)
     static class TestConfig {

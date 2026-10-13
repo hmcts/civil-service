@@ -27,6 +27,10 @@ public class ClaimFormService {
     }
 
     public DownloadedDocumentResponse downloadDocumentById(String authorisation, String caseDocumentId) {
-        return documentDownloadService.downloadDocument(authorisation, caseDocumentId);
+        return downloadDocumentById(authorisation, caseDocumentId, null);
+    }
+
+    public DownloadedDocumentResponse downloadDocumentById(String authorisation, String caseDocumentId, String caseId) {
+        return documentDownloadService.downloadDocument(authorisation, caseDocumentId, caseId);
     }
 }

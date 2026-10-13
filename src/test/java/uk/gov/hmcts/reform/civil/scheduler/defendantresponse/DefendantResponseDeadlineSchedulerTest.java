@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
-import uk.gov.hmcts.reform.civil.service.search.DefendantResponseDeadlineCheckSearchService;
+import uk.gov.hmcts.reform.civil.service.search.defendantresponse.DefendantResponseDeadlineCheckPaginatedSearchService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -19,7 +19,7 @@ class DefendantResponseDeadlineSchedulerTest {
     private static final String SCHEDULER_NAME = "DefendantResponseDeadline";
 
     @Mock
-    private DefendantResponseDeadlineCheckSearchService searchService;
+    private DefendantResponseDeadlineCheckPaginatedSearchService searchService;
 
     @Mock
     private ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;

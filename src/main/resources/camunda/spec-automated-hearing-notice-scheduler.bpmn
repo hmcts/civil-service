@@ -53,7 +53,7 @@
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>Flow_090bysl</bpmn:outgoing>
       <bpmn:timerEventDefinition id="TimerEventDefinition_0rfty1c">
-        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">0 0 0,12 ? * * *</bpmn:timeCycle>
+        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">0 0 0,12 ? * *</bpmn:timeCycle>
       </bpmn:timerEventDefinition>
     </bpmn:startEvent>
     <bpmn:endEvent id="Event_1j24hl7">

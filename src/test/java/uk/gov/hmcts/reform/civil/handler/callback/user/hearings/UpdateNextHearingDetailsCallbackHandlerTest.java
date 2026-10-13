@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -280,6 +282,79 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
                 assertNull(updatedData.getNextHearingDetails());
+            }
+
+            @Test
+            void shouldClearHearingDateAndTime_whenLatestHearingIsCancelled() {
+                LocalDateTime hearingStartTime = TODAY.plusHours(10);
+                LocalDateTime requestedDateTime = TODAY.plusHours(9);
+                LocalDate hearingDate = LocalDate.of(2024, 1, 30);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .hearingDate(hearingDate)
+                    .build();
+                caseData.setHearingTimeHourMinute("1030");
+
+                HearingsResponse hearingsResponse = new HearingsResponse()
+                    .setCaseHearings(List.of(
+                        hearing("11111", LISTED, requestedDateTime.minusDays(1), List.of(hearingStartTime)),
+                        hearing("12345", CANCELLED, requestedDateTime, List.of(hearingStartTime))
+                    ));
+
+                when(hearingService.getHearings(any(), any(), any())).thenReturn(hearingsResponse);
+
+                CallbackParams params = callbackParamsOf(
+                    caseData,
+                    CaseEvent.UPDATE_NEXT_HEARING_DETAILS,
+                    ABOUT_TO_SUBMIT
+                );
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+                assertNull(updatedData.getNextHearingDetails());
+                assertNull(updatedData.getHearingDate());
+                assertNull(updatedData.getHearingTimeHourMinute());
+            }
+
+            @ParameterizedTest(name = "when the latest requested hearing HMCStatus is {0}")
+            @EnumSource(
+                value = HmcStatus.class,
+                names = {"COMPLETED", "ADJOURNED"})
+            void shouldKeepHearingDateAndTime_whenLatestHearingIsNotCancelled(HmcStatus hmcstatus) {
+                LocalDateTime hearingStartTime = TODAY.plusHours(10);
+                LocalDateTime requestedDateTime = TODAY.plusHours(9);
+                LocalDate hearingDate = LocalDate.of(2024, 1, 30);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .hearingDate(hearingDate)
+                    .build();
+                caseData.setHearingTimeHourMinute("1030");
+
+                HearingsResponse hearingsResponse = new HearingsResponse()
+                    .setCaseHearings(List.of(
+                        hearing("11111", LISTED, requestedDateTime.minusDays(1), List.of(hearingStartTime)),
+                        hearing("12345", hmcstatus, requestedDateTime, List.of(hearingStartTime))
+                    ));
+
+                when(hearingService.getHearings(any(), any(), any())).thenReturn(hearingsResponse);
+
+                CallbackParams params = callbackParamsOf(
+                    caseData,
+                    CaseEvent.UPDATE_NEXT_HEARING_DETAILS,
+                    ABOUT_TO_SUBMIT
+                );
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+                assertNull(updatedData.getNextHearingDetails());
+                assertEquals(hearingDate, updatedData.getHearingDate());
+                assertEquals("1030", updatedData.getHearingTimeHourMinute());
             }
         }
 

@@ -12,12 +12,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
-import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
 import java.util.Collections;
 
@@ -30,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.validation.PostcodeValidator.POSTCODE_REQUIRED_ERROR;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -40,9 +41,6 @@ class ValidateDateOfBirthTest {
 
     @Mock
     private DateOfBirthValidator dateOfBirthValidator;
-
-    @Mock
-    private PostcodeValidator postcodeValidator;
 
     @Mock
     private ObjectMapper objectMapper;
@@ -84,15 +82,31 @@ class ValidateDateOfBirthTest {
     }
 
     @Test
-    void shouldReturnErrorsWhenCorrespondenceAddressIsInvalid() {
-        when(postcodeValidator.validate(null)).thenReturn(Collections.singletonList("Invalid postcode"));
+    void shouldReturnNoErrorsWhenRespondent1CorrespondenceAddressIsOutsideEnglandOrWales() {
+        Address address = new Address();
+        address.setPostCode("BT1 1SS");
         caseData.setIsRespondent1(YES);
         caseData.setSpecAoSRespondentCorrespondenceAddressRequired(NO);
+        caseData.setSpecAoSRespondentCorrespondenceAddressdetails(address);
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateDateOfBirth.execute(callbackParams);
 
-        assertThat(response.getErrors()).contains("Invalid postcode");
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldReturnPostcodeRequiredErrorWhenRespondent1CorrespondenceAddressPostcodeIsNull() {
+        Address address = new Address();
+        address.setPostCode(null);
+        caseData.setIsRespondent1(YES);
+        caseData.setSpecAoSRespondentCorrespondenceAddressRequired(NO);
+        caseData.setSpecAoSRespondentCorrespondenceAddressdetails(address);
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateDateOfBirth.execute(callbackParams);
+
+        assertThat(response.getErrors()).containsOnly(POSTCODE_REQUIRED_ERROR);
     }
 
     @Test
@@ -136,15 +150,31 @@ class ValidateDateOfBirthTest {
     }
 
     @Test
-    void shouldReturnErrorsWhenSpecAoSRespondent2CorrespondenceAddressRequiredIsNO() {
-        when(postcodeValidator.validate(null)).thenReturn(Collections.singletonList("Invalid postcode"));
+    void shouldReturnNoErrorsWhenRespondent2CorrespondenceAddressIsOutsideEnglandOrWales() {
+        Address address = new Address();
+        address.setPostCode("BT1 1SS");
         caseData.setIsRespondent2(YES);
         caseData.setSpecAoSRespondent2CorrespondenceAddressRequired(NO);
+        caseData.setSpecAoSRespondent2CorrespondenceAddressdetails(address);
         when(callbackParams.getCaseData()).thenReturn(caseData);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateDateOfBirth.execute(callbackParams);
 
-        assertThat(response.getErrors()).contains("Invalid postcode");
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldReturnPostcodeRequiredErrorWhenRespondent2CorrespondenceAddressPostcodeIsNull() {
+        Address address = new Address();
+        address.setPostCode(null);
+        caseData.setIsRespondent2(YES);
+        caseData.setSpecAoSRespondent2CorrespondenceAddressRequired(NO);
+        caseData.setSpecAoSRespondent2CorrespondenceAddressdetails(address);
+        when(callbackParams.getCaseData()).thenReturn(caseData);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) validateDateOfBirth.execute(callbackParams);
+
+        assertThat(response.getErrors()).containsOnly(POSTCODE_REQUIRED_ERROR);
     }
 
     @Test

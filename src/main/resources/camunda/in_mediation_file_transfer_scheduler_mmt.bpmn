@@ -11,7 +11,7 @@
     <bpmn:startEvent id="InMediationMMTtimer">
       <bpmn:outgoing>Flow_1gnbmqe</bpmn:outgoing>
       <bpmn:timerEventDefinition id="TimerEventDefinition_0g5qu8x">
-        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">0 0 1 ? * * *</bpmn:timeCycle>
+        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">0 0 1 ? * *</bpmn:timeCycle>
       </bpmn:timerEventDefinition>
     </bpmn:startEvent>
     <bpmn:sequenceFlow id="Flow_1gnbmqe" sourceRef="InMediationMMTtimer" targetRef="GenerateCsvAndSendToMmtActivityID" />

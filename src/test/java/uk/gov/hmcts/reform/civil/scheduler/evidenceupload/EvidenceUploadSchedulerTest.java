@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
-import uk.gov.hmcts.reform.civil.service.search.EvidenceUploadNotificationSearchService;
+import uk.gov.hmcts.reform.civil.service.search.evidenceupload.EvidenceUploadNotificationPaginatedSearchService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 class EvidenceUploadSchedulerTest {
 
     @Mock
-    private EvidenceUploadNotificationSearchService searchService;
+    private EvidenceUploadNotificationPaginatedSearchService searchService;
 
     @Mock
     private ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;

@@ -1,0 +1,75 @@
+{
+  "new": {
+    "queries": {
+      "partyName": "All queries",
+      "caseMessages": [
+        {
+          "id": "20000000-0000-4000-8000-000000000001",
+          "value": {
+            "id": "20000000-0000-4000-8000-000000000002",
+            "subject": "Hearing documents",
+            "name": "Mx Sam Example",
+            "body": "Please confirm receipt of the document.",
+            "createdBy": "cui-user-id",
+            "createdOn": "2025-05-01T10:00:00.000Z",
+            "attachments": [
+              {
+                "value": {
+                  "document_url": "http://dm-store/documents/30000000-0000-4000-8000-000000000001",
+                  "document_binary_url": "http://dm-store/documents/30000000-0000-4000-8000-000000000001/binary",
+                  "document_filename": "example.pdf"
+                }
+              }
+            ],
+            "isHearingRelated": "Yes",
+            "hearingDate": "2025-06-01"
+          }
+        }
+      ]
+    }
+  },
+  "follow-up": {
+    "queries": {
+      "partyName": "All queries",
+      "caseMessages": [
+        {
+          "id": "20000000-0000-4000-8000-000000000001",
+          "value": {
+            "id": "20000000-0000-4000-8000-000000000002",
+            "subject": "Hearing documents",
+            "name": "Mx Sam Example",
+            "body": "Please confirm receipt of the document.",
+            "createdBy": "cui-user-id",
+            "createdOn": "2025-05-01T10:00:00.000Z",
+            "attachments": [
+              {
+                "value": {
+                  "document_url": "http://dm-store/documents/30000000-0000-4000-8000-000000000001",
+                  "document_binary_url": "http://dm-store/documents/30000000-0000-4000-8000-000000000001/binary",
+                  "document_filename": "example.pdf"
+                }
+              }
+            ],
+            "isHearingRelated": "Yes",
+            "hearingDate": "2025-06-01"
+          }
+        },
+        {
+          "id": "20000000-0000-4000-8000-000000000003",
+          "value": {
+            "id": "20000000-0000-4000-8000-000000000004",
+            "parentId": "20000000-0000-4000-8000-000000000002",
+            "subject": "Hearing documents",
+            "name": "Mx Sam Example",
+            "body": "Please provide an update on my query.",
+            "createdBy": "cui-user-id",
+            "createdOn": "2025-05-01T10:00:00.000Z",
+            "attachments": [],
+            "isHearingRelated": "Yes",
+            "hearingDate": "2025-06-01"
+          }
+        }
+      ]
+    }
+  }
+}

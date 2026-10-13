@@ -4,7 +4,6 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
-import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
@@ -71,11 +70,6 @@ public class DeleteExpiredResponseRespondentNotificationSearchService extends Ga
 
     @Override
     Query queryForOrderMade(final int startIndex, final CaseState caseState, final GeneralApplicationTypes gaType) {
-        return null;
-    }
-
-    @Override
-    Query queryForBusinessProcessStatus(final int startIndex, final BusinessProcessStatus processStatus) {
         return null;
     }
 

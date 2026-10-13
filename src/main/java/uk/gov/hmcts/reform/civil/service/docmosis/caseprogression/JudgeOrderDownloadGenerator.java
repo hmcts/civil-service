@@ -6,6 +6,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -21,6 +23,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -88,7 +91,7 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
 
     public JudgeFinalOrderForm getDownloadTemplate(CaseData caseData, String authorisation) {
 
-        switch (caseData.getFinalOrderDownloadTemplateOptions().getValue().getLabel()) {
+        switch (getFinalOrderDownloadTemplateOptionLabel(caseData)) {
             case BLANK_TEMPLATE_TO_BE_USED_AFTER_A_HEARING:
                 docmosisTemplate = BLANK_TEMPLATE_AFTER_HEARING_DOCX;
                 return getBlankAfterHearing(caseData, authorisation);
@@ -104,6 +107,13 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
             default:
                 return null;
         }
+    }
+
+    private String getFinalOrderDownloadTemplateOptionLabel(CaseData caseData) {
+        return Optional.ofNullable(caseData.getFinalOrderDownloadTemplateOptions())
+            .map(DynamicList::getValue)
+            .map(DynamicListElement::getLabel)
+            .orElse(BLANK_TEMPLATE_TO_BE_USED_BEFORE_A_HEARING_BOX_WORK);
     }
 
     public JudgeFinalOrderForm getBlankAfterHearing(CaseData caseData, String authorisation) {

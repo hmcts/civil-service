@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.ga.service.GaFeesPaymentService;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
@@ -58,6 +59,7 @@ public class FeesPaymentController {
         @PathVariable("feeType") FeeType feeType,
         @PathVariable("caseReference") String caseReference,
         @PathVariable("paymentReference") String paymentReference) {
+        rejectUnusablePaymentReference(paymentReference);
         return new ResponseEntity<>(
             feesPaymentService.getGovPaymentRequestStatus(feeType, caseReference, paymentReference, authorization),
             HttpStatus.OK
@@ -88,9 +90,25 @@ public class FeesPaymentController {
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
         @PathVariable("caseReference") String caseReference,
         @PathVariable("paymentReference") String paymentReference) {
+        rejectUnusablePaymentReference(paymentReference);
         return new ResponseEntity<>(
             gaFeesPaymentService.getGovPaymentRequestStatus(caseReference, paymentReference, authorization),
             HttpStatus.OK
         );
+    }
+
+    private void rejectUnusablePaymentReference(String paymentReference) {
+        if (!isUsablePaymentReference(paymentReference)) {
+            log.warn("Rejected payment status request with unusable payment reference");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid payment reference");
+        }
+    }
+
+    private static boolean isUsablePaymentReference(String paymentReference) {
+        if (paymentReference == null || paymentReference.isBlank()) {
+            return false;
+        }
+        String value = paymentReference.trim();
+        return !"undefined".equalsIgnoreCase(value) && !"null".equalsIgnoreCase(value);
     }
 }

@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_HEARING_FEE_P
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
+import static uk.gov.hmcts.reform.civil.utils.PaymentUtils.isPaymentAlreadyApplied;
 
 @Slf4j
 @Service
@@ -36,12 +37,15 @@ public class PaymentStatusRetryService {
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper objectMapper;
 
-    @Retryable(retryFor = CaseDataUpdateException.class, backoff = @Backoff(delay = 500))
+    @Retryable(retryFor = CaseDataUpdateException.class, noRetryFor = IllegalArgumentException.class, backoff = @Backoff(delay = 500))
     public void updatePaymentStatus(FeeType feeType, String caseReference, CaseData caseData) {
         try {
             Long caseId = Long.valueOf(caseReference);
             submitUpdatePaymentEvent(caseData, caseId, feeType);
+        } catch (IllegalArgumentException ex) {
+            throw ex;
         } catch (Exception ex) {
+            log.error("Payment status update failed for case {} and fee type {}", caseReference, feeType, ex);
             throw new CaseDataUpdateException(ex.getMessage(), ex);
         }
     }
@@ -57,6 +61,14 @@ public class PaymentStatusRetryService {
         } catch (IllegalArgumentException ex) {
             throw ex;
         } catch (Exception ex) {
+            log.error(
+                "Payment status update failed for case {} and fee type {}. Status: {}, ErrorCode: {}",
+                caseReference,
+                feeType,
+                getStatus(response),
+                getErrorCode(response),
+                ex
+            );
             throw new CaseDataUpdateException(ex.getMessage(), ex);
         }
     }
@@ -67,15 +79,12 @@ public class PaymentStatusRetryService {
                         String caseReference,
                         CardPaymentStatusResponse response) {
 
-        String status = response != null ? response.getStatus() : "N/A";
-        String errorCode = response != null ? response.getErrorCode() : "N/A";
-
         log.error(
             "Payment status update failed after retries for case {} and fee type {}. Status: {}, ErrorCode: {}",
             caseReference,
             feeType,
-            status,
-            errorCode,
+            getStatus(response),
+            getErrorCode(response),
             ex
         );
     }
@@ -132,7 +141,7 @@ public class PaymentStatusRetryService {
 
     private void submitUpdatePaymentEvent(CaseData caseData, Long caseId, FeeType feeType) {
         CaseEvent event = determineEventFromFeeType(caseData, feeType);
-        submitEvent(caseData, caseId, event);
+        submitEvent(caseData, caseId, event, feeType);
     }
 
     CaseEvent determineEventFromFeeType(CaseData caseData, FeeType feeType) {
@@ -153,18 +162,40 @@ public class PaymentStatusRetryService {
         }
     }
 
-    private void submitEvent(CaseData caseData, Long caseId, CaseEvent event) {
+    private void submitEvent(CaseData caseData, Long caseId, CaseEvent event, FeeType feeType) {
         StartEventResponse startEvent = coreCaseDataService.startUpdate(
             String.valueOf(caseId),
             event
         );
 
+        CaseData freshCaseData = caseDetailsConverter.toCaseData(startEvent.getCaseDetails());
+
+        PaymentDetails intendedPayment = getPaymentDetails(feeType, caseData);
+        PaymentDetails freshPayment = getPaymentDetails(feeType, freshCaseData);
+
+        if (isPaymentAlreadyApplied(intendedPayment, freshPayment)) {
+            String reference = freshPayment != null ? freshPayment.getReference() : "N/A";
+            log.info("Payment with reference {} already applied for case {} and fee type {}. Skipping submission.",
+                     reference, caseId, feeType);
+            return;
+        }
+
+        applyPaymentDetails(freshCaseData, feeType, intendedPayment);
+
         CaseDataContent caseDataContent = CaseDataContent.builder()
             .eventToken(startEvent.getToken())
             .event(Event.builder().id(startEvent.getEventId()).build())
-            .data(caseData.toMap(objectMapper))
+            .data(freshCaseData.toMap(objectMapper))
             .build();
 
         coreCaseDataService.submitUpdate(String.valueOf(caseId), caseDataContent);
+    }
+
+    private String getStatus(CardPaymentStatusResponse response) {
+        return response != null ? response.getStatus() : "N/A";
+    }
+
+    private String getErrorCode(CardPaymentStatusResponse response) {
+        return response != null ? response.getErrorCode() : "N/A";
     }
 }

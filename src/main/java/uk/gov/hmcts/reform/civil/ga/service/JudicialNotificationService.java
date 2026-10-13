@@ -179,15 +179,17 @@ public class JudicialNotificationService implements NotificationDataGA {
 
     private void sendNotificationForJudicialDecision(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData, String recipient, String template)
         throws NotificationException {
-        try {
-            log.info("JudicialNotificationService.class::sendNotificationForJudicialDecision::templateId: {}",
-                     template);
-            notificationService.sendMail(recipient, template, addProperties(caseData, mainCaseData),
-                                         String.format(REFERENCE_TEMPLATE,
-                                                       caseData.getGeneralAppParentCaseLink().getCaseReference()));
-        } catch (NotificationException e) {
-            throw new NotificationException(e);
-        }
+        log.info(
+            "JudicialNotificationService.class::sendNotificationForJudicialDecision::templateId: {}",
+            template
+        );
+        notificationService.sendMail(
+            recipient, template, addProperties(caseData, mainCaseData),
+            String.format(
+                REFERENCE_TEMPLATE,
+                caseData.getGeneralAppParentCaseLink().getCaseReference()
+            )
+        );
     }
 
     private void concurrentWrittenRepNotification(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData, String solicitorType) {

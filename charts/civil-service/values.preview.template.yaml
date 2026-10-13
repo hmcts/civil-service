@@ -14,6 +14,7 @@ java:
     CMC_DB_PASSWORD: ${POSTGRES_PASSWORD}
     CMC_DB_CONNECTION_OPTIONS: '?sslmode=allow'
     REFERENCE_DATABASE_MIGRATION: true
+    SPRING_FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK: "false"
     EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccdorc
     CAMUNDA_URL: http://${SERVICE_NAME}-camunda/engine-rest/
     SERVICE_REQUEST_UPDATE: https://${SERVICE_NAME}.preview.platform.hmcts.net/service-request-update
@@ -138,13 +139,6 @@ java:
     auth:
       username: ${POSTGRES_USER}
       password: ${POSTGRES_PASSWORD}
-
-idam-pr:
-  releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
-  enabled: true
-  redirect_uris:
-    XUI:
-      - https://xui-${SERVICE_NAME}.preview.platform.hmcts.net/oauth2/callback
 
 xui-webapp:
   enabled: true

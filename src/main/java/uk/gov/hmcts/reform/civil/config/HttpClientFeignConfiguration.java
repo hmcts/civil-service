@@ -4,7 +4,9 @@ import com.microsoft.applicationinsights.TelemetryClient;
 import feign.Client;
 import feign.Request;
 import feign.Response;
+import feign.codec.ErrorDecoder;
 import feign.httpclient.ApacheHttpClient;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -18,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
+@Slf4j
 public class HttpClientFeignConfiguration {
 
     @Value("${http.client.connectTimeout:5000}")
@@ -38,6 +41,19 @@ public class HttpClientFeignConfiguration {
         connectionManager.setMaxTotal(maxTotal);
         connectionManager.setDefaultMaxPerRoute(maxPerRoute);
         return connectionManager;
+    }
+
+    /**
+     * Feign's own default decoder, registered as a bean so that every client shares it and
+     * {@code ErrorDecoderTelemetryAspect} can advise it. Spring AOP only sees Spring beans:
+     * when Feign instantiates {@code ErrorDecoder.Default} internally (which it does once
+     * Holunda's global decoder is disabled) the aspect never fires and the
+     * {@code httpclient.feign.error.classified} event is never emitted. Behaviour of the
+     * clients is unchanged; this is the decoder they would use anyway.
+     */
+    @Bean
+    public ErrorDecoder feignErrorDecoder() {
+        return new ErrorDecoder.Default();
     }
 
     @Bean
@@ -101,7 +117,13 @@ public class HttpClientFeignConfiguration {
                 reportMetrics(service, System.currentTimeMillis() - startTime, true, null);
                 return response;
             } catch (Exception e) {
-                reportMetrics(service, System.currentTimeMillis() - startTime, false, e);
+                long duration = System.currentTimeMillis() - startTime;
+                log.error(
+                    "Outbound Feign request failed: targetHost={}, method={}, elapsedMs={}, connectTimeoutMs={}, readTimeoutMs={}, exceptionType={}",
+                    service, request.httpMethod(), duration, options.connectTimeoutMillis(), options.readTimeoutMillis(),
+                    e.getClass().getName()
+                );
+                reportMetrics(service, duration, false, e);
                 throw e;
             }
         }

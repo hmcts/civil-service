@@ -6,6 +6,15 @@
               value="%d{${LOGBACK_DATE_FORMAT:-yyyy-MM-dd'T'HH:mm:ss.SSS}} %-5level [%thread] %logger{${LOGGER_LENGTH:-50}} %pii(%msg%n%ex{${EXCEPTION_LENGTH:-50}})"/>
     <include resource="reform-base.xml"/>
 
+    <!--
+      Demotes self-recovering Camunda external-task polling errors (gateway 5xx, dropped
+      connections, unparseable error bodies - EXC-CS-020) to a rate-limited WARN summary.
+      Genuine client faults from org.camunda.bpm.client are left at ERROR.
+    -->
+    <turboFilter class="uk.gov.hmcts.reform.civil.logging.CamundaPollingErrorTurboFilter">
+        <windowSeconds>${CAMUNDA_POLLING_ERROR_WINDOW_SECONDS:-60}</windowSeconds>
+    </turboFilter>
+
     <root level="${ROOT_LOGGING_LEVEL:-INFO}">
         <appender-ref ref="${ROOT_APPENDER:-ASYNC_CONSOLE}"/>
     </root>

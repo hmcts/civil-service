@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoReconsiderationDeadlineService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -43,9 +44,9 @@ class CreateSdoDefendantDashboardServiceTest {
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @Mock
-    private CreateSdoDashboardDate createSdoDashboardDate;
-    @Mock
     private DashboardNotificationHelper dashboardDecisionHelper;
+    @Mock
+    private SdoReconsiderationDeadlineService reconsiderationDeadlineService;
 
     @InjectMocks
     private CreateSdoDefendantDashboardService createSdoDefendantDashboardService;
@@ -371,7 +372,7 @@ class CreateSdoDefendantDashboardServiceTest {
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
-        when(dashboardDecisionHelper.isEligibleForReconsideration(any())).thenReturn(true);
+        when(reconsiderationDeadlineService.isEligibleForReconsideration(any())).thenReturn(true);
 
         createSdoDefendantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 
@@ -393,7 +394,7 @@ class CreateSdoDefendantDashboardServiceTest {
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
-        when(dashboardDecisionHelper.isEligibleForReconsideration(any())).thenReturn(false);
+        when(reconsiderationDeadlineService.isEligibleForReconsideration(any())).thenReturn(false);
 
         createSdoDefendantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 
@@ -422,7 +423,7 @@ class CreateSdoDefendantDashboardServiceTest {
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(dashboardDecisionHelper.isDashBoardEnabledForCase(caseData)).thenReturn(true);
-        when(dashboardDecisionHelper.isEligibleForReconsideration(any())).thenReturn(true);
+        when(reconsiderationDeadlineService.isEligibleForReconsideration(any())).thenReturn(true);
 
         createSdoDefendantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 

@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.scheduler.common.DefaultBackPressureConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTask;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskBackPressureConfiguration;
-import uk.gov.hmcts.reform.civil.scheduler.hearingfee.publisher.HearingFeePublisherProvider;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 @Component
@@ -19,7 +18,7 @@ public class HearingFeeSchedulerTask implements ScheduledTask<CaseDetails, Long>
 
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
-    private final HearingFeePublisherProvider hearingFeePublisherProvider;
+    private final HearingFeePublisherService hearingFeePublisherService;
     private final DefaultBackPressureConfiguration defaultBackPressureConfiguration;
 
     @Override
@@ -32,7 +31,7 @@ public class HearingFeeSchedulerTask implements ScheduledTask<CaseDetails, Long>
         Long caseId = caseDetails.getId();
         log.info("HearingFeeSchedulerTask::accept case {}", caseId);
         CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId));
-        hearingFeePublisherProvider.provide(caseData).accept(caseId);
+        hearingFeePublisherService.publishHearingFeeEvent(caseData);
     }
 
     @Override

@@ -30,6 +30,7 @@ public class SdoSubmissionService {
     private final SdoLocationService sdoLocationService;
     private final DirectionsOrderCaseProgressionService directionsOrderCaseProgressionService;
     private final SdoCaseClassificationService caseClassificationService;
+    private final SdoReconsiderationDeadlineService reconsiderationDeadlineService;
 
     public CaseData prepareSubmission(CaseData caseData, String authToken) {
         log.info("Preparing SDO submission payload for caseId {}", caseData.getCcdCaseReference());
@@ -38,6 +39,7 @@ public class SdoSubmissionService {
 
         moveGeneratedDocument(caseData);
         updateClaimsTrack(caseData);
+        setRequestForReconsiderationDeadline(caseData);
         directionsOrderCaseProgressionService.applyCaseProgressionRouting(caseData, authToken, false, true);
         trimMethodLocations(caseData);
         updateSmallClaimsHearing(caseData);
@@ -67,6 +69,13 @@ public class SdoSubmissionService {
         }
 
         caseData.setSdoOrderDocument(null);
+    }
+
+    private void setRequestForReconsiderationDeadline(CaseData caseData) {
+        if (caseData.getRequestForReconsiderationDeadline() == null
+            && reconsiderationDeadlineService.isEligibleForReconsideration(caseData)) {
+            caseData.setRequestForReconsiderationDeadline(reconsiderationDeadlineService.calculateReconsiderationDeadline());
+        }
     }
 
     private void trimMethodLocations(CaseData caseData) {

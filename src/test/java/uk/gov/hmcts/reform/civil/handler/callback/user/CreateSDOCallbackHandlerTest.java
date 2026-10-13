@@ -132,6 +132,7 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoNihlFieldsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoNihlOrderService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoOrderDetailsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoPrePopulateService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoReconsiderationDeadlineService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsDirectionsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsNarrativeService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsOrderDefaultsService;
@@ -360,6 +361,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private FeatureToggleService featureToggleService;
+
+    @MockBean
+    private SdoReconsiderationDeadlineService reconsiderationDeadlineService;
 
     @Autowired
     private CreateSDOCallbackHandler handler;

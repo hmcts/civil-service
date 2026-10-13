@@ -199,6 +199,7 @@ public class NocNotificationUtils {
 
     public static CaseData getCaseDataWithoutFormerSolicitorEmail(CaseData caseData) {
         caseData.getChangeOfRepresentation().setFormerRepresentationEmailAddress(null);
+        caseData.getChangeOfRepresentation().setFormerRepresentationReference(null);
         return caseData;
     }
 }
