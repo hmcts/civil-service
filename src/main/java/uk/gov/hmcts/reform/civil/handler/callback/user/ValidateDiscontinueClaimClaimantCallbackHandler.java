@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
 import java.util.List;
 import java.util.Map;
@@ -32,8 +33,10 @@ import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARENT_CLAIM_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_DISCONTINUE_CLAIM_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -51,6 +54,7 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
     private final ObjectMapper objectMapper;
     private static final String BOTH = "Both";
     private final FeatureToggleService featureToggleService;
+    private final GenAppStateHelperService genAppStateHelperService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -79,6 +83,7 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
             .AboutToStartOrSubmitCallbackResponseBuilder aboutToStartOrSubmitCallbackResponseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder();
 
+        String nextState = null;
         if (caseData.getTypeOfDiscontinuance() != null
             && ConfirmOrderGivesPermission.YES.equals(caseData.getConfirmOrderGivesPermission())) {
             if (DiscontinuanceTypeList.FULL_DISCONTINUANCE.equals(caseData.getTypeOfDiscontinuance())) {
@@ -90,7 +95,8 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
                         && CaseState.JUDGMENT_REQUESTED.equals(caseData.getCcdState())) {
                         JudgmentsOnlineHelper.clearJOCaseData(caseData);
                     }
-                    aboutToStartOrSubmitCallbackResponseBuilder.state(CaseState.CASE_DISCONTINUED.name());
+                    nextState = CASE_DISCONTINUED.name();
+                    aboutToStartOrSubmitCallbackResponseBuilder.state(nextState);
                 } else {
                     caseData.setConfirmOrderGivesPermission(caseData.getConfirmOrderGivesPermission());
                 }
@@ -99,9 +105,14 @@ public class ValidateDiscontinueClaimClaimantCallbackHandler extends CallbackHan
                     && CaseState.JUDGMENT_REQUESTED.equals(caseData.getCcdState())) {
                     JudgmentsOnlineHelper.clearJOCaseData(caseData);
                 }
-                aboutToStartOrSubmitCallbackResponseBuilder.state(CaseState.CASE_DISCONTINUED.name());
+                nextState = CASE_DISCONTINUED.name();
+                aboutToStartOrSubmitCallbackResponseBuilder.state(nextState);
             } else {
                 caseData.setConfirmOrderGivesPermission(caseData.getConfirmOrderGivesPermission());
+            }
+
+            if (CASE_DISCONTINUED.name().equals(nextState)) {
+                genAppStateHelperService.triggerEvent(caseData, PARENT_CLAIM_DISCONTINUED);
             }
         }
 
