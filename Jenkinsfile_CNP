@@ -97,6 +97,7 @@ def createBpmnGithubRelease() {
 }
 
 withPipeline(type, product, component) {
+  alwaysTerraformPlanOnPR()
   pipelineConf = config
   disableLegacyDeployment()
   enableAksStagingDeployment()
