@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@DTSPO-35800/gradle-stashing-exclude")
+@Library("Infrastructure@2.12.1")
 
 import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
