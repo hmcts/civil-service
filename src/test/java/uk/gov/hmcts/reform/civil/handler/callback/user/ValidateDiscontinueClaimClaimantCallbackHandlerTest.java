@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -43,11 +44,14 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_NOTICE_OF_DISCONTINUANCE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARENT_CLAIM_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_DISCONTINUE_CLAIM_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.NOTICE_OF_DISCONTINUANCE;
 
@@ -62,6 +66,8 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
         No further action required.""";
     @Mock
     FeatureToggleService featureToggleService;
+    @Mock
+    GenAppStateHelperService genAppStateHelperService;
     @Spy
     private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     @InjectMocks
@@ -125,6 +131,7 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             assertThat(updatedData.getConfirmOrderGivesPermission()).isNull();
             assertThat(updatedData.getBusinessProcess().getCamundaEvent())
                 .isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
+            verify(genAppStateHelperService, never()).triggerEvent(caseData, PARENT_CLAIM_DISCONTINUED);
         }
 
         @Test
@@ -147,6 +154,7 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             assertThat(response.getState()).isNull();
             assertThat(updatedData.getBusinessProcess().getCamundaEvent())
                 .isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
+            verify(genAppStateHelperService, never()).triggerEvent(caseData, PARENT_CLAIM_DISCONTINUED);
         }
 
         @Test
@@ -166,6 +174,7 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             assertThat(updatedData.getConfirmOrderGivesPermission()).isEqualTo(ConfirmOrderGivesPermission.YES);
             assertThat(updatedData.getBusinessProcess().getCamundaEvent())
                 .isEqualTo(VALIDATE_DISCONTINUE_CLAIM_CLAIMANT.name());
+            verify(genAppStateHelperService).triggerEvent(caseData, PARENT_CLAIM_DISCONTINUED);
         }
 
         @Test
