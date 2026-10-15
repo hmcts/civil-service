@@ -1,0 +1,2 @@
+org.springframework.test.context.TestExecutionListener=\
+uk.gov.hmcts.reform.civil.testutils.MockitoAnnotationsTestExecutionListener

@@ -6,9 +6,9 @@ import org.apache.tika.Tika;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -43,7 +43,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = {
     SecuredDocumentManagementService.class,
     SecuredDocumentManagementServiceRetryTest.TestRetryConfig.class,
-    JacksonAutoConfiguration.class,
+    Jackson2AutoConfiguration.class,
     DocumentManagementConfiguration.class, Tika.class})
 class SecuredDocumentManagementServiceRetryTest {
 
@@ -57,13 +57,13 @@ class SecuredDocumentManagementServiceRetryTest {
     static class TestRetryConfig {
     }
 
-    @MockBean
+    @MockitoBean
     private CaseDocumentClientApi caseDocumentClientApi;
-    @MockBean
+    @MockitoBean
     private DocumentDownloadClientApi documentDownloadClient;
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
-    @MockBean
+    @MockitoBean
     private UserService userService;
     @Autowired
     private SecuredDocumentManagementService documentManagementService;

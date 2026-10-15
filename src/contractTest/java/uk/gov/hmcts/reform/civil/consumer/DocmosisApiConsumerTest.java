@@ -10,7 +10,7 @@ import org.json.JSONException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.TestPropertySource;
@@ -48,7 +48,7 @@ public class DocmosisApiConsumerTest extends BaseContractTest {
     @Autowired
     private DocumentConversionService documentConversionService;
 
-    @MockBean
+    @MockitoBean
     private DocumentManagementService documentManagementService;
 
     @Pact(consumer = "civil_service")
