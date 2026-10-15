@@ -221,7 +221,7 @@ public class ConversionToBundleRequestDocs {
     }
 
     private boolean isBundledDocument(Document document) {
-        return document.getCategoryID() != null && !UNBUNDLED_FOLDER.equals(document.getCategoryID());
+        return document != null && document.getCategoryID() != null && !UNBUNDLED_FOLDER.equals(document.getCategoryID());
     }
 
     private String getExpertise(String documentType, UploadEvidenceExpert uploadEvidenceExpert) {

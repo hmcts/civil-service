@@ -6,6 +6,8 @@ import feign.Response;
 import org.apache.tika.Tika;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,15 +23,20 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -154,14 +161,79 @@ class SecuredDocumentManagementServiceRetryTest {
         verify(userService, times(1)).getUserInfo(BEARER_TOKEN);
     }
 
+    enum EmptyResponse {
+        NULL_METADATA, METADATA_DECODER_NPE, BINARY_DECODER_NPE, NULL_BINARY_BODY
+    }
+
+    @ParameterizedTest
+    @EnumSource(EmptyResponse.class)
+    void downloadDocumentWithMetaData_emptyResponse_isRetriedThreeTimes(EmptyResponse failure) {
+        String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
+        NullPointerException decoderFailure = new NullPointerException("Feign response body is null");
+
+        switch (failure) {
+            case NULL_METADATA -> when(caseDocumentClientApi.getMetadataForDocument(
+                anyString(), anyString(), any(UUID.class))).thenReturn(null);
+            case METADATA_DECODER_NPE -> when(caseDocumentClientApi.getMetadataForDocument(
+                anyString(), anyString(), any(UUID.class))).thenThrow(decoderFailure);
+            case BINARY_DECODER_NPE, NULL_BINARY_BODY -> {
+                when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), any(UUID.class)))
+                    .thenReturn(document(1024));
+                if (failure == EmptyResponse.BINARY_DECODER_NPE) {
+                    when(caseDocumentBinaryApiClient.getDocumentBinary(anyString(), anyString(), any(UUID.class)))
+                        .thenThrow(decoderFailure);
+                } else {
+                    when(caseDocumentBinaryApiClient.getDocumentBinary(anyString(), anyString(), any(UUID.class)))
+                        .thenAnswer(invocation -> binaryResponse(200, null));
+                }
+            }
+            default -> throw new IllegalArgumentException("Unexpected failure: " + failure);
+        }
+
+        DocumentDownloadException exception = assertThrows(DocumentDownloadException.class,
+            () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath));
+
+        assertEquals(String.format(DocumentDownloadException.MESSAGE_TEMPLATE, documentPath), exception.getMessage());
+        if (failure == EmptyResponse.METADATA_DECODER_NPE || failure == EmptyResponse.BINARY_DECODER_NPE) {
+            assertSame(decoderFailure, exception.getCause());
+        }
+        verify(caseDocumentClientApi, times(3))
+            .getMetadataForDocument(anyString(), anyString(), any(UUID.class));
+        boolean binaryCalled = failure == EmptyResponse.BINARY_DECODER_NPE || failure == EmptyResponse.NULL_BINARY_BODY;
+        verify(caseDocumentBinaryApiClient, binaryCalled ? times(3) : never())
+            .getDocumentBinary(anyString(), anyString(), any(UUID.class));
+        verifyNoInteractions(documentDownloadClient);
+    }
+
+    @Test
+    void downloadDocumentWithMetaData_emptyMetadataThenSuccess_returnsDocument() throws IOException {
+        byte[] content = {1, 2, 3};
+        when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), any(UUID.class)))
+            .thenReturn(null, document(content.length));
+        when(caseDocumentBinaryApiClient.getDocumentBinary(anyString(), anyString(), any(UUID.class)))
+            .thenAnswer(invocation -> binaryResponse(200, content));
+
+        String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
+        var response = documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath);
+
+        assertArrayEquals(content, response.file().getContentAsByteArray());
+        verify(caseDocumentClientApi, times(2))
+            .getMetadataForDocument(anyString(), anyString(), any(UUID.class));
+        verify(caseDocumentBinaryApiClient).getDocumentBinary(anyString(), anyString(), any(UUID.class));
+    }
+
     private static Document document(long size) {
         return Document.builder().size(size).originalDocumentName("TEST_DOCUMENT_1.pdf").build();
     }
 
     private static Response binaryResponse(int status) {
+        return binaryResponse(status, new byte[]{});
+    }
+
+    private static Response binaryResponse(int status, byte[] body) {
         Request request = Request.create(
             Request.HttpMethod.GET, "/cases/documents/x/binary", Map.of(), new byte[]{}, StandardCharsets.UTF_8, null);
-        return Response.builder().status(status).request(request).headers(Map.of()).body(new byte[]{}).build();
+        return Response.builder().status(status).request(request).headers(Map.of()).body(body).build();
     }
 
     private static FeignException buildFeignException(int status) {
