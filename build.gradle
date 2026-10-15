@@ -806,12 +806,9 @@ tasks.register('contract', Test) {
   systemProperty 'pact.content_type.override.application/x-www-form-urlencoded', 'text'
 }
 
-tasks.register('runAndPublishConsumerPactTests', Test) {
+tasks.register('runAndPublishConsumerPactTests') {
   dependsOn(contract)
   logger.lifecycle("Runs pact Tests")
-  testClassesDirs = sourceSets.contractTest.output.classesDirs
-  classpath = sourceSets.contractTest.runtimeClasspath
-  systemProperty 'pact.content_type.override.application/x-www-form-urlencoded', 'text'
   finalizedBy(pactPublish)
 }
 
