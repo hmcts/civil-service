@@ -1,4 +1,10 @@
 {
+  "Breathing space lift pending scheduler": {
+    "purpose": "Lifts breathing space when a saved end date has been reached.",
+    "topics": [
+      "BREATHING_SPACE_LIFT_PENDING"
+    ]
+  },
   "Bundle creation scheduler": {
     "purpose": "Builds bundles for eligible hearings each evening.",
     "springScheduler": "BundleCreation",
