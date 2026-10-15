@@ -34,6 +34,13 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_LIP_
  * instance remains on a pre migration version of the definition, which can be confirmed from the
  * engine rather than assumed from elapsed time.</p>
  *
+ * <p>The removal takes this class and the {@code NOTIFY_APPLICANT_LIP_HWF} entry in
+ * civil-ccd-definition, but not the {@link uk.gov.hmcts.reform.civil.callback.CaseEvent} value
+ * itself. That name has a second, unrelated role: the five HWF user callbacks set it as the
+ * business process event, and {@code GaEventEmitterService} correlates it as the Camunda start
+ * message that launches {@code GA_NOTIFY_HWF}. Deleting the enum value or the
+ * {@code bpmn:message} would stop the process starting at all.</p>
+ *
  * @deprecated retained only to drain in flight process instances. See DTSCCI-6726.
  */
 @Deprecated(forRemoval = true)
