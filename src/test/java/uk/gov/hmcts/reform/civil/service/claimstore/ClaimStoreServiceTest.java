@@ -60,6 +60,11 @@ public class ClaimStoreServiceTest {
         Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
         "gateway timeout response body".getBytes(UTF_8),
         Map.of());
+    private final FeignException unauthorizedException = new FeignException.Unauthorized(
+        "unauthorized message",
+        Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
+        "unauthorized response body".getBytes(UTF_8),
+        Map.of());
     private static final List<DashboardClaimInfo> EXPECTED_CLAIM_RESULT
         = Arrays.asList(new DashboardClaimInfo()
                             .setClaimNumber(
@@ -116,6 +121,26 @@ public class ClaimStoreServiceTest {
     void shouldReturnEmptyListForDefendantWhenCmcClaimStoreIsUnavailable() {
         given(claimStoreApi.getClaimsForDefendant(any(), any())).willThrow(FeignException.FeignClientException.class);
         List<DashboardClaimInfo> resultClaims = claimStoreService.getClaimsForDefendant("23746486", "1234");
+        verify(claimStoreApi).getClaimsForDefendant("23746486", "1234");
+        assertThat(resultClaims).isEmpty();
+    }
+
+    @Test
+    void shouldReturnEmptyListForClaimantWhenCmcClaimStoreReturnsUnauthorized() {
+        given(claimStoreApi.getClaimsForClaimant(any(), any())).willThrow(unauthorizedException);
+
+        List<DashboardClaimInfo> resultClaims = claimStoreService.getClaimsForClaimant("23746486", "1234");
+
+        verify(claimStoreApi).getClaimsForClaimant("23746486", "1234");
+        assertThat(resultClaims).isEmpty();
+    }
+
+    @Test
+    void shouldReturnEmptyListForDefendantWhenCmcClaimStoreReturnsUnauthorized() {
+        given(claimStoreApi.getClaimsForDefendant(any(), any())).willThrow(unauthorizedException);
+
+        List<DashboardClaimInfo> resultClaims = claimStoreService.getClaimsForDefendant("23746486", "1234");
+
         verify(claimStoreApi).getClaimsForDefendant("23746486", "1234");
         assertThat(resultClaims).isEmpty();
     }
