@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.settleanddiscontinue.ClaimSettledDefendantLiPLetterGenerator;
@@ -110,6 +111,24 @@ public class DefendantLetterHandlerTest extends BaseCallbackHandlerTest {
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1Represented(YesOrNo.NO).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        params.getRequest().setEventId(SEND_UNSPEC_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1.name());
+
+        // when
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // then
+        assertThat(response.getErrors()).isNull();
+        verify(lipLetterGenerator, never()).generateAndPrintClaimSettledLetter(any(), anyString());
+    }
+
+    @Test
+    void shouldNotGenerateLetter_whenMultiParty() {
+        // given
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1Represented(YesOrNo.NO).build();
+        caseData.setPreStayState(AWAITING_CASE_DETAILS_NOTIFICATION.name());
+        caseData.setRespondent2(new Party().setType(Party.Type.COMPANY).setCompanyName("Defendant Two"));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_UNSPEC_CLAIM_SETTLED_LETTER_TO_LIP_DEFENDANT1.name());
 
