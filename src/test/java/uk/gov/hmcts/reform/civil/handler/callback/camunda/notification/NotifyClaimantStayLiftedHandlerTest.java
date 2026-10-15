@@ -196,6 +196,8 @@ class NotifyClaimantStayLiftedHandlerTest {
         notificationData.put("claimReferenceNumber", "1594901956117591");
         notificationData.put("name", "John Doe");
         notificationData.put("claimantvdefendant", "John Doe V Jack Jackson");
+        notificationData.put("claim16DigitNumber", "1594901956117591");
+        notificationData.put("casemanRef", caseData.getLegacyCaseReference());
 
         verify(notificationService).sendMail(
             isRespondentLiP ? "claimant@hmcts.net" : "solicitor@example.com",

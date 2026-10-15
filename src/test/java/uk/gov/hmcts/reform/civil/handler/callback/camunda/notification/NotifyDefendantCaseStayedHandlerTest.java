@@ -150,6 +150,9 @@ class NotifyDefendantCaseStayedHandlerTest {
             : "John Doe V Jack Jackson, John Johnson");
         notificationData.put("partyReferences", buildPartiesReferencesEmailSubject(caseData));
         notificationData.put("casemanRef", caseData.getLegacyCaseReference());
+        if (isRespondentLiP) {
+            notificationData.put("claim16DigitNumber", "1594901956117591");
+        }
 
         verify(notificationService).sendMail(
             isRespondent1 ? email : "solicitor2@gmail.com",

@@ -27,6 +27,8 @@ import java.util.Objects;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addLipClaimantVDefendant;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addSubjectReferences;
 
 @Slf4j
 @Service
@@ -70,6 +72,7 @@ public class HearingScheduledNotificationService implements NotificationDataGA {
             customProps.remove(GA_LIP_APPLICANT_NAME);
             customProps.remove(GA_LIP_RESP_NAME);
         }
+        addSubjectReferences(mainCaseData, caseData.getGeneralAppParentCaseLink().getCaseReference(), customProps);
         addAllFooterItems(caseData, mainCaseData, customProps, configuration,
                            featureToggleService.isPublicQueryManagementEnabledGa(caseData));
         return customProps;
@@ -92,6 +95,10 @@ public class HearingScheduledNotificationService implements NotificationDataGA {
         }
 
         addProperties(caseData, mainCaseData);
+        if ((gaForLipService.isLipApp(caseData) && gaLipType.equals(APPLICANT))
+            || (gaForLipService.isLipResp(caseData) && gaLipType.equals(RESPONDENT))) {
+            addLipClaimantVDefendant(caseData, customProps);
+        }
         return customProps;
     }
 
