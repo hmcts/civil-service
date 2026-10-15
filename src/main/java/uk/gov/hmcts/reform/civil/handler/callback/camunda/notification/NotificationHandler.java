@@ -63,7 +63,7 @@ public class NotificationHandler extends CallbackHandler {
     private CallbackResponse sendNotifications(CallbackParams callbackParams) {
         final CaseData caseData = callbackParams.getCaseData();
         final String taskId = caseData.getBusinessProcess().getActivityId();
-        final Notifier notifier = notifierFactory.getNotifier(taskId);
+        final Notifier<CaseData> notifier = notifierFactory.getNotifier(taskId);
 
         if (notifier == null) {
             throw new IllegalStateException(

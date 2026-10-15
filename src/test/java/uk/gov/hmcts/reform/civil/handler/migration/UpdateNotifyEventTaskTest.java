@@ -19,9 +19,11 @@ import static org.mockito.Mockito.when;
 class UpdateNotifyEventTaskTest {
 
     private NotifierFactory notifierFactory;
-    private Notifier notifier;
+    private Notifier<CaseData> notifier;
     private UpdateNotifyEventTask task;
 
+    // mock() cannot carry the type argument, so the assignment to Notifier<CaseData> is unchecked
+    @SuppressWarnings("unchecked")
     @BeforeEach
     void setUp() {
         notifierFactory = mock(NotifierFactory.class);

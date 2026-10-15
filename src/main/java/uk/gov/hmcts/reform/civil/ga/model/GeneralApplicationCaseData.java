@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.model;
 
+import uk.gov.hmcts.reform.civil.notification.handlers.NotifiableCaseData;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -103,7 +104,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.POST_JUDGE_OR
 @EqualsAndHashCode(callSuper = false)
 @Data
 @NoArgsConstructor
-public class GeneralApplicationCaseData extends BaseCaseData implements MappableObject {
+public class GeneralApplicationCaseData extends BaseCaseData implements MappableObject, NotifiableCaseData {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Long ccdCaseReference;

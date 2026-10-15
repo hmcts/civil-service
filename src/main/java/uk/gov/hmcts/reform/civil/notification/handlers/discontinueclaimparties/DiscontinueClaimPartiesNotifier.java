@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.discontinueclaimparties;
 
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
 
@@ -9,7 +10,7 @@ import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.DiscontinuanceClaimNotifyParties;
 
 @Component
-public class DiscontinueClaimPartiesNotifier extends Notifier {
+public class DiscontinueClaimPartiesNotifier extends Notifier<CaseData> {
 
     private static final String TASK_ID = DiscontinuanceClaimNotifyParties.toString();
 

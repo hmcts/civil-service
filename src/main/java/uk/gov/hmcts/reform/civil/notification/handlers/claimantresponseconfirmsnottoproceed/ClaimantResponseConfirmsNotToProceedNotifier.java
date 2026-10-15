@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmsnottoproceed;
 
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -7,7 +8,7 @@ import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.ClaimantResponseConfirmsNotToProceedNotify;
 
 @Component
-public class ClaimantResponseConfirmsNotToProceedNotifier extends Notifier {
+public class ClaimantResponseConfirmsNotToProceedNotifier extends Notifier<CaseData> {
 
     public ClaimantResponseConfirmsNotToProceedNotifier(NotificationService notificationService, CaseTaskTrackingService caseTaskTrackingService,
                                                         ClaimantResponseConfirmsNotToProceedAllLegalRepsEmailGenerator partiesNotifier) {

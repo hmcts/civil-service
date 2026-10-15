@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
-import uk.gov.hmcts.reform.civil.model.CaseData;
-
 import java.util.Set;
 
-public interface PartiesEmailGenerator {
+public interface PartiesEmailGenerator<T extends NotifiableCaseData> {
 
-    Set<EmailDTO> getPartiesToNotify(CaseData caseData, String taskId);
+    Set<EmailDTO> getPartiesToNotify(T caseData, String taskId);
 }

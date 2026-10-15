@@ -25,7 +25,7 @@ import java.util.Set;
 @Component
 @AllArgsConstructor
 @Slf4j
-public class MediationUpdateAllPartiesEmailGenerator implements PartiesEmailGenerator {
+public class MediationUpdateAllPartiesEmailGenerator implements PartiesEmailGenerator<CaseData> {
 
     private final CarmAppSolOneEmailDTOGenerator carmAppSolOneEmailDTOGenerator;
     private final CarmRespSolOneEmailDTOGenerator carmRespSolOneEmailDTOGenerator;
