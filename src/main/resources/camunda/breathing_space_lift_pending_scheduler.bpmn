@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_breathing_space_lift_pending" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.1.0">
+  <bpmn:process id="BREATHING_SPACE_LIFT_PENDING_SCHEDULER" name="Breathing space lift pending scheduler" isExecutable="true" camunda:historyTimeToLive="P90D">
+    <bpmn:sequenceFlow id="Flow_start_to_task" sourceRef="Start_Scheduler" targetRef="BreathingSpaceLiftPending" />
+    <bpmn:sequenceFlow id="Flow_task_to_end" sourceRef="BreathingSpaceLiftPending" targetRef="End_Scheduler" />
+    <bpmn:serviceTask id="BreathingSpaceLiftPending" name="Breathing space lift pending scheduler" camunda:type="external" camunda:topic="BREATHING_SPACE_LIFT_PENDING">
+      <bpmn:incoming>Flow_start_to_task</bpmn:incoming>
+      <bpmn:outgoing>Flow_task_to_end</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:startEvent id="Start_Scheduler">
+      <bpmn:outgoing>Flow_start_to_task</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="Timer_BreathingSpaceLiftPending">
+        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">0 5 0 * * ?</bpmn:timeCycle>
+      </bpmn:timerEventDefinition>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="End_Scheduler">
+      <bpmn:incoming>Flow_task_to_end</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_breathing_space_lift_pending">
+    <bpmndi:BPMNPlane id="BPMNPlane_breathing_space_lift_pending" bpmnElement="BREATHING_SPACE_LIFT_PENDING_SCHEDULER">
+      <bpmndi:BPMNEdge id="Flow_task_to_end_di" bpmnElement="Flow_task_to_end">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="432" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_start_to_task_di" bpmnElement="Flow_start_to_task">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BreathingSpaceLiftPending_di" bpmnElement="BreathingSpaceLiftPending">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_Scheduler_di" bpmnElement="Start_Scheduler">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Scheduler_di" bpmnElement="End_Scheduler">
+        <dc:Bounds x="432" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
