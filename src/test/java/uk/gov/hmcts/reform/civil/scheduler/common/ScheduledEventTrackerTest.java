@@ -310,4 +310,22 @@ class ScheduledEventTrackerTest {
             )
         );
     }
+
+    @Test
+    void shouldTrackBackPressureUpdatedEvent() {
+        scheduledEventTracker.backPressureUpdatedEvent(
+            eventConfig,
+            Duration.ofMillis(100),
+            Duration.ofMillis(200)
+        );
+
+        verify(telemetryService).trackEvent(
+            "TestSchedulerBackPressureUpdated",
+            Map.of(
+                "schedulerName", "TestScheduler",
+                "previousDelay", "100",
+                "currentDelay", "200"
+            )
+        );
+    }
 }
