@@ -13,6 +13,8 @@ java:
   devcpuLimits: 3500m
   startupDelay: 30
   startupTimeout: 5
+  startupPeriod: 20
+  startupFailureThreshold: 15
   environment:
     CORE_CASE_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
     OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
