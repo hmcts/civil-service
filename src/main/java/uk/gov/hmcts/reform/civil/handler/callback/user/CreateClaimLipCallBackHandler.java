@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
@@ -18,6 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
@@ -31,6 +34,8 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CaseServiceUtil;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
+import uk.gov.hmcts.reform.draftstore.DraftType;
+import uk.gov.hmcts.reform.draftstore.services.DraftStoreService;
 
 import java.util.Collections;
 import java.util.List;
@@ -63,6 +68,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     private final HelpWithFeesForTabService helpWithFeesForTabService;
     private final FeatureToggleService featureToggleService;
     private final LocationReferenceDataService locationRefDataService;
+    private final DraftStoreService draftStoreService;
 
     @Value("${court-location.specified-claim.epimms-id}")
     private String epimmsId;
@@ -74,7 +80,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
             .put(callbackKey(V_1, ABOUT_TO_START), this::lipClaimInitialState)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
-            .put(callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse)
+            .put(callbackKey(SUBMITTED), this::linkDraftBySubmissionIdOnSubmitted)
             .build();
     }
 
@@ -152,5 +158,51 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
 
     private void setUpHelpWithFees(CaseData caseData) {
         helpWithFeesForTabService.setUpHelpWithFeeTab(caseData);
+    }
+
+    private CallbackResponse linkDraftBySubmissionIdOnSubmitted(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        String userId = Optional.ofNullable(caseData.getClaimantUserDetails())
+            .map(IdamUserDetails::getId)
+            .orElse(null);
+        String caseId = resolveCaseId(callbackParams, caseData);
+        String submissionId = caseData.getLipClaimSubmissionId();
+
+        if (userId == null || caseId == null || submissionId == null || submissionId.isBlank()) {
+            log.warn(
+                "Skipping draft link on CREATE_LIP_CLAIM submitted: missing userId={} caseId={} or submissionId={}",
+                userId,
+                caseId,
+                submissionId
+            );
+            return SubmittedCallbackResponse.builder().build();
+        }
+
+        try {
+            draftStoreService.linkDraftBySubmissionId(
+                userId,
+                caseId,
+                submissionId,
+                DraftType.DRAFT_CLAIM
+            );
+        } catch (RuntimeException ex) {
+            log.warn(
+                "Failed to link draft by submissionId for userId={} caseId={} submissionId={} on CREATE_LIP_CLAIM submitted",
+                userId,
+                caseId,
+                submissionId,
+                ex
+            );
+        }
+        return SubmittedCallbackResponse.builder().build();
+    }
+
+    private static String resolveCaseId(CallbackParams callbackParams, CaseData caseData) {
+        return Optional.ofNullable(callbackParams.getRequest())
+            .map(CallbackRequest::getCaseDetails)
+            .map(CaseDetails::getId)
+            .map(Object::toString)
+            .or(() -> Optional.ofNullable(caseData.getCcdCaseReference()).map(Object::toString))
+            .orElse(null);
     }
 }
