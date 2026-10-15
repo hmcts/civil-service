@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.Dashboard
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 
@@ -25,7 +26,7 @@ public class RemoveDefaultJudgmentDashboardTask extends DashboardServiceTask {
         if (!dashboardNotificationHelper.isAwaitingWelshTranslation(caseData, DEFENDANT_RESPONSE_SPEC)) {
             return;
         }
-        if (caseData.getRespondent1ResponseDeadline().isBefore(LocalDateTime.now())) {
+        if (caseData.getRespondent1ResponseDeadline().isBefore(LocalDateTime.now(ZoneId.systemDefault()))) {
             dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(DJ_NOTIFICATION,
                                                                                 String.valueOf(caseData.getCcdCaseReference()),
                                                                                 CLAIMANT_ROLE

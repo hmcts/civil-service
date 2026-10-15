@@ -57,16 +57,7 @@ class DeleteApplicationPaymentDashboardTaskTest {
     }
 
     @Test
-    void shouldSkipTranslatedApplication() {
-        GeneralApplicationCaseData caseData = mock(GeneralApplicationCaseData.class);
-
-        execute(caseData);
-
-        verifyNoInteractions(client, gaForLipService);
-    }
-
-    @Test
-    void shouldSkipEnglishSubmission() {
+    void shouldSkipWhenApplicationIsNotAwaitingWelshTranslation() {
         GeneralApplicationCaseData caseData = mock(GeneralApplicationCaseData.class);
 
         execute(caseData);
