@@ -3,10 +3,15 @@ package uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -21,6 +26,7 @@ import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -43,6 +49,55 @@ class DashboardNotificationHelperTest {
 
     @InjectMocks
     private DashboardNotificationHelper dashboardDecisionHelper;
+
+    @ParameterizedTest
+    @CsvSource({
+        "true, true, true, CREATE_CLAIM_SPEC_AFTER_PAYMENT, CREATE_CLAIM_SPEC_AFTER_PAYMENT, true",
+        "true, true, true, DEFENDANT_RESPONSE_SPEC, DEFENDANT_RESPONSE_SPEC, true",
+        "false, true, true, DEFENDANT_RESPONSE_SPEC, DEFENDANT_RESPONSE_SPEC, false",
+        "true, false, true, DEFENDANT_RESPONSE_SPEC, DEFENDANT_RESPONSE_SPEC, false",
+        "true, true, false, DEFENDANT_RESPONSE_SPEC, DEFENDANT_RESPONSE_SPEC, false",
+        "true, true, true, CLAIMANT_RESPONSE, DEFENDANT_RESPONSE_SPEC, false"
+    })
+    void shouldIdentifyCivilSubmissionAwaitingTranslation(boolean lip, boolean bilingual, boolean welshEnabled,
+                                                          CaseEvent processEvent, CaseEvent expectedEvent,
+                                                          boolean expected) {
+        CaseData caseData = mock(CaseData.class);
+        when(caseData.getBusinessProcess()).thenReturn(BusinessProcess.ready(processEvent));
+        if (processEvent == expectedEvent) {
+            when(caseData.isApplicantLiP()).thenReturn(lip);
+            if (lip) {
+                when(caseData.isClaimantBilingual()).thenReturn(bilingual);
+                if (bilingual) {
+                    when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(welshEnabled);
+                }
+            }
+        }
+
+        assertThat(dashboardDecisionHelper.isAwaitingWelshTranslation(caseData, expectedEvent)).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT, true, true",
+        "INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT, false, false",
+        "UPLOAD_TRANSLATED_DOCUMENT_GA_SUMMARY_DOC, true, false"
+    })
+    void shouldIdentifyGaSubmissionAwaitingTranslation(CaseEvent processEvent, boolean bilingual, boolean expected) {
+        GeneralApplicationCaseData caseData = mock(GeneralApplicationCaseData.class);
+        when(caseData.getBusinessProcess()).thenReturn(BusinessProcess.ready(processEvent));
+        if (processEvent == CaseEvent.INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT) {
+            when(caseData.isApplicationBilingual()).thenReturn(bilingual);
+        }
+
+        assertThat(dashboardDecisionHelper.isAwaitingWelshTranslation(caseData)).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldNotDeferNotificationsWithoutBusinessProcess() {
+        assertFalse(dashboardDecisionHelper.isAwaitingWelshTranslation(CaseData.builder().build(), CaseEvent.DEFENDANT_RESPONSE_SPEC));
+        assertFalse(dashboardDecisionHelper.isAwaitingWelshTranslation(new GeneralApplicationCaseData()));
+    }
 
     @Nested
     class UploadDocumentsTest {

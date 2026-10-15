@@ -6,6 +6,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskIds;
 
 import java.util.Map;
 
@@ -95,12 +96,12 @@ class RecordJudgmentDeterminationMeansNotificationTest extends BpmnBaseTest {
 
             if (dashboardServiceEnabled) {
                 //complete generate dashboard notification to defendant
-                ExternalTask respondent1DashboardNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
+                ExternalTask respondent1DashboardNotification = assertNextExternalTask(DASHBOARD_NOTIFICATION_TOPIC);
                 assertCompleteExternalTask(
                     respondent1DashboardNotification,
-                    PROCESS_CASE_EVENT,
-                    "CREATE_DASHBOARD_NOTIFICATION_RECORD_JUDGMENT_DEFENDANT",
-                    "GenerateDashboardNotificationRecordJudgmentDefendant",
+                    DASHBOARD_NOTIFICATION_TOPIC,
+                    DASHBOARD_NOTIFICATION_EVENT,
+                    DashboardTaskIds.RECORD_JUDGMENT,
                     variables
                 );
             }
