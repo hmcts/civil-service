@@ -23,6 +23,11 @@ public class BreathingSpaceInfo {
     @JsonProperty("breathingSpaceActive")
     private YesOrNo active;
 
+    // Yes -> once a lift is submitted with an end date after today. Set back to No -> when the lift happens.
+    // The lift event in EXUI can only check Yes/No, so this is what keeps that event hidden until the date arrives.
+    @JsonProperty("breathingSpaceLiftPending")
+    private YesOrNo liftPending;
+
     @JsonProperty("storedBreathingSpace")
     private List<Element<StoredBreathingSpace>> storedBreathingSpace;
 
