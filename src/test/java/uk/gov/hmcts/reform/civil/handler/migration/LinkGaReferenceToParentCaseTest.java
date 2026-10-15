@@ -1,6 +1,10 @@
 package uk.gov.hmcts.reform.civil.handler.migration;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
@@ -19,6 +23,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -27,6 +32,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -37,9 +43,11 @@ class LinkGaReferenceToParentCaseTest {
     private final CaseDetailsConverter converter = mock(CaseDetailsConverter.class);
     private final LinkGaReferenceToParentCase task = new LinkGaReferenceToParentCase(service, converter);
 
-    @Test
-    void shouldAppendApplicationAndPreserveExistingEntries() {
-        Element<GeneralApplicationsDetails> existing = element(new GeneralApplicationsDetails().setCaseLink(new CaseLink("111")));
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldAppendApplicationAndPreserveExistingEntries(boolean hasCaseLink) {
+        Element<GeneralApplicationsDetails> existing = element(new GeneralApplicationsDetails()
+            .setCaseLink(hasCaseLink ? new CaseLink("111") : null));
         CaseData parent = CaseData.builder()
             .gaDetailsMasterCollection(List.of(existing)).build();
 
@@ -90,8 +98,16 @@ class LinkGaReferenceToParentCaseTest {
             return content;
         });
 
+        CaseDetails gaDetails = CaseDetails.builder().id(333L).build();
+        when(service.getCase(333L)).thenReturn(gaDetails);
+        when(converter.toGeneralApplicationCaseData(gaDetails)).thenReturn(ga);
+        CaseData original = CaseData.builder().build();
+
         assertThat(parent.getGaDetailsMasterCollection()).isNull();
-        task.migrateGeneralApplicationCaseData(CaseData.builder().build(), ga, reference());
+        assertThat(task.migrateCaseData(original, reference())).isSameAs(original);
+
+        verify(service).getCase(333L);
+        verify(converter).toGeneralApplicationCaseData(gaDetails);
 
         verify(service).caseDataContentFromStartEventResponse(eq(start), anyMap());
         verify(service).submitUpdate("222", content);
@@ -110,16 +126,44 @@ class LinkGaReferenceToParentCaseTest {
         verify(service, never()).submitUpdate(eq("222"), org.mockito.ArgumentMatchers.any());
     }
 
-    @Test
-    void shouldRejectMissingParentReference() {
-        LinkGaCaseReference reference = reference();
-        reference.setParentCaseReference(null);
-        CaseData caseData = CaseData.builder().build();
-        assertThrows(IllegalArgumentException.class,
-                     () -> task.migrateCaseData(caseData, reference));
+    @ParameterizedTest
+    @MethodSource("invalidInputs")
+    void shouldRejectInvalidInput(CaseData caseData, LinkGaCaseReference reference) {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+            () -> task.migrateCaseData(caseData, reference));
+
+        assertThat(exception).hasMessage("CaseData, GA case reference and parent case reference must be provided");
+        verifyNoInteractions(service, converter);
     }
 
-    private LinkGaCaseReference reference() {
+    private static Stream<Arguments> invalidInputs() {
+        CaseData caseData = CaseData.builder().build();
+        return Stream.of(
+            Arguments.of(null, reference()),
+            Arguments.of(caseData, null),
+            Arguments.of(caseData, referenceWith(null, "222")),
+            Arguments.of(caseData, referenceWith(" ", "222")),
+            Arguments.of(caseData, referenceWith("333", null)),
+            Arguments.of(caseData, referenceWith("333", " "))
+        );
+    }
+
+    @Test
+    void shouldExposeMigrationMetadata() {
+        assertThat(task.getTaskName()).isEqualTo("LinkGaReferenceToParentCase");
+        assertThat(task.getEventSummary()).isEqualTo("Link Ga reference to Parent Case");
+        assertThat(task.getEventDescription()).isEqualTo("Link Ga reference to Parent Case");
+        assertThat(task.getType()).isEqualTo(LinkGaCaseReference.class);
+    }
+
+    private static LinkGaCaseReference referenceWith(String gaReference, String parentReference) {
+        LinkGaCaseReference reference = new LinkGaCaseReference();
+        reference.setCaseReference(gaReference);
+        reference.setParentCaseReference(parentReference);
+        return reference;
+    }
+
+    private static LinkGaCaseReference reference() {
         LinkGaCaseReference reference = new LinkGaCaseReference();
         reference.setCaseReference("333");
         reference.setParentCaseReference("222");
