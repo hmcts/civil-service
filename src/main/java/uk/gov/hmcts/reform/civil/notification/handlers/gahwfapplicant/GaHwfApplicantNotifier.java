@@ -11,10 +11,10 @@ import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
  * First General Application notifier on the framework, replacing
  * {@code HwfApplicantNotificationHandler} and its bespoke {@code NOTIFY_APPLICANT_LIP_HWF} event.
  *
- * <p>{@link #getTaskId()} returns the BPMN activity id that
- * {@code notify_ga_applicant_hwf_outcome.bpmn} will carry once it raises {@code NOTIFY_EVENT}. The
- * BPMN is not switched in this change because {@code NOTIFY_EVENT} does not yet exist for the
- * GENERALAPPLICATION case type in civil-ccd-definition, so CCD would refuse the event trigger.</p>
+ * <p>{@link #getTaskId()} returns the activity id of the notify service task in
+ * {@code notify_ga_applicant_hwf_outcome.bpmn}, which is how {@code GaNotifierFactory} resolves
+ * this notifier. The two are asserted against each other in {@code GaHwfNotifyTest}, because a
+ * mismatch compiles cleanly and only shows up as "no notifier found" on a live case.</p>
  */
 @Component
 public class GaHwfApplicantNotifier extends Notifier<GeneralApplicationCaseData> {
