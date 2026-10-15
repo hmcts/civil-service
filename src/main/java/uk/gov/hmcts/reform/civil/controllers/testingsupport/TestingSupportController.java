@@ -8,8 +8,6 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
-import org.camunda.community.rest.client.model.HistoricProcessInstanceDto;
-import org.camunda.community.rest.client.model.ProcessInstanceWithVariablesDto;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -47,6 +45,8 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BaseCaseData;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.camunda.CamundaHistoricProcessInstance;
+import uk.gov.hmcts.reform.civil.model.camunda.CamundaProcessInstance;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
@@ -320,24 +320,25 @@ public class TestingSupportController {
     @PostMapping(
         value = "/testing-support/trigger-camunda-process",
         produces = "application/json")
-    public ResponseEntity<ProcessInstanceWithVariablesDto> triggerCamundaProcess(
+    public ResponseEntity<CamundaProcessInstance> triggerCamundaProcess(
         @RequestBody TestCamundaProcess camundaProcess) {
-        var response = camundaRestEngineClient.startProcessByKey(camundaProcess.getName(), camundaProcess.getVariables());
-        return new ResponseEntity<>(response.getBody(), response.getStatusCode());
+        return new ResponseEntity<>(
+            camundaRestEngineClient.startProcessByKey(camundaProcess.getName(), camundaProcess.getVariables()),
+            HttpStatus.OK);
     }
 
     @RequestMapping(
             method = RequestMethod.GET,
             value = "/testing-support/camunda-processes",
             produces = "application/json")
-    public ResponseEntity<List<HistoricProcessInstanceDto>> getCamundaProcesses(
+    public ResponseEntity<List<CamundaHistoricProcessInstance>> getCamundaProcesses(
             @RequestParam(value = "processInstanceId", required = false) String processInstanceId,
             @RequestParam(value = "definitionKey", required = false) String definitionKey,
             @RequestParam(value = "variables", required = false) String variables
     ) {
-        ResponseEntity<List<HistoricProcessInstanceDto>> response =
-                camundaRestEngineClient.getProcessInstances(processInstanceId, definitionKey, variables);
-        return new ResponseEntity<>(response.getBody(), response.getStatusCode());
+        return new ResponseEntity<>(
+                camundaRestEngineClient.getProcessInstances(processInstanceId, definitionKey, variables),
+                HttpStatus.OK);
     }
 
     @SuppressWarnings("ClassEscapesDefinedScope")
