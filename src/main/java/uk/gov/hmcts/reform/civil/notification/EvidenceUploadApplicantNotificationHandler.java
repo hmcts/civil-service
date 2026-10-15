@@ -17,6 +17,7 @@ import java.util.Map;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipSubjectProperties;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 
@@ -82,6 +83,9 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
                 : getApplicantLegalOrganizationName(caseData, organisationService),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
+        if (isApplicantLip(caseData)) {
+            addLipSubjectProperties(caseData, properties);
+        }
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;

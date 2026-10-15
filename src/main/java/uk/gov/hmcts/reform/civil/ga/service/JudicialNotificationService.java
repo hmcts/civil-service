@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseState.APPLICATION_ADD_PAYMENT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -33,6 +34,8 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.ga.helpers.DateFormatHelper.JUDICIAL_FORMATTER;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addLipClaimantVDefendant;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addSubjectReferences;
 import static uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil.areRespondentSolicitorsPresent;
 import static uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil.isGeneralAppConsentOrder;
 import static uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil.notificationCriterion;
@@ -104,6 +107,7 @@ public class JudicialNotificationService implements NotificationDataGA {
     @Override
     public Map<String, String> addProperties(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData) {
         addBaseProperties(caseData);
+        addSubjectReferences(mainCaseData, caseData.getGeneralAppParentCaseLink().getCaseReference(), customProps);
         updateLipProperties(caseData);
         addAllFooterItems(caseData, mainCaseData, customProps, configuration,
                            featureToggleService.isPublicQueryManagementEnabledGa(caseData));
@@ -183,8 +187,12 @@ public class JudicialNotificationService implements NotificationDataGA {
             "JudicialNotificationService.class::sendNotificationForJudicialDecision::templateId: {}",
             template
         );
+        Map<String, String> properties = addProperties(caseData, mainCaseData);
+        if (isLipTemplate(template)) {
+            addLipClaimantVDefendant(caseData, properties);
+        }
         notificationService.sendMail(
-            recipient, template, addProperties(caseData, mainCaseData),
+            recipient, template, properties,
             String.format(
                 REFERENCE_TEMPLATE,
                 caseData.getGeneralAppParentCaseLink().getCaseReference()
@@ -228,6 +236,15 @@ public class JudicialNotificationService implements NotificationDataGA {
         }
 
         customProps.remove(GA_JUDICIAL_CONCURRENT_DATE_TEXT);
+    }
+
+    private boolean isLipTemplate(String template) {
+        return template != null && Stream.of(
+            notificationProperties.getLipGeneralAppApplicantEmailTemplate(),
+            notificationProperties.getLipGeneralAppApplicantEmailTemplateInWelsh(),
+            notificationProperties.getLipGeneralAppRespondentEmailTemplate(),
+            notificationProperties.getLipGeneralAppRespondentEmailTemplateInWelsh()
+        ).anyMatch(template::equals);
     }
 
     private String getLiPApplicantTemplate(GeneralApplicationCaseData caseData) {

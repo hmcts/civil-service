@@ -11,6 +11,11 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 public abstract class DefendantTwoEmailDTOGenerator extends EmailDTOGenerator {
 
     @Override
+    protected boolean isLipRecipient() {
+        return true;
+    }
+
+    @Override
     public Boolean getShouldNotify(CaseData caseData) {
         return caseData.isRespondent2LiP() ? Boolean.TRUE : Boolean.FALSE;
     }

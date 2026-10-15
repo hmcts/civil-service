@@ -121,6 +121,9 @@ class NotifyClaimantCaseStayedHandlerTest {
         notificationData.put("claimantvdefendant", "John Doe V Jack Jackson");
         notificationData.put("partyReferences", buildPartiesReferencesEmailSubject(caseData));
         notificationData.put("casemanRef", caseData.getLegacyCaseReference());
+        if (isApplicantLiP) {
+            notificationData.put("claim16DigitNumber", "1594901956117591");
+        }
 
         CallbackResponse response = handler.sendNotification(params);
 
