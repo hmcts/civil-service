@@ -66,6 +66,8 @@ java:
     DOCUMENT_MANAGEMENT_URL: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     SPRING_CLOUD_BOOTSTRAP_ENABLED: true
     MANAGEMENT_HEALTH_FEES_ENABLED: false
+    # DO NOT MERGE: CIVIL and GENERALAPPLICATION cases are kept by this service's decentralised runtime.
+    CIVIL_DECENTRALISED_ENABLED: true
   keyVaults:
     civil:
       resourceGroup: civil
@@ -216,6 +218,8 @@ ccd:
       keyVaults: []
   ccd-data-store-api:
     java:
+      # DO NOT MERGE: hmcts/ccd-data-store-api#3077 passes Client-Context through decentralised submissions.
+      image: hmctsprod.azurecr.io/ccd/data-store-api:pr-3077-7c5991a-20261012131702
       imagePullPolicy: Always
       devcpuRequests: 50m
       devcpuLimits: 500m
@@ -243,6 +247,17 @@ ccd:
         CCD_MULTIPARTY_CASE_TYPES: CIVIL
         CCD_MULTIPARTY_EVENTS: DEFENDANT_RESPONSE,ACKNOWLEDGE_CLAIM,CLAIMANT_RESPONSE,queryManagementRaiseQuery,queryManagementRespondQuery
         ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
+        SPRING_APPLICATION_JSON: |
+          {
+            "ccd": {
+              "decentralised": {
+                "case-type-service-urls": {
+                  "CIVIL": "http://${SERVICE_NAME}-java",
+                  "GENERALAPPLICATION": "http://${SERVICE_NAME}-java"
+                }
+              }
+            }
+          }
       secrets:
         DATA_STORE_DB_PASSWORD:
           secretRef: "{{ .Values.global.postgresSecret }}"

@@ -140,4 +140,13 @@
         <packageUrl regex="true">^pkg:maven/io\.projectreactor\.netty/reactor-netty-.*@1\.2\.18$</packageUrl>
         <cve>CVE-2026-47874</cve>
     </suppress>
+    <suppress until="2026-10-30Z">
+        <notes><![CDATA[
+        NOT a false positive. Temporary suppression so hmcts/civil-service#8496 (do not merge) can reach
+        preview; the dependency upgrade is being made separately. Spring Boot's dependency management pins
+        io.opentelemetry to 1.49.0. Expires 2026-10-30Z - do not extend.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.opentelemetry/opentelemetry-(api|context)@1\.49\.0$</packageUrl>
+        <cve>CVE-2026-54285</cve>
+    </suppress>
 </suppressions>
