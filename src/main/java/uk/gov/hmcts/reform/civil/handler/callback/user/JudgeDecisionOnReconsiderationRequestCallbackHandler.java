@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.RequestReconsiderationGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
-import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -56,12 +55,6 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
     private static final String CONFIRMATION_BODY_CREATE_SDO = "### Amend previous order and create new SDO \n" +
         "A new SDO task has been created for this case and appears in 'Available tasks' on your dashboard. You will " +
         "need to go there to reselect the case to continue.";
-    private static final String CONFIRMATION_BODY_CREATE_GENERAL_ORDER = "### Amend previous order and create a " +
-        "general order" +
-        " \n" +
-        "To make a bespoke order in this claim, select 'General order' from the dropdown menu on the right of the " +
-        "screen on your dashboard.";
-
     private static final String CONFIRMATION_BODY_CREATE_MAKE_AN_ORDER = "### Amend previous order and create a " +
         "general order" +
         " \n" +
@@ -125,18 +118,14 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
 
     private CallbackResponse saveRequestForReconsiderationReason(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (!caseData.getDecisionOnRequestReconsiderationOptions().name().equals(DecisionOnRequestReconsiderationOptions.YES.name())) {
-            caseData.setUpholdingPreviousOrderReason(null);
-        }
-
-        if (caseData.getDecisionOnRequestReconsiderationOptions().name().equals(DecisionOnRequestReconsiderationOptions.YES.name())) {
+        if (DecisionOnRequestReconsiderationOptions.YES.equals(caseData.getDecisionOnRequestReconsiderationOptions())) {
             if (caseData.getDecisionOnReconsiderationDocument() != null) {
                 CaseDocument requestForReconsiderationDocument = caseData.getDecisionOnReconsiderationDocument();
                 List<Element<CaseDocument>> systemGeneratedCaseDocuments =
                     caseData.getSystemGeneratedCaseDocuments();
                 if (featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimantBilingual()
                     || caseData.isRespondentResponseBilingual())) {
-                    caseData.setPreTranslationDocuments(List.of(ElementUtils.element(requestForReconsiderationDocument)));
+                    caseData.setPreTranslationDocuments(List.of(element(requestForReconsiderationDocument)));
                     caseData.setBilingualHint(YesOrNo.YES);
                     caseData.setPreTranslationDocumentType(DECISION_MADE_ON_APPLICATIONS);
                 } else {
@@ -147,6 +136,9 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
                 //delete temp so it will not show up twice in case file view
                 caseData.setDecisionOnReconsiderationDocument(null);
             }
+        } else {
+            caseData.setUpholdingPreviousOrderReason(null);
+            caseData.setBusinessProcess(BusinessProcess.ready(DECISION_ON_RECONSIDERATION_REQUEST));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

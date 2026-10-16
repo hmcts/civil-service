@@ -1,11 +1,10 @@
 package uk.gov.hmcts.reform.civil.service.search;
 
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.search.common.CommonQueryConstructs;
 
 import java.time.LocalTime;
 import java.time.ZoneOffset;
@@ -16,13 +15,18 @@ import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 
 @Service
 @Slf4j
 public class RequestForReconsiderationNotificationDeadlineSearchService extends ElasticSearchService {
 
-    public RequestForReconsiderationNotificationDeadlineSearchService(CoreCaseDataService coreCaseDataService) {
+    private final CommonQueryConstructs commonQueryConstructs;
+
+    public RequestForReconsiderationNotificationDeadlineSearchService(CoreCaseDataService coreCaseDataService,
+                                                                      CommonQueryConstructs commonQueryConstructs) {
         super(coreCaseDataService);
+        this.commonQueryConstructs = commonQueryConstructs;
     }
 
     @Override
@@ -35,7 +39,7 @@ public class RequestForReconsiderationNotificationDeadlineSearchService extends 
                 .should(boolQuery()
                             .must(rangeQuery("data.requestForReconsiderationDeadline").lt(deadlineCutoff))
                             .mustNot(matchQuery("data.requestForReconsiderationDeadlineChecked", "Yes"))
-                            .must(beState(CASE_PROGRESSION))),
+                            .must(commonQueryConstructs.beState(CASE_PROGRESSION, HEARING_READINESS))),
             List.of("reference"),
             startIndex
         );
@@ -47,10 +51,5 @@ public class RequestForReconsiderationNotificationDeadlineSearchService extends 
             .toLocalDate()
             .atTime(LocalTime.MIN)
             .toString();
-    }
-
-    private QueryBuilder beState(CaseState caseState) {
-        return boolQuery()
-            .must(matchQuery("state", caseState.toString()));
     }
 }
