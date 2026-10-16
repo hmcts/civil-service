@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -40,6 +41,7 @@ import static org.mockito.Mockito.when;
 
 @MockServerConfig(hostInterface = "localhost", port = "6681")
 @TestPropertySource(properties = "role-assignment-service.api.url=http://localhost:6681")
+@Import(RoleAssignmentsService.class)
 public class RoleAssignmentsApiConsumerTest extends BaseContractTest {
 
     private static final String ROLE_ASSIGNMENT_CREATE_PROVIDER = "am_roleAssignment_createAssignment";
