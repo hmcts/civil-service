@@ -15,4 +15,13 @@ public class RoboticsEmailParams {
     private CaseData caseData;
     private boolean isMultiParty;
     private String authToken;
+    /**
+     * When false, Breathing Space events are omitted from the RPA payload
+     * (NOTIFY_RPA_ON_CONTINUOUS_FEED). Handed-offline / adhoc feeds keep these events.
+     */
+    private boolean includeBreathingSpaceEvents = true;
+
+    public RoboticsEmailParams(CaseData caseData, boolean isMultiParty, String authToken) {
+        this(caseData, isMultiParty, authToken, true);
+    }
 }

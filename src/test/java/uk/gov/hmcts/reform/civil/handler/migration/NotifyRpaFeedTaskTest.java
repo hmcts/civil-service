@@ -38,12 +38,11 @@ class NotifyRpaFeedTaskTest {
         notifyRpaFeedTask = new NotifyRpaFeedTask(roboticsNotifier, userConfig, userService, defaultJudgmentRoboticsNotifier);
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"NOTIFY_RPA_ON_CONTINUOUS_FEED", "NOTIFY_RPA_ON_CASE_HANDED_OFFLINE"})
-    void shouldNotifyRobotics_whenEventIsNotDjSpecOrUnspec(String notifyEventId) {
+    @Test
+    void shouldNotifyRoboticsWithoutBreathingSpace_whenContinuousFeedEvent() {
         NotifyRpaFeedCaseReference caseReference = new NotifyRpaFeedCaseReference();
         caseReference.setCaseReference("1234567890123456");
-        caseReference.setNotifyEventId(notifyEventId);
+        caseReference.setNotifyEventId("NOTIFY_RPA_ON_CONTINUOUS_FEED");
         String accessToken = "accessToken";
         String userName = "userName";
         String password = "password";
@@ -55,7 +54,27 @@ class NotifyRpaFeedTaskTest {
         CaseData caseData = CaseData.builder().build();
         notifyRpaFeedTask.migrateCaseData(caseData, caseReference);
 
-        verify(roboticsNotifier).notifyRobotics(caseData, accessToken);
+        verify(roboticsNotifier).notifyRobotics(caseData, accessToken, false);
+        verifyNoInteractions(defaultJudgmentRoboticsNotifier);
+    }
+
+    @Test
+    void shouldNotifyRoboticsWithBreathingSpace_whenHandedOfflineEvent() {
+        NotifyRpaFeedCaseReference caseReference = new NotifyRpaFeedCaseReference();
+        caseReference.setCaseReference("1234567890123456");
+        caseReference.setNotifyEventId("NOTIFY_RPA_ON_CASE_HANDED_OFFLINE");
+        String accessToken = "accessToken";
+        String userName = "userName";
+        String password = "password";
+
+        given(userConfig.getUserName()).willReturn(userName);
+        given(userConfig.getPassword()).willReturn(password);
+        given(userService.getAccessToken(userName, password)).willReturn(accessToken);
+
+        CaseData caseData = CaseData.builder().build();
+        notifyRpaFeedTask.migrateCaseData(caseData, caseReference);
+
+        verify(roboticsNotifier).notifyRobotics(caseData, accessToken, true);
         verifyNoInteractions(defaultJudgmentRoboticsNotifier);
     }
 

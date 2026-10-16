@@ -46,7 +46,8 @@ public class NotifyRoboticsOnContinuousFeedHandler extends CallbackHandler {
 
         log.info("Notifying RPA on continuous feed for case: {}", caseReference);
         try {
-            roboticsNotifier.notifyRobotics(caseData, authToken);
+            // Continuous feed must not transfer Breathing Space (adhoc / handed-offline only).
+            roboticsNotifier.notifyRobotics(caseData, authToken, false);
         } catch (Exception e) {
             log.error("Failed to notify RPA on continuous feed for case: {}, error: {}",
                       caseReference, e.getMessage(), e);

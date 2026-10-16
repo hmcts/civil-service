@@ -74,6 +74,10 @@ public abstract class BaseRoboticsDataMapper {
                 );
     }
 
+    /**
+     * Top-level Breathing Space block for RPA. Used for handed-offline
+     * ({@code PROCEEDS_IN_HERITAGE_SYSTEM}) payloads only — not continuous feed.
+     */
     protected RPABreathingSpace buildBreathingSpace(CaseData caseData) {
         var breathingSpaceEnterInfo = caseData.getBreathing().getEnter();
         RPABreathingSpace breathingSpace = new RPABreathingSpace();

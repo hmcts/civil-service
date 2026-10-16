@@ -57,6 +57,11 @@ public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
     }
 
     public RoboticsCaseDataSpec toRoboticsCaseData(CaseData caseData, String authToken) {
+        return toRoboticsCaseData(caseData, authToken, true);
+    }
+
+    public RoboticsCaseDataSpec toRoboticsCaseData(CaseData caseData, String authToken,
+                                                   boolean includeBreathingSpaceEvents) {
         log.info("Preparing Robotics data for spec caseId {}", caseData.getCcdCaseReference());
         requireNonNull(caseData);
         log.info("Starting RoboticsCaseData mapping for caseId={}", caseData.getCcdCaseReference());
@@ -73,7 +78,7 @@ public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
         var claimDetails = buildClaimDetails(caseData);
         log.info("RoboticsCaseDataSpec ClaimDetails built for caseId={}", caseData.getCcdCaseReference());
 
-        var events = eventHistoryMapper.buildEvents(caseData, authToken);
+        var events = eventHistoryMapper.buildEvents(caseData, authToken, includeBreathingSpaceEvents);
         log.info("RoboticsCaseDataSpec Events built for caseId={}", caseData.getCcdCaseReference());
 
         RoboticsCaseDataSpec roboticsCaseDataSpec = new RoboticsCaseDataSpec()
@@ -87,7 +92,10 @@ public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
             || caseData.getCcdState() == CASE_DISMISSED) {
             roboticsCaseDataSpec.setNoticeOfChange(RoboticsDataUtil.buildNoticeOfChange(caseData));
         }
-        if (caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM && hasBreathingSpaceData(caseData)) {
+        // Top-level breathingSpace is for handed-offline (heritage) only — never continuous feed.
+        if (includeBreathingSpaceEvents
+            && caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM
+            && hasBreathingSpaceData(caseData)) {
             roboticsCaseDataSpec.setBreathingSpace(buildBreathingSpace(caseData));
         }
 

@@ -78,6 +78,10 @@ public class EventHistoryMapper {
     }
 
     public EventHistory buildEvents(CaseData caseData, String authToken) {
+        return buildEvents(caseData, authToken, true);
+    }
+
+    public EventHistory buildEvents(CaseData caseData, String authToken, boolean includeBreathingSpaceEvents) {
         log.info("Building robotics event history for caseId {}", caseData.getCcdCaseReference());
 
         EventHistory builder = new EventHistory()
@@ -89,7 +93,7 @@ public class EventHistoryMapper {
         stateFlowEngine.evaluate(caseData).getStateHistory()
             .forEach(state -> dispatchState(builder, caseData, authToken, registry, invoked, state));
 
-        runGlobalStrategies(builder, caseData, authToken, registry, invoked);
+        runGlobalStrategies(builder, caseData, authToken, registry, invoked, includeBreathingSpaceEvents);
 
         EventHistory eventHistory = eventHistorySequencer.sortEvents(builder);
         log.info("Completed robotics event history for caseId {}", caseData.getCcdCaseReference());
@@ -156,8 +160,12 @@ public class EventHistoryMapper {
                                      CaseData caseData,
                                      String authToken,
                                      Map<Class<?>, EventHistoryStrategy> registry,
-                                     Set<Class<? extends EventHistoryStrategy>> invoked) {
+                                     Set<Class<? extends EventHistoryStrategy>> invoked,
+                                     boolean includeBreathingSpaceEvents) {
         for (Class<? extends EventHistoryStrategy> strategyClass : GLOBAL_STRATEGIES_ORDER) {
+            if (BreathingSpaceEventStrategy.class.equals(strategyClass) && !includeBreathingSpaceEvents) {
+                continue;
+            }
             EventHistoryStrategy strategy = registry.get(strategyClass);
             boolean allowDuplicate = CaseProceedsInCasemanStrategy.class.equals(strategyClass)
                 || (caseData != null

@@ -40,7 +40,7 @@ class DefaultJudgmentRoboticsNotifierTest {
             .respondent1Represented(YesOrNo.NO)
             .build();
 
-        defaultJudgmentRoboticsNotifier.sendNotifications(data, false, "auth");
+        defaultJudgmentRoboticsNotifier.sendNotifications(data, false, "auth", true);
 
         verify(roboticsNotificationService).notifyJudgementLip(any(), any());
     }
@@ -52,9 +52,9 @@ class DefaultJudgmentRoboticsNotifierTest {
             .respondent1Represented(YesOrNo.YES)
             .build();
 
-        defaultJudgmentRoboticsNotifier.sendNotifications(data, false, "auth");
+        defaultJudgmentRoboticsNotifier.sendNotifications(data, false, "auth", true);
 
-        verify(roboticsNotificationService).notifyRobotics(any(), anyBoolean(), any());
+        verify(roboticsNotificationService).notifyRobotics(any(), anyBoolean(), any(), anyBoolean());
     }
 
 }

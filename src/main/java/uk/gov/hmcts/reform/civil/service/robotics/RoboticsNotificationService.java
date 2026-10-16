@@ -50,9 +50,19 @@ public class RoboticsNotificationService {
     private final FeatureToggleService toggleService;
 
     public void notifyRobotics(@NotNull CaseData caseData, boolean isMultiParty, String authToken) {
+        notifyRobotics(caseData, isMultiParty, authToken, true);
+    }
+
+    public void notifyRobotics(@NotNull CaseData caseData, boolean isMultiParty, String authToken,
+                               boolean includeBreathingSpaceEvents) {
         requireNonNull(caseData);
-        log.info(String.format("Start notifyRobotics and case data is not null %s", caseData.getLegacyCaseReference()));
-        Optional<EmailData> emailData = prepareEmailData(new RoboticsEmailParams(caseData, isMultiParty, authToken));
+        log.info(
+            "Start notifyRobotics for case {}, includeBreathingSpaceEvents={}",
+            caseData.getLegacyCaseReference(),
+            includeBreathingSpaceEvents
+        );
+        Optional<EmailData> emailData = prepareEmailData(
+            new RoboticsEmailParams(caseData, isMultiParty, authToken, includeBreathingSpaceEvents));
 
         emailData.ifPresent(data -> {
             log.info(String.format("Sending email via client to %s", data.getTo()));
@@ -73,7 +83,8 @@ public class RoboticsNotificationService {
         try {
             RoboticsCaseDataDTO roboticsCaseDataDTO = getRoboticsCaseDataDTO(
                 params.getCaseData(),
-                params.getAuthToken()
+                params.getAuthToken(),
+                params.isIncludeBreathingSpaceEvents()
             );
             String fileName = getFileName(params.getCaseData());
             String triggerEvent;
@@ -101,13 +112,16 @@ public class RoboticsNotificationService {
         return String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
     }
 
-    private RoboticsCaseDataDTO getRoboticsCaseDataDTO(CaseData caseData, String authToken) throws JsonProcessingException {
+    private RoboticsCaseDataDTO getRoboticsCaseDataDTO(CaseData caseData, String authToken,
+                                                       boolean includeBreathingSpaceEvents)
+        throws JsonProcessingException {
         RoboticsCaseDataDTO roboticsCaseDataDTO;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            roboticsCaseDataDTO = getRoboticsCaseDataDTOForSpec(caseData, authToken);
+            roboticsCaseDataDTO = getRoboticsCaseDataDTOForSpec(caseData, authToken, includeBreathingSpaceEvents);
         } else {
-            RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData, authToken);
-            if (roboticsCaseData.getBreathingSpace() != null) {
+            RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(
+                caseData, authToken, includeBreathingSpaceEvents);
+            if (includeBreathingSpaceEvents && roboticsCaseData.getBreathingSpace() != null) {
                 log.info(
                     "RPA breathing space payload for unspec case {}: {}",
                     caseData.getLegacyCaseReference(),
@@ -119,10 +133,18 @@ public class RoboticsNotificationService {
         return roboticsCaseDataDTO;
     }
 
-    private RoboticsCaseDataDTO getRoboticsCaseDataDTOForSpec(CaseData caseData, String authToken) throws JsonProcessingException {
+    private RoboticsCaseDataDTO getRoboticsCaseDataDTOForSpec(CaseData caseData, String authToken)
+        throws JsonProcessingException {
+        return getRoboticsCaseDataDTOForSpec(caseData, authToken, true);
+    }
+
+    private RoboticsCaseDataDTO getRoboticsCaseDataDTOForSpec(CaseData caseData, String authToken,
+                                                              boolean includeBreathingSpaceEvents)
+        throws JsonProcessingException {
         RoboticsCaseDataDTO roboticsCaseDataDTO;
-        RoboticsCaseDataSpec roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData, authToken);
-        if (roboticsCaseDataSpec.getBreathingSpace() != null) {
+        RoboticsCaseDataSpec roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(
+            caseData, authToken, includeBreathingSpaceEvents);
+        if (includeBreathingSpaceEvents && roboticsCaseDataSpec.getBreathingSpace() != null) {
             log.info(
                 "RPA breathing space payload for Spec case {}: {}",
                 caseData.getLegacyCaseReference(),

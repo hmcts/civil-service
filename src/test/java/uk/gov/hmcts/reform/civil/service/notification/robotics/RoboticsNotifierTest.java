@@ -51,12 +51,13 @@ class RoboticsNotifierTest {
         CaseData caseData = CaseDataBuilder.builder().legacyCaseReference(LEGACY_REFERENCE)
             .caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
 
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(eq(caseData), eq(TOKEN))).thenReturn(roboticsCaseDataSpec);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(eq(caseData), eq(TOKEN), anyBoolean()))
+            .thenReturn(roboticsCaseDataSpec);
         when(jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString())).thenReturn(Set.of());
 
         roboticsNotifier.notifyRobotics(caseData, TOKEN);
 
-        verify(roboticsNotificationService).notifyRobotics(any(), anyBoolean(), any());
+        verify(roboticsNotificationService).notifyRobotics(any(), anyBoolean(), any(), anyBoolean());
     }
 
     @Test
@@ -65,7 +66,8 @@ class RoboticsNotifierTest {
         CaseData caseData = CaseDataBuilder.builder().legacyCaseReference(LEGACY_REFERENCE)
             .caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
 
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(eq(caseData), eq(TOKEN))).thenReturn(roboticsCaseDataSpec);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(eq(caseData), eq(TOKEN), anyBoolean()))
+            .thenReturn(roboticsCaseDataSpec);
         when(jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString())).thenReturn(Set.of(
             ValidationMessage.builder().message("whoops").build()
         ));
@@ -79,12 +81,13 @@ class RoboticsNotifierTest {
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM).build();
         RoboticsCaseData roboticsCaseData = new RoboticsCaseData();
 
-        when(roboticsDataMapper.toRoboticsCaseData(eq(caseData), eq(TOKEN))).thenReturn(roboticsCaseData);
+        when(roboticsDataMapper.toRoboticsCaseData(eq(caseData), eq(TOKEN), anyBoolean()))
+            .thenReturn(roboticsCaseData);
         when(jsonSchemaValidationService.validate(roboticsCaseData.toJsonString())).thenReturn(Set.of());
 
         roboticsNotifier.notifyRobotics(caseData, TOKEN);
 
-        verify(roboticsNotificationService).notifyRobotics(any(), anyBoolean(), any());
+        verify(roboticsNotificationService).notifyRobotics(any(), anyBoolean(), any(), anyBoolean());
     }
 
     @Test
@@ -93,7 +96,8 @@ class RoboticsNotifierTest {
         CaseData caseData = CaseDataBuilder.builder().legacyCaseReference(LEGACY_REFERENCE)
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM).build();
 
-        when(roboticsDataMapper.toRoboticsCaseData(eq(caseData), eq(TOKEN))).thenReturn(roboticsCaseData);
+        when(roboticsDataMapper.toRoboticsCaseData(eq(caseData), eq(TOKEN), anyBoolean()))
+            .thenReturn(roboticsCaseData);
         when(jsonSchemaValidationService.validate(roboticsCaseData.toJsonString())).thenReturn(Set.of(
             ValidationMessage.builder().message("whoops").build()
         ));

@@ -196,7 +196,7 @@ class RoboticsNotificationServiceTest {
                     .build())
                 .build())
             .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN, true)).thenReturn(build);
 
         // When
         service.notifyRobotics(caseData, false, BEARER_TOKEN);
@@ -281,14 +281,14 @@ class RoboticsNotificationServiceTest {
                     .build()
             ).build())
             .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(roboticsCaseData);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN, true)).thenReturn(roboticsCaseData);
 
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
 
         // When
         service.notifyRobotics(caseData, multiPartyScenario, BEARER_TOKEN);
 
-        verify(roboticsDataMapperForSpec).toRoboticsCaseData(caseData, BEARER_TOKEN);
+        verify(roboticsDataMapperForSpec).toRoboticsCaseData(caseData, BEARER_TOKEN, true);
         verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
 
         EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
@@ -361,7 +361,7 @@ class RoboticsNotificationServiceTest {
                     .build())
                 .build())
             .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN, true)).thenReturn(build);
 
         // When
         service.notifyRobotics(caseData, false, BEARER_TOKEN);
@@ -399,7 +399,7 @@ class RoboticsNotificationServiceTest {
                     .build())
                 .build())
             .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN, true)).thenReturn(build);
 
         //When
         service.notifyJudgementLip(caseData, BEARER_TOKEN);
@@ -433,7 +433,7 @@ class RoboticsNotificationServiceTest {
                     .build())
                 .build())
             .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN, true)).thenReturn(build);
 
         //When
         service.notifyJudgementLip(caseData, BEARER_TOKEN);
@@ -467,7 +467,7 @@ class RoboticsNotificationServiceTest {
                     .build())
                 .build())
             .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN, true)).thenReturn(build);
 
         //When
         service.notifyJudgementLip(caseData, BEARER_TOKEN);
@@ -501,7 +501,7 @@ class RoboticsNotificationServiceTest {
                     .build())
                 .build())
             .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN, true)).thenReturn(build);
 
         //When
         service.notifyJudgementLip(caseData, BEARER_TOKEN);
@@ -541,7 +541,7 @@ class RoboticsNotificationServiceTest {
                     .build())
                 .build())
             .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN, true)).thenReturn(build);
 
         //When
         service.notifyJudgementLip(caseData, BEARER_TOKEN);
@@ -576,7 +576,7 @@ class RoboticsNotificationServiceTest {
                     .build())
                 .build())
             .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN, true)).thenReturn(build);
 
         //When
         service.notifyJudgementLip(caseData, BEARER_TOKEN);
@@ -612,7 +612,7 @@ class RoboticsNotificationServiceTest {
                                            .build())
                         .build())
             .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN, true)).thenReturn(build);
 
         // When
         service.notifyRobotics(caseData, false, BEARER_TOKEN);
@@ -654,7 +654,7 @@ class RoboticsNotificationServiceTest {
                                            .build())
                         .build())
             .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN, true)).thenReturn(build);
 
         // When
         service.notifyRobotics(caseData, false, BEARER_TOKEN);

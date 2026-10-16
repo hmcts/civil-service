@@ -10077,6 +10077,33 @@ class EventHistoryMapperTest {
         }
 
         @Test
+        void shouldOmitBreathingSpaceEvents_whenIncludeBreathingSpaceEventsIsFalse() {
+            CaseData caseData =
+                    CaseDataBuilder.builder()
+                            .setClaimTypeToSpecClaim()
+                            .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                            .atState(FlowState.Main.CLAIM_ISSUED)
+                            .addEnterBreathingSpace()
+                            .build();
+
+            var withBreathingSpace = mapper.buildEvents(caseData, BEARER_TOKEN, true);
+            var withoutBreathingSpace = mapper.buildEvents(caseData, BEARER_TOKEN, false);
+
+            assertThat(withBreathingSpace.getBreathingSpaceEntered())
+                    .extracting(Event::getEventCode)
+                    .doesNotContainNull();
+            // Sequencer fills empty Event placeholders; omit means no real BS event codes.
+            assertThat(withoutBreathingSpace.getBreathingSpaceEntered())
+                    .allMatch(event -> event.getEventCode() == null);
+            assertThat(withoutBreathingSpace.getBreathingSpaceLifted())
+                    .allMatch(event -> event.getEventCode() == null);
+            assertThat(withoutBreathingSpace.getBreathingSpaceMentalHealthEntered())
+                    .allMatch(event -> event.getEventCode() == null);
+            assertThat(withoutBreathingSpace.getBreathingSpaceMentalHealthLifted())
+                    .allMatch(event -> event.getEventCode() == null);
+        }
+
+        @Test
         void shouldPrepareExpectedEvents_whenCaseLiftsBreathingSpace() {
 
             CaseData caseData =
