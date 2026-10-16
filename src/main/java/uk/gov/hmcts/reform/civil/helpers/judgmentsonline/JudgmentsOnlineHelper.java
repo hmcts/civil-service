@@ -21,6 +21,8 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.math.BigDecimal.ZERO;
 import static java.util.Optional.ofNullable;
@@ -97,15 +99,22 @@ public class JudgmentsOnlineHelper {
 
         String repaymentSummary = data.getRepaymentSummaryObject();
         BigDecimal claimCost = null;
-        if (null != repaymentSummary) {
-            claimCost = new BigDecimal(repaymentSummary.substring(
-                repaymentSummary.indexOf("Claim fee amount \n £") + 20,
-                repaymentSummary.indexOf("\n ## Subtotal")
-            ));
+
+        if (repaymentSummary != null) {
+            Pattern pattern = Pattern.compile(
+                "Claim fee amount\\s*£\\s*([\\d,]+(?:\\.\\d{1,2})?)"
+            );
+
+            Matcher matcher = pattern.matcher(repaymentSummary);
+
+            if (matcher.find()) {
+                claimCost = new BigDecimal(
+                    matcher.group(1).replace(",", "")
+                );
+            }
         }
 
         return claimCost != null ? claimCost : ZERO;
-
     }
 
     public static BigDecimal getFixedCostsOfJudgmentForDJ(CaseData data) {
