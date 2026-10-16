@@ -935,7 +935,6 @@ spring:
     url: jdbc:tc:postgresql:15://localhost/cmc
     jdbcUrl: jdbc:tc:postgresql:15://localhost/cmc
     hikari:
-      minimum-idle: 1
       connectionTimeout: 10000
       idleTimeout: 30000
       maxLifetime: 60000
