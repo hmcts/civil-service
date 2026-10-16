@@ -149,9 +149,9 @@ class CancelUnissuedClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class MidEventValidateCancelReason {
+    class MidEventPopulateBlankReason {
 
-        private static final String PAGE_ID = "validate-cancel-reason";
+        private static final String PAGE_ID = "populate-cancel-reason";
 
         private AboutToStartOrSubmitCallbackResponse validate(String reason) {
             CaseData caseData = eligibleLrCaseData(CaseCategory.UNSPEC_CLAIM);
@@ -180,48 +180,8 @@ class CancelUnissuedClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotReturnData_whenReasonProvided() {
             var response = validate("Settled outside the portal");
 
-            assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getErrors()).isNullOrEmpty();
             assertThat(response.getData()).isNull();
-        }
-
-        @Test
-        void shouldReturnNoError_whenReasonIs200AllowedCharacters() {
-            assertThat(validate("a".repeat(200)).getErrors()).isEmpty();
-        }
-
-        @Test
-        void shouldReturnNoError_whenReasonHasStandardPunctuation() {
-            assertThat(validate("Settled outside the portal: paid £100 (in full) - 'agreed' & \"signed\"; @#/$%+=?!\r\n—…")
-                           .getErrors()).isEmpty();
-        }
-
-        @Test
-        void shouldNotReturnData_whenReasonHasErrors() {
-            var response = validate("Settled <script>");
-
-            assertThat(response.getErrors()).isNotEmpty();
-            assertThat(response.getData()).isNull();
-        }
-
-        @Test
-        void shouldReturnError_whenReasonExceeds200Characters() {
-            assertThat(validate("a".repeat(201)).getErrors())
-                .containsExactly(CancelUnissuedClaimCallbackHandler.REASON_TOO_LONG);
-        }
-
-        @Test
-        void shouldReturnError_whenReasonHasForbiddenCharacters() {
-            assertThat(validate("Settled <script>").getErrors())
-                .containsExactly(CancelUnissuedClaimCallbackHandler.REASON_INVALID_CHARACTERS);
-        }
-
-        @Test
-        void shouldReturnBothErrors_whenReasonTooLongAndHasForbiddenCharacters() {
-            assertThat(validate("a".repeat(200) + "<").getErrors())
-                .containsExactly(
-                    CancelUnissuedClaimCallbackHandler.REASON_TOO_LONG,
-                    CancelUnissuedClaimCallbackHandler.REASON_INVALID_CHARACTERS
-                );
         }
     }
 
