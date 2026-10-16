@@ -6,6 +6,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 
@@ -19,6 +20,11 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SP
 @ExtendWith(MockitoExtension.class)
 class RemoveDefaultJudgmentDashboardTaskTest {
 
+    private static final LocalDateTime NOW = LocalDateTime.of(2026, 10, 16, 12, 0);
+
+    @Mock
+    private Time time;
+
     @Mock
     private DashboardNotificationService service;
     @Mock
@@ -26,29 +32,43 @@ class RemoveDefaultJudgmentDashboardTaskTest {
 
     @Test
     void shouldDeleteOnlyTheRetiredNotificationForClaimant() {
-        CaseData caseData = caseData(LocalDateTime.now().minusDays(1));
+        CaseData caseData = caseData(NOW.minusDays(1));
         when(dashboardNotificationHelper.isAwaitingWelshTranslation(caseData, DEFENDANT_RESPONSE_SPEC)).thenReturn(true);
+        when(time.now()).thenReturn(NOW);
 
-        new RemoveDefaultJudgmentDashboardTask(dashboardNotificationHelper, service).execute(DashboardTaskContext.civil(caseData, "token"));
+        new RemoveDefaultJudgmentDashboardTask(dashboardNotificationHelper, service, time).execute(DashboardTaskContext.civil(caseData, "token"));
 
         verify(service).deleteByNameAndReferenceAndCitizenRole("Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant", "123", "CLAIMANT");
     }
 
     @Test
     void shouldSkipRemovalOutsideTheWelshSubmissionBranch() {
-        CaseData caseData = caseData(LocalDateTime.now().minusDays(1));
+        CaseData caseData = caseData(NOW.minusDays(1));
 
-        new RemoveDefaultJudgmentDashboardTask(dashboardNotificationHelper, service).execute(DashboardTaskContext.civil(caseData, "token"));
+        new RemoveDefaultJudgmentDashboardTask(dashboardNotificationHelper, service, time).execute(DashboardTaskContext.civil(caseData, "token"));
 
         verifyNoInteractions(service);
     }
 
     @Test
     void shouldKeepDefaultJudgmentNotificationBeforeResponseDeadline() {
-        CaseData caseData = caseData(LocalDateTime.now().plusDays(1));
+        CaseData caseData = caseData(NOW.plusDays(1));
         when(dashboardNotificationHelper.isAwaitingWelshTranslation(caseData, DEFENDANT_RESPONSE_SPEC)).thenReturn(true);
+        when(time.now()).thenReturn(NOW);
 
-        new RemoveDefaultJudgmentDashboardTask(dashboardNotificationHelper, service)
+        new RemoveDefaultJudgmentDashboardTask(dashboardNotificationHelper, service, time)
+            .execute(DashboardTaskContext.civil(caseData, "token"));
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    void shouldKeepDefaultJudgmentNotificationAtResponseDeadline() {
+        CaseData caseData = caseData(NOW);
+        when(dashboardNotificationHelper.isAwaitingWelshTranslation(caseData, DEFENDANT_RESPONSE_SPEC)).thenReturn(true);
+        when(time.now()).thenReturn(NOW);
+
+        new RemoveDefaultJudgmentDashboardTask(dashboardNotificationHelper, service, time)
             .execute(DashboardTaskContext.civil(caseData, "token"));
 
         verifyNoInteractions(service);
