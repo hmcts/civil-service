@@ -543,6 +543,23 @@ class RoboticsDataMapperForUnspecTest {
     }
 
     @Test
+    void shouldOmitTopLevelBreathingSpaceWhenIncludeBreathingSpaceEventsIsFalse() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePaymentSuccessful()
+            .build();
+        caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+        caseData.setBreathing(new BreathingSpaceInfo()
+                                  .setEnter(new BreathingSpaceEnterInfo()
+                                                .setReference("BS-12345")
+                                                .setStart(LocalDate.of(2026, 9, 1))
+                                                .setType(BreathingSpaceType.STANDARD)));
+
+        RoboticsCaseData mapped = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN, false);
+
+        assertThat(mapped.getBreathingSpace()).isNull();
+    }
+
+    @Test
     void shouldMapExpectedNoticeOfChangeData_whenCaseDismissed() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePaymentSuccessful()

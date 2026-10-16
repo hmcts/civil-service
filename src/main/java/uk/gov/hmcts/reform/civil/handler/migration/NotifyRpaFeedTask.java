@@ -41,8 +41,11 @@ public class NotifyRpaFeedTask extends MigrationTask<NotifyRpaFeedCaseReference>
             defaultJudgmentRoboticsNotifier.notifyRobotics(caseData, accessToken);
             log.info("Notified to RPA via migration task for caseId {} for event type {}", obj.getCaseReference(),
                      obj.getNotifyEventId());
-        } else if ("NOTIFY_RPA_ON_CONTINUOUS_FEED".equals(obj.getNotifyEventId()) || "NOTIFY_RPA_ON_CASE_HANDED_OFFLINE".equals(obj.getNotifyEventId())) {
-            roboticsNotifier.notifyRobotics(caseData, accessToken);
+        } else if ("NOTIFY_RPA_ON_CONTINUOUS_FEED".equals(obj.getNotifyEventId())) {
+            roboticsNotifier.notifyRobotics(caseData, accessToken, false);
+            log.info("Notified to RPA via migration task for caseId {}", obj.getCaseReference());
+        } else if ("NOTIFY_RPA_ON_CASE_HANDED_OFFLINE".equals(obj.getNotifyEventId())) {
+            roboticsNotifier.notifyRobotics(caseData, accessToken, true);
             log.info("Notified to RPA via migration task for caseId {}", obj.getCaseReference());
         } else {
             log.info("Not to send RPA via migration task for caseId {}", obj.getCaseReference());

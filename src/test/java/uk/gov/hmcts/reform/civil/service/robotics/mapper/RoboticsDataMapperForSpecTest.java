@@ -112,6 +112,7 @@ class RoboticsDataMapperForSpecTest {
             .anyMatch(p -> p.getName().equals(caseData.getApplicant1().getPartyName())));
         Assertions.assertTrue(mapped.getLitigiousParties().stream()
             .anyMatch(p -> p.getName().equals(caseData.getRespondent1().getPartyName())));
+        assertThat(mapped.getBreathingSpace()).isNull();
     }
 
     @Test
@@ -148,6 +149,29 @@ class RoboticsDataMapperForSpecTest {
                 breathingSpace -> breathingSpace.getReasonForLifting()
             )
             .containsExactly("BS-12345", startDate, BreathingSpaceType.MENTAL_HEALTH, endDate, "reason to lift");
+    }
+
+    @Test
+    void shouldOmitTopLevelBreathingSpaceWhenIncludeBreathingSpaceEventsIsFalse() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .legacyCaseReference("reference")
+            .totalInterest(BigDecimal.ZERO)
+            .totalClaimAmount(BigDecimal.valueOf(15000_00))
+            .applicant1(createPartyWithCompany("company 1"))
+            .respondent1(createPartyWithCompany("company 2"))
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicant1solicitor@gmail.com"))
+            .build();
+        caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+        caseData.setSubmittedDate(LocalDateTime.now().minusDays(14));
+        caseData.setBreathing(new BreathingSpaceInfo()
+                                  .setEnter(new BreathingSpaceEnterInfo()
+                                                .setReference("BS-12345")
+                                                .setStart(LocalDate.of(2026, 9, 1))
+                                                .setType(BreathingSpaceType.STANDARD)));
+
+        RoboticsCaseDataSpec mapped = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN, false);
+
+        assertThat(mapped.getBreathingSpace()).isNull();
     }
 
     @Test

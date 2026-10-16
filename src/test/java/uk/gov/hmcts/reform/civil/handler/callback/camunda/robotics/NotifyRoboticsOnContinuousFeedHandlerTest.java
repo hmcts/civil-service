@@ -114,7 +114,7 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
 
             // Then
             verify(roboticsNotificationService).notifyRobotics(caseData, false,
-                params.getParams().get(BEARER_TOKEN).toString()
+                params.getParams().get(BEARER_TOKEN).toString(), false
             );
         }
 
@@ -132,7 +132,7 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
 
             // Then
             verify(roboticsNotificationService).notifyRobotics(caseData, false,
-                params.getParams().get(BEARER_TOKEN).toString()
+                params.getParams().get(BEARER_TOKEN).toString(), false
             );
         }
 

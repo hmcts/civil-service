@@ -35,6 +35,6 @@ class NotifyRoboticsOnCaseHandedOfflineHandlerTest extends BaseCallbackHandlerTe
 
         handler.handle(params);
 
-        verify(roboticsNotifier).notifyRobotics(caseData, TOKEN);
+        verify(roboticsNotifier).notifyRobotics(caseData, TOKEN, true);
     }
 }

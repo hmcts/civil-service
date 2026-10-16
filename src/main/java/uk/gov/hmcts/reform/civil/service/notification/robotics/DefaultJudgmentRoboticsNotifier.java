@@ -22,12 +22,12 @@ public class DefaultJudgmentRoboticsNotifier extends RoboticsNotifier {
     }
 
     @Override
-    public void sendNotifications(CaseData caseData, boolean multiPartyScenario, String authToken) {
+    public void sendNotifications(CaseData caseData, boolean multiPartyScenario, String authToken,
+                                  boolean includeBreathingSpaceEvents) {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.isRespondent1NotRepresented()) {
             roboticsNotificationService.notifyJudgementLip(caseData, authToken);
         } else {
-            super.sendNotifications(caseData, multiPartyScenario,
-                authToken);
+            super.sendNotifications(caseData, multiPartyScenario, authToken, includeBreathingSpaceEvents);
         }
     }
 }

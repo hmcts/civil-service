@@ -47,7 +47,7 @@ public class NotifyRoboticsOnCaseHandedOfflineHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = (String) callbackParams.getParams().get(BEARER_TOKEN);
 
-        roboticsNotifier.notifyRobotics(caseData, authToken);
+        roboticsNotifier.notifyRobotics(caseData, authToken, true);
 
         return SubmittedCallbackResponse.builder().build();
     }

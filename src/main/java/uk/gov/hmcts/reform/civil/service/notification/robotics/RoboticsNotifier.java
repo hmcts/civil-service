@@ -32,6 +32,10 @@ public class RoboticsNotifier {
     private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
 
     public void notifyRobotics(CaseData caseData, String authToken) {
+        notifyRobotics(caseData, authToken, true);
+    }
+
+    public void notifyRobotics(CaseData caseData, String authToken, boolean includeBreathingSpaceEvents) {
         String legacyCaseReference = caseData.getLegacyCaseReference();
 
         RoboticsCaseData roboticsCaseData = null;
@@ -43,20 +47,22 @@ public class RoboticsNotifier {
             log.info(String.format("Start notify robotics for %s", legacyCaseReference));
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
                 log.info(String.format("Spec robotics Data Mapping for %s", legacyCaseReference));
-                roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData, authToken);
+                roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(
+                    caseData, authToken, includeBreathingSpaceEvents);
                 errors = jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString());
             } else {
                 log.info(String.format("Unspec robotics Data Mapping for %s", legacyCaseReference));
                 roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(
                     caseData,
-                    authToken
+                    authToken,
+                    includeBreathingSpaceEvents
                 );
                 errors = jsonSchemaValidationService.validate(roboticsCaseData.toJsonString());
             }
 
             if (errors == null || errors.isEmpty()) {
                 log.info(String.format("Valid RPA Json payload for %s", legacyCaseReference));
-                sendNotifications(caseData, multiPartyScenario, authToken);
+                sendNotifications(caseData, multiPartyScenario, authToken, includeBreathingSpaceEvents);
             } else {
                 throw new JsonSchemaValidationException(
                     format("Invalid RPA Json payload for %s", legacyCaseReference), errors);
@@ -69,8 +75,13 @@ public class RoboticsNotifier {
     }
 
     protected void sendNotifications(CaseData caseData, boolean multiPartyScenario, String authToken) {
+        sendNotifications(caseData, multiPartyScenario, authToken, true);
+    }
+
+    protected void sendNotifications(CaseData caseData, boolean multiPartyScenario, String authToken,
+                                     boolean includeBreathingSpaceEvents) {
         roboticsNotificationService.notifyRobotics(caseData, multiPartyScenario,
-            authToken
+            authToken, includeBreathingSpaceEvents
         );
     }
 }
