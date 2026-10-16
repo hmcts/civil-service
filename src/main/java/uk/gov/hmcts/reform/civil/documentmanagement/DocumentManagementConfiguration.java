@@ -15,8 +15,9 @@ public class DocumentManagementConfiguration {
     private final DataSize maxDownloadSize;
 
     public DocumentManagementConfiguration(@Value("${document_management.userRoles}") List<String> userRoles,
-                                           @Value("${document_management.maxDownloadSize:1024MB}") DataSize maxDownloadSize) {
+                                           @Value("${document_management.maxDownloadSize:1024MB}") String maxDownloadSize) {
         this.userRoles = userRoles;
-        this.maxDownloadSize = maxDownloadSize;
+        // Parsed here rather than bound as DataSize so contexts without Boot's conversion service can load it
+        this.maxDownloadSize = DataSize.parse(maxDownloadSize);
     }
 }
