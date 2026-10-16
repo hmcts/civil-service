@@ -140,14 +140,4 @@
         <packageUrl regex="true">^pkg:maven/io\.projectreactor\.netty/reactor-netty-.*@1\.2\.18$</packageUrl>
         <cve>CVE-2026-47874</cve>
     </suppress>
-    <suppress until="2026-11-10Z">
-        <notes><![CDATA[
-        Temp fix. CVEs reported against org.elasticsearch 9.5.4 jars. Re-check for an
-        upstream Elasticsearch patch before expiry; do not extend without review.
-        ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.elasticsearch(\.plugin)?/elasticsearch.*@9\.5\.4$</packageUrl>
-        <cve>CVE-2026-103005</cve>
-        <cve>CVE-2026-103008</cve>
-        <cve>CVE-2026-103009</cve>
-    </suppress>
 </suppressions>
