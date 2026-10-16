@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.documentmanagement;
 
 import feign.FeignException;
+import feign.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
@@ -17,9 +18,11 @@ import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 import uk.gov.hmcts.reform.ccd.document.am.model.DocumentUploadRequest;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
+import uk.gov.hmcts.reform.civil.client.CaseDocumentBinaryApiClient;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.StreamingDocumentResource;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 import uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -27,6 +30,7 @@ import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.document.utils.InMemoryMultipartFile;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.io.IOException;
 import java.net.URI;
 import java.time.ZoneId;
 import java.util.Collections;
@@ -53,6 +57,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     private final UserService userService;
     private final DocumentManagementConfiguration documentManagementConfiguration;
     private final CaseDocumentClientApi caseDocumentClientApi;
+    private final CaseDocumentBinaryApiClient caseDocumentBinaryApiClient;
     private final Tika tika;
 
     @Retryable(retryFor = {DocumentUploadException.class},
@@ -204,44 +209,54 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
     @Retryable(retryFor = {DocumentDownloadException.class},
         noRetryFor = {DocumentNotFoundException.class, DocumentAccessException.class,
-            InvalidDocumentLinkException.class},
+            InvalidDocumentLinkException.class, DocumentTooLargeException.class},
         maxAttempts = 3,
         backoff = @Backoff(delay = 1000, multiplier = 3))
     @Override
     public DownloadedDocumentResponse downloadDocumentWithMetaData(String authorisation, String documentPath) {
         log.info("Downloading document {}", documentPath);
         try {
-            UserInfo userInfo = userService.getUserInfo(authorisation);
-            String userRoles = String.join(",", this.documentManagementConfiguration.getUserRoles());
             Document documentMetadata = getDocumentMetaData(authorisation, documentPath);
+            long maxDownloadSize = documentManagementConfiguration.getMaxDownloadSize().toBytes();
+            if (documentMetadata.size > maxDownloadSize) {
+                throw new DocumentTooLargeException(documentPath, documentMetadata.size, maxDownloadSize);
+            }
 
-            ResponseEntity<Resource> responseEntity = caseDocumentClientApi.getDocumentBinary(
+            String mimeType = tika.detect(documentMetadata.originalDocumentName);
+
+            Response response = caseDocumentBinaryApiClient.getDocumentBinary(
                 authorisation,
                 authTokenGenerator.generate(),
                 UUID.fromString(documentPath.substring(documentPath.lastIndexOf("/") + 1))
             );
 
-            if (responseEntity == null) {
-                responseEntity = documentDownloadClientApi.downloadBinary(
-                    authorisation,
-                    authTokenGenerator.generate(),
-                    userRoles,
-                    userInfo.getUid(),
-                    URI.create(documentMetadata.links.binary.href).getPath().replaceFirst("/", "")
-                );
-            }
-
-            if (responseEntity == null || responseEntity.getBody() == null) {
-                throw new IllegalStateException("Document binary response was empty for " + documentPath);
-            }
-
-            return new DownloadedDocumentResponse(responseEntity.getBody(), documentMetadata.originalDocumentName,
-                                                  tika.detect(documentMetadata.originalDocumentName));
-        } catch (DocumentDownloadException ex) {
+            return new DownloadedDocumentResponse(openBody(response, documentPath),
+                                                  documentMetadata.originalDocumentName, mimeType);
+        } catch (DocumentDownloadException | DocumentTooLargeException ex) {
             throw ex;
         } catch (Exception ex) {
             throw classifyDownloadFailure(documentPath, ex);
         }
+    }
+
+    /**
+     * Wraps the CDAM response body as a stream without reading it into memory. Feign does not
+     * apply the error decoder when the return type is {@link Response}, so non-2xx statuses are
+     * turned into the usual {@link FeignException} here for {@link #classifyDownloadFailure}.
+     */
+    private Resource openBody(Response response, String documentPath) throws IOException {
+        if (response.status() < 200 || response.status() >= 300) {
+            try (response) {
+                throw FeignException.errorStatus("CaseDocumentBinaryApiClient#getDocumentBinary", response);
+            }
+        }
+        Response.Body body = response.body();
+        if (body == null) {
+            response.close();
+            throw new IllegalStateException("Document binary response was empty for " + documentPath);
+        }
+        Integer length = body.length();
+        return new StreamingDocumentResource(body.asInputStream(), length == null ? -1 : length);
     }
 
     @Override
