@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARENT_CLAIM_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,6 +49,9 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private FeatureToggleService featureToggleService;
 
+    @Mock
+    private GenAppStateHelperService genAppStateHelperService;
+
     @Nested
     class AboutToSubmitCallback {
 
@@ -58,6 +63,7 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
             assertThat(response.getState()).isNotNull();
             assertThat(response.getState()).isEqualTo(CASE_SETTLED.name());
+            verify(genAppStateHelperService).triggerEvent(caseData, PARENT_CLAIM_SETTLED);
         }
 
         @Test

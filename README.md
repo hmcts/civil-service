@@ -76,6 +76,7 @@ The project defines a set of timer-driven Camunda and Spring schedulers that kee
 <!-- SCHEDULED_JOBS_TABLE_START -->
 | Job | Purpose | Scheduler Name | Camunda topic(s) | Schedule (cron, UTC) | When it runs |
 | --- | --- | --- | --- | --- | --- |
+| Breathing space lift pending scheduler | Lifts breathing space when a saved end date has been reached. |  | `BREATHING_SPACE_LIFT_PENDING` | `0 5 0 * * ?` | Daily at 00:05 |
 | Bundle creation scheduler | Builds bundles for eligible hearings each evening. | BundleCreation | `BUNDLE_CREATION_CHECK` | `0 0 21 * * ?` | Daily at 21:00 |
 | Decision outcome scheduler | Moves cases awaiting judicial decisions into the decision outcome workflow. | DecisionOutcome | `MOVE_TO_DECISION_OUTCOME` | `0 40 0 * * ?` | Daily at 00:40 |
 | Defendant response deadline check scheduler | Sweeps for defendants whose response deadline elapsed and triggers enforcement. | DefendantResponseDeadline | `DEFENDANT_RESPONSE_DEADLINE_CHECK` | `0 1 16 * * ?` | Daily at 16:01 |
@@ -124,6 +125,15 @@ The project is dependent on other Civil repositories:
 - [civil-ccd-definition](https://github.com/hmcts/civil-ccd-definition)
 
 Camunda BPMN definitions are included in this repository under `src/main/resources/camunda/`.
+
+The `Render BPMN diagrams` GitHub Action renders changed BPMNs and commits their PNGs
+under `docs/bpmn-diagrams/` to the same repository's PR branch. Renderer or dependency
+changes render all BPMNs. Fork PRs and protected branches receive the `bpmn-diagrams`
+artifact only. To regenerate everything, run `workflow_dispatch` on an unprotected
+working branch and include the resulting commit in a PR. If the branch advances while
+rendering, the workflow leaves the output in the artifact and the newer PR run handles
+it. Commit-back uses `GITHUB_TOKEN`; confirm the required Jenkins check runs on the
+resulting diagram commit before merging.
 
 To set up complete local environment for Civil check [civil-sdk](https://github.com/hmcts/civil-sdk)
 
@@ -397,6 +407,20 @@ role-assignment, etc.). Add this label when you need to test against live AAT se
 ## [Scheduler Framework](docs/scheduler-framework.md)
 
 Detailed documentation on core components, safety mechanisms, and instructions for creating new schedulers can be found in [docs/scheduler-framework.md](docs/scheduler-framework.md).
+
+## Null-safety baseline
+
+`./gradlew nullAwayBaseline` runs NullAway in WARN mode against production Java
+sources under `uk.gov.hmcts`. It also runs as part of `check` and `build`.
+The log prints `NullAway warning count (src/main/java): <count>` on every run,
+including when analysis is up to date or restored from the build cache. Full
+compiler diagnostics are saved to `build/reports/nullaway/diagnostics.txt`.
+Use `./gradlew nullAwayBaseline --rerun-tasks` to force a fresh analysis.
+
+Analysis compiles into `build/classes/nullaway`, outside application outputs.
+Normal compilation retains `-Werror`; the analysis compilation omits it and
+only enables the NullAway Error Prone check. Test sources are excluded from the
+production baseline. Warnings are observations, not a build threshold.
 
 ## License
 

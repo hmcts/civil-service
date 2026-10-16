@@ -40,7 +40,8 @@ public class DefendantPinToPostLRspecService {
         if (pinInPostData == null || pinInPostData.getAccessCode() == null
             || !pinInPostData.getAccessCode().equals(pin)
             || pinInPostData.getExpiryDate().isBefore(LocalDate.now())) {
-            log.error("Pin does not match or expired for {}", caseData.getLegacyCaseReference());
+            log.info("Pin does not match or expired for {} (CCD case reference {})",
+                     caseData.getLegacyCaseReference(), caseDetails.getId());
             throw new PinNotMatchException();
         }
     }
@@ -91,7 +92,7 @@ public class DefendantPinToPostLRspecService {
             return response.headers().get("Location").stream().findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Missing 'Location' header"));
         } else {
-            log.error("Pin does not match or expired for {}, pin {}", caseReference, pin);
+            log.info("Pin does not match or expired for {}", caseReference);
             throw new PinNotMatchException();
         }
     }

@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.civil.config;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.microsoft.applicationinsights.TelemetryClient;
 import feign.Client;
 import feign.Request;
@@ -7,12 +11,12 @@ import feign.Response;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.Isolated;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.system.CapturedOutput;
-import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.slf4j.LoggerFactory;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
@@ -35,6 +39,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@Isolated
 @ExtendWith(MockitoExtension.class)
 class HttpClientFeignConfigurationTest {
 
@@ -168,10 +173,9 @@ class HttpClientFeignConfigurationTest {
     }
 
     @Test
-    @ExtendWith(OutputCaptureExtension.class)
-    void shouldLogReadTimeoutWithoutTelemetryAndPreserveException(CapturedOutput output) throws Exception {
+    void shouldLogReadTimeoutWithoutTelemetryAndPreserveException() throws Exception {
         Client delegate = mock(Client.class);
-        Client client = (Client) newInnerInstance(
+        final Client client = (Client) newInnerInstance(
             new Class<?>[]{Client.class, TelemetryClient.class, long.class},
             new Object[]{delegate, null, 15000L});
         Request request = Request.create(Request.HttpMethod.POST,
@@ -181,13 +185,30 @@ class HttpClientFeignConfigurationTest {
         SocketTimeoutException exception = new SocketTimeoutException("Read timed out");
         when(delegate.execute(request, options)).thenThrow(exception);
 
-        assertThatThrownBy(() -> client.execute(request, options)).isSameAs(exception);
+        Logger logger = (Logger) LoggerFactory.getLogger(HttpClientFeignConfiguration.class);
+        final Level previousLevel = logger.getLevel();
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+        logger.setLevel(Level.ERROR);
+        try {
+            assertThatThrownBy(() -> client.execute(request, options)).isSameAs(exception);
 
-        assertThat(output.getOut())
-            .contains("targetHost=ccd-data-store-api", "method=POST", "connectTimeoutMs=5000",
-                "readTimeoutMs=25000", "exceptionType=java.net.SocketTimeoutException")
-            .containsPattern("elapsedMs=\\d+")
-            .doesNotContain("/cases/123", "token=secret");
+            // Capture the event synchronously; ASYNC_CONSOLE may not have written to stdout yet.
+            assertThat(appender.list).hasSize(1);
+            ILoggingEvent event = appender.list.getFirst();
+            assertThat(event.getLevel()).isEqualTo(Level.ERROR);
+            assertThat(event.getThrowableProxy()).isNull();
+            assertThat(event.getFormattedMessage())
+                .contains("targetHost=ccd-data-store-api", "method=POST", "connectTimeoutMs=5000",
+                    "readTimeoutMs=25000", "exceptionType=java.net.SocketTimeoutException")
+                .containsPattern("elapsedMs=\\d+")
+                .doesNotContain("/cases/123", "token=secret");
+        } finally {
+            logger.detachAppender(appender);
+            appender.stop();
+            logger.setLevel(previousLevel);
+        }
     }
 
     private Object newInnerInstance(Class<?>[] parameterTypes, Object[] args) throws Exception {

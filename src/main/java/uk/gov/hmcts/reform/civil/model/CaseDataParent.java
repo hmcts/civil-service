@@ -341,6 +341,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private  HelpWithFeesForTab hearingHwfForTab;
     private  YesOrNo applicantDefenceResponseDocumentAndDQFlag;
     private  String migrationId;
+    private  String lipClaimSubmissionId;
 
     @JsonIgnore
     public boolean isApplicantNotRepresented() {
