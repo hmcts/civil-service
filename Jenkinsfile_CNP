@@ -238,21 +238,12 @@ withPipeline(type, product, component) {
     uploadBpmnDiagrams('aat')
   }
 
-  before('prod:promotion') {
-    withEnv([
-      'ENVIRONMENT_AGENT_STASH_INCLUDES=bin/**,src/main/resources/camunda/**',
-      'ENVIRONMENT_AGENT_STASH_BACK=false'
-    ]) {
-      withSubscription(
-        env.PROD_SUBSCRIPTION_NAME ?: 'prod', product, 'prod'
-      ) {
-        withAzureKeyvault(
-          azureKeyVaultSecrets: secretsProd['civil-prod'],
-          keyVaultURLOverride: 'https://civil-prod.vault.azure.net/'
-        ) {
-          uploadBpmnDiagrams('prod')
-        }
-      }
+  afterSuccess('buildinfra:prod') {
+    withAzureKeyvault(
+      azureKeyVaultSecrets: secretsProd['civil-prod'],
+      keyVaultURLOverride: 'https://civil-prod.vault.azure.net/'
+    ) {
+      uploadBpmnDiagrams('prod')
     }
   }
 
