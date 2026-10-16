@@ -2,9 +2,12 @@ package uk.gov.hmcts.reform.civil.config;
 
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import uk.gov.hmcts.reform.civil.repositories.CasemanReferenceNumberRepository;
@@ -16,7 +19,8 @@ import javax.sql.DataSource;
 public class DatabaseConfiguration {
 
     @Bean
-    public TransactionAwareDataSourceProxy dataSourceProxy(DataSource dataSource) {
+    @Primary
+    public TransactionAwareDataSourceProxy dataSourceProxy(@Qualifier("dataSource") @Lazy DataSource dataSource) {
         return new TransactionAwareDataSourceProxy(dataSource);
     }
 
