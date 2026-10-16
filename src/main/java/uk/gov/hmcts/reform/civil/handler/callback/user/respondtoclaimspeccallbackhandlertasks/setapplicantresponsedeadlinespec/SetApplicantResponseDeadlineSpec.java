@@ -130,22 +130,19 @@ public class SetApplicantResponseDeadlineSpec implements CaseTask {
         } else {
             handleBothRespondentsRepresentation(callbackParams, caseData, responseDate);
         }
-
-        if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWO)
-            && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
-            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(null);
-        }
     }
 
     private void handleSingleRespondentRepresentation(CallbackParams callbackParams, CaseData caseData,
                                                       LocalDateTime responseDate) {
         caseData.setRespondent2ResponseDate(responseDate);
         caseData.setBusinessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
+        LocalDateTime applicant1ResponseDeadline = getApplicant1ResponseDeadline(responseDate);
         if (caseData.getRespondent1ResponseDate() != null) {
-            LocalDateTime applicant1ResponseDeadline = getApplicant1ResponseDeadline(responseDate);
-            caseData
-                .setApplicant1ResponseDeadline(applicant1ResponseDeadline);
             caseData.setNextDeadline(applicant1ResponseDeadline.toLocalDate());
+        }
+
+        if (caseData.getApplicant1ResponseDeadline() == null) {
+            caseData.setApplicant1ResponseDeadline(applicant1ResponseDeadline);
         }
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
         Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();

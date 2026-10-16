@@ -246,4 +246,46 @@ class ShowConditionFlagsCaseUpdaterTest {
         assertThat(caseData.getShowConditionFlags()).isNotEmpty();
         assertThat(caseData.getShowConditionFlags()).doesNotContain(WHEN_WILL_CLAIM_BE_PAID);
     }
+
+    @Test
+    void shouldAddNeedFinancialDetails1ForFullAdmitSetDateEvenWhenCounterAdmitFlagSet() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent1(YES);
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        caseData.setRespondent1(party);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setSpecDefenceAdmittedRequired(NO);
+        caseData.setSpecDefenceFullAdmittedRequired(NO);
+        caseData.setRespondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setMultiPartyResponseTypeFlags(
+            uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
+        caseData.setSameSolicitorSameResponse(YES);
+        caseData.setDefendantSingleResponseToBothClaimants(YES);
+        caseData.setShowConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_1));
+
+        updater.update(caseData);
+
+        assertThat(caseData.getShowConditionFlags()).contains(NEED_FINANCIAL_DETAILS_1, WHY_1_DOES_NOT_PAY_IMMEDIATELY);
+    }
+
+    @Test
+    void shouldAddWhy2DoesNotPayImmediatelyForCompanyRespondent2() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent2(YES);
+        Party party = new Party();
+        party.setType(Party.Type.COMPANY);
+        caseData.setRespondent2(party);
+        caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+        caseData.setSpecDefenceFullAdmitted2Required(NO);
+        caseData.setSpecDefenceAdmitted2Required(NO);
+        caseData.setRespondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setShowConditionFlags(EnumSet.of(CAN_ANSWER_RESPONDENT_2));
+
+        updater.update(caseData);
+
+        assertThat(caseData.getShowConditionFlags()).contains(WHY_2_DOES_NOT_PAY_IMMEDIATELY);
+        assertThat(caseData.getShowConditionFlags())
+            .doesNotContain(uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.NEED_FINANCIAL_DETAILS_2);
+    }
 }

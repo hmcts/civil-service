@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -29,19 +31,15 @@ class HandleRespondentResponseTypeForSpecTest {
 
     @BeforeEach
     void setUp() {
-        objectMapper = new ObjectMapper();
+        objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
         handleRespondentResponseTypeForSpec = new HandleRespondentResponseTypeForSpec(objectMapper);
     }
 
-    private void assertSpecDefenceFullAdmittedRequired(CaseData caseData, Object expectedValue) {
+    private CaseData execute(CaseData caseData) {
         CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         CallbackResponse response = handleRespondentResponseTypeForSpec.execute(callbackParams);
-
         Map<String, Object> responseData = ((AboutToStartOrSubmitCallbackResponse) response).getData();
-
-        CaseData updatedCaseData = objectMapper.convertValue(responseData, CaseData.class);
-
-        assertEquals(expectedValue, updatedCaseData.getSpecDefenceFullAdmittedRequired());
+        return objectMapper.convertValue(responseData, CaseData.class);
     }
 
     @Test
@@ -51,7 +49,7 @@ class HandleRespondentResponseTypeForSpecTest {
                 .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .build();
 
-        assertSpecDefenceFullAdmittedRequired(caseData, NO);
+        assertEquals(NO, execute(caseData).getSpecDefenceFullAdmittedRequired());
     }
 
     @Test
@@ -61,7 +59,7 @@ class HandleRespondentResponseTypeForSpecTest {
         caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
         caseData.setSpecDefenceFullAdmittedRequired(YES);
 
-        assertSpecDefenceFullAdmittedRequired(caseData, YES);
+        assertEquals(YES, execute(caseData).getSpecDefenceFullAdmittedRequired());
     }
 
     @Test
@@ -71,16 +69,35 @@ class HandleRespondentResponseTypeForSpecTest {
                 .respondent2ClaimResponseTypeForSpec(null)
                 .build();
 
-        assertSpecDefenceFullAdmittedRequired(caseData, NO);
+        assertEquals(NO, execute(caseData).getSpecDefenceFullAdmittedRequired());
     }
 
     @Test
-    void shouldSetSpecDefenceFullAdmittedRequiredToNoWhenRespondent2ResponseTypeIsNotFullAdmission() {
+    void shouldNotOverwriteRespondent1FullAdmitPaidFlagWhenRespondent2IsNotFullAdmission() {
         CaseData caseData = CaseDataBuilder.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .build();
+        caseData.setSpecDefenceFullAdmittedRequired(YES);
 
-        assertSpecDefenceFullAdmittedRequired(caseData, NO);
+        CaseData updated = execute(caseData);
+
+        assertEquals(YES, updated.getSpecDefenceFullAdmittedRequired());
+        assertNull(updated.getSpecDefenceFullAdmitted2Required());
+    }
+
+    @Test
+    void shouldSetSpecDefenceFullAdmitted2RequiredToNoWhenRespondent2IsNotFullAdmission() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .isRespondent2(YES)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .build();
+        caseData.setSpecDefenceFullAdmittedRequired(YES);
+
+        CaseData updated = execute(caseData);
+
+        assertEquals(YES, updated.getSpecDefenceFullAdmittedRequired());
+        assertEquals(NO, updated.getSpecDefenceFullAdmitted2Required());
     }
 }

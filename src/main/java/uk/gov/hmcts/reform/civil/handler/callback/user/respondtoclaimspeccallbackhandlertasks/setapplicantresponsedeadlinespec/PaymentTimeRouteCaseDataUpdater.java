@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
@@ -14,6 +15,7 @@ import java.time.ZonedDateTime;
 
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 
 @Component
 @RequiredArgsConstructor
@@ -26,24 +28,43 @@ public class PaymentTimeRouteCaseDataUpdater implements SetApplicantResponseDead
     public void update(CaseData caseData) {
         log.info("Updating PaymentTimeRouteCaseData for caseId: {}", caseData.getCcdCaseReference());
 
-        if (IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
-                && isFullAdmission(caseData)) {
-            log.debug("Defence admit part payment time route is IMMEDIATELY and response type is full admission for caseId: {}", caseData.getCcdCaseReference());
-            LocalDate whenBePaid = deadlineCalculatorService.calculateExtendedDeadline(
-                    ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDateTime(),
-                    RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
-            RespondToClaimAdmitPartLRspec admitPartLRspec = new RespondToClaimAdmitPartLRspec();
-            admitPartLRspec.setWhenWillThisAmountBePaid(whenBePaid);
-            caseData.setRespondToClaimAdmitPartLRspec(admitPartLRspec);
+        if (caseData.isCurrentDefendantRespondent2()) {
+            updateImmediatePayByDateForRespondent2(caseData);
         } else {
-            log.info("Defence admit part payment time route is not IMMEDIATELY for caseId: {}", caseData.getCcdCaseReference());
+            updateImmediatePayByDateForRespondent1(caseData);
         }
     }
 
-    private boolean isFullAdmission(CaseData caseData) {
-        log.debug("Checking if response type is full admission for caseId: {}", caseData.getCcdCaseReference());
-        return FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || FULL_ADMISSION.equals(
-            caseData.getRespondent2ClaimResponseTypeForSpec());
+    private void updateImmediatePayByDateForRespondent1(CaseData caseData) {
+        if (IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
+            && isAdmissionNeedingImmediateDeadline(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+            log.debug("Respondent 1 pay immediately admission for caseId: {}", caseData.getCcdCaseReference());
+            caseData.setRespondToClaimAdmitPartLRspec(buildImmediateAdmitPart());
+        } else {
+            log.info("Respondent 1 defence admit part payment time route is not IMMEDIATELY admission for caseId: {}",
+                     caseData.getCcdCaseReference());
+        }
+    }
+
+    private void updateImmediatePayByDateForRespondent2(CaseData caseData) {
+        if (IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired2())
+            && isAdmissionNeedingImmediateDeadline(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+            log.debug("Respondent 2 pay immediately admission for caseId: {}", caseData.getCcdCaseReference());
+            caseData.setRespondToClaimAdmitPartLRspec2(buildImmediateAdmitPart());
+        } else {
+            log.info("Respondent 2 defence admit part payment time route is not IMMEDIATELY admission for caseId: {}",
+                     caseData.getCcdCaseReference());
+        }
+    }
+
+    private RespondToClaimAdmitPartLRspec buildImmediateAdmitPart() {
+        LocalDate whenBePaid = deadlineCalculatorService.calculateExtendedDeadline(
+            ZonedDateTime.now(ZoneId.of("Europe/London")).toLocalDateTime(),
+            RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
+        return new RespondToClaimAdmitPartLRspec(whenBePaid);
+    }
+
+    private boolean isAdmissionNeedingImmediateDeadline(RespondentResponseTypeSpec responseType) {
+        return FULL_ADMISSION.equals(responseType) || PART_ADMISSION.equals(responseType);
     }
 }
