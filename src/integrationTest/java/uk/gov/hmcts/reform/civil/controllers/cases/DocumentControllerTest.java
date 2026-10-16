@@ -167,7 +167,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     @Test
     void shouldReturnPayloadTooLarge_whenDocumentExceedsMaxDownloadSize() throws Exception {
         Document document = document();
-        document.size = DataSize.ofMegabytes(100).toBytes() + 1;
+        document.size = DataSize.ofMegabytes(1024).toBytes() + 1;
         String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
         UUID documentId = getDocumentIdFromSelfHref(documentPath);
 

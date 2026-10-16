@@ -460,7 +460,7 @@ class SecuredDocumentManagementServiceTest {
                 ResourceReader.readString("document-management/download.success.json"),
                 Document.class
             );
-            document.size = DataSize.ofMegabytes(100).toBytes() + 1;
+            document.size = DataSize.ofMegabytes(1024).toBytes() + 1;
             String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
             UUID documentId = getDocumentIdFromSelfHref(documentPath);
 
@@ -474,7 +474,7 @@ class SecuredDocumentManagementServiceTest {
 
             assertEquals(
                 format(DocumentTooLargeException.MESSAGE_TEMPLATE, documentPath, document.size,
-                       DataSize.ofMegabytes(100).toBytes()),
+                       DataSize.ofMegabytes(1024).toBytes()),
                 ex.getMessage()
             );
             verify(caseDocumentBinaryApiClient, never()).getDocumentBinary(anyString(), anyString(), any());

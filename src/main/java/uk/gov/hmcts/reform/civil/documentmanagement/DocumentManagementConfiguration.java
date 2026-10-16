@@ -15,7 +15,7 @@ public class DocumentManagementConfiguration {
     private final DataSize maxDownloadSize;
 
     public DocumentManagementConfiguration(@Value("${document_management.userRoles}") List<String> userRoles,
-                                           @Value("${document_management.maxDownloadSize:100MB}") DataSize maxDownloadSize) {
+                                           @Value("${document_management.maxDownloadSize:1024MB}") DataSize maxDownloadSize) {
         this.userRoles = userRoles;
         this.maxDownloadSize = maxDownloadSize;
     }

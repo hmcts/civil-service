@@ -123,7 +123,7 @@ class SecuredDocumentManagementServiceRetryTest {
     @Test
     void downloadDocumentWithMetaData_tooLarge_isNotRetried() {
         when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), any(UUID.class)))
-            .thenReturn(document(DataSize.ofMegabytes(100).toBytes() + 1));
+            .thenReturn(document(DataSize.ofMegabytes(1024).toBytes() + 1));
 
         assertThrows(
             DocumentTooLargeException.class,
