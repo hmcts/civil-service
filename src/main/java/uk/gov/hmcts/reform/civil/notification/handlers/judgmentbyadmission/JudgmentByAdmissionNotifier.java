@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.judgmentbyadmission;
 
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -8,7 +9,7 @@ import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 import org.springframework.stereotype.Component;
 
 @Component
-public class JudgmentByAdmissionNotifier extends Notifier {
+public class JudgmentByAdmissionNotifier extends Notifier<CaseData> {
 
     public JudgmentByAdmissionNotifier(
         NotificationService notificationService,

@@ -13,7 +13,7 @@ import java.util.Set;
 @Component
 @AllArgsConstructor
 @Slf4j
-public class ResetPinDefendantLipEmailGenerator implements PartiesEmailGenerator {
+public class ResetPinDefendantLipEmailGenerator implements PartiesEmailGenerator<CaseData> {
 
     private final ResetPinDefendantLipEmailDTOGenerator resetPinDefendantLipEmailDTOGenerator;
 

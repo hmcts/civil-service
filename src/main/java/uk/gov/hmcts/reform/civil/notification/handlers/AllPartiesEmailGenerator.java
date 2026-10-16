@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 @Slf4j
-public class AllPartiesEmailGenerator implements PartiesEmailGenerator {
+public class AllPartiesEmailGenerator implements PartiesEmailGenerator<CaseData> {
 
     private final List<EmailDTOGenerator> generators;
 

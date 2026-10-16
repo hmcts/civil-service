@@ -37,7 +37,7 @@ class NotifierTest {
 
     private CaseTaskTrackingService caseTaskTrackingService;
 
-    private PartiesEmailGenerator emailGenerator;
+    private PartiesEmailGenerator<CaseData> emailGenerator;
 
     private TestNotifier notifier;
     EmailDTO party1;
@@ -47,10 +47,10 @@ class NotifierTest {
     CaseData caseData;
     String taskId = "taskId";
 
-    private static class TestNotifier extends Notifier {
+    private static class TestNotifier extends Notifier<CaseData> {
         public TestNotifier(NotificationService notificationService,
                             CaseTaskTrackingService caseTaskTrackingService,
-                            PartiesEmailGenerator emailGenerator) {
+                            PartiesEmailGenerator<CaseData> emailGenerator) {
             super(notificationService, caseTaskTrackingService, emailGenerator);
         }
 

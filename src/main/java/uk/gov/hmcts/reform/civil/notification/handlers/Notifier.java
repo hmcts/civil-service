@@ -4,7 +4,6 @@ import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.util.stream.Collectors.joining;
 
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 
@@ -16,19 +15,19 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public abstract class Notifier extends BaseNotifier {
+public abstract class Notifier<T extends NotifiableCaseData> extends BaseNotifier {
 
     protected final CaseTaskTrackingService caseTaskTrackingService;
-    protected final PartiesEmailGenerator partiesNotifier;
+    protected final PartiesEmailGenerator<T> partiesNotifier;
 
     protected Notifier(NotificationService notificationService, CaseTaskTrackingService caseTaskTrackingService,
-                       PartiesEmailGenerator partiesNotifier) {
+                       PartiesEmailGenerator<T> partiesNotifier) {
         super(notificationService);
         this.caseTaskTrackingService = caseTaskTrackingService;
         this.partiesNotifier = partiesNotifier;
     }
 
-    public String notifyParties(CaseData caseData, String eventId, String taskId) {
+    public String notifyParties(T caseData, String eventId, String taskId) {
         log.info(
             "Notifying parties for case ID: {} and eventId: {} and taskId: {} ",
             caseData.getCcdCaseReference(),
