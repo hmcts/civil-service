@@ -11,6 +11,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -91,5 +92,60 @@ class EmailDTOGeneratorTest {
         verify(helper).addCommonFooterSignatureWelsh(any());
         verify(helper).addLipContact(eq(caseData), any());
         verify(helper).addLipContactWelsh(eq(caseData), any());
+        verify(helper, never()).addLipClaimantVDefendant(any(), any());
+    }
+
+    @Test
+    void shouldAddClaimantVDefendant_whenRecipientIsLip() {
+        EmailDTOGenerator lipGenerator = new ClaimantEmailDTOGenerator() {
+
+            @Override
+            protected String getEmailTemplateId(CaseData caseData) {
+                return TEST_TEMPLATE_ID;
+            }
+
+            @Override
+            protected String getReferenceTemplate() {
+                return TEST_REFERENCE_TEMPLATE;
+            }
+
+            @Override
+            protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+                return properties;
+            }
+        };
+        lipGenerator.templateCommonPropertiesHelper = helper;
+
+        lipGenerator.addProperties(caseData);
+
+        verify(helper).addBaseProperties(eq(caseData), any());
+        verify(helper).addLipClaimantVDefendant(eq(caseData), any());
+    }
+
+    @Test
+    void shouldTreatClaimantAndDefendantGeneratorsAsLipRecipients() {
+        assertThat(new ClaimantEmailDTOGenerator() {
+            @Override
+            protected String getEmailTemplateId(CaseData caseData) {
+                return TEST_TEMPLATE_ID;
+            }
+
+            @Override
+            protected String getReferenceTemplate() {
+                return TEST_REFERENCE_TEMPLATE;
+            }
+        }.isLipRecipient()).isTrue();
+        assertThat(new DefendantEmailDTOGenerator() {
+            @Override
+            protected String getEmailTemplateId(CaseData caseData) {
+                return TEST_TEMPLATE_ID;
+            }
+
+            @Override
+            protected String getReferenceTemplate() {
+                return TEST_REFERENCE_TEMPLATE;
+            }
+        }.isLipRecipient()).isTrue();
+        assertThat(emailDTOGenerator.isLipRecipient()).isFalse();
     }
 }

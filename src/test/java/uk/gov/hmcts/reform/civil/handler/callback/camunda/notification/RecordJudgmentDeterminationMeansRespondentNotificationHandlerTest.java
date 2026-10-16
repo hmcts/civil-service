@@ -185,6 +185,7 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
                                  .setType(Party.Type.INDIVIDUAL).setPartyEmail("respondentLip@example.com"))
                 .respondent1Represented(null)
                 .legacyCaseReference("000DC001")
+                .ccdCaseReference(1594901956117591L)
                 .specRespondent1Represented(YesOrNo.NO)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
 
@@ -232,6 +233,8 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
             properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
             properties.put(PARTY_NAME, caseData.getRespondent1().getPartyName());
             properties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
+            properties.put("claim16DigitNumber", "1594901956117591");
+            properties.put("casemanRef", "000DC001");
             properties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
             properties.put(CNBC_CONTACT, configuration.getCnbcContact());
             return properties;

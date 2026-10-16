@@ -332,6 +332,7 @@ public class DocUploadNotificationServiceTest {
             customProp.put(NotificationDataGA.CASE_TITLE, "CL v DEF");
             customProp.put(NotificationDataGA.PARTY_REFERENCE, PARTY_REFERENCE);
             customProp.put(NotificationData.CASEMAN_REF, LEGACY_CASE_REFERENCE);
+            customProp.put(NotificationData.CLAIM_16_DIGIT_NUMBER, "1");
             customProp.put(
                 NotificationDataGA.CLAIM_LEGAL_ORG_NAME_SPEC,
                 isLipRespondent == YES ? RESPONDENT_ORG_NAME : APPLICANT_ORG_NAME
@@ -382,6 +383,7 @@ public class DocUploadNotificationServiceTest {
             }
             properties.put(NotificationDataGA.WELSH_CONTACT, "E-bost: ymholiadaucymraeg@justice.gov.uk");
             properties.put(NotificationData.CASEMAN_REF, LEGACY_CASE_REFERENCE);
+            properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, "1");
             properties.put(
                 NotificationDataGA.CLAIM_LEGAL_ORG_NAME_SPEC,
                 isLipCase ? RESPONDENT_ORG_NAME : APPLICANT_ORG_NAME

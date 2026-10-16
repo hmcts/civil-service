@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_FOR_RECORD_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT2_FOR_RECORD_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipSubjectProperties;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
@@ -138,6 +139,7 @@ public class RecordJudgmentDeterminationMeansRespondentNotificationHandler exten
             PARTY_NAME, caseData.getRespondent1().getPartyName(),
             CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
         ));
+        addLipSubjectProperties(caseData, properties);
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;

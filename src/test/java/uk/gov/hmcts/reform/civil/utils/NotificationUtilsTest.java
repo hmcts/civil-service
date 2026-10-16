@@ -26,6 +26,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_16_DIGIT_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
@@ -41,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterS
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignatureWelsh;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContactWelsh;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipSubjectProperties;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantEmail;
 
@@ -59,6 +63,29 @@ class NotificationUtilsTest {
         String actual = NotificationUtils.buildPartiesReferencesEmailSubject(caseData);
 
         assertThat(actual).isEqualTo("Claimant reference: Not provided - Defendant reference: Not provided");
+    }
+
+    @Test
+    void shouldAddLipSubjectProperties() {
+        CaseData caseData = lipCaseData();
+
+        Map<String, String> properties = addLipSubjectProperties(caseData, new HashMap<>());
+
+        assertThat(properties)
+            .containsEntry(CLAIM_16_DIGIT_NUMBER, "1594901956117591")
+            .containsEntry(CASEMAN_REF, "000DC001")
+            .containsEntry(CLAIMANT_V_DEFENDANT, "Claimant Ltd V Defendant Ltd");
+    }
+
+    private CaseData lipCaseData() {
+        return CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .ccdCaseReference(1594901956117591L)
+            .legacyCaseReference("000DC001")
+            .applicant1(new Party().setCompanyName("Claimant Ltd").setType(Party.Type.COMPANY))
+            .respondent1(new Party().setCompanyName("Defendant Ltd").setType(Party.Type.COMPANY))
+            .build();
     }
 
     @Test

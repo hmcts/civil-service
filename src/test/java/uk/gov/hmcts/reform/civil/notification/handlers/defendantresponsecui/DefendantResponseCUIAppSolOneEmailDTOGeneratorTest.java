@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_AD
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.Language.BOTH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 
@@ -107,6 +108,7 @@ public class DefendantResponseCUIAppSolOneEmailDTOGeneratorTest {
         String partyName = "party name";
         MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
         partyUtilsMockedStatic.when(() -> PartyUtils.getPartyNameBasedOnType(party)).thenReturn(partyName);
+        partyUtilsMockedStatic.when(() -> PartyUtils.getAllPartyNames(caseData)).thenReturn("Claimant V Defendant");
 
         Map<String, String> properties = new HashMap<>();
         Map<String, String> actualResults = emailDTOGenerator.addCustomProperties(properties, caseData);
@@ -114,9 +116,10 @@ public class DefendantResponseCUIAppSolOneEmailDTOGeneratorTest {
         notificationUtilsMockedStatic.close();
         partyUtilsMockedStatic.close();
 
-        assertThat(actualResults.size()).isEqualTo(2);
+        assertThat(actualResults.size()).isEqualTo(3);
         assertThat(actualResults).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, legalOrg);
         assertThat(actualResults).containsEntry(RESPONDENT_NAME, partyName);
+        assertThat(actualResults).containsEntry(CLAIMANT_V_DEFENDANT, "Claimant V Defendant");
     }
 
     @Test
