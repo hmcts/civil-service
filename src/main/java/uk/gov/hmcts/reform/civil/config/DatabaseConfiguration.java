@@ -18,13 +18,6 @@ import javax.sql.DataSource;
 @ConditionalOnProperty("reference.database.enabled")
 public class DatabaseConfiguration {
 
-    @Primary
-    @ConfigurationProperties(prefix = "spring.datasource")
-    @Bean
-    public DataSource dataSource() {
-        return new DriverManagerDataSource();
-    }
-
     @Bean
     public TransactionAwareDataSourceProxy dataSourceProxy(DataSource dataSource) {
         return new TransactionAwareDataSourceProxy(dataSource);
