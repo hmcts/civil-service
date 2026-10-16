@@ -10,7 +10,7 @@ class ListTaskResultTest {
 
     @Test
     void shouldExposeItemsAndTotalResults() {
-        ListTaskResult<String> result = new ListTaskResult<>(List.of("one", "two"), 2);
+        ListTaskResult<String> result = new ListTaskResult<>(List.of("one", "two"));
 
         assertThat(result.totalResults()).isEqualTo(2);
         assertThat(result.itemStream()).containsExactly("one", "two");
@@ -18,8 +18,8 @@ class ListTaskResultTest {
     }
 
     @Test
-    void shouldBeEmptyWhenTotalResultsIsZero() {
-        ListTaskResult<String> result = new ListTaskResult<>(List.of("not-counted"), 0);
+    void shouldBeEmptyWhenListIsEmpty() {
+        ListTaskResult<String> result = new ListTaskResult<>(List.of());
 
         assertThat(result.isEmpty()).isTrue();
     }

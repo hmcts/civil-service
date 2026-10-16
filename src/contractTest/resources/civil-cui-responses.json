@@ -1,0 +1,416 @@
+{
+  "defence": {
+    "respondent1ClaimResponseTypeForSpec": "FULL_DEFENCE",
+    "respondToClaimAdmitPartLRspec": {},
+    "responseClaimMediationSpecRequired": "No",
+    "specAoSApplicantCorrespondenceAddressRequired": "Yes",
+    "totalClaimAmount": 1000,
+    "respondent1": {
+      "individualDateOfBirth": null,
+      "individualFirstName": "Sam",
+      "individualLastName": "Example",
+      "individualTitle": "Mx",
+      "partyEmail": "defendant@example.com",
+      "primaryAddress": {
+        "AddressLine1": "1 Example Street",
+        "AddressLine2": "",
+        "AddressLine3": "",
+        "PostCode": "LS1 1AA",
+        "PostTown": "Leeds"
+      },
+      "soleTraderDateOfBirth": null,
+      "type": "INDIVIDUAL"
+    },
+    "respondent1LiPResponse": {
+      "respondent1DQExtraDetails": {
+        "wantPhoneOrVideoHearing": "Yes",
+        "whyPhoneOrVideoHearing": "A video hearing is requested.",
+        "triedToSettle": "Yes",
+        "determinationWithoutHearingReason": "",
+        "considerClaimantDocumentsDetails": "",
+        "respondent1DQLiPExpert": {
+          "expertCanStillExamineDetails": ""
+        }
+      },
+      "respondent1DQHearingSupportLip": {},
+      "respondent1ResponseLanguage": "BOTH"
+    },
+    "respondent1LiPResponseCarm": {
+      "isMediationContactNameCorrect": "Yes",
+      "isMediationEmailCorrect": "Yes",
+      "isMediationPhoneCorrect": "Yes",
+      "hasUnavailabilityNextThreeMonths": "No"
+    },
+    "respondent1LiPFinancialDetails": {},
+    "detailsOfWhyDoesYouDisputeTheClaim": "The invoice was issued in error.",
+    "specClaimResponseTimelineList": "MANUAL",
+    "specResponseTimelineOfEvents": [],
+    "defenceRouteRequired": "DISPUTES_THE_CLAIM",
+    "respondent1DQHomeDetails": {},
+    "respondent1PartnerAndDependent": {
+      "howManyChildrenByAgeGroup": {}
+    },
+    "specDefendant1SelfEmploymentDetails": {},
+    "respondToClaimAdmitPartUnemployedLRspec": {},
+    "respondent1DQLanguage": {
+      "court": "WELSH",
+      "documents": "BOTH"
+    },
+    "respondent1DQVulnerabilityQuestions": {},
+    "respondent1DQRequestedCourt": {
+      "otherPartyPreferredSite": "",
+      "responseCourtCode": "",
+      "responseCourtLocations": [],
+      "caseLocation": {}
+    },
+    "respondent1DQWitnesses": {},
+    "respondent1DQHearingSmallClaim": {
+      "unavailableDatesRequired": "No"
+    },
+    "respondent1DQExperts": {},
+    "respondent1DQHearingSupport": {},
+    "respondent1LiPStatementOfTruth": {}
+  },
+  "full-admission": {
+    "respondent1ClaimResponseTypeForSpec": "FULL_ADMISSION",
+    "defenceAdmitPartPaymentTimeRouteRequired": "SUGGESTION_OF_REPAYMENT_PLAN",
+    "respondent1RepaymentPlan": {
+      "paymentAmount": 10000,
+      "repaymentFrequency": "ONCE_ONE_MONTH",
+      "firstRepaymentDate": "2025-06-01T00:00:00.000Z"
+    },
+    "respondToClaimAdmitPartLRspec": {},
+    "responseClaimMediationSpecRequired": "No",
+    "specAoSApplicantCorrespondenceAddressRequired": "Yes",
+    "totalClaimAmount": 1000,
+    "respondent1": {
+      "individualDateOfBirth": null,
+      "individualFirstName": "Sam",
+      "individualLastName": "Example",
+      "individualTitle": "Mx",
+      "partyEmail": "defendant@example.com",
+      "primaryAddress": {
+        "AddressLine1": "1 Example Street",
+        "AddressLine2": "",
+        "AddressLine3": "",
+        "PostCode": "LS1 1AA",
+        "PostTown": "Leeds"
+      },
+      "soleTraderDateOfBirth": null,
+      "type": "INDIVIDUAL"
+    },
+    "respondent1LiPResponse": {
+      "respondent1DQExtraDetails": {
+        "whyPhoneOrVideoHearing": "",
+        "determinationWithoutHearingReason": "",
+        "considerClaimantDocumentsDetails": "",
+        "respondent1DQLiPExpert": {
+          "expertCanStillExamineDetails": ""
+        }
+      },
+      "respondent1DQHearingSupportLip": {},
+      "respondent1ResponseLanguage": "BOTH"
+    },
+    "respondent1LiPFinancialDetails": {},
+    "specClaimResponseTimelineList": "MANUAL",
+    "specResponseTimelineOfEvents": [],
+    "respondent1DQHomeDetails": {},
+    "respondent1PartnerAndDependent": {
+      "howManyChildrenByAgeGroup": {}
+    },
+    "specDefendant1SelfEmploymentDetails": {},
+    "respondToClaimAdmitPartUnemployedLRspec": {},
+    "respondent1DQLanguage": {},
+    "respondent1DQVulnerabilityQuestions": {},
+    "respondent1DQRequestedCourt": {
+      "otherPartyPreferredSite": "",
+      "responseCourtCode": "",
+      "responseCourtLocations": [],
+      "caseLocation": {}
+    },
+    "respondent1DQWitnesses": {},
+    "respondent1DQHearingSmallClaim": {},
+    "respondent1DQExperts": {},
+    "respondent1DQHearingSupport": {},
+    "respondent1LiPStatementOfTruth": {}
+  },
+  "part-admission": {
+    "respondent1ClaimResponseTypeForSpec": "PART_ADMISSION",
+    "defenceAdmitPartPaymentTimeRouteRequired": "BY_SET_DATE",
+    "respondToClaimAdmitPartLRspec": {
+      "whenWillThisAmountBePaid": "2025-06-01T00:00:00.000Z"
+    },
+    "responseClaimMediationSpecRequired": "No",
+    "specAoSApplicantCorrespondenceAddressRequired": "Yes",
+    "totalClaimAmount": 1000,
+    "respondent1": {
+      "individualDateOfBirth": null,
+      "individualFirstName": "Sam",
+      "individualLastName": "Example",
+      "individualTitle": "Mx",
+      "partyEmail": "defendant@example.com",
+      "primaryAddress": {
+        "AddressLine1": "1 Example Street",
+        "AddressLine2": "",
+        "AddressLine3": "",
+        "PostCode": "LS1 1AA",
+        "PostTown": "Leeds"
+      },
+      "soleTraderDateOfBirth": null,
+      "type": "INDIVIDUAL"
+    },
+    "respondent1LiPResponse": {
+      "respondent1DQExtraDetails": {
+        "wantPhoneOrVideoHearing": "Yes",
+        "whyPhoneOrVideoHearing": "A video hearing is requested.",
+        "triedToSettle": "Yes",
+        "determinationWithoutHearingReason": "",
+        "considerClaimantDocumentsDetails": "",
+        "respondent1DQLiPExpert": {
+          "expertCanStillExamineDetails": ""
+        }
+      },
+      "respondent1DQHearingSupportLip": {},
+      "respondent1ResponseLanguage": "BOTH"
+    },
+    "respondent1LiPResponseCarm": {
+      "isMediationContactNameCorrect": "Yes",
+      "isMediationEmailCorrect": "Yes",
+      "isMediationPhoneCorrect": "Yes",
+      "hasUnavailabilityNextThreeMonths": "No"
+    },
+    "respondent1LiPFinancialDetails": {},
+    "specDefenceAdmittedRequired": "No",
+    "respondToAdmittedClaimOwingAmountPounds": "600",
+    "respondToAdmittedClaimOwingAmount": "60000",
+    "detailsOfWhyDoesYouDisputeTheClaim": "Only part of the invoice is due.",
+    "specClaimResponseTimelineList": "MANUAL",
+    "specResponseTimelineOfEvents": [],
+    "respondent1DQHomeDetails": {},
+    "respondent1PartnerAndDependent": {
+      "howManyChildrenByAgeGroup": {}
+    },
+    "specDefendant1SelfEmploymentDetails": {},
+    "respondToClaimAdmitPartUnemployedLRspec": {},
+    "respondent1DQLanguage": {
+      "court": "WELSH",
+      "documents": "BOTH"
+    },
+    "respondent1DQVulnerabilityQuestions": {},
+    "respondent1DQRequestedCourt": {
+      "otherPartyPreferredSite": "",
+      "responseCourtCode": "",
+      "responseCourtLocations": [],
+      "caseLocation": {}
+    },
+    "respondent1DQWitnesses": {},
+    "respondent1DQHearingSmallClaim": {
+      "unavailableDatesRequired": "No"
+    },
+    "respondent1DQExperts": {},
+    "respondent1DQHearingSupport": {},
+    "respondent1LiPStatementOfTruth": {}
+  },
+  "claimant-acceptance": {
+    "applicant1": {
+      "individualDateOfBirth": null,
+      "partyEmail": "claimant@example.com",
+      "primaryAddress": {
+        "AddressLine1": "1 Example Street",
+        "AddressLine2": "",
+        "AddressLine3": "",
+        "PostCode": "LS1 1AA",
+        "PostTown": "Leeds"
+      },
+      "soleTraderDateOfBirth": null,
+      "soleTraderFirstName": "Alex",
+      "soleTraderLastName": "Example",
+      "soleTraderTitle": "Mx",
+      "soleTraderTradingAs": "Example Trading",
+      "type": "SOLE_TRADER"
+    },
+    "applicant1AcceptAdmitAmountPaidSpec": "Yes",
+    "applicant1LiPResponse": {
+      "applicant1DQExtraDetails": {
+        "whyPhoneOrVideoHearing": "",
+        "determinationWithoutHearingReason": "",
+        "considerClaimantDocumentsDetails": "",
+        "applicant1DQLiPExpert": {
+          "expertCanStillExamineDetails": ""
+        }
+      },
+      "applicant1DQHearingSupportLip": {}
+    },
+    "applicant1DQLanguage": {},
+    "applicant1DQVulnerabilityQuestions": {},
+    "applicant1DQRequestedCourt": {
+      "otherPartyPreferredSite": "",
+      "responseCourtCode": "",
+      "responseCourtLocations": [],
+      "caseLocation": {}
+    },
+    "applicant1DQWitnesses": {},
+    "applicant1DQSmallClaimHearing": {},
+    "applicant1DQExperts": {},
+    "applicant1DQHearingSupport": {},
+    "applicant1AcceptPartAdmitPaymentPlanSpec": "Yes",
+    "applicant1ProceedWithClaim": "No",
+    "applicant1SettleClaim": "Yes"
+  },
+  "claimant-rejection": {
+    "applicant1": {
+      "individualDateOfBirth": null,
+      "partyEmail": "claimant@example.com",
+      "primaryAddress": {
+        "AddressLine1": "1 Example Street",
+        "AddressLine2": "",
+        "AddressLine3": "",
+        "PostCode": "LS1 1AA",
+        "PostTown": "Leeds"
+      },
+      "soleTraderDateOfBirth": null,
+      "soleTraderFirstName": "Alex",
+      "soleTraderLastName": "Example",
+      "soleTraderTitle": "Mx",
+      "soleTraderTradingAs": "Example Trading",
+      "type": "SOLE_TRADER"
+    },
+    "applicant1AcceptAdmitAmountPaidSpec": "No",
+    "applicant1LiPResponse": {
+      "applicant1DQExtraDetails": {
+        "wantPhoneOrVideoHearing": "Yes",
+        "whyPhoneOrVideoHearing": "A video hearing is requested.",
+        "triedToSettle": "Yes",
+        "determinationWithoutHearingReason": "",
+        "considerClaimantDocumentsDetails": "",
+        "applicant1DQLiPExpert": {
+          "expertCanStillExamineDetails": ""
+        }
+      },
+      "applicant1DQHearingSupportLip": {}
+    },
+    "applicant1LiPResponseCarm": {
+      "isMediationContactNameCorrect": "Yes",
+      "isMediationEmailCorrect": "Yes",
+      "isMediationPhoneCorrect": "Yes",
+      "hasUnavailabilityNextThreeMonths": "No"
+    },
+    "applicant1DQLanguage": {
+      "court": "WELSH",
+      "documents": "BOTH"
+    },
+    "applicant1DQVulnerabilityQuestions": {},
+    "applicant1DQRequestedCourt": {
+      "otherPartyPreferredSite": "",
+      "responseCourtCode": "",
+      "responseCourtLocations": [],
+      "caseLocation": {}
+    },
+    "applicant1DQWitnesses": {},
+    "applicant1DQSmallClaimHearing": {
+      "unavailableDatesRequired": "No"
+    },
+    "applicant1DQExperts": {},
+    "applicant1DQHearingSupport": {},
+    "applicant1ProceedWithClaim": "Yes",
+    "applicant1SettleClaim": "No"
+  },
+  "claimant-instalments": {
+    "applicant1": {
+      "individualDateOfBirth": null,
+      "partyEmail": "claimant@example.com",
+      "primaryAddress": {
+        "AddressLine1": "1 Example Street",
+        "AddressLine2": "",
+        "AddressLine3": "",
+        "PostCode": "LS1 1AA",
+        "PostTown": "Leeds"
+      },
+      "soleTraderDateOfBirth": null,
+      "soleTraderFirstName": "Alex",
+      "soleTraderLastName": "Example",
+      "soleTraderTitle": "Mx",
+      "soleTraderTradingAs": "Example Trading",
+      "type": "SOLE_TRADER"
+    },
+    "applicant1LiPResponse": {
+      "applicant1DQExtraDetails": {
+        "whyPhoneOrVideoHearing": "",
+        "determinationWithoutHearingReason": "",
+        "considerClaimantDocumentsDetails": "",
+        "applicant1DQLiPExpert": {
+          "expertCanStillExamineDetails": ""
+        }
+      },
+      "applicant1DQHearingSupportLip": {},
+      "applicant1RejectedRepaymentReason": "A different repayment schedule is proposed."
+    },
+    "applicant1DQLanguage": {},
+    "applicant1DQVulnerabilityQuestions": {},
+    "applicant1DQRequestedCourt": {
+      "otherPartyPreferredSite": "",
+      "responseCourtCode": "",
+      "responseCourtLocations": [],
+      "caseLocation": {}
+    },
+    "applicant1DQWitnesses": {},
+    "applicant1DQSmallClaimHearing": {},
+    "applicant1DQExperts": {},
+    "applicant1DQHearingSupport": {},
+    "applicant1AcceptFullAdmitPaymentPlanSpec": "No",
+    "applicant1RepaymentOptionForDefendantSpec": "REPAYMENT_PLAN",
+    "applicant1SettleClaim": "Yes",
+    "applicant1SuggestInstalmentsPaymentAmountForDefendantSpec": 20000,
+    "applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec": "ONCE_ONE_MONTH",
+    "applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec": "2025-07-01"
+  },
+  "claimant-set-date": {
+    "applicant1": {
+      "individualDateOfBirth": null,
+      "partyEmail": "claimant@example.com",
+      "primaryAddress": {
+        "AddressLine1": "1 Example Street",
+        "AddressLine2": "",
+        "AddressLine3": "",
+        "PostCode": "LS1 1AA",
+        "PostTown": "Leeds"
+      },
+      "soleTraderDateOfBirth": null,
+      "soleTraderFirstName": "Alex",
+      "soleTraderLastName": "Example",
+      "soleTraderTitle": "Mx",
+      "soleTraderTradingAs": "Example Trading",
+      "type": "SOLE_TRADER"
+    },
+    "applicant1LiPResponse": {
+      "applicant1DQExtraDetails": {
+        "whyPhoneOrVideoHearing": "",
+        "determinationWithoutHearingReason": "",
+        "considerClaimantDocumentsDetails": "",
+        "applicant1DQLiPExpert": {
+          "expertCanStillExamineDetails": ""
+        }
+      },
+      "applicant1DQHearingSupportLip": {},
+      "applicant1RejectedRepaymentReason": "A different repayment schedule is proposed."
+    },
+    "applicant1DQLanguage": {},
+    "applicant1DQVulnerabilityQuestions": {},
+    "applicant1DQRequestedCourt": {
+      "otherPartyPreferredSite": "",
+      "responseCourtCode": "",
+      "responseCourtLocations": [],
+      "caseLocation": {}
+    },
+    "applicant1DQWitnesses": {},
+    "applicant1DQSmallClaimHearing": {},
+    "applicant1DQExperts": {},
+    "applicant1DQHearingSupport": {},
+    "applicant1AcceptFullAdmitPaymentPlanSpec": "No",
+    "applicant1RepaymentOptionForDefendantSpec": "SET_DATE",
+    "applicant1SettleClaim": "Yes",
+    "applicant1RequestedPaymentDateForDefendantSpec": {
+      "paymentSetDate": "2025-07-01"
+    }
+  }
+}

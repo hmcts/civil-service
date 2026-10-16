@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
-import uk.gov.hmcts.reform.civil.service.search.TakeCaseOfflineSearchService;
+import uk.gov.hmcts.reform.civil.service.search.takecaseoffline.TakeCaseOfflineSchedulerSearchService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.verify;
 class TakeCaseOfflineSchedulerTest {
 
     @Mock
-    private TakeCaseOfflineSearchService searchService;
+    private TakeCaseOfflineSchedulerSearchService searchService;
     @Mock
     private ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
     @Mock

@@ -36,7 +36,7 @@ public enum CaseState {
     ADDITIONAL_RESPONSE_TIME_PROVIDED("Additional Response Time Provided"),
     AWAITING_DIRECTIONS_ORDER_DOCS("Directions Order Made"),
     ORDER_MADE("Order Made"),
-    LISTING_FOR_A_HEARING("Listed for a Hearing"),
+    LISTING_FOR_A_HEARING("List for hearing"),
     HEARING_SCHEDULED("Hearing Scheduled"),
     APPLICATION_PAYMENT_FAILED("Application Payment Failed"),
     AWAITING_APPLICATION_PAYMENT("Awaiting Application Payment"),

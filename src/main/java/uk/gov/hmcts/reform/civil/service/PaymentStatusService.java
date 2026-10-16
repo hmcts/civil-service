@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
 @RequiredArgsConstructor
 public class PaymentStatusService {
 
+    private static final int FOUND = 302;
     private static final int PRECONDITION_FAILED = 412;
     private static final String SERVICE_REQUEST_ALREADY_PAID = "serviceRequest has already been paid";
 
@@ -49,8 +50,9 @@ public class PaymentStatusService {
     }
 
     private boolean isServiceRequestAlreadyPaid(FeignException ex) {
-        return ex.status() == PRECONDITION_FAILED
-            && ex.contentUTF8().contains(SERVICE_REQUEST_ALREADY_PAID);
+        return ex.status() == FOUND
+            || (ex.status() == PRECONDITION_FAILED
+            && ex.contentUTF8().contains(SERVICE_REQUEST_ALREADY_PAID));
     }
 
     @Retryable(value = RetryablePaymentException.class, maxAttempts = 5, backoff = @Backoff(delay = 500))

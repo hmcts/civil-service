@@ -7,12 +7,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAApproveConsentOrder;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialMakeAnOrder;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.scheduler.common.DefaultBackPressureConfiguration;
@@ -40,6 +42,8 @@ class GAOrderMadeScheduledTaskTest {
     @Mock
     private DefaultBackPressureConfiguration defaultBackPressureConfiguration;
     @Mock
+    private CaseDetailsConverter caseDetailsConverter;
+    @Mock
     private ScheduledTaskBackPressureConfiguration backPressureConfiguration;
 
     @InjectMocks
@@ -47,19 +51,19 @@ class GAOrderMadeScheduledTaskTest {
 
     @Test
     void shouldReturnCaseId() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
-            .ccdCaseReference(CASE_ID)
-            .build();
-
-        assertThat(task.getItemId(caseData)).isEqualTo(CASE_ID);
+        CaseDetails caseDetails = CaseDetails.builder().id(CASE_ID).build();
+        assertThat(task.getItemId(caseDetails)).isEqualTo(CASE_ID);
     }
 
     @Test
     void shouldTriggerStayOrderDeadlineEventForJudicialOrder() {
+        CaseDetails caseDetails = CaseDetails.builder().id(CASE_ID).build();
         GeneralApplicationCaseData caseData = getJudicialOrderCaseData(LocalDate.now(), YesOrNo.NO);
         GeneralApplicationCaseData expectedCaseData = getJudicialOrderCaseData(LocalDate.now(), YesOrNo.YES);
 
-        task.accept(caseData);
+        when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
+
+        task.accept(caseDetails);
 
         verify(coreCaseDataService).triggerGaEvent(
             CASE_ID,
@@ -70,10 +74,13 @@ class GAOrderMadeScheduledTaskTest {
 
     @Test
     void shouldTriggerStayOrderDeadlineEventForConsentOrder() {
+        CaseDetails caseDetails = CaseDetails.builder().id(CASE_ID).build();
         GeneralApplicationCaseData caseData = getConsentOrderCaseData(LocalDate.now(), YesOrNo.NO);
         GeneralApplicationCaseData expectedCaseData = getConsentOrderCaseData(LocalDate.now(), YesOrNo.YES);
 
-        task.accept(caseData);
+        when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
+
+        task.accept(caseDetails);
 
         verify(coreCaseDataService).triggerGaEvent(
             CASE_ID,
