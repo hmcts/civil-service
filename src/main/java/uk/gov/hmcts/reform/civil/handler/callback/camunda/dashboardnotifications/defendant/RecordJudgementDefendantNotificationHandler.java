@@ -14,6 +14,11 @@ import java.util.List;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_RECORD_JUDGMENT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGMENT_ONLINE_RECORD_JUDGMENT_DETERMINATION_ISSUED_DEFENDANT;
 
+/**
+ * Retained for running Camunda instances using pre-migration process definitions.
+ * Remove after no instance can reach the legacy dashboard task (DTSCCI-6703).
+ */
+@Deprecated(forRemoval = true)
 @Service
 public class RecordJudgementDefendantNotificationHandler extends DashboardJudgementOnlineCallbackHandler {
 

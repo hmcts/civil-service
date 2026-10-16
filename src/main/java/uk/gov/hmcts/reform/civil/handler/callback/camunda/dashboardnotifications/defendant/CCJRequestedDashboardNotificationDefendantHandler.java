@@ -16,6 +16,11 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CCJ_CLAIMANT_ACCEPT_OR_REJECT_PLAN_SETTLEMENT_REQUESTED_NO_DEF_RESPONSE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_DEFENDANT;
 
+/**
+ * Retained for running Camunda instances using pre-migration process definitions.
+ * Remove after no instance can reach the legacy dashboard task (DTSCCI-6703).
+ */
+@Deprecated(forRemoval = true)
 @Service
 public class CCJRequestedDashboardNotificationDefendantHandler extends DashboardCallbackHandler {
 

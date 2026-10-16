@@ -4,6 +4,7 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskIds;
 
 import java.util.Map;
 
@@ -14,14 +15,6 @@ class RequestForReconsiderationCuiDefendantTest extends BpmnBaseTest {
 
     public static final String MESSAGE_NAME = "REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT";
     public static final String PROCESS_ID = "REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CUI_DEFENDANT";
-
-    //CCD CASE EVENT
-    public static final String CREATE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_CLAIMANT
-            = "CREATE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_CLAIMANT";
-
-    //ACTIVITY IDs
-    private static final String CREATE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_CLAIMANT_ACTIVITY_ID
-            = "CreateNotificationRequestForReconsiderationClaimant";
 
     public RequestForReconsiderationCuiDefendantTest() {
         super("request_for_reconsideration_cui_defendant.bpmn", PROCESS_ID);
@@ -46,16 +39,24 @@ class RequestForReconsiderationCuiDefendantTest extends BpmnBaseTest {
         ExternalTask notificationTask;
 
         //complete the claimant notification
-        notificationTask = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(notificationTask, PROCESS_CASE_EVENT,
-                CREATE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_CLAIMANT,
-                CREATE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_CLAIMANT_ACTIVITY_ID,
+        notificationTask = assertNextExternalTask(DASHBOARD_NOTIFICATION_TOPIC);
+        assertCompleteExternalTask(notificationTask, DASHBOARD_NOTIFICATION_TOPIC,
+                DASHBOARD_NOTIFICATION_EVENT,
+                DashboardTaskIds.REQUEST_FOR_RECONSIDERATION_CLAIMANT,
                 variables
         );
 
         //end business process
         ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);
         completeBusinessProcess(endBusinessProcess);
+
+        assertNoExternalTasksLeft();
+    }
+
+    @Test
+    void shouldAbortWhenStartBusinessProcessFails() {
+        ExternalTask startBusiness = assertNextExternalTask(START_BUSINESS_TOPIC);
+        assertFailExternalTask(startBusiness, START_BUSINESS_TOPIC, START_BUSINESS_EVENT, START_BUSINESS_ACTIVITY);
 
         assertNoExternalTasksLeft();
     }
