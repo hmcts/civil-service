@@ -42,7 +42,8 @@ public class CasesStuckCheckSearchService {
         }
 
         List<Long> ids = caseDetailsSet.stream().map(CaseDetails::getId).sorted().toList();
-        log.info("CasesStuckCheckSearchService: Found {} stuck case(s) in the last 7 days with ids {} at time {}", ids.size(), ids, timeNow);
+        log.info("CasesStuckCheckSearchService: Found {} stuck case(s) in the last {} days with ids {} at time {}",
+                 ids.size(), stuckCasesFromPastDays, ids, timeNow);
 
         return caseDetailsSet;
     }
