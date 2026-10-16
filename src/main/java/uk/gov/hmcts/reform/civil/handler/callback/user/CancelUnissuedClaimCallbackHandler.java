@@ -36,7 +36,6 @@ public class CancelUnissuedClaimCallbackHandler extends CallbackHandler {
     static final String CONFIRMATION_BODY = "### What happens next\n\n"
         + "No further action can be taken on this case. You can start a new claim by going to your account.";
 
-    // EXUI hides empty fields on Check your answers; a single space keeps the row and its Change link
     private static final String BLANK_REASON_PLACEHOLDER = " ";
 
     private final ObjectMapper objectMapper;
@@ -74,7 +73,6 @@ public class CancelUnissuedClaimCallbackHandler extends CallbackHandler {
         return !caseData.isApplicantLiP() && isOneVOne(caseData);
     }
 
-    // Length and allowed characters are validated by CCD (field Max / RegularExpression)
     private CallbackResponse populateBlankReason(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String reason = caseData.getCancelUnissuedClaimReason();
