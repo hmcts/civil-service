@@ -266,7 +266,7 @@ public class JudgmentsOnlineHelper {
         if (null != activeJudgment.getClaimFeeAmount()) {
             BigDecimal claimFeeAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getClaimFeeAmount()));
             if (claimFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
-                repaymentBreakdown.append("\n ### Claim fee amount \n £").append(claimFeeAmount.setScale(2));
+                repaymentBreakdown.append("\n ### Claim fee amount \n").append("£").append(claimFeeAmount.setScale(2));
             }
         }
 
