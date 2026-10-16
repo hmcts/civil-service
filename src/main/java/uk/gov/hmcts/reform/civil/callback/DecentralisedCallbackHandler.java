@@ -60,10 +60,10 @@ public class DecentralisedCallbackHandler implements JsonCallbackHandler {
         String authorisation = headers.getFirst(HttpHeaders.AUTHORIZATION);
         CaseDetails caseDetails = request.getCaseDetails();
         CaseDetails caseDetailsBefore = request.getCaseDetailsBefore();
-        boolean generalApplicationCaseType = isGeneralApplication(caseDetails);
 
         log.info("Running decentralised callback, caseId: {}, caseType: {}, eventId: {}, path: {}",
                  caseDetails.getId(), caseDetails.getCaseTypeId(), request.getEventId(), callbackPath);
+        boolean generalApplicationCaseType = isGeneralApplication(caseDetails);
 
         CallbackParams callbackParams = new CallbackParams()
             .request(request)
