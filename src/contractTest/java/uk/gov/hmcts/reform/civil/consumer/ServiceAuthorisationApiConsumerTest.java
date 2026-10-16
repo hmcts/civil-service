@@ -10,6 +10,7 @@ import au.com.dius.pact.core.model.annotations.Pact;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+@Import({AuthorisationService.class})
 @PactTestFor(providerName = "s2s_auth")
 @MockServerConfig(hostInterface = "localhost", port = "6679")
 @TestPropertySource(properties = {
