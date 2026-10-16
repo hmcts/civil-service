@@ -359,6 +359,10 @@ dashboard:
     url: ${CIVIL_SERVICE_URL:http://localhost:4000}
 
 ccd:
+  decentralised-runtime:
+    # CCD attaches the documents an about-to-submit callback returns only for case types it keeps itself.
+    cdam-attach:
+      enabled: ${CIVIL_DECENTRALISED_ENABLED:false}
   data-migration:
     enabled: ${CIVIL_CCD_DATA_MIGRATION_ENABLED:false}
     task-name: ${CIVIL_CCD_DATA_MIGRATION_TASK_NAME:civil-ccd-data-migration}
