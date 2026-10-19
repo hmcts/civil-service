@@ -47,7 +47,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        variant: [current, c1, noexclude, c1_noexclude]
+        variant: [current, noexclude]
+        repeat: [1, 2, 3]
     env:
       GRADLE_OPTS: -Dorg.gradle.workers.max=2
     steps:
@@ -63,6 +64,8 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 21.0.12+101.0.LTS
+      - name: Runner CPU
+        run: lscpu | grep -E 'Model name|^CPU\(s\)'
       - name: Compile
         run: ./gradlew testClasses
       - name: Unit tests
@@ -78,7 +81,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: test-results-${{ matrix.variant }}
+          name: test-results-${{ matrix.variant }}-${{ matrix.repeat }}
           path: build/test-results/test/*.xml
 
   build:
@@ -112,6 +115,8 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 21.0.12+101.0.LTS
+      - name: Runner CPU
+        run: lscpu | grep -E "Model name|^CPU\(s\)"
       - name: Run checks
         run: ./gradlew check
       - name: Run integration tests
