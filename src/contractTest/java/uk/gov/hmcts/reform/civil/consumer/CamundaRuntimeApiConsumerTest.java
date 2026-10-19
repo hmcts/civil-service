@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -31,6 +32,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
+@Import({CamundaRuntimeClient.class})
 @PactTestFor(providerName = "camunda_rest_engine")
 @MockServerConfig(hostInterface = "localhost", port = "6687")
 @TestPropertySource(properties = "feign.client.config.processInstance.url=http://localhost:6687")
