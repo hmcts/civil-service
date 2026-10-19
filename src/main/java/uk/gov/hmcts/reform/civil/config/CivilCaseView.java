@@ -10,11 +10,10 @@ import java.util.Map;
 import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
-import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 
 /**
- * Returns decentralised CIVIL and GENERALAPPLICATION cases to CCD as they were stored, as CCD returns the cases it
- * keeps. Typing the view as a map keeps case data out of this service's models, which do not round-trip every field.
+ * Returns decentralised CIVIL cases to CCD as they were stored, as CCD returns the cases it keeps. Typing the view as
+ * a map keeps case data out of this service's models, which do not round-trip every field.
  */
 @Component
 @ConditionalOnProperty(name = "civil.decentralised.enabled", havingValue = "true")
@@ -22,7 +21,7 @@ public class CivilCaseView implements CaseView<Map<String, Object>, CaseState> {
 
     @Override
     public Set<String> caseTypeIds() {
-        return Set.of(CASE_TYPE, GENERALAPPLICATION_CASE_TYPE);
+        return Set.of(CASE_TYPE);
     }
 
     @Override
