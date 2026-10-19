@@ -1,0 +1,7 @@
+// TEMPORARY (DTSCCI-6734): unit tests with C1 only, keeping the build.gradle CompileCommand exclusion
+gradle.projectsEvaluated {
+  rootProject.tasks.withType(Test).configureEach { t ->
+    t.jvmArgs = t.jvmArgs + ['-XX:TieredStopAtLevel=1']
+    t.doFirst { logger.lifecycle("JVM args for ${t.name}: ${t.allJvmArgs.findAll { it.startsWith('-XX') }}") }
+  }
+}
