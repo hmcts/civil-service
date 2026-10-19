@@ -674,6 +674,21 @@ class SecuredDocumentManagementServiceTest {
     @Nested
     class DocumentMetaData {
         @Test
+        void shouldClassifyEmptyMetadataAsDownloadFailure() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
+            when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), any(UUID.class)))
+                .thenReturn(null);
+
+            DocumentDownloadException exception = assertThrows(DocumentDownloadException.class,
+                () -> documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath));
+
+            assertEquals(format(MESSAGE_TEMPLATE, documentPath), exception.getMessage());
+            Assertions.assertInstanceOf(IllegalStateException.class, exception.getCause());
+            assertEquals("Document metadata response was empty for " + documentPath,
+                         exception.getCause().getMessage());
+        }
+
+        @Test
         void getDocumentMetaData() throws JsonProcessingException {
             String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b3";
             UUID documentId = getDocumentIdFromSelfHref(documentPath);

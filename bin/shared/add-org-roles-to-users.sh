@@ -70,7 +70,7 @@ ${dir}/organisational-role-assignment.sh "DJ.Angel.Morgan@ejudiciary.net" "${JUD
 
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hmcts-admin" '{"jurisdiction":"CIVIL","primaryLocation":"20262"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "task-supervisor" '{"jurisdiction":"CIVIL","primaryLocation":"20262","workTypes":"routine_work,hearing_work,access_requests"}' "ADMIN"
-${dir}/organisational-role-assignment.sh "hearing_center_admin_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hmcts-viewer" '{"jurisdiction":"CIVIL","primaryLocation":"20262"}' "ADMIN"
+${dir}/organisational-role-assignment.sh "hearing_center_admin_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-viewer" '{"jurisdiction":"CIVIL","primaryLocation":"20262"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-manager" '{"jurisdiction":"CIVIL","primaryLocation":"20262"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-centre-team-leader" '{"jurisdiction":"CIVIL","primaryLocation":"20262","workTypes":"hearing_work,access_requests,routine_work"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-centre-admin" '{"jurisdiction":"CIVIL","primaryLocation":"20262","workTypes":"hearing_work,routine_work,multi_track_hearing_work,intermediate_track_hearing_work,query_work"}' "ADMIN"
