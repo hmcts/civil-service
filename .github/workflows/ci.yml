@@ -40,15 +40,15 @@ jobs:
             src/main
           python .semgrep/annotate.py semgrep-results.json
 
-  # TEMPORARY (DTSCCI-6734): times the unit test task under different JIT settings. Remove before merge.
+  # TEMPORARY (DTSCCI-6734): times this branch's unit tests against master's on the same runner. Remove before merge.
   test-timing:
     if: github.event_name == 'pull_request' && github.head_ref == 'DTSCCI-6734-unit-test-time'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        variant: [current, noexclude]
-        repeat: [1, 2, 3]
+        order: [branch-first, master-first]
+        repeat: [1, 2]
     env:
       GRADLE_OPTS: -Dorg.gradle.workers.max=2
     steps:
@@ -66,23 +66,28 @@ jobs:
           java-version: 21.0.12+101.0.LTS
       - name: Runner CPU
         run: lscpu | grep -E 'Model name|^CPU\(s\)'
-      - name: Compile
-        run: ./gradlew testClasses
-      - name: Unit tests
+      - name: Check out master alongside
         run: |
-          args=()
-          if [ "${{ matrix.variant }}" != current ]; then
-            args=(--init-script ".github/test-timing/${{ matrix.variant }}.gradle")
+          git fetch --depth=1 origin master
+          git worktree add ../civil-master FETCH_HEAD
+      - name: Compile both
+        run: |
+          ./gradlew testClasses
+          (cd ../civil-master && ./gradlew testClasses)
+      - name: Paired unit test runs
+        run: |
+          run() {
+            local label=$1 dir=$2 start
+            start=$(date +%s)
+            (cd "$dir" && ./gradlew test --rerun)
+            echo "TIMING $label $(( $(date +%s) - start ))s tests=$(cat "$dir"/build/test-results/test/*.xml | grep -o '<testcase ' | wc -l)" | tee -a "$RUNNER_TEMP/timing.txt"
+          }
+          if [ "${{ matrix.order }}" = branch-first ]; then
+            run branch . && run master ../civil-master
+          else
+            run master ../civil-master && run branch .
           fi
-          start=$(date +%s)
-          ./gradlew test "${args[@]}"
-          echo "TEST_SECONDS=$(( $(date +%s) - start ))"
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: test-results-${{ matrix.variant }}-${{ matrix.repeat }}
-          path: build/test-results/test/*.xml
+          cat "$RUNNER_TEMP/timing.txt"
 
   build:
     runs-on: ubuntu-latest
