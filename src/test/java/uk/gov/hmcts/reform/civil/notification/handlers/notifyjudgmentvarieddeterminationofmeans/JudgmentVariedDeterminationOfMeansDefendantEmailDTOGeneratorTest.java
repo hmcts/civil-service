@@ -81,7 +81,7 @@ class JudgmentVariedDeterminationOfMeansDefendantEmailDTOGeneratorTest {
                 .respondent1(new Party().setPartyEmail(RESPONDENT_EMAIL).setCompanyName(RESPONDENT_NAME).setType(Party.Type.COMPANY))
                 .legacyCaseReference(LEGACY_REF)
                 .build();
-        when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
+        when(notificationsProperties.getNotifyLipJudgmentVariedDeterminationOfMeansTemplate()).thenReturn(TEMPLATE_ID);
 
         assertThat(generator.getEmailTemplateId(caseData)).isEqualTo(TEMPLATE_ID);
 

@@ -9,6 +9,7 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA.CASE_TITLE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_16_DIGIT_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 
 public class EmailSubjectUtils {
 
@@ -30,7 +31,9 @@ public class EmailSubjectUtils {
 
     public static Map<String, String> addLipClaimantVDefendant(GeneralApplicationCaseData caseData,
                                                                Map<String, String> properties) {
-        properties.put(CASE_TITLE, JudicialFinalDecisionHandler.getAllPartyNames(caseData));
+        String partyNames = JudicialFinalDecisionHandler.getAllPartyNames(caseData);
+        properties.put(CASE_TITLE, partyNames);
+        properties.put(CLAIMANT_V_DEFENDANT, partyNames);
         return properties;
     }
 }

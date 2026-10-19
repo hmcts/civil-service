@@ -53,7 +53,7 @@ class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGeneratorTest {
     @Test
     void shouldUseLipTemplate() {
         CaseData caseData = CaseData.builder().applicant1Represented(YesOrNo.NO).build();
-        when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(LIP_TEMPLATE_ID);
+        when(notificationsProperties.getNotifyLipJudgmentVariedDeterminationOfMeansTemplate()).thenReturn(LIP_TEMPLATE_ID);
         assertThat(generator.getEmailTemplateId(caseData)).isEqualTo(LIP_TEMPLATE_ID);
     }
 

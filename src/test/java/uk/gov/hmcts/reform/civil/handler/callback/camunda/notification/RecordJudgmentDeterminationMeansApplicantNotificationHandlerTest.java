@@ -143,7 +143,7 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id");
+            when(notificationsProperties.getNotifyLipJudgmentVariedDeterminationOfMeansTemplate()).thenReturn("template-id");
             handler.handle(params);
 
             verify(notificationService).sendMail(

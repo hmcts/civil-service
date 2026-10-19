@@ -401,6 +401,24 @@ public class NotificationsProperties {
     private String notifyLipUpdateTemplateBilingual;
 
     @NotEmpty
+    private String notifyLipJudgmentVariedDeterminationOfMeansTemplate;
+
+    @NotEmpty
+    private String notifyLipDjNonDivergentClaimantTemplate;
+
+    @NotEmpty
+    private String notifyLipDjNonDivergentDefendantTemplate;
+
+    @NotEmpty
+    private String notifyLipHearingFeeUnpaidTemplate;
+
+    @NotEmpty
+    private String notifyLiPClaimantTranslatedDocumentUploadedTemplate;
+
+    @NotEmpty
+    private String notifyLiPDefendantTranslatedDocumentUploadedTemplate;
+
+    @NotEmpty
     private String notifyUpdateTemplate;
 
     @NotEmpty

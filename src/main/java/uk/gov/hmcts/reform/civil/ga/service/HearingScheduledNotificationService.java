@@ -29,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addLipClaimantVDefendant;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addSubjectReferences;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 
 @Slf4j
 @Service
@@ -57,6 +58,7 @@ public class HearingScheduledNotificationService implements NotificationDataGA {
         int minutes = Integer.parseInt(hourMinute.substring(2, 4));
         LocalTime hearingTime = LocalTime.of(hours, minutes, 0);
 
+        customProps.remove(CLAIMANT_V_DEFENDANT);
         customProps.put(CASE_REFERENCE, caseData.getGeneralAppParentCaseLink().getCaseReference());
         customProps.put(GENAPP_REFERENCE, String.valueOf(Objects.requireNonNull(caseData.getCcdCaseReference())));
         customProps.put(GA_HEARING_DATE, DateFormatHelper

@@ -322,6 +322,7 @@ public class HwfNotificationServiceTest {
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
         properties.put(NotificationDataGA.CASE_TITLE, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIMANT_V_DEFENDANT, CLAIMANT + " v " + DEFENDANT);
         properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, GA_REFERENCE);
         properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
@@ -351,6 +352,7 @@ public class HwfNotificationServiceTest {
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
         properties.put(NotificationDataGA.CASE_TITLE, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIMANT_V_DEFENDANT, CLAIMANT + " v " + DEFENDANT);
         properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, GA_REFERENCE);
         properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
@@ -623,6 +625,7 @@ public class HwfNotificationServiceTest {
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
         properties.put(NotificationDataGA.CASE_TITLE, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIMANT_V_DEFENDANT, CLAIMANT + " v " + DEFENDANT);
         properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, GA_REFERENCE);
         properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
@@ -648,6 +651,7 @@ public class HwfNotificationServiceTest {
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
         properties.put(NotificationDataGA.CASE_TITLE, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIMANT_V_DEFENDANT, CLAIMANT + " v " + DEFENDANT);
         properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, GA_REFERENCE);
         properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
@@ -912,6 +916,7 @@ public class HwfNotificationServiceTest {
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
         properties.put(NotificationDataGA.CASE_TITLE, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIMANT_V_DEFENDANT, CLAIMANT + " v " + DEFENDANT);
         properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, GA_REFERENCE);
         properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
@@ -940,6 +945,7 @@ public class HwfNotificationServiceTest {
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
         properties.put(NotificationDataGA.CASE_TITLE, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIMANT_V_DEFENDANT, CLAIMANT + " v " + DEFENDANT);
         properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, GA_REFERENCE);
         properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
@@ -967,6 +973,7 @@ public class HwfNotificationServiceTest {
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
         properties.put(NotificationDataGA.CASE_TITLE, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIMANT_V_DEFENDANT, CLAIMANT + " v " + DEFENDANT);
         properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, GA_REFERENCE);
         properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
@@ -994,6 +1001,7 @@ public class HwfNotificationServiceTest {
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
         properties.put(NotificationDataGA.CASE_TITLE, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIMANT_V_DEFENDANT, CLAIMANT + " v " + DEFENDANT);
         properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, GA_REFERENCE);
         properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
@@ -1113,6 +1121,7 @@ public class HwfNotificationServiceTest {
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
         properties.put(NotificationDataGA.CASE_TITLE, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIMANT_V_DEFENDANT, CLAIMANT + " v " + DEFENDANT);
         properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, GA_REFERENCE);
         properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
