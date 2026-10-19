@@ -174,7 +174,7 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
-            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id");
+            when(notificationsProperties.getNotifyLipJudgmentVariedDeterminationOfMeansTemplate()).thenReturn("template-id");
 
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
             caseData = caseData.toBuilder()

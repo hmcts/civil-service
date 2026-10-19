@@ -778,6 +778,8 @@ class JudicialApplicantNotificationServiceTest {
         private Map<String, String> notificationPropertiesSummeryJudgement() {
 
             customProp.put(NotificationDataGA.CASE_TITLE, "CL v DEF");
+
+            customProp.put(NotificationData.CLAIMANT_V_DEFENDANT, "CL v DEF");
             customProp.put(NotificationDataGA.CASE_REFERENCE, CASE_REFERENCE.toString());
             customProp.put(NotificationDataGA.GENAPP_REFERENCE, CASE_REFERENCE.toString());
             customProp.put(NotificationDataGA.GA_APPLICATION_TYPE, GeneralApplicationTypes.SUMMARY_JUDGEMENT.getDisplayedValue());
@@ -801,6 +803,7 @@ class JudicialApplicantNotificationServiceTest {
         private Map<String, String> notificationPropertiesVaryOrder(boolean isLipTemplate) {
             if (isLipTemplate) {
                 customProp.put(NotificationDataGA.CASE_TITLE, "CL v DEF");
+                customProp.put(NotificationData.CLAIMANT_V_DEFENDANT, "CL v DEF");
             }
 
             customProp.put(NotificationDataGA.CASE_REFERENCE, CASE_REFERENCE.toString());
@@ -2602,7 +2605,8 @@ class JudicialApplicantNotificationServiceTest {
             NotificationDataGA.GENAPP_REFERENCE, CASE_REFERENCE.toString(),
             NotificationDataGA.GA_APPLICATION_TYPE, GeneralApplicationTypes.STAY_THE_CLAIM.getDisplayedValue(),
             NotificationDataGA.PARTY_REFERENCE, PARTY_REFERENCE,
-            NotificationDataGA.CASE_TITLE, "CL v DEF"
+            NotificationDataGA.CASE_TITLE, "CL v DEF",
+            NotificationData.CLAIMANT_V_DEFENDANT, "CL v DEF"
         ));
         properties.put(NotificationDataGA.WELSH_CONTACT, "E-bost: ymholiadaucymraeg@justice.gov.uk");
         properties.put(NotificationDataGA.WELSH_HMCTS_SIGNATURE, "Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
@@ -2623,6 +2627,7 @@ class JudicialApplicantNotificationServiceTest {
     private Map<String, String> notificationPropertiesToStayTheClaimLipRespondent() {
         HashMap<String, String> properties = new HashMap<>(Map.of(
             "ClaimantvDefendant", "CL v DEF",
+            "claimantvdefendant", "CL v DEF",
             "claimReferenceNumber", "111111",
             "GenAppclaimReferenceNumber", "111111",
             "generalAppType", "Stay the claim",

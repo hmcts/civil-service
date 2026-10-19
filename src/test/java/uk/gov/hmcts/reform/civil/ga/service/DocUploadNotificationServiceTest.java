@@ -330,6 +330,7 @@ public class DocUploadNotificationServiceTest {
             customProp.put(NotificationDataGA.CASE_REFERENCE, CASE_REFERENCE.toString());
             customProp.put(NotificationDataGA.GENAPP_REFERENCE, CASE_REFERENCE.toString());
             customProp.put(NotificationDataGA.CASE_TITLE, "CL v DEF");
+            customProp.put(NotificationData.CLAIMANT_V_DEFENDANT, "CL v DEF");
             customProp.put(NotificationDataGA.PARTY_REFERENCE, PARTY_REFERENCE);
             customProp.put(NotificationData.CASEMAN_REF, LEGACY_CASE_REFERENCE);
             customProp.put(NotificationData.CLAIM_16_DIGIT_NUMBER, "1");

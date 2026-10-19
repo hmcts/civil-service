@@ -43,7 +43,7 @@ class HearingFeeUnpaidClaimantEmailDTOGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastHearingFeeDueDeadline().build()
                 .toBuilder().build();
 
-        when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
+        when(notificationsProperties.getNotifyLipHearingFeeUnpaidTemplate()).thenReturn(TEMPLATE_ID);
 
         String templateId = generator.getEmailTemplateId(caseData);
 

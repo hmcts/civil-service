@@ -40,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUti
 import static uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil.isGeneralAppConsentOrder;
 import static uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil.notificationCriterion;
 import static uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil.requiredGAType;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 
 @Service
 @RequiredArgsConstructor
@@ -106,6 +107,7 @@ public class JudicialNotificationService implements NotificationDataGA {
 
     @Override
     public Map<String, String> addProperties(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData) {
+        customProps.remove(CLAIMANT_V_DEFENDANT);
         addBaseProperties(caseData);
         addSubjectReferences(mainCaseData, caseData.getGeneralAppParentCaseLink().getCaseReference(), customProps);
         updateLipProperties(caseData);
