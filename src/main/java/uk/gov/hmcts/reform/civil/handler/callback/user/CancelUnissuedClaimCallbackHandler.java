@@ -15,11 +15,9 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -34,24 +32,17 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 public class CancelUnissuedClaimCallbackHandler extends CallbackHandler {
 
     static final String EVENT_NOT_ALLOWED = "Event Not Allowed";
-    static final String REASON_TOO_LONG = "Explain why you are cancelling the claim must be 200 characters or less";
-    static final String REASON_INVALID_CHARACTERS = "Enter alphanumerical characters or standard punctuation marks only";
     static final String CONFIRMATION_HEADER = "# This claim has been cancelled";
     static final String CONFIRMATION_BODY = "### What happens next\n\n"
         + "No further action can be taken on this case. You can start a new claim by going to your account.";
 
-    private static final int REASON_MAX_LENGTH = 200;
-    // EXUI hides empty fields on Check your answers; a single space keeps the row and its Change link
     private static final String BLANK_REASON_PLACEHOLDER = " ";
-    // Same allowed characters as the citizen UI cancellation reason
-    private static final Pattern ALLOWED_CHARACTERS = Pattern.compile(
-        "^[A-Za-z0-9 \\t\\r\\n.,!?'\"()&:;@#/$%+=\\u00A3\\u2018\\u2019\\u201C\\u201D\\u2013\\u2014\\u2026-]*$");
 
     private final ObjectMapper objectMapper;
 
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_START), this::aboutToStartValidation,
-        callbackKey(MID, "validate-cancel-reason"), this::validateCancelReason,
+        callbackKey(MID, "populate-cancel-reason"), this::populateBlankReason,
         callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
         callbackKey(SUBMITTED), this::submitted);
 
@@ -82,27 +73,16 @@ public class CancelUnissuedClaimCallbackHandler extends CallbackHandler {
         return !caseData.isApplicantLiP() && isOneVOne(caseData);
     }
 
-    private CallbackResponse validateCancelReason(CallbackParams callbackParams) {
+    private CallbackResponse populateBlankReason(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String reason = caseData.getCancelUnissuedClaimReason();
-        List<String> errors = new ArrayList<>();
-        if (reason != null) {
-            if (reason.length() > REASON_MAX_LENGTH) {
-                errors.add(REASON_TOO_LONG);
-            }
-            if (!ALLOWED_CHARACTERS.matcher(reason).matches()) {
-                errors.add(REASON_INVALID_CHARACTERS);
-            }
-        }
-        if (errors.isEmpty() && (reason == null || reason.isBlank())) {
+        if (reason == null || reason.isBlank()) {
             caseData.setCancelUnissuedClaimReason(BLANK_REASON_PLACEHOLDER);
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toMap(objectMapper))
                 .build();
         }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
