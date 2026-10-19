@@ -406,7 +406,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
             "General app respondent has not agreed and the additional payment has not been made for caseId: {}",
             caseData.getCcdCaseReference()
         );
-        return caseData.getGeneralAppInformOtherParty().getIsWithNotice();
+        return getApplicationWithNotice(caseData);
     }
 
     private YesOrNo resolveRequestMoreInfoNoticeForAgreedResponse(GeneralApplicationCaseData caseData) {
@@ -757,7 +757,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
             return;
         }
         if (caseData.getGeneralAppRespondentAgreement().getHasAgreed().equals(NO)) {
-            gaJudicialRequestMoreInfo.setIsWithNotice(caseData.getGeneralAppInformOtherParty().getIsWithNotice());
+            gaJudicialRequestMoreInfo.setIsWithNotice(getApplicationWithNotice(caseData));
             return;
         }
         if (caseData.getGeneralAppRespondentAgreement().getHasAgreed().equals(YES)) {
@@ -1782,8 +1782,14 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
         return NO;
     }
 
+    private YesOrNo getApplicationWithNotice(GeneralApplicationCaseData caseData) {
+        return ofNullable(caseData.getGeneralAppInformOtherParty())
+            .map(informOtherParty -> informOtherParty.getIsWithNotice())
+            .orElse(null);
+    }
+
     private YesOrNo isAdditionalPaymentMade(GeneralApplicationCaseData caseData) {
-        return caseData.getGeneralAppInformOtherParty().getIsWithNotice().equals(NO)
+        return NO.equals(getApplicationWithNotice(caseData))
             && Objects.nonNull(caseData.getGeneralAppPBADetails())
             && Objects.nonNull(caseData.getGeneralAppPBADetails().getAdditionalPaymentDetails()) ? YES : NO;
 
