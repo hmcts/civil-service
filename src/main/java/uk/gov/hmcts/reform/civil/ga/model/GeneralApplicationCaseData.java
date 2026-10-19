@@ -368,6 +368,10 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
     private YesOrNo respondentResponseDeadlineChecked;
     //Case name for manage case
     private String caseNameGaInternal;
+    // Carries the notifier's summary from the NOTIFY_EVENT about to submit callback to its
+    // submitted callback, which writes it onto the RECORD_NOTIFICATIONS history event and
+    // then clears it. See DTSCCI-4296.
+    private String notificationSummary;
     private String claimantBilingualLanguagePreference;
     private RespondentLiPResponse respondent1LiPResponse;
     private YesOrNo bilingualHint;
@@ -630,6 +634,7 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
         this.generalAppWrittenRepText = other.generalAppWrittenRepText;
         this.respondentResponseDeadlineChecked = other.respondentResponseDeadlineChecked;
         this.caseNameGaInternal = other.caseNameGaInternal;
+        this.notificationSummary = other.notificationSummary;
         this.claimantBilingualLanguagePreference = other.claimantBilingualLanguagePreference;
         this.respondent1LiPResponse = other.respondent1LiPResponse;
         this.bilingualHint = other.bilingualHint;
@@ -1861,6 +1866,11 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
 
     public GeneralApplicationCaseData caseNameGaInternal(String caseNameGaInternal) {
         this.caseNameGaInternal = caseNameGaInternal;
+        return this;
+    }
+
+    public GeneralApplicationCaseData notificationSummary(String notificationSummary) {
+        this.notificationSummary = notificationSummary;
         return this;
     }
 

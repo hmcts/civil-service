@@ -35,7 +35,7 @@ public class AllGaPartiesEmailGenerator implements PartiesEmailGenerator<General
     private final CoreCaseDataService coreCaseDataService;
     private final SolicitorEmailValidation solicitorEmailValidation;
 
-    public AllGaPartiesEmailGenerator(List<? extends EmailDTOGenerator<GaNotificationContext>> generators,
+    public AllGaPartiesEmailGenerator(List<?     extends EmailDTOGenerator<GaNotificationContext>> generators,
                                       CaseDetailsConverter caseDetailsConverter,
                                       CoreCaseDataService coreCaseDataService,
                                       SolicitorEmailValidation solicitorEmailValidation) {
