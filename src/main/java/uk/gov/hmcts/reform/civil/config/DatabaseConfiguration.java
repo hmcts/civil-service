@@ -1,14 +1,15 @@
 package uk.gov.hmcts.reform.civil.config;
 
+import com.zaxxer.hikari.HikariDataSource;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.flyway.FlywayDataSource;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import uk.gov.hmcts.reform.civil.repositories.CasemanReferenceNumberRepository;
 
@@ -19,14 +20,16 @@ import javax.sql.DataSource;
 public class DatabaseConfiguration {
 
     @Bean
-    @Primary
-    public TransactionAwareDataSourceProxy dataSourceProxy(@Qualifier("dataSource") @Lazy DataSource dataSource) {
-        return new TransactionAwareDataSourceProxy(dataSource);
+    @FlywayDataSource
+    @ConfigurationProperties(prefix = "spring.datasource.hikari")
+    public HikariDataSource hikariDataSource() {
+        return new HikariDataSource();
     }
 
-    @Bean
-    public DataSourceTransactionManager transactionManager(TransactionAwareDataSourceProxy dataSourceProxy) {
-        return new DataSourceTransactionManager(dataSourceProxy);
+    @Primary
+    @Bean(name = "dataSource")
+    public TransactionAwareDataSourceProxy dataSource(@Qualifier("hikariDataSource") DataSource hikariDataSource) {
+        return new TransactionAwareDataSourceProxy(hikariDataSource);
     }
 
     @Bean
