@@ -52,6 +52,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.utils.CaseServiceUtil;
@@ -1784,7 +1785,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
 
     private YesOrNo getApplicationWithNotice(GeneralApplicationCaseData caseData) {
         return ofNullable(caseData.getGeneralAppInformOtherParty())
-            .map(informOtherParty -> informOtherParty.getIsWithNotice())
+            .map(GAInformOtherParty::getIsWithNotice)
             .orElse(null);
     }
 
