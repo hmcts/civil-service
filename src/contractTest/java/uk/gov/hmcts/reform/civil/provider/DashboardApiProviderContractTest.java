@@ -7,7 +7,7 @@ import au.com.dius.pact.provider.junitsupport.Provider;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 import au.com.dius.pact.provider.junitsupport.loader.PactBrokerConsumerVersionSelectors;
 import au.com.dius.pact.provider.junitsupport.loader.SelectorBuilder;
-import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
+import au.com.dius.pact.provider.spring.spring7.Spring7MockMvcTestTarget;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
@@ -73,7 +73,7 @@ class DashboardApiProviderContractTest {
             .build();
 
         if (context != null) {
-            MockMvcTestTarget target = new MockMvcTestTarget();
+            Spring7MockMvcTestTarget target = new Spring7MockMvcTestTarget();
             target.setMockMvc(mockMvc);
             context.setTarget(target);
         }

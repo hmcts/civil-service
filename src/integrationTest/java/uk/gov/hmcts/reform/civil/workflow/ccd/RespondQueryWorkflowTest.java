@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.workflow.ccd;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
@@ -23,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 @SuppressWarnings("java:S5960")
 class RespondQueryWorkflowTest extends WorkflowIntegrationTest {
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @Test

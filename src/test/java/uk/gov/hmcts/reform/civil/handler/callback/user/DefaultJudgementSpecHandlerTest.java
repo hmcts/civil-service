@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
+import org.springframework.boot.validation.autoconfigure.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -72,7 +72,7 @@ import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     DefaultJudgementSpecHandler.class,
-    JacksonAutoConfiguration.class,
+    Jackson2AutoConfiguration.class,
     ValidationAutoConfiguration.class,
     CaseDetailsConverter.class,
     DefaultJudgmentOnlineMapper.class,
@@ -87,18 +87,18 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private ObjectMapper mapper;
 
-    @MockBean
+    @MockitoBean
     private InterestCalculator interestCalculator;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
 
-    @MockBean
+    @MockitoBean
     private RoboticsAddressMapper addressMapper;
 
     @Autowired
