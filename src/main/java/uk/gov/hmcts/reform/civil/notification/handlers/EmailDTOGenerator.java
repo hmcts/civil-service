@@ -57,7 +57,7 @@ public abstract class EmailDTOGenerator<T extends NotifiableCaseData> {
     public abstract Map<String, String> addProperties(T caseData);
 
     /**
-     * The reference the email is sent under. Civil formats {@link #getReferenceTemplate()} with the
+     * The reference the email is sent under. Civil formats its own reference template with the
      * legacy case reference; General Application uses the parent case reference, which is why this
      * is not fixed here.
      */
@@ -70,8 +70,6 @@ public abstract class EmailDTOGenerator<T extends NotifiableCaseData> {
     protected String getEmailTemplateId(T caseData, String taskId) {
         return getEmailTemplateId(caseData);
     }
-
-    protected abstract String getReferenceTemplate();
 
     protected abstract Map<String, String> addCustomProperties(Map<String, String> properties, T caseData);
 }

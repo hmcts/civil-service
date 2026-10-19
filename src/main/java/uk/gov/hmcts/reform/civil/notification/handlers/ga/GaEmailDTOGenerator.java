@@ -16,13 +16,4 @@ public abstract class GaEmailDTOGenerator extends EmailDTOGenerator<GaNotificati
     protected String buildEmailReference(GaNotificationContext context) {
         return context.gaCaseData().getGeneralAppParentCaseLink().getCaseReference();
     }
-
-    /**
-     * Unused on the General Application side, because {@link #buildEmailReference} returns the
-     * parent case reference verbatim rather than formatting a template around it.
-     */
-    @Override
-    protected String getReferenceTemplate() {
-        return "%s";
-    }
 }

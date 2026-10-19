@@ -38,4 +38,11 @@ public abstract class CivilEmailDTOGenerator extends EmailDTOGenerator<CaseData>
     protected String buildEmailReference(CaseData caseData) {
         return String.format(getReferenceTemplate(), caseData.getLegacyCaseReference());
     }
+
+    /**
+     * Declared here rather than on {@link EmailDTOGenerator} because only the civil reference
+     * format uses it. General Application sends under the parent case reference verbatim, so a
+     * GA generator would otherwise have to supply a template it never applies.
+     */
+    protected abstract String getReferenceTemplate();
 }
