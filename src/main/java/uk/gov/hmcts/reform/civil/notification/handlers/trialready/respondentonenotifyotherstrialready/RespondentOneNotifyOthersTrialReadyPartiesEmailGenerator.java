@@ -38,6 +38,12 @@ public class RespondentOneNotifyOthersTrialReadyPartiesEmailGenerator extends Tr
 
     @Override
     public Set<EmailDTO> getPartiesToNotify(CaseData caseData, String taskId) {
+        if (caseData.getHearingDate() == null) {
+            log.info("Skipping trial-ready notification for case ID: {} because there is no hearing date",
+                     caseData.getCcdCaseReference());
+            return Set.of();
+        }
+
         Set<EmailDTO> partiesToEmail = new HashSet<>();
         log.info("Generating email for case ID: {}", caseData.getCcdCaseReference());
 
