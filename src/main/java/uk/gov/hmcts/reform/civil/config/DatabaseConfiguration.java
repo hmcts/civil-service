@@ -6,6 +6,7 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.flyway.FlywayDataSource;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,10 +21,19 @@ import javax.sql.DataSource;
 public class DatabaseConfiguration {
 
     @Bean
+    @Primary
+    @ConfigurationProperties("spring.datasource")
+    public DataSourceProperties dataSourceProperties() {
+        return new DataSourceProperties();
+    }
+
+    @Bean
     @FlywayDataSource
-    @ConfigurationProperties(prefix = "spring.datasource")
-    public HikariDataSource hikariDataSource() {
-        return new HikariDataSource();
+    @ConfigurationProperties("spring.datasource.hikari")
+    public HikariDataSource hikariDataSource(DataSourceProperties properties) {
+        return properties.initializeDataSourceBuilder()
+            .type(HikariDataSource.class)
+            .build();
     }
 
     @Primary
