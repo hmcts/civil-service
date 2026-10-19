@@ -115,6 +115,8 @@ public class CivilCftlibConfig implements CFTLibConfigurer {
             "next-hearing-date-admin", "prd-admin"
         }),
         Map.entry("civil.prd.admin@example.com", new String[] {"caseworker", "prd-admin"}),
+        // CCD data store's own system user
+        Map.entry("data.store.idam.system.user@gmail.com", new String[] {"caseworker"}),
         Map.entry("caseworker-caa@mailnesia.com", new String[] {"caseworker", "caseworker-caa"})
     );
 
@@ -127,10 +129,12 @@ public class CivilCftlibConfig implements CFTLibConfigurer {
         });
 
         File definitions = new File(System.getenv("CIVIL_CFTLIB_CCD_DEFINITIONS_DIR"));
+        // ccd-definition-processor's template, as preview's xlsx build uses: it decides the columns each sheet keeps.
+        File template = new File(System.getenv("CIVIL_CFTLIB_CCD_TEMPLATE"));
         Map<String, String> substitutions = Map.of("CCD_DEF_CASE_SERVICE_BASE_URL", SERVICE_URL);
         for (String caseType : List.of("civil", "generalapplication")) {
             // The variants preview excludes: production-only sheets and the shuttered authorisations.
-            lib.importJsonDefinition(new File(definitions, caseType), null, substitutions,
+            lib.importJsonDefinition(new File(definitions, caseType), template, substitutions,
                 "*-prod.json", "AuthorisationCaseType-shuttered.json");
         }
 

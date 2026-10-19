@@ -16,11 +16,15 @@ import uk.gov.service.notify.NotificationClient;
 public class LocalServicesConfiguration {
 
     /**
-     * CDAM calls the local dm-store with a service token only, as it calls dm-store.
+     * CDAM calls the local dm-store with a service token only, as it calls dm-store; tests sign in through the local
+     * IDAM endpoints before they hold a token.
      */
     @Bean
-    public WebSecurityCustomizer localDmStoreIsServiceToService() {
-        return web -> web.ignoring().requestMatchers(LocalDmStoreController.PATH, LocalDmStoreController.PATH + "/**");
+    public WebSecurityCustomizer localStandInsAreOpen() {
+        return web -> web.ignoring().requestMatchers(
+            LocalDmStoreController.PATH, LocalDmStoreController.PATH + "/**",
+            LocalIdamController.LOGIN_USER, LocalIdamController.USER_INFO
+        );
     }
 
     /**

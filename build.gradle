@@ -968,6 +968,18 @@ def fetchCftlibCcdDefinitions = tasks.register('fetchCftlibCcdDefinitions') {
   }
 }
 
+// ccd-definition-processor's template, which the JSON import uses as preview's xlsx build does: it decides the
+// columns each sheet keeps.
+def fetchCftlibCcdTemplate = tasks.register('fetchCftlibCcdTemplate') {
+  description = 'Fetches the ccd-definition-processor template that bootWithCCD imports the JSON definitions with.'
+  def template = cftlibDir.map { it.file('ccd-template.xlsx') }
+  outputs.file template
+  doLast {
+    new URL('https://raw.githubusercontent.com/hmcts/ccd-definition-processor/master/data/ccd-template.xlsx')
+      .withInputStream { input -> template.get().asFile.withOutputStream { it << input } }
+  }
+}
+
 def startCftlibWiremock = tasks.register('startCftlibWiremock') {
   description = 'Starts wiremock with civil-wiremock-mappings and the local stubs in src/cftlib/wiremock, on port 8765.'
   def root = cftlibDir.map { it.dir('wiremock') }
@@ -1001,7 +1013,7 @@ def startCftlibWiremock = tasks.register('startCftlibWiremock') {
 
 tasks.withType(CftlibExec).configureEach {
   group = 'ccd tasks'
-  dependsOn fetchCftlibCcdDefinitions, startCftlibWiremock
+  dependsOn fetchCftlibCcdDefinitions, fetchCftlibCcdTemplate, startCftlibWiremock
   authMode = AuthMode.Local
 
   def definitions = System.getenv('CIVIL_CCD_DEFINITIONS_DIR') ?: cftlibDir.get().dir('ccd-definition').asFile.path
@@ -1012,6 +1024,7 @@ tasks.withType(CftlibExec).configureEach {
   environment 'RSE_LIB_ADDITIONAL_DATABASES', 'cmc'
   environment 'XUI_JURISDICTIONS', 'CIVIL'
   environment 'CIVIL_CFTLIB_CCD_DEFINITIONS_DIR', definitions
+  environment 'CIVIL_CFTLIB_CCD_TEMPLATE', cftlibDir.get().file('ccd-template.xlsx').asFile.path
   environment 'CIVIL_CFTLIB_CAMUNDA_DIR', file('src/main/resources').path
 
   // This service
@@ -1050,6 +1063,7 @@ tasks.withType(CftlibExec).configureEach {
   // CCD, AAC and CDAM, which store documents in the dm-store stub this service serves under cftlib
   environment 'DM_STORE_BASE_URL', 'http://localhost:4000'
   environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
+  environment 'IDAM_DATA_STORE_SYSTEM_USER_PASSWORD', 'password'
   environment 'DATA_STORE_S2S_AUTHORISED_SERVICES',
     'ccd_gw,ccd_data,ccd_ps,xui_webapp,civil_service,ccd_case_document_am_api,aac_manage_case_assignment,em_ccd_orchestrator'
   environment 'CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES', 'civil_service,aac_manage_case_assignment'
