@@ -125,7 +125,7 @@ public class GenerateDJFormAllPartiesEmailGenerator extends AllPartiesEmailGener
     }
 
     public void addIfPartyNeedsNotification(CaseData caseData, String taskId,
-                                             EmailDTOGenerator generator,
+                                             EmailDTOGenerator<CaseData> generator,
                                              Set<EmailDTO> partiesToEmail) {
         if ((generator != null) && generator.getShouldNotify(caseData)) {
             log.info("Generating email for party [{}] for case ID: {}",

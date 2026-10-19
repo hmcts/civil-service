@@ -1,28 +1,49 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.utils.MaskHelper.maskEmail;
 
+/**
+ * Builds the email for one recipient of a notification.
+ *
+ * <p>Typed on the case data so that General Application notifiers can have generators too. It was
+ * {@code CaseData} only, which is why the first GA notifier on the framework had to implement
+ * {@link PartiesEmailGenerator} directly and build its {@link EmailDTO} by hand. The civil
+ * behaviour, which is the common properties and the legacy case reference, lives in
+ * {@link CivilEmailDTOGenerator} so that none of its roughly 255 leaf subclasses had to change.</p>
+ *
+ * @param <T> the case data this generator reads
+ */
 @Slf4j
-public abstract class EmailDTOGenerator implements NotificationData {
+public abstract class EmailDTOGenerator<T extends NotifiableCaseData> {
 
-    @Autowired
-    protected TemplateCommonPropertiesHelper templateCommonPropertiesHelper;
+    public abstract Boolean getShouldNotify(T caseData);
 
-    public abstract Boolean getShouldNotify(CaseData caseData);
+    /**
+     * The emails this generator contributes, which is normally the one it builds.
+     *
+     * <p>Overridden where a single generator stands for a collection of recipients rather than a
+     * fixed party. General Application respondents are a list rather than the respondent1 and
+     * respondent2 slots the civil side has, so a GA generator can fan out here instead of the
+     * aggregator having to know about GA party shapes.</p>
+     *
+     * <p>Only {@link uk.gov.hmcts.reform.civil.notification.handlers.ga.AllGaPartiesEmailGenerator}
+     * calls this. The civil aggregators deliberately still call {@link #buildEmailDTO}, because
+     * their parties are fixed slots and because routing them through here would silently return
+     * nothing for the many tests that mock {@code buildEmailDTO} on a generator.</p>
+     */
+    public Set<EmailDTO> buildEmailDTOs(T caseData, String taskId) {
+        return Set.of(buildEmailDTO(caseData, taskId));
+    }
 
-    public EmailDTO buildEmailDTO(CaseData caseData, String taskId) {
+    public EmailDTO buildEmailDTO(T caseData, String taskId) {
         Map<String, String> properties = addProperties(caseData);
         addCustomProperties(properties, caseData);
-        String emailReference = String.format(getReferenceTemplate(),
-                                         caseData.getLegacyCaseReference());
+        String emailReference = buildEmailReference(caseData);
         log.info("buildEmailDTO for taskId: {} and email: {} and reference: {}",
                  taskId, maskEmail(getEmailAddress(caseData)), emailReference);
         EmailDTO emailDTO = new EmailDTO();
@@ -33,27 +54,24 @@ public abstract class EmailDTOGenerator implements NotificationData {
         return emailDTO;
     }
 
-    public Map<String, String> addProperties(CaseData caseData) {
-        HashMap<String, String> properties = new HashMap<>();
-        templateCommonPropertiesHelper.addBaseProperties(caseData, properties);
-        templateCommonPropertiesHelper.addCommonFooterSignature(properties);
-        templateCommonPropertiesHelper.addCnbcContact(caseData, properties);
-        templateCommonPropertiesHelper.addSpecAndUnspecContact(caseData, properties);
-        templateCommonPropertiesHelper.addCommonFooterSignatureWelsh(properties);
-        templateCommonPropertiesHelper.addLipContact(caseData, properties);
-        templateCommonPropertiesHelper.addLipContactWelsh(caseData, properties);
-        return properties;
-    }
+    public abstract Map<String, String> addProperties(T caseData);
 
-    protected abstract String getEmailAddress(CaseData caseData);
+    /**
+     * The reference the email is sent under. Civil formats {@link #getReferenceTemplate()} with the
+     * legacy case reference; General Application uses the parent case reference, which is why this
+     * is not fixed here.
+     */
+    protected abstract String buildEmailReference(T caseData);
 
-    protected abstract String getEmailTemplateId(CaseData caseData);
+    protected abstract String getEmailAddress(T caseData);
 
-    protected String getEmailTemplateId(CaseData caseData, String taskId) {
+    protected abstract String getEmailTemplateId(T caseData);
+
+    protected String getEmailTemplateId(T caseData, String taskId) {
         return getEmailTemplateId(caseData);
     }
 
     protected abstract String getReferenceTemplate();
 
-    protected abstract Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData);
+    protected abstract Map<String, String> addCustomProperties(Map<String, String> properties, T caseData);
 }

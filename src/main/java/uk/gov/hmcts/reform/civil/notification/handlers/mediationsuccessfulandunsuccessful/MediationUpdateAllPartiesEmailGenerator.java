@@ -61,7 +61,7 @@ public class MediationUpdateAllPartiesEmailGenerator implements PartiesEmailGene
     }
 
     private void addIfPartyNeedsNotification(CaseData caseData,
-                                             EmailDTOGenerator generator,
+                                             EmailDTOGenerator<CaseData> generator,
                                              Set<EmailDTO> partiesToEmail,
                                              String taskId) {
         if ((generator != null) && generator.getShouldNotify(caseData)) {
