@@ -404,7 +404,8 @@ ccd-case-document-am-api:
   java:
     releaseNameOverride: ${SERVICE_NAME}-cdam
     imagePullPolicy: Always
-    image: hmctsprod.azurecr.io/ccd/case-document-am-api:latest
+    # DO NOT MERGE: hmcts/ccd-case-document-am-api#820 lets civil_service attach the documents its callbacks return.
+    image: hmctsprod.azurecr.io/ccd/case-document-am-api:pr-820-48d0e2b-20261016160159
     ingressHost: ccd-case-document-am-api-${SERVICE_FQDN}
     environment:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
