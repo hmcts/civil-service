@@ -23,6 +23,10 @@ spring:
     import: "optional:configtree:/mnt/secrets/civil/"
   application:
     name: civil-service
+  # Boot 4 defaults HTTP conversion to Jackson 3; keep the customised Jackson 2 ObjectMapper
+  http:
+    converters:
+      preferred-json-mapper: jackson2
   main:
     allow-bean-definition-overriding: true
   task:
@@ -967,7 +971,8 @@ spring:
 
 management:
   endpoints:
-    enabled-by-default: false
+    access:
+      default: none
 
 print:
   service:

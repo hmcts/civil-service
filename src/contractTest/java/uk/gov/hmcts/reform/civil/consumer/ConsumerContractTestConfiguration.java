@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.civil.consumer;
 
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
-import org.springframework.boot.autoconfigure.http.HttpMessageConvertersAutoConfiguration;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.http.converter.autoconfigure.HttpMessageConvertersAutoConfiguration;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.cloud.openfeign.FeignAutoConfiguration;
@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.idam.client.OAuth2Configuration;
  */
 @TestConfiguration(proxyBeanMethods = false)
 @EnableConfigurationProperties
-@ImportAutoConfiguration({FeignAutoConfiguration.class, JacksonAutoConfiguration.class,
+@ImportAutoConfiguration({FeignAutoConfiguration.class, Jackson2AutoConfiguration.class,
     HttpMessageConvertersAutoConfiguration.class, PropertyPlaceholderAutoConfiguration.class})
 @EnableFeignClients(basePackages = {
     "uk.gov.hmcts.reform.idam.client", "uk.gov.hmcts.reform.civil",

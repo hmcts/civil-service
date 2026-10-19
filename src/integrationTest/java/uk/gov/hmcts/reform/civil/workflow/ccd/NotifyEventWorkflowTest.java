@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.workflow.ccd;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
 import uk.gov.hmcts.reform.civil.notification.handlers.NotifierFactory;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 @SuppressWarnings("java:S5960")
 class NotifyEventWorkflowTest extends WorkflowIntegrationTest {
 
-    @MockBean
+    @MockitoBean
     private NotifierFactory notifierFactory;
 
     @Test

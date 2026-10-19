@@ -2,14 +2,15 @@ package uk.gov.hmcts.reform.civil.health;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.availability.AvailabilityHealthContributorAutoConfiguration;
+import org.springframework.boot.health.autoconfigure.application.AvailabilityHealthContributorAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.endpoint.EndpointAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.health.HealthContributorAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.health.HealthEndpointAutoConfiguration;
-import org.springframework.boot.actuate.health.CompositeHealth;
-import org.springframework.boot.actuate.health.HealthComponent;
-import org.springframework.boot.actuate.health.HealthEndpoint;
-import org.springframework.boot.actuate.health.Status;
+import org.springframework.boot.health.autoconfigure.contributor.HealthContributorAutoConfiguration;
+import org.springframework.boot.health.autoconfigure.actuate.endpoint.HealthEndpointAutoConfiguration;
+import org.springframework.boot.health.autoconfigure.registry.HealthContributorRegistryAutoConfiguration;
+import org.springframework.boot.health.actuate.endpoint.CompositeHealthDescriptor;
+import org.springframework.boot.health.actuate.endpoint.HealthDescriptor;
+import org.springframework.boot.health.actuate.endpoint.HealthEndpoint;
+import org.springframework.boot.health.contributor.Status;
 import org.springframework.boot.autoconfigure.availability.ApplicationAvailabilityAutoConfiguration;
 import org.springframework.boot.availability.AvailabilityChangeEvent;
 import org.springframework.boot.availability.ReadinessState;
@@ -40,6 +41,7 @@ import static org.mockito.Mockito.when;
         S2sSecretReadinessHealthGroupIntegrationTest.TestConfig.class,
         EndpointAutoConfiguration.class,
         HealthContributorAutoConfiguration.class,
+        HealthContributorRegistryAutoConfiguration.class,
         HealthEndpointAutoConfiguration.class,
         ApplicationAvailabilityAutoConfiguration.class,
         AvailabilityHealthContributorAutoConfiguration.class,
@@ -93,10 +95,10 @@ class S2sSecretReadinessHealthGroupIntegrationTest {
         when(serviceAuthTokenGenerator.generate()).thenReturn("Bearer valid");
         indicator.refresh();
 
-        HealthComponent s2s = healthEndpoint.healthForPath("s2s");
+        HealthDescriptor s2s = healthEndpoint.healthForPath("s2s");
 
         assertThat(s2s.getStatus()).isEqualTo(Status.UP);
-        assertThat(((CompositeHealth) s2s).getComponents())
+        assertThat(((CompositeHealthDescriptor) s2s).getComponents())
             .as("s2s group must reference the contributor named in application.yaml")
             .containsKey("s2sSecretReadiness");
     }
@@ -107,12 +109,12 @@ class S2sSecretReadinessHealthGroupIntegrationTest {
             .thenThrow(new IllegalStateException("microservice key is null"));
         indicator.refresh();
 
-        HealthComponent s2s = healthEndpoint.healthForPath("s2s");
+        HealthDescriptor s2s = healthEndpoint.healthForPath("s2s");
 
         assertThat(s2s.getStatus())
             .as("a DOWN S2S indicator must drag its own s2s group DOWN for alerting")
             .isEqualTo(Status.DOWN);
-        assertThat(((CompositeHealth) s2s).getComponents()).containsKey("s2sSecretReadiness");
+        assertThat(((CompositeHealthDescriptor) s2s).getComponents()).containsKey("s2sSecretReadiness");
     }
 
     @Test
@@ -122,9 +124,9 @@ class S2sSecretReadinessHealthGroupIntegrationTest {
             .thenThrow(new IllegalStateException("microservice key is null"));
         indicator.refresh();
 
-        HealthComponent readiness = healthEndpoint.healthForPath("readiness");
+        HealthDescriptor readiness = healthEndpoint.healthForPath("readiness");
 
-        assertThat(((CompositeHealth) readiness).getComponents())
+        assertThat(((CompositeHealthDescriptor) readiness).getComponents())
             .as("the S2S check must NOT gate the Kubernetes readiness probe")
             .doesNotContainKey("s2sSecretReadiness");
         assertThat(readiness.getStatus())
