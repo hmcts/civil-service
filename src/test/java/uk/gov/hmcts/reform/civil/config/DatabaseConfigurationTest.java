@@ -16,12 +16,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DatabaseConfigurationTest {
 
     private final ApplicationContextRunner context = new ApplicationContextRunner()
-        .withPropertyValues(
-            "reference.database.enabled=true",
-            "spring.datasource.url=jdbc:h2:mem:testdb",
-            "spring.datasource.driver-class-name=org.h2.Driver"
-        )
-        .withConfiguration(AutoConfigurations.of(DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class))
+        .withPropertyValues("reference.database.enabled=true")
+        .withConfiguration(AutoConfigurations.of(
+            DataSourceAutoConfiguration.class,
+            DataSourceTransactionManagerAutoConfiguration.class
+        ))
         .withUserConfiguration(DatabaseConfiguration.class);
 
     @Test
@@ -30,16 +29,12 @@ class DatabaseConfigurationTest {
             assertThat(it).hasSingleBean(DataSourceTransactionManager.class);
             assertThat(it).hasSingleBean(Jdbi.class);
             assertThat(it).hasSingleBean(CasemanReferenceNumberRepository.class);
-
-            // Base Hikari pool bean
-            assertThat(it).hasBean("hikariDataSource")
-                .getBean("hikariDataSource")
-                .isInstanceOf(HikariDataSource.class);
-
-            // Primary TransactionAwareDataSourceProxy bean
             assertThat(it).hasBean("dataSource")
                 .getBean("dataSource")
                 .isInstanceOf(TransactionAwareDataSourceProxy.class);
+            assertThat(it).hasBean("hikariDataSource")
+                .getBean("hikariDataSource")
+                .isInstanceOf(HikariDataSource.class);
         });
     }
 }

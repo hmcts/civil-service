@@ -21,7 +21,7 @@ public class DatabaseConfiguration {
 
     @Bean
     @FlywayDataSource
-    @ConfigurationProperties(prefix = "spring.datasource.hikari")
+    @ConfigurationProperties(prefix = "spring.datasource")
     public HikariDataSource hikariDataSource() {
         return new HikariDataSource();
     }
