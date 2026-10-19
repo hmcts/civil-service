@@ -100,8 +100,10 @@ public class GaNotificationHandler extends CallbackHandler implements GeneralApp
         final GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         final String caseId = caseData.getCcdCaseReference().toString();
 
-        StartEventResponse startEventResponse = gaCoreCaseDataService.startUpdate(caseId, RECORD_NOTIFICATIONS);
-        gaCoreCaseDataService.submitUpdate(
+        // the Ga variants, because these carry GENERALAPPLICATION_CASE_TYPE. startUpdate and
+        // submitUpdate pass CASE_TYPE (CIVIL), which is what every other GA task handler avoids.
+        StartEventResponse startEventResponse = gaCoreCaseDataService.startGaUpdate(caseId, RECORD_NOTIFICATIONS);
+        gaCoreCaseDataService.submitGaUpdate(
             caseId, getCaseContent(startEventResponse, caseData.getNotificationSummary()));
 
         return SubmittedCallbackResponse.builder().build();

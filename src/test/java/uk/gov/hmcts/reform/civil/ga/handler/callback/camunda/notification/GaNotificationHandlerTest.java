@@ -2,7 +2,10 @@ package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -96,14 +99,25 @@ class GaNotificationHandlerTest {
 
     private CaseDataContent recordAndCapture(String summary) {
         when(caseData.getNotificationSummary()).thenReturn(summary);
-        when(gaCoreCaseDataService.startUpdate(String.valueOf(CASE_ID), RECORD_NOTIFICATIONS))
+        when(gaCoreCaseDataService.startGaUpdate(String.valueOf(CASE_ID), RECORD_NOTIFICATIONS))
             .thenReturn(startEventFor(summary));
 
         handler.callbacks().get(SUBMITTED.getValue()).execute(params);
 
         ArgumentCaptor<CaseDataContent> captor = ArgumentCaptor.forClass(CaseDataContent.class);
-        verify(gaCoreCaseDataService).submitUpdate(eq(String.valueOf(CASE_ID)), captor.capture());
+        verify(gaCoreCaseDataService).submitGaUpdate(eq(String.valueOf(CASE_ID)), captor.capture());
         return captor.getValue();
+    }
+
+    @Test
+    void shouldRaiseTheEventAgainstTheGeneralApplicationCaseType() {
+        recordAndCapture("Attempted: a@b.com : ref : tmpl || Errors: ");
+
+        // startUpdate/submitUpdate carry CASE_TYPE (CIVIL); only the Ga variants carry
+        // GENERALAPPLICATION_CASE_TYPE, which is what a GA case reference needs
+        verify(gaCoreCaseDataService).startGaUpdate(String.valueOf(CASE_ID), RECORD_NOTIFICATIONS);
+        verify(gaCoreCaseDataService, never()).startUpdate(anyString(), any());
+        verify(gaCoreCaseDataService, never()).submitUpdate(anyString(), any());
     }
 
     @Test
