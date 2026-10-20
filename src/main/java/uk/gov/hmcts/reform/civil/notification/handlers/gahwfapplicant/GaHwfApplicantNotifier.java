@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.notification.handlers.gahwfapplicant;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
-import uk.gov.hmcts.reform.civil.notification.handlers.PartiesEmailGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 
@@ -19,11 +18,15 @@ import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 @Component
 public class GaHwfApplicantNotifier extends Notifier<GeneralApplicationCaseData> {
 
+    // the concrete generator, not the PartiesEmailGenerator interface. Generics are erased, so
+    // every GA generator is the same injectable type and Spring cannot choose between them once
+    // there is more than one. See GaNotifierBeanWiringTest.
+
     public static final String TASK_ID = "NotifyGaApplicantHwfOutcome";
 
     public GaHwfApplicantNotifier(NotificationService notificationService,
                                   CaseTaskTrackingService caseTaskTrackingService,
-                                  PartiesEmailGenerator<GeneralApplicationCaseData> partiesNotifier) {
+                                  GaHwfApplicantEmailGenerator partiesNotifier) {
         super(notificationService, caseTaskTrackingService, partiesNotifier);
     }
 

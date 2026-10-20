@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
-import uk.gov.hmcts.reform.civil.notification.handlers.PartiesEmailGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 
@@ -31,14 +30,14 @@ class GaHwfApplicantNotifierTest {
     private static final String EVENT_ID = "NOTIFY_EVENT";
 
     private NotificationService notificationService;
-    private PartiesEmailGenerator<GeneralApplicationCaseData> emailGenerator;
+    private GaHwfApplicantEmailGenerator emailGenerator;
     private GaHwfApplicantNotifier notifier;
 
     @SuppressWarnings("unchecked")
     @BeforeEach
     void setUp() {
         notificationService = mock(NotificationService.class);
-        emailGenerator = mock(PartiesEmailGenerator.class);
+        emailGenerator = mock(GaHwfApplicantEmailGenerator.class);
         notifier = new GaHwfApplicantNotifier(
             notificationService, mock(CaseTaskTrackingService.class), emailGenerator);
     }
