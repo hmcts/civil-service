@@ -225,9 +225,9 @@ class UpdatePaymentStatusServiceTest {
 
         assertThat(listAppender.list)
             .anySatisfy(event -> {
-                assertThat(event.getLevel()).isEqualTo(Level.ERROR);
+                assertThat(event.getLevel()).isEqualTo(Level.WARN);
                 assertThat(event.getFormattedMessage())
-                    .contains("updatePaymentStatus failed for caseReference=1594901956117591 status=SUCCESS");
+                    .contains("updatePaymentStatus failed for caseReference=1594901956117591 status=SUCCESS; will retry if attempts remain.");
                 assertThat(event.getThrowableProxy().getMessage()).isEqualTo("CCD submit failed");
             });
     }

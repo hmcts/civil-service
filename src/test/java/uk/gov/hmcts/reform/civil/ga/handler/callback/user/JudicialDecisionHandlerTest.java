@@ -118,6 +118,7 @@ import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeRequestMoreInfoOption
 import static uk.gov.hmcts.reform.civil.ga.service.JudicialDecisionWrittenRepService.WRITTEN_REPRESENTATION_DATE_CANNOT_BE_IN_PAST;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper.nowInLocalZone;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
@@ -1850,7 +1851,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         @Test
         void shouldReturnErrors_whenSequentialWrittenRepresentationDateIsInPast() {
             CallbackParams params = callbackParamsOf(
-                    getSequentialWrittenRepresentationDecision(LocalDate.now().minusDays(1)),
+                    getSequentialWrittenRepresentationDecision(nowInLocalZone().toLocalDate().minusDays(1)),
                     MID,
                     VALIDATE_WRITTEN_REPRESENTATION_PAGE
             );
@@ -1865,7 +1866,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         @Test
         void shouldReturnErrors_whenConcurrentWrittenRepresentationDateIsInPast() {
             CallbackParams params = callbackParamsOf(
-                    getConcurrentWrittenRepresentationDecision(LocalDate.now().minusDays(1)),
+                    getConcurrentWrittenRepresentationDecision(nowInLocalZone().toLocalDate().minusDays(1)),
                     MID,
                     VALIDATE_WRITTEN_REPRESENTATION_PAGE
             );
@@ -1886,7 +1887,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 "The claimant should upload any written responses or evidence in reply by 4pm on %s";
 
             CallbackParams params = callbackParamsOf(
-                getSequentialWrittenRepresentationDecision(LocalDate.now()),
+                getSequentialWrittenRepresentationDecision(nowInLocalZone().toLocalDate()),
                 MID,
                 VALIDATE_WRITTEN_REPRESENTATION_PAGE
             );
@@ -1919,7 +1920,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 "The claimant and defendant should upload any written submissions and evidence by 4pm on %s";
 
             CallbackParams params = callbackParamsOf(
-                getConcurrentWrittenRepresentationDecision(LocalDate.now()),
+                getConcurrentWrittenRepresentationDecision(nowInLocalZone().toLocalDate()),
                 MID,
                 VALIDATE_WRITTEN_REPRESENTATION_PAGE
             );
