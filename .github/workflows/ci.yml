@@ -51,6 +51,7 @@ jobs:
           POSTGRES_DB: cmc
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
+          PGOPTIONS: "-c max_connections=300"
         ports:
           - 5432:5432
         options: >-
