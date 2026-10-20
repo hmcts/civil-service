@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.controllers;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -23,9 +25,12 @@ import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.http.HttpResponseHeadersService;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 
@@ -77,16 +82,36 @@ public class CallbackController {
                  version
         );
 
-        CallbackParams callbackParams = new CallbackParams()
-            .request(callback)
-            .type(CallbackType.fromValue(callbackType))
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, authorisation))
-            .version(version.orElse(null))
-            .pageId(pageId.orElse(null))
-            .caseData(caseDetailsConverter.toBaseCaseData(caseDetails))
-            .caseDataBefore(caseDetailsBefore != null ? caseDetailsConverter.toBaseCaseData(caseDetailsBefore) : null)
-            .isGeneralApplicationCaseType(generalApplicationCaseType)
-            .isCivilCaseType(!generalApplicationCaseType);
+        CallbackParams callbackParams;
+        try {
+            callbackParams = new CallbackParams()
+                .request(callback)
+                .type(CallbackType.fromValue(callbackType))
+                .params(Map.of(CallbackParams.Params.BEARER_TOKEN, authorisation))
+                .version(version.orElse(null))
+                .pageId(pageId.orElse(null))
+                .caseData(caseDetailsConverter.toBaseCaseData(caseDetails))
+                .caseDataBefore(caseDetailsBefore != null ? caseDetailsConverter.toBaseCaseData(caseDetailsBefore) : null)
+                .isGeneralApplicationCaseType(generalApplicationCaseType)
+                .isCivilCaseType(!generalApplicationCaseType);
+        } catch (IllegalArgumentException exception) {
+            // Submitted callbacks have already committed case data and cannot reject a write.
+            // Keep their failure visible so that downstream processing is not silently skipped.
+            if (!CallbackType.SUBMITTED.getValue().equals(callbackType)
+                && exception.getCause() instanceof InvalidFormatException invalidFormat
+                && LocalDate.class.equals(invalidFormat.getTargetType())) {
+                String field = invalidFormat.getPath().stream()
+                    .map(reference -> reference.getFieldName() == null
+                        ? "[" + reference.getIndex() + "]" : reference.getFieldName())
+                    .collect(Collectors.joining("."));
+                log.warn("Rejected callback with invalid date for case {}, field {}", caseId, field);
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(List.of("Invalid date in " + field
+                        + ". Enter a valid date before continuing. If this date is already stored, contact support."))
+                    .build();
+            }
+            throw exception;
+        }
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(callbackParams);
         responseHeadersService.addClientContextHeader(callbackResponse, response);
