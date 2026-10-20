@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.event;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -304,7 +303,6 @@ class HearingNoticeSchedulerEventHandlerTest {
         verify(camundaRuntimeClient, times(0)).correlateStartMessage(eq(MESSAGE_ID), any(), any());
     }
 
-    @Disabled("DO NOT MERGE: the already notified guard is removed to reproduce HMC's 003 Already set")
     @Test
     void shouldSkipPartiesNotifiedPut_whenHearingIsListedAndAlreadyNotifiedWithUnchangedData() {
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
@@ -334,7 +332,6 @@ class HearingNoticeSchedulerEventHandlerTest {
         verify(camundaRuntimeClient, times(0)).correlateStartMessage(any(), any(), any());
     }
 
-    @Disabled("DO NOT MERGE: the already notified guard is removed to reproduce HMC's 003 Already set")
     @Test
     void shouldNotDispatchCamundaMessage_whenChangedHearingIsAlreadyNotifiedForCurrentResponse() {
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
@@ -356,7 +353,6 @@ class HearingNoticeSchedulerEventHandlerTest {
         verify(camundaRuntimeClient, times(0)).correlateStartMessage(any(), any(), any());
     }
 
-    @Disabled("DO NOT MERGE: the already notified guard is removed to reproduce HMC's 003 Already set")
     @Test
     void shouldNotDispatchCamundaMessage_whenCurrentVersionIsAlreadyNotifiedButLatestResponseIsDifferentVersion() {
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
@@ -489,7 +485,6 @@ class HearingNoticeSchedulerEventHandlerTest {
         assertDoesNotThrow(() -> handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID)));
     }
 
-    @Disabled("DO NOT MERGE: the already notified guard is removed to reproduce HMC's 003 Already set")
     @Test
     void shouldSkipPartiesNotifiedPut_whenListedDisallowedCaseAlreadyNotifiedForCurrentVersion() {
         // Hearing data has CHANGED (different days than the stored notification) so we won't
