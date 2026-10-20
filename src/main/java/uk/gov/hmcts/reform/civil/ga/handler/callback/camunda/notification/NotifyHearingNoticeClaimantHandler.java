@@ -26,10 +26,12 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_HEARING_NOTICE
  * Superseded by {@code GaHearingScheduledNotifier} on the Notifier framework, and deliberately kept.
  *
  * <p>Camunda versions process definitions, and an instance keeps running the version it started
- * on. Every {@code GA_HEARING_SCHEDULED_PROCESS_ID} instance already in flight when the migrated
- * {@code ga_hearing_scheduled_access.bpmn} deploys continues on the previous version and still
- * raises {@code NOTIFY_HEARING_NOTICE_CLAIMANT}. Deleting this handler would leave those callbacks unhandled, so they
- * would fail into Camunda incidents and the cases would need unsticking by hand.</p>
+ * on. Both definitions that raised this event are migrated:
+ * {@code GA_HEARING_SCHEDULED_PROCESS_ID} and, for the Welsh translated notice,
+ * {@code UPLOAD_TRANSLATED_GA_HEARING_SCHEDULED_PROCESS_ID}. Instances of either already in
+ * flight when the migrated definitions deploy continue on the previous version and still raise
+ * {@code NOTIFY_HEARING_NOTICE_CLAIMANT}. Deleting this handler would leave those callbacks unhandled, so they would
+ * fail into Camunda incidents and the cases would need unsticking by hand.</p>
  *
  * <p>New instances raise {@code NOTIFY_EVENT} and the {@code applicant} email is built by its
  * generator instead. Remove this and its civil-ccd-definition entry once no running instance

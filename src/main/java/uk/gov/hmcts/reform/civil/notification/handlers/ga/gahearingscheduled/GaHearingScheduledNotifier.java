@@ -11,8 +11,13 @@ import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
  *
  * <p>Replaces {@code NotifyHearingNoticeClaimantHandler} and
  * {@code NotifyHearingNoticeDefendantHandler}, and their two bespoke case events, with one
- * {@code NOTIFY_EVENT} raised by {@code ga_hearing_scheduled_access.bpmn}. The activity id below is
- * the one that BPMN carries, and {@code GaHwfNotifyTest}'s sibling asserts the two agree.</p>
+ * {@code NOTIFY_EVENT}. Both definitions that raised those events now do so:
+ * {@code ga_hearing_scheduled_access.bpmn} for the English notice and
+ * {@code upload_translated_ga_hearing_scheduled_access.bpmn} for the Welsh translated one, which
+ * is why the two share this activity id. Migrating only the first would have left the Welsh path
+ * on the old handlers, with different error handling and nothing to stop someone deleting them.
+ * {@code GaHearingScheduledTest} and {@code UploadTranslatedHearingNoticeGaTest} both drive their
+ * deployed BPMN with {@link #TASK_ID}, so neither can drift from the id in the XML.</p>
  */
 @Component
 public class GaHearingScheduledNotifier extends Notifier<GeneralApplicationCaseData> {
