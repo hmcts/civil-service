@@ -27,7 +27,7 @@ public class DatabaseConfiguration {
         return new DataSourceProperties();
     }
 
-    @Bean
+    @Bean(destroyMethod = "close")
     @FlywayDataSource
     @ConfigurationProperties("spring.datasource.hikari")
     public HikariDataSource hikariDataSource(DataSourceProperties properties) {
