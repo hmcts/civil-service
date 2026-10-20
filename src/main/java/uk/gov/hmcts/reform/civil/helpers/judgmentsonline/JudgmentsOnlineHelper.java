@@ -118,19 +118,25 @@ public class JudgmentsOnlineHelper {
     }
 
     public static BigDecimal getFixedCostsOfJudgmentForDJ(CaseData data) {
-
         String repaymentSummary = data.getRepaymentSummaryObject();
-        BigDecimal fixedCost = null;
-        if (null != repaymentSummary) {
-            fixedCost = repaymentSummary.contains("Fixed")
-                ? new BigDecimal(repaymentSummary.substring(
-                repaymentSummary.indexOf("Fixed cost amount \n£") + 20,
-                repaymentSummary.indexOf("\n### Claim fee amount ")
-            )) : null;
+
+        if (repaymentSummary == null) {
+            return BigDecimal.ZERO;
         }
 
-        return fixedCost != null ? fixedCost : ZERO;
+        Pattern pattern = Pattern.compile(
+            "Fixed cost amount\\s*£\\s*([\\d,]+\\.\\d{2})"
+        );
 
+        Matcher matcher = pattern.matcher(repaymentSummary);
+
+        if (matcher.find()) {
+            return new BigDecimal(
+                matcher.group(1).replace(",", "")
+            );
+        }
+
+        return BigDecimal.ZERO;
     }
 
     public static BigDecimal getDebtAmount(CaseData caseData, InterestCalculator interestCalculator) {
