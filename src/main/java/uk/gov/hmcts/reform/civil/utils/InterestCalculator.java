@@ -183,7 +183,7 @@ public class InterestCalculator {
                                                                 LocalDate interestFromDate,
                                                                 LocalDate interestToDate) {
         long pausedDays = 0;
-        for (BreathingSpaceDateRange dateRange : getStoredBreathingSpaceDateRanges(caseData)) {
+        for (BreathingSpaceDateRange dateRange : getBreathingSpaceDateRanges(caseData)) {
             pausedDays += countDaysBreathingSpaceOverlapsInterestPeriod(
                 dateRange.start(),
                 dateRange.end(),
@@ -194,14 +194,26 @@ public class InterestCalculator {
         return pausedDays;
     }
 
+    private static List<BreathingSpaceDateRange> getBreathingSpaceDateRanges(CaseData caseData) {
+        List<BreathingSpaceDateRange> dateRanges = getStoredBreathingSpaceDateRanges(caseData);
+        addCurrentBreathingSpaceDateRangeIfMissing(caseData, dateRanges);
+        return dateRanges;
+    }
+
     private static List<BreathingSpaceDateRange> getStoredBreathingSpaceDateRanges(CaseData caseData) {
         if (caseData.getBreathing() == null
             || caseData.getBreathing().getStoredBreathingSpace() == null) {
-            return List.of();
+            return new ArrayList<>();
         }
         List<BreathingSpaceDateRange> dateRanges = new ArrayList<>();
         for (Element<StoredBreathingSpace> storedBreathingSpace : caseData.getBreathing().getStoredBreathingSpace()) {
+            if (storedBreathingSpace == null || storedBreathingSpace.getValue() == null) {
+                continue;
+            }
             StoredBreathingSpace storedCycle = storedBreathingSpace.getValue();
+            if (storedCycle.getEnter() == null || storedCycle.getEnter().getStart() == null) {
+                continue;
+            }
             dateRanges.add(new BreathingSpaceDateRange(
                 storedCycle.getEnter().getStart(),
                 getBreathingSpaceEndDateOrToday(storedCycle.getLift())
@@ -210,8 +222,26 @@ public class InterestCalculator {
         return dateRanges;
     }
 
+    private static void addCurrentBreathingSpaceDateRangeIfMissing(CaseData caseData,
+                                                                   List<BreathingSpaceDateRange> dateRanges) {
+        if (caseData.getBreathing() == null || caseData.getBreathing().getEnter() == null) {
+            return;
+        }
+        LocalDate start = caseData.getBreathing().getEnter().getStart();
+        if (start == null) {
+            return;
+        }
+        boolean alreadyStored = dateRanges.stream().anyMatch(dateRange -> start.equals(dateRange.start()));
+        if (!alreadyStored) {
+            dateRanges.add(new BreathingSpaceDateRange(
+                start,
+                getBreathingSpaceEndDateOrToday(caseData.getBreathing().getLift())
+            ));
+        }
+    }
+
     private static LocalDate getBreathingSpaceEndDateOrToday(BreathingSpaceLiftInfo lift) {
-        if (lift == null) {
+        if (lift == null || lift.getExpectedEnd() == null) {
             return LocalDate.now();
         }
         return lift.getExpectedEnd();
