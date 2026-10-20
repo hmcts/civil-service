@@ -42,6 +42,11 @@ spring:
     username: ${CMC_DB_USERNAME:-}
     password: ${CMC_DB_PASSWORD:-}
     url: jdbc:postgresql://${CMC_DB_HOST:}:${CMC_DB_PORT:}/${CMC_DB_NAME:cmc}${CMC_DB_CONNECTION_OPTIONS:}
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 3000
+      idle-timeout: 600000
+      max-lifetime: 1800000
 
   servlet:
     multipart:
@@ -935,10 +940,10 @@ spring:
     url: jdbc:tc:postgresql:15://localhost/cmc
     jdbcUrl: jdbc:tc:postgresql:15://localhost/cmc
     hikari:
-      maximumPoolSize: 10
-      connectionTimeout: 3000
-      idleTimeout: 600000
-      maxLifetime: 1800000
+      maximum-pool-size: 3
+      connection-timeout: 10000
+      idle-timeout: 600000
+      max-lifetime: 1800000
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
