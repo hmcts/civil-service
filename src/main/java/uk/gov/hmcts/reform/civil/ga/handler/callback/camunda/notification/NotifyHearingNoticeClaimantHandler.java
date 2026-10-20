@@ -22,6 +22,23 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_HEARING_NOTICE
 
 @Slf4j
 @Service
+/**
+ * Superseded by {@code GaHearingScheduledNotifier} on the Notifier framework, and deliberately kept.
+ *
+ * <p>Camunda versions process definitions, and an instance keeps running the version it started
+ * on. Every {@code GA_HEARING_SCHEDULED_PROCESS_ID} instance already in flight when the migrated
+ * {@code ga_hearing_scheduled_access.bpmn} deploys continues on the previous version and still
+ * raises {@code NOTIFY_HEARING_NOTICE_CLAIMANT}. Deleting this handler would leave those callbacks unhandled, so they
+ * would fail into Camunda incidents and the cases would need unsticking by hand.</p>
+ *
+ * <p>New instances raise {@code NOTIFY_EVENT} and the {@code applicant} email is built by its
+ * generator instead. Remove this and its civil-ccd-definition entry once no running instance
+ * remains on a pre migration version of the definition, which can be confirmed from the engine
+ * rather than assumed from elapsed time.</p>
+ *
+ * @deprecated retained only to drain in flight process instances. See DTSCCI-6726.
+ */
+@Deprecated(forRemoval = true)
 @RequiredArgsConstructor
 public class NotifyHearingNoticeClaimantHandler extends CallbackHandler implements GeneralApplicationCallbackHandler {
 
