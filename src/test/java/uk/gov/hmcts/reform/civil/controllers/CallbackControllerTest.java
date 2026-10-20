@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandlerFactory;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.http.HttpResponseHeadersService;
@@ -125,15 +126,21 @@ class CallbackControllerTest {
 
     @Test
     void shouldKeepSubmittedFailuresVisible() {
-        assertThatThrownBy(() -> controller.callback(null, "test", "submitted",
-            CallbackRequest.builder().caseDetails(details(Map.of("hearingDate", "--00"))).build(),
-            Optional.empty(), Optional.empty())).isInstanceOf(IllegalArgumentException.class);
+        CallbackRequest request = CallbackRequest.builder()
+            .caseDetails(details(Map.of("hearingDate", "--00"))).build();
+        Optional<CallbackVersion> version = Optional.empty();
+        Optional<String> pageId = Optional.empty();
+
+        assertThatThrownBy(() -> controller.callback(null, "test", "submitted", request, version, pageId))
+            .isInstanceOf(IllegalArgumentException.class);
         verifyNoInteractions(factory);
     }
 
     @Test
     void shouldNotHideUnrelatedConversionErrors() {
-        assertThatThrownBy(() -> invoke(details(Map.of("hearingDate", Map.of("bad", "value"))), null))
+        CaseDetails caseDetails = details(Map.of("hearingDate", Map.of("bad", "value")));
+
+        assertThatThrownBy(() -> invoke(caseDetails, null))
             .isInstanceOf(IllegalArgumentException.class);
         verifyNoInteractions(factory);
     }
