@@ -41,6 +41,13 @@ public class CalculateSpecFeeTask {
     }
 
     public CallbackResponse calculateSpecFee(CaseData caseData, String authorizationToken) {
+        List<String> interestValidationErrors = interestCalculator.getInterestValidationErrors(caseData);
+        if (!interestValidationErrors.isEmpty()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(interestValidationErrors)
+                .build();
+        }
+
         updatePaymentDetails(caseData);
 
         calculateAndUpdateClaimFee(caseData);

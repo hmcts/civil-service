@@ -257,6 +257,33 @@ class SubmitClaimTaskTest {
     }
 
     @Test
+    void shouldUseSessionUserEmailWhenApplicantSolicitorDetailsAreMissing() {
+        Party applicant = new Party();
+        applicant.setIndividualFirstName("Clay");
+        applicant.setIndividualLastName("Mint");
+        applicant.setPartyName("Clay Mint");
+        applicant.setType(Party.Type.INDIVIDUAL);
+        Party respondent = new Party();
+        respondent.setCompanyName("Defendant Inc.");
+        respondent.setPartyName("Defendant Inc.");
+        respondent.setType(Party.Type.COMPANY);
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1(applicant)
+            .respondent1(respondent)
+            .applicantSolicitor1UserDetails(null)
+            .build();
+        caseData.setApplicantSolicitor1CheckEmail(null);
+
+        when(userService.getUserDetails("authToken"))
+            .thenReturn(UserDetails.builder().id("userId").email("session-user@example.com").build());
+
+        submitClaimTask.submitClaim(caseData, null, "authToken", NO, null);
+
+        assertThat(caseData.getApplicantSolicitor1UserDetails().getId()).isEqualTo("userId");
+        assertThat(caseData.getApplicantSolicitor1UserDetails().getEmail()).isEqualTo("session-user@example.com");
+    }
+
+    @Test
     void shouldCallPinToPostOnlyIfCaseMatched() {
         // Given
         Party party = new Party();

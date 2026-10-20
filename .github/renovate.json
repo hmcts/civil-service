@@ -7,9 +7,17 @@
   "labels": [
     "dependencies"
   ],
-  "automergeSchedule": ["after 8am and before 11am every weekday"],
-  "schedule": ["after 8am and before 11am every weekday"],
-  "rebaseWhen": "conflicted",
+  "timezone": "Europe/London",
+  "automergeSchedule": [
+    "after 7am and before 8am every weekday",
+    "after 6pm and before 8pm every weekday"
+  ],
+  "platformAutomerge": false,
+  "schedule": [
+    "after 7am and before 8am every weekday",
+    "after 6pm and before 8pm every weekday"
+  ],
+  "rebaseWhen": "behind-base-branch",
   "automergeStrategy": "squash",
   "prConcurrentLimit": 5,
   "helmv3": {
@@ -27,7 +35,30 @@
   ],
   "packageRules": [
     {
-      "matchPackagePatterns": ["pact"],
+      "matchPackageNames": [
+        "com.github.hmcts:core-case-data-store-client"
+      ],
+      "allowedVersions": "<6.0.0",
+      "description": "Version 6 requires Spring Boot 4 and Jackson 3; retain the compatible client until the service migrates"
+    },
+    {
+      "matchPackageNames": [
+        "com.github.hmcts:auth-checker-lib"
+      ],
+      "allowedVersions": "<3.2.0",
+      "description": "Version 3.2 requires Spring Boot 4; retain the compatible client until the service migrates"
+    },
+    {
+      "matchPackageNames": [
+        "com.github.hmcts:ccd-case-document-am-client"
+      ],
+      "allowedVersions": "<1.60.0",
+      "description": "Version 1.60.0 requires Spring Boot 4; retain the compatible client until the service migrates"
+    },
+    {
+      "matchPackagePatterns": [
+        "pact"
+      ],
       "enabled": false
     },
     {
@@ -37,31 +68,39 @@
         "com.github.hmcts:ccd-case-document-am-client",
         "com.github.hmcts:core-case-data-store-client"
       ],
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
       "description": "Restrict HMCTS library upgrades to minor/patch versions. Major versions may introduce incompatibilities with Spring Boot or other core dependencies (e.g., ccd-case-document-am-client v1.60.0 requires Spring Boot 4.0.6, incompatible with project's Spring Boot 3.3.7)"
     },
     {
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
       "groupName": "All non-major updates",
       "groupSlug": "all-non-major",
       "automerge": true,
-      "automergeType": "pr",
-      "automergeSchedule": ["before 4pm every weekday"]
+      "automergeType": "pr"
     },
     {
-      "matchPackagePatterns": ["^org\\.camunda\\.bpm"],
+      "matchPackagePatterns": [
+        "^org\\.camunda\\.bpm"
+      ],
       "groupName": "Camunda updates",
       "groupSlug": "camunda",
       "automerge": false,
       "description": "Camunda upgrades are isolated in their own group and require manual review to prevent build failures"
     },
     {
-      "matchManagers": ["helmv3"],
+      "matchManagers": [
+        "helmv3"
+      ],
       "groupName": "Helm chart updates",
       "groupSlug": "helm-charts",
       "automerge": true,
-      "automergeType": "pr",
-      "automergeSchedule": ["before 4pm every weekday"]
+      "automergeType": "pr"
     },
     {
       "matchPackagePatterns": [
@@ -75,16 +114,16 @@
       "groupName": "Spring Boot and related updates",
       "groupSlug": "spring-boot-related",
       "automerge": true,
-      "automergeType": "pr",
-      "automergeSchedule": ["before 4pm every weekday"]
+      "automergeType": "pr"
     },
     {
-      "matchManagers": ["terraform"],
+      "matchManagers": [
+        "terraform"
+      ],
       "groupName": "Terraform updates",
       "groupSlug": "terraform",
       "automerge": true,
-      "automergeType": "pr",
-      "automergeSchedule": ["before 4pm every weekday"]
+      "automergeType": "pr"
     },
     {
       "matchPackagePatterns": [
@@ -94,8 +133,7 @@
       "groupName": "Lombok updates",
       "groupSlug": "lombok",
       "automerge": true,
-      "automergeType": "pr",
-      "automergeSchedule": ["before 4pm every weekday"]
+      "automergeType": "pr"
     }
   ]
 }

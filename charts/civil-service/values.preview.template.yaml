@@ -14,12 +14,14 @@ java:
     CMC_DB_PASSWORD: ${POSTGRES_PASSWORD}
     CMC_DB_CONNECTION_OPTIONS: '?sslmode=allow'
     REFERENCE_DATABASE_MIGRATION: true
+    SPRING_FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK: "false"
     EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccdorc
     CAMUNDA_URL: http://${SERVICE_NAME}-camunda/engine-rest/
     SERVICE_REQUEST_UPDATE: https://${SERVICE_NAME}.preview.platform.hmcts.net/service-request-update
     SERVICE_REQUEST_UPDATE_CLAIM_ISSUED: https://${SERVICE_NAME}.preview.platform.hmcts.net/service-request-update-claim-issued
     LAUNCH_DARKLY_ENV: aat
     TESTING_SUPPORT_ENABLED: true
+    SCHEDULER_ACTIVE_SCHEDULERS: "JudgementBuffer,ExpiredDraftStore"
     POLLING_EVENT_EMITTER_ENABLED: true
     CASE_DOCUMENT_AM_URL:  http://${SERVICE_NAME}-cdam
     STITCHING_API_ENABLED: true
@@ -138,13 +140,6 @@ java:
     auth:
       username: ${POSTGRES_USER}
       password: ${POSTGRES_PASSWORD}
-
-idam-pr:
-  releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
-  enabled: true
-  redirect_uris:
-    XUI:
-      - https://xui-${SERVICE_NAME}.preview.platform.hmcts.net/oauth2/callback
 
 xui-webapp:
   enabled: true

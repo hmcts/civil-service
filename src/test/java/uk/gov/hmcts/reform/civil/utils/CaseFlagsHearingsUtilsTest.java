@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.caseflags.PartyFlags;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,6 +18,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class CaseFlagsHearingsUtilsTest {
@@ -60,6 +63,29 @@ public class CaseFlagsHearingsUtilsTest {
         assertThat(actualFlags).isEqualTo(expectedFlags);
     }
 
+    @Test
+    void shouldReturnAllActiveCaseFlags_whenFlagDetailsListIsImmutable() {
+        List<Element<FlagDetail>> flagDetails = List.of(
+            element(flagDetail("AB001", "Active", YES)),
+            element(flagDetail("SM001", "Inactive", YES))
+        );
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefence()
+            .withRespondent1Flags(flagDetails)
+            .withApplicant1Flags(flagDetails)
+            .build();
+
+        List<PartyFlags> actualFlags = CaseFlagsHearingsUtils.getAllActiveFlags(caseData);
+
+        assertThat(actualFlags).hasSize(2);
+        assertThat(unwrapElements(actualFlags.get(0).getDetails()))
+            .extracting(FlagDetail::getFlagCode)
+            .containsExactly("AB001");
+        assertThat(unwrapElements(actualFlags.get(1).getDetails()))
+            .extracting(FlagDetail::getFlagCode)
+            .containsExactly("AB001");
+    }
+
     @SuppressWarnings("checkstyle:CommentsIndentation")
     @Test
     void shouldReturnAllHearingRelevantCaseFlags() {
@@ -98,6 +124,20 @@ public class CaseFlagsHearingsUtilsTest {
         List<PartyFlags> actualFlags = CaseFlagsHearingsUtils.getAllHearingRelevantCaseFlags(activeFlags);
 
         assertThat(actualFlags).isEqualTo(expectedFlags);
+    }
+
+    @Test
+    void shouldReturnAllHearingRelevantCaseFlags_whenFlagDetailsListIsImmutable() {
+        List<PartyFlags> flags = List.of(partyFlags(List.of(
+            element(flagDetail("AB001", "Active", YES)),
+            element(flagDetail("RA001", "Active", NO))
+        )));
+
+        List<PartyFlags> actualFlags = CaseFlagsHearingsUtils.getAllHearingRelevantCaseFlags(flags);
+
+        assertThat(unwrapElements(actualFlags.get(0).getDetails()))
+            .extracting(FlagDetail::getFlagCode)
+            .containsExactly("AB001");
     }
 
     @Test
@@ -141,6 +181,20 @@ public class CaseFlagsHearingsUtilsTest {
     }
 
     @Test
+    void shouldReturnSMCodeFlags_whenFlagDetailsListIsImmutable() {
+        List<PartyFlags> flags = List.of(partyFlags(List.of(
+            element(flagDetail("AB001", "Active", YES)),
+            element(flagDetail("SM001", "Active", YES))
+        )));
+
+        List<PartyFlags> actualFlags = CaseFlagsHearingsUtils.getSMCodeFlags(flags);
+
+        assertThat(unwrapElements(actualFlags.get(0).getDetails()))
+            .extracting(FlagDetail::getFlagCode)
+            .containsExactly("SM001");
+    }
+
+    @Test
     void shouldReturnAllCaseFlags_withRAFlagCode() {
         CaseData caseData = CaseDataBuilder.builder()
             .addRespondent1LitigationFriend()
@@ -178,6 +232,20 @@ public class CaseFlagsHearingsUtilsTest {
         List<PartyFlags> actualFlags = CaseFlagsHearingsUtils.getRACodeFlags(activeFlags);
 
         assertThat(actualFlags).isEqualTo(expectedFlags);
+    }
+
+    @Test
+    void shouldReturnRACodeFlags_whenFlagDetailsListIsImmutable() {
+        List<PartyFlags> flags = List.of(partyFlags(List.of(
+            element(flagDetail("AB001", "Active", YES)),
+            element(flagDetail("RA001", "Active", NO))
+        )));
+
+        List<PartyFlags> actualFlags = CaseFlagsHearingsUtils.getRACodeFlags(flags);
+
+        assertThat(unwrapElements(actualFlags.get(0).getDetails()))
+            .extracting(FlagDetail::getFlagCode)
+            .containsExactly("RA001");
     }
 
     @Nested
@@ -337,6 +405,23 @@ public class CaseFlagsHearingsUtilsTest {
             .setRoleOnCase(role)
             .setDetails(details);
         return partyFlags;
+    }
+
+    private PartyFlags partyFlags(List<Element<FlagDetail>> details) {
+        PartyFlags partyFlags = new PartyFlags();
+        partyFlags.setPartyId("party-id")
+            .setPartyName("Party")
+            .setRoleOnCase("Role")
+            .setDetails(details);
+        return partyFlags;
+    }
+
+    private FlagDetail flagDetail(String flagCode, String status, YesOrNo hearingRelevant) {
+        return new FlagDetail()
+            .setName("Flag")
+            .setFlagCode(flagCode)
+            .setHearingRelevant(hearingRelevant)
+            .setStatus(status);
     }
 
     private List<Element<FlagDetail>> getAllFlagDetails() {

@@ -14,7 +14,11 @@ public class ContentCachingRequestWrapperUtil {
     }
 
     public static String getCaseId(ContentCachingRequestWrapper requestBody) {
-        return requestBody != null && requestBody.getContentAsByteArray() != null ? getCaseReference(requestBody) : "";
+        if (requestBody == null) {
+            return "";
+        }
+        String caseId = getCaseReference(requestBody);
+        return caseId != null ? caseId : "";
     }
 
     public static String getUserId(ContentCachingRequestWrapper requestBody) {
@@ -45,21 +49,23 @@ public class ContentCachingRequestWrapperUtil {
         var pathCaseId = getPathVariable(requestBody, "caseId");
         if (StringUtils.isNotBlank(pathCaseId)) {
             return pathCaseId;
-        } else {
-            return getBodyCaseId(requestBody);
         }
+        var queryCaseId = requestBody.getParameter("caseId");
+        if (StringUtils.isNotBlank(queryCaseId)) {
+            return queryCaseId;
+        }
+        return getBodyCaseId(requestBody);
     }
 
     @Nullable
     private static String getBodyCaseId(ContentCachingRequestWrapper requestBody) {
-        String bodyId = getValueByKey(new String(
-            requestBody.getContentAsByteArray(),
-            StandardCharsets.UTF_8
-        ), "id");
-        String bodyCaseReference = getValueByKey(new String(
-            requestBody.getContentAsByteArray(),
-            StandardCharsets.UTF_8
-        ), "caseReference");
+        byte[] content = requestBody.getContentAsByteArray();
+        if (content == null) {
+            return null;
+        }
+        String json = new String(content, StandardCharsets.UTF_8);
+        String bodyId = getValueByKey(json, "id");
+        String bodyCaseReference = getValueByKey(json, "caseReference");
         return bodyId != null ? bodyId : bodyCaseReference;
     }
 }

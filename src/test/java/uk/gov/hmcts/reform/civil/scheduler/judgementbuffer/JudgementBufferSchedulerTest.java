@@ -16,7 +16,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.scheduler.judgementbuffer.JudgementBufferScheduler.SCHEDULER_NAME;
 
 @ExtendWith(MockitoExtension.class)
 class JudgementBufferSchedulerTest {
@@ -46,7 +45,7 @@ class JudgementBufferSchedulerTest {
             scheduler.runScheduledTask();
 
             verify(scheduledTaskRunner).run(
-                eq(SCHEDULER_NAME),
+                eq(scheduler.getName()),
                 any(),
                 eq(judgementBufferScheduledTask)
             );

@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -56,7 +57,47 @@ class PdfMergerTest {
     @Test
     void should_throw_pdf_merge_exception_when_doc_is_not_pdf_stream() {
         assertThatThrownBy(PdfMergerTest::merge)
-            .isInstanceOf(PdfMergeException.class);
+            .isInstanceOf(PdfMergeException.class)
+            .hasMessage("Document at index 0 is not a valid PDF for caseId civil_service (size: 5 bytes)");
+    }
+
+    @Test
+    void should_identify_invalid_document_in_multiple_documents() throws Exception {
+        byte[] validPdf = loadResource("stitch-documents/test1.pdf");
+
+        assertThatThrownBy(() -> PdfMerger.mergeDocuments(
+            asList(validPdf, "not-pdf".getBytes()), "1776674103714442"
+        ))
+            .isInstanceOf(PdfMergeException.class)
+            .hasMessage("Document at index 1 is not a valid PDF for caseId 1776674103714442 (size: 7 bytes)");
+    }
+
+    @Test
+    void should_reject_invalid_single_document() {
+        assertThatThrownBy(() -> PdfMerger.mergeDocuments(singletonList(new byte[0]), "civil_service"))
+            .isInstanceOf(PdfMergeException.class)
+            .hasMessage("Document at index 0 is not a valid PDF for caseId civil_service (size: 0 bytes)");
+    }
+
+    @Test
+    void should_reject_null_document() {
+        assertThatThrownBy(() -> PdfMerger.mergeDocuments(singletonList(null), "civil_service"))
+            .isInstanceOf(PdfMergeException.class)
+            .hasMessage("Document at index 0 is not a valid PDF for caseId civil_service (size: 0 bytes)");
+    }
+
+    @Test
+    void should_reject_empty_document_list() {
+        assertThatThrownBy(() -> PdfMerger.mergeDocuments(emptyList(), "civil_service"))
+            .isInstanceOf(PdfMergeException.class)
+            .hasMessage("No PDF documents supplied for caseId civil_service");
+    }
+
+    @Test
+    void should_reject_null_document_list() {
+        assertThatThrownBy(() -> PdfMerger.mergeDocuments(null, "civil_service"))
+            .isInstanceOf(PdfMergeException.class)
+            .hasMessage("No PDF documents supplied for caseId civil_service");
     }
 
     private static void merge() {

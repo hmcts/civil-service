@@ -55,6 +55,12 @@ public class DocumentGeneratorService {
             throw ex;
         }
 
+        if (response == null || response.length == 0) {
+            throw new DocumentGenerationFailedException(
+                "Docmosis document generation returned an empty response for template " + template.getTemplate()
+            );
+        }
+
         return new DocmosisDocument(template.getDocumentTitle(), response);
     }
 }

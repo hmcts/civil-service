@@ -28,8 +28,12 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.InterestCalculator.INTEREST_RATE_MUST_NOT_BE_NEGATIVE;
 
 @ExtendWith(MockitoExtension.class)
 class CalculateSpecFeeTaskTest extends BaseCallbackHandlerTest {
@@ -71,9 +75,31 @@ class CalculateSpecFeeTaskTest extends BaseCallbackHandlerTest {
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
             .totalClaimAmount(new BigDecimal(1000))
             .build();
+        when(interestCalculator.getInterestValidationErrors(any(CaseData.class))).thenReturn(List.of());
         when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
         var response = (AboutToStartOrSubmitCallbackResponse) calculateSpecFeeTask.calculateSpecFee(caseData, authTokenGenerator);
 
         assertThat(response.getData()).containsEntry("applicantSolicitor1PbaAccountsIsEmpty", "Yes");
+    }
+
+    @Test
+    void shouldReturnError_whenInterestRateIsNegative() {
+        SameRateInterestSelection sameRateInterestSelection = new SameRateInterestSelection();
+        sameRateInterestSelection.setSameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE);
+        sameRateInterestSelection.setDifferentRate(BigDecimal.valueOf(-5));
+        CaseData caseData = CaseDataBuilder.builder().claimInterest(YES)
+            .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
+            .sameRateInterestSelection(sameRateInterestSelection)
+            .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
+            .totalClaimAmount(new BigDecimal(1000))
+            .build();
+        when(interestCalculator.getInterestValidationErrors(any(CaseData.class)))
+            .thenReturn(List.of(INTEREST_RATE_MUST_NOT_BE_NEGATIVE));
+
+        var response = (AboutToStartOrSubmitCallbackResponse) calculateSpecFeeTask.calculateSpecFee(caseData, authTokenGenerator);
+
+        assertThat(response.getErrors()).containsExactly(INTEREST_RATE_MUST_NOT_BE_NEGATIVE);
+        verify(interestCalculator, never()).calculateInterest(any(CaseData.class));
+        verify(feesService, never()).getFeeDataByTotalClaimAmount(any());
     }
 }

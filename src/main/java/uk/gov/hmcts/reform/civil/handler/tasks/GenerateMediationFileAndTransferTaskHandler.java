@@ -17,6 +17,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 @Slf4j
 public abstract class GenerateMediationFileAndTransferTaskHandler extends BaseExternalTaskHandler {
@@ -26,7 +27,9 @@ public abstract class GenerateMediationFileAndTransferTaskHandler extends BaseEx
     protected final CaseDetailsConverter caseDetailsConverter;
     protected final SendGridClient sendGridClient;
     protected final MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
+    protected final FeatureToggleService featureToggleService;
     protected static final String SUBJECT = "OCMC Mediation Data";
+    protected static final String SCHEDULER_NAME = "GenerateCsvAndSendToMmt";
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     protected GenerateMediationFileAndTransferTaskHandler(
@@ -36,13 +39,15 @@ public abstract class GenerateMediationFileAndTransferTaskHandler extends BaseEx
         CoreCaseDataService coreCaseDataService,
         CaseDetailsConverter caseDetailsConverter,
         SendGridClient sendGridClient,
-        MediationCSVEmailConfiguration mediationCSVEmailConfiguration) {
+        MediationCSVEmailConfiguration mediationCSVEmailConfiguration,
+        FeatureToggleService featureToggleService) {
         super(externalTaskCompletionService, eventProperties);
         this.caseSearchService = caseSearchService;
         this.coreCaseDataService = coreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;
         this.sendGridClient = sendGridClient;
         this.mediationCSVEmailConfiguration = mediationCSVEmailConfiguration;
+        this.featureToggleService = featureToggleService;
     }
 
     protected void setMediationFileSent(CaseData caseData) {

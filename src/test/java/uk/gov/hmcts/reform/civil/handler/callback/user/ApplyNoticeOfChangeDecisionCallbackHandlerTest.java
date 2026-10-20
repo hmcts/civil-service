@@ -290,11 +290,67 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
             return caseDetails;
         }
 
-        private void executeTest(CaseData caseData, String applicantOrRespondentOrgPolicy) {
-            executeTest(caseData, applicantOrRespondentOrgPolicy, "APPLY_NOC_DECISION");
+        @Test
+        void shouldCaptureFormerRepresentationReference_whenInvokedByRespondent1() {
+            AboutToStartOrSubmitCallbackResponse response = executeTest(
+                CaseDataBuilder.builder().atStateClaimIssued()
+                    .changeOrganisationRequestField(false, false, "1234", "QWERTY R", REQUESTER_EMAIL)
+                    .build(),
+                RESPONDENT_ONE_ORG_POLICY
+            );
+
+            assertThat(getChangeOfRepresentation(response).getFormerRepresentationReference()).isEqualTo("6789");
         }
 
-        private void executeTest(CaseData caseData, String applicantOrRespondentOrgPolicy, String camundaEvent) {
+        @Test
+        void shouldCaptureFormerRepresentationReference_whenInvokedByApplicant1() {
+            AboutToStartOrSubmitCallbackResponse response = executeTest(
+                CaseDataBuilder.builder().atStateClaimIssued()
+                    .changeOrganisationRequestField(true, false, "1234", "QWERTY A", REQUESTER_EMAIL)
+                    .build(),
+                APPLICANT_ONE_ORG_POLICY
+            );
+
+            assertThat(getChangeOfRepresentation(response).getFormerRepresentationReference()).isEqualTo("12345");
+        }
+
+        @Test
+        void shouldCaptureFormerRepresentationReference_whenInvokedByRespondent2For1v2DS() {
+            AboutToStartOrSubmitCallbackResponse response = executeTest(
+                CaseDataBuilder.builder().atStateClaimIssued()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .changeOrganisationRequestField(false, true, "1234", "QWERTY R2", REQUESTER_EMAIL)
+                    .build(),
+                RESPONDENT_TWO_ORG_POLICY
+            );
+
+            assertThat(getChangeOfRepresentation(response).getFormerRepresentationReference()).isEqualTo("01234");
+        }
+
+        @Test
+        void shouldNotCaptureFormerRepresentationReference_whenNoReferenceProvided() {
+            AboutToStartOrSubmitCallbackResponse response = executeTest(
+                CaseDataBuilder.builder().atStateClaimIssued()
+                    .removeSolicitorReferences()
+                    .changeOrganisationRequestField(false, false, "1234", "QWERTY R", REQUESTER_EMAIL)
+                    .build(),
+                RESPONDENT_ONE_ORG_POLICY
+            );
+
+            assertThat(getChangeOfRepresentation(response).getFormerRepresentationReference()).isNull();
+        }
+
+        private ChangeOfRepresentation getChangeOfRepresentation(AboutToStartOrSubmitCallbackResponse response) {
+            return mapper.convertValue(
+                response.getData().get("changeOfRepresentation"), ChangeOfRepresentation.class);
+        }
+
+        private AboutToStartOrSubmitCallbackResponse executeTest(CaseData caseData,
+                                                                 String applicantOrRespondentOrgPolicy) {
+            return executeTest(caseData, applicantOrRespondentOrgPolicy, "APPLY_NOC_DECISION");
+        }
+
+        private AboutToStartOrSubmitCallbackResponse executeTest(CaseData caseData, String applicantOrRespondentOrgPolicy, String camundaEvent) {
             CallbackParams params = callbackParamsOf(caseData,
                                                      CaseDetails.builder().data(caseData.toMap(mapper)).build(), ABOUT_TO_SUBMIT);
 
@@ -313,6 +369,8 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
             assertChangeOrganisationFieldIsUpdated(response);
             assertOrgIDIsUpdated(response, applicantOrRespondentOrgPolicy);
             assertCamundaEventIsReady(response, camundaEvent);
+
+            return response;
         }
 
         private void assertChangeOrganisationFieldIsUpdated(AboutToStartOrSubmitCallbackResponse response) {

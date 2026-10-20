@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ObligationReason;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -19,18 +18,17 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StoredObligationData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -40,8 +38,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW_DASHBOARD_UPDATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW_FINAL_ORDER;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CourtStaffNextSteps.STILL_TASKS;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -52,10 +50,8 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CONFIRM_ORDER_REVIEW);
 
-    private final FeatureToggleService featureToggleService;
     private final ObjectMapper objectMapper;
     private final UserService userService;
-    private final Time time;
     private static final String HEADER_CONFIRMATION = "# The order review has been completed";
     private static final String BODY_CONFIRMATION_NO_OBLIGATION = "&nbsp;";
     private static final String BODY_CONFIRMATION_OBLIGATION = "### What happens next \n\n" +
@@ -102,8 +98,8 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
                 .filter(element -> element != null && element.getValue() != null)
                 .map(Element::getValue)
                 .filter(data -> data.getObligationDate() == null || !data.getObligationDate().isAfter(
-                    LocalDate.now()))
-                .map(data -> OBLIGATION_DATE_ERROR).collect(Collectors.toList());
+                    LocalDate.now(ZoneId.of("Europe/London"))))
+                .map(data -> OBLIGATION_DATE_ERROR).toList();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -127,11 +123,15 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
 
     private CallbackResponse confirmOrderReview(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        boolean isReturningFromDecisionOutcome = CaseState.DECISION_OUTCOME.toString()
+            .equals(callbackParams.getRequest().getCaseDetails().getState());
 
         if (YesOrNo.YES.equals(caseData.getObligationDatePresent())) {
             caseData.setBusinessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW));
         } else if (YesOrNo.YES.equals(caseData.getIsFinalOrder())) {
             caseData.setBusinessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW_FINAL_ORDER));
+        } else if (isReturningFromDecisionOutcome) {
+            caseData.setBusinessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW_DASHBOARD_UPDATE));
         }
 
         if (nonNull(caseData.getObligationData())) {
@@ -147,7 +147,7 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
             caseData.getObligationData().forEach(obligation -> {
                 StoredObligationData storedObligation = new StoredObligationData();
                 storedObligation.setCreatedBy(officerName);
-                storedObligation.setCreatedOn(time.now());
+                storedObligation.setCreatedOn(LocalDateTime.now(ZoneId.of("Europe/London")));
                 storedObligation.setObligationDate(obligation.getValue().getObligationDate());
                 storedObligation.setObligationReason(obligation.getValue().getObligationReason());
                 storedObligation.setOtherObligationReason(obligation.getValue().getOtherObligationReason());
@@ -165,14 +165,13 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
         }
 
         if (YesOrNo.YES.equals(caseData.getIsFinalOrder())) {
-            caseData.setEnableUploadEvent(shouldEvidenceUploadEventBeAvailable(caseData));
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toMap(objectMapper))
                 .state(CaseState.All_FINAL_ORDERS_ISSUED.toString())
                 .build();
         }
-        caseData.setEnableUploadEvent(YesOrNo.YES);
-        if (CaseState.DECISION_OUTCOME.toString().equals(callbackParams.getRequest().getCaseDetails().getState())) {
+
+        if (isReturningFromDecisionOutcome) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toMap(objectMapper))
                 .state(CaseState.CASE_PROGRESSION.toString())
@@ -181,25 +180,6 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
-    }
-
-    private YesOrNo shouldEvidenceUploadEventBeAvailable(CaseData caseData) {
-        YesOrNo eaCourtLocation = caseData.getEaCourtLocation();
-        boolean eaFlag = eaCourtLocation == null || YesOrNo.YES.equals(eaCourtLocation);
-        boolean result = isMultiOrIntTrack(caseData) && eaFlag;
-        log.info("Evidence upload event is enabled for minti claim {}, eaCourtLocation {}, for caseId {}",
-                 result, eaFlag, caseData.getCcdCaseReference());
-        return result ? YesOrNo.YES : YesOrNo.NO;
-    }
-
-    private boolean isMultiOrIntTrack(CaseData caseData) {
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
-                || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack());
-        } else {
-            return AllocatedTrack.INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())
-                || AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack());
-        }
     }
 
     private CallbackResponse fillConfirmationScreen(CallbackParams callbackParams) {

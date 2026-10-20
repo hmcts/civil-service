@@ -23,25 +23,23 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidator;
-import uk.gov.hmcts.reform.civil.utils.UserRoleUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -77,6 +75,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private static final String VALIDATE_HEARING_DATE = "ga-validate-hearing-date";
     private static final String VALIDATE_HEARING_PAGE = "ga-hearing-screen-validation";
     private static final String INVALID_HEARING_DATE = "The hearing date must be in the future";
+    private static final String HEARING_DATE_REQUIRED = "Please provide a preferred hearing date.";
     private static final String SET_FEES_AND_PBA = "ga-fees-and-pba";
     private static final String POUND_SYMBOL = "£";
     private static final List<CaseEvent> EVENTS = List.of(INITIATE_GENERAL_APPLICATION, INITIATE_GENERAL_APPLICATION_COSC);
@@ -86,8 +85,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             + "respondent solicitor are assigned to the case.";
     private static final String RESP_NOT_ASSIGNED_ERROR_LIP = "Application cannot be created until the Defendant "
         + "is assigned to the case.";
-    public static final String NOT_IN_EA_REGION = "Sorry this service is not available in the current case management location, please raise an application manually.";
     public static final String NOT_ALLOWED_SETTLE_DISCONTINUE = "Sorry this service is not available, please raise an application manually.";
+    private static final String LR_VS_LIP = "Sorry this service is not available, please raise an application manually.";
+    private static final String MISSING_APPLICATION_TYPE_ERROR = "Select an application type";
     private static final String CONFIRMATION_BODY_FREE = "<br/> <p> The court will make a decision"
         + " on this application."
         + "<br/> <p>  The other party's legal representative has been notified that you have"
@@ -98,8 +98,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private final UserService userService;
     private final GeneralAppFeesService feesService;
     private final LocationReferenceDataService locationRefDataService;
-    private final FeatureToggleService featureToggleService;
-    private final CoreCaseUserService coreCaseUserService;
     private final GeneralAppFeesService generalAppFeesService;
 
     @Override
@@ -139,13 +137,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         }
         log.info("initiating general application allowed for caseId {}", caseData.getCcdCaseReference());
 
-        if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
-            if (!(featureToggleService.isLocationWhiteListed(caseData.getCaseManagementLocation()
-                                                                                    .getBaseLocation()))
-                    && !(featureToggleService.isCuiGaNroEnabled())) {
-                errors.add(NOT_IN_EA_REGION);
-            }
-        }
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         GAHearingDetails generalAppHearingDetails = new GAHearingDetails();
         generalAppHearingDetails.setHearingPreferredLocation(getLocationsFromList(locationRefDataService
@@ -167,7 +158,13 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse gaValidateConsent(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        List<GeneralApplicationTypes> generalAppTypes = getGeneralApplicationTypes(callbackParams, caseData);
+        List<GeneralApplicationTypes> generalAppTypes = getGeneralApplicationTypes(caseData);
+        if (generalAppTypes.isEmpty()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseData.toMap(objectMapper))
+                .errors(List.of(MISSING_APPLICATION_TYPE_ERROR))
+                .build();
+        }
 
         var consent = Objects.nonNull(caseData.getGeneralAppRespondentAgreement())
                                 && YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed());
@@ -183,23 +180,11 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .build();
     }
 
-    private List<GeneralApplicationTypes> getGeneralApplicationTypes(CallbackParams callbackParams, CaseData caseData) {
-        List<GeneralApplicationTypes> generalAppTypes;
-        if (caseData.getGeneralAppTypeLR() != null && isCoscEnabledAndUserNotLip(callbackParams)) {
-            generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
-        } else {
-            generalAppTypes = caseData.getGeneralAppType().getTypes();
+    private List<GeneralApplicationTypes> getGeneralApplicationTypes(CaseData caseData) {
+        if (hasGeneralAppTypeLRTypes(caseData)) {
+            return GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
         }
-        return generalAppTypes;
-    }
-
-    private boolean isCoscEnabledAndUserNotLip(CallbackParams callbackParams) {
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        List<String> roles = coreCaseUserService.getUserCaseRoles(
-                callbackParams.getCaseData().getCcdCaseReference().toString(),
-                userInfo.getUid()
-        );
-        return !(UserRoleUtils.isLIPDefendant(roles) || UserRoleUtils.isLIPClaimant(roles));
+        return hasGeneralAppTypes(caseData) ? caseData.getGeneralAppType().getTypes() : List.of();
     }
 
     private CallbackResponse gaValidateType(CallbackParams callbackParams) {
@@ -207,7 +192,13 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
-        List<GeneralApplicationTypes> generalAppTypes = getGeneralApplicationTypes(callbackParams, caseData);
+        List<GeneralApplicationTypes> generalAppTypes = getGeneralApplicationTypes(caseData);
+        if (generalAppTypes.isEmpty()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseData.toMap(objectMapper))
+                .errors(List.of(MISSING_APPLICATION_TYPE_ERROR))
+                .build();
+        }
 
         if (generalAppTypes.size() > 1
             && generalAppTypes.contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
@@ -242,10 +233,15 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
 
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.getGeneralAppHearingDate() != null
-            && caseData.getGeneralAppHearingDate().getHearingScheduledPreferenceYesNo().equals(YesOrNo.YES)
-            && caseData.getGeneralAppHearingDate().getHearingScheduledDate().isBefore(LocalDate.now())) {
-            errors.add(INVALID_HEARING_DATE);
+        GAHearingDateGAspec gaHearingDate = caseData.getGeneralAppHearingDate();
+        if (gaHearingDate != null
+            && YesOrNo.YES.equals(gaHearingDate.getHearingScheduledPreferenceYesNo())) {
+            LocalDate hearingScheduledDate = gaHearingDate.getHearingScheduledDate();
+            if (hearingScheduledDate == null) {
+                errors.add(HEARING_DATE_REQUIRED);
+            } else if (hearingScheduledDate.isBefore(LocalDate.now(ZoneId.systemDefault()))) {
+                errors.add(INVALID_HEARING_DATE);
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -280,11 +276,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse setFeesAndPBA(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (caseData.getGeneralAppTypeLR() != null && isCoscEnabledAndUserNotLip(callbackParams)) {
-            GAApplicationType gaApplicationType = new GAApplicationType();
-            gaApplicationType.setTypes(GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes()));
-            caseData.setGeneralAppType(gaApplicationType);
-        }
+        setGeneralAppTypeFromLRIfRequired(caseData);
         caseData = setWithNoticeByType(caseData);
         Fee feeForGA = feesService.getFeeForGA(caseData);
         GAPbaDetails generalAppPBADetails = new GAPbaDetails();
@@ -299,7 +291,14 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private CallbackResponse submitApplication(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        caseData = setWithNoticeByType(caseData);
+        setGeneralAppTypeFromLRIfRequired(caseData);
+        if (!hasGeneralAppTypes(caseData)) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(MISSING_APPLICATION_TYPE_ERROR))
+                .data(caseData.toMap(objectMapper))
+                .build();
+        }
+        setWithNoticeByType(caseData);
         final UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         if (caseData.getGeneralAppPBADetails() == null) {
@@ -330,18 +329,32 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             generalAppHearingDetails.setHearingPreferredLocation(dynamicList);
             caseData.setGeneralAppParentClaimantIsApplicant(null);
         }
-        if (caseData.getGeneralAppTypeLR() != null && isCoscEnabledAndUserNotLip(callbackParams)) {
-            var generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
-            GAApplicationType gaApplicationType = new GAApplicationType();
-            gaApplicationType.setTypes(generalAppTypes);
-            caseData.setGeneralAppType(gaApplicationType);
-        }
-
         Map<String, Object> data = initiateGeneralApplicationService
                 .buildCaseData(caseData, userDetails, callbackParams.getParams().get(BEARER_TOKEN)
                         .toString()).toMap(objectMapper);
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(data).build();
+    }
+
+    private void setGeneralAppTypeFromLRIfRequired(CaseData caseData) {
+        if (hasGeneralAppTypeLRTypes(caseData)) {
+            var generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
+            GAApplicationType gaApplicationType = new GAApplicationType();
+            gaApplicationType.setTypes(generalAppTypes);
+            caseData.setGeneralAppType(gaApplicationType);
+        }
+    }
+
+    private boolean hasGeneralAppTypes(CaseData caseData) {
+        return caseData.getGeneralAppType() != null
+            && caseData.getGeneralAppType().getTypes() != null
+            && !caseData.getGeneralAppType().getTypes().isEmpty();
+    }
+
+    private boolean hasGeneralAppTypeLRTypes(CaseData caseData) {
+        return caseData.getGeneralAppTypeLR() != null
+            && caseData.getGeneralAppTypeLR().getTypes() != null
+            && !caseData.getGeneralAppTypeLR().getTypes().isEmpty();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

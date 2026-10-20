@@ -1,0 +1,7 @@
+# Branches exempt from manual and scheduled stale-branch cleanup.
+# Add one exact, case-sensitive branch name per line, without refs/heads/.
+# Blank lines and lines starting with # are ignored. Wildcards are not expanded.
+# Keep explanations on separate comment lines above the branch name.
+# The default branch, protected branches, release/hotfix branches and branches
+# with open pull requests are already excluded automatically.
+# Guide: .github/stale-branch-cleanup.md

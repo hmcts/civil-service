@@ -4,7 +4,10 @@ import com.microsoft.applicationinsights.TelemetryClient;
 import feign.Client;
 import feign.Request;
 import feign.Response;
+import feign.Retryer;
+import feign.codec.ErrorDecoder;
 import feign.httpclient.ApacheHttpClient;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -18,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
+@Slf4j
 public class HttpClientFeignConfiguration {
 
     @Value("${http.client.connectTimeout:5000}")
@@ -38,6 +42,43 @@ public class HttpClientFeignConfiguration {
         connectionManager.setMaxTotal(maxTotal);
         connectionManager.setDefaultMaxPerRoute(maxPerRoute);
         return connectionManager;
+    }
+
+    /**
+     * Feign's own default decoder, registered as a bean so that every client shares it and
+     * {@code ErrorDecoderTelemetryAspect} can advise it. Spring AOP only sees Spring beans:
+     * when Feign instantiates {@code ErrorDecoder.Default} internally (which it does once
+     * Holunda's global decoder is disabled) the aspect never fires and the
+     * {@code httpclient.feign.error.classified} event is never emitted. Behaviour of the
+     * clients is unchanged; this is the decoder they would use anyway.
+     */
+    @Bean
+    public ErrorDecoder feignErrorDecoder() {
+        return new ErrorDecoder.Default();
+    }
+
+    /**
+     * Retry on transient network failures for every Feign client.
+     *
+     * <p>Holunda's {@code FeignClientConfiguration} contributed exactly this bean, a no-arg
+     * {@code Retryer.Default}, and because Spring Cloud OpenFeign declares its own
+     * {@code @ConditionalOnMissingBean}, that single bean set the retry behaviour of every Feign
+     * client in the service, not just the Camunda ones. Removing the dependency in DTSCCI-6513
+     * would otherwise drop all of them to {@code Retryer.NEVER_RETRY}.
+     *
+     * <p>That matters because Feign raises a {@code RetryableException} for exactly the failures
+     * worth retrying: a connection reset, or a pooled keep-alive socket the far side has closed,
+     * which surfaces as {@code NoHttpResponseException}. With no retryer those become hard
+     * failures on the first attempt. It was caught by the Pact consumer tests, where a mock server
+     * restarting on a fixed port leaves a stale pooled connection, but the production surface is
+     * every outbound call to CCD, IDAM, CDAM, ref data, HMC and payments.
+     *
+     * <p>Declared here rather than left implicit so the behaviour is visible and owned. Defaults
+     * are Feign's: 5 attempts, 100ms initial interval, 1s maximum.</p>
+     */
+    @Bean
+    public Retryer feignRetryer() {
+        return new Retryer.Default();
     }
 
     @Bean
@@ -101,7 +142,13 @@ public class HttpClientFeignConfiguration {
                 reportMetrics(service, System.currentTimeMillis() - startTime, true, null);
                 return response;
             } catch (Exception e) {
-                reportMetrics(service, System.currentTimeMillis() - startTime, false, e);
+                long duration = System.currentTimeMillis() - startTime;
+                log.error(
+                    "Outbound Feign request failed: targetHost={}, method={}, elapsedMs={}, connectTimeoutMs={}, readTimeoutMs={}, exceptionType={}",
+                    service, request.httpMethod(), duration, options.connectTimeoutMillis(), options.readTimeoutMillis(),
+                    e.getClass().getName()
+                );
+                reportMetrics(service, duration, false, e);
                 throw e;
             }
         }

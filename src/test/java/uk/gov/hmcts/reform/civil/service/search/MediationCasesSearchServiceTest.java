@@ -153,14 +153,14 @@ public class MediationCasesSearchServiceTest {
                                           String searchAfterValue) {
 
         ZonedDateTime startOfToday = FIXED_NOW.toLocalDate().atStartOfDay(ZoneOffset.UTC);
-        ZonedDateTime eightDaysAgo = startOfToday.minusDays(8);
+        ZonedDateTime thirtyDaysAgo = startOfToday.minusDays(30);
         if (carmEnabled) {
             BoolQueryBuilder query = boolQuery()
                 .must(matchAllQuery())
                 .must(boolQuery().must(matchQuery("state", "IN_MEDIATION")))
                 .must(boolQuery().must(rangeQuery("data.submittedDate").gte(CARM_DATE)))
                 .must(rangeQuery("data.claimMovedToMediationOn")
-                          .gt(eightDaysAgo.toString()).lt(startOfToday.toString()))
+                          .gt(thirtyDaysAgo.toString()).lt(startOfToday.toString()))
                 .mustNot(matchQuery("data.mediationFileSentToMmt", "Yes"));
             return new Query(query, Collections.emptyList(), fromValue, initialSearch, searchAfterValue);
         } else {
@@ -170,7 +170,7 @@ public class MediationCasesSearchServiceTest {
                             .must(boolQuery().must(matchQuery("state", "IN_MEDIATION")))
                             .must(boolQuery().must(rangeQuery("data.submittedDate").lt(CARM_DATE)))
                             .must(rangeQuery("data.claimMovedToMediationOn")
-                                      .gt(eightDaysAgo.toString()).lt(startOfToday.toString())))
+                                      .gt(thirtyDaysAgo.toString()).lt(startOfToday.toString())))
                 .mustNot(matchQuery("data.mediationFileSentToMmt", "Yes"));
 
             return new Query(query, Collections.emptyList(), fromValue);

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.GeneralApplicationFeeRequest;
@@ -65,8 +66,13 @@ public class FeesController {
     @Operation(summary = "Calculates the claim interest")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "400", description = "Bad Request - enter a positive interest rate or amount"),
         @ApiResponse(responseCode = "401", description = "Not Authorized")})
     public ResponseEntity<BigDecimal> calculateClaimInterest(@RequestBody CaseData caseData) {
+        List<String> errors = interestCalculator.getInterestValidationErrors(caseData);
+        if (!errors.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.join("; ", errors));
+        }
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         return new ResponseEntity<>(interest, HttpStatus.OK);
     }

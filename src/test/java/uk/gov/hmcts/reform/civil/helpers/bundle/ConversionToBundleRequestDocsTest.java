@@ -10,9 +10,9 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
+import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,16 +23,13 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 class ConversionToBundleRequestDocsTest {
 
     @Mock
     private BundleRequestDocsOrganizer requestDocsOrganizer;
-
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private ConversionToBundleRequestDocs conversionToBundleRequestDocs;
@@ -70,10 +67,12 @@ class ConversionToBundleRequestDocsTest {
 
     @Test
     void shouldPreserveOriginalWitnessIndexWhenFilteringOtherWitnessEvidence() {
-        when(featureToggleService.isAmendBundleEnabled()).thenReturn(true);
         String displayName = "%s %s %s";
         String documentType = "documentType";
 
+        Element<UploadEvidenceWitness> witnessWithoutDocument = new Element<UploadEvidenceWitness>().setValue(
+            new UploadEvidenceWitness().setWitnessOptionName("Witness Without Document")
+        );
         Element<UploadEvidenceWitness> unbundledWitness = new Element<UploadEvidenceWitness>().setValue(
             new UploadEvidenceWitness()
                 .setWitnessOptionName("Witness One")
@@ -96,13 +95,13 @@ class ConversionToBundleRequestDocsTest {
         );
 
         Map<String, List<Element<UploadEvidenceWitness>>> witnessStatementsMap = new HashMap<>();
-        witnessStatementsMap.put("Witness1", List.of(unbundledWitness, bundledWitness));
+        witnessStatementsMap.put("Witness1", List.of(witnessWithoutDocument, unbundledWitness, bundledWitness));
 
         List<BundlingRequestDocument> result = conversionToBundleRequestDocs.covertOtherWitnessEvidenceToBundleRequestDocs(
             witnessStatementsMap, displayName, documentType, null);
 
         assertEquals(1, result.size());
-        assertEquals("Witness Two 2 06/02/2023", result.getFirst().getDocumentFileName());
+        assertEquals("Witness Two 3 06/02/2023", result.getFirst().getDocumentFileName());
     }
 
     @Test
@@ -131,6 +130,18 @@ class ConversionToBundleRequestDocsTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
+    }
+
+    @Test
+    void shouldSkipWitnessEvidenceWithoutDocument() {
+        List<Element<UploadEvidenceWitness>> witnessEvidence = List.of(
+            new Element<UploadEvidenceWitness>().setValue(new UploadEvidenceWitness())
+        );
+
+        List<BundlingRequestDocument> result = conversionToBundleRequestDocs.covertWitnessEvidenceToBundleRequestDocs(
+            witnessEvidence, "fileNamePrefix", "documentType", PartyType.CLAIMANT1, true);
+
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -166,6 +177,37 @@ class ConversionToBundleRequestDocsTest {
 
         assertNotNull(result);
         assertEquals(2, result.size());
+    }
+
+    @Test
+    void shouldSkipEvidenceUploadWithoutDocumentAndKeepBundledDocument() {
+        UploadEvidenceDocumentType missingDocument = new UploadEvidenceDocumentType();
+        UploadEvidenceDocumentType bundledDocument = new UploadEvidenceDocumentType()
+            .setDocumentUpload(new Document()
+                                   .setDocumentFileName("document.pdf")
+                                   .setCategoryID("SomeCategoryID"));
+        List<Element<UploadEvidenceDocumentType>> uploads = List.of(
+            new Element<UploadEvidenceDocumentType>().setValue(missingDocument),
+            new Element<UploadEvidenceDocumentType>().setValue(bundledDocument)
+        );
+
+        List<BundlingRequestDocument> result = conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
+            uploads, "DOC_FILE_NAME", EvidenceUploadType.COSTS.name(), PartyType.CLAIMANT1);
+
+        assertEquals(1, result.size());
+        assertEquals("document", result.getFirst().getDocumentFileName());
+    }
+
+    @Test
+    void shouldSkipExpertEvidenceWithoutDocument() {
+        List<Element<UploadEvidenceExpert>> expertEvidence = List.of(
+            new Element<UploadEvidenceExpert>().setValue(new UploadEvidenceExpert())
+        );
+
+        List<BundlingRequestDocument> result = conversionToBundleRequestDocs.covertExpertEvidenceTypeToBundleRequestDocs(
+            expertEvidence, "fileNamePrefix", EvidenceUploadType.EXPERT_REPORT.name());
+
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -217,6 +259,37 @@ class ConversionToBundleRequestDocsTest {
 
         assertNotNull(result);
         assertEquals("document", result.getFirst().getDocumentFileName());
+    }
+
+    @Test
+    void shouldLimitOriginalDocumentFileNamesInBundleRequest() {
+        String longBaseName = "source-document-" + "A".repeat(250) + "-important-suffix";
+        Document longNameDocument = new Document()
+            .setDocumentFileName(longBaseName + ".pdf")
+            .setCategoryID("SomeCategoryID");
+        Document ordinaryDocument = new Document()
+            .setDocumentFileName("ordinary-document.pdf")
+            .setCategoryID("SomeCategoryID");
+        List<Element<UploadEvidenceDocumentType>> uploads = List.of(longNameDocument, ordinaryDocument).stream()
+            .map(document -> new Element<UploadEvidenceDocumentType>().setValue(
+                new UploadEvidenceDocumentType()
+                    .setDocumentIssuedDate(LocalDate.of(2023, 4, 24))
+                    .setDocumentUpload(document)
+            ))
+            .toList();
+
+        List<BundlingRequestDocument> result = conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
+            uploads,
+            "DOC_FILE_NAME",
+            EvidenceUploadType.COSTS.name(),
+            PartyType.CLAIMANT1
+        );
+
+        assertEquals(2, result.size());
+        assertTrue(result.stream().allMatch(document ->
+            document.getDocumentFileName().length() <= BundleUtils.MAX_DOC_TITLE_LENGTH));
+        assertTrue(result.getFirst().getDocumentFileName().endsWith("-important-suffix"));
+        assertEquals("ordinary-document", result.get(1).getDocumentFileName());
     }
 
     @Test

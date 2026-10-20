@@ -28,5 +28,7 @@ public class ChangeOfRepresentation {
     private LocalDateTime timestamp;
     @JsonProperty("formerRepresentationEmailAddress")
     private String formerRepresentationEmailAddress;
+    @JsonProperty("formerRepresentationReference")
+    private String formerRepresentationReference;
 
 }

@@ -11,12 +11,13 @@
     "bpmn-to-image": "0.10.0"
   },
   "devDependencies": {
-    "puppeteer": "24.43.1"
+    "puppeteer": "25.11.0"
   },
   "overrides": {
-    "basic-ftp": "5.3.1",
-    "js-yaml": "4.2.0",
-    "ip-address": "10.2.0",
-    "ws": "8.21.0"
+    "puppeteer": "$puppeteer",
+    "basic-ftp": "6.2.1",
+    "js-yaml": "5.4.2",
+    "ip-address": "10.7.1",
+    "ws": "8.21.3"
   }
 }

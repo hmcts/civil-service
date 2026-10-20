@@ -26,6 +26,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -168,6 +169,26 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
                     () -> assertEquals("Applicant Org Ltd", props.get(CLAIM_LEGAL_ORG_NAME_SPEC))
             );
         }
+    }
+
+    @Test
+    void addCustomProperties_missingHearingStartDateTime_throwsClearException() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+                .toBuilder()
+                .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
+                .build();
+        when(camundaService.getProcessVariables(PROCESS_ID))
+                .thenReturn(new HearingNoticeVariables());
+
+        IllegalStateException exception = assertThrows(
+            IllegalStateException.class,
+            () -> generator.addCustomProperties(new HashMap<>(), caseData)
+        );
+
+        assertEquals(
+            "Missing hearingStartDateTime process variable for process instance " + PROCESS_ID,
+            exception.getMessage()
+        );
     }
 
     @Test

@@ -12,12 +12,16 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +43,8 @@ public class DefaultJudgementGrantedSpecCallbackHandler extends CallbackHandler 
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_GRANTED_SPEC);
 
     private final ObjectMapper objectMapper;
+
+    private final InterestCalculator interestCalculator;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -95,12 +101,28 @@ public class DefaultJudgementGrantedSpecCallbackHandler extends CallbackHandler 
     }
 
     private CaseData updateCaseData(CaseData caseData) {
+        BigInteger orderAmount = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator));
+        BigInteger costs = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getFixedCostsOfJudgmentForDJ(caseData));
+        BigInteger claimFee = MonetaryConversions.poundsToPennies(JudgmentsOnlineHelper.getClaimFeeOfJudgmentForDJ(caseData));
         JudgmentDetails activeJudgment = caseData.getActiveJudgment();
         activeJudgment.setState(JudgmentState.ISSUED)
             .setIssueDate(LocalDate.now())
             .setRtlState(JudgmentRTLStatus.ISSUED.getRtlState())
-            .setIsRegisterWithRTL(YES);
+            .setIsRegisterWithRTL(YES)
+            .setOrderedAmount(orderAmount.toString())
+            .setClaimFeeAmount(claimFee.toString())
+            .setCosts(costs.toString())
+            .setTotalAmount(orderAmount.add(costs).add(claimFee).toString());
+
         caseData.setJoIsLiveJudgmentExists(YES);
+        caseData.setJoState(JudgmentState.ISSUED);
+        String repaymentSummaryObject = JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryWithoutClaimInterest(
+            activeJudgment,
+            true
+        );
+        caseData.setJoRepaymentSummaryObject(repaymentSummaryObject);
+        caseData.setRepaymentSummaryObject(repaymentSummaryObject);
+        caseData.setTotalInterest(interestCalculator.calculateInterest(caseData));
         caseData.setBusinessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
 
         return caseData;

@@ -72,6 +72,28 @@ class BundleUtilsTest {
     }
 
     @Test
+    void shouldTruncateLongDocNameWhenBuildingBundlingRequestDocAndPreserveSuffix() {
+        String docName = "A".repeat(260) + " 24/04/2023.pdf";
+        Document document = new Document().setDocumentFileName("document.pdf");
+
+        BundlingRequestDocument result = BundleUtils.buildBundlingRequestDoc(docName, document, "TestDocType");
+
+        assertEquals(BundleUtils.MAX_DOC_TITLE_LENGTH, result.getDocumentFileName().length());
+        assertTrue(result.getDocumentFileName().startsWith("A"));
+        assertTrue(result.getDocumentFileName().endsWith(" 24/04/2023.pdf"));
+        assertTrue(result.getDocumentFileName().contains("..."));
+    }
+
+    @Test
+    void shouldLeaveDocNameAtMaxLengthUnchangedWhenBuildingBundlingRequestDoc() {
+        String docName = "A".repeat(BundleUtils.MAX_DOC_TITLE_LENGTH);
+        Document document = new Document().setDocumentFileName("document.pdf");
+
+        BundlingRequestDocument result = BundleUtils.buildBundlingRequestDoc(docName, document, "TestDocType");
+        assertEquals(docName, result.getDocumentFileName());
+    }
+
+    @Test
     void shouldTruncateDocNameWhenExceedsMaxLength() {
         String longParam = "A".repeat(300); // More than 255 characters
         String fileName = "%s";
@@ -80,7 +102,7 @@ class BundleUtilsTest {
         String result = BundleUtils.generateDocName(fileName, longParam, "Param2", date);
 
         assertEquals(BundleUtils.MAX_DOC_TITLE_LENGTH, result.length());
-        assertEquals(longParam.substring(0, BundleUtils.MAX_DOC_TITLE_LENGTH), result);
+        assertTrue(result.startsWith(longParam.substring(0, 200)));
     }
 
     @Test

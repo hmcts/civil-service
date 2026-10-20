@@ -66,7 +66,7 @@ public class ValidateRespondentWitnessesSpec implements CaseTask, WitnessesValid
 
     private boolean isRespondent2HasDifferentResponse(CaseData caseData) {
         log.info("Checking if Respondent 2 has different response for caseId: {}", caseData.getCcdCaseReference());
-        return respondent2HasSameLegalRep(caseData)
+        return caseData.respondent2HasSameLegalRep()
                 && caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO
                 && caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null;
     }
@@ -84,11 +84,5 @@ public class ValidateRespondentWitnessesSpec implements CaseTask, WitnessesValid
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
                 .build();
-    }
-
-    private boolean respondent2HasSameLegalRep(CaseData caseData) {
-        log.info("Checking if Respondent 2 has the same legal representative for caseId: {}", caseData.getCcdCaseReference());
-        return caseData.getRespondent2SameLegalRepresentative() != null
-                && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
 }

@@ -131,7 +131,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
-            return validateCorrespondenceApplicantAddress(callbackParams, postcodeValidator);
+            return validateCorrespondenceApplicantAddressPostcodeRequired(callbackParams);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .build();

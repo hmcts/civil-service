@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.refdata;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
@@ -13,6 +14,8 @@ import java.util.List;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class CourtVenueServiceTest {
@@ -91,6 +94,22 @@ class CourtVenueServiceTest {
     void shouldFilterCMLByEpimmsIdAndServiceId(String serviceId) {
         List<LocationRefData> result = courtVenueService.getCMLCourtByEpimmsId(serviceAuth, auth, "111", serviceId);
         assertThat(result).containsExactly(court1); // court3 has CML=Y but hearing=N
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenEpimmsIdIsNull() {
+        List<LocationRefData> result = courtVenueService.getCourtByEpimmsId(serviceAuth, auth, null, "AAA7");
+
+        assertThat(result).isEmpty();
+        verify(rdClientService, never()).fetchAllCivilCourtsByServiceId(any(), any(), any());
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenCmlEpimmsIdIsNull() {
+        List<LocationRefData> result = courtVenueService.getCMLCourtByEpimmsId(serviceAuth, auth, null, "AAA7");
+
+        assertThat(result).isEmpty();
+        verify(rdClientService, never()).fetchAllCivilCourtsByServiceId(any(), any(), any());
     }
 
     @ParameterizedTest()

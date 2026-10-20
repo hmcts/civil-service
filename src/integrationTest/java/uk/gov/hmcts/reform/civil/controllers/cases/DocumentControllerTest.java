@@ -159,6 +159,37 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    void shouldReturnBadRequestWithCaseId_whenDocumentLinkUndefined() throws Exception {
+        MvcResult result = doGet(
+            BEARER_TOKEN,
+            DOWNLOAD_FILE_URL + "?caseId={caseId}",
+            "undefined",
+            "1767636822302602"
+        )
+            .andExpect(status().isBadRequest())
+            .andReturn();
+
+        assertEquals(
+            "Invalid document link 'documents/undefined' for case 1767636822302602"
+                + ": expected a path of at least 36 characters ending in a document UUID.",
+            result.getResponse().getContentAsString()
+        );
+    }
+
+    @Test
+    void shouldReturnBadRequestWithoutCaseIdSuffix_whenDocumentLinkUndefined() throws Exception {
+        MvcResult result = doGet(BEARER_TOKEN, DOWNLOAD_FILE_URL, "undefined")
+            .andExpect(status().isBadRequest())
+            .andReturn();
+
+        assertEquals(
+            "Invalid document link 'documents/undefined'"
+                + ": expected a path of at least 36 characters ending in a document UUID.",
+            result.getResponse().getContentAsString()
+        );
+    }
+
+    @Test
     void shouldReturnExpectedGeneratedSealedDocument() throws Exception {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
             .legacyCaseReference(REFERENCE_NUMBER)

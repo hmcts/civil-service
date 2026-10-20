@@ -1,47 +1,60 @@
 name: Render BPMN diagrams
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - 'src/main/resources/camunda/**/*.bpmn'
   pull_request:
     paths:
       - 'src/main/resources/camunda/**/*.bpmn'
+      - 'scripts/render-bpmn-diagrams.mjs'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/render-bpmn-diagrams.yml'
   workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: render-bpmn-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   render:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Install npm dependencies
         run: npm ci --ignore-scripts
 
       - name: Download Puppeteer browser
-        run: node node_modules/puppeteer/install.mjs
+        run: npx --no-install puppeteer browsers install chrome
 
       - name: Determine changed BPMN files
         id: changed
         shell: bash
+        env:
+          BASE_REF: ${{ github.base_ref }}
         run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            git fetch origin "${{ github.base_ref }}"
-            CHANGED=$(git diff --name-only "origin/${{ github.base_ref }}...${{ github.sha }}")
-          else
-            CHANGED=$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}")
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "bpmn_list=src/main/resources/camunda/" >> "$GITHUB_OUTPUT"
+            exit 0
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            git fetch origin "$BASE_REF"
+            CHANGED=$(git diff --name-only "origin/$BASE_REF...HEAD")
+          fi
+
+          # Exercise all diagrams when the renderer or its dependencies change.
+          if echo "$CHANGED" | grep -qE '^(scripts/render-bpmn-diagrams\.mjs|package\.json|package-lock\.json|\.github/workflows/render-bpmn-diagrams\.yml)$'; then
+            echo "bpmn_list=src/main/resources/camunda/" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
           BPMN_CHANGED=$(echo "$CHANGED" | grep -E '^src/main/resources/camunda/.*\.bpmn$' || true)
@@ -65,15 +78,39 @@ jobs:
 
       - name: Upload rendered diagrams
         if: steps.changed.outputs.bpmn_list != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: bpmn-diagrams
           path: docs/bpmn-diagrams
           if-no-files-found: error
 
       - name: Commit rendered diagrams
-        if: steps.changed.outputs.bpmn_list != '' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: >-
+          steps.changed.outputs.bpmn_list != '' &&
+          (github.event_name == 'workflow_dispatch' ||
+           github.event.pull_request.head.repo.full_name == github.repository) &&
+          (github.head_ref || github.ref_name) != github.event.repository.default_branch &&
+          (github.head_ref || github.ref_name) != 'master' &&
+          (github.event_name == 'pull_request' || github.ref_type == 'branch')
+        env:
+          TARGET_BRANCH: ${{ github.head_ref || github.ref_name }}
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
         run: |
+          ENCODED_BRANCH=$(jq -rn --arg branch "$TARGET_BRANCH" '$branch | @uri')
+          PROTECTED=$(gh api "repos/$REPOSITORY/branches/$ENCODED_BRANCH" --jq '.protected')
+          if [[ "$PROTECTED" != "false" ]]; then
+            echo "::notice::Target branch is protected; download diagrams from the artifact."
+            exit 0
+          fi
+
+          # Never overwrite a contributor's newer commits with stale diagrams.
+          git fetch origin "$TARGET_BRANCH"
+          if [[ "$(git rev-parse HEAD)" != "$(git rev-parse FETCH_HEAD)" ]]; then
+            echo "Branch advanced during rendering; leaving diagrams in the artifact."
+            exit 0
+          fi
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/bpmn-diagrams/*.png
@@ -84,4 +121,4 @@ jobs:
           fi
 
           git commit -m "Update BPMN diagrams"
-          git push
+          git push origin "HEAD:refs/heads/$TARGET_BRANCH"

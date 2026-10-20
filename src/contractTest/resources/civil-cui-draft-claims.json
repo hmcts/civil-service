@@ -1,0 +1,197 @@
+{
+  "common": {
+    "applicant1Represented": "No",
+    "totalClaimAmount": 1000,
+    "claimAmountBreakup": [
+      {
+        "id": "0",
+        "value": {
+          "claimAmount": "100000",
+          "claimReason": "Unpaid invoice"
+        }
+      }
+    ],
+    "detailsOfClaim": "The invoice remains unpaid.",
+    "claimInterest": "Yes",
+    "interestClaimOptions": "SAME_RATE_INTEREST",
+    "sameRateInterestSelection": {
+      "sameRateInterestType": "SAME_RATE_INTEREST_8_PC"
+    },
+    "interestClaimFrom": "FROM_A_SPECIFIC_DATE",
+    "interestFromSpecificDate": "2025-01-01",
+    "interestFromSpecificDateDescription": "Invoice became overdue",
+    "interestClaimUntil": "UNTIL_SETTLED_OR_JUDGEMENT_MADE",
+    "claimantUserDetails": {
+      "email": "claimant@example.com",
+      "id": "cui-user-id"
+    },
+    "respondent1LiPResponse": {
+      "respondent1DQExtraDetails": {
+        "whyPhoneOrVideoHearing": "",
+        "determinationWithoutHearingReason": "",
+        "considerClaimantDocumentsDetails": "",
+        "respondent1DQLiPExpert": {
+          "expertCanStillExamineDetails": ""
+        }
+      },
+      "respondent1DQHearingSupportLip": {}
+    },
+    "specRespondent1Represented": "No",
+    "respondent1AdditionalLipPartyDetails": {
+      "correspondenceAddress": {}
+    },
+    "applicant1AdditionalLipPartyDetails": {
+      "correspondenceAddress": {}
+    },
+    "res1MediationDocumentsReferred": [],
+    "res1MediationNonAttendanceDocs": [],
+    "app1MediationDocumentsReferred": [],
+    "app1MediationNonAttendanceDocs": [],
+    "isFlightDelayClaim": "No",
+    "uiStatementOfTruth": {
+      "name": "Alex Example",
+      "role": "Owner"
+    },
+    "claimFee": {
+      "calculatedAmountInPence": "11500",
+      "version": "1",
+      "code": "FEE0209"
+    }
+  },
+  "variants": {
+    "individual-company": {
+      "applicant1": {
+        "individualDateOfBirth": null,
+        "individualFirstName": "Alex",
+        "individualLastName": "Example",
+        "individualTitle": "Mx",
+        "partyEmail": "claimant@example.com",
+        "primaryAddress": {
+          "AddressLine1": "1 Example Street",
+          "AddressLine2": "",
+          "AddressLine3": "",
+          "PostCode": "LS1 1AA",
+          "PostTown": "Leeds"
+        },
+        "soleTraderDateOfBirth": null,
+        "type": "INDIVIDUAL"
+      },
+      "respondent1": {
+        "companyName": "Example Services",
+        "individualDateOfBirth": null,
+        "partyEmail": "defendant@example.com",
+        "primaryAddress": {
+          "AddressLine1": "1 Example Street",
+          "AddressLine2": "",
+          "AddressLine3": "",
+          "PostCode": "LS1 1AA",
+          "PostTown": "Leeds"
+        },
+        "soleTraderDateOfBirth": null,
+        "type": "COMPANY"
+      },
+      "claimantBilingualLanguagePreference": "ENGLISH"
+    },
+    "company-organisation": {
+      "applicant1": {
+        "companyName": "Example Supplies",
+        "individualDateOfBirth": null,
+        "partyEmail": "claimant@example.com",
+        "primaryAddress": {
+          "AddressLine1": "1 Example Street",
+          "AddressLine2": "",
+          "AddressLine3": "",
+          "PostCode": "LS1 1AA",
+          "PostTown": "Leeds"
+        },
+        "soleTraderDateOfBirth": null,
+        "type": "COMPANY"
+      },
+      "respondent1": {
+        "individualDateOfBirth": null,
+        "organisationName": "Example Services",
+        "partyEmail": "defendant@example.com",
+        "primaryAddress": {
+          "AddressLine1": "1 Example Street",
+          "AddressLine2": "",
+          "AddressLine3": "",
+          "PostCode": "LS1 1AA",
+          "PostTown": "Leeds"
+        },
+        "soleTraderDateOfBirth": null,
+        "type": "ORGANISATION"
+      },
+      "claimantBilingualLanguagePreference": "WELSH"
+    },
+    "organisation-sole-trader": {
+      "applicant1": {
+        "individualDateOfBirth": null,
+        "organisationName": "Example Supplies",
+        "partyEmail": "claimant@example.com",
+        "primaryAddress": {
+          "AddressLine1": "1 Example Street",
+          "AddressLine2": "",
+          "AddressLine3": "",
+          "PostCode": "LS1 1AA",
+          "PostTown": "Leeds"
+        },
+        "soleTraderDateOfBirth": null,
+        "type": "ORGANISATION"
+      },
+      "respondent1": {
+        "individualDateOfBirth": null,
+        "partyEmail": "defendant@example.com",
+        "primaryAddress": {
+          "AddressLine1": "1 Example Street",
+          "AddressLine2": "",
+          "AddressLine3": "",
+          "PostCode": "LS1 1AA",
+          "PostTown": "Leeds"
+        },
+        "soleTraderDateOfBirth": null,
+        "soleTraderFirstName": "Sam",
+        "soleTraderLastName": "Example",
+        "soleTraderTitle": "Mx",
+        "soleTraderTradingAs": "Example Trading",
+        "type": "SOLE_TRADER"
+      },
+      "claimantBilingualLanguagePreference": "BOTH"
+    },
+    "sole-trader-individual": {
+      "applicant1": {
+        "individualDateOfBirth": null,
+        "partyEmail": "claimant@example.com",
+        "primaryAddress": {
+          "AddressLine1": "1 Example Street",
+          "AddressLine2": "",
+          "AddressLine3": "",
+          "PostCode": "LS1 1AA",
+          "PostTown": "Leeds"
+        },
+        "soleTraderDateOfBirth": null,
+        "soleTraderFirstName": "Alex",
+        "soleTraderLastName": "Example",
+        "soleTraderTitle": "Mx",
+        "soleTraderTradingAs": "Example Trading",
+        "type": "SOLE_TRADER"
+      },
+      "respondent1": {
+        "individualDateOfBirth": null,
+        "individualFirstName": "Sam",
+        "individualLastName": "Example",
+        "individualTitle": "Mx",
+        "partyEmail": "defendant@example.com",
+        "primaryAddress": {
+          "AddressLine1": "1 Example Street",
+          "AddressLine2": "",
+          "AddressLine3": "",
+          "PostCode": "LS1 1AA",
+          "PostTown": "Leeds"
+        },
+        "soleTraderDateOfBirth": null,
+        "type": "INDIVIDUAL"
+      },
+      "claimantBilingualLanguagePreference": "ENGLISH"
+    }
+  }
+}

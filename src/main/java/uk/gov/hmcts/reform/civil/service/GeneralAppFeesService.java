@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
@@ -49,6 +50,10 @@ public class GeneralAppFeesService {
 
     private static final String MISCELLANEOUS = "miscellaneous";
     private static final String OTHER = "other";
+    private static final String MISSING_CASE_DATA_APPLICATION_TYPE =
+        "General application type is required to calculate the fee";
+    private static final String MISSING_APPLICATION_TYPE_FOR_FEE_CALCULATION =
+        "General application type is required to calculate a fee";
 
     protected static final List<GeneralApplicationTypes> VARY_TYPES
         = List.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT);
@@ -90,8 +95,9 @@ public class GeneralAppFeesService {
     }
 
     public Fee getFeeForGA(CaseData caseData) {
+        List<GeneralApplicationTypes> types = getApplicationTypes(caseData.getGeneralAppType());
         return getFeeForGA(
-            caseData.getGeneralAppType().getTypes(),
+            types,
             getRespondentAgreed(caseData),
             getInformOtherParty(caseData),
             getHearingDate(caseData)
@@ -99,7 +105,7 @@ public class GeneralAppFeesService {
     }
 
     public Fee getFeeForGA(GeneralApplicationCaseData caseData) {
-        List<GeneralApplicationTypes> types = caseData.getGeneralAppType().getTypes();
+        List<GeneralApplicationTypes> types = getApplicationTypes(caseData.getGeneralAppType());
         FeeCalculationState calculationState = initialCalculationState(types);
         calculationState = applyVaryFee(calculationState, types);
         calculationState = applySettlementByConsentFee(calculationState, types);
@@ -118,6 +124,7 @@ public class GeneralAppFeesService {
     }
 
     private Fee getFeeForGA(List<GeneralApplicationTypes> types, Boolean respondentAgreed, Boolean informOtherParty, LocalDate hearingScheduledDate) {
+        validateApplicationTypes(types);
         FeeCalculationState calculationState = initialCalculationState(types);
         calculationState = applyVaryFee(calculationState, types);
         calculationState = applySettlementByConsentFee(calculationState, types);
@@ -156,6 +163,19 @@ public class GeneralAppFeesService {
             throw new RuntimeException("No Fees returned by fee-service while creating General Application");
         }
         return buildFeeDto(feeLookupResponseDto);
+    }
+
+    private List<GeneralApplicationTypes> getApplicationTypes(GAApplicationType applicationType) {
+        if (applicationType == null || CollectionUtils.isEmpty(applicationType.getTypes())) {
+            throw new IllegalArgumentException(MISSING_CASE_DATA_APPLICATION_TYPE);
+        }
+        return applicationType.getTypes();
+    }
+
+    private void validateApplicationTypes(List<GeneralApplicationTypes> types) {
+        if (CollectionUtils.isEmpty(types)) {
+            throw new IllegalArgumentException(MISSING_APPLICATION_TYPE_FOR_FEE_CALCULATION);
+        }
     }
 
     private Fee getDefaultFee(List<GeneralApplicationTypes> types, Boolean respondentAgreed, Boolean informOtherParty, LocalDate hearingScheduledDate) {
@@ -272,15 +292,29 @@ public class GeneralAppFeesService {
         return typeSize > 0 && CollectionUtils.containsAny(types, CONFIRM_YOU_PAID_CCJ_DEBT);
     }
 
-    private Fee getCoScFeeResult(Fee existingResult, Fee certOfSatisfactionOrCancel) {
-        if (certOfSatisfactionOrCancel.getCalculatedAmountInPence().compareTo(existingResult.getCalculatedAmountInPence()) < 0) {
-            return certOfSatisfactionOrCancel;
+    private Fee getLowestFee(Fee existingResult, Fee candidateFee) {
+        validateFee(candidateFee);
+        if (existingResult == null) {
+            return candidateFee;
+        }
+        validateFee(existingResult);
+        if (candidateFee.getCalculatedAmountInPence().compareTo(existingResult.getCalculatedAmountInPence()) < 0) {
+            return candidateFee;
         }
         return existingResult;
     }
 
+    private void validateFee(Fee fee) {
+        if (fee == null || fee.getCalculatedAmountInPence() == null) {
+            throw new IllegalStateException("General Application fee calculation did not produce a valid fee");
+        }
+    }
+
     private FeeCalculationState initialCalculationState(List<GeneralApplicationTypes> types) {
-        return new FeeCalculationState(createMaxFee(), types.size());
+        if (CollectionUtils.isEmpty(types)) {
+            throw new IllegalArgumentException(MISSING_APPLICATION_TYPE_FOR_FEE_CALCULATION);
+        }
+        return new FeeCalculationState(null, types.size());
     }
 
     private FeeCalculationState applyVaryFee(FeeCalculationState calculationState, List<GeneralApplicationTypes> types) {
@@ -382,22 +416,17 @@ public class GeneralAppFeesService {
 
     private Fee applyDefaultFee(FeeCalculationState calculationState, Supplier<Fee> defaultFeeSupplier) {
         if (calculationState.remainingTypes() <= 0) {
+            validateFee(calculationState.fee());
             return calculationState.fee();
         }
-        return getCoScFeeResult(calculationState.fee(), defaultFeeSupplier.get());
+        return getLowestFee(calculationState.fee(), defaultFeeSupplier.get());
     }
 
     private FeeCalculationState applyCandidateFee(FeeCalculationState calculationState, Fee candidateFee) {
         return calculationState.withFeeAndRemainingTypes(
-            getCoScFeeResult(calculationState.fee(), candidateFee),
+            getLowestFee(calculationState.fee(), candidateFee),
             calculationState.remainingTypes() - 1
         );
-    }
-
-    private Fee createMaxFee() {
-        Fee fee = new Fee();
-        fee.setCalculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE));
-        return fee;
     }
 
     private record FeeCalculationState(Fee fee, int remainingTypes) {

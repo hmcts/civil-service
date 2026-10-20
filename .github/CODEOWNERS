@@ -25,3 +25,4 @@ Dockerfile
 build.gradle
 charts/**/Chart.yaml
 .github/workflows/*.yaml
+.github/workflows/*.yml

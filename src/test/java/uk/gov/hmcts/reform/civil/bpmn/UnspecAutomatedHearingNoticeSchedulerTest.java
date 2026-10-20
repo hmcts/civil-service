@@ -39,7 +39,7 @@ class UnspecAutomatedHearingNoticeSchedulerTest extends BpmnBaseTest {
         assertThat(jobDefinitions.get(1).getJobType()).isEqualTo("timer-intermediate-transition");
         assertThat(jobDefinitions.get(2).getJobType()).isEqualTo("timer-transition");
 
-        String cronString = "0 0 0,12 ? * * *";
+        String cronString = "0 0 0,12 ? * *";
         assertThat(jobDefinitions.get(0).getJobConfiguration()).isEqualTo("CYCLE: " + cronString);
         assertThat(jobDefinitions.get(1).getJobConfiguration()).isEqualTo("DURATION: PT300S");
         assertThat(jobDefinitions.get(2).getJobConfiguration()).isEqualTo("DURATION: PT30M");

@@ -7,9 +7,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.BaseCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -176,6 +178,28 @@ public class CaseDetailsBuilder {
     public CaseDetailsBuilder atStateDecisionOutcome() {
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build().toBuilder()
             .hearingDate(LocalDate.now())
+            .ccdState(PREPARE_FOR_HEARING_CONDUCT_HEARING)
+            .build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = PREPARE_FOR_HEARING_CONDUCT_HEARING.name();
+        return this;
+    }
+
+    public CaseDetailsBuilder atStateHearingFeePaid() {
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build().toBuilder()
+            .hearingDueDate(LocalDate.now().minusDays(1))
+            .hearingFeePaymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
+            .ccdState(PREPARE_FOR_HEARING_CONDUCT_HEARING)
+            .build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = PREPARE_FOR_HEARING_CONDUCT_HEARING.name();
+        return this;
+    }
+
+    public CaseDetailsBuilder atStateHearingFeeUnpaid() {
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build().toBuilder()
+            .hearingDueDate(LocalDate.now().minusDays(1))
+            .hearingFeePaymentDetails(new PaymentDetails().setStatus(PaymentStatus.FAILED))
             .ccdState(PREPARE_FOR_HEARING_CONDUCT_HEARING)
             .build();
         this.data = mapper.convertValue(caseData, Map.class);

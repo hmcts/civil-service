@@ -2,14 +2,12 @@ package uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import static java.util.Objects.isNull;
@@ -52,15 +50,6 @@ public class DashboardNotificationHelper {
         return !(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(
             caseData.getCaseManagementLocation().getBaseLocation())
             || featureToggleService.isWelshEnabledForMainCase());
-    }
-
-    public boolean isEligibleForReconsideration(CaseData caseData) {
-        return (featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
-            || featureToggleService.isWelshEnabledForMainCase())
-            && caseData.isSmallClaim()
-            && caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(10000)) <= 0
-            && (isNull(caseData.getDecisionOnRequestReconsiderationOptions())
-            || !DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions()));
     }
 
     public boolean hasTrackChanged(CaseData caseData) {
