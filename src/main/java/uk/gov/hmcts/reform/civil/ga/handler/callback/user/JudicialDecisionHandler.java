@@ -685,8 +685,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
         caseDataBuilder.showRequestInfoPreviewDoc(NO);
         caseDataBuilder.caseNameHmctsInternal(getAllPartyNames(caseData));
         caseDataBuilder.judicialDecisionRequestMoreInfo(
-            new GAJudicialRequestMoreInfo().setJudgeRequestMoreInfoByDate(deadlinesCalculator
-                .getJudicialOrderDeadlineDate(nowInLocalZone(), PLUS_7DAYS))
+            new GAJudicialRequestMoreInfo().setJudgeRequestMoreInfoByDate(nowInLocalZone().toLocalDate().plusDays(PLUS_7DAYS))
         );
         caseDataBuilder.orderOnCourtInitiative(new FreeFormOrderValues()
                                                    .setOnInitiativeSelectionTextArea(ON_INITIATIVE_SELECTION_TEST)
