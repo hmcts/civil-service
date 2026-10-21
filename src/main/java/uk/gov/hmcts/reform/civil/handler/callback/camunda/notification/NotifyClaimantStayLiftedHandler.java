@@ -12,6 +12,11 @@ import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_STAY_LIFTED;
 
+/**
+ * Retained for pre-migration STAY_LIFTED process versions. Remove with the legacy events and CCD entries
+ * once production confirms that no instances remain on those versions after deployment.
+ */
+@Deprecated(forRemoval = true)
 @Service
 public class NotifyClaimantStayLiftedHandler extends AbstractNotifyManageStayClaimantHandler {
 

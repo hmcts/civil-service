@@ -79,5 +79,6 @@ public enum CamundaProcessIdentifier {
     STANDARD_DIRECTION_ORDER_DJ_NOTIFY_PARTIES,
     DJ_NON_DIVERGENT_NOTIFIER,
     RequestJudgementByAdmissionNotifyParties,
-    StayCaseNotifyParties;
+    StayCaseNotifyParties,
+    StayLiftedNotifyParties;
 }
