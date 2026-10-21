@@ -16,6 +16,11 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_STAY_CASE;
 
+/**
+ * Retained for pre-migration STAY_CASE process versions. Remove with the legacy events and CCD entries
+ * once production confirms that no instances remain on those versions after deployment.
+ */
+@Deprecated(forRemoval = true)
 @Service
 public class NotifyClaimantCaseStayedHandler extends AbstractNotifyCaseStayedHandler {
 
