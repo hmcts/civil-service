@@ -655,7 +655,7 @@ dependencies {
   implementation "org.springframework.retry:spring-retry"
   implementation "com.github.hmcts.java-logging:logging:8.0.0"
   implementation "com.microsoft.azure:applicationinsights-web:${versions.applicationInsights}"
-  implementation "com.github.hmcts:befta-fw:9.2.12_CCD-8388"
+  implementation "com.github.hmcts:befta-fw:9.2.10"
   implementation "com.github.hmcts:core-case-data-store-client:5.3.0"
   implementation "com.github.hmcts:document-management-client:7.1.0"
   implementation "com.github.hmcts:send-letter-client:5.1.1"
@@ -695,7 +695,7 @@ dependencies {
   implementation "com.azure:azure-messaging-servicebus:${versions.azureServiceBus}"
   implementation "org.apache.pdfbox:pdfbox:${versions.pdfbox}"
   implementation "org.apache.pdfbox:pdfbox-io:${versions.pdfbox}"
-  implementation "com.github.hmcts:auth-checker-lib:3.1.2"
+  implementation "com.github.hmcts:auth-checker-lib:3.1.1"
   implementation 'org.apache.poi:poi:5.5.1'
   implementation 'org.apache.poi:poi-ooxml:5.5.1'
   implementation "org.apache.httpcomponents.client5:httpclient5:${versions.httpclient5}"
