@@ -30,8 +30,7 @@ public class StayLiftedDefendantTwoEmailDTOGenerator extends StayLiftedEmailDTOG
         // Preserve the first matching branch of the former exclusive gateway.
         return !flow.isFlagSet(ONE_RESPONDENT_REPRESENTATIVE)
             && !flow.isFlagSet(UNREPRESENTED_DEFENDANT_ONE)
-            && (flow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES) || flow.isFlagSet(UNREPRESENTED_DEFENDANT_TWO))
-            && super.getShouldNotify(caseData);
+            && (flow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES) || flow.isFlagSet(UNREPRESENTED_DEFENDANT_TWO));
     }
 
     @Override

@@ -29,11 +29,6 @@ public class BreathingSpaceLiftedRespSolOneEmailDTOGenerator extends RespSolOneE
     }
 
     @Override
-    public String getEmailAddress(CaseData caseData) {
-        return caseData.getRespondentSolicitor1EmailAddress();
-    }
-
-    @Override
     protected String getEmailTemplateId(CaseData caseData) {
         return notificationsProperties.getBreathingSpaceLiftedRespondentEmailTemplate();
     }
