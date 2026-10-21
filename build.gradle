@@ -15,7 +15,7 @@ plugins {
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.6"
-  id 'hmcts.ccd.sdk' version '7.19.0'
+  id 'hmcts.ccd.sdk' version '7.17.0'
   id 'net.ltgt.errorprone' version '5.1.1'
 }
 
