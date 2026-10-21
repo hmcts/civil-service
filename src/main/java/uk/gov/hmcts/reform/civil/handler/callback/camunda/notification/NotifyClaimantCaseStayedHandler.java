@@ -17,9 +17,10 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_STAY_CASE;
 
 /**
- * @deprecated Replaced by StayCaseNotifier for new process instances.
  * Retained for pre-migration STAY_CASE process versions. Remove with the legacy events and CCD entries
  * once production confirms that no instances remain on those versions after deployment.
+ *
+ * @deprecated Replaced by StayCaseNotifier for new process instances.
  */
 @Deprecated(forRemoval = true)
 @Service
