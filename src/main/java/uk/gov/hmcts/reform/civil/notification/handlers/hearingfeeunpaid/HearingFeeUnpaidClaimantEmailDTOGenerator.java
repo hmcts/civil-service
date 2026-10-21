@@ -21,7 +21,7 @@ public class HearingFeeUnpaidClaimantEmailDTOGenerator extends ClaimantEmailDTOG
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
         return caseData.isClaimantBilingual()
-                ? notificationsProperties.getNotifyLipUpdateTemplateBilingual()
+                ? notificationsProperties.getNotifyLipHearingFeeUnpaidBilingualTemplate()
                 : notificationsProperties.getNotifyLipHearingFeeUnpaidTemplate();
     }
 

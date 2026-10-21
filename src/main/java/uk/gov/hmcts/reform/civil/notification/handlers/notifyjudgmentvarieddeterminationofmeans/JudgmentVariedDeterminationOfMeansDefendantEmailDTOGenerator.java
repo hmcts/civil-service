@@ -25,7 +25,7 @@ public class JudgmentVariedDeterminationOfMeansDefendantEmailDTOGenerator extend
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
         return caseData.isRespondentResponseBilingual()
-                ? notificationsProperties.getNotifyLipUpdateTemplateBilingual()
+                ? notificationsProperties.getNotifyLipJudgmentVariedDeterminationOfMeansBilingualTemplate()
                 : notificationsProperties.getNotifyLipJudgmentVariedDeterminationOfMeansTemplate();
     }
 

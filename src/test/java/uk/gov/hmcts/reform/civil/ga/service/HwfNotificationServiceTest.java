@@ -1143,7 +1143,7 @@ public class HwfNotificationServiceTest {
     }
 
     private void mockNotificationPropertiesBilingual() {
-        when(notificationsProperties.getLipGeneralAppApplicantEmailTemplateInWelsh()).thenReturn(
+        when(notificationsProperties.getNotifyApplicantForHwfPaymentOutcomeBilingual()).thenReturn(
             EMAIL_TEMPLATE_HWF_PAYMENT_OUTCOME_WLESH);
         when(notificationsProperties.getNotifyApplicantForHwFMoreInformationNeededWelsh()).thenReturn(
             EMAIL_TEMPLATE_MORE_INFO_HWF_BILINGUAL);

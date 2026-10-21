@@ -56,7 +56,7 @@ class JudgmentVariedDeterminationOfMeansDefendantEmailDTOGeneratorTest {
                                 .setRespondent1ResponseLanguage(Language.BOTH.toString())))
                 .build();
 
-        when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(BILINGUAL_TEMPLATE_ID);
+        when(notificationsProperties.getNotifyLipJudgmentVariedDeterminationOfMeansBilingualTemplate()).thenReturn(BILINGUAL_TEMPLATE_ID);
 
         String templateId = generator.getEmailTemplateId(caseData);
 

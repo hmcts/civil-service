@@ -204,7 +204,7 @@ public class HwfNotificationService implements NotificationDataGA {
                 CaseEvent.PARTIAL_REMISSION_HWF_GA,
                 notificationsProperties.getNotifyApplicantForHwfPartialRemissionBilingual(),
                 CaseEvent.FEE_PAYMENT_OUTCOME_GA,
-                notificationsProperties.getLipGeneralAppApplicantEmailTemplateInWelsh()
+                notificationsProperties.getNotifyApplicantForHwfPaymentOutcomeBilingual()
             );
         }
         return emailTemplatesBilingual.get(hwfEvent);

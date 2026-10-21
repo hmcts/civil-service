@@ -413,6 +413,15 @@ public class NotificationsProperties {
     private String notifyLipHearingFeeUnpaidTemplate;
 
     @NotEmpty
+    private String notifyLipJudgmentVariedDeterminationOfMeansBilingualTemplate;
+
+    @NotEmpty
+    private String notifyLipDjNonDivergentClaimantBilingualTemplate;
+
+    @NotEmpty
+    private String notifyLipHearingFeeUnpaidBilingualTemplate;
+
+    @NotEmpty
     private String notifyLiPClaimantTranslatedDocumentUploadedTemplate;
 
     @NotEmpty
@@ -833,6 +842,8 @@ public class NotificationsProperties {
     private String notifyApplicantForNoRemission;
     @NotEmpty
     private String notifyApplicantForHwfPaymentOutcome;
+    @NotEmpty
+    private String notifyApplicantForHwfPaymentOutcomeBilingual;
     @NotEmpty
     private String notifyApplicantLiPTranslatedDocumentUploadedWhenParentCaseInBilingual;
     @NotEmpty
