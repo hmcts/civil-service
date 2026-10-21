@@ -80,5 +80,6 @@ public enum CamundaProcessIdentifier {
     DJ_NON_DIVERGENT_NOTIFIER,
     RequestJudgementByAdmissionNotifyParties,
     StayCaseNotifyParties,
-    StayLiftedNotifyParties;
+    StayLiftedNotifyParties,
+    CoscApplicationAfterPaymentNotifyParties;
 }
