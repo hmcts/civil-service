@@ -13,6 +13,7 @@ import java.util.List;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_STAY_LIFTED;
 
 /**
+ * @deprecated Replaced by StayLiftedNotifier for new process instances.
  * Retained for pre-migration STAY_LIFTED process versions. Remove with the legacy events and CCD entries
  * once production confirms that no instances remain on those versions after deployment.
  */

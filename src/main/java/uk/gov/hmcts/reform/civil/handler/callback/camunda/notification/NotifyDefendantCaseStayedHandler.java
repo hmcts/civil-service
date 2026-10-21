@@ -18,6 +18,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_STAY
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_TWO_STAY_CASE;
 
 /**
+ * @deprecated Replaced by StayCaseNotifier for new process instances.
  * Retained for pre-migration STAY_CASE process versions. Remove with the legacy events and CCD entries
  * once production confirms that no instances remain on those versions after deployment.
  */
