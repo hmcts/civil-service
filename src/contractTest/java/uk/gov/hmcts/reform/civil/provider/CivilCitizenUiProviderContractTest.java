@@ -16,6 +16,6 @@ class CivilCitizenUiProviderContractTest extends CivilCitizenUiProviderSupport {
 
     @PactBrokerConsumerVersionSelectors
     public static SelectorBuilder consumerVersionSelectors() {
-        return new SelectorBuilder().matchingBranch().mainBranch().deployedOrReleased();
+        return new SelectorBuilder().mainBranch().deployedOrReleased();
     }
 }
