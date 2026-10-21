@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.notification.robotics.DefaultJudgmentRoboticsNotifier;
 import uk.gov.hmcts.reform.civil.service.notification.robotics.RoboticsNotifier;
+import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
 
 @Slf4j
 @Component
@@ -41,7 +42,18 @@ public class NotifyRpaFeedTask extends MigrationTask<NotifyRpaFeedCaseReference>
             defaultJudgmentRoboticsNotifier.notifyRobotics(caseData, accessToken);
             log.info("Notified to RPA via migration task for caseId {} for event type {}", obj.getCaseReference(),
                      obj.getNotifyEventId());
-        } else if ("NOTIFY_RPA_ON_CONTINUOUS_FEED".equals(obj.getNotifyEventId()) || "NOTIFY_RPA_ON_CASE_HANDED_OFFLINE".equals(obj.getNotifyEventId())) {
+        } else if ("NOTIFY_RPA_ON_CONTINUOUS_FEED".equals(obj.getNotifyEventId())) {
+            log.info(
+                "Notifying RPA on continuous feed via migration for caseId {} (Breathing Space omitted from payload)",
+                obj.getCaseReference()
+            );
+            roboticsNotifier.notifyRobotics(RoboticsDataUtil.withoutBreathingSpace(caseData), accessToken);
+            log.info("Notified to RPA via migration task for caseId {}", obj.getCaseReference());
+        } else if ("NOTIFY_RPA_ON_CASE_HANDED_OFFLINE".equals(obj.getNotifyEventId())) {
+            log.info(
+                "Notifying RPA on case handed offline via migration for caseId {} (Breathing Space included when present)",
+                obj.getCaseReference()
+            );
             roboticsNotifier.notifyRobotics(caseData, accessToken);
             log.info("Notified to RPA via migration task for caseId {}", obj.getCaseReference());
         } else {

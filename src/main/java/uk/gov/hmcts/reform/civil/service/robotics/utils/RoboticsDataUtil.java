@@ -49,4 +49,16 @@ public class RoboticsDataUtil {
         return latestChanges.size() > 0 ? latestChanges : null;
     }
 
+    /**
+     * Continuous-feed RPA must not transfer Breathing Space. Returns a copy with
+     * {@code breathing} cleared so event history / top-level BS are omitted without
+     * changing notifier or mapper APIs. Handed-offline / adhoc keep the original case data.
+     */
+    public static CaseData withoutBreathingSpace(CaseData caseData) {
+        if (caseData == null || caseData.getBreathing() == null) {
+            return caseData;
+        }
+        return caseData.toBuilder().breathing(null).build();
+    }
+
 }
