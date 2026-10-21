@@ -524,12 +524,19 @@ def sonarExclusions = [
   "**/informagreedextensiondate/InformAgreedExtensionDateRespSolTwoEmailDTOGenerator.java",
   "**/setasidejudgementrequest/SetAsideJudgementRequestAppSolOneEmailDTOGenerator.java",
   "**/setasidejudgementrequest/SetAsideJudgementRequestRespSolOneEmailDTOGenerator.java",
- " **/setasidejudgementrequest/SetAsideJudgementRequestRespSolTwoEmailDTOGenerator.java"
+ " **/setasidejudgementrequest/SetAsideJudgementRequestRespSolTwoEmailDTOGenerator.java",
+  "**/notification/handlers/staycase/StayCaseClaimantEmailDTOGenerator.java",
+  "**/notification/handlers/staycase/StayCaseDefendantEmailDTOGenerator.java",
+  "**/notification/handlers/staycase/StayCaseDefendantTwoEmailDTOGenerator.java",
+  "**/notification/handlers/staylifted/StayLiftedClaimantEmailDTOGenerator.java",
+  "**/notification/handlers/staylifted/StayLiftedDefendantEmailDTOGenerator.java",
+  "**/notification/handlers/staylifted/StayLiftedDefendantTwoEmailDTOGenerator.java"
 ]
 
 def sonarCoverageExclusions = [
   "**/.github/scripts/**"
 ]
+
 
 sonarqube {
   properties {
