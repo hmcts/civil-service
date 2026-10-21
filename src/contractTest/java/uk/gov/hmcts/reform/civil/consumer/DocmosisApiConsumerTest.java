@@ -11,6 +11,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.TestPropertySource;
@@ -31,6 +32,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
+@Import({DocumentConversionService.class})
 @PactTestFor(providerName = "docmosis_render")
 @MockServerConfig(hostInterface = "localhost", port = "6660")
 @TestPropertySource(properties = "docmosis.tornado.key=accessKey")
