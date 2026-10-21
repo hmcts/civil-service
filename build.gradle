@@ -136,7 +136,7 @@ allprojects {
       dependency 'org.apache.commons:commons-lang3:' + versions.commonsLang3
       dependency 'org.bouncycastle:bcprov-jdk18on:1.86'
       dependency 'io.projectreactor:reactor-core:3.8.7'
-      dependency 'io.micrometer:micrometer-core:1.17.1'
+      dependency 'io.micrometer:micrometer-core:1.16.7'
       dependency 'ch.qos.logback:logback-core:1.6.5'
     }
     imports {
