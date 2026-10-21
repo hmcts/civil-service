@@ -67,7 +67,30 @@ public class AllGaPartiesEmailGenerator implements PartiesEmailGenerator<General
         // the GA case carries solicitor emails that can be stale, so they are patched from the
         // parent case before any generator reads them. This mirrors what the GA notification
         // services do today.
-        return new GaNotificationContext(
-            solicitorEmailValidation.validateSolicitorEmail(mainCaseData, caseData), mainCaseData);
+        GeneralApplicationCaseData validated =
+            solicitorEmailValidation.validateSolicitorEmail(mainCaseData, caseData);
+        retainValidatedSolicitorDetails(caseData, validated);
+        return new GaNotificationContext(validated, mainCaseData);
+    }
+
+    /**
+     * Copies the refreshed solicitor details back onto the case the handler will return to CCD.
+     *
+     * <p>{@code SolicitorEmailValidation.validateSolicitorEmail} works on a {@code copy()}, so
+     * without this the refreshed addresses would be used for the emails and then discarded. The
+     * retired {@code NotifyHearingNoticeClaimantHandler} and {@code NotifyHearingNoticeDefendantHandler}
+     * persisted them, because {@code HearingScheduledNotificationService} reassigned
+     * {@code caseData} to the validated copy and returned it, so dropping them here would be a
+     * behaviour change rather than a tidy up.</p>
+     *
+     * <p>It matters beyond this notification: {@code DocUploadNotificationService} reads
+     * {@code getGeneralAppApplnSolicitor().getEmail()} off the saved case without revalidating, so
+     * a stale address left here would be used by a later evidence upload notification. These are
+     * the only two fields {@code validateSolicitorEmail} can change.</p>
+     */
+    private void retainValidatedSolicitorDetails(GeneralApplicationCaseData caseData,
+                                                 GeneralApplicationCaseData validated) {
+        caseData.generalAppApplnSolicitor(validated.getGeneralAppApplnSolicitor());
+        caseData.generalAppRespondentSolicitors(validated.getGeneralAppRespondentSolicitors());
     }
 }

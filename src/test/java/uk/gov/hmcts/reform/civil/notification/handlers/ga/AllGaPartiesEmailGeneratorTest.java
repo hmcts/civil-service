@@ -17,7 +17,16 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.ccd.model.Organisation;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -128,6 +137,61 @@ class AllGaPartiesEmailGeneratorTest {
             return addresses.stream().map(AllGaPartiesEmailGeneratorTest.this::email)
                 .collect(java.util.stream.Collectors.toSet());
         }
+    }
+
+    /**
+     * Regression for the DTSCCI-6726 review finding: the refreshed solicitor addresses have to end
+     * up on the case the handler returns to CCD, not only on the copy the emails are built from.
+     *
+     * <p>Uses the real {@link SolicitorEmailValidation} rather than a mock, because the defect was
+     * that {@code validateSolicitorEmail} works on a {@code copy()}. A stubbed validator would pass
+     * whether or not the fix is present.</p>
+     *
+     * <p>It matters because the retired hearing notice handlers persisted these, and because
+     * {@code DocUploadNotificationService} reads the saved applicant solicitor email without
+     * revalidating, so a stale address here reaches a later evidence upload notification.</p>
+     */
+    @Test
+    void shouldPersistRefreshedSolicitorEmailsOntoTheCaseReturnedToCcd() {
+        String oldEmail = "stale@example.com";
+        String newEmail = "current@example.com";
+
+        GASolicitorDetailsGAspec gaApplicantSolicitor = new GASolicitorDetailsGAspec()
+            .setId("id").setForename("Applicant One").setEmail(oldEmail).setOrganisationIdentifier("1");
+        List<Element<GASolicitorDetailsGAspec>> respondentSolicitors = new ArrayList<>();
+
+        GeneralApplicationCaseData realGaCaseData = new GeneralApplicationCaseDataBuilder()
+            .isMultiParty(YesOrNo.NO)
+            .isGaApplicantLip(YesOrNo.NO)
+            .isGaRespondentOneLip(YesOrNo.NO)
+            .isGaRespondentTwoLip(YesOrNo.NO)
+            .generalAppApplnSolicitor(gaApplicantSolicitor)
+            .generalAppRespondentSolicitors(respondentSolicitors)
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink(PARENT_REFERENCE))
+            .build();
+
+        // the parent claim now holds a different address for the same organisation
+        GeneralApplicationCaseData realMainCaseData = new GeneralApplicationCaseDataBuilder()
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setId("123").setEmail(newEmail))
+            .applicant1OrganisationPolicy(new OrganisationPolicy()
+                                              .setOrganisation(new Organisation().setOrganisationID("1")))
+            .build();
+
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(realMainCaseData);
+
+        GaForLipService gaForLipService = mock(GaForLipService.class);
+        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+        AllGaPartiesEmailGenerator generator = new AllGaPartiesEmailGenerator(
+            List.of(new SingleRecipientGenerator("one@example.com", true)),
+            caseDetailsConverter, coreCaseDataService, new SolicitorEmailValidation(gaForLipService));
+
+        assertThat(realGaCaseData.getGeneralAppApplnSolicitor().getEmail()).isEqualTo(oldEmail);
+
+        generator.getPartiesToNotify(realGaCaseData, TASK_ID);
+
+        assertThat(realGaCaseData.getGeneralAppApplnSolicitor().getEmail())
+            .as("the handler returns this instance to CCD, so it must carry the refreshed address")
+            .isEqualTo(newEmail);
     }
 
     @Test
