@@ -52,7 +52,7 @@ def versions = [
   protonJ           : '0.35.0',
   tika              : '3.3.3',
   tomcat            : '10.1.61',
-  applicationInsights: '3.7.10',
+  applicationInsights: '3.7.9',
   commonsLang3      : '3.21.0'
 ]
 
