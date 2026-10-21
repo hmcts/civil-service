@@ -63,7 +63,7 @@ class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGeneratorTest {
                 .applicant1Represented(YesOrNo.NO)
                 .claimantBilingualLanguagePreference(Language.BOTH.toString())
                 .build();
-        when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(BIL_LIP_TEMPLATE);
+        when(notificationsProperties.getNotifyLipJudgmentVariedDeterminationOfMeansBilingualTemplate()).thenReturn(BIL_LIP_TEMPLATE);
         assertThat(generator.getEmailTemplateId(caseData)).isEqualTo(BIL_LIP_TEMPLATE);
     }
 

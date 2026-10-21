@@ -154,6 +154,39 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
             );
         }
 
+        @Test
+        void shouldNotifyApplicantLipWithBilingualTemplate_whenClaimantBilingual() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
+            caseData = caseData.toBuilder()
+                .applicant1(new Party()
+                                .setIndividualFirstName("Applicant1").setIndividualLastName("ApplicantLastName").setPartyName("Applicant1")
+                                .setType(Party.Type.INDIVIDUAL).setPartyEmail("respondentLip@example.com"))
+                .respondent1(new Party().setPartyName("Respondent1").setIndividualFirstName("Respondent1").setIndividualLastName("RespondentLastName")
+                                 .setType(Party.Type.INDIVIDUAL).setPartyEmail("respondentLip@example.com"))
+                .applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference("BOTH")
+                .legacyCaseReference("000DC001")
+                .ccdCaseReference(1594901956117591L)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            when(notificationsProperties.getNotifyLipJudgmentVariedDeterminationOfMeansBilingualTemplate())
+                .thenReturn("bilingual-template-id");
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentLip@example.com",
+                "bilingual-template-id",
+                addPropertiesLip(caseData),
+                "record-judgment-determination-means-notification-000DC001"
+            );
+        }
+
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             Map<String, String> properties = new HashMap<>(addCommonProperties(false));

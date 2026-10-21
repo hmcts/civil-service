@@ -66,7 +66,7 @@ public class RecordJudgmentDeterminationMeansApplicantNotificationHandler extend
         String emailTemplateID;
         if (isApplicantLip) {
             if (caseData.isClaimantBilingual()) {
-                emailTemplateID = notificationsProperties.getNotifyLipUpdateTemplateBilingual();
+                emailTemplateID = notificationsProperties.getNotifyLipJudgmentVariedDeterminationOfMeansBilingualTemplate();
             } else {
                 emailTemplateID = notificationsProperties.getNotifyLipJudgmentVariedDeterminationOfMeansTemplate();
             }

@@ -25,7 +25,7 @@ class DjNonDivergentApplicantLipEmailDTOGeneratorTest {
     void shouldReturnCorrectEmailTemplateIdWhenBilingual() {
         CaseData caseData = CaseData.builder().claimantBilingualLanguagePreference(BOTH.toString()).build();
         String expectedTemplateId = "notify-lip-update-template-bilingual";
-        when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(expectedTemplateId);
+        when(notificationsProperties.getNotifyLipDjNonDivergentClaimantBilingualTemplate()).thenReturn(expectedTemplateId);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 

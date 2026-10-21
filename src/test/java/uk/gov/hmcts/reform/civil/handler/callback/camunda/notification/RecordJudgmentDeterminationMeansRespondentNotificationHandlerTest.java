@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
@@ -197,6 +199,45 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
             verify(notificationService).sendMail(
                 "respondentLip@example.com",
                 "template-id",
+                addPropertiesLip(caseData),
+                "record-judgment-determination-means-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondentLipWithBilingualTemplate_whenRespondentResponseBilingual() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(notificationsProperties.getNotifyLipJudgmentVariedDeterminationOfMeansBilingualTemplate())
+                .thenReturn("bilingual-template-id");
+
+            RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
+            respondentLiPResponse.setRespondent1ResponseLanguage("BOTH");
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            caseDataLiP.setRespondent1LiPResponse(respondentLiPResponse);
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
+            caseData = caseData.toBuilder()
+                .applicant1(new Party()
+                                .setIndividualFirstName("Applicant1").setIndividualLastName("ApplicantLastName").setPartyName("Applicant1")
+                                .setType(Party.Type.INDIVIDUAL).setPartyEmail("respondentLip@example.com"))
+                .respondent1(new Party().setPartyName("Respondent1").setIndividualFirstName("Respondent1").setIndividualLastName("RespondentLastName")
+                                 .setType(Party.Type.INDIVIDUAL).setPartyEmail("respondentLip@example.com"))
+                .respondent1Represented(null)
+                .legacyCaseReference("000DC001")
+                .ccdCaseReference(1594901956117591L)
+                .specRespondent1Represented(YesOrNo.NO)
+                .caseDataLiP(caseDataLiP)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT1_FOR_RECORD_JUDGMENT.name()).build()
+            ).build();
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentLip@example.com",
+                "bilingual-template-id",
                 addPropertiesLip(caseData),
                 "record-judgment-determination-means-notification-000DC001"
             );
