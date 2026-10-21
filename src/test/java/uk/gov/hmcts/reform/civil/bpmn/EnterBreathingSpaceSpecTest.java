@@ -4,6 +4,8 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Map;
 
@@ -14,12 +16,6 @@ class EnterBreathingSpaceSpecTest extends BpmnBaseTest {
 
     private static final String MESSAGE_NAME = "ENTER_BREATHING_SPACE_SPEC";
     private static final String PROCESS_ID = "ENTER_BREATHING_SPACE_SPEC";
-    private static final String NOTIFY_RESPONDENT_SOLICITOR_1 = "NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_ENTER";
-    private static final String NOTIFY_RESPONDENT_SOLICITOR_1_ACTIVITY_ID = "BreathingSpaceEnterNotifyRespondentSolicitor1";
-    private static final String NOTIFY_RESPONDENT_SOLICITOR_2 = "NOTIFY_RESPONDENT_SOLICITOR2_BREATHING_SPACE_ENTER";
-    private static final String NOTIFY_RESPONDENT_SOLICITOR_2_ACTIVITY_ID = "BreathingSpaceEnterNotifyRespondentSolicitor2";
-    private static final String NOTIFY_APPLICANT_SOLICITOR = "NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_ENTER";
-    private static final String NOTIFY_APPLICANT_SOLICITOR_ACTIVITY_ID = "BreathingSpaceEnterNotifyApplicantSolicitor1";
     private static final String NOTIFY_RPA_ON_CONTINUOUS_FEED = "NOTIFY_RPA_ON_CONTINUOUS_FEED";
     private static final String NOTIFY_RPA_ON_CONTINUOUS_FEED_ACTIVITY_ID = "NotifyRoboticsBreathingSpaceEnter";
 
@@ -27,55 +23,14 @@ class EnterBreathingSpaceSpecTest extends BpmnBaseTest {
         super("enter_breathing_space_spec.bpmn", PROCESS_ID);
     }
 
-    @Test
-    void shouldSuccessfullyComplete_whenSingleRespondentRepresentative() {
-        VariableMap variables = flowFlagVariables(true, false);
-
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCompleteWithOneNotificationTask(boolean twoRepresentatives) {
+        VariableMap variables = flowFlagVariables(!twoRepresentatives, twoRepresentatives);
         assertFalse(processInstance.isEnded());
         assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
-
         startBusinessProcess(variables);
-
-        ExternalTask respondentNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            respondentNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_RESPONDENT_SOLICITOR_1,
-            NOTIFY_RESPONDENT_SOLICITOR_1_ACTIVITY_ID,
-            variables
-        );
-
-        assertApplicantAndRoboticsNotifications(variables);
-    }
-
-    @Test
-    void shouldSuccessfullyComplete_whenTwoRespondentRepresentatives() {
-        VariableMap variables = flowFlagVariables(false, true);
-
-        assertFalse(processInstance.isEnded());
-        assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
-
-        startBusinessProcess(variables);
-
-        ExternalTask respondentOneNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            respondentOneNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_RESPONDENT_SOLICITOR_1,
-            NOTIFY_RESPONDENT_SOLICITOR_1_ACTIVITY_ID,
-            variables
-        );
-
-        ExternalTask respondentTwoNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            respondentTwoNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_RESPONDENT_SOLICITOR_2,
-            NOTIFY_RESPONDENT_SOLICITOR_2_ACTIVITY_ID,
-            variables
-        );
-
-        assertApplicantAndRoboticsNotifications(variables);
+        assertNotifications(variables);
     }
 
     @Test
@@ -89,13 +44,13 @@ class EnterBreathingSpaceSpecTest extends BpmnBaseTest {
         assertNoExternalTasksLeft();
     }
 
-    private void assertApplicantAndRoboticsNotifications(VariableMap variables) {
+    private void assertNotifications(VariableMap variables) {
         ExternalTask applicantNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(
             applicantNotification,
             PROCESS_CASE_EVENT,
-            NOTIFY_APPLICANT_SOLICITOR,
-            NOTIFY_APPLICANT_SOLICITOR_ACTIVITY_ID,
+            "NOTIFY_EVENT",
+            "BreathingSpaceEnterNotifyParties",
             variables
         );
 
