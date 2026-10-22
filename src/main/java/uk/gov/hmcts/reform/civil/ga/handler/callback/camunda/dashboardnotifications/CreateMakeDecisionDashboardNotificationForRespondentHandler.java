@@ -85,7 +85,8 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandler extends
     }
 
     private boolean isWithoutNotice(GeneralApplicationCaseData caseData) {
-        return NO.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice());
+        return caseData.getGeneralAppInformOtherParty() != null
+            && NO.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice());
     }
 
 }
