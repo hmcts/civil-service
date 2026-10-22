@@ -13,7 +13,8 @@ public class FilenameGenerator {
             ? caseData.getApplicant1().getIndividualLastName() : caseData.getApplicant1().getPartyName();
         String respondentName = caseData.getRespondent1().isIndividual()
             ? caseData.getRespondent1().getIndividualLastName() : caseData.getRespondent1().getPartyName();
-        return applicantName + " v " + respondentName + "-"
-            + DateFormatHelper.formatLocalDate(caseData.getHearingDate(), "ddMMyyyy");
+        String partyNames = applicantName + " v " + respondentName;
+        return caseData.getHearingDate() == null ? partyNames
+            : partyNames + "-" + DateFormatHelper.formatLocalDate(caseData.getHearingDate(), "ddMMyyyy");
     }
 }
