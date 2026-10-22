@@ -4,8 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.recordjudgment.RecordJudgmentDefendantDashboardTask;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.RecordJudgementDefendantNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
@@ -16,7 +15,7 @@ public class DefendantRecordJudgementScenarioTest extends  DashboardBaseIntegrat
     public static final String DEFENDANT = "DEFENDANT";
 
     @Autowired
-    private RecordJudgmentDefendantDashboardTask handler;
+    private RecordJudgementDefendantNotificationHandler handler;
 
     @Test
     void should_create_scenario_for_record_judgement() throws Exception {
@@ -27,7 +26,7 @@ public class DefendantRecordJudgementScenarioTest extends  DashboardBaseIntegrat
                 .respondent1Represented(YesOrNo.NO)
                 .buildJudgmentOnlineCaseDataWithDeterminationMeans();
 
-        handler.execute(DashboardTaskContext.civil(caseData, BEARER_TOKEN));
+        handler.handle(callbackParams(caseData));
         String caseId = "720111";
 
         //Verify Notification is created
