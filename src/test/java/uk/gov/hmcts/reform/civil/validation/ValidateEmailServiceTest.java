@@ -42,6 +42,8 @@ class ValidateEmailServiceTest {
             "email@domain.superlongtld",
             "email@domain.co.jp",
             "firstname-lastname@domain.com",
+            "firstname.o'lastname@domain.com",
+            "o'brien@example.com",
             "info@german-financial-services.vermögensberatung",
             "info@german-financial-services.reallylongarbitrarytldthatiswaytoohugejustincase",
             "japanese-info@例え.テスト",
@@ -86,7 +88,6 @@ class ValidateEmailServiceTest {
             "brackets(in)local@domain.com",
             ".Douglas.@hmcts.net",
             "Douglas.@hmcts.net",
-            "firstname.o'lastname@domain.com",
             format("%s@example.com", "a".repeat(65)),
             format("email-too-long-%s@example.com", "a".repeat(320)));
     }
