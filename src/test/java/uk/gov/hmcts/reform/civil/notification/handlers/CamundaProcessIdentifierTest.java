@@ -11,7 +11,7 @@ class CamundaProcessIdentifierTest {
     void shouldContainAllExpectedEnumValues() {
         CamundaProcessIdentifier[] values = CamundaProcessIdentifier.values();
 
-        assertThat(values).hasSize(80)
+        assertThat(values).hasSize(81)
             .contains(
                 CamundaProcessIdentifier.ClaimDismissedNotifyParties,
                 CamundaProcessIdentifier.ClaimantConfirmProceedNotifyParties,
@@ -92,7 +92,8 @@ class CamundaProcessIdentifierTest {
                 CamundaProcessIdentifier.StayLiftedNotifyParties,
                 CamundaProcessIdentifier.CoscApplicationAfterPaymentNotifyParties,
                 CamundaProcessIdentifier.BreathingSpaceEnterNotifyParties,
-                CamundaProcessIdentifier.BreathingSpaceLiftedNotifyParties
+                CamundaProcessIdentifier.BreathingSpaceLiftedNotifyParties,
+                CamundaProcessIdentifier.StayUpdateRequestedNotifyParties
         );
     }
 
@@ -128,6 +129,7 @@ class CamundaProcessIdentifierTest {
             .satisfies(v -> assertThat(v[76]).isEqualTo(CamundaProcessIdentifier.StayLiftedNotifyParties))
             .satisfies(v -> assertThat(v[77]).isEqualTo(CamundaProcessIdentifier.CoscApplicationAfterPaymentNotifyParties))
             .satisfies(v -> assertThat(v[78]).isEqualTo(CamundaProcessIdentifier.BreathingSpaceEnterNotifyParties))
-            .satisfies(v -> assertThat(v[79]).isEqualTo(CamundaProcessIdentifier.BreathingSpaceLiftedNotifyParties));
+            .satisfies(v -> assertThat(v[79]).isEqualTo(CamundaProcessIdentifier.BreathingSpaceLiftedNotifyParties))
+            .satisfies(v -> assertThat(v[80]).isEqualTo(CamundaProcessIdentifier.StayUpdateRequestedNotifyParties));
     }
 }
