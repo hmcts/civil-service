@@ -21,6 +21,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REMOVE_CLAIMANT_DJ_DA
 /**
  * Retained for running Camunda instances using pre-migration process definitions.
  * Remove after no instance can reach the legacy dashboard task (DTSCCI-6703).
+ *
+ * @deprecated Replaced by dashboard framework tasks for new process instances.
  */
 @Deprecated(forRemoval = true)
 @Service
