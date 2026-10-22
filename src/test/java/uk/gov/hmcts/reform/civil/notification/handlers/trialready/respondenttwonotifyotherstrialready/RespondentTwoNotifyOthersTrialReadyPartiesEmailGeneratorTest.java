@@ -15,12 +15,14 @@ import uk.gov.hmcts.reform.civil.notification.handlers.trialready.TrialReadyResp
 import uk.gov.hmcts.reform.civil.notification.handlers.trialready.TrialReadyRespSolTwoEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
@@ -54,8 +56,19 @@ public class RespondentTwoNotifyOthersTrialReadyPartiesEmailGeneratorTest {
     private SimpleStateFlowEngine stateFlowEngine;
 
     @Test
+    void shouldSkipNotificationsWhenHearingDateIsMissing() {
+        CaseData caseData = CaseData.builder().build();
+
+        assertThat(emailGenerator.getPartiesToNotify(caseData, "task id")).isEmpty();
+        verifyNoInteractions(appSolOneEmailDTOGenerator, claimantEmailDTOGenerator,
+                                               respSolOneEmailDTOGenerator, respSolTwoEmailDTOGenerator,
+                                               defendantEmailDTOGenerator, defendantTwoEmailDTOGenerator);
+    }
+
+    @Test
     void shouldNotifyAppSolOneAndRespSolOneWhenRepresented() {
         CaseData caseData = mock(CaseData.class);
+        when(caseData.getHearingDate()).thenReturn(LocalDate.of(2026, 10, 19));
         EmailDTO appSolOneEmail = mock(EmailDTO.class);
         EmailDTO respSolOneEmail = mock(EmailDTO.class);
         String taskId = "task id";
@@ -79,6 +92,7 @@ public class RespondentTwoNotifyOthersTrialReadyPartiesEmailGeneratorTest {
     @Test
     void shouldNotifyClaimantAndDefendantWhenLip() {
         CaseData caseData = mock(CaseData.class);
+        when(caseData.getHearingDate()).thenReturn(LocalDate.of(2026, 10, 19));
         EmailDTO claimantEmail = mock(EmailDTO.class);
         EmailDTO defendantEmail = mock(EmailDTO.class);
         String taskId = "task id";
@@ -104,6 +118,7 @@ public class RespondentTwoNotifyOthersTrialReadyPartiesEmailGeneratorTest {
     @Test
     void shouldNotifyAppSolOneAndRespSolOneWhenNotSpec() {
         CaseData caseData = mock(CaseData.class);
+        when(caseData.getHearingDate()).thenReturn(LocalDate.of(2026, 10, 19));
         EmailDTO appSolOneEmail = mock(EmailDTO.class);
         EmailDTO respSolOneEmail = mock(EmailDTO.class);
         String taskId = "task id";
@@ -127,6 +142,7 @@ public class RespondentTwoNotifyOthersTrialReadyPartiesEmailGeneratorTest {
     @Test
     void shouldNotNotifyPartiesWhenTrialReadyRespondentIsSet() {
         CaseData caseData = mock(CaseData.class);
+        when(caseData.getHearingDate()).thenReturn(LocalDate.of(2026, 10, 19));
         String taskId = "task id";
 
         when(caseData.getTrialReadyApplicant()).thenReturn(YES);
