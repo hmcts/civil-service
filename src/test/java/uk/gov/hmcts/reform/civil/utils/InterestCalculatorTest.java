@@ -377,6 +377,60 @@ class InterestCalculatorTest {
     }
 
     @Test
+    void shouldPauseInterestWhenOnlyCurrentBreathingSpaceIsPresent() {
+        CaseData caseData = sameRateInterestUntilJudgement(LocalDate.now().minusDays(6), BigDecimal.valueOf(5000));
+        caseData = caseData.toBuilder()
+            .breathing(new BreathingSpaceInfo()
+                           .setEnter(new BreathingSpaceEnterInfo().setStart(LocalDate.now().minusDays(3))))
+            .build();
+
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
+
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(2.20).setScale(2, RoundingMode.UNNECESSARY));
+    }
+
+    @Test
+    void shouldNotPauseTheSameBreathingSpacePeriodTwice() {
+        LocalDate start = LocalDate.now().minusDays(3);
+        CaseData caseData = sameRateInterestUntilJudgement(LocalDate.now().minusDays(6), BigDecimal.valueOf(5000));
+        caseData = caseData.toBuilder()
+            .breathing(new BreathingSpaceInfo()
+                           .setEnter(new BreathingSpaceEnterInfo().setStart(start))
+                           .setStoredBreathingSpace(wrapElements(
+                               new StoredBreathingSpace().setEnter(new BreathingSpaceEnterInfo().setStart(start))
+                           )))
+            .build();
+
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
+
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(2.20).setScale(2, RoundingMode.UNNECESSARY));
+    }
+
+    @Test
+    void shouldOmitLiftedBreathingSpacePeriodWhenOnlyCurrentPeriodIsPresent() {
+        CaseData caseData = sameRateInterestUntilJudgement(LocalDate.of(2026, 6, 1), new BigDecimal("3650"))
+            .toBuilder()
+            .sameRateInterestSelection(buildSameRateSelection(
+                SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE,
+                BigDecimal.TEN,
+                null
+            ))
+            .build();
+        BigDecimal interestWithoutBreathingSpace = interestCalculator.calculateInterest(caseData);
+
+        caseData = caseData.toBuilder()
+            .breathing(new BreathingSpaceInfo()
+                           .setEnter(new BreathingSpaceEnterInfo().setStart(LocalDate.of(2026, 9, 1)))
+                           .setLift(new BreathingSpaceLiftInfo().setExpectedEnd(LocalDate.of(2026, 9, 30))))
+            .build();
+
+        BigDecimal interestWithBreathingSpace = interestCalculator.calculateInterest(caseData);
+
+        assertThat(interestWithoutBreathingSpace.subtract(interestWithBreathingSpace))
+            .isEqualByComparingTo(new BigDecimal("30.00"));
+    }
+
+    @Test
     void shouldNotChangeBreakdownInterestWhenCaseIsInBreathingSpace() {
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .claimInterest(YesOrNo.YES)
