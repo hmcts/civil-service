@@ -1440,11 +1440,14 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidateClaimTimelineDate_whenPopulated() {
             // Given
-            List<TimelineOfEvents> timelineOfEvents = new ArrayList<>();
+            LocalDate yesterday = LocalDate.now().minusDays(1);
             TimelineOfEventDetails pastEventDetails = new TimelineOfEventDetails();
-            pastEventDetails.setTimelineDate(LocalDate.now().minusDays(1));
+            pastEventDetails.setTimelineDay(String.valueOf(yesterday.getDayOfMonth()));
+            pastEventDetails.setTimelineMonth(String.valueOf(yesterday.getMonthValue()));
+            pastEventDetails.setTimelineYear(String.valueOf(yesterday.getYear()));
             TimelineOfEvents pastEvent = new TimelineOfEvents();
             pastEvent.setValue(pastEventDetails);
+            List<TimelineOfEvents> timelineOfEvents = new ArrayList<>();
             timelineOfEvents.add(pastEvent);
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setTimelineOfEvents(timelineOfEvents);
@@ -1460,11 +1463,14 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnErrorWhenTimelineDatePopulatedWithFutureDate() {
             // Given
-            List<TimelineOfEvents> timelineOfEvents = new ArrayList<>();
+            LocalDate tomorrow = LocalDate.now().plusDays(1);
             TimelineOfEventDetails futureEventDetails = new TimelineOfEventDetails();
-            futureEventDetails.setTimelineDate(LocalDate.now().plusDays(1));
+            futureEventDetails.setTimelineDay(String.valueOf(tomorrow.getDayOfMonth()));
+            futureEventDetails.setTimelineMonth(String.valueOf(tomorrow.getMonthValue()));
+            futureEventDetails.setTimelineYear(String.valueOf(tomorrow.getYear()));
             TimelineOfEvents futureEvent = new TimelineOfEvents();
             futureEvent.setValue(futureEventDetails);
+            List<TimelineOfEvents> timelineOfEvents = new ArrayList<>();
             timelineOfEvents.add(futureEvent);
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setTimelineOfEvents(timelineOfEvents);
