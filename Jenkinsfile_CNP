@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@2.9.0")
+@Library("Infrastructure@2.13.1")
 
 import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
@@ -117,7 +117,7 @@ withPipeline(type, product, component) {
 
   env.PLAYWRIGHT_TEST_RESULTS_DIR = 'playwright-test-results'
   env.PLAYWRIGHT_BOOTSTRAP_TEST_RESULTS_DIR = 'civil-service-bootstrap'
-  env.PLAYWRIGHT_SMOKE_TEST_RESULTS_DIR = 'civil-service-smoke'
+  env.PLAYWRIGHT_SMOKE_TEST_RESULTS_DIR = 'civil-service-master-pr-smoke'
   env.PLAYWRIGHT_WORKERS = 8
   env.PLAYWRIGHT_RETRIES = 1
   env.PLAYWRIGHT_EXUI_RETRIES = 1
@@ -161,6 +161,7 @@ withPipeline(type, product, component) {
     env.CCD_DEFINITION_BRANCH = "master"
     env.SKIP_COMMON_AAT_CCD_SETUP = "true"
     env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR = 'civil-service-master'
+    env.STASH_DIAGNOSTICS = 'true'
 
     afterSuccess('akschartsinstall') {
       runStagingHighLevelDataSetup()
@@ -237,12 +238,21 @@ withPipeline(type, product, component) {
     uploadBpmnDiagrams('aat')
   }
 
-  afterSuccess('buildinfra:prod') {
-    withAzureKeyvault(
-      azureKeyVaultSecrets: secretsProd['civil-prod'],
-      keyVaultURLOverride: 'https://civil-prod.vault.azure.net/'
-    ) {
-      uploadBpmnDiagrams('prod')
+  before('prod:promotion') {
+    withEnv([
+      'ENVIRONMENT_AGENT_STASH_INCLUDES=bin/**,src/main/resources/camunda/**',
+      'ENVIRONMENT_AGENT_STASH_BACK=false'
+    ]) {
+      withSubscription(
+        env.PROD_SUBSCRIPTION_NAME ?: 'prod', product, 'prod'
+      ) {
+        withAzureKeyvault(
+          azureKeyVaultSecrets: secretsProd['civil-prod'],
+          keyVaultURLOverride: 'https://civil-prod.vault.azure.net/'
+        ) {
+          uploadBpmnDiagrams('prod')
+        }
+      }
     }
   }
 
@@ -508,7 +518,9 @@ def runStagingHighLevelDataSetup() {
     'CCD_DEF_CASE_SERVICE_BASE_URL=http://civil-service-staging-java',
     'CCD_DEF_GEN_APP_SERVICE_BASE_URL=http://civil-service-staging-java'
   ]) {
-    sh './gradlew --rerun-tasks highLevelDataSetup --args=aat'
+    // Keep the staging import on the same Maven mirror as the normal HLD stage.
+    new uk.gov.hmcts.contino.GradleBuilder(this, 'civil')
+      .gradle('--rerun-tasks highLevelDataSetup --args=aat')
   }
 }
 

@@ -1,13 +1,16 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT;
 
+@Slf4j
 public class CoscHandlerUtility {
 
     private CoscHandlerUtility() {
@@ -27,10 +30,20 @@ public class CoscHandlerUtility {
                 .filter(application ->
                             application.getValue().getGeneralAppType().getTypes().contains(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID))
                 .findFirst()
-                .ifPresent(coscApplication -> dashboardNotificationService.deleteByReferenceAndCitizenRole(
-                    coscApplication.getValue().getCaseLink().getCaseReference(),
-                    "APPLICANT"
-                ));
+                .ifPresent(coscApplication -> {
+                    CaseLink caseLink = coscApplication.getValue().getCaseLink();
+                    if (caseLink == null || caseLink.getCaseReference() == null) {
+                        log.warn(
+                            "CoSC application on case {} has no caseLink; skipping notification cleanup",
+                            caseData.getCcdCaseReference()
+                        );
+                        return;
+                    }
+                    dashboardNotificationService.deleteByReferenceAndCitizenRole(
+                        caseLink.getCaseReference(),
+                        "APPLICANT"
+                    );
+                });
         }
     }
 }

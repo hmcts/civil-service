@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -13,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermission;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class UpdateVisibilityNoticeOfDiscontinuanceHandler extends CallbackHandl
     private static final List<CaseEvent> EVENTS = List.of(UPDATE_VISIBILITY_NOTICE_OF_DISCONTINUANCE);
     public static final String TASK_ID = "UpdateVisibilityNoticeOfDiscontinuance";
 
-    private final RuntimeService runTimeService;
+    private final CamundaRuntimeClient camundaRuntimeClient;
     private final AssignCategoryId assignCategoryId;
     private final ObjectMapper objectMapper;
 
@@ -88,7 +88,7 @@ public class UpdateVisibilityNoticeOfDiscontinuanceHandler extends CallbackHandl
     }
 
     private void updateCamundaVars(CaseData caseData) {
-        runTimeService.setVariable(
+        camundaRuntimeClient.setProcessVariable(
             caseData.getBusinessProcess().getProcessInstanceId(),
             "discontinuanceValidationSuccess",
             ConfirmOrderGivesPermission.YES.equals(caseData.getConfirmOrderGivesPermission())
