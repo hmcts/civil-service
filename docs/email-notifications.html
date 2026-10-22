@@ -145,7 +145,6 @@
       <option value='upload_translated_document_hearing_notice'>Upload Translated document Hearing Notice (UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE)</option>
       <option value='upload_translated_document_claim_issue'>Upload translated document lip (UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE)</option>
       <option value='upload_translated_document_order'>Upload translated document order (UPLOAD_TRANSLATED_DOCUMENT_ORDER)</option>
-      <option value='upload_translated_document_order_notice'>Upload translated document order notice (UPLOAD_TRANSLATED_DOCUMENT_ORDER_NOTICE)</option>
       <option value='upload_translated_document_sdo'>Upload translated document SDO process (UPLOAD_TRANSLATED_DOCUMENT_SDO)</option>
       <option value='upload_translated_document_hearing_scheduled'>Upload Translated GA hearing scheduled process (UPLOAD_TRANSLATED_DOCUMENT_HEARING_SCHEDULED)</option>
       <option value='upload_translated_document_settlement_agreement'>Upload translated settlement agreement process (UPLOAD_TRANSLATED_DOCUMENT_SETTLEMENT_AGREEMENT)</option>
@@ -3618,18 +3617,18 @@
         <td>Defendant 1 (LiP)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/8e5c35fc-b9b3-4172-9509-e5f1838a218a'>orderBeingTranslatedTemplateWelsh (8e5c35fc-b9b3-4172-9509-e5f1838a218a)</a></td>
       </tr>
-      <tr data-ccd-events='generate_order_notification upload_translated_document_order upload_translated_document_order_notice generate_directions_order' data-channel='docmosis'>
-        <td>Generate order notification (GENERATE_ORDER_NOTIFICATION)<br>Upload translated document order (UPLOAD_TRANSLATED_DOCUMENT_ORDER)<br>Upload translated document order notice (UPLOAD_TRANSLATED_DOCUMENT_ORDER_NOTICE)<br>Make an order (GENERATE_DIRECTIONS_ORDER)</td>
+      <tr data-ccd-events='generate_order_notification upload_translated_document_order generate_directions_order' data-channel='docmosis'>
+        <td>Generate order notification (GENERATE_ORDER_NOTIFICATION)<br>Upload translated document order (UPLOAD_TRANSLATED_DOCUMENT_ORDER)<br>Make an order (GENERATE_DIRECTIONS_ORDER)</td>
         <td><code>SendFinalOrderToClaimantLIP</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/generate_order_notification.png'>generate_order_notification.bpmn</a><br><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_order.png'>upload_translated_document_order.bpmn</a><br><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_order_notice.png'>upload_translated_document_order_notice.bpmn</a></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/generate_order_notification.png'>generate_order_notification.bpmn</a><br><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_order.png'>upload_translated_document_order.bpmn</a></td>
         <td>Docmosis (Camunda callback)</td>
         <td>—</td>
         <td><a class='template-link' href='https://github.com/hmcts/rdo-docmosis/blob/HEAD/Templates/Base/CV-SPC-LET-ENG-COVER-LETTER.docx?raw=1'><code>COVER_LETTER (CV-SPC-LET-ENG-COVER-LETTER.docx) - cover_letter.pdf</code></a></td>
       </tr>
-      <tr data-ccd-events='generate_order_notification upload_translated_document_order upload_translated_document_order_notice generate_directions_order' data-channel='docmosis'>
-        <td>Generate order notification (GENERATE_ORDER_NOTIFICATION)<br>Upload translated document order (UPLOAD_TRANSLATED_DOCUMENT_ORDER)<br>Upload translated document order notice (UPLOAD_TRANSLATED_DOCUMENT_ORDER_NOTICE)<br>Make an order (GENERATE_DIRECTIONS_ORDER)</td>
+      <tr data-ccd-events='generate_order_notification upload_translated_document_order generate_directions_order' data-channel='docmosis'>
+        <td>Generate order notification (GENERATE_ORDER_NOTIFICATION)<br>Upload translated document order (UPLOAD_TRANSLATED_DOCUMENT_ORDER)<br>Make an order (GENERATE_DIRECTIONS_ORDER)</td>
         <td><code>SendFinalOrderToDefendantLIP</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/generate_order_notification.png'>generate_order_notification.bpmn</a><br><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_order.png'>upload_translated_document_order.bpmn</a><br><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_order_notice.png'>upload_translated_document_order_notice.bpmn</a></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/generate_order_notification.png'>generate_order_notification.bpmn</a><br><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_order.png'>upload_translated_document_order.bpmn</a></td>
         <td>Docmosis (Camunda callback)</td>
         <td>—</td>
         <td><a class='template-link' href='https://github.com/hmcts/rdo-docmosis/blob/HEAD/Templates/Base/CV-SPC-LET-ENG-COVER-LETTER.docx?raw=1'><code>COVER_LETTER (CV-SPC-LET-ENG-COVER-LETTER.docx) - cover_letter.pdf</code></a></td>
@@ -6217,22 +6216,6 @@
         <td>Dashboard</td>
         <td>Defendant</td>
         <td><a class='template-link' href='dashboard-template.html?path=src/main/resources/notification-templates/Notice.AAA6.ClaimIssue.Response.Required.json'><code>Notice.AAA6.ClaimIssue.Response.Required</code></a></td>
-      </tr>
-      <tr data-ccd-events='upload_translated_document_order_notice' data-channel='email'>
-        <td>Upload translated document order notice (UPLOAD_TRANSLATED_DOCUMENT_ORDER_NOTICE)</td>
-        <td><code>NotifyClaimantOfUploadedOrderNotice</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_order_notice.png'>upload_translated_document_order_notice.bpmn</a></td>
-        <td>Email</td>
-        <td>Claimant</td>
-        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/d1eb5d79-6d1f-4b05-bbdf-a18fda06cf01'>notifyLiPOrderTranslatedTemplate (d1eb5d79-6d1f-4b05-bbdf-a18fda06cf01)</a></td>
-      </tr>
-      <tr data-ccd-events='upload_translated_document_order_notice' data-channel='email'>
-        <td>Upload translated document order notice (UPLOAD_TRANSLATED_DOCUMENT_ORDER_NOTICE)</td>
-        <td><code>NotifyDefendantOfUploadedOrderNotice</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_order_notice.png'>upload_translated_document_order_notice.bpmn</a></td>
-        <td>Email</td>
-        <td>Defendant</td>
-        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/d1eb5d79-6d1f-4b05-bbdf-a18fda06cf01'>notifyLiPOrderTranslatedTemplate (d1eb5d79-6d1f-4b05-bbdf-a18fda06cf01)</a></td>
       </tr>
       <tr data-ccd-events='' data-channel='email'>
         <td>—</td>
