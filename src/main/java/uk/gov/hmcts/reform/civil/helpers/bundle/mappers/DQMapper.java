@@ -42,6 +42,8 @@ public class DQMapper {
         bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(
             caseData, DocCategory.APP1_DQ.getValue(), CLAIMANT1));
         bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(
+            caseData, DocCategory.DQ_APP1.getValue(), CLAIMANT1));
+        bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(
             caseData, DocCategory.DEF1_DEFENSE_DQ.getValue(), DEFENDANT1));
         bundlingRequestDocuments.addAll(bundleDocumentsRetrieval.getDqByCategoryId(
             caseData, DQ_DEF1.getValue(), DEFENDANT1));
