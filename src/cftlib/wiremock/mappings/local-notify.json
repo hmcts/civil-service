@@ -1,0 +1,27 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPathPattern": "/v2/notifications/(email|sms|letter)"
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": "{{randomValue type='UUID'}}",
+      "reference": null,
+      "content": {
+        "body": "Sent by the local Notify stub",
+        "subject": "Local Notify stub",
+        "from_email": "local@notify.example"
+      },
+      "template": {
+        "id": "{{jsonPath request.body '$.template_id'}}",
+        "version": 1,
+        "uri": "http://localhost:8765/v2/template"
+      },
+      "uri": "http://localhost:8765/v2/notifications"
+    }
+  }
+}
