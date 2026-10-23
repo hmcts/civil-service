@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -929,6 +930,20 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             assertThat(gaJudicialRequestMoreInfo.getIsWithNotice()).isEqualTo(NO);
             assertThat(gaJudicialRequestMoreInfo.getJudgeRecitalText()).isEqualTo(judgeRecitalText);
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldOpenMakeDecisionWhenNoticeAnswerIsMissing(boolean missingInformOtherParty) {
+            GeneralApplicationCaseData caseData = getCloakedApplication(YES).copy()
+                .generalAppInformOtherParty(missingInformOtherParty ? null : new GAInformOtherParty())
+                .build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_START));
+
+            assertThat(response.getErrors()).isNullOrEmpty();
+            assertThat(getJudicialRequestMoreInfo(response).getIsWithNotice()).isNull();
         }
 
         @Test
@@ -2898,6 +2913,25 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 + "respond, is required.";
         public static final String REQUESTED_MORE_INFO_BY_DATE_IN_PAST = "The date, by which the applicant must "
                 + "respond, cannot be in past.";
+
+        @Test
+        void shouldValidateRequestMoreInfoWhenInformOtherPartyIsMissing() {
+            when(requestForInformationGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
+
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication()
+                .generalAppInformOtherParty(null)
+                .applicationIsUncloakedOnce(null)
+                .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(NO))
+                .build();
+            caseData.getJudicialDecisionRequestMoreInfo().setIsWithNotice(null);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, MID, VALIDATE_REQUEST_MORE_INFO_SCREEN));
+
+            assertThat(response.getErrors()).isNullOrEmpty();
+            assertThat(getJudicialRequestMoreInfo(response).getIsWithNotice()).isNull();
+        }
 
         @Test
         void shouldGenerateRequestMoreInfoDocument_JudgeRevisit_Without_Uncloaked() {
