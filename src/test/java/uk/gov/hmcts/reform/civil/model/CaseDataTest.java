@@ -1641,4 +1641,68 @@ class CaseDataTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         assertNull(caseData.getRespondent1PartyEmail());
     }
+
+    @Nested
+    @DisplayName("Current defendant helpers for LRVLR party structures")
+    class CurrentDefendantHelpers {
+
+        @Test
+        void shouldTreatOneVOneAsRespondent1_whenIsRespondent2Unset() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .isRespondent1(YES)
+                .build();
+
+            assertThat(caseData.isCurrentDefendantRespondent2()).isFalse();
+            assertThat(caseData.getCurrentDefendantClaimResponseTypeForSpec()).isEqualTo(FULL_ADMISSION);
+            assertThat(caseData.getCurrentDefendantPaymentTimeRoute())
+                .isEqualTo(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+            assertThat(caseData.isPayImmediately()).isTrue();
+        }
+
+        @Test
+        void shouldPreferRespondent1PaymentRoute_whenIsRespondent1AndGenericDiffers() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                .isRespondent1(YES)
+                .build();
+            caseData.setDefenceAdmitPartPaymentTimeRouteGeneric(
+                RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY
+            );
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(
+                RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN
+            );
+
+            assertThat(caseData.getCurrentDefendantPaymentTimeRoute())
+                .isEqualTo(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+            assertThat(caseData.isPayBySetDate()).isTrue();
+            assertThat(caseData.isPayImmediately()).isFalse();
+            assertThat(caseData.isPayByInstallment()).isFalse();
+        }
+
+        @Test
+        void shouldUseRespondent2PaymentRoute_whenIsRespondent2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent2(new PartyBuilder().individual().build())
+                .respondent2SameLegalRepresentative(NO)
+                .isRespondent2(YES)
+                .build();
+            caseData.setRespondent2ClaimResponseTypeForSpec(FULL_ADMISSION);
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
+                RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY
+            );
+            caseData.setDefenceAdmitPartPaymentTimeRouteRequired2(
+                RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN
+            );
+
+            assertThat(caseData.isCurrentDefendantRespondent2()).isTrue();
+            assertThat(caseData.getCurrentDefendantClaimResponseTypeForSpec()).isEqualTo(FULL_ADMISSION);
+            assertThat(caseData.getCurrentDefendantPaymentTimeRoute())
+                .isEqualTo(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN);
+            assertThat(caseData.isPayByInstallment()).isTrue();
+            assertThat(caseData.isPayImmediately()).isFalse();
+        }
+    }
 }

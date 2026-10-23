@@ -112,17 +112,20 @@ public class HandleDefendAllClaim implements CaseTask {
 
     private boolean isPaidLessOrDisputesOrPartAdmission(CaseData caseData) {
         log.info("Checking if caseId {} has paid less or disputes or part admission", caseData.getCcdCaseReference());
+        if (caseData.isCurrentDefendantRespondent2()) {
+            return DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired2())
+                || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+                || isPaidLessThanClaimed(caseData.getRespondToClaim2(), caseData.getTotalClaimAmount());
+        }
         return caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec() == RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
                 || DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
-                || DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired2())
-                || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
-                || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION;
+                || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION;
     }
 
     private void updateSpecDisputesOrPartAdmission(CaseData caseData) {
         log.info("Updating specDisputesOrPartAdmission for caseId: {}", caseData.getCcdCaseReference());
 
-        if (YES.equals(caseData.getIsRespondent2())) {
+        if (caseData.isCurrentDefendantRespondent2()) {
             if (isRespondent2DisputesOrPartAdmission(caseData)) {
                 log.info("CaseId {}: specDisputesOrPartAdmission set to YES for Respondent2", caseData.getCcdCaseReference());
                 caseData.setSpecDisputesOrPartAdmission(YES);
@@ -143,7 +146,7 @@ public class HandleDefendAllClaim implements CaseTask {
 
     private boolean isRespondent2DisputesOrPartAdmission(CaseData caseData) {
         log.info("Checking if Respondent2 disputes or part admission for caseId: {}", caseData.getCcdCaseReference());
-        return RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT != caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
+        return !isPaidLessThanClaimed(caseData.getRespondToClaim2(), caseData.getTotalClaimAmount())
                 && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired2())
                 || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION);
     }
@@ -366,7 +369,7 @@ public class HandleDefendAllClaim implements CaseTask {
         log.info("Populating RespondentResponseTypeSpecPaidStatus for caseId: {}", caseData.getCcdCaseReference());
         updateRespondent1PaymentStatus(caseData);
 
-        if (YES.equals(caseData.getIsRespondent2())) {
+        if (caseData.isCurrentDefendantRespondent2()) {
             log.info("CaseId {}: Respondent2 is present, updating payment status", caseData.getCcdCaseReference());
             updateRespondent2PaymentStatus(caseData);
         }
@@ -376,6 +379,7 @@ public class HandleDefendAllClaim implements CaseTask {
         log.info("Updating Respondent1 payment status for caseId: {}", caseData.getCcdCaseReference());
 
         if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
+                && caseData.getRespondToClaim() != null
                 && caseData.getRespondToClaim().getHowMuchWasPaid() != null) {
             int comparison = caseData.getRespondToClaim().getHowMuchWasPaid()
                     .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount())));
@@ -398,6 +402,7 @@ public class HandleDefendAllClaim implements CaseTask {
         log.info("Updating Respondent2 payment status for caseId: {}", caseData.getCcdCaseReference());
 
         if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired2())
+                && caseData.getRespondToClaim2() != null
                 && caseData.getRespondToClaim2().getHowMuchWasPaid() != null) {
             int comparison = caseData.getRespondToClaim2().getHowMuchWasPaid()
                     .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount())));

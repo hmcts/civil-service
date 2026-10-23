@@ -14,12 +14,12 @@ public class DefenceAdmitPartPaymentTimeRouteCaseUpdater implements HandleAdmitP
     public void update(CaseData caseData) {
         log.info("Updating Defence Admit Part Payment Time Route for caseId: {}", caseData.getCcdCaseReference());
 
-        if (YES.equals(caseData.getIsRespondent1()) && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null) {
-            log.debug("Respondent 1 condition met for caseId: {}", caseData.getCcdCaseReference());
+        if (YES.equals(caseData.getIsRespondent1())) {
             caseData.setDefenceAdmitPartPaymentTimeRouteGeneric(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
-        } else if (YES.equals(caseData.getIsRespondent2()) && caseData.getDefenceAdmitPartPaymentTimeRouteRequired2() != null) {
-            log.debug("Respondent 2 condition met for caseId: {}", caseData.getCcdCaseReference());
+            log.debug("Respondent 1 payment route generic updated for caseId: {}", caseData.getCcdCaseReference());
+        } else if (caseData.isCurrentDefendantRespondent2()) {
             caseData.setDefenceAdmitPartPaymentTimeRouteGeneric(caseData.getDefenceAdmitPartPaymentTimeRouteRequired2());
+            log.debug("Respondent 2 payment route generic updated for caseId: {}", caseData.getCcdCaseReference());
         }
     }
 }

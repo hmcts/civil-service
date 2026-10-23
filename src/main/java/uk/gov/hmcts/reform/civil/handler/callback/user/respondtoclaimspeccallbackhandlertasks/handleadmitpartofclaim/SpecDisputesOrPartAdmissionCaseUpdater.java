@@ -5,8 +5,14 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+
+import java.math.BigDecimal;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM;
+import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -18,14 +24,36 @@ public class SpecDisputesOrPartAdmissionCaseUpdater implements HandleAdmitPartOf
     public void update(CaseData caseData) {
         log.info("Updating SpecDisputesOrPartAdmissionCase for caseId: {}", caseData.getCcdCaseReference());
 
-        if (RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT != caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
-                && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
-                || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION)) {
+        if (matchesCurrentDefendant(caseData)) {
             log.debug("Setting specDisputesOrPartAdmission to YES for caseId: {}", caseData.getCcdCaseReference());
             caseData.setSpecDisputesOrPartAdmission(YES);
         } else {
             log.debug("Setting specDisputesOrPartAdmission to NO for caseId: {}", caseData.getCcdCaseReference());
             caseData.setSpecDisputesOrPartAdmission(NO);
         }
+    }
+
+    private boolean matchesCurrentDefendant(CaseData caseData) {
+        if (caseData.isCurrentDefendantRespondent2()) {
+            return !isPaidLess(caseData.getDefenceRouteRequired2(), caseData.getRespondToClaim2(), caseData.getTotalClaimAmount())
+                && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired2())
+                || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION);
+        }
+
+        return RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
+            != caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
+            && (DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
+            || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION);
+    }
+
+    private boolean isPaidLess(String defenceRoute, RespondToClaim respondToClaim, BigDecimal totalClaimAmount) {
+        if (!HAS_PAID_THE_AMOUNT_CLAIMED.equals(defenceRoute) || totalClaimAmount == null) {
+            return false;
+        }
+        return Optional.ofNullable(respondToClaim)
+            .map(RespondToClaim::getHowMuchWasPaid)
+            .map(MonetaryConversions::penniesToPounds)
+            .map(paid -> paid.compareTo(totalClaimAmount) < 0)
+            .orElse(false);
     }
 }
