@@ -540,18 +540,20 @@ public class BundleTestUtil {
     public static void assertDirectionsQuestionnairesWithCategoryIds(final BundleCreateRequest bundleCreateRequest) {
         assertEquals("CL 1 Directions Questionnaire 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(0).getValue().getDocumentFileName());
-        assertEquals("DF 1 Directions Questionnaire 10/02/2023",
+        assertEquals("CL 1 Directions Questionnaire 11/03/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(1).getValue().getDocumentFileName());
-        assertEquals("DF 1 Directions Questionnaire 12/03/2023",
+        assertEquals("DF 1 Directions Questionnaire 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(2).getValue().getDocumentFileName());
-        assertEquals("DF 2 Directions Questionnaire 10/02/2023",
+        assertEquals("DF 1 Directions Questionnaire 12/03/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(3).getValue().getDocumentFileName());
-        assertEquals("DF 2 Directions Questionnaire 11/02/2023",
+        assertEquals("DF 2 Directions Questionnaire 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(4).getValue().getDocumentFileName());
-        assertEquals("DF 2 Directions Questionnaire 10/03/2023",
+        assertEquals("DF 2 Directions Questionnaire 11/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(5).getValue().getDocumentFileName());
-        assertEquals("Directions Questionnaire 10/02/2023",
+        assertEquals("DF 2 Directions Questionnaire 10/03/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(6).getValue().getDocumentFileName());
+        assertEquals("Directions Questionnaire 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(7).getValue().getDocumentFileName());
     }
 
     public static void assertDirectionsQuestionnaires(final BundleCreateRequest bundleCreateRequest) {
