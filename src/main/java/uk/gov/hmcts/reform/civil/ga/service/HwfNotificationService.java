@@ -26,13 +26,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addLipClaimantVDefendant;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addSubjectReferences;
 
 @Slf4j
 @Service
@@ -82,11 +82,9 @@ public class HwfNotificationService implements NotificationDataGA {
     }
 
     private Map<String, String> addAllProperties(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData, CaseEvent event) {
-        Map<String, String> commonProperties = addProperties(caseData, mainCaseData);
-        Map<String, String> furtherProperties = getFurtherProperties(caseData, event);
-        return Collections.unmodifiableMap(
-            Stream.concat(commonProperties.entrySet().stream(), furtherProperties.entrySet().stream())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+        Map<String, String> properties = new HashMap<>(addProperties(caseData, mainCaseData));
+        properties.putAll(getFurtherProperties(caseData, event));
+        return Collections.unmodifiableMap(properties);
     }
 
     private Map<String, String> getCommonProperties(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData) {
@@ -97,6 +95,8 @@ public class HwfNotificationService implements NotificationDataGA {
                 TYPE_OF_FEE_WELSH, caseData.getHwfFeeType().getLabelInWelsh(),
                 HWF_REFERENCE_NUMBER, caseData.getGeneralAppHelpWithFees().getHelpWithFeesReferenceNumber()
         ));
+        addSubjectReferences(mainCaseData, caseData.getParentCaseReference(), properties);
+        addLipClaimantVDefendant(caseData, properties);
         addAllFooterItems(caseData, mainCaseData, properties, configuration,
                           featureToggleService.isPublicQueryManagementEnabledGa(caseData));
         return properties;
@@ -204,7 +204,7 @@ public class HwfNotificationService implements NotificationDataGA {
                 CaseEvent.PARTIAL_REMISSION_HWF_GA,
                 notificationsProperties.getNotifyApplicantForHwfPartialRemissionBilingual(),
                 CaseEvent.FEE_PAYMENT_OUTCOME_GA,
-                notificationsProperties.getLipGeneralAppApplicantEmailTemplateInWelsh()
+                notificationsProperties.getNotifyApplicantForHwfPaymentOutcomeBilingual()
             );
         }
         return emailTemplatesBilingual.get(hwfEvent);

@@ -36,7 +36,7 @@ class HearingFeeUnpaidDefendantEmailDTOGeneratorTest {
                                 .setRespondent1ResponseLanguage(Language.BOTH.toString())))
                 .build();
 
-        when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(BILINGUAL_TEMPLATE_ID);
+        when(notificationsProperties.getNotifyLipHearingFeeUnpaidBilingualTemplate()).thenReturn(BILINGUAL_TEMPLATE_ID);
 
         String templateId = generator.getEmailTemplateId(caseData);
 
@@ -48,7 +48,7 @@ class HearingFeeUnpaidDefendantEmailDTOGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastHearingFeeDueDeadline().build()
                 .toBuilder().build();
 
-        when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
+        when(notificationsProperties.getNotifyLipHearingFeeUnpaidTemplate()).thenReturn(TEMPLATE_ID);
 
         String templateId = generator.getEmailTemplateId(caseData);
 

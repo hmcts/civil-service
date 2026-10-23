@@ -17,6 +17,11 @@ public class NoCClaimantLipEmailDTOGenerator extends EmailDTOGenerator {
     private final NoCHelper noCHelper;
 
     @Override
+    protected boolean isLipRecipient() {
+        return true;
+    }
+
+    @Override
     public Boolean getShouldNotify(CaseData caseData) {
         return NotificationHelper.isApplicantLipForRespondentSolicitorChange(caseData);
     }

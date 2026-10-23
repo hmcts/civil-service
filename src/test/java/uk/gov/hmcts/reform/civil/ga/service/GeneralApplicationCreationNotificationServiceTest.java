@@ -14,6 +14,7 @@ import org.mockito.stubbing.OngoingStubbing;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -356,6 +357,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
             );
             assertThat(argumentCaptor.getValue().get("partyReferences"))
                 .isEqualTo("Claimant Reference: ABC limited - Defendant Reference: Defendant Ltd");
+            assertThat(argumentCaptor.getValue().get("ClaimantvDefendant")).isEqualTo("CL v DEF");
         }
 
         @Test
@@ -459,6 +461,8 @@ public class GeneralApplicationCreationNotificationServiceTest {
                 NotificationDataGA.GA_LIP_RESP_NAME, isLip ? "Lip Resp" : "",
                 NotificationDataGA.CASE_TITLE, isLip ? "CL v DEF" : ""
             ));
+            properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, CASE_REFERENCE.toString());
+            properties.put(NotificationData.CASEMAN_REF, "Not provided");
             properties.put(NotificationDataGA.WELSH_CONTACT, "E-bost: ymholiadaucymraeg@justice.gov.uk");
             properties.put(NotificationDataGA.WELSH_HMCTS_SIGNATURE, "Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
             properties.put(NotificationDataGA.WELSH_OPENING_HOURS, "Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");

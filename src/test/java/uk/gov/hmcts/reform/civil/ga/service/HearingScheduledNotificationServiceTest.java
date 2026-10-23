@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
@@ -96,6 +97,8 @@ class HearingScheduledNotificationServiceTest {
                                            GA_HEARING_DATE_SAMPLE, DateFormatHelper.DATE));
         properties.put(NotificationDataGA.GA_HEARING_TIME, GA_HEARING_TIME_SAMPLE.toString());
         properties.put(NotificationDataGA.PARTY_REFERENCE, customEmailReference ? CUSTOM_PARTY_REFERENCE : PARTY_REFERENCE);
+        properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, CASE_REFERENCE.toString());
+        properties.put(NotificationData.CASEMAN_REF, "Not provided");
         properties.put(NotificationDataGA.WELSH_CONTACT, "E-bost: ymholiadaucymraeg@justice.gov.uk");
         properties.put(NotificationDataGA.WELSH_HMCTS_SIGNATURE, "Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
         properties.put(NotificationDataGA.WELSH_OPENING_HOURS, "Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
@@ -115,9 +118,12 @@ class HearingScheduledNotificationServiceTest {
         customProp.put(NotificationDataGA.GA_HEARING_DATE, DateFormatHelper.formatLocalDate(
             GA_HEARING_DATE_SAMPLE, DateFormatHelper.DATE));
         customProp.put(NotificationDataGA.CASE_TITLE, "Test Claimant1 Name v Test Defendant1 Name");
+        customProp.put(NotificationData.CLAIMANT_V_DEFENDANT, "Test Claimant1 Name v Test Defendant1 Name");
 
         customProp.put(NotificationDataGA.GA_HEARING_TIME, GA_HEARING_TIME_SAMPLE.toString());
         customProp.put(NotificationDataGA.PARTY_REFERENCE, PARTY_REFERENCE);
+        customProp.put(NotificationData.CLAIM_16_DIGIT_NUMBER, CASE_REFERENCE.toString());
+        customProp.put(NotificationData.CASEMAN_REF, "Not provided");
         customProp.put(NotificationDataGA.WELSH_CONTACT, "E-bost: ymholiadaucymraeg@justice.gov.uk");
         customProp.put(NotificationDataGA.WELSH_HMCTS_SIGNATURE, "Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
         customProp.put(NotificationDataGA.WELSH_OPENING_HOURS, "Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
