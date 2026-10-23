@@ -1,0 +1,33 @@
+package uk.gov.hmcts.reform.civil.model.docmosis.settleanddiscontinue;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+
+import java.time.LocalDate;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
+public class ClaimSettledDefendantLiPLetter implements MappableObject {
+
+    private String claimReferenceNumber;
+    private String ccdCaseReference;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private LocalDate letterIssueDate;
+    private String defendantLipName;
+    private String addressLine1;
+    private String addressLine2;
+    private String addressLine3;
+    private String postCode;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private LocalDate dateOfEvent;
+}
