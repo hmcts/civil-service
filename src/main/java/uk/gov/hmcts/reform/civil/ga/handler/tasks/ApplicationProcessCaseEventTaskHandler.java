@@ -19,6 +19,8 @@ import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
 
 import java.util.Map;
+import java.util.Objects;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
@@ -30,6 +32,7 @@ public class ApplicationProcessCaseEventTaskHandler extends BaseExternalTaskHand
     private final GaStateFlowEngine stateFlowEngine;
     private final GaCoreCaseDataService coreCaseDataService;
     private final ObjectMapper mapper;
+    private final CamundaRuntimeClient camundaRuntimeClient;
 
     public ApplicationProcessCaseEventTaskHandler(
         ExternalTaskCompletionService externalTaskCompletionService,
@@ -37,13 +40,15 @@ public class ApplicationProcessCaseEventTaskHandler extends BaseExternalTaskHand
         CaseDetailsConverter caseDetailsConverter,
         GaStateFlowEngine stateFlowEngine,
         GaCoreCaseDataService coreCaseDataService,
-        ObjectMapper mapper
+        ObjectMapper mapper,
+        CamundaRuntimeClient camundaRuntimeClient
     ) {
         super(externalTaskCompletionService, eventProperties);
         this.caseDetailsConverter = caseDetailsConverter;
         this.stateFlowEngine = stateFlowEngine;
         this.coreCaseDataService = coreCaseDataService;
         this.mapper = mapper;
+        this.camundaRuntimeClient = camundaRuntimeClient;
     }
 
     @Override
@@ -55,7 +60,7 @@ public class ApplicationProcessCaseEventTaskHandler extends BaseExternalTaskHand
             variables.getCaseEvent());
         CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
         BusinessProcess businessProcess = startEventData.getBusinessProcess();
-        if (isEventAlreadyProcessed(externalTask, businessProcess)) {
+        if (isApplicationEventAlreadyProcessed(externalTask, businessProcess)) {
             log.info("GA event {} for caseId {} activityId {} is already processed",
                      variables.getCaseEvent(), generalApplicationCaseId, externalTask.getActivityId());
             return new ExternalTaskData().setParentCaseData(
@@ -63,10 +68,28 @@ public class ApplicationProcessCaseEventTaskHandler extends BaseExternalTaskHand
         }
 
         businessProcess.updateActivityId(externalTask.getActivityId());
+        businessProcess.updateProcessInstanceId(externalTask.getProcessInstanceId());
         CaseDataContent caseDataContent = caseDataContent(startEventResponse, businessProcess);
         var data = coreCaseDataService.submitGaUpdate(generalApplicationCaseId, caseDataContent);
         log.info("Successfully submitted update for caseId: {}", generalApplicationCaseId);
         return new ExternalTaskData().setParentCaseData(data);
+    }
+
+    private boolean isApplicationEventAlreadyProcessed(ExternalTask externalTask, BusinessProcess businessProcess) {
+        if (isEventAlreadyProcessed(externalTask, businessProcess)) {
+            return true;
+        }
+        if (businessProcess == null
+            || businessProcess.getProcessInstanceId() == null
+            || externalTask.getProcessInstanceId() == null
+            || externalTask.getActivityId() == null
+            || !Objects.equals(externalTask.getActivityId(), businessProcess.getActivityId())) {
+            return false;
+        }
+        // Older GA events retained the ID of the called start subprocess rather than its parent.
+        return camundaRuntimeClient.isCompletedChildProcess(
+            businessProcess.getProcessInstanceId(), externalTask.getProcessInstanceId(),
+            "GA_StartGeneralApplicationBusinessProcess");
     }
 
     @Override

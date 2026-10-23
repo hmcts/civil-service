@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -32,6 +33,7 @@ import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
@@ -40,10 +42,13 @@ import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -67,6 +72,9 @@ class ApplicationProcessCaseEventTaskHandlerTest {
     @Mock
     private GaCoreCaseDataService coreCaseDataService;
 
+    @Mock
+    private CamundaRuntimeClient camundaRuntimeClient;
+
     @Spy
     private ObjectMapper objectMapper = ObjectMapperFactory.instance();
 
@@ -88,7 +96,8 @@ class ApplicationProcessCaseEventTaskHandlerTest {
             caseDetailsConverter,
             gaStateFlowEngine,
             coreCaseDataService,
-            objectMapper
+            objectMapper,
+            camundaRuntimeClient
         );
 
         when(mockTask.getTopicName()).thenReturn("test");
@@ -142,15 +151,23 @@ class ApplicationProcessCaseEventTaskHandlerTest {
 
         @ParameterizedTest
         @CsvSource({
-            "process-1, CreatePDFDocument, false",
-            "process-2, CreatePDFDocument, true",
-            "process-1, PreviousActivity, true"
+            "process-1, CreatePDFDocument, false, false",
+            "process-2, CreatePDFDocument, false, true",
+            "process-2, CreatePDFDocument, true, false",
+            "process-1, PreviousActivity, false, true",
+            "process-2, PreviousActivity, false, true"
         })
         void shouldOnlySubmitEvent_whenTaskHasNotAlreadyCommitted(String processInstanceId,
                                                                 String activityId,
+                                                                boolean completedChild,
                                                                 boolean shouldSubmit) {
             when(mockTask.getProcessInstanceId()).thenReturn("process-1");
             when(mockTask.getActivityId()).thenReturn("CreatePDFDocument");
+            if (!"process-1".equals(processInstanceId) && "CreatePDFDocument".equals(activityId)) {
+                when(camundaRuntimeClient.isCompletedChildProcess(
+                    processInstanceId, "process-1", "GA_StartGeneralApplicationBusinessProcess"))
+                    .thenReturn(completedChild);
+            }
             GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
                 .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.STARTED)
                                      .setProcessInstanceId(processInstanceId).setActivityId(activityId))
@@ -179,6 +196,40 @@ class ApplicationProcessCaseEventTaskHandlerTest {
             expectedVariables.putValue(FLOW_FLAGS, Map.of());
             expectedVariables.putValue("generalAppParentCaseLink", PARENT_CASE_ID);
             verify(externalTaskService).complete(mockTask, expectedVariables);
+            if (shouldSubmit) {
+                ArgumentCaptor<CaseDataContent> content = ArgumentCaptor.forClass(CaseDataContent.class);
+                verify(coreCaseDataService).submitGaUpdate(eq(CASE_ID), content.capture());
+                BusinessProcess submittedProcess = (BusinessProcess) ((Map<?, ?>) content.getValue().getData()).get("businessProcess");
+                assertEquals("process-1", submittedProcess.getProcessInstanceId());
+                assertEquals("CreatePDFDocument", submittedProcess.getActivityId());
+            }
+            if ("process-1".equals(processInstanceId) || !"CreatePDFDocument".equals(activityId)) {
+                verifyNoInteractions(camundaRuntimeClient);
+            }
+        }
+
+        @Test
+        void shouldFailWithoutSubmittingOrCompleting_whenHistoryLookupFails() {
+            when(mockTask.getProcessInstanceId()).thenReturn("parent");
+            when(mockTask.getActivityId()).thenReturn("CreatePDFDocument");
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.STARTED)
+                                     .setProcessInstanceId("child").setActivityId("CreatePDFDocument"))
+                .build();
+            when(coreCaseDataService.startGaUpdate(CASE_ID, GENERATE_JUDGES_FORM))
+                .thenReturn(StartEventResponse.builder()
+                                .caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).build());
+            when(camundaRuntimeClient.isCompletedChildProcess(
+                "child", "parent", "GA_StartGeneralApplicationBusinessProcess"))
+                .thenThrow(new IllegalStateException("History unavailable"));
+            when(mockTask.getRetries()).thenReturn(1);
+
+            applicationProcessCaseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(coreCaseDataService, never()).submitGaUpdate(any(), any());
+            verify(externalTaskService, never()).complete(eq(mockTask), anyMap());
+            verify(externalTaskService).handleFailure(
+                eq(mockTask), eq("History unavailable"), anyString(), eq(0), anyLong());
         }
 
         @Test
