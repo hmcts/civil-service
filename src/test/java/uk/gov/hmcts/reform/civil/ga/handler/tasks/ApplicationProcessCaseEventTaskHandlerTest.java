@@ -12,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -107,6 +109,7 @@ class ApplicationProcessCaseEventTaskHandlerTest {
 
         @Test
         void shouldTriggerCCDEvent_whenHandlerIsExecuted() {
+            when(mockTask.getActivityId()).thenReturn("CreatePDFDocument");
             GaStateFlow stateFlow = mock(GaStateFlow.class);
             State state = mock(State.class);
             when(state.getName()).thenReturn("MAIN.DRAFT");
@@ -135,6 +138,47 @@ class ApplicationProcessCaseEventTaskHandlerTest {
             verify(coreCaseDataService).startGaUpdate(CASE_ID, GENERATE_JUDGES_FORM);
             verify(coreCaseDataService).submitGaUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).complete(mockTask, variables);
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            "process-1, CreatePDFDocument, false",
+            "process-2, CreatePDFDocument, true",
+            "process-1, PreviousActivity, true"
+        })
+        void shouldOnlySubmitEvent_whenTaskHasNotAlreadyCommitted(String processInstanceId,
+                                                                String activityId,
+                                                                boolean shouldSubmit) {
+            when(mockTask.getProcessInstanceId()).thenReturn("process-1");
+            when(mockTask.getActivityId()).thenReturn("CreatePDFDocument");
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.STARTED)
+                                     .setProcessInstanceId(processInstanceId).setActivityId(activityId))
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
+                .build();
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            when(coreCaseDataService.startGaUpdate(CASE_ID, GENERATE_JUDGES_FORM))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
+            if (shouldSubmit) {
+                when(coreCaseDataService.submitGaUpdate(eq(CASE_ID), any(CaseDataContent.class)))
+                    .thenReturn(caseData);
+            }
+            GaStateFlow stateFlow = mock(GaStateFlow.class);
+            State state = mock(State.class);
+            when(state.getName()).thenReturn("MAIN.DRAFT");
+            when(stateFlow.getState()).thenReturn(state);
+            when(stateFlow.getFlags()).thenReturn(Map.of());
+            when(gaStateFlowEngine.evaluate(any(GeneralApplicationCaseData.class))).thenReturn(stateFlow);
+
+            applicationProcessCaseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(coreCaseDataService, times(shouldSubmit ? 1 : 0))
+                .submitGaUpdate(eq(CASE_ID), any(CaseDataContent.class));
+            VariableMap expectedVariables = Variables.createVariables();
+            expectedVariables.putValue(FLOW_STATE, "MAIN.DRAFT");
+            expectedVariables.putValue(FLOW_FLAGS, Map.of());
+            expectedVariables.putValue("generalAppParentCaseLink", PARENT_CASE_ID);
+            verify(externalTaskService).complete(mockTask, expectedVariables);
         }
 
         @Test
@@ -196,6 +240,7 @@ class ApplicationProcessCaseEventTaskHandlerTest {
 
         @Test
         void shouldCallHandleFailureMethod_whenExceptionOnCompleteCall() {
+            when(mockTask.getActivityId()).thenReturn("CreatePDFDocument");
             GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
                 .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                 .build();

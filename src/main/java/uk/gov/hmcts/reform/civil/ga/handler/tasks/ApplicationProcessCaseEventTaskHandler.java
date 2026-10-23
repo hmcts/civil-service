@@ -55,6 +55,13 @@ public class ApplicationProcessCaseEventTaskHandler extends BaseExternalTaskHand
             variables.getCaseEvent());
         CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
         BusinessProcess businessProcess = startEventData.getBusinessProcess();
+        if (isEventAlreadyProcessed(externalTask, businessProcess)) {
+            log.info("GA event {} for caseId {} activityId {} is already processed",
+                     variables.getCaseEvent(), generalApplicationCaseId, externalTask.getActivityId());
+            return new ExternalTaskData().setParentCaseData(
+                caseDetailsConverter.toGeneralApplicationCaseData(startEventResponse.getCaseDetails()));
+        }
+
         businessProcess.updateActivityId(externalTask.getActivityId());
         CaseDataContent caseDataContent = caseDataContent(startEventResponse, businessProcess);
         var data = coreCaseDataService.submitGaUpdate(generalApplicationCaseId, caseDataContent);
