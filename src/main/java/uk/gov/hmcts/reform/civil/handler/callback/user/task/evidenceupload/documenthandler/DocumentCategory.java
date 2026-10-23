@@ -87,6 +87,7 @@ public enum DocumentCategory {
     APPLICANT_TWO_TRIAL_DOC_TIME_TABLE("ApplicantTwoTrialDocTimetable"),
     RESPONDENT_TWO_TRIAL_DOC_TIME_TABLE("RespondentTwoTrialDocTimetable"),
 
+    WITHOUT_PREJUDICE("WithoutPrejudice"),
 
     BUNDLE_EVIDENCE_UPLOAD("bundles");
 
