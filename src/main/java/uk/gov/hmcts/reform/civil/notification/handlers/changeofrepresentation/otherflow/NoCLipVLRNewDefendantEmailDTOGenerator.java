@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.o
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.CivilEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.common.NotificationHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Component
 @AllArgsConstructor
-public class NoCLipVLRNewDefendantEmailDTOGenerator extends EmailDTOGenerator {
+public class NoCLipVLRNewDefendantEmailDTOGenerator extends CivilEmailDTOGenerator {
 
     private final FeatureToggleService featureToggleService;
     private final NotificationsProperties notificationsProperties;

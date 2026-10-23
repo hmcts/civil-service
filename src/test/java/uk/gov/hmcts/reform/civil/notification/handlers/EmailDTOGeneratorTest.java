@@ -23,7 +23,7 @@ class EmailDTOGeneratorTest {
     protected static final String CUSTOM_KEY = "customKey";
     protected static final String CUSTOM_VALUE = "customValue";
 
-    private EmailDTOGenerator emailDTOGenerator;
+    private CivilEmailDTOGenerator emailDTOGenerator;
     String taskId = "someTaskId";
 
     @Mock
@@ -37,7 +37,7 @@ class EmailDTOGeneratorTest {
         MockitoAnnotations.openMocks(this);
 
         // Create a concrete implementation of the abstract class for testing
-        emailDTOGenerator = new EmailDTOGenerator() {
+        emailDTOGenerator = new CivilEmailDTOGenerator() {
 
             @Override
             public Boolean getShouldNotify(CaseData caseData) {

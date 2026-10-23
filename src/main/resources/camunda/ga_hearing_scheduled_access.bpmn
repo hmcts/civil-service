@@ -29,24 +29,14 @@
       <bpmn:outgoing>Flow_1u4hj3q</bpmn:outgoing>
       <bpmn:outgoing>Flow_1qchrvw</bpmn:outgoing>
     </bpmn:callActivity>
-    <bpmn:serviceTask id="NotifyHearingNoticeDefendant" name="Notify Hearing Notice Defendant(s)" camunda:type="external" camunda:topic="processExternalCaseEventGASpec">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">NOTIFY_HEARING_NOTICE_DEFENDANT</camunda:inputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0z35dfn</bpmn:incoming>
-      <bpmn:outgoing>Flow_1jro4pc</bpmn:outgoing>
-    </bpmn:serviceTask>
     <bpmn:boundaryEvent id="Event_0qc2eoy" name="Abort" attachedToRef="Activity_0vuxatn">
       <bpmn:errorEventDefinition id="ErrorEventDefinition_002mhpf" />
     </bpmn:boundaryEvent>
     <bpmn:sequenceFlow id="Flow_1karrfz" sourceRef="Event_0ks94xn" targetRef="Activity_0vuxatn" />
     <bpmn:sequenceFlow id="Flow_1u4hj3q" sourceRef="Activity_0vuxatn" targetRef="Event_1s3ugpj" />
     <bpmn:sequenceFlow id="Flow_1qchrvw" sourceRef="Activity_0vuxatn" targetRef="GenerateHearingNoticeDocument" />
-    <bpmn:sequenceFlow id="Flow_1yg2hgc" sourceRef="LinkDocumentToParentCase" targetRef="NotifyHearingNoticeClaimant" />
-    <bpmn:sequenceFlow id="Flow_0z35dfn" sourceRef="NotifyHearingNoticeClaimant" targetRef="NotifyHearingNoticeDefendant" />
-    <bpmn:sequenceFlow id="Flow_1jro4pc" sourceRef="NotifyHearingNoticeDefendant" targetRef="GenerateDashboardNotificationsGaMakeDecision" />
+    <bpmn:sequenceFlow id="Flow_1yg2hgc" sourceRef="LinkDocumentToParentCase" targetRef="NotifyGaHearingScheduled" />
+    <bpmn:sequenceFlow id="Flow_1jro4pc" sourceRef="NotifyGaHearingScheduled" targetRef="GenerateDashboardNotificationsGaMakeDecision" />
     <bpmn:sequenceFlow id="Flow_1830oky" sourceRef="Activity_0sa4hmt" targetRef="Event_0tam17y" />
     <bpmn:sequenceFlow id="Flow_1pqfxa1" sourceRef="GenerateHearingNoticeDocument" targetRef="Gateway_1rc2rjp" />
     <bpmn:exclusiveGateway id="Gateway_1rc2rjp" name="welsh Language">
@@ -77,14 +67,14 @@
       <bpmn:incoming>Flow_1y2xlpv</bpmn:incoming>
       <bpmn:outgoing>Flow_1yg2hgc</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="NotifyHearingNoticeClaimant" name="Notify Hearing Notice Claimant" camunda:type="external" camunda:topic="processExternalCaseEventGASpec">
+    <bpmn:serviceTask id="NotifyGaHearingScheduled" name="Notify Hearing Notice Parties" camunda:type="external" camunda:topic="processExternalCaseEventGASpec">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">NOTIFY_HEARING_NOTICE_CLAIMANT</camunda:inputParameter>
+          <camunda:inputParameter name="caseEvent">NOTIFY_EVENT</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1yg2hgc</bpmn:incoming>
-      <bpmn:outgoing>Flow_0z35dfn</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1jro4pc</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_1gwjthl" sourceRef="GenerateDashboardNotificationsGaMakeDecision" targetRef="Activity_0sa4hmt" />
     <bpmn:serviceTask id="GenerateDashboardNotificationsGaMakeDecision" name="Create Dashboard notification" camunda:type="external" camunda:topic="gaDashboardNotifications">
@@ -132,10 +122,6 @@
       <bpmndi:BPMNShape id="Activity_0vuxatn_di" bpmnElement="Activity_0vuxatn">
         <dc:Bounds x="309" y="238" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_1300hq4" bpmnElement="NotifyHearingNoticeDefendant">
-        <dc:Bounds x="955" y="238" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1rc2rjp_di" bpmnElement="Gateway_1rc2rjp" isMarkerVisible="true">
         <dc:Bounds x="605" y="253" width="50" height="50" />
         <bpmndi:BPMNLabel>
@@ -150,19 +136,19 @@
         <dc:Bounds x="690" y="238" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_02izv88_di" bpmnElement="NotifyHearingNoticeClaimant">
+      <bpmndi:BPMNShape id="Activity_02izv88_di" bpmnElement="NotifyGaHearingScheduled">
         <dc:Bounds x="820" y="238" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1vqp3lv_di" bpmnElement="GenerateDashboardNotificationsGaMakeDecision">
-        <dc:Bounds x="1100" y="238" width="100" height="80" />
+        <dc:Bounds x="950" y="238" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0sa4hmt_di" bpmnElement="Activity_0sa4hmt">
-        <dc:Bounds x="1250" y="238" width="100" height="80" />
+        <dc:Bounds x="1100" y="238" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0tam17y_di" bpmnElement="Event_0tam17y">
-        <dc:Bounds x="1412" y="258" width="36" height="36" />
+        <dc:Bounds x="1262" y="258" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0qc2eoy_di" bpmnElement="Event_0qc2eoy">
         <dc:Bounds x="341" y="220" width="36" height="36" />
@@ -186,17 +172,13 @@
         <di:waypoint x="790" y="278" />
         <di:waypoint x="820" y="278" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0z35dfn_di" bpmnElement="Flow_0z35dfn">
-        <di:waypoint x="920" y="277" />
-        <di:waypoint x="955" y="277" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1jro4pc_di" bpmnElement="Flow_1jro4pc">
-        <di:waypoint x="1055" y="278" />
-        <di:waypoint x="1100" y="278" />
+        <di:waypoint x="920" y="278" />
+        <di:waypoint x="950" y="278" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1830oky_di" bpmnElement="Flow_1830oky">
-        <di:waypoint x="1350" y="278" />
-        <di:waypoint x="1412" y="278" />
+        <di:waypoint x="1200" y="278" />
+        <di:waypoint x="1262" y="278" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1pqfxa1_di" bpmnElement="Flow_1pqfxa1">
         <di:waypoint x="590" y="278" />
@@ -218,12 +200,12 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0f5sxi5_di" bpmnElement="Flow_0f5sxi5">
         <di:waypoint x="680" y="420" />
-        <di:waypoint x="1430" y="420" />
-        <di:waypoint x="1430" y="294" />
+        <di:waypoint x="1280" y="420" />
+        <di:waypoint x="1280" y="294" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1gwjthl_di" bpmnElement="Flow_1gwjthl">
-        <di:waypoint x="1200" y="278" />
-        <di:waypoint x="1250" y="278" />
+        <di:waypoint x="1050" y="278" />
+        <di:waypoint x="1100" y="278" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

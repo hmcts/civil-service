@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.amendrestitchbundle;
 
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
@@ -10,7 +11,7 @@ import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIden
 
 @Component
 @Slf4j
-public class AmendRestitchBundleNotifier extends Notifier {
+public class AmendRestitchBundleNotifier extends Notifier<CaseData> {
 
     public AmendRestitchBundleNotifier(NotificationService notificationService, CaseTaskTrackingService caseTaskTrackingService,
                                        AmendRestitchBundleAllPartiesEmailGenerator partiesNotifier) {

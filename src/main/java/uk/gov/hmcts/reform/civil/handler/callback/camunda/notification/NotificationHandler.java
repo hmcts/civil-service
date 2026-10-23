@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
+import uk.gov.hmcts.reform.civil.notification.handlers.NotificationSummaryParser;
 import uk.gov.hmcts.reform.civil.notification.handlers.NotifierFactory;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
@@ -32,9 +33,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class NotificationHandler extends CallbackHandler {
-
-    private static final String ATTEMPTED_PREFIX = "Attempted: ";
-    private static final String DELIMITER = " || Errors: ";
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_EVENT);
 
@@ -63,7 +61,7 @@ public class NotificationHandler extends CallbackHandler {
     private CallbackResponse sendNotifications(CallbackParams callbackParams) {
         final CaseData caseData = callbackParams.getCaseData();
         final String taskId = caseData.getBusinessProcess().getActivityId();
-        final Notifier notifier = notifierFactory.getNotifier(taskId);
+        final Notifier<CaseData> notifier = notifierFactory.getNotifier(taskId);
 
         if (notifier == null) {
             throw new IllegalStateException(
@@ -96,8 +94,8 @@ public class NotificationHandler extends CallbackHandler {
 
         data.put("notificationSummary", null);
 
-        String cleanSummary = extractAttempted(fullSummary);
-        String errors = extractErrors(fullSummary);
+        String cleanSummary = NotificationSummaryParser.attempted(fullSummary);
+        String errors = NotificationSummaryParser.errors(fullSummary);
 
         Event.EventBuilder eventBuilder = Event.builder()
             .id(startEventResponse.getEventId())
@@ -112,34 +110,5 @@ public class NotificationHandler extends CallbackHandler {
             .event(eventBuilder.build())
             .data(data)
             .build();
-    }
-
-    private String extractAttempted(String combined) {
-        if (combined == null) {
-            return null;
-        }
-
-        int delimiterPos = combined.indexOf(DELIMITER);
-        String left = (delimiterPos >= 0) ? combined.substring(0, delimiterPos) : combined;
-
-        if (left.startsWith(ATTEMPTED_PREFIX)) {
-            return left.substring(ATTEMPTED_PREFIX.length());
-        }
-
-        return left;
-    }
-
-    private String extractErrors(String combined) {
-        if (combined == null) {
-            return null;
-        }
-
-        int delimiterPos = combined.indexOf(DELIMITER);
-        if (delimiterPos < 0) {
-            return null;
-        }
-
-        String right = combined.substring(delimiterPos + DELIMITER.length());
-        return !right.isBlank() ? right : null;
     }
 }

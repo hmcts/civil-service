@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.generateordercourtofficerorder;
 
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -8,7 +9,7 @@ import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.GenerateOrderNotifyPartiesCourtOfficerOrder;
 
 @Component
-public class CourtOfficerOrderNotifier extends Notifier {
+public class CourtOfficerOrderNotifier extends Notifier<CaseData> {
 
     private static final String TASK_ID = GenerateOrderNotifyPartiesCourtOfficerOrder.toString();
 
