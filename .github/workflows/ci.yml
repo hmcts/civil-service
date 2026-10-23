@@ -63,7 +63,7 @@ jobs:
       - uses: actions/checkout@v7
       - name: Increase PostgreSQL Max Connections
         run: |
-          docker exec -i postgres sed -i "s/max_connections = 100/max_connections = 300/" /var/lib/postgresql/data/postgresql.conf
+          docker exec -i postgres sed -i "s/max_connections = 100/max_connections = 300/" $PGDATA/postgresql.conf
           docker restart --time 0 postgres
           sleep 5
       - name: Set up Cache
