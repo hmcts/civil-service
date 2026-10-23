@@ -11,7 +11,7 @@
     "bpmn-to-image": "0.10.0"
   },
   "devDependencies": {
-    "puppeteer": "25.15.0"
+    "puppeteer": "25.16.0"
   },
   "overrides": {
     "puppeteer": "$puppeteer",
