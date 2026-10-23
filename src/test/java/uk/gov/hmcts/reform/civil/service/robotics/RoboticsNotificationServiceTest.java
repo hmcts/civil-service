@@ -9,9 +9,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -73,7 +73,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     classes = {
         RoboticsEmailConfiguration.class,
         RoboticsNotificationService.class,
-        JacksonAutoConfiguration.class,
+        Jackson2AutoConfiguration.class,
         CaseDetailsConverter.class,
         SimpleStateFlowEngine.class,
         SimpleStateFlowBuilder.class,
@@ -112,29 +112,29 @@ class RoboticsNotificationServiceTest {
     RoboticsEmailConfiguration emailConfiguration;
     @Autowired
     RoboticsDataMapperForUnspec roboticsDataMapper;
-    @MockBean
+    @MockitoBean
     FeatureToggleService featureToggleService;
 
     @Captor
     private ArgumentCaptor<EmailData> emailDataArgumentCaptor;
     private static final String BEARER_TOKEN = "Bearer Token";
-    @MockBean
+    @MockitoBean
     SendGridClient sendGridClient;
-    @MockBean
+    @MockitoBean
     OrganisationApi organisationApi;
-    @MockBean
+    @MockitoBean
     AuthTokenGenerator authTokenGenerator;
-    @MockBean
+    @MockitoBean
     UserService userService;
-    @MockBean
+    @MockitoBean
     PrdAdminUserConfiguration userConfig;
-    @MockBean
+    @MockitoBean
     RoboticsDataMapperForSpec roboticsDataMapperForSpec;
-    @MockBean
+    @MockitoBean
     private Time time;
-    @MockBean
+    @MockitoBean
     LocationReferenceDataService locationRefDataService;
-    @MockBean
+    @MockitoBean
     LocationRefDataUtil locationRefDataUtil;
 
     LocalDateTime localDateTime;

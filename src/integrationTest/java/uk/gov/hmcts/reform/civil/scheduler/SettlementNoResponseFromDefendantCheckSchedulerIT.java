@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("integration-test")
@@ -48,13 +48,13 @@ class SettlementNoResponseFromDefendantCheckSchedulerIT {
     @Autowired
     private SettlementNoResponseFromDefendantCheckScheduler scheduler;
 
-    @MockBean
+    @MockitoBean
     private TelemetryService telemetryService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private SettlementNoResponseFromDefendantCheckScheduledTask scheduledTask;
 
     @Autowired

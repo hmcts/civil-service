@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -57,7 +57,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SE
 
 @SpringBootTest(classes = {
     SecuredDocumentManagementService.class,
-    JacksonAutoConfiguration.class,
+    Jackson2AutoConfiguration.class,
     DocumentManagementConfiguration.class, Tika.class})
 class SecuredDocumentManagementServiceTest {
 
@@ -69,13 +69,13 @@ class SecuredDocumentManagementServiceTest {
         "exception":"uk.gov.hmcts.reform.ccd.documentam.exception.ForbiddenException"}
         """;
 
-    @MockBean
+    @MockitoBean
     private CaseDocumentClientApi caseDocumentClientApi;
-    @MockBean
+    @MockitoBean
     private DocumentDownloadClientApi documentDownloadClient;
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
-    @MockBean
+    @MockitoBean
     private UserService userService;
     @Autowired
     private ObjectMapper mapper;
