@@ -16,7 +16,6 @@
       <bpmn:incoming>Flow_1mjphqk</bpmn:incoming>
       <bpmn:incoming>Flow_1wtmwy3</bpmn:incoming>
       <bpmn:incoming>Flow_0ni85hb</bpmn:incoming>
-      <bpmn:incoming>Flow_15mh645</bpmn:incoming>
       <bpmn:outgoing>Flow_0jauxrx</bpmn:outgoing>
     </bpmn:callActivity>
     <bpmn:sequenceFlow id="Flow_1bv320r" sourceRef="DefendantResponseFullDefenceGenerateDirectionsQuestionnaire" targetRef="Activity_1ga6w9n" />
@@ -209,6 +208,7 @@
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_041nrrf</bpmn:incoming>
+      <bpmn:incoming>Flow_1dkjkyy</bpmn:incoming>
       <bpmn:outgoing>Flow_1mjphqk</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_1mjphqk" sourceRef="GenerateDashboardNotificationsDefendantResponse" targetRef="Activity_1m5szz9" />
@@ -359,7 +359,7 @@
     <bpmn:sequenceFlow id="Flow_0omcbvp" name="Full admit" sourceRef="Gateway_0ozqjp1" targetRef="Activity_0nakdad">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"> ${ flowState == "MAIN.FULL_ADMISSION" }</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1dkjkyy" sourceRef="Activity_0nakdad" targetRef="Activity_1phjbuy" />
+    <bpmn:sequenceFlow id="Flow_1dkjkyy" sourceRef="Activity_0nakdad" targetRef="GenerateDashboardNotificationsDefendantResponse" />
     <bpmn:serviceTask id="Activity_1dkbh3e" name="Generate DQ" camunda:type="external" camunda:topic="processCaseEvent">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -399,16 +399,6 @@
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${flowState == "MAIN.PART_ADMISSION"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_1nre60m" sourceRef="FullDefenceResponse" targetRef="DefendantResponseSpecFullDefenceFullPartAdmitNotifyParties" />
-    <bpmn:serviceTask id="Activity_1phjbuy" name="Remove Claimant DJ notification" camunda:type="external" camunda:topic="processCaseEvent">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">REMOVE_CLAIMANT_DJ_DASHBOARD_NOTIFICATION</camunda:inputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1dkjkyy</bpmn:incoming>
-      <bpmn:outgoing>Flow_15mh645</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_15mh645" sourceRef="Activity_1phjbuy" targetRef="Activity_1m5szz9" />
     <bpmn:sequenceFlow id="Flow_0ewki5y" sourceRef="ProceedOfflineForNonDefenceResponse" targetRef="Activity_0drqld6" />
     <bpmn:textAnnotation id="TextAnnotation_0yaoqdd">
       <bpmn:text>Full Defence, Part Admission Responses</bpmn:text>
@@ -572,10 +562,6 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0ipbyde_di" bpmnElement="DefendantResponseSpecFullDefenceFullPartAdmitNotifyParties">
         <dc:Bounds x="1200" y="517" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1phjbuy_di" bpmnElement="Activity_1phjbuy">
-        <dc:Bounds x="930" y="1120" width="100" height="80" />
-        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="TextAnnotation_0yaoqdd_di" bpmnElement="TextAnnotation_0yaoqdd">
         <dc:Bounds x="810" y="500" width="100" height="53" />
@@ -820,7 +806,8 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1dkjkyy_di" bpmnElement="Flow_1dkjkyy">
         <di:waypoint x="790" y="1160" />
-        <di:waypoint x="930" y="1160" />
+        <di:waypoint x="2360" y="1160" />
+        <di:waypoint x="2360" y="700" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1oehejf_di" bpmnElement="Flow_1oehejf">
         <di:waypoint x="420" y="1185" />
@@ -859,11 +846,6 @@
       <bpmndi:BPMNEdge id="Flow_1nre60m_di" bpmnElement="Flow_1nre60m">
         <di:waypoint x="1030" y="557" />
         <di:waypoint x="1200" y="557" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_15mh645_di" bpmnElement="Flow_15mh645">
-        <di:waypoint x="1030" y="1160" />
-        <di:waypoint x="2510" y="1160" />
-        <di:waypoint x="2510" y="607" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0ewki5y_di" bpmnElement="Flow_0ewki5y">
         <di:waypoint x="956" y="160" />

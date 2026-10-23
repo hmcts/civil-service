@@ -5,6 +5,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskIds;
 
 import java.util.Map;
 
@@ -20,11 +21,6 @@ public class InitiateGeneralApplicationAfterPaymentForWelshTest extends BpmnBase
     private static final String ASSIGNIN_OF_ROLES_ID = "AssigningOfRoles";
     private static final String GENERATE_DRAFT_DOCUMENT = "GENERATE_DRAFT_DOCUMENT";
     private static final String GENERATE_DRAFT_DOCUMENT_ID = "GenerateDraftDocumentId";
-    private static final String DELETE_APPLICATION_PAYMENT_DASHBOARD_NOTIFICATION
-        = "DELETE_APPLICATION_PAYMENT_DASHBOARD_NOTIFICATION";
-
-    private static final String DELETE_PAYMENT_DASHBOARD_NOTIFICATION_ACTIVITY_ID
-        = "DeletePaymentDashboardNotification";
 
     public InitiateGeneralApplicationAfterPaymentForWelshTest() {
         super("initiate_general_application_after_payment.bpmn", "GA_INITIATE_AFTER_PAYMENT_PROCESS_ID");
@@ -102,13 +98,13 @@ public class InitiateGeneralApplicationAfterPaymentForWelshTest extends BpmnBase
             variables
         );
 
-        //Delete payment notification
-        ExternalTask deletePaymentNotification = assertNextExternalTask(APPLICATION_PROCESS_CASE_EVENT);
+        //Framework task removes payment notification while creation awaits translation
+        ExternalTask welshDashboardNotification = assertNextExternalTask(GA_DASHBOARD_NOTIFICATION_TOPIC);
         assertCompleteExternalTask(
-            deletePaymentNotification,
-            APPLICATION_PROCESS_CASE_EVENT,
-            DELETE_APPLICATION_PAYMENT_DASHBOARD_NOTIFICATION,
-            DELETE_PAYMENT_DASHBOARD_NOTIFICATION_ACTIVITY_ID
+            welshDashboardNotification,
+            GA_DASHBOARD_NOTIFICATION_TOPIC,
+            "DASHBOARD_NOTIFICATION_EVENT",
+            DashboardTaskIds.GA_APPLICATION_SUBMITTED
         );
 
         //end business process

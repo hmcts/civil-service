@@ -19,14 +19,17 @@ class ApplicationSubmittedDashboardTaskContributorTest {
     @Mock
     private ApplicationSubmittedRespondentDashboardTask respondentTask;
 
+    @Mock
+    private DeleteApplicationPaymentDashboardTask removalTask;
+
     @Test
     void shouldExposeTaskIdCaseTypeAndDashboardTasks() {
         ApplicationSubmittedDashboardTaskContributor contributor =
-            new ApplicationSubmittedDashboardTaskContributor(applicantTask, respondentTask);
+            new ApplicationSubmittedDashboardTaskContributor(applicantTask, respondentTask, removalTask);
 
         assertThat(contributor.taskId()).isEqualTo(DashboardTaskIds.GA_APPLICATION_SUBMITTED);
         assertThat(contributor.caseType()).isEqualTo(DashboardCaseType.GENERAL_APPLICATION);
-        assertThat(contributor.dashboardTasks()).containsExactly(applicantTask, respondentTask);
+        assertThat(contributor.dashboardTasks()).containsExactly(applicantTask, respondentTask, removalTask);
         assertListIsImmutable(contributor.dashboardTasks());
     }
 
