@@ -12,18 +12,10 @@ public class BreathingSpaceLiftedTest extends BpmnBaseTest {
     public static final String PROCESS_ID = "BREATHING_SPACE_LIFTED";
 
     //CCD CASE EVENTS
-    public static final String NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED
-        = "NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED";
-    public static final String NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED
-        = "NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED";
     public static final String NOTIFY_RPA_ON_CONTINUOUS_FEED
         = "NOTIFY_RPA_ON_CONTINUOUS_FEED";
 
     //ACTIVITY IDs
-    public static final String NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID
-        = "NotifyApplicantSolicitorBSLifted";
-    public static final String NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID
-        = "NotifyRespondentSolicitorBSLifted";
     public static final String NOTIFY_RPA_ON_CONTINUOUS_FEED_ACTIVITY_ID = "NotifyRpaBsLifted";
 
     public BreathingSpaceLiftedTest() {
@@ -45,21 +37,9 @@ public class BreathingSpaceLiftedTest extends BpmnBaseTest {
             START_BUSINESS_ACTIVITY
         );
 
-        //complete the applicant notification
         ExternalTask notificationTask = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(notificationTask,
-                                   PROCESS_CASE_EVENT,
-                                   NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED,
-                                   NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID
-        );
-
-        //complete the respondent notification
-        notificationTask = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(notificationTask,
-                                   PROCESS_CASE_EVENT,
-                                   NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED,
-                                   NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID
-        );
+        assertCompleteExternalTask(notificationTask, PROCESS_CASE_EVENT,
+                                   "NOTIFY_EVENT", "BreathingSpaceLiftedNotifyParties");
 
         //complete the Robotics notification
         ExternalTask forRobotics = assertNextExternalTask(PROCESS_CASE_EVENT);

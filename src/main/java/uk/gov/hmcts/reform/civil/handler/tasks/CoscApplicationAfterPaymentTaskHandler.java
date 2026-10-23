@@ -57,7 +57,11 @@ public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHand
 
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(civilCaseId, caseEvent);
 
-            var data = coreCaseDataService.submitUpdate(civilCaseId, caseDataContentFromStartEventResponse(startEventResponse, Map.of()));
+            Map<String, Object> updates = caseEvent == CaseEvent.NOTIFY_EVENT
+                ? Map.of("businessProcess", Map.of("activityId", externalTask.getActivityId()))
+                : Map.of();
+            var data = coreCaseDataService.submitUpdate(
+                civilCaseId, caseDataContentFromStartEventResponse(startEventResponse, updates));
             return new ExternalTaskData().setCaseData(data);
 
         } catch (NumberFormatException ne) {
