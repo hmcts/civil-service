@@ -335,7 +335,27 @@ def parse_alter_table(statement, tables, foreign_keys):
         flags=re.IGNORECASE,
     )
     if drop_column_match:
-        table.columns.pop(normalise_identifier(drop_column_match.group(1)), None)
+        column_name = normalise_identifier(drop_column_match.group(1))
+        table.columns.pop(column_name, None)
+        foreign_keys[:] = [
+            foreign_key
+            for foreign_key in foreign_keys
+            if foreign_key.source_table != table.name or column_name not in foreign_key.source_columns
+        ]
+        return True
+
+    drop_constraint_match = re.match(
+        r"DROP\s+CONSTRAINT\s+(?:IF\s+EXISTS\s+)?\"?([A-Za-z_][A-Za-z0-9_]*)\"?",
+        action,
+        flags=re.IGNORECASE,
+    )
+    if drop_constraint_match:
+        constraint_name = normalise_identifier(drop_constraint_match.group(1))
+        foreign_keys[:] = [
+            foreign_key
+            for foreign_key in foreign_keys
+            if foreign_key.source_table != table.name or foreign_key.name != constraint_name
+        ]
         return True
 
     if re.match(r"ADD\s+(?:CONSTRAINT|FOREIGN|PRIMARY)", action, flags=re.IGNORECASE):
@@ -425,6 +445,9 @@ def render_mermaid(tables, foreign_keys, included_schemas):
     rendered_relationships = set()
     for foreign_key in foreign_keys:
         if foreign_key.source_table not in table_names or foreign_key.target_table not in table_names:
+            continue
+        source_table = included_tables[foreign_key.source_table]
+        if any(column not in source_table.columns for column in foreign_key.source_columns):
             continue
         relationship = (foreign_key.name, foreign_key.source_table, foreign_key.target_table)
         if relationship in rendered_relationships:
