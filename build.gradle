@@ -867,7 +867,8 @@ tasks.withType(Test).configureEach { t ->
   }
 
   // Common configuration for all test tasks
-  // Keep within typical Jenkins container limits
+  // Gradle caps this at org.gradle.workers.max, which Jenkins sets in Jenkinsfile_CNP, so that is the
+  // real fork count in CI
   maxParallelForks = Runtime.runtime.availableProcessors() - 1 ?: 1
   minHeapSize = "256m"
   jvmArgs "-XX:MaxMetaspaceSize=512m"
