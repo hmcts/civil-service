@@ -295,6 +295,8 @@ auth:
 
 document_management:
   userRoles: "caseworker-civil,caseworker-civil-solicitor"
+  # Upper bound on a single document download. Matches dm-store's non-media upload limit (MAX_NON_MEDIA_FILE_SIZE).
+  maxDownloadSize: ${DOCUMENT_MANAGEMENT_MAX_DOWNLOAD_SIZE:1024MB}
 
 bankHolidays:
   api:
