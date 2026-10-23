@@ -6,6 +6,9 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.StoredBreathingSpace;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
@@ -130,14 +133,26 @@ public class InterestCalculator {
     }
 
     private BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate, LocalDate interestToDate) {
+        LocalDate interestFromDate;
         if (InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE.equals(caseData.getInterestClaimFrom())) {
-            LocalDate interestFromDate = getSubmittedDate(caseData);
-            return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate, interestFromDate, interestToDate);
+            interestFromDate = getSubmittedDate(caseData);
         } else if (InterestClaimFromType.FROM_A_SPECIFIC_DATE.equals(caseData.getInterestClaimFrom())) {
-            return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate,
-                caseData.getInterestFromSpecificDate(), interestToDate);
+            interestFromDate = caseData.getInterestFromSpecificDate();
+        } else {
+            return ZERO;
         }
-        return ZERO;
+        return calculateInterestAmountForPeriod(caseData, interestRate, interestFromDate, interestToDate);
+    }
+
+    private BigDecimal calculateInterestAmountForPeriod(CaseData caseData,
+                                                        BigDecimal interestRate,
+                                                        LocalDate interestFromDate,
+                                                        LocalDate interestToDate) {
+        long numberOfDays = getNumberOfDays(interestFromDate, interestToDate);
+        long pausedDays = countInterestDaysPausedByBreathingSpace(caseData, interestFromDate, interestToDate);
+        long accruableDays = Math.max(0L, numberOfDays - pausedDays);
+        BigDecimal interestPerDay = getInterestPerDay(caseData.getTotalClaimAmount(), interestRate);
+        return interestPerDay.multiply(BigDecimal.valueOf(accruableDays));
     }
 
     private LocalDate getToDate(CaseData caseData) {
@@ -162,6 +177,65 @@ public class InterestCalculator {
             numberOfDays = Math.abs(ChronoUnit.DAYS.between(interestToSpecificDate, interestFromSpecificDate));
         }
         return numberOfDays;
+    }
+
+    private static long countInterestDaysPausedByBreathingSpace(CaseData caseData,
+                                                                LocalDate interestFromDate,
+                                                                LocalDate interestToDate) {
+        long pausedDays = 0;
+        for (BreathingSpaceDateRange dateRange : getStoredBreathingSpaceDateRanges(caseData)) {
+            pausedDays += countDaysBreathingSpaceOverlapsInterestPeriod(
+                dateRange.start(),
+                dateRange.end(),
+                interestFromDate,
+                interestToDate
+            );
+        }
+        return pausedDays;
+    }
+
+    private static List<BreathingSpaceDateRange> getStoredBreathingSpaceDateRanges(CaseData caseData) {
+        if (caseData.getBreathing() == null
+            || caseData.getBreathing().getStoredBreathingSpace() == null) {
+            return List.of();
+        }
+        List<BreathingSpaceDateRange> dateRanges = new ArrayList<>();
+        for (Element<StoredBreathingSpace> storedBreathingSpace : caseData.getBreathing().getStoredBreathingSpace()) {
+            StoredBreathingSpace storedCycle = storedBreathingSpace.getValue();
+            dateRanges.add(new BreathingSpaceDateRange(
+                storedCycle.getEnter().getStart(),
+                getBreathingSpaceEndDateOrToday(storedCycle.getLift())
+            ));
+        }
+        return dateRanges;
+    }
+
+    private static LocalDate getBreathingSpaceEndDateOrToday(BreathingSpaceLiftInfo lift) {
+        if (lift == null) {
+            return LocalDate.now();
+        }
+        return lift.getExpectedEnd();
+    }
+
+    private record BreathingSpaceDateRange(LocalDate start, LocalDate end) {
+    }
+
+    private static long countDaysBreathingSpaceOverlapsInterestPeriod(LocalDate breathingSpaceStart,
+                                                                      LocalDate breathingSpaceEnd,
+                                                                      LocalDate interestFromDate,
+                                                                      LocalDate interestToDate) {
+        LocalDate firstInterestDay = interestFromDate.plusDays(1);
+        LocalDate firstPausedInterestDay = breathingSpaceStart.isAfter(firstInterestDay)
+            ? breathingSpaceStart
+            : firstInterestDay;
+        LocalDate lastPausedInterestDay = breathingSpaceEnd.isBefore(interestToDate)
+            ? breathingSpaceEnd
+            : interestToDate;
+
+        if (lastPausedInterestDay.isBefore(firstPausedInterestDay)) {
+            return 0;
+        }
+        return ChronoUnit.DAYS.between(firstPausedInterestDay, lastPausedInterestDay) + 1;
     }
 
     @NotNull
