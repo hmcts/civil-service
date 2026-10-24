@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@2.12.1")
+@Library("Infrastructure@2.13.1")
 
 import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
@@ -109,7 +109,8 @@ withPipeline(type, product, component) {
   env.PACT_BROKER_PORT = "443"
   env.PACT_BROKER_SCHEME = "https"
   env.ENABLE_SECURE_URL = true
-  env.GRADLE_OPTS = "-Dorg.gradle.workers.max=3"
+  // Caps unit test forks too: maxParallelForks cannot exceed the worker count. Each fork peaks at ~2.2G RSS.
+  env.GRADLE_OPTS = "-Dorg.gradle.workers.max=5"
   env.CHECKSTYLE_SKIP = (env.CHANGE_ID != null) ? "false" : "true"
   env.BEFTA_S2S_CLIENT_ID = "ccd_data"
   env.DMN_DEFINITION_BRANCH = dmnBranch
@@ -161,6 +162,7 @@ withPipeline(type, product, component) {
     env.CCD_DEFINITION_BRANCH = "master"
     env.SKIP_COMMON_AAT_CCD_SETUP = "true"
     env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR = 'civil-service-master'
+    env.STASH_DIAGNOSTICS = 'false'
 
     afterSuccess('akschartsinstall') {
       runStagingHighLevelDataSetup()
@@ -237,12 +239,21 @@ withPipeline(type, product, component) {
     uploadBpmnDiagrams('aat')
   }
 
-  afterSuccess('buildinfra:prod') {
-    withAzureKeyvault(
-      azureKeyVaultSecrets: secretsProd['civil-prod'],
-      keyVaultURLOverride: 'https://civil-prod.vault.azure.net/'
-    ) {
-      uploadBpmnDiagrams('prod')
+  before('prod:promotion') {
+    withEnv([
+      'ENVIRONMENT_AGENT_STASH_INCLUDES=bin/**,src/main/resources/camunda/**',
+      'ENVIRONMENT_AGENT_STASH_BACK=false'
+    ]) {
+      withSubscription(
+        env.PROD_SUBSCRIPTION_NAME ?: 'prod', product, 'prod'
+      ) {
+        withAzureKeyvault(
+          azureKeyVaultSecrets: secretsProd['civil-prod'],
+          keyVaultURLOverride: 'https://civil-prod.vault.azure.net/'
+        ) {
+          uploadBpmnDiagrams('prod')
+        }
+      }
     }
   }
 
