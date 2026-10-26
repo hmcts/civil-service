@@ -4,7 +4,12 @@
 
 import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
+import uk.gov.hmcts.contino.DockerImage
+import uk.gov.hmcts.contino.Environment
 import uk.gov.hmcts.contino.GithubAPI
+import uk.gov.hmcts.contino.ProjectBranch
+import uk.gov.hmcts.contino.Subscription
+import uk.gov.hmcts.pipeline.AKSSubscriptions
 
 properties([
   copyArtifactPermission('/HMCTS_a_to_c/civil-service/*'),
@@ -152,6 +157,10 @@ withPipeline(type, product, component) {
       sh """
       ./bin/validate-migration-files.sh ${env.CHANGE_BRANCH} ${env.CHANGE_TARGET} --jenkins
        """
+    }
+
+    afterFailure('highleveldatasetup') {
+      saveHighLevelDataSetupPodsLogs(product, component)
     }
   }
 
@@ -308,6 +317,22 @@ def getPlaywrightFunctionalTestsGroups() {
     functionalTestGroups.add(label.substring(labelPrefix.length()))
   }
   return functionalTestGroups.join(",")
+}
+
+// The library saves the preview's pod logs after smoke and functional tests, but not after High Level
+// Data Setup, so a failed Camunda or CCD definition import left only the client side of the error.
+// Camunda answers a failed deployment with a bare ProcessEnginePersistenceException and "check the
+// server logs", and by the time anyone looks the preview has been redeployed.
+def saveHighLevelDataSetupPodsLogs(String product, String component) {
+  def imageTag = new ProjectBranch(env.BRANCH_NAME).imageTag()
+  def dockerImage = new DockerImage(product, component, null, imageTag, env.GIT_COMMIT, env.LAST_COMMIT_TIMESTAMP)
+  savePodsLogs(dockerImage, [
+    product        : product,
+    component      : component,
+    subscription   : new Subscription(env).previewName,
+    environment    : new Environment(env).previewName,
+    aksSubscription: new AKSSubscriptions(this).preview,
+  ], 'high-level-data-setup')
 }
 
 def publishAllureReport(String reportDir, String reportName, String historyArchiveDir) {
