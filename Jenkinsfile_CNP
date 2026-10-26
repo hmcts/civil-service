@@ -6,9 +6,20 @@ import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
 
-properties([
-  copyArtifactPermission('/HMCTS_a_to_c/civil-service/*'),
-])
+// properties() replaces the job's whole property list, so both branches must carry every property.
+// On a PR, a new push aborts the running build: otherwise the new build queues on the per-PR preview
+// deploy lock until the superseded one has finished deploying and testing a commit nobody wants.
+// Master is left alone so every merge still deploys to AAT.
+if (env.BRANCH_NAME?.startsWith('PR-')) {
+  properties([
+    copyArtifactPermission('/HMCTS_a_to_c/civil-service/*'),
+    disableConcurrentBuilds(abortPrevious: true),
+  ])
+} else {
+  properties([
+    copyArtifactPermission('/HMCTS_a_to_c/civil-service/*'),
+  ])
+}
 
 def type = "java"
 def product = "civil"
@@ -109,7 +120,8 @@ withPipeline(type, product, component) {
   env.PACT_BROKER_PORT = "443"
   env.PACT_BROKER_SCHEME = "https"
   env.ENABLE_SECURE_URL = true
-  env.GRADLE_OPTS = "-Dorg.gradle.workers.max=3"
+  // Caps unit test forks too: maxParallelForks cannot exceed the worker count. Each fork peaks at ~2.2G RSS.
+  env.GRADLE_OPTS = "-Dorg.gradle.workers.max=5"
   env.CHECKSTYLE_SKIP = (env.CHANGE_ID != null) ? "false" : "true"
   env.BEFTA_S2S_CLIENT_ID = "ccd_data"
   env.DMN_DEFINITION_BRANCH = dmnBranch
@@ -161,7 +173,7 @@ withPipeline(type, product, component) {
     env.CCD_DEFINITION_BRANCH = "master"
     env.SKIP_COMMON_AAT_CCD_SETUP = "true"
     env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR = 'civil-service-master'
-    env.STASH_DIAGNOSTICS = 'true'
+    env.STASH_DIAGNOSTICS = 'false'
 
     afterSuccess('akschartsinstall') {
       runStagingHighLevelDataSetup()
