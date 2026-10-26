@@ -1,8 +1,8 @@
 {
   "name": "Notice.AAA6.CancelUnissuedClaim.Claimant",
   "role": "CLAIMANT",
-  "titleEn": "Claim is unissued and cancelled",
-  "titleCy": "Nid yw’r hawliad wedi ei gyflwyno ac mae wedi'i ganslo",
-  "descriptionEn": "<p class=\"govuk-body\">The unissued claim against ${respondent1PartyName} was cancelled on ${cancelUnissuedClaimDateEn}.</p>",
-  "descriptionCy": "<p class=\"govuk-body\">Cafodd yr hawliad heb ei gyhoeddi yn erbyn ${respondent1PartyName} ei ganslo ar ${cancelUnissuedClaimDateCy}.</p>"
+  "titleEn": "The unissued claim is cancelled",
+  "titleCy": "Mae’r hawliad heb ei gyhoeddi wedi’i ganslo",
+  "descriptionEn": "<p class=\"govuk-body\">You have confirmed that the claim against ${respondent1PartyName} was unissued and cancelled on ${cancelUnissuedClaimDateEn}</p>",
+  "descriptionCy": "<p class=\"govuk-body\">Rydych wedi cadarnhau bod yr hawliad yn erbyn ${respondent1PartyName} heb ei gyhoeddi a’i fod wedi’i ganslo ar ${cancelUnissuedClaimDateCy}</p>"
 }
