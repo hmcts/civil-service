@@ -57,7 +57,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
     @Retryable(retryFor = {DocumentUploadException.class},
         maxAttempts = 3,
-        backoff = @Backoff(delay = 1000, multiplier = 3))
+        backoff = @Backoff(delayExpression = "${document-management.retry.delay-ms:1000}", multiplier = 3))
     @Override
     public CaseDocument uploadDocument(String authorisation, PDF pdf) {
         String originalFileName = pdf.getFileBaseName();
@@ -109,7 +109,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
     @Retryable(retryFor = {DocumentUploadException.class},
         maxAttempts = 3,
-        backoff = @Backoff(delay = 1000, multiplier = 3))
+        backoff = @Backoff(delayExpression = "${document-management.retry.delay-ms:1000}", multiplier = 3))
     @Override
     public CaseDocument uploadDocument(String authorisation, UploadedDocument uploadedDocument) {
 
@@ -164,7 +164,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         noRetryFor = {DocumentNotFoundException.class, DocumentAccessException.class,
             InvalidDocumentLinkException.class},
         maxAttempts = 3,
-        backoff = @Backoff(delay = 1000, multiplier = 3))
+        backoff = @Backoff(delayExpression = "${document-management.retry.delay-ms:1000}", multiplier = 3))
     @Override
     public byte[] downloadDocument(String authorisation, String documentPath) {
         log.info("Downloading document {}", documentPath);
@@ -206,7 +206,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         noRetryFor = {DocumentNotFoundException.class, DocumentAccessException.class,
             InvalidDocumentLinkException.class},
         maxAttempts = 3,
-        backoff = @Backoff(delay = 1000, multiplier = 3))
+        backoff = @Backoff(delayExpression = "${document-management.retry.delay-ms:1000}", multiplier = 3))
     @Override
     public DownloadedDocumentResponse downloadDocumentWithMetaData(String authorisation, String documentPath) {
         log.info("Downloading document {}", documentPath);
