@@ -569,7 +569,8 @@ public class JudicialNotificationService implements NotificationDataGA {
 
     private boolean isSendUncloakAdditionalFeeEmailForWithoutNotice(GeneralApplicationCaseData caseData) {
         return caseData.getGeneralAppRespondentAgreement().getHasAgreed().equals(NO)
-            && caseData.getGeneralAppInformOtherParty().getIsWithNotice().equals(NO)
+            && caseData.getGeneralAppInformOtherParty() != null
+            && NO.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice())
             && caseData.getGeneralAppPBADetails().getAdditionalPaymentDetails() == null;
     }
 

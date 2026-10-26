@@ -46,6 +46,8 @@ class DQMapperTest {
             .setDocumentType("t");
         when(bundleDocumentsRetrieval.getDqByCategoryId(caseData, DocCategory.APP1_DQ.getValue(), PartyType.CLAIMANT1))
             .thenReturn(singletonList(bundlingRequestDocument));
+        when(bundleDocumentsRetrieval.getDqByCategoryId(caseData, DocCategory.DQ_APP1.getValue(), PartyType.CLAIMANT1))
+            .thenReturn(singletonList(bundlingRequestDocument));
         when(bundleDocumentsRetrieval.getDqByCategoryId(caseData, DocCategory.DEF1_DEFENSE_DQ.getValue(), PartyType.DEFENDANT1))
             .thenReturn(singletonList(bundlingRequestDocument));
         when(bundleDocumentsRetrieval.getDqByCategoryId(caseData, DocCategory.DEF2_DEFENSE_DQ.getValue(), PartyType.DEFENDANT2))
@@ -57,7 +59,7 @@ class DQMapperTest {
 
         caseData.setManageDocuments(getTestDocuments());
         List<Element<BundlingRequestDocument>> result = mapper.map(caseData);
-        assertEquals(9, result.size());
+        assertEquals(10, result.size());
     }
 
     private List<Element<ManageDocument>> getTestDocuments() {

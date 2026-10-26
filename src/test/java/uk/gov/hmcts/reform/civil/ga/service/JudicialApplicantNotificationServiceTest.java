@@ -2352,6 +2352,26 @@ class JudicialApplicantNotificationServiceTest {
         }
 
         @Test
+        void shouldSendRequestMoreInfoNotificationWhenInformOtherPartyIsMissing() {
+            GeneralApplicationCaseData caseData = caseDataForJudicialRequestForInformationOfApplication(
+                NO, YES, NO, NO, NO, REQUEST_MORE_INFORMATION)
+                .copy().generalAppInformOtherParty(null).build();
+
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any()))
+                .thenReturn(new GeneralApplicationCaseData().ccdState(CaseState.CASE_PROGRESSION).build());
+            when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
+
+            judicialNotificationService.sendNotification(caseData, APPLICANT);
+
+            verify(notificationService).sendMail(
+                DUMMY_EMAIL,
+                "general-application-apps-judicial-notification-template-id",
+                notificationPropertiesToStayTheClaim(),
+                "general-apps-judicial-notification-make-decision-" + CASE_REFERENCE
+            );
+        }
+
+        @Test
         void notificationShouldSend_ApplicantRespondent_When_RequestForInformation_withConsentOrder() {
 
             GeneralApplicationCaseData caseData = caseDataForJudicialRequestForInformationOfApplication(YES, YES, YES, NO, NO,
