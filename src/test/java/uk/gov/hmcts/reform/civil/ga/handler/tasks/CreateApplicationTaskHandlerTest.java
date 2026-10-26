@@ -675,8 +675,6 @@ public class CreateApplicationTaskHandlerTest {
             assertThat(unrelated.getCaseLink()).isNull();
         }
 
-
-
         @Test
         void shouldTriggerCCDEvent() {
             GeneralApplication generalApplication = getGeneralApplication();
