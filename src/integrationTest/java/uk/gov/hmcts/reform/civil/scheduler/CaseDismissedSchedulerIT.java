@@ -64,8 +64,8 @@ public class CaseDismissedSchedulerIT {
     @Test
     void shouldExecuteCaseDismissedScheduler() {
         CaseDetails searchCase = CaseDetailsBuilder.builder()
+            .atStateAwaitingRespondentAcknowledgement()
             .id(CASE_ID)
-            .data(new HashMap<>())
             .build();
         SearchResult searchResult = SearchResult.builder()
             .total(1)
@@ -110,6 +110,25 @@ public class CaseDismissedSchedulerIT {
 
         coreCaseDataApiMockHelper.mockElasticSearchResult(searchResult);
         coreCaseDataApiMockHelper.mockGetCaseAnyCase(fullCaseDetails);
+
+        scheduler.runScheduledTask();
+
+        coreCaseDataApiMockHelper.verifySubmitEvent(0);
+        verify(telemetryService).trackEvent(eq("CaseDismissedJobStarted"), anyMap());
+        verify(telemetryService).trackEvent(eq("CaseDismissedCaseAborted"), anyMap());
+        verify(telemetryService).trackEvent(eq("CaseDismissedJobCompleted"), anyMap());
+    }
+
+    @Test
+    void shouldAbortCaseDismissedScheduler_whenDismissClaimEventNotAllowed() {
+        CaseDetails searchCase = CaseDetailsBuilder.builder().atStatePendingClaimIssued().id(CASE_ID).build();
+        SearchResult searchResult = SearchResult.builder()
+            .total(1)
+            .cases(List.of(searchCase))
+            .build();
+
+        coreCaseDataApiMockHelper.mockElasticSearchResult(searchResult);
+        coreCaseDataApiMockHelper.mockGetCaseAnyCase(searchCase);
 
         scheduler.runScheduledTask();
 
