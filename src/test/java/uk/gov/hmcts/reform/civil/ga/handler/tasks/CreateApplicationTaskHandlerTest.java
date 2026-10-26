@@ -133,6 +133,7 @@ public class CreateApplicationTaskHandlerTest {
             gaStateFlowEngine
         );
         lenient().when(mockTask.getTopicName()).thenReturn("test");
+        lenient().when(mockTask.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
 
         Map<String, Object> variables = Map.of(
             "caseId", CASE_ID,
@@ -631,6 +632,50 @@ public class CreateApplicationTaskHandlerTest {
 
     @Nested
     class CreateGeneralApplicationCCDEvent {
+
+        @Test
+        void shouldCreateApplicantOnlyApplicationWithoutRespondentAgreement() {
+            GeneralApplication application = getGeneralApplication()
+                .setGeneralAppRespondentAgreement(null);
+            buildData(application, NO, NO, false);
+        }
+
+        @Test
+        void shouldCreateApplicantOnlyApplicationWithoutAgreementAnswerOrNotice() {
+            GeneralApplication application = getGeneralApplication()
+                .setGeneralAppRespondentAgreement(new GARespondentOrderAgreement())
+                .setGeneralAppInformOtherParty(null);
+            buildData(application, NO, NO, false);
+        }
+
+        @Test
+        void shouldSelectApplicationForTaskProcessInstance() {
+            GeneralApplication unrelated = getGeneralApplication()
+                .setGeneralAppRespondentAgreement(null);
+            unrelated.getBusinessProcess().setProcessInstanceId("other-process");
+            GeneralApplication selected = getGeneralApplication();
+            GeneralApplicationCaseData parent = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
+                .generalApplications(wrapElements(unrelated, selected)).build();
+            StartEventResponse startEvent = StartEventResponse.builder()
+                .caseDetails(CaseDetailsBuilder.builder().data(parent).build()).build();
+            GeneralApplicationCaseData child = new GeneralApplicationCaseData().ccdCaseReference(2L);
+            when(coreCaseDataService.startUpdate(CASE_ID, CREATE_GENERAL_APPLICATION_CASE)).thenReturn(startEvent);
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(parent);
+            when(coreCaseDataService.createGeneralAppCase(anyMap())).thenReturn(child);
+            when(coreCaseDataService.caseDataContentFromStartEventResponse(any(), anyMap())).thenReturn(caseDataContent);
+            when(coreCaseDataService.submitUpdate(CASE_ID, caseDataContent)).thenReturn(parent);
+
+            createApplicationTaskHandler.handleTask(mockTask);
+
+            verify(coreCaseDataService).createGeneralAppCase(org.mockito.ArgumentMatchers.argThat(
+                map -> ((Map<?, ?>) map.get("businessProcess")).get("processInstanceId").equals(PROCESS_INSTANCE_ID)));
+            assertThat(selected.getBusinessProcess().getStatus())
+                .isEqualTo(uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED);
+            assertThat(unrelated.getBusinessProcess().getStatus()).isEqualTo(STARTED);
+            assertThat(unrelated.getCaseLink()).isNull();
+        }
+
+
 
         @Test
         void shouldTriggerCCDEvent() {
