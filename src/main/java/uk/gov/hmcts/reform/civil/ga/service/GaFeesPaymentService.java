@@ -43,9 +43,11 @@ public class GaFeesPaymentService {
         String parentCaseRef = caseData.getParentCaseReference();
         GeneralApplicationPbaDetails generalAppPbaDetails = caseData.getGeneralAppPBADetails();
 
-        String serviceRequestReference = generalAppPbaDetails == null ? null
-            : caseData.isAdditionalFeeRequested() ? generalAppPbaDetails.getAdditionalPaymentServiceRef()
-                : generalAppPbaDetails.getServiceReqReference();
+        String serviceRequestReference = null;
+        if (generalAppPbaDetails != null) {
+            serviceRequestReference = caseData.isAdditionalFeeRequested()
+                ? generalAppPbaDetails.getAdditionalPaymentServiceRef() : generalAppPbaDetails.getServiceReqReference();
+        }
         if (!StringUtils.hasText(serviceRequestReference)) {
             log.warn("General application payment is not ready for case {}", caseReference);
             throw new ResponseStatusException(HttpStatus.CONFLICT, PAYMENT_NOT_READY_MESSAGE);

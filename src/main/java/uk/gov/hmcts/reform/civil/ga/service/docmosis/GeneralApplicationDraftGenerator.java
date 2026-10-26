@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements;
+import uk.gov.hmcts.reform.civil.enums.dq.GAHearingType;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -102,7 +103,7 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
                 : null)
             .setHearingPreferencesPreferredType(Optional.ofNullable(hearingDetails)
                 .map(GAHearingDetails::getHearingPreferencesPreferredType)
-                .map(type -> type.getDisplayedValue()).orElse(null))
+                .map(GAHearingType::getDisplayedValue).orElse(null))
             .setReasonForPreferredHearingType(hearingDetails != null ? hearingDetails.getReasonForPreferredHearingType() : null)
             .setHearingPreferredLocation(getHearingLocation(hearingDetails))
             .setHearingDetailsTelephoneNumber(hearingDetails != null ? hearingDetails.getHearingDetailsTelephoneNumber() : null)
