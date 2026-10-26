@@ -10,6 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.retry.annotation.EnableRetry;
@@ -36,11 +40,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -144,46 +146,31 @@ class GaFeesPaymentServiceTest {
     }
 
     @Test
-    @SneakyThrows
     void shouldNotCreateGovPayPaymentUrlForMissingPbaDetails() {
-        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().ccdCaseReference(1701090368574910L)
-                .generalAppPBADetails(new GeneralApplicationPbaDetails()
-                        .setFee(new Fee().setCalculatedAmountInPence(new BigDecimal("23200")))
-                        )
-            .build();
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any()))
+            .thenReturn(new GeneralApplicationCaseData());
 
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
-        assertThatThrownBy(
-            () -> feesPaymentService.createGovPaymentRequest(
-                "2801090368574910",
-                BEARER_TOKEN
-            )
-        ).isInstanceOf(NullPointerException.class)
-            .hasMessage("Fee Payment service request cannot be null");
-
-        verify(paymentsClient, never()).createGovPayCardPaymentRequest(anyString(), anyString(), any());
+        assertPaymentNotReady();
     }
 
-    @Test
-    @SneakyThrows
-    void shouldNotCreateGovPayPaymentUrlForMissingServiceRequest() {
-        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().ccdCaseReference(1701090368574910L)
-            .generalAppPBADetails(new GeneralApplicationPbaDetails()
-                                      .setFee(new Fee().setCalculatedAmountInPence(new BigDecimal("23200")))
-                                      )
-            .build();
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" "})
+    void shouldNotCreateGovPayPaymentUrlForMissingServiceRequest(String serviceReference) {
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(
+            new GeneralApplicationCaseData().generalAppPBADetails(
+                new GeneralApplicationPbaDetails().setServiceReqReference(serviceReference)));
 
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
+        assertPaymentNotReady();
+    }
 
-        assertThatThrownBy(
-            () -> feesPaymentService.createGovPaymentRequest(
-                "2801090368574910",
-                BEARER_TOKEN
-            )
-        ).isInstanceOf(NullPointerException.class)
-            .hasMessage("Fee Payment service request cannot be null");
+    private void assertPaymentNotReady() {
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+            () -> feesPaymentService.createGovPaymentRequest("2801090368574910", BEARER_TOKEN));
 
-        verify(paymentsClient, never()).createGovPayCardPaymentRequest(anyString(), anyString(), any());
+        assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(exception.getReason()).isEqualTo("Payment is not ready yet, please retry in a moment");
+        verifyNoInteractions(paymentsClient);
     }
 
     @Test
