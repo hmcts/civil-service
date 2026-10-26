@@ -649,30 +649,15 @@ public class CreateApplicationTaskHandlerTest {
         }
 
         @Test
-        void shouldSelectApplicationForTaskProcessInstance() {
-            GeneralApplication unrelated = getGeneralApplication()
-                .setGeneralAppRespondentAgreement(null);
-            unrelated.getBusinessProcess().setProcessInstanceId("other-process");
-            GeneralApplication selected = getGeneralApplication();
-            GeneralApplicationCaseData parent = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-                .generalApplications(wrapElements(unrelated, selected)).build();
-            StartEventResponse startEvent = StartEventResponse.builder()
-                .caseDetails(CaseDetailsBuilder.builder().data(parent).build()).build();
-            GeneralApplicationCaseData child = new GeneralApplicationCaseData().ccdCaseReference(2L);
-            when(coreCaseDataService.startUpdate(CASE_ID, CREATE_GENERAL_APPLICATION_CASE)).thenReturn(startEvent);
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(parent);
-            when(coreCaseDataService.createGeneralAppCase(anyMap())).thenReturn(child);
-            when(coreCaseDataService.caseDataContentFromStartEventResponse(any(), anyMap())).thenReturn(caseDataContent);
-            when(coreCaseDataService.submitUpdate(CASE_ID, caseDataContent)).thenReturn(parent);
+        void shouldCreateApplicationWhenStoredChildProcessDiffersFromTaskParentProcess() {
+            GeneralApplication application = getGeneralApplication();
+            when(mockTask.getProcessInstanceId()).thenReturn("parent-process-instance");
 
-            createApplicationTaskHandler.handleTask(mockTask);
+            buildData(application, NO, NO, false);
 
-            verify(coreCaseDataService).createGeneralAppCase(org.mockito.ArgumentMatchers.argThat(
-                map -> ((Map<?, ?>) map.get("businessProcess")).get("processInstanceId").equals(PROCESS_INSTANCE_ID)));
-            assertThat(selected.getBusinessProcess().getStatus())
+            assertThat(application.getBusinessProcess().getStatus())
                 .isEqualTo(uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED);
-            assertThat(unrelated.getBusinessProcess().getStatus()).isEqualTo(STARTED);
-            assertThat(unrelated.getCaseLink()).isNull();
+            assertThat(application.getBusinessProcess().getProcessInstanceId()).isEqualTo(PROCESS_INSTANCE_ID);
         }
 
         @Test

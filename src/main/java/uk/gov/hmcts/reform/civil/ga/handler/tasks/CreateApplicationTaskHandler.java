@@ -86,9 +86,7 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
                 .filter(application -> application.getValue() != null
                     && application.getValue().getBusinessProcess() != null
                     && application.getValue().getBusinessProcess().getStatus() == BusinessProcessStatus.STARTED
-                    && application.getValue().getBusinessProcess().getProcessInstanceId() != null
-                    && application.getValue().getBusinessProcess().getProcessInstanceId()
-                        .equals(externalTask.getProcessInstanceId())).findFirst();
+                    && application.getValue().getBusinessProcess().getProcessInstanceId() != null).findFirst();
 
             if (genApps.isPresent()) {
                 log.info("Selected general application element ID: {} for case ID: {}, process instance ID: {}",
