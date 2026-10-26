@@ -18,7 +18,7 @@ plugins {
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.6"
   id 'hmcts.ccd.sdk' version '7.17.0'
-  id 'com.github.hmcts.rse-cft-lib' version 'civil-cc-5'
+  id 'com.github.hmcts.rse-cft-lib' version 'civil-cc-6'
   id 'net.ltgt.errorprone' version '5.1.1'
 }
 
@@ -1009,6 +1009,13 @@ def startCftlibWiremock = tasks.register('startCftlibWiremock') {
       throw new GradleException('Could not start wiremock')
     }
   }
+}
+
+dependencies {
+  cftlibTestImplementation "org.springframework.boot:spring-boot-starter-test"
+  cftlibTestImplementation platform("org.junit:junit-bom:${versions.junit}")
+  cftlibTestImplementation 'org.junit.jupiter:junit-jupiter'
+  cftlibTestImplementation 'org.junit.platform:junit-platform-console'
 }
 
 tasks.withType(CftlibExec).configureEach {

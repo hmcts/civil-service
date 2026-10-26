@@ -29,6 +29,17 @@ Nothing reaches AAT, so no VPN is needed.
 
 Everything under `src/cftlib` runs only under cftlib. That includes IDAM's `/loginUser`, which civil's Playwright tests sign in with and the IDAM simulator lacks (`LocalIdamController`).
 
+## Checking the stack
+
+`./gradlew cftlibTest` starts the same stack and runs `src/cftlibTest` against it, in about five minutes:
+- the claimant solicitor starts `CREATE_CLAIM_SPEC`, which runs this service's about-to-start callback against the imported definition;
+- the CIVIL and GENERALAPPLICATION case types are in CCD;
+- civil's business processes are deployed to Camunda;
+- this service stores a document through CDAM and the local dm-store and reads it back;
+- tests can sign in through the local `/loginUser`.
+
+It is not part of `check`, since it needs Docker and access to `hmctsprod.azurecr.io` (`az acr login --name hmctsprod`).
+
 ## Running civil's Playwright tests against it
 
 In civil-ccd-definition, create `.env.tests.local` (it is gitignored) pointing the tests at the local services:
