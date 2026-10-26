@@ -9,8 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -73,6 +75,7 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PDFBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -90,6 +93,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -926,6 +930,20 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             assertThat(gaJudicialRequestMoreInfo.getIsWithNotice()).isEqualTo(NO);
             assertThat(gaJudicialRequestMoreInfo.getJudgeRecitalText()).isEqualTo(judgeRecitalText);
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldOpenMakeDecisionWhenNoticeAnswerIsMissing(boolean missingInformOtherParty) {
+            GeneralApplicationCaseData caseData = getCloakedApplication(YES).copy()
+                .generalAppInformOtherParty(missingInformOtherParty ? null : new GAInformOtherParty())
+                .build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_START));
+
+            assertThat(response.getErrors()).isNullOrEmpty();
+            assertThat(getJudicialRequestMoreInfo(response).getIsWithNotice()).isNull();
         }
 
         @Test
@@ -2125,6 +2143,31 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         private static final String VALIDATE_MAKE_AN_ORDER = "validate-make-an-order";
 
+        @ParameterizedTest
+        @CsvSource({
+            "2026-10-03T12:00:00, 2026-10-10",
+            "2026-10-04T12:00:00, 2026-10-11",
+            "2026-12-18T12:00:00, 2026-12-25"
+        })
+        void shouldDefaultRequestMoreInfoToSevenCalendarDays(String decisionTime, String expectedDate) {
+            GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(
+                List.of(GeneralApplicationTypes.EXTEND_TIME), NO, NO, SPEC_CLAIM).copy()
+                .judicialDecision(new GAJudicialDecision(REQUEST_MORE_INFO))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_MAKE_AN_ORDER);
+
+            try (MockedStatic<LocalDateTimeHelper> dates = mockStatic(LocalDateTimeHelper.class)) {
+                dates.when(LocalDateTimeHelper::nowInLocalZone).thenReturn(LocalDateTime.parse(decisionTime));
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(
+                    response.getData(), GeneralApplicationCaseData.class);
+
+                assertThat(responseCaseData.getJudicialDecisionRequestMoreInfo().getJudgeRequestMoreInfoByDate())
+                    .isEqualTo(LocalDate.parse(expectedDate));
+            }
+        }
+
         @Test
         void shouldSetBilingualHintWhenDecisionUsesWelshNotice() {
             List<GeneralApplicationTypes> types = List.of((GeneralApplicationTypes.STRIKE_OUT));
@@ -2870,6 +2913,25 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 + "respond, is required.";
         public static final String REQUESTED_MORE_INFO_BY_DATE_IN_PAST = "The date, by which the applicant must "
                 + "respond, cannot be in past.";
+
+        @Test
+        void shouldValidateRequestMoreInfoWhenInformOtherPartyIsMissing() {
+            when(requestForInformationGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
+
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication()
+                .generalAppInformOtherParty(null)
+                .applicationIsUncloakedOnce(null)
+                .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(NO))
+                .build();
+            caseData.getJudicialDecisionRequestMoreInfo().setIsWithNotice(null);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, MID, VALIDATE_REQUEST_MORE_INFO_SCREEN));
+
+            assertThat(response.getErrors()).isNullOrEmpty();
+            assertThat(getJudicialRequestMoreInfo(response).getIsWithNotice()).isNull();
+        }
 
         @Test
         void shouldGenerateRequestMoreInfoDocument_JudgeRevisit_Without_Uncloaked() {

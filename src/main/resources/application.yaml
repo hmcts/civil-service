@@ -7,6 +7,9 @@ management:
       show-details: "always"
       probes:
         enabled: true
+      group:
+        s2s:
+          include: s2sSecretReadiness
   endpoints:
     web:
       base-path: /
@@ -81,7 +84,7 @@ spring:
             readTimeout: ${CORE_CASE_EVENT_API_READ_TIMEOUT:25000}
 
 scheduler:
-  active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:JudgementBuffer, ExpiredDraftStore}
+  active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:}
   circuitBreakerThreshold: ${CIRCUIT_BREAKER_THRESHOLD:5}
   lockAtLeastFor: ${LOCK_AT_LEAST_FOR:PT1M}
   lockAtMostFor: ${LOCK_AT_MOST_FOR:PT30M}
