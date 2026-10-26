@@ -42,34 +42,3 @@ resource "azurerm_monitor_metric_alert" "civil-ci-alerts" {
     azurerm_monitor_action_group.civil-service-action-group,
   ]
 }
-
-# ================================================================================================
-# Resource Health Alert
-# ================================================================================================
-resource "azurerm_monitor_activity_log_alert" "cmc_db_resource_health" {
-  name                = "cmc-db-resource-health-${var.env}"
-  resource_group_name = local.resource_group_name
-  scopes = [data.azurerm_postgresql_flexible_server.cmc_db.id]
-  description         = "Triggers when CMC PostgreSQL Flexible Server health is Degraded or Unavailable in ${var.env}."
-  enabled             = true
-  tags                = var.common_tags
-
-  criteria {
-    category = "ResourceHealth"
-
-    resource_health {
-      current = ["Degraded", "Unavailable"]
-      previous = ["Available"]
-      reason = ["PlatformInitiated", "UserInitiated"]
-    }
-  }
-
-  action {
-    action_group_id = azurerm_monitor_action_group.civil-service-action-group[action.value.action_group_name].id
-  }
-
-  depends_on = [
-    azurerm_monitor_action_group.civil-service-action-group,
-  ]
-  location = var.location
-}
