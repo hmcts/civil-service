@@ -37,7 +37,7 @@ monitor_cmc_db_metric_alerts = {
   },
   "prod-cmc-db-cpu-critical" = {
     description  = "Production CMC DB CPU utilization >= 85% for 5 mins"
-    severity     = 1
+    severity     = 0
     enabled      = true
     frequency    = "PT1M"
     autoMitigate = true
@@ -71,7 +71,7 @@ monitor_cmc_db_metric_alerts = {
   },
   "prod-cmc-db-storage-critical" = {
     description  = "Production CMC DB disk usage >= 90%"
-    severity     = 1
+    severity     = 0
     enabled      = true
     frequency    = "PT5M"
     autoMitigate = true
@@ -105,7 +105,7 @@ monitor_cmc_db_metric_alerts = {
   },
   "prod-cmc-db-memory-critical" = {
     description  = "Production CMC DB memory usage >= 95%"
-    severity     = 1
+    severity     = 0
     enabled      = true
     frequency    = "PT1M"
     autoMitigate = true
