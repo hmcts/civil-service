@@ -51,11 +51,13 @@ import static org.mockito.Mockito.when;
  * applied, so the sibling test can only assert at the method level and cannot prove the
  * {@code noRetryFor} classification actually short-circuits the three attempts.
  */
-@SpringBootTest(classes = {
-    SecuredDocumentManagementService.class,
-    SecuredDocumentManagementServiceRetryTest.TestRetryConfig.class,
-    JacksonAutoConfiguration.class,
-    DocumentManagementConfiguration.class, Tika.class})
+@SpringBootTest(
+    properties = "document-management.retry.delay-ms=0",
+    classes = {
+        SecuredDocumentManagementService.class,
+        SecuredDocumentManagementServiceRetryTest.TestRetryConfig.class,
+        JacksonAutoConfiguration.class,
+        DocumentManagementConfiguration.class, Tika.class})
 class SecuredDocumentManagementServiceRetryTest {
 
     public static final String BEARER_TOKEN = "Bearer Token";
