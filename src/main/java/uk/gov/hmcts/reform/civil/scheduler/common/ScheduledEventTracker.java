@@ -2,11 +2,20 @@ package uk.gov.hmcts.reform.civil.scheduler.common;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.AbortCategory;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
 
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+
+import static uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration.SCHEDULER_BACK_PRESSURE_UPDATED;
+import static uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration.SCHEDULER_CASE_ABORTED;
+import static uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration.SCHEDULER_CASE_FAILED;
+import static uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration.SCHEDULER_CASE_PROCESSED;
+import static uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration.SCHEDULER_JOB_ABORTED;
+import static uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration.SCHEDULER_JOB_COMPLETED;
+import static uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskEventConfiguration.SCHEDULER_JOB_STARTED;
 
 @Component
 @AllArgsConstructor
@@ -18,6 +27,7 @@ public class ScheduledEventTracker {
     private static final String FAILED_CASES = "failedCases";
     private static final String ABORTED_CASES = "abortedCases";
     private static final String ABORT_REASON = "abortReason";
+    private static final String ABORT_CATEGORY = "abortCategory";
     private static final String JOB_ABORT_REASON = "jobAbortReason";
     private static final String CUMULATIVE_DELAY = "cumulativeDelay";
     private static final String SEARCH_DURATION = "searchDuration";
@@ -41,7 +51,7 @@ public class ScheduledEventTracker {
 
     public void jobStartedEvent(ScheduledTaskEventConfiguration eventConfig, int casesSize) {
         telemetryService.trackEvent(
-            eventConfig.getJobStartedEvent(),
+            SCHEDULER_JOB_STARTED,
             Map.of(
                 SCHEDULER_NAME, eventConfig.getSchedulerName(),
                 TOTAL_CASES, String.valueOf(casesSize),
@@ -60,13 +70,14 @@ public class ScheduledEventTracker {
     }
 
     public void caseProcessedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, Map<String, Long> metrics) {
-        Map<String, String> properties = new HashMap<>();
-        properties.put(SCHEDULER_NAME, eventConfig.getSchedulerName());
-        properties.put(CASE_ID, caseId);
-        properties.put(STATUS, SUCCESS);
-        metrics.forEach((key, value) -> properties.put(METRIC_PREFIX + key, String.valueOf(value)));
+        caseProcessedEvent(eventConfig, caseId, metrics, Map.of());
+    }
 
-        telemetryService.trackEvent(eventConfig.getCaseProcessedEvent(), properties);
+    public void caseProcessedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, Map<String, Long> metrics, Map<String, String> customProperties) {
+        Map<String, String> properties = createCaseProperties(eventConfig, caseId, metrics, customProperties);
+        properties.put(STATUS, SUCCESS);
+
+        telemetryService.trackEvent(SCHEDULER_CASE_PROCESSED, properties);
     }
 
     public void caseFailedEvent(ScheduledTaskEventConfiguration eventConfig, Long caseId, Exception e) {
@@ -78,35 +89,63 @@ public class ScheduledEventTracker {
     }
 
     public void caseFailedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, Exception e, Map<String, Long> metrics) {
-        Map<String, String> properties = new HashMap<>();
-        properties.put(SCHEDULER_NAME, eventConfig.getSchedulerName());
-        properties.put(CASE_ID, caseId);
+        caseFailedEvent(eventConfig, caseId, e, metrics, Map.of());
+    }
+
+    public void caseFailedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, Exception e, Map<String, Long> metrics, Map<String, String> customProperties) {
+        Map<String, String> properties = createCaseProperties(eventConfig, caseId, metrics, customProperties);
         properties.put(STATUS, FAILURE);
         properties.put(ERROR, e.getMessage());
         properties.put(ERROR_CATEGORY, errorCategorizer.categorizeError(e));
-        metrics.forEach((key, value) -> properties.put(METRIC_PREFIX + key, String.valueOf(value)));
 
-        telemetryService.trackEvent(eventConfig.getCaseFailedEvent(), properties);
+        telemetryService.trackEvent(SCHEDULER_CASE_FAILED, properties);
     }
 
     public void caseAbortedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, String errorMessage) {
-        caseAbortedEvent(eventConfig, caseId, errorMessage, Map.of());
+        caseAbortedEvent(eventConfig, caseId, AbortCategory.OTHER, errorMessage, Map.of(), Map.of());
     }
 
-    public void caseAbortedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, String errorMessage, Map<String, Long> metrics) {
+    public void caseAbortedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, AbortCategory category, String errorMessage) {
+        caseAbortedEvent(eventConfig, caseId, category, errorMessage, Map.of(), Map.of());
+    }
+
+    public void caseAbortedEvent(ScheduledTaskEventConfiguration eventConfig, String caseId, AbortCategory category, String errorMessage, Map<String, Long> metrics) {
+        caseAbortedEvent(eventConfig, caseId, category, errorMessage, metrics, Map.of());
+    }
+
+    public void caseAbortedEvent(ScheduledTaskEventConfiguration eventConfig,
+                                 String caseId,
+                                 AbortCategory category,
+                                 String errorMessage,
+                                 Map<String, Long> metrics,
+                                 Map<String, String> customProperties) {
+        Map<String, String> properties = createCaseProperties(eventConfig, caseId, metrics, customProperties);
+        properties.put(ABORT_REASON, errorMessage);
+        properties.put(ABORT_CATEGORY, category != null ? category.name() : AbortCategory.OTHER.name());
+        properties.put(STATUS, ABORTED);
+
+        telemetryService.trackEvent(SCHEDULER_CASE_ABORTED, properties);
+    }
+
+    private Map<String, String> createCaseProperties(ScheduledTaskEventConfiguration eventConfig,
+                                                     String caseId,
+                                                     Map<String, Long> metrics,
+                                                     Map<String, String> customProperties) {
         Map<String, String> properties = new HashMap<>();
+        if (customProperties != null) {
+            properties.putAll(customProperties);
+        }
+        if (metrics != null) {
+            metrics.forEach((key, value) -> properties.put(METRIC_PREFIX + key, String.valueOf(value)));
+        }
         properties.put(SCHEDULER_NAME, eventConfig.getSchedulerName());
         properties.put(CASE_ID, caseId);
-        properties.put(ABORT_REASON, errorMessage);
-        properties.put(STATUS, ABORTED);
-        metrics.forEach((key, value) -> properties.put(METRIC_PREFIX + key, String.valueOf(value)));
-
-        telemetryService.trackEvent(eventConfig.getCaseAbortedEvent(), properties);
+        return properties;
     }
 
     public void jobCompletedEvent(ScheduledTaskEventConfiguration eventConfig, ScheduledJobReport report) {
         telemetryService.trackEvent(
-            eventConfig.getJobCompletedEvent(),
+            SCHEDULER_JOB_COMPLETED,
             Map.of(
                 SCHEDULER_NAME, eventConfig.getSchedulerName(),
                 TOTAL_CASES, String.valueOf(report.totalCases()),
@@ -123,7 +162,7 @@ public class ScheduledEventTracker {
 
     public void jobCompletedNoCasesEvent(ScheduledTaskEventConfiguration eventConfig, Duration searchDuration) {
         telemetryService.trackEvent(
-            eventConfig.getJobCompletedEvent(),
+            SCHEDULER_JOB_COMPLETED,
             Map.of(
                 SCHEDULER_NAME, eventConfig.getSchedulerName(),
                 TOTAL_CASES, ZERO,
@@ -140,7 +179,7 @@ public class ScheduledEventTracker {
 
     public void jobAbortedEvent(ScheduledTaskEventConfiguration eventConfig, ScheduledJobReport report) {
         telemetryService.trackEvent(
-            eventConfig.getJobAbortedEvent(),
+            SCHEDULER_JOB_ABORTED,
             Map.of(
                 SCHEDULER_NAME, eventConfig.getSchedulerName(),
                 TOTAL_CASES, String.valueOf(report.totalCases()),
@@ -158,7 +197,7 @@ public class ScheduledEventTracker {
 
     public void jobAbortedEvent(ScheduledTaskEventConfiguration eventConfig, String reason, Duration searchDuration) {
         telemetryService.trackEvent(
-            eventConfig.getJobAbortedEvent(),
+            SCHEDULER_JOB_ABORTED,
             Map.of(
                 SCHEDULER_NAME, eventConfig.getSchedulerName(),
                 TOTAL_CASES, ZERO,
@@ -176,7 +215,7 @@ public class ScheduledEventTracker {
 
     public void backPressureUpdatedEvent(ScheduledTaskEventConfiguration eventConfig, Duration oldDelay, Duration newDelay) {
         telemetryService.trackEvent(
-            eventConfig.getBackPressureUpdatedEvent(),
+            SCHEDULER_BACK_PRESSURE_UPDATED,
             Map.of(
                 SCHEDULER_NAME, eventConfig.getSchedulerName(),
                 PREVIOUS_DELAY, String.valueOf(oldDelay.toMillis()),
