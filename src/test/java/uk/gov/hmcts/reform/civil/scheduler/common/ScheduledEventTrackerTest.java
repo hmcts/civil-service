@@ -416,7 +416,7 @@ class ScheduledEventTrackerTest {
         );
 
         verify(telemetryService).trackEvent(
-            "TestSchedulerBackPressureUpdated",
+            ScheduledTaskEventConfiguration.SCHEDULER_BACK_PRESSURE_UPDATED,
             Map.of(
                 "schedulerName", "TestScheduler",
                 "previousDelay", "100",
