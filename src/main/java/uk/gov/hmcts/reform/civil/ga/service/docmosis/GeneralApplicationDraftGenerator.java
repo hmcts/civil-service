@@ -68,6 +68,8 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
         String claimantName = listGeneratorService.claimantsName(caseData);
         String defendantName = listGeneratorService.defendantsName(caseData);
 
+        GAHearingDetails hearingDetails = caseData.getGeneralAppHearingDetails();
+
         GADraftForm gaDraftForm = new GADraftForm()
             .setApplicationId(caseData.getCcdCaseReference().toString())
             .setClaimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
@@ -98,28 +100,24 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
             .setHearingDate(Objects.nonNull(caseData.getGeneralAppHearingDate())
                 ? caseData.getGeneralAppHearingDate().getHearingScheduledDate()
                 : null)
-            .setHearingPreferencesPreferredType(caseData.getGeneralAppHearingDetails()
-                .getHearingPreferencesPreferredType()
-                .getDisplayedValue())
-            .setReasonForPreferredHearingType(caseData.getGeneralAppHearingDetails()
-                .getReasonForPreferredHearingType())
-            .setHearingPreferredLocation(getHearingLocation(caseData))
-            .setHearingDetailsTelephoneNumber(caseData.getGeneralAppHearingDetails()
-                .getHearingDetailsTelephoneNumber())
-            .setHearingDetailsEmailId(caseData.getGeneralAppHearingDetails()
-                .getHearingDetailsEmailID())
-            .setUnavailableTrialRequiredYesOrNo(caseData.getGeneralAppHearingDetails()
-                .getUnavailableTrialRequiredYesOrNo())
-            .setUnavailableTrialDates(getAppUnavailabilityDates(caseData.getGeneralAppHearingDetails()))
-            .setVulnerabilityQuestionsYesOrNo(caseData.getGeneralAppHearingDetails().getVulnerabilityQuestionsYesOrNo())
-            .setSupportRequirement(getGaSupportRequirement(caseData))
-            .setSupportRequirementSignLanguage(caseData.getGeneralAppHearingDetails().getSupportRequirementSignLanguage())
-            .setIsSignLanguageExists(checkAdditionalSupport(caseData, SIGN_INTERPRETER))
-            .setSupportRequirementLanguageInterpreter(caseData.getGeneralAppHearingDetails()
-                .getSupportRequirementLanguageInterpreter())
-            .setIsLanguageInterpreterExists(checkAdditionalSupport(caseData, LANGUAGE_INTERPRETER))
-            .setSupportRequirementOther(caseData.getGeneralAppHearingDetails().getSupportRequirementOther())
-            .setIsOtherSupportExists(checkAdditionalSupport(caseData, OTHER_SUPPORT))
+            .setHearingPreferencesPreferredType(Optional.ofNullable(hearingDetails)
+                .map(GAHearingDetails::getHearingPreferencesPreferredType)
+                .map(type -> type.getDisplayedValue()).orElse(null))
+            .setReasonForPreferredHearingType(hearingDetails != null ? hearingDetails.getReasonForPreferredHearingType() : null)
+            .setHearingPreferredLocation(getHearingLocation(hearingDetails))
+            .setHearingDetailsTelephoneNumber(hearingDetails != null ? hearingDetails.getHearingDetailsTelephoneNumber() : null)
+            .setHearingDetailsEmailId(hearingDetails != null ? hearingDetails.getHearingDetailsEmailID() : null)
+            .setUnavailableTrialRequiredYesOrNo(hearingDetails != null ? hearingDetails.getUnavailableTrialRequiredYesOrNo() : null)
+            .setUnavailableTrialDates(getAppUnavailabilityDates(hearingDetails))
+            .setVulnerabilityQuestionsYesOrNo(hearingDetails != null ? hearingDetails.getVulnerabilityQuestionsYesOrNo() : null)
+            .setSupportRequirement(getGaSupportRequirement(hearingDetails))
+            .setSupportRequirementSignLanguage(hearingDetails != null ? hearingDetails.getSupportRequirementSignLanguage() : null)
+            .setIsSignLanguageExists(checkAdditionalSupport(caseData, hearingDetails, SIGN_INTERPRETER))
+            .setSupportRequirementLanguageInterpreter(hearingDetails != null
+                ? hearingDetails.getSupportRequirementLanguageInterpreter() : null)
+            .setIsLanguageInterpreterExists(checkAdditionalSupport(caseData, hearingDetails, LANGUAGE_INTERPRETER))
+            .setSupportRequirementOther(hearingDetails != null ? hearingDetails.getSupportRequirementOther() : null)
+            .setIsOtherSupportExists(checkAdditionalSupport(caseData, hearingDetails, OTHER_SUPPORT))
             .setName(caseData.getGeneralAppStatementOfTruth() != null ? caseData.getGeneralAppStatementOfTruth().getName() : null)
             .setRole(caseData.getGeneralAppStatementOfTruth() != null && caseData.getGeneralAppStatementOfTruth().getRole() != null
                 ? caseData.getGeneralAppStatementOfTruth().getRole() : null)
@@ -255,8 +253,9 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
         return Collections.emptyList();
     }
 
-    private Boolean checkAdditionalSupport(GeneralApplicationCaseData caseData, SupportRequirements additionalSupport) {
-        String appSupportRequirement = getGaSupportRequirement(caseData);
+    private Boolean checkAdditionalSupport(GeneralApplicationCaseData caseData, GAHearingDetails hearingDetails,
+                                           SupportRequirements additionalSupport) {
+        String appSupportRequirement = getGaSupportRequirement(hearingDetails);
         log.info("Check additional support for caseId: {}", caseData.getCcdCaseReference());
         return appSupportRequirement != null && appSupportRequirement.contains(additionalSupport.getDisplayedValue());
     }
@@ -305,21 +304,21 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
         return gaRespSupportRequirement;
     }
 
-    private String getGaSupportRequirement(GeneralApplicationCaseData caseData) {
+    private String getGaSupportRequirement(GAHearingDetails hearingDetails) {
         String gaSupportRequirement = null;
-        if (caseData.getGeneralAppHearingDetails() != null
-            && caseData.getGeneralAppHearingDetails().getSupportRequirement() != null) {
-            gaSupportRequirement = caseData.getGeneralAppHearingDetails().getSupportRequirement().stream().map(
+        if (hearingDetails != null
+            && hearingDetails.getSupportRequirement() != null) {
+            gaSupportRequirement = hearingDetails.getSupportRequirement().stream().map(
                 GAHearingSupportRequirements::getDisplayedValue).collect(Collectors.joining(", "));
         }
         return  gaSupportRequirement;
     }
 
-    private String getHearingLocation(GeneralApplicationCaseData caseData) {
+    private String getHearingLocation(GAHearingDetails hearingDetails) {
         String preferredLocation = null;
-        if (caseData.getGeneralAppHearingDetails() != null
-            && caseData.getGeneralAppHearingDetails().getHearingPreferredLocation() != null) {
-            preferredLocation = caseData.getGeneralAppHearingDetails().getHearingPreferredLocation()
+        if (hearingDetails != null
+            && hearingDetails.getHearingPreferredLocation() != null) {
+            preferredLocation = hearingDetails.getHearingPreferredLocation()
                 .getValue().getLabel();
         }
         return preferredLocation;
