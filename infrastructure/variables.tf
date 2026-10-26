@@ -70,6 +70,11 @@ variable "expected_schedulers" {
   description = "List of expected scheduler names that should run at least once within the job_not_run_threshold window"
 }
 
+variable "monitor_cmc_db_metric_alerts" {
+  default = {}
+  description = "Map of cmc database alerts to create, with action_group mapping"
+}
+
 variable "civil_service_alert_slack_email_secret_name" {
   type        = string
   description = "The name of the Key Vault secret containing the slack email group"

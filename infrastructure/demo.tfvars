@@ -34,3 +34,108 @@ expected_schedulers = [
   "TrialReadyCheck",
   "TrialReadyNotification"
 ]
+
+monitor_cmc_db_metric_alerts = {
+  "demo-cmc-db-cpu-warning" = {
+    description  = "Demo CMC DB CPU utilization >= 70% for 5 mins"
+    severity     = 2
+    enabled      = true
+    frequency    = "PT1M"
+    autoMitigate = true
+    window_size  = "PT5M"
+    criteria = [{
+      operator             = "GreaterThanOrEqual"
+      threshold            = 70
+      metricNamespace      = "Microsoft.DBforPostgreSQL/flexibleServers"
+      metricName           = "cpu_percent"
+      aggregation          = "Average"
+      skipMetricValidation = false
+    }]
+    action = [{ action_group_name = "demo-civil-service-slack-alert" }]
+  },
+  "demo-cmc-db-cpu-critical" = {
+    description  = "Demo CMC DB CPU utilization >= 85% for 5 mins"
+    severity     = 1
+    enabled      = true
+    frequency    = "PT1M"
+    autoMitigate = true
+    window_size  = "PT5M"
+    criteria = [{
+      operator             = "GreaterThanOrEqual"
+      threshold            = 85
+      metricNamespace      = "Microsoft.DBforPostgreSQL/flexibleServers"
+      metricName           = "cpu_percent"
+      aggregation          = "Average"
+      skipMetricValidation = false
+    }]
+    action = [{ action_group_name = "demo-civil-service-slack-alert" }]
+  },
+  "demo-cmc-db-storage-warning" = {
+    description  = "Demo CMC DB disk usage >= 80%"
+    severity     = 2
+    enabled      = true
+    frequency    = "PT5M"
+    autoMitigate = true
+    window_size  = "PT15M"
+    criteria = [{
+      operator             = "GreaterThanOrEqual"
+      threshold            = 80
+      metricNamespace      = "Microsoft.DBforPostgreSQL/flexibleServers"
+      metricName           = "storage_percent"
+      aggregation          = "Maximum"
+      skipMetricValidation = false
+    }]
+    action = [{ action_group_name = "demo-civil-service-slack-alert" }]
+  },
+  "demo-cmc-db-storage-critical" = {
+    description  = "Demo CMC DB disk usage >= 90%"
+    severity     = 1
+    enabled      = true
+    frequency    = "PT5M"
+    autoMitigate = true
+    window_size  = "PT15M"
+    criteria = [{
+      operator             = "GreaterThanOrEqual"
+      threshold            = 90
+      metricNamespace      = "Microsoft.DBforPostgreSQL/flexibleServers"
+      metricName           = "storage_percent"
+      aggregation          = "Maximum"
+      skipMetricValidation = false
+    }]
+    action = [{ action_group_name = "demo-civil-service-slack-alert" }]
+  },
+  "demo-cmc-db-memory-warning" = {
+    description  = "Demo CMC DB memory usage >= 85%"
+    severity     = 2
+    enabled      = true
+    frequency    = "PT1M"
+    autoMitigate = true
+    window_size  = "PT5M"
+    criteria = [{
+      operator             = "GreaterThanOrEqual"
+      threshold            = 85
+      metricNamespace      = "Microsoft.DBforPostgreSQL/flexibleServers"
+      metricName           = "memory_percent"
+      aggregation          = "Average"
+      skipMetricValidation = false
+    }]
+    action = [{ action_group_name = "demo-civil-service-slack-alert" }]
+  },
+  "demo-cmc-db-memory-critical" = {
+    description  = "Demo CMC DB memory usage >= 95%"
+    severity     = 1
+    enabled      = true
+    frequency    = "PT1M"
+    autoMitigate = true
+    window_size  = "PT5M"
+    criteria = [{
+      operator             = "GreaterThanOrEqual"
+      threshold            = 95
+      metricNamespace      = "Microsoft.DBforPostgreSQL/flexibleServers"
+      metricName           = "memory_percent"
+      aggregation          = "Average"
+      skipMetricValidation = false
+    }]
+    action = [{ action_group_name = "demo-civil-service-slack-alert" }]
+  }
+}
