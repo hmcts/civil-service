@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.exceptions.PaymentsApiException;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -50,6 +51,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {GaFeesPaymentService.class, GaCoreCaseDataService.class, PaymentStatusService.class,
     PaymentsClient.class, CaseDetailsConverter.class, ObjectMapper.class})
+@TestPropertySource(properties = "payments.retry.delay-ms=0")
 @EnableRetry
 class GaFeesPaymentServiceTest {
 
