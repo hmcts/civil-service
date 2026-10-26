@@ -18,7 +18,7 @@ locals {
 resource "azurerm_monitor_action_group" "civil-service-action-group" {
   for_each            = var.monitor_action_group
   name                = "${each.key}-${var.env}"
-  resource_group_name = local.resource_group_name
+  resource_group_name = local.civil_service_rg_name
   short_name          = try(each.value.short_name, null)
   tags                = var.common_tags
 
@@ -38,7 +38,7 @@ module "scheduler-fleet-aborted-alert" {
   enabled  = tostring(var.scheduler_alerts_enabled)
 
   app_insights_name  = module.application_insights.name
-  resourcegroup_name = local.resource_group_name
+  resourcegroup_name = local.civil_service_rg_name
 
   alert_name = "SchedulerFleetJobAbortedAlert-${var.env}"
   alert_desc = "Triggers when any scheduled task in ${var.env} has aborted."
@@ -69,7 +69,7 @@ module "scheduler-fleet-high-failure-rate-alert" {
   enabled  = tostring(var.scheduler_alerts_enabled)
 
   app_insights_name  = module.application_insights.name
-  resourcegroup_name = local.resource_group_name
+  resourcegroup_name = local.civil_service_rg_name
 
   alert_name = "SchedulerFleetHighFailureRateAlert-${var.env}"
   alert_desc = "Triggers when any scheduled task in ${var.env} experiences a failure rate exceeding 20%."
@@ -102,7 +102,7 @@ module "scheduler-fleet-job-not-run-alert" {
   enabled  = tostring(var.scheduler_alerts_enabled && length(var.expected_schedulers) > 0)
 
   app_insights_name  = module.application_insights.name
-  resourcegroup_name = local.resource_group_name
+  resourcegroup_name = local.civil_service_rg_name
 
   alert_name = "SchedulerFleetJobNotRunAlert-${var.env}"
   alert_desc = "Triggers when any expected scheduled task in ${var.env} has not run within the last ${var.job_not_run_threshold} hours."

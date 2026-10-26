@@ -9,7 +9,7 @@ ccd_service_bus_filter_rule = "jurisdiction_id IN ('IMPOSSIBLE_VALUE')"
 #================================================================================================
 # Azure Monitor
 #================================================================================================
-civil_service_alert_slack_email_secret_name = "civil-service-alert-slack-email"
+civil_service_alert_slack_email_secret_name = "civil-service-alert-slack-group-email"
 
 monitor_action_group = {
   "prod-civil-service-slack-alert" = {
