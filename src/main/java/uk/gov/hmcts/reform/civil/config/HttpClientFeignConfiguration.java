@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +36,18 @@ public class HttpClientFeignConfiguration {
     private int maxPerRoute;
     @Value("${http.client.maxTotal:25}")
     private int maxTotal;
+
+    /**
+     * Read-only POSTs that keep Feign's replay after a read timeout, as
+     * {@code <feign-client-name>:<path-suffix>}. The list is set only in {@code application.yaml}
+     * under {@code http.client.retry.replay-on-read-timeout}. There is deliberately no default here:
+     * if the property is missing the application fails to start, rather than read-only POSTs
+     * silently losing their replay. {@code FeignWriteEndpointReplayPolicyTest} fails when a new
+     * POST, PUT or PATCH Feign endpoint has not been classified, or when the list disagrees with
+     * the classification.
+     */
+    @Value("${http.client.retry.replay-on-read-timeout}")
+    private String replayOnReadTimeoutPaths;
 
     @Bean
     public PoolingHttpClientConnectionManager connectionManager4() {
@@ -75,10 +88,21 @@ public class HttpClientFeignConfiguration {
      *
      * <p>Declared here rather than left implicit so the behaviour is visible and owned. Defaults
      * are Feign's: 5 attempts, 100ms initial interval, 1s maximum.</p>
+     *
+     * <p>The one exception is a read timeout on a POST, PUT or PATCH: the server may already have
+     * processed it, so replaying it duplicates side effects or, for a CCD event submit, fails with
+     * a 404 because the event token is stale. Those are propagated so the Camunda task retry can
+     * re-run the handler with fresh data. Read-only POSTs in
+     * {@code http.client.retry.replay-on-read-timeout} ({@code application.yaml}) keep the replay.</p>
      */
     @Bean
-    public Retryer feignRetryer() {
-        return new Retryer.Default();
+    public Retryer feignRetryer(TelemetryClient telemetryClient) {
+        return new ReadTimeoutAwareRetryer(
+            Arrays.stream(replayOnReadTimeoutPaths.split(","))
+                .map(String::trim)
+                .filter(path -> !path.isEmpty())
+                .toList(),
+            telemetryClient);
     }
 
     @Bean
