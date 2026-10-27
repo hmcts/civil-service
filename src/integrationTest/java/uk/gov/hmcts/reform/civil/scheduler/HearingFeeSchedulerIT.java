@@ -4,8 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
@@ -23,7 +23,7 @@ import java.util.Map;
 
 import static java.util.stream.IntStream.rangeClosed;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -41,14 +41,15 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_HEARING_FEE_DUE;
 public class HearingFeeSchedulerIT {
 
     private static final Long CASE_ID = 1234L;
+    private static final String SCHEDULER_NAME = HearingFeeScheduler.SCHEDULER_NAME;
 
     @Autowired
     private HearingFeeScheduler scheduler;
 
-    @MockBean
+    @MockitoBean
     private TelemetryService telemetryService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @Autowired
@@ -86,8 +87,8 @@ public class HearingFeeSchedulerIT {
         scheduler.runScheduledTask();
 
         // Then
-        verify(telemetryService).trackEvent(eq("HearingFeeJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("HearingFeeJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
         coreCaseDataApiMockHelper.verifySubmitEvent(1);
     }
 
@@ -114,8 +115,8 @@ public class HearingFeeSchedulerIT {
         scheduler.runScheduledTask();
 
         // Then
-        verify(telemetryService).trackEvent(eq("HearingFeeJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("HearingFeeJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
         coreCaseDataApiMockHelper.verifySubmitEvent(1);
     }
 
@@ -142,8 +143,8 @@ public class HearingFeeSchedulerIT {
         scheduler.runScheduledTask();
 
         // Then
-        verify(telemetryService).trackEvent(eq("HearingFeeJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("HearingFeeJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
         coreCaseDataApiMockHelper.verifySubmitEvent(1);
     }
 
@@ -169,8 +170,8 @@ public class HearingFeeSchedulerIT {
         scheduler.runScheduledTask();
 
         // Then every case on both pages is processed
-        verify(telemetryService).trackEvent(eq("HearingFeeJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("HearingFeeJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
         coreCaseDataApiMockHelper.verifySubmitEvent(51);
     }
 
