@@ -1188,6 +1188,11 @@ class CaseEventTaskHandlerTest {
                 anyLong()
             );
         }
+
+        @Test
+        void shouldBeRetryGuarded() {
+            assertThat(caseEventTaskHandler.isRetryGuarded()).isTrue();
+        }
     }
 
     private static EventProperties configuredEventProperties() {

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import feign.FeignException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.camunda.bpm.client.task.ExternalTaskService;
@@ -7,13 +8,17 @@ import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 import uk.gov.hmcts.reform.civil.helpers.ExternalTaskExceptionHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.TelemetryService;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -25,15 +30,28 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
     public static final String FLOW_STATE = "flowState";
     public static final String FLOW_FLAGS = "flowFlags";
     public static final int SMALL_BATCH = 25;
+    public static final String GUARDED_RETRY_EVENT = "external.task.guarded.retry";
 
     protected final Logger log = LoggerFactory.getLogger(BaseExternalTaskHandler.class);
 
     private final ExternalTaskCompletionService externalTaskCompletionService;
     private final EventProperties eventProperties;
+    private TelemetryService telemetryService;
 
     protected BaseExternalTaskHandler(ExternalTaskCompletionService externalTaskCompletionService, EventProperties eventProperties) {
         this.externalTaskCompletionService = externalTaskCompletionService;
         this.eventProperties = eventProperties;
+    }
+
+    /**
+     * Optional: records the {@value #GUARDED_RETRY_EVENT} telemetry event. Not set outside Spring,
+     * in which case the event is skipped and only the log line is written.
+     *
+     * @param telemetryService the telemetry service
+     */
+    @Autowired(required = false)
+    public void setTelemetryService(TelemetryService telemetryService) {
+        this.telemetryService = telemetryService;
     }
 
     /**
@@ -63,7 +81,8 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
             handleTaskFailureNotRetryable(externalTask, externalTaskService, e);
         } catch (Exception e) {
             log.error("External task '{}' errored before handleFailure, processInstanceId '{}'", topicName, processInstanceId, e);
-            if (ExternalTaskExceptionHelper.isRetryable(e)) {
+            if (isRetryable(e)) {
+                recordGuardedRetry(externalTask, e);
                 handleTaskFailure(externalTask, externalTaskService, e);
             } else {
                 handleTaskFailureNotRetryable(externalTask, externalTaskService, e);
@@ -112,11 +131,94 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
         );
     }
 
+    /**
+     * The retries left once the current failure is counted, which is the value
+     * {@link #handleTaskFailure} passes to Camunda. A task that has not failed before has no
+     * retries recorded, so it starts from {@link #getMaxAttempts()}.
+     */
+    private int remainingRetriesAfterFailure(ExternalTask externalTask) {
+        Integer extRetries = externalTask.getRetries();
+        return (extRetries != null ? extRetries : getMaxAttempts()) - 1;
+    }
+
     @SuppressWarnings("java:S1168")
     public VariableMap getVariableMap(ExternalTaskData data) {
         return null;
     }
 
+    /**
+     * Determines whether an exception encountered while executing this task is retryable.
+     * Delegates to {@link ExternalTaskExceptionHelper#isRetryable(Throwable, boolean)} using
+     * {@link #isRetryGuarded()}.
+     *
+     * @param e the exception thrown during task handling
+     * @return true if the task failure is retryable, false otherwise
+     */
+    protected boolean isRetryable(Throwable e) {
+        return ExternalTaskExceptionHelper.isRetryable(e, isRetryGuarded());
+    }
+
+    /**
+     * Logs, and sends the {@value #GUARDED_RETRY_EVENT} telemetry event, when a guarded handler
+     * is about to retry a CCD event submit that failed with 502/503/504. This lets the retries
+     * be counted in production. No case data is recorded.
+     */
+    private void recordGuardedRetry(ExternalTask externalTask, Throwable e) {
+        if (!isRetryGuarded()) {
+            return;
+        }
+        FeignException failure = ExternalTaskExceptionHelper.findGuardedGatewayFailure(e);
+        if (failure == null) {
+            return;
+        }
+        String topicName = externalTask.getTopicName();
+        String processInstanceId = externalTask.getProcessInstanceId();
+        log.warn("Guarded external task '{}' will retry CCD event submit '{}' after HTTP {}, processInstanceId '{}'",
+                 topicName, ExternalTaskExceptionHelper.describeEndpoint(failure.request()),
+                 failure.status(), processInstanceId);
+        if (telemetryService == null) {
+            return;
+        }
+        try {
+            Map<String, String> properties = new HashMap<>();
+            properties.put("topic", String.valueOf(topicName));
+            properties.put("processInstanceId", String.valueOf(processInstanceId));
+            properties.put("status", String.valueOf(failure.status()));
+            properties.put("httpMethod", failure.request().httpMethod().name());
+            properties.put("retriesRemaining", String.valueOf(remainingRetriesAfterFailure(externalTask)));
+            telemetryService.trackEvent(GUARDED_RETRY_EVENT, properties);
+        } catch (Exception telemetryFailure) {
+            log.warn("Failed to track guarded retry telemetry", telemetryFailure);
+        }
+    }
+
+    /**
+     * Indicates whether this handler is protected by an idempotency guard. Overriding this to
+     * return true is a contract on the handler, not a switch to flip: the handler must call
+     * {@link #isEventAlreadyProcessed(ExternalTask, BusinessProcess)} (or an equivalent check) before
+     * every non-idempotent write, so that a re-run after a 502/503/504 skips a write that was
+     * in fact applied. It only affects CCD event submits (see
+     * {@link ExternalTaskExceptionHelper#isRetryable(Throwable, boolean)}). Defaults to false.
+     *
+     * @return true if this handler checks for already-completed work before each write
+     */
+    protected boolean isRetryGuarded() {
+        return false;
+    }
+
+    /**
+     * Checks whether the event for this task has already been submitted, by comparing the
+     * business process {@code processInstanceId} and {@code activityId} with the task's.
+     *
+     * <p>Known limitation: nothing else is compared. If a process loops back through the same
+     * activity within one process instance, a re-run could wrongly treat a submit that was never
+     * made as already done. Retrying 502/503/504 on guarded handlers makes that slightly more
+     * reachable, because those failures used to end as incidents.
+     *
+     * @param externalTask    the task being handled
+     * @param businessProcess the business process read back from CCD, may be null
+     * @return true if the same process instance and activity have already been recorded
+     */
     protected boolean isEventAlreadyProcessed(ExternalTask externalTask, BusinessProcess businessProcess) {
         return businessProcess != null
             && businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())
