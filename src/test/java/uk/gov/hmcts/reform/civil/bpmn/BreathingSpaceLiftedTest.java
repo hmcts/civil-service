@@ -16,19 +16,11 @@ class BreathingSpaceLiftedTest extends BpmnBaseTest {
     public static final String MESSAGE_NAME = "LIFT_BREATHING_SPACE_SPEC";
     public static final String PROCESS_ID = "BREATHING_SPACE_LIFTED";
 
-    private static final String NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED
-        = "NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED";
-    private static final String NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED
-        = "NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED";
     private static final String NOTIFY_LIP_APPLICANT_BREATHING_SPACE_LIFTED
         = "NOTIFY_LIP_APPLICANT_BREATHING_SPACE_LIFTED";
     private static final String NOTIFY_LIP_RESPONDENT1_BREATHING_SPACE_LIFTED
         = "NOTIFY_LIP_RESPONDENT1_BREATHING_SPACE_LIFTED";
 
-    private static final String NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID
-        = "NotifyApplicantSolicitorBSLifted";
-    private static final String NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID
-        = "NotifyRespondentSolicitorBSLifted";
     private static final String NOTIFY_LIP_APPLICANT_ACTIVITY_ID = "BreathingSpaceLiftedNotifyLipApplicant";
     private static final String NOTIFY_LIP_RESPONDENT_ACTIVITY_ID = "BreathingSpaceLiftedNotifyLipRespondent1";
 
@@ -44,17 +36,12 @@ class BreathingSpaceLiftedTest extends BpmnBaseTest {
         assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
 
         startBusinessProcess(variables);
-
-        ExternalTask respondentNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(
-            respondentNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED,
-            NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID,
-            variables
+            assertNextExternalTask(PROCESS_CASE_EVENT), PROCESS_CASE_EVENT,
+            "NOTIFY_EVENT", "BreathingSpaceLiftedNotifyParties", variables
         );
 
-        assertApplicantSolicitorNotificationAndEnd(variables);
+        assertEnd();
     }
 
     @Test
@@ -65,6 +52,10 @@ class BreathingSpaceLiftedTest extends BpmnBaseTest {
         assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
 
         startBusinessProcess(variables);
+        assertCompleteExternalTask(
+            assertNextExternalTask(PROCESS_CASE_EVENT), PROCESS_CASE_EVENT,
+            "NOTIFY_EVENT", "BreathingSpaceLiftedNotifyParties", variables
+        );
 
         ExternalTask lipRespondentNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(
@@ -95,14 +86,9 @@ class BreathingSpaceLiftedTest extends BpmnBaseTest {
         assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
 
         startBusinessProcess(variables);
-
-        ExternalTask respondentNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(
-            respondentNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED,
-            NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID,
-            variables
+            assertNextExternalTask(PROCESS_CASE_EVENT), PROCESS_CASE_EVENT,
+            "NOTIFY_EVENT", "BreathingSpaceLiftedNotifyParties", variables
         );
 
         ExternalTask lipApplicantNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
@@ -125,6 +111,10 @@ class BreathingSpaceLiftedTest extends BpmnBaseTest {
         assertThat(getProcessDefinitionByMessage(MESSAGE_NAME).getKey()).isEqualTo(PROCESS_ID);
 
         startBusinessProcess(variables);
+        assertCompleteExternalTask(
+            assertNextExternalTask(PROCESS_CASE_EVENT), PROCESS_CASE_EVENT,
+            "NOTIFY_EVENT", "BreathingSpaceLiftedNotifyParties", variables
+        );
 
         ExternalTask lipRespondentNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(
@@ -135,7 +125,7 @@ class BreathingSpaceLiftedTest extends BpmnBaseTest {
             variables
         );
 
-        assertApplicantSolicitorNotificationAndEnd(variables);
+        assertEnd();
     }
 
     @Test
@@ -147,19 +137,6 @@ class BreathingSpaceLiftedTest extends BpmnBaseTest {
         assertFailExternalTask(startBusiness, START_BUSINESS_TOPIC, START_BUSINESS_EVENT, START_BUSINESS_ACTIVITY);
 
         assertNoExternalTasksLeft();
-    }
-
-    private void assertApplicantSolicitorNotificationAndEnd(VariableMap variables) {
-        ExternalTask applicantNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            applicantNotification,
-            PROCESS_CASE_EVENT,
-            NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED,
-            NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED_ACTIVITY_ID,
-            variables
-        );
-
-        assertEnd();
     }
 
     private void assertEnd() {
