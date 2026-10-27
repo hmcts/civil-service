@@ -7,8 +7,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.scheduler.common.CivilScheduler;
+import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskRunner;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.AllowedEventFlowStateCheckFactory;
 import uk.gov.hmcts.reform.civil.service.search.TrialReadyNotificationSearchService;
+
+import java.util.List;
+
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
 
 @Component
 @RequiredArgsConstructor
@@ -20,6 +26,7 @@ public class TrialReadyNotificationScheduler implements CivilScheduler {
     private final TrialReadyNotificationSearchService searchService;
     private final ScheduledTaskRunner<CaseDetails, Long> scheduledTaskRunner;
     private final TrialReadyNotificationScheduledTask trialReadyNotificationScheduledTask;
+    private final AllowedEventFlowStateCheckFactory allowedEventFlowStateCheckFactory;
 
     @Override
     public String getName() {
@@ -33,9 +40,12 @@ public class TrialReadyNotificationScheduler implements CivilScheduler {
     @Override
     public void runScheduledTask() {
         scheduledTaskRunner.run(
-            SCHEDULER_NAME,
-            searchService::getElasticSearchResult,
-            trialReadyNotificationScheduledTask
+            ScheduledTaskConfiguration.<CaseDetails, Long>builder()
+                .schedulerName(SCHEDULER_NAME)
+                .searchResultSupplier(searchService::getElasticSearchResult)
+                .scheduledTask(trialReadyNotificationScheduledTask)
+                .interceptors(List.of(allowedEventFlowStateCheckFactory.forEvent(TRIAL_READY_NOTIFICATION)))
+                .build()
         );
     }
 }

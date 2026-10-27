@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
+import java.time.LocalDateTime;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
@@ -75,7 +77,35 @@ class OnGoingBusinessProcessCheckTest {
     }
 
     @Test
-    void shouldThrowTaskAbortedException_whenCaseHasOngoingBusinessProcess() {
+    void shouldThrowTaskAbortedException_whenCaseHasOngoingBusinessProcessWithAllDetails() {
+        LocalDateTime readyOn = LocalDateTime.of(2026, 10, 13, 12, 0, 0);
+        CaseDetails caseDetails = CaseDetails.builder().id(123L).caseTypeId(CASE_TYPE).data(java.util.Map.of()).build();
+        CaseData caseData = new CaseDataBuilder()
+            .businessProcess(new BusinessProcess()
+                .setStatus(BusinessProcessStatus.STARTED)
+                .setCamundaEvent("CREATE_CLAIM")
+                .setActivityId("GenerateClaimForm")
+                .setProcessInstanceId("process-1234")
+                .setReadyOn(readyOn))
+            .build();
+
+        InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", caseDetails);
+        when(coreCaseDataService.getCase(123L)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+
+        TaskAbortedException exception = assertThrows(TaskAbortedException.class, () -> check.accept(context, chain));
+        assertThat(exception.getReason()).isEqualTo("Ongoing business process");
+        assertThat(exception.getCategory()).isEqualTo(AbortCategory.ONGOING_BUSINESS_PROCESS);
+        assertThat(context.getProperties()).containsEntry("businessProcessStatus", "STARTED");
+        assertThat(context.getProperties()).containsEntry("camundaEvent", "CREATE_CLAIM");
+        assertThat(context.getProperties()).containsEntry("activityId", "GenerateClaimForm");
+        assertThat(context.getProperties()).containsEntry("processInstanceId", "process-1234");
+        assertThat(context.getProperties()).containsEntry("businessProcessReadyOn", readyOn.toString());
+        verify(chain, never()).next(context);
+    }
+
+    @Test
+    void shouldThrowTaskAbortedException_whenCaseHasOngoingBusinessProcessWithMinimalDetails() {
         CaseDetails caseDetails = CaseDetails.builder().id(123L).caseTypeId(CASE_TYPE).data(java.util.Map.of()).build();
         CaseData caseData = new CaseDataBuilder()
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.STARTED))
@@ -87,14 +117,24 @@ class OnGoingBusinessProcessCheckTest {
 
         TaskAbortedException exception = assertThrows(TaskAbortedException.class, () -> check.accept(context, chain));
         assertThat(exception.getReason()).isEqualTo("Ongoing business process");
+        assertThat(exception.getCategory()).isEqualTo(AbortCategory.ONGOING_BUSINESS_PROCESS);
+        assertThat(context.getProperties()).containsEntry("businessProcessStatus", "STARTED");
+        assertThat(context.getProperties())
+            .doesNotContainKeys("camundaEvent", "activityId", "processInstanceId", "businessProcessReadyOn");
         verify(chain, never()).next(context);
     }
 
     @Test
-    void shouldThrowTaskAbortedException_whenGACaseHasOngoingBusinessProcess() {
+    void shouldThrowTaskAbortedException_whenGACaseHasOngoingBusinessProcessWithAllDetails() {
+        LocalDateTime readyOn = LocalDateTime.of(2026, 10, 13, 12, 0, 0);
         CaseDetails caseDetails = CaseDetails.builder().id(123L).caseTypeId(GENERALAPPLICATION_CASE_TYPE).data(java.util.Map.of()).build();
         GeneralApplicationCaseData gaCaseData = new GeneralApplicationCaseData();
-        gaCaseData.setBusinessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.STARTED));
+        gaCaseData.setBusinessProcess(new BusinessProcess()
+            .setStatus(BusinessProcessStatus.READY)
+            .setCamundaEvent("INITIATE_GENERAL_APPLICATION")
+            .setActivityId("CreatePDF")
+            .setProcessInstanceId("ga-process-5678")
+            .setReadyOn(readyOn));
 
         InterceptorContext<CaseDetails> context = new InterceptorContext<>("scheduler", caseDetails);
         when(coreCaseDataService.getCase(123L)).thenReturn(caseDetails);
@@ -102,7 +142,12 @@ class OnGoingBusinessProcessCheckTest {
 
         TaskAbortedException exception = assertThrows(TaskAbortedException.class, () -> check.accept(context, chain));
         assertThat(exception.getReason()).isEqualTo("Ongoing business process");
+        assertThat(exception.getCategory()).isEqualTo(AbortCategory.ONGOING_BUSINESS_PROCESS);
+        assertThat(context.getProperties()).containsEntry("businessProcessStatus", "READY");
+        assertThat(context.getProperties()).containsEntry("camundaEvent", "INITIATE_GENERAL_APPLICATION");
+        assertThat(context.getProperties()).containsEntry("activityId", "CreatePDF");
+        assertThat(context.getProperties()).containsEntry("processInstanceId", "ga-process-5678");
+        assertThat(context.getProperties()).containsEntry("businessProcessReadyOn", readyOn.toString());
         verify(chain, never()).next(context);
     }
-
 }
