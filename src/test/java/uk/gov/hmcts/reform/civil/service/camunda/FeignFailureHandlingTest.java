@@ -183,10 +183,21 @@ class FeignFailureHandlingTest {
     /** Minimal external task handler whose business logic is one upstream Feign call. */
     static class UpstreamCallingHandler extends BaseExternalTaskHandler {
         private final Runnable upstreamCall;
+        private final boolean retryGuarded;
 
         UpstreamCallingHandler(ExternalTaskCompletionService completionService, EventProperties properties, Runnable upstreamCall) {
+            this(completionService, properties, upstreamCall, false);
+        }
+
+        UpstreamCallingHandler(ExternalTaskCompletionService completionService, EventProperties properties, Runnable upstreamCall, boolean retryGuarded) {
             super(completionService, properties);
             this.upstreamCall = upstreamCall;
+            this.retryGuarded = retryGuarded;
+        }
+
+        @Override
+        protected boolean isRetryGuarded() {
+            return retryGuarded;
         }
 
         @Override
@@ -262,6 +273,10 @@ class FeignFailureHandlingTest {
             return new UpstreamCallingHandler(completionService, eventProperties, call);
         }
 
+        private UpstreamCallingHandler guardedHandler(Runnable call) {
+            return new UpstreamCallingHandler(completionService, eventProperties, call, true);
+        }
+
         @Test
         void upstream500OnRead_isRetriedWithBackoff() {
             responseStatus = 500;
@@ -300,12 +315,21 @@ class FeignFailureHandlingTest {
         }
 
         @Test
-        void upstream502OnNonIdempotentWrite_failsImmediately() {
+        void upstream502OnNonIdempotentWrite_failsImmediatelyWhenUnguarded() {
             responseStatus = 502;
 
             handler(() -> camundaClient.setProcessVariables("proc-1", Map.of("flag", true))).execute(externalTask, externalTaskService);
 
             verify(externalTaskService).handleFailure(eq(externalTask), anyString(), anyString(), eq(0), eq(1000L));
+        }
+
+        @Test
+        void upstream502OnNonIdempotentWrite_isRetriedWhenGuarded() {
+            responseStatus = 502;
+
+            guardedHandler(FeignFailureHandlingTest.this::submitCcdEvent).execute(externalTask, externalTaskService);
+
+            verify(externalTaskService).handleFailure(eq(externalTask), anyString(), anyString(), eq(MAX_RETRIES - 1), longThat(backoff -> backoff > 0));
         }
 
         @Test

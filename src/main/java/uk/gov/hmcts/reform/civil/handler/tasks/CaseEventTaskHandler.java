@@ -392,4 +392,9 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
             default -> null;
         };
     }
+
+    @Override
+    protected boolean isRetryGuarded() {
+        return true;
+    }
 }
