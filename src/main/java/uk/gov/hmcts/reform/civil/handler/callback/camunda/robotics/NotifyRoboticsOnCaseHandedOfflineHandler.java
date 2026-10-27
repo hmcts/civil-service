@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.robotics;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -19,7 +18,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_ON_CASE_HANDED_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RETRY_NOTIFY_RPA_ON_CASE_HANDED_OFFLINE;
 
-@Slf4j
 @Service
 public class NotifyRoboticsOnCaseHandedOfflineHandler extends CallbackHandler {
 
@@ -48,12 +46,7 @@ public class NotifyRoboticsOnCaseHandedOfflineHandler extends CallbackHandler {
     private CallbackResponse notifyRobotics(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = (String) callbackParams.getParams().get(BEARER_TOKEN);
-        String caseReference = caseData.getLegacyCaseReference();
 
-        log.info(
-            "Notifying RPA on case handed offline for case: {} (Breathing Space included when present)",
-            caseReference
-        );
         roboticsNotifier.notifyRobotics(caseData, authToken);
 
         return SubmittedCallbackResponse.builder().build();
