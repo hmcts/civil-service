@@ -5,14 +5,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONException;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 
-@ExtendWith(PactConsumerTestExt.class)
+@ExtendWith({PactConsumerTestExt.class, SpringExtension.class})
 @ActiveProfiles({"integration-test", "contract-test"})
-@SpringBootTest
+@ContextConfiguration(classes = ConsumerContractTestConfiguration.class,
+    initializers = ConfigDataApplicationContextInitializer.class)
 public class BaseContractTest {
 
     public static final String AUTHORIZATION_HEADER = "Authorization";

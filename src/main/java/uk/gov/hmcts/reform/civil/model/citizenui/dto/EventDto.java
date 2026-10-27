@@ -16,5 +16,5 @@ public class EventDto {
 
     private CaseEvent event;
     private Map<String, Object> caseDataUpdate;
-
+    private String submissionId;
 }

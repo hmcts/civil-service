@@ -16,6 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -58,6 +59,7 @@ import static uk.gov.hmcts.reform.civil.enums.FeeType.HEARING;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {FeesPaymentService.class, CoreCaseDataService.class, PaymentStatusService.class,
     PaymentsClient.class, CaseDetailsConverter.class, PinInPostConfiguration.class, ObjectMapper.class})
+@TestPropertySource(properties = "payments.retry.delay-ms=0")
 @EnableRetry
 class FeesPaymentServiceTest {
 
@@ -225,6 +227,36 @@ class FeesPaymentServiceTest {
             BEARER_TOKEN,
             CARD_PAYMENT_SERVICE_REQUEST
         )).thenThrow(alreadyPaidException());
+
+        CardPaymentStatusResponse govPaymentRequest =
+            feesPaymentService.createGovPaymentRequest(FeeType.HEARING, "1701090368574910", BEARER_TOKEN);
+
+        assertThat(govPaymentRequest)
+            .isEqualTo(new CardPaymentStatusResponse()
+                           .setExternalReference("2023-1701090705688")
+                           .setPaymentReference("2023-1701090705688")
+                           .setStatus("Success"));
+
+        verify(paymentsClient).createGovPayCardPaymentRequest(
+            "2023-1701090705688",
+            BEARER_TOKEN,
+            CARD_PAYMENT_SERVICE_REQUEST
+        );
+    }
+
+    @Test
+    void shouldTreatAlreadyPaidServiceRequestAsSuccessfulWhenCreatePaymentRequestReturnsFound() {
+        when(paymentsClient.createGovPayCardPaymentRequest(
+            "2023-1701090705688",
+            BEARER_TOKEN,
+            CARD_PAYMENT_SERVICE_REQUEST
+        )).thenThrow(FeignException.errorStatus(
+            "createGovPayCardPaymentRequest",
+            Response.builder()
+                .request(Request.create(Request.HttpMethod.POST, "/card-payments", new HashMap<>(), null, null, null))
+                .status(302)
+                .build()
+        ));
 
         CardPaymentStatusResponse govPaymentRequest =
             feesPaymentService.createGovPaymentRequest(FeeType.HEARING, "1701090368574910", BEARER_TOKEN);
