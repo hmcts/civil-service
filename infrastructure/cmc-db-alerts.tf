@@ -22,8 +22,8 @@ resource "azurerm_monitor_metric_alert" "civil-ci-alerts" {
   dynamic "criteria" {
     for_each = try(each.value.criteria, [])
     content {
-      metric_namespace       = criteria.value.metricNamespace
-      metric_name            = criteria.value.metricName
+      metric_namespace       = criteria.value.metric_namespace
+      metric_name            = criteria.value.metric_name
       threshold              = criteria.value.threshold
       operator               = criteria.value.operator
       aggregation            = criteria.value.aggregation
