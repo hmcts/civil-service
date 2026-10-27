@@ -524,7 +524,11 @@ def sonarExclusions = [
   "**/informagreedextensiondate/InformAgreedExtensionDateRespSolTwoEmailDTOGenerator.java",
   "**/setasidejudgementrequest/SetAsideJudgementRequestAppSolOneEmailDTOGenerator.java",
   "**/setasidejudgementrequest/SetAsideJudgementRequestRespSolOneEmailDTOGenerator.java",
- " **/setasidejudgementrequest/SetAsideJudgementRequestRespSolTwoEmailDTOGenerator.java"
+ " **/setasidejudgementrequest/SetAsideJudgementRequestRespSolTwoEmailDTOGenerator.java",
+  "**/notification/handlers/breathingspace/BreathingSpaceEnterRespSolOneEmailDTOGenerator.java",
+  "**/notification/handlers/breathingspace/BreathingSpaceEnterAppSolOneEmailDTOGenerator.java",
+  "**/notification/handlers/breathingspace/BreathingSpaceLiftedAppSolOneEmailDTOGenerator.java",
+  "**/notification/handlers/breathingspace/BreathingSpaceEnterRespSolTwoEmailDTOGenerator.java"
 ]
 
 def sonarCoverageExclusions = [
