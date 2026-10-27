@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -112,6 +113,9 @@ public class GaCoreCaseDataService {
         try {
             return submitUpdate(caseId, caseDataContent, systemUpdateUser);
         } catch (Exception e) {
+            if (!isAuthFailure(e)) {
+                throw e;
+            }
             log.info(e.getMessage());
             log.info(RETRY_MSG);
             systemUpdateUser = refreshSystemUpdateUser();
@@ -138,6 +142,9 @@ public class GaCoreCaseDataService {
         try {
             return submitGaUpdate(caseId, caseDataContent, systemUpdateUser);
         } catch (Exception e) {
+            if (!isAuthFailure(e)) {
+                throw e;
+            }
             log.info(e.getMessage());
             log.info(RETRY_MSG);
             systemUpdateUser = refreshSystemUpdateUser();
@@ -321,6 +328,9 @@ public class GaCoreCaseDataService {
         try {
             return submitForCaseWorker(caseDataContent, systemUpdateUser);
         } catch (Exception e) {
+            if (!isAuthFailure(e)) {
+                throw e;
+            }
             log.info(e.getMessage());
             log.info(RETRY_MSG);
             systemUpdateUser = refreshSystemUpdateUser();
@@ -394,6 +404,24 @@ public class GaCoreCaseDataService {
         caseDataContent.getEvent().setDescription(eventDescription);
 
         submitGaUpdate(caseId.toString(), caseDataContent);
+    }
+
+    /**
+     * True when the failure is CCD rejecting the user token (401/403), so the request was not
+     * processed and can be sent again with a fresh token. An event submit must not be resent after
+     * any other failure (read timeout, 5xx): the same event token may already have been used, and
+     * the resend would get a 404 "No field found". A case create must not be resent either, as the
+     * first create may have been applied and the resend would create a duplicate case. Those
+     * failures are left to the task-level retry.
+     */
+    private static boolean isAuthFailure(Throwable throwable) {
+        for (Throwable current = throwable; current != null; current = current.getCause()) {
+            if (current instanceof FeignException feignException
+                && (feignException.status() == 401 || feignException.status() == 403)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
