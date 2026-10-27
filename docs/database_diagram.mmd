@@ -2,7 +2,6 @@
 erDiagram
   dbs_dashboard_notifications {
     uuid id PK "not null"
-    integer notification_action_id FK "nullable"
     varchar reference "nullable"
     varchar notification_name "nullable"
     varchar citizen_role "nullable"
@@ -17,6 +16,18 @@ erDiagram
     timestamp updated_on "nullable"
     timestamp deadline "nullable"
     varchar time_to_live "nullable"
+  }
+
+  dbs_draft_store {
+    uuid id PK "not null"
+    varchar user_id "not null"
+    varchar case_id "nullable"
+    varchar draft_type "not null"
+    jsonb payload "not null"
+    timestamp created_at "not null"
+    timestamp updated_at "not null"
+    timestamp expires_at "not null"
+    varchar submission_id "nullable"
   }
 
   dbs_notification_action {
@@ -68,6 +79,5 @@ erDiagram
     character_varying updated_by "nullable"
   }
 
-  dbs_notification_action ||--o{ dbs_dashboard_notifications : "fk_dbs_dashboard_notifications_notification_action_id"
   dbs_dashboard_notifications ||--o{ dbs_notification_action : "fk_dashboard_notifications_id"
   dbs_task_item_template ||--o{ dbs_task_list : "fk_task_list_task_item_template"
