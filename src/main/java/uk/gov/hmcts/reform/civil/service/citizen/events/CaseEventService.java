@@ -112,7 +112,7 @@ public class CaseEventService {
 
     public CaseDetails submitEventForNewClaim(EventSubmissionParams params) {
         if (!params.hasSubmissionId()) {
-            return createNewClaim(params);
+            return createNewClaim(params, null);
         }
 
         Optional<DraftStoreEntity> bySubmission = draftStoreService.getDraftBySubmissionId(
@@ -171,7 +171,7 @@ public class CaseEventService {
     private CaseDetails createAndLink(UUID draftId, EventSubmissionParams params) {
         CaseDetails created;
         try {
-            created = createNewClaim(params);
+            created = createNewClaim(params, draftId);
         } catch (RuntimeException ex) {
             if (isDefinitiveCcdClientFailure(ex)) {
                 log.warn(
@@ -254,8 +254,23 @@ public class CaseEventService {
         );
     }
 
-    private CaseDetails createNewClaim(EventSubmissionParams params) {
-        StartEventResponse eventResponse = startEvent(params.getAuthorisation(), params.getUserId(), params.getEvent());
+    private CaseDetails createNewClaim(EventSubmissionParams params, UUID draftId) {
+        StartEventResponse eventResponse;
+        try {
+            eventResponse = startEvent(params.getAuthorisation(), params.getUserId(), params.getEvent());
+        } catch (RuntimeException ex) {
+            // No CCD case exists when start-event fails, so the draft claim is
+            // safe to release and retry. Keep the claim for failures after the
+            // start event because CCD may have created a case already.
+            if (draftId != null) {
+                draftStoreService.releaseFailedSubmissionClaim(
+                    draftId,
+                    params.getUserId(),
+                    DraftType.DRAFT_CLAIM
+                );
+            }
+            throw ex;
+        }
         Map<String, Object> updates = new HashMap<>();
         if (params.getUpdates() != null) {
             updates.putAll(params.getUpdates());

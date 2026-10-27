@@ -286,6 +286,36 @@ public class CaseEventServiceTest {
     }
 
     @Test
+    void shouldReleaseFailedSubmissionClaimWhenCcdStartEventTimesOut() {
+        DraftStoreEntity draft = blankDraft();
+        FeignException timeout = new FeignException.GatewayTimeout(
+            "gateway timeout",
+            Request.create(Request.HttpMethod.POST, "url", Map.of(), null, null, null),
+            null,
+            null
+        );
+        given(draftStoreService.getDraftBySubmissionId(SUBMISSION_ID, USER_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.empty());
+        given(draftStoreService.getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM)).willReturn(Optional.of(draft));
+        given(draftStoreService.claimSubmission(DRAFT_ID, USER_ID, SUBMISSION_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(true);
+        given(coreCaseDataApi.startForCitizen(any(), any(), any(), any(), any(), any()))
+            .willThrow(timeout);
+
+        assertThatThrownBy(() -> caseEventService.submitEvent(new EventSubmissionParams()
+                                                                  .setUpdates(Maps.newHashMap())
+                                                                  .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+                                                                  .setCaseId(DRAFT)
+                                                                  .setUserId(USER_ID)
+                                                                  .setAuthorisation(AUTHORISATION)
+                                                                  .setSubmissionId(SUBMISSION_ID)))
+            .isSameAs(timeout);
+
+        verify(draftStoreService).releaseFailedSubmissionClaim(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM);
+        verify(coreCaseDataApi, never()).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
+    }
+
+    @Test
     void shouldNotReleaseSubmissionClaimWhenCcdCreateTimesOut() {
         DraftStoreEntity draft = blankDraft();
         FeignException timeout = new FeignException.GatewayTimeout(
