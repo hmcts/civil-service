@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.service.camunda;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.sun.net.httpserver.HttpServer;
+import feign.FeignException;
+import feign.RetryableException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.AfterAll;
@@ -27,10 +29,14 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertySource;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
+import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.civil.config.HttpClientFeignConfiguration;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.event.DispatchBusinessProcessEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
+import uk.gov.hmcts.reform.civil.helpers.ExternalTaskExceptionHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
@@ -45,12 +51,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.longThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -63,9 +73,10 @@ import static org.mockito.Mockito.when;
  * Feign stack (Spring Cloud OpenFeign, the production {@link HttpClientFeignConfiguration}
  * with its Apache client, read timeout and default {@code ErrorDecoder} bean) against a
  * local HTTP server that returns whatever status or delay each test asks for. Only the
- * production {@link CamundaRuntimeApi} client is registered: a test-only {@code @FeignClient}
- * would be picked up by the application's {@code @EnableFeignClients} scan in the integration
- * and contract test contexts, where its URL property does not exist.
+ * production {@link CamundaRuntimeApi} and {@link CoreCaseDataApi} clients are registered: a
+ * test-only {@code @FeignClient} would be picked up by the application's
+ * {@code @EnableFeignClients} scan in the integration and contract test contexts, where its URL
+ * property does not exist.
  *
  * <p>Two things are under test. First, that an external task classifies upstream failures
  * the way production traffic needs: 500 and idempotent 5xx retry with backoff, 4xx and
@@ -97,6 +108,15 @@ class FeignFailureHandlingTest {
     private static HttpServer server;
     private static volatile int responseStatus = 200;
     private static volatile long responseDelayMs = 0;
+    /**
+     * When positive, delays only the first request; later ones use {@code responseDelayMs}.
+     */
+    private static volatile long firstRequestDelayMs = 0;
+    /**
+     * When positive, every request after the first answers with this status and CCD's 404 body.
+     */
+    private static volatile int laterRequestStatus = 0;
+    private static final AtomicInteger requestCount = new AtomicInteger();
     private static final List<String> requestLog = new CopyOnWriteArrayList<>();
 
     @BeforeAll
@@ -110,16 +130,19 @@ class FeignFailureHandlingTest {
                 body = new String(in.readAllBytes(), StandardCharsets.UTF_8);
             }
             requestLog.add(exchange.getRequestMethod() + " " + exchange.getRequestURI().getPath() + " " + body);
-            if (responseDelayMs > 0) {
+            boolean replay = requestCount.incrementAndGet() > 1;
+            long delay = !replay && firstRequestDelayMs > 0 ? firstRequestDelayMs : responseDelayMs;
+            if (delay > 0) {
                 try {
-                    Thread.sleep(responseDelayMs);
+                    Thread.sleep(delay);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
-            byte[] payload = "{}".getBytes(StandardCharsets.UTF_8);
+            boolean staleReplay = replay && laterRequestStatus > 0;
+            byte[] payload = (staleReplay ? "{\"message\":\"No field found\"}" : "{}").getBytes(StandardCharsets.UTF_8);
             exchange.getResponseHeaders().add("Content-Type", "application/json");
-            exchange.sendResponseHeaders(responseStatus, payload.length);
+            exchange.sendResponseHeaders(staleReplay ? laterRequestStatus : responseStatus, payload.length);
             exchange.getResponseBody().write(payload);
             exchange.close();
         });
@@ -135,6 +158,7 @@ class FeignFailureHandlingTest {
     static void properties(DynamicPropertyRegistry registry) {
         Supplier<Object> url = () -> "http://127.0.0.1:" + server.getAddress().getPort();
         registry.add("feign.client.config.processInstance.url", url);
+        registry.add("core_case_data.api.url", url);
         registry.add("http.client.readTimeout", () -> READ_TIMEOUT_MS);
         registry.add("http.client.connectTimeout", () -> 1000);
         registry.add("http.client.requestTimeout", () -> 1000);
@@ -142,12 +166,17 @@ class FeignFailureHandlingTest {
         // timeout, and application.yaml sets the default to 30s; pin it so the delay tests time out.
         registry.add("spring.cloud.openfeign.client.config.default.readTimeout", () -> READ_TIMEOUT_MS);
         registry.add("spring.cloud.openfeign.client.config.default.connectTimeout", () -> 1000);
+        // application.yaml gives the CCD client its own 25s read timeout, as in production
+        registry.add("spring.cloud.openfeign.client.config.core-case-data-api.readTimeout", () -> READ_TIMEOUT_MS);
     }
 
     @BeforeEach
     void reset() {
         responseStatus = 200;
         responseDelayMs = 0;
+        firstRequestDelayMs = 0;
+        laterRequestStatus = 0;
+        requestCount.set(0);
         requestLog.clear();
     }
 
@@ -169,7 +198,7 @@ class FeignFailureHandlingTest {
 
     @Configuration
     @Profile(PROFILE)
-    @EnableFeignClients(clients = CamundaRuntimeApi.class)
+    @EnableFeignClients(clients = {CamundaRuntimeApi.class, CoreCaseDataApi.class})
     @ImportAutoConfiguration({FeignAutoConfiguration.class, HttpMessageConvertersAutoConfiguration.class, JacksonAutoConfiguration.class})
     @Import({HttpClientFeignConfiguration.class, CamundaRuntimeClient.class, EventEmitterService.class})
     static class Config {
@@ -192,6 +221,9 @@ class FeignFailureHandlingTest {
 
     @Autowired
     private CamundaRuntimeClient camundaClient;
+
+    @Autowired
+    private CoreCaseDataApi coreCaseDataApi;
 
     @Autowired
     private EventEmitterService eventEmitterService;
@@ -291,6 +323,33 @@ class FeignFailureHandlingTest {
         }
 
         @Test
+        void upstreamReadTimeoutOnWrite_isSentOnceAndLeftToTheTaskRetry() {
+            responseDelayMs = READ_TIMEOUT_MS * 3L;
+
+            handler(() -> camundaClient.setProcessVariables("proc-1", Map.of("flag", true))).execute(externalTask, externalTaskService);
+
+            assertThat(requestLog)
+                .as("a write that timed out on read must not be replayed with the same payload")
+                .hasSize(1);
+            verify(externalTaskService).handleFailure(eq(externalTask), anyString(), anyString(), eq(MAX_RETRIES - 1), longThat(backoff -> backoff > 0));
+        }
+
+        @Test
+        void ccdEventSubmitReadTimeout_isSentOnceAndLeftToTheTaskRetry() {
+            firstRequestDelayMs = READ_TIMEOUT_MS * 3L;
+            // what CCD answers a replay with once the event token is stale
+            laterRequestStatus = 404;
+
+            handler(() -> submitCcdEvent()).execute(externalTask, externalTaskService);
+
+            assertThat(requestLog)
+                .as("the event submit must not be replayed with the same token")
+                .hasSize(1);
+            verify(externalTaskService).handleFailure(eq(externalTask), anyString(), anyString(), eq(MAX_RETRIES - 1), longThat(backoff -> backoff > 0));
+            verify(completionService, never()).completeTask(any(), any(), any(), any());
+        }
+
+        @Test
         void lastRetry_decrementsToZero() {
             responseStatus = 500;
             when(externalTask.getRetries()).thenReturn(1);
@@ -298,6 +357,85 @@ class FeignFailureHandlingTest {
             handler(() -> camundaClient.getProcessVariables("proc-1")).execute(externalTask, externalTaskService);
 
             verify(externalTaskService).handleFailure(eq(externalTask), anyString(), anyString(), eq(0), longThat(backoff -> backoff > 0));
+        }
+    }
+
+    private void submitCcdEvent() {
+        coreCaseDataApi.submitEventForCaseWorker(
+            "Bearer user-token", "s2s-token", "user-1", "CIVIL", "CIVIL", "1792636528942239", true,
+            CaseDataContent.builder()
+                .event(Event.builder().id("CREATE_CLAIM").build())
+                .eventToken("token-1")
+                .data(Map.of())
+                .build());
+    }
+
+    private List<String> requestsTo(String pathSuffix) {
+        return requestLog.stream().filter(r -> r.split(" ")[1].endsWith(pathSuffix)).toList();
+    }
+
+    /**
+     * The CCD event submit from the ticket, through the production {@link CoreCaseDataApi} client
+     * and the real Feign stack. A timed-out submit that is replayed with the same event token is
+     * rejected by CCD with a 404 "No field found", which the task handler does not retry, so the
+     * case stalls. The submit must be sent once and surface as retryable instead.
+     */
+    @Nested
+    class CcdEventSubmit {
+
+        @Test
+        void readTimeout_isSentOnceAndSurfacesAsRetryable() {
+            firstRequestDelayMs = READ_TIMEOUT_MS * 3L;
+            laterRequestStatus = 404;
+
+            assertThatThrownBy(FeignFailureHandlingTest.this::submitCcdEvent)
+                .isInstanceOf(RetryableException.class)
+                .satisfies(e -> assertThat(ExternalTaskExceptionHelper.isRetryable(e)).isTrue());
+
+            assertThat(requestsTo("/events")).hasSize(1);
+            assertThat(requestLog).hasSize(1);
+            // the real request template carries the client name and Feign method, so the suppressed
+            // replay can be traced to the endpoint in production
+            verify(telemetryClient).trackEvent(
+                eq("feign.replay.suppressed"),
+                argThat(properties -> "POST".equals(properties.get("method"))
+                    && "core-case-data-api".equals(properties.get("client"))
+                    && properties.get("endpoint").startsWith("CoreCaseDataApi#submitEventForCaseWorker(")),
+                isNull());
+        }
+
+        @Test
+        void staleTokenReplay404_isNotRetryable() {
+            responseStatus = 404;
+
+            assertThatThrownBy(FeignFailureHandlingTest.this::submitCcdEvent)
+                .isInstanceOf(FeignException.NotFound.class)
+                .satisfies(e -> assertThat(ExternalTaskExceptionHelper.isRetryable(e)).isFalse());
+
+            assertThat(requestsTo("/events")).hasSize(1);
+        }
+
+        @Test
+        void searchCasesReadTimeout_keepsTheReplay() {
+            responseDelayMs = READ_TIMEOUT_MS * 3L;
+
+            assertThatThrownBy(() -> coreCaseDataApi.searchCases("Bearer user-token", "s2s-token", "CIVIL", "{}"))
+                .isInstanceOf(RetryableException.class);
+
+            assertThat(requestsTo("/searchCases"))
+                .as("a read-only POST on the allowlist is still replayed")
+                .hasSize(FEIGN_MAX_ATTEMPTS);
+        }
+
+        @Test
+        void startEventTokenReadTimeout_keepsTheReplay() {
+            responseDelayMs = READ_TIMEOUT_MS * 3L;
+
+            assertThatThrownBy(() -> coreCaseDataApi.startEventForCaseWorker(
+                "Bearer user-token", "s2s-token", "user-1", "CIVIL", "CIVIL", "1792636528942239", "CREATE_CLAIM"))
+                .isInstanceOf(RetryableException.class);
+
+            assertThat(requestsTo("/token")).hasSize(FEIGN_MAX_ATTEMPTS);
         }
     }
 
@@ -331,17 +469,9 @@ class FeignFailureHandlingTest {
          * A read timeout must not trigger the untenanted fallback that a 400 does, and must not
          * dispatch the business process more than once.
          *
-         * <p>It does not assert a single request to the engine, and it used to. That assertion
-         * passed only because this sliced context omitted the Feign {@code Retryer}: the Holunda
-         * REST client contributed one globally, so the deployed service has always retried a
-         * timed-out correlation while this test ran without one. DTSCCI-6513 declares the retryer
-         * explicitly in {@link uk.gov.hmcts.reform.civil.config.HttpClientFeignConfiguration}, which
-         * is behaviour preserving for production and made the gap visible here.
-         *
-         * <p>So a timeout can reach the engine more than once, and the engine may correlate the
-         * message more than once as a result. That is pre-existing production behaviour, not
-         * something this change introduced, and it is raised separately rather than altered inside
-         * a dependency removal.
+         * <p>The correlation is a POST, so the Feign retryer must not replay it after a read
+         * timeout: the engine may already have started the process, and a replay would start it
+         * again.</p>
          */
         @Test
         void engineTimeout_doesNotFallBackToAnUntenantedCorrelation() {
@@ -350,10 +480,10 @@ class FeignFailureHandlingTest {
             eventEmitterService.emitBusinessProcessCamundaEvent(caseData(), true);
 
             assertThat(messageRequests())
-                .as("the timeout is retried, so the engine is called more than once")
-                .hasSizeBetween(2, FEIGN_MAX_ATTEMPTS);
+                .as("a write that timed out on read is not replayed")
+                .hasSize(1);
             assertThat(messageRequests())
-                .as("every attempt must carry the tenant; the untenanted fallback is for a 400 only")
+                .as("the attempt must carry the tenant; the untenanted fallback is for a 400 only")
                 .allSatisfy(request -> assertThat(request)
                     .contains(TENANT_BODY_MARKER)
                     .doesNotContain(NO_TENANT_BODY_MARKER));
