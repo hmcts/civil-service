@@ -242,6 +242,54 @@ class EndBusinessProcessTaskHandlerTest {
         verify(externalTaskService).complete(mockExternalTask, null);
     }
 
+    @Test
+    void shouldBeRetryGuarded() {
+        assertThat(handler.isRetryGuarded()).isTrue();
+    }
+
+    @Test
+    void shouldRetryOnBadGatewayDuringSubmitUpdate() {
+        when(mockExternalTask.getRetries()).thenReturn(null);
+
+        CaseData caseData = new CaseDataBuilder()
+            .atStateClaimDraft()
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
+            .build();
+
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
+        StartEventResponse startEventResponse = startEventResponse(caseDetails);
+
+        when(coreCaseDataService.startUpdate(CASE_ID, END_BUSINESS_PROCESS)).thenReturn(startEventResponse);
+
+        FeignException badGateway = FeignException.errorStatus(
+            "submitUpdate",
+            Response.builder()
+                .request(Request.create(
+                    Request.HttpMethod.POST,
+                    "http://core-case-data-api/cases/" + CASE_ID + "/events",
+                    Collections.emptyMap(),
+                    null,
+                    StandardCharsets.UTF_8,
+                    null
+                ))
+                .status(502)
+                .reason("Bad Gateway")
+                .build()
+        );
+        when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenThrow(badGateway);
+
+        handler.execute(mockExternalTask, externalTaskService);
+
+        verify(externalTaskService).handleFailure(
+            eq(mockExternalTask),
+            anyString(),
+            anyString(),
+            eq(2),
+            anyLong()
+        );
+        verify(externalTaskService, never()).complete(any(), any());
+    }
+
     private StartEventResponse startEventResponse(CaseDetails caseDetails) {
         return StartEventResponse.builder()
             .token("1234")
