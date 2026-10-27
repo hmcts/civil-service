@@ -27,8 +27,8 @@ monitor_cmc_db_metric_alerts = {
     criteria = [{
       operator        = "GreaterThanOrEqual"
       threshold       = 70
-      metricNamespace = "Microsoft.DBforPostgreSQL/flexibleServers"
-      metricName      = "cpu_percent"
+      metric_namespace = "Microsoft.DBforPostgreSQL/flexibleServers"
+      metric_name      = "cpu_percent"
       aggregation     = "Average"
     }]
     action = [{ action_group_name = "prod-civil-service-slack-alert" }]
@@ -38,15 +38,13 @@ monitor_cmc_db_metric_alerts = {
     severity     = 1
     enabled      = true
     frequency    = "PT1M"
-    autoMitigate = true
     window_size  = "PT5M"
     criteria = [{
       operator             = "GreaterThanOrEqual"
       threshold            = 85
-      metricNamespace      = "Microsoft.DBforPostgreSQL/flexibleServers"
-      metricName           = "cpu_percent"
+      metric_namespace      = "Microsoft.DBforPostgreSQL/flexibleServers"
+      metric_name           = "cpu_percent"
       aggregation          = "Average"
-      skipMetricValidation = false
     }]
     action = [{ action_group_name = "prod-civil-service-slack-alert" }]
   },
@@ -55,15 +53,13 @@ monitor_cmc_db_metric_alerts = {
     severity     = 2
     enabled      = true
     frequency    = "PT5M"
-    autoMitigate = true
     window_size  = "PT15M"
     criteria = [{
       operator             = "GreaterThanOrEqual"
       threshold            = 80
-      metricNamespace      = "Microsoft.DBforPostgreSQL/flexibleServers"
-      metricName           = "storage_percent"
+      metric_namespace      = "Microsoft.DBforPostgreSQL/flexibleServers"
+      metric_name           = "storage_percent"
       aggregation          = "Maximum"
-      skipMetricValidation = false
     }]
     action = [{ action_group_name = "prod-civil-service-slack-alert" }]
   },
@@ -72,15 +68,13 @@ monitor_cmc_db_metric_alerts = {
     severity     = 0
     enabled      = true
     frequency    = "PT5M"
-    autoMitigate = true
     window_size  = "PT15M"
     criteria = [{
       operator             = "GreaterThanOrEqual"
       threshold            = 90
-      metricNamespace      = "Microsoft.DBforPostgreSQL/flexibleServers"
-      metricName           = "storage_percent"
+      metric_namespace      = "Microsoft.DBforPostgreSQL/flexibleServers"
+      metric_name           = "storage_percent"
       aggregation          = "Maximum"
-      skipMetricValidation = false
     }]
     action = [{ action_group_name = "prod-civil-service-slack-alert" }]
   },
@@ -89,15 +83,13 @@ monitor_cmc_db_metric_alerts = {
     severity     = 2
     enabled      = true
     frequency    = "PT1M"
-    autoMitigate = true
     window_size  = "PT5M"
     criteria = [{
       operator             = "GreaterThanOrEqual"
       threshold            = 85
-      metricNamespace      = "Microsoft.DBforPostgreSQL/flexibleServers"
-      metricName           = "memory_percent"
+      metric_namespace      = "Microsoft.DBforPostgreSQL/flexibleServers"
+      metric_name           = "memory_percent"
       aggregation          = "Average"
-      skipMetricValidation = false
     }]
     action = [{ action_group_name = "prod-civil-service-slack-alert" }]
   },
@@ -106,15 +98,13 @@ monitor_cmc_db_metric_alerts = {
     severity     = 0
     enabled      = true
     frequency    = "PT1M"
-    autoMitigate = true
     window_size  = "PT5M"
     criteria = [{
       operator             = "GreaterThanOrEqual"
       threshold            = 95
-      metricNamespace      = "Microsoft.DBforPostgreSQL/flexibleServers"
-      metricName           = "memory_percent"
+      metric_namespace      = "Microsoft.DBforPostgreSQL/flexibleServers"
+      metric_name           = "memory_percent"
       aggregation          = "Average"
-      skipMetricValidation = false
     }]
     action = [{ action_group_name = "prod-civil-service-slack-alert" }]
   }
