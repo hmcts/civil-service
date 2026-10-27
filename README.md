@@ -412,14 +412,19 @@ Detailed documentation on core components, safety mechanisms, and instructions f
 `./gradlew nullAwayBaseline` runs NullAway in WARN mode against production Java
 sources under `uk.gov.hmcts`. It also runs as part of `check` and `build`.
 The log prints `NullAway warning count (src/main/java): <count>` on every run,
-including when analysis is up to date or restored from the build cache. Full
-compiler diagnostics are saved to `build/reports/nullaway/diagnostics.txt`.
+including when analysis is up to date. Full compiler diagnostics are saved to
+`build/reports/nullaway/diagnostics.txt` instead
+of printing each warning in the console. If analysis compilation fails, its
+diagnostics are also printed in the console and the build fails.
 Use `./gradlew nullAwayBaseline --rerun-tasks` to force a fresh analysis.
 
 Analysis compiles into `build/classes/nullaway`, outside application outputs.
 Normal compilation retains `-Werror`; the analysis compilation omits it and
 only enables the NullAway Error Prone check. Test sources are excluded from the
 production baseline. Warnings are observations, not a build threshold.
+The analysis uses command-line javac to redirect diagnostics. Gradle supports
+up-to-date checks for this task but disables build-cache reuse with an explicit
+compiler executable.
 
 ## License
 
