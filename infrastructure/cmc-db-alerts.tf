@@ -12,7 +12,7 @@ resource "azurerm_monitor_metric_alert" "civil-ci-alerts" {
   resource_group_name = local.cmc_db_rg_name
   description         = each.value.description
   severity            = each.value.severity
-  enabled             = true
+  enabled             = each.value.enabled
   frequency           = each.value.frequency
   window_size         = each.value.window_size
   auto_mitigate       = true

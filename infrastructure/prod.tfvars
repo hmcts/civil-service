@@ -19,25 +19,23 @@ monitor_action_group = {
 
 monitor_cmc_db_metric_alerts = {
   "prod-cmc-db-cpu-warning" = {
-    description  = "Production CMC DB CPU utilization >= 70% for 5 mins"
-    severity     = 2
-    enabled      = true
-    frequency    = "PT1M"
-    autoMitigate = true
-    window_size  = "PT5M"
+    description = "Five-minute average CPU utilization >= 70%"
+    severity    = 2
+    enabled     = true
+    frequency   = "PT1M"
+    window_size = "PT5M"
     criteria = [{
-      operator             = "GreaterThanOrEqual"
-      threshold            = 70
-      metricNamespace      = "Microsoft.DBforPostgreSQL/flexibleServers"
-      metricName           = "cpu_percent"
-      aggregation          = "Average"
-      skipMetricValidation = false
+      operator        = "GreaterThanOrEqual"
+      threshold       = 70
+      metricNamespace = "Microsoft.DBforPostgreSQL/flexibleServers"
+      metricName      = "cpu_percent"
+      aggregation     = "Average"
     }]
     action = [{ action_group_name = "prod-civil-service-slack-alert" }]
   },
   "prod-cmc-db-cpu-critical" = {
-    description  = "Production CMC DB CPU utilization >= 85% for 5 mins"
-    severity     = 0
+    description  = "Five-minute average CPU utilization >= 85%"
+    severity     = 1
     enabled      = true
     frequency    = "PT1M"
     autoMitigate = true
