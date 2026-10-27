@@ -70,4 +70,9 @@ public class EndBusinessProcessTaskHandler extends BaseExternalTaskHandler {
             .data(data)
             .build();
     }
+
+    @Override
+    protected boolean isRetryGuarded() {
+        return true;
+    }
 }
