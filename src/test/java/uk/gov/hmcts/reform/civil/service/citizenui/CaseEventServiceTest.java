@@ -280,6 +280,54 @@ public class CaseEventServiceTest {
     }
 
     @Test
+    void shouldReclaimStaleSubmissionWhenCcdHasNoCase() {
+        DraftStoreEntity draft = blankDraft();
+        given(draftStoreService.getDraftBySubmissionId(SUBMISSION_ID, USER_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.empty());
+        given(draftStoreService.getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM)).willReturn(Optional.of(draft));
+        given(draftStoreService.claimSubmission(DRAFT_ID, USER_ID, SUBMISSION_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(false)
+            .willReturn(true);
+        given(coreCaseDataService.findCaseByLipClaimSubmissionId(SUBMISSION_ID, AUTHORISATION))
+            .willReturn(Optional.empty());
+
+        assertThat(caseEventService.submitEvent(new EventSubmissionParams()
+                                                    .setUpdates(Maps.newHashMap())
+                                                    .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+                                                    .setCaseId(DRAFT)
+                                                    .setUserId(USER_ID)
+                                                    .setAuthorisation(AUTHORISATION)
+                                                    .setSubmissionId(SUBMISSION_ID)))
+            .isEqualTo(CASE_DETAILS);
+
+        verify(draftStoreService).releaseFailedSubmissionClaim(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM);
+        verify(coreCaseDataApi).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
+    }
+
+    @Test
+    void shouldRecoverCaseForLegacySubmissionClaim() {
+        DraftStoreEntity draft = blankDraft();
+        given(draftStoreService.getDraftBySubmissionId("legacy-submission", USER_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.empty())
+            .willReturn(Optional.of(draft));
+        given(draftStoreService.claimLegacySubmission(USER_ID, "legacy-submission", DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.empty());
+        given(coreCaseDataService.findCaseByLipClaimSubmissionId("legacy-submission", AUTHORISATION))
+            .willReturn(Optional.of(CASE_DETAILS));
+
+        CaseDetails result = caseEventService.submitEvent(new EventSubmissionParams()
+                                                              .setUpdates(Maps.newHashMap())
+                                                              .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+                                                              .setCaseId(DRAFT)
+                                                              .setUserId(USER_ID)
+                                                              .setAuthorisation(AUTHORISATION)
+                                                              .setSubmissionId("legacy-submission"));
+
+        assertThat(result).isEqualTo(CASE_DETAILS);
+        verify(draftStoreService).linkCaseId(DRAFT_ID, USER_ID, "1", DraftType.DRAFT_CLAIM);
+    }
+
+    @Test
     void shouldReleaseFailedSubmissionClaimWhenCcdCreateReturns422() {
         DraftStoreEntity draft = blankDraft();
         FeignException validationFailure = new FeignException.UnprocessableEntity(
