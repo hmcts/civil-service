@@ -407,6 +407,25 @@ role-assignment, etc.). Add this label when you need to test against live AAT se
 
 Detailed documentation on core components, safety mechanisms, and instructions for creating new schedulers can be found in [docs/scheduler-framework.md](docs/scheduler-framework.md).
 
+## Null-safety baseline
+
+`./gradlew nullAwayBaseline` runs NullAway in WARN mode against production Java
+sources under `uk.gov.hmcts`. It also runs as part of `check` and `build`.
+The log prints `NullAway warning count (src/main/java): <count>` on every run,
+including when analysis is up to date. Full compiler diagnostics are saved to
+`build/reports/nullaway/diagnostics.txt` instead
+of printing each warning in the console. If analysis compilation fails, its
+diagnostics are also printed in the console and the build fails.
+Use `./gradlew nullAwayBaseline --rerun-tasks` to force a fresh analysis.
+
+Analysis compiles into `build/classes/nullaway`, outside application outputs.
+Normal compilation retains `-Werror`; the analysis compilation omits it and
+only enables the NullAway Error Prone check. Test sources are excluded from the
+production baseline. Warnings are observations, not a build threshold.
+The analysis uses command-line javac to redirect diagnostics. Gradle supports
+up-to-date checks for this task but disables build-cache reuse with an explicit
+compiler executable.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
