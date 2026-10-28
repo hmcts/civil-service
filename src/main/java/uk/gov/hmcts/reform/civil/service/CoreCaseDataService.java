@@ -223,6 +223,13 @@ public class CoreCaseDataService {
         return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query.toString());
     }
 
+    public SearchResult searchCases(Query query) {
+        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        String searchString = query.toString();
+        log.info("Searching Elasticsearch with query: " + searchString);
+        return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, searchString);
+    }
+
     public Optional<CaseDetails> findCaseByLipClaimSubmissionId(String submissionId, String authorization) {
         Query query = new Query(
             QueryBuilders.matchQuery("data.lipClaimSubmissionId", submissionId), List.of(), 0
@@ -232,13 +239,6 @@ public class CoreCaseDataService {
             return Optional.empty();
         }
         return Optional.of(result.getCases().get(0));
-    }
-
-    public SearchResult searchCases(Query query) {
-        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
-        String searchString = query.toString();
-        log.info("Searching Elasticsearch with query: " + searchString);
-        return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, searchString);
     }
 
     public SearchResult searchCasesPaginated(PaginatedQuery paginatedQuery) {
