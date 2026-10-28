@@ -230,17 +230,20 @@ def nullAwayCompile = tasks.register('nullAwayCompile', JavaCompile) {
   options.compilerArgs.remove('-Werror')
   options.compilerArgs += ['-Xmaxwarns', '1000000']
   outputs.file(nullAwayDiagnostics)
-  def diagnostics = new StringBuffer()
-  def diagnosticListener = { CharSequence output -> diagnostics.append(output) } as StandardOutputListener
+  // Use javac's command-line output redirection to retain diagnostics quietly.
+  options.fork = true
+  options.forkOptions.executable = javaCompiler.get().executablePath.asFile.absolutePath
+  // Gradle forwards command-line JVM arguments verbatim, so javac needs -J.
+  def errorProneJvmArgs = options.forkOptions.jvmArgumentProviders.find { it.name == 'errorprone' }
+  options.forkOptions.jvmArgumentProviders.remove(errorProneJvmArgs)
+  options.forkOptions.jvmArgumentProviders.add({
+    errorProneJvmArgs.asArguments().collect { "-J${it}".toString() }
+  } as CommandLineArgumentProvider)
+  options.compilerArgs += ['-Xstdout', nullAwayDiagnostics.get().asFile.absolutePath]
   doFirst {
-    diagnostics.setLength(0)
-    logging.addStandardErrorListener(diagnosticListener)
-  }
-  doLast {
-    logging.removeStandardErrorListener(diagnosticListener)
     def report = nullAwayDiagnostics.get().asFile
     report.parentFile.mkdirs()
-    report.text = diagnostics.toString()
+    report.text = ''
   }
   options.incremental = false
   options.errorprone {
@@ -251,8 +254,22 @@ def nullAwayCompile = tasks.register('nullAwayCompile', JavaCompile) {
   }
 }
 
+// A failed compiler invocation must remain actionable in the build log.
+def nullAwayCompileFailure = tasks.register('nullAwayCompileFailure') {
+  onlyIf { nullAwayCompile.get().state.failure != null }
+  doLast {
+    def report = nullAwayDiagnostics.get().asFile
+    if (report.exists()) {
+      logger.error(report.text)
+    }
+  }
+}
+nullAwayCompile.configure {
+  finalizedBy nullAwayCompileFailure
+}
+
 def nullAwayBaseline = tasks.register('nullAwayBaseline') {
-  description = 'Prints the NullAway warning count, including on cached or up-to-date builds.'
+  description = 'Prints the NullAway warning count, including on up-to-date builds.'
   group = 'verification'
   dependsOn nullAwayCompile
   inputs.file(nullAwayDiagnostics)
@@ -856,7 +873,8 @@ tasks.withType(Test).configureEach { t ->
   }
 
   // Common configuration for all test tasks
-  // Keep within typical Jenkins container limits
+  // Gradle caps this at org.gradle.workers.max, which Jenkins sets in Jenkinsfile_CNP, so that is the
+  // real fork count in CI
   maxParallelForks = Runtime.runtime.availableProcessors() - 1 ?: 1
   minHeapSize = "256m"
   jvmArgs "-XX:MaxMetaspaceSize=512m"

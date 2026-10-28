@@ -7,6 +7,9 @@ management:
       show-details: "always"
       probes:
         enabled: true
+      group:
+        s2s:
+          include: s2sSecretReadiness
   endpoints:
     web:
       base-path: /
@@ -42,6 +45,11 @@ spring:
     username: ${CMC_DB_USERNAME:-}
     password: ${CMC_DB_PASSWORD:-}
     url: jdbc:postgresql://${CMC_DB_HOST:}:${CMC_DB_PORT:}/${CMC_DB_NAME:cmc}${CMC_DB_CONNECTION_OPTIONS:}
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 3000
+      idle-timeout: 600000
+      max-lifetime: 1800000
 
   servlet:
     multipart:
@@ -81,7 +89,7 @@ spring:
             readTimeout: ${CORE_CASE_EVENT_API_READ_TIMEOUT:25000}
 
 scheduler:
-  active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:JudgementBuffer, ExpiredDraftStore}
+  active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:}
   circuitBreakerThreshold: ${CIRCUIT_BREAKER_THRESHOLD:5}
   lockAtLeastFor: ${LOCK_AT_LEAST_FOR:PT1M}
   lockAtMostFor: ${LOCK_AT_MOST_FOR:PT30M}
@@ -935,10 +943,10 @@ spring:
     url: jdbc:tc:postgresql:15://localhost/cmc
     jdbcUrl: jdbc:tc:postgresql:15://localhost/cmc
     hikari:
-      minimum-idle: 1
-      connectionTimeout: 10000
-      idleTimeout: 30000
-      maxLifetime: 60000
+      maximum-pool-size: 3
+      connection-timeout: 10000
+      idle-timeout: 600000
+      max-lifetime: 1800000
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
