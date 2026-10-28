@@ -18,6 +18,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.sql.DriverManager;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -56,7 +57,13 @@ class CivilHearingsCftlibTest extends CftlibTest {
 
     @Test
     void reviewsAHearingThatHmiCannotList() {
-        String caseReference = createCase();
+        // Task configuration takes the task's case name, region and location from the case.
+        String caseReference = createCase(
+            "{\"applicant1\": {\"partyName\": \"cftlib\"},"
+                + " \"caseManagementLocation\": {\"region\": \"2\", \"baseLocation\": \"20262\"}}",
+            "{\"applicant1\": {\"classification\": \"PUBLIC\", \"value\": {\"partyName\": \"PUBLIC\"}},"
+                + " \"caseManagementLocation\": {\"classification\": \"PUBLIC\","
+                + " \"value\": {\"region\": \"PUBLIC\", \"baseLocation\": \"PUBLIC\"}}}");
         cftlib().rejectNextHmiRequest(2000, "cftlib could not list the hearing");
 
         requestHearing(caseReference);
@@ -67,6 +74,9 @@ class CivilHearingsCftlibTest extends CftlibTest {
             () -> assertThat(caseEvents(caseReference)).contains("REVIEW_HEARING_EXCEPTION"));
         await().atMost(WAIT).untilAsserted(
             () -> assertThat(taskNames(caseReference)).contains("Review HMC Hearing Request Failure"));
+        // Task management configures the task from the case, which WA's system user reads with civil's roles.
+        await().atMost(WAIT).untilAsserted(
+            () -> assertThat(configuredTasks(caseReference)).containsExactly("reviewHearingException UNASSIGNED 20262"));
     }
 
     @Test
@@ -87,16 +97,22 @@ class CivilHearingsCftlibTest extends CftlibTest {
      * A CIVIL case with no claim in it, as these events need nothing more. Creating a claim through CCD would need
      * the whole claim journey. It is in a state that work allocation's system role can read.
      */
-    @SneakyThrows
     private String createCase() {
+        return createCase("{}", "{}");
+    }
+
+    @SneakyThrows
+    private String createCase(String data, String classification) {
         String reference = caseReference();
         try (var connection = cftlib().getConnection(Database.Datastore)) {
             var insert = connection.prepareStatement(
                 "insert into case_data (reference, jurisdiction, case_type_id, state, data, data_classification,"
                     + " security_classification, created_date, last_modified, last_state_modified_date)"
-                    + " values (?, 'CIVIL', 'CIVIL', 'JUDICIAL_REFERRAL', '{}'::jsonb, '{}'::jsonb, 'PUBLIC',"
+                    + " values (?, 'CIVIL', 'CIVIL', 'JUDICIAL_REFERRAL', ?::jsonb, ?::jsonb, 'PUBLIC',"
                     + " now(), now(), now())");
             insert.setLong(1, Long.parseLong(reference));
+            insert.setString(2, data);
+            insert.setString(3, classification);
             insert.execute();
         }
         return reference;
@@ -231,6 +247,23 @@ class CivilHearingsCftlibTest extends CftlibTest {
             }
         }
         return events;
+    }
+
+    // Each of the case's tasks in task management, as its type, state and location.
+    @SneakyThrows
+    private List<String> configuredTasks(String caseReference) {
+        List<String> tasks = new ArrayList<>();
+        try (var connection = DriverManager.getConnection("jdbc:postgresql://localhost:6432/cft_task_db",
+                                                          "postgres", "postgres")) {
+            var query = connection.prepareStatement(
+                "select task_type, state, location from cft_task_db.tasks where case_id = ?");
+            query.setString(1, caseReference);
+            var rows = query.executeQuery();
+            while (rows.next()) {
+                tasks.add(rows.getString(1) + " " + rows.getString(2) + " " + rows.getString(3));
+            }
+        }
+        return tasks;
     }
 
     @SneakyThrows

@@ -25,7 +25,7 @@ Nothing reaches AAT, so no VPN is needed.
 
 - **CCD definitions:** the CIVIL and GENERALAPPLICATION JSON from civil-ccd-definition, with callbacks to this service. It uses `CCD_DEFINITION_BRANCH` (default `master`), or the checkout named by `CIVIL_CCD_DEFINITIONS_DIR`. Like preview, it leaves out `*-prod.json` and the shuttered authorisations.
 - **Business processes:** the BPMN files in `src/main/resources/camunda`, deployed to Camunda once it is up.
-- **Work allocation:** civil-wa-task-configuration's DMNs, deployed with the tenant `civil`. It uses `WA_TASK_CONFIGURATION_BRANCH` (default `master`), or the folder of DMNs named by `CIVIL_WA_DMNS_DIR`. cftlib delivers each case event whose definition publishes it to wa-case-event-handler, so tasks appear in Camunda and task management as they would in an environment.
+- **Work allocation:** civil-wa-task-configuration's DMNs, deployed with the tenant `civil`. It uses `WA_TASK_CONFIGURATION_BRANCH` (default `master`), or the folder of DMNs named by `CIVIL_WA_DMNS_DIR`. cftlib delivers each case event whose definition publishes it to wa-case-event-handler, so tasks appear in Camunda and task management as they would in an environment. As in AAT, WA's system user has `caseworker-civil` and `caseworker-civil-systemupdate` (`RSE_LIB_WA_SYSTEM_USER_ROLES`), which let task management read the case to configure its tasks.
 - **Hearings:** cftlib runs HMC on the Service Bus emulator. This service calls it at `HMC_API_URL` and receives hearing updates on the `hmc-to-cft` topic, through the subscription in `src/cftlib/servicebus.json`. HMI is a stand-in in cftlib's runtime that accepts each request; tests list a hearing, or have HMI reject a request, through the cftlib API. The system update user holds the `hearing-manager` and `hearing-viewer` roles HMC checks.
 - **Users:** the professional users civil's Playwright tests sign in as (`hmcts.civil+organisation.*`), the system update user, the PRD admin and the cross-access user. All have the password `password`. See `src/cftlib/java/.../CivilCftlibConfig.java`.
 - **Stand-ins for services outside CCD:**
@@ -42,7 +42,7 @@ Everything under `src/cftlib` runs only under cftlib. It holds configuration, an
 - civil's business processes are deployed to Camunda;
 - this service stores a document through CDAM and cftlib's dm-store and reads it back;
 - tests can sign in through cftlib's `/loginUser`;
-- a hearing HMI cannot list makes this service trigger `REVIEW_HEARING_EXCEPTION`, whose work allocation task appears in Camunda;
+- a hearing HMI cannot list makes this service trigger `REVIEW_HEARING_EXCEPTION`, whose work allocation task appears in Camunda and is configured by task management;
 - a listed hearing makes this service trigger `UPDATE_NEXT_HEARING_DETAILS`.
 
 It is not part of `check`, since it needs Docker and access to `hmctsprod.azurecr.io` (`az acr login --name hmctsprod`).

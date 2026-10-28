@@ -18,7 +18,7 @@ plugins {
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.6"
   id 'hmcts.ccd.sdk' version '7.17.0'
-  id 'com.github.hmcts.rse-cft-lib' version 'civil-cc-8'
+  id 'com.github.hmcts.rse-cft-lib' version 'civil-cc-9'
   id 'net.ltgt.errorprone' version '5.1.1'
 }
 
@@ -1053,6 +1053,8 @@ tasks.withType(CftlibExec).configureEach {
   def wiremock = 'http://localhost:8765'
   // Work allocation, which brings Camunda, and hearings, which bring the Service Bus emulator.
   features 'wa', 'hmc'
+  // As in AAT, WA's system user reads civil's cases through civil's own roles.
+  environment 'RSE_LIB_WA_SYSTEM_USER_ROLES', 'caseworker-civil,caseworker-civil-systemupdate'
   environment 'RSE_LIB_SERVICEBUS_CONFIG', file('src/cftlib/servicebus.json').path
   // The shared cftlib database volume other services' cftlib runs create, as dtsse-ccd-config-generator's e2e does.
   environment 'POSTGRES_VERSION', '15'
