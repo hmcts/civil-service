@@ -251,7 +251,7 @@ public class CaseEventServiceTest {
 
         verify(coreCaseDataApi, never()).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
         verify(draftStoreService, never()).linkCaseId(any(), any(), any(), any());
-        verify(draftStoreService, never()).releaseFailedSubmissionClaim(any(), any(), any());
+        verify(draftStoreService).releaseFailedSubmissionClaim(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM);
         verify(coreCaseDataService, never()).getCCDClaimsForLipClaimant(any(), any(Integer.class));
     }
 

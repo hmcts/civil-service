@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
@@ -44,6 +46,8 @@ public class CaseEventService {
     private final CoreCaseDataService coreCaseDataService;
     @Value("${case-flags.logging.enabled:false}")
     private boolean caseFlagsLoggingEnabled;
+    @Value("${draft-store.submission-claim-stale-after-minutes:5}")
+    private long submissionClaimStaleAfterMinutes;
 
     private StartEventResponse startEvent(String authorisation, String userId, String caseId, CaseEvent event) {
         return coreCaseDataApi.startEventForCitizen(
@@ -222,6 +226,23 @@ public class CaseEventService {
             return existingCase(draft, params);
         }
 
+        Optional<CaseDetails> recoveredCase = findCaseCreatedBySubmission(params);
+        if (recoveredCase.isPresent()) {
+            draftStoreService.linkCaseId(
+                draftId, params.getUserId(), recoveredCase.get().getId().toString(), DraftType.DRAFT_CLAIM
+            );
+            return recoveredCase.get();
+        }
+
+        if (isStale(draft)) {
+            draftStoreService.releaseFailedSubmissionClaim(draftId, params.getUserId(), DraftType.DRAFT_CLAIM);
+            if (draftStoreService.claimSubmission(
+                draftId, params.getUserId(), params.getSubmissionId(), DraftType.DRAFT_CLAIM
+            )) {
+                return createAndLink(draftId, params);
+            }
+        }
+
         log.warn(
             "Submission already claimed for draftId={} submissionId={} existingSubmissionId={}",
             draftId,
@@ -241,6 +262,14 @@ public class CaseEventService {
 
         if (draft.getCaseId() != null) {
             return existingCase(draft, params);
+        }
+
+        Optional<CaseDetails> recoveredCase = findCaseCreatedBySubmission(params);
+        if (recoveredCase.isPresent()) {
+            draftStoreService.linkCaseId(
+                draft.getId(), params.getUserId(), recoveredCase.get().getId().toString(), DraftType.DRAFT_CLAIM
+            );
+            return recoveredCase.get();
         }
 
         log.warn(
@@ -286,6 +315,22 @@ public class CaseEventService {
                                                 CASE_TYPE,
                                                 true, caseDataContent
         );
+    }
+
+    private Optional<CaseDetails> findCaseCreatedBySubmission(EventSubmissionParams params) {
+        if (!params.hasSubmissionId()) {
+            return Optional.empty();
+        }
+        return coreCaseDataService.findCaseByLipClaimSubmissionId(
+            params.getSubmissionId(), params.getAuthorisation()
+        );
+    }
+
+    private boolean isStale(DraftStoreEntity draft) {
+        return draft.getUpdatedAt() != null
+            && draft.getUpdatedAt().isBefore(
+                OffsetDateTime.now(ZoneOffset.UTC).minusMinutes(submissionClaimStaleAfterMinutes)
+            );
     }
 
     public CaseDetails submitEvent(EventSubmissionParams params) {
