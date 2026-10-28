@@ -28,6 +28,12 @@ import java.util.function.Supplier;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
+/**
+ * Retained for pre-migration breathing-space enter process versions until production confirms they have drained.
+ *
+ * @deprecated Replaced by BreathingSpaceEnterNotifier for new process instances.
+ */
+@Deprecated(forRemoval = true)
 @Service
 @RequiredArgsConstructor
 public class BreathingSpaceEnterNotificationHandler extends CallbackHandler implements NotificationData {
