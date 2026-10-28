@@ -5,16 +5,10 @@ data "azurerm_key_vault_secret" "civil-service-alert-slack-email" {
   key_vault_id = module.key-vault.key_vault_id
 }
 
-locals {
-  # Retrieves the Slack email address from Key Vault if the secret exists, otherwise defaults to null
-  civil_service_alert_slack_email = length(data.azurerm_key_vault_secret.civil-service-alert-slack-email) > 0 ? data.azurerm_key_vault_secret.civil-service-alert-slack-email[0].value : null
-  resource_group_name             = "civil-service-${var.env}"
-}
-
 resource "azurerm_monitor_action_group" "civil-service-action-group" {
   for_each            = var.monitor_action_group
   name                = "${each.key}-${var.env}"
-  resource_group_name = local.resource_group_name
+  resource_group_name = local.civil_service_rg_name
   short_name          = try(each.value.short_name, null)
   tags                = var.common_tags
 
@@ -28,92 +22,101 @@ resource "azurerm_monitor_action_group" "civil-service-action-group" {
   }
 }
 
-module "scheduler-aborted-alerts" {
-  for_each = var.monitor_scheduler_alerts
+module "scheduler-fleet-aborted-alert" {
   source   = "git@github.com:hmcts/cnp-module-metric-alert"
   location = var.location
-  enabled  = tostring(try(each.value.enabled, false))
+  enabled  = tostring(var.scheduler_alerts_enabled)
 
   app_insights_name  = module.application_insights.name
-  resourcegroup_name = local.resource_group_name
+  resourcegroup_name = local.civil_service_rg_name
 
-  alert_name = "${each.key}JobAbortedAlert-${var.env}"
-  alert_desc = "Triggers when scheduler ${each.key} in ${var.env} has aborted."
+  alert_name = "SchedulerFleetJobAbortedAlert-${var.env}"
+  alert_desc = "Triggers when any scheduled task in ${var.env} has aborted."
 
   app_insights_query = <<-AIQ
       customEvents
-        | where name == "${each.key}JobAborted"
-        | extend abortReason = tostring(column_ifexists('properties.abortReason', 'Unknown'))
-        | project timestamp, name, abortReason
+        | where name == "SchedulerJobAborted"
+        | extend schedulerName = tostring(customDimensions.schedulerName)
+        | extend jobAbortReason = tostring(column_ifexists('customDimensions.jobAbortReason', 'Unknown'))
+        | extend failedCases = toint(column_ifexists('customDimensions.failedCases', 0))
+        | extend totalCases = toint(column_ifexists('customDimensions.totalCases', 0))
+        | project timestamp, schedulerName, jobAbortReason, failedCases, totalCases
       AIQ
 
-  custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has aborted."
-  frequency_in_minutes       = tostring(try(each.value.frequency_in_minutes, 60))
-  time_window_in_minutes     = tostring(try(each.value.time_window_in_minutes, 120))
+  custom_email_subject       = "Alert: A Civil Service scheduler has ABORTED in ${var.env}"
+  frequency_in_minutes       = "15"
+  time_window_in_minutes     = "30"
   severity_level             = "2"
-  action_group_name          = azurerm_monitor_action_group.civil-service-action-group[each.value.action_group].name
+  action_group_name          = local.default_action_group_name
   trigger_threshold_operator = "GreaterThan"
   trigger_threshold          = "0"
   common_tags                = var.common_tags
 }
 
-module "scheduler-high-failure-rate-alerts" {
-  for_each = var.monitor_scheduler_alerts
+module "scheduler-fleet-high-failure-rate-alert" {
   source   = "git@github.com:hmcts/cnp-module-metric-alert"
   location = var.location
-  enabled  = tostring(try(each.value.enabled, false))
+  enabled  = tostring(var.scheduler_alerts_enabled)
 
   app_insights_name  = module.application_insights.name
-  resourcegroup_name = local.resource_group_name
+  resourcegroup_name = local.civil_service_rg_name
 
-  alert_name = "${each.key}HighFailureRateAlert-${var.env}"
-  alert_desc = "Triggers when scheduler ${each.key} in ${var.env} has a high failure rate."
+  alert_name = "SchedulerFleetHighFailureRateAlert-${var.env}"
+  alert_desc = "Triggers when any scheduled task in ${var.env} experiences a failure rate exceeding 20%."
 
   app_insights_query = <<-AIQ
       customEvents
-        | where name in ("${each.key}JobCompleted", "${each.key}JobAborted")
-        | extend cases = toint(column_ifexists('properties.totalCases', 0))
-        | extend failed = toint(column_ifexists('properties.failedCases', 0))
-        | where cases > 0
-        | extend failureRate = failed * 1.0 / cases
-        | project timestamp, name, cases, failed, failureRate
+        | where name in ("SchedulerJobCompleted", "SchedulerJobAborted")
+        | extend schedulerName = tostring(customDimensions.schedulerName)
+        | extend totalCases = toint(column_ifexists('customDimensions.totalCases', 0))
+        | extend failedCases = toint(column_ifexists('customDimensions.failedCases', 0))
+        | where totalCases > 0
+        | extend failureRate = failedCases * 1.0 / totalCases
         | where failureRate > 0.2
+        | project timestamp, schedulerName, totalCases, failedCases, failureRate
       AIQ
 
-  custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has a high failure rate."
-  frequency_in_minutes       = tostring(try(each.value.frequency_in_minutes, 60))
-  time_window_in_minutes     = tostring(try(each.value.time_window_in_minutes, 120))
+  custom_email_subject       = "Warning: A Civil Service scheduler has a HIGH FAILURE RATE in ${var.env}"
+  frequency_in_minutes       = "30"
+  time_window_in_minutes     = "60"
   severity_level             = "1"
-  action_group_name          = azurerm_monitor_action_group.civil-service-action-group[each.value.action_group].name
+  action_group_name          = local.default_action_group_name
   trigger_threshold_operator = "GreaterThan"
   trigger_threshold          = "0"
   common_tags                = var.common_tags
 }
 
-module "scheduler-job-not-run-alerts" {
-  for_each = var.monitor_scheduler_alerts
+module "scheduler-fleet-job-not-run-alert" {
   source   = "git@github.com:hmcts/cnp-module-metric-alert"
   location = var.location
-  enabled  = tostring(try(each.value.enabled, false))
+  enabled  = tostring(var.scheduler_alerts_enabled && length(var.expected_schedulers) > 0)
 
   app_insights_name  = module.application_insights.name
-  resourcegroup_name = local.resource_group_name
+  resourcegroup_name = local.civil_service_rg_name
 
-  alert_name = "${each.key}JobNotRunAlert-${var.env}"
-  alert_desc = "Triggers when scheduler ${each.key} in ${var.env} has not run in the last ${var.job_not_run_threshold} hours."
+  alert_name = "SchedulerFleetJobNotRunAlert-${var.env}"
+  alert_desc = "Triggers when any expected scheduled task in ${var.env} has not run within the last ${var.job_not_run_threshold} hours."
 
   app_insights_query = <<-AIQ
-      customEvents
-        | where name == "${each.key}JobStarted"
+      let expectedSchedulers = datatable(expectedSchedulerName: string) [
+        ${local.expected_schedulers_kql}
+      ];
+      let actualRuns = customEvents
+        | where name == "SchedulerJobStarted"
         | where timestamp > ago(${var.job_not_run_threshold}h)
+        | extend schedulerName = tostring(customDimensions.schedulerName)
+        | summarize lastRun = max(timestamp) by schedulerName;
+      expectedSchedulers
+        | join kind=leftanti actualRuns on $left.expectedSchedulerName == $right.schedulerName
+        | project missingScheduler = expectedSchedulerName
       AIQ
 
-  custom_email_subject       = "Warning: The scheduler ${each.key} in ${var.env} has not run in the last ${var.job_not_run_threshold} hours."
-  frequency_in_minutes       = tostring(try(each.value.frequency_in_minutes, 60))
-  time_window_in_minutes     = tostring(try(each.value.time_window_in_minutes, 120))
+  custom_email_subject       = "Alert: An expected Civil Service scheduler has NOT RUN in ${var.env}"
+  frequency_in_minutes       = "60"
+  time_window_in_minutes     = "120"
   severity_level             = "2"
-  action_group_name          = azurerm_monitor_action_group.civil-service-action-group[each.value.action_group].name
-  trigger_threshold_operator = "LessThan"
-  trigger_threshold          = "1"
+  action_group_name          = local.default_action_group_name
+  trigger_threshold_operator = "GreaterThan"
+  trigger_threshold          = "0"
   common_tags                = var.common_tags
 }
