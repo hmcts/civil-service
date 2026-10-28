@@ -256,6 +256,30 @@ public class CaseEventServiceTest {
     }
 
     @Test
+    void shouldLinkCaseFoundAfterAmbiguousSubmissionFailure() {
+        DraftStoreEntity draft = blankDraft();
+        given(draftStoreService.getDraftBySubmissionId(SUBMISSION_ID, USER_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(Optional.empty());
+        given(draftStoreService.getDraft(DRAFT_ID, USER_ID, DraftType.DRAFT_CLAIM)).willReturn(Optional.of(draft));
+        given(draftStoreService.claimSubmission(DRAFT_ID, USER_ID, SUBMISSION_ID, DraftType.DRAFT_CLAIM))
+            .willReturn(false);
+        given(coreCaseDataService.findCaseByLipClaimSubmissionId(SUBMISSION_ID, AUTHORISATION))
+            .willReturn(Optional.of(CASE_DETAILS));
+
+        CaseDetails result = caseEventService.submitEvent(new EventSubmissionParams()
+                                                              .setUpdates(Maps.newHashMap())
+                                                              .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+                                                              .setCaseId(DRAFT)
+                                                              .setUserId(USER_ID)
+                                                              .setAuthorisation(AUTHORISATION)
+                                                              .setSubmissionId(SUBMISSION_ID));
+
+        assertThat(result).isEqualTo(CASE_DETAILS);
+        verify(draftStoreService).linkCaseId(DRAFT_ID, USER_ID, "1", DraftType.DRAFT_CLAIM);
+        verify(coreCaseDataApi, never()).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
+    }
+
+    @Test
     void shouldReleaseFailedSubmissionClaimWhenCcdCreateReturns422() {
         DraftStoreEntity draft = blankDraft();
         FeignException validationFailure = new FeignException.UnprocessableEntity(
