@@ -287,4 +287,11 @@ class FeatureToggleServiceTest {
         givenToggle("hmcts-access-migration", toggleStat);
         assertThat(featureToggleService.isHmctsAccessMigrationEnabled()).isEqualTo(toggleStat);
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenCaseworkerMediationActivitiesEnabled(Boolean toggleStat) {
+        givenToggle("caseworker-mediation-activities", toggleStat);
+        assertThat(featureToggleService.isCaseworkerMediationActivitiesEnabled()).isEqualTo(toggleStat);
+    }
 }
