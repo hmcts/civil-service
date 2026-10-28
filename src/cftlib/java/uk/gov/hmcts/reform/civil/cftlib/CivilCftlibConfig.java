@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.cftlib;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.setup.CamundaDefinitionImporter;
@@ -12,15 +14,18 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Seeds the local CCD stack for civil: roles, the users civil's tests sign in as, the CIVIL and GENERALAPPLICATION
- * definitions, and civil's business processes in the cftlib Camunda engine.
+ * definitions, civil's business processes and work allocation DMNs in the cftlib Camunda engine, and the system
+ * user's hearing roles.
  */
 @Slf4j
 @Component
@@ -115,8 +120,6 @@ public class CivilCftlibConfig implements CFTLibConfigurer {
             "next-hearing-date-admin", "prd-admin"
         }),
         Map.entry("civil.prd.admin@example.com", new String[] {"caseworker", "prd-admin"}),
-        // CCD data store's own system user
-        Map.entry("data.store.idam.system.user@gmail.com", new String[] {"caseworker"}),
         Map.entry("caseworker-caa@mailnesia.com", new String[] {"caseworker", "caseworker-caa"})
     );
 
@@ -139,6 +142,54 @@ public class CivilCftlibConfig implements CFTLibConfigurer {
         }
 
         deployBusinessProcesses();
+        deployWorkAllocation(lib);
+        grantHearingRoles(lib);
+    }
+
+    /**
+     * civil-wa-task-configuration's DMNs, which decide the tasks civil's case events create, for cftlib's wa feature.
+     */
+    private void deployWorkAllocation(CFTLib lib) {
+        File dir = new File(System.getenv("CIVIL_CFTLIB_WA_DMNS_DIR"));
+        File[] dmns = dir.listFiles((parent, name) -> name.endsWith(".dmn"));
+        if (dmns == null || dmns.length == 0) {
+            throw new IllegalStateException("No WA DMNs in " + dir);
+        }
+        lib.importCamundaDefinitions("civil", dmns);
+    }
+
+    /**
+     * HMC checks its callers' organisational hearing roles. In an environment the system update user holds them
+     * through organisational role mapping.
+     */
+    private void grantHearingRoles(CFTLib lib) {
+        List<Map<String, Object>> roles = List.of("hearing-manager", "hearing-viewer").stream()
+            .map(role -> Map.<String, Object>of(
+                "roleType", "ORGANISATION",
+                "roleName", role,
+                "grantType", "STANDARD",
+                "roleCategory", "SYSTEM",
+                "classification", "PUBLIC",
+                "readOnly", false,
+                "attributes", Map.of("jurisdiction", "CIVIL"),
+                "authorisations", List.of()
+            ))
+            .toList();
+        String systemUpdate = "civil-system-update@mailnesia.com";
+        lib.configureRoleAssignments(toJson(List.of(Map.of(
+            // The IDAM simulator derives each user's id from their email.
+            "id", UUID.nameUUIDFromBytes(systemUpdate.getBytes(StandardCharsets.UTF_8)).toString(),
+            "overrideAll", false,
+            "roleAssignments", roles
+        ))));
+    }
+
+    private static String toJson(Object value) {
+        try {
+            return new ObjectMapper().writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     private void deployBusinessProcesses() throws Exception {

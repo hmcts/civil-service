@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * The local stack bootWithCCD runs civil on: CCD with civil's definitions, Camunda with civil's business processes,
- * and the stand-ins under src/cftlib for services outside CCD.
+ * and cftlib's stand-ins for the platform services outside CCD.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -35,6 +35,8 @@ class CivilCftlibTest extends CftlibTest {
     private static final String SOLICITOR = "hmcts.civil+organisation.1.solicitor.1@gmail.com";
     private static final String SYSTEM_UPDATE = "civil-system-update@mailnesia.com";
     private static final String PASSWORD = "password";
+    // cftlib's runtime, which serves IDAM's /loginUser for tests over the IDAM simulator.
+    private static final String RUNTIME = "http://localhost:8489";
 
     @Autowired
     private UserService userService;
@@ -112,7 +114,7 @@ class CivilCftlibTest extends CftlibTest {
     @SneakyThrows
     void signsTestsInThroughLoginUser() {
         HttpResponse<String> login = client.send(
-            HttpRequest.newBuilder(URI.create(CivilCftlibConfig.SERVICE_URL + LocalIdamController.LOGIN_USER
+            HttpRequest.newBuilder(URI.create(RUNTIME + "/loginUser"
                                                   + "?username=" + URLEncoder.encode(SOLICITOR, StandardCharsets.UTF_8)
                                                   + "&password=" + PASSWORD))
                 .POST(HttpRequest.BodyPublishers.noBody())
@@ -122,7 +124,7 @@ class CivilCftlibTest extends CftlibTest {
         String accessToken = mapper.readTree(login.body()).path("access_token").asText();
 
         HttpResponse<String> userInfo = client.send(
-            HttpRequest.newBuilder(URI.create(CivilCftlibConfig.SERVICE_URL + LocalIdamController.USER_INFO))
+            HttpRequest.newBuilder(URI.create(RUNTIME + "/o/userinfo"))
                 .header("Authorization", "Bearer " + accessToken)
                 .build(),
             HttpResponse.BodyHandlers.ofString());
