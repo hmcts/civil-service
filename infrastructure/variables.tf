@@ -70,6 +70,31 @@ variable "expected_schedulers" {
   description = "List of expected scheduler names that should run at least once within the job_not_run_threshold window"
 }
 
+variable "monitor_cmc_db_metric_alerts" {
+  type = map(object({
+    description   = optional(string)
+    severity      = optional(number)
+    enabled       = optional(bool, true)
+    auto_mitigate = optional(bool, true)
+    frequency     = optional(string, "PT1M")
+    window_size   = optional(string, "PT5M")
+
+    criteria = list(object({
+      metric_namespace       = string
+      metric_name            = string
+      aggregation            = string
+      operator               = string
+      threshold              = number
+      skip_metric_validation = optional(bool, false)
+    }))
+
+    action = optional(list(object({
+      action_group_name = string
+    })), [])
+  }))
+  default = {}
+}
+
 variable "civil_service_alert_slack_email_secret_name" {
   type        = string
   description = "The name of the Key Vault secret containing the slack email group"
