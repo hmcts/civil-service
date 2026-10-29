@@ -52,12 +52,21 @@ public class EndBusinessProcessTaskHandler extends BaseExternalTaskHandler {
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, END_BUSINESS_PROCESS);
         CaseData data = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
         BusinessProcess businessProcess = data.getBusinessProcess();
-        if (businessProcess.getStatusOrDefault() != BusinessProcessStatus.FINISHED) {
-            coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
-        } else {
+        BusinessProcessStatus status = businessProcess.getStatusOrDefault();
+        if (status == BusinessProcessStatus.FINISHED) {
             log.info("Stopping multiple calls, END_BUSINESS_PROCESS already performed for caseid: {}", caseId);
+        } else if (isRetryAttempt(externalTask) && status != BusinessProcessStatus.STARTED) {
+            log.warn("Skipping END_BUSINESS_PROCESS on retry for caseid: {}, business process status is {} "
+                         + "(camundaEvent {}), a newer business process has been triggered since the first attempt",
+                     caseId, status, businessProcess.getCamundaEvent());
+        } else {
+            coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
         }
         return new ExternalTaskData();
+    }
+
+    private boolean isRetryAttempt(ExternalTask externalTask) {
+        return externalTask.getRetries() != null;
     }
 
     private CaseDataContent caseDataContent(StartEventResponse startEventResponse, BusinessProcess businessProcess) {
@@ -69,5 +78,23 @@ public class EndBusinessProcessTaskHandler extends BaseExternalTaskHandler {
             .event(Event.builder().id(startEventResponse.getEventId()).build())
             .data(data)
             .build();
+    }
+
+    /**
+     * Guarded by the business process status checks in {@code handleTask}. The update is skipped if the
+     * status is already {@code FINISHED}. On a retried attempt it is also skipped unless the status is
+     * still {@code STARTED}: a {@code READY} or {@code DISPATCHED} status means the first attempt was in
+     * fact applied and a newer business process has been triggered since, which must not be reset.
+     *
+     * <p>The {@code processInstanceId} cannot be compared, because this task runs in the
+     * {@code EndBusinessProcess} called process, whose instance id differs from the one stored on the
+     * case. Known limitation: if the newer business process has already reached {@code STARTED} by the
+     * time of the retry, it is still reset.
+     *
+     * @return true as this handler checks business process status before submitting the update
+     */
+    @Override
+    protected boolean isRetryGuarded() {
+        return true;
     }
 }

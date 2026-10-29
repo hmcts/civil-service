@@ -735,6 +735,24 @@ http:
     maxPerRoute: ${HTTP_MAX_PER_ROUTE:20}
     maxTotal: ${HTTP_MAX_TOTAL:75}
     threshold: 10000
+    retry:
+      # Read-only POSTs that Feign still replays after a read timeout, as <feign-client-name>:<path-suffix>.
+      # Any other POST, PUT or PATCH that times out on read is not replayed, because the server may already
+      # have processed it. This is the only place the list is set: HttpClientFeignConfiguration has no default, so the
+      # application fails to start if it is missing. FeignWriteEndpointReplayPolicyTest checks this list against every
+      # Feign write endpoint.
+      replay-on-read-timeout: >-
+        core-case-data-api:/searchCases,
+        docmosis:/rs/render,
+        idam-api:/o/token,
+        oidc-api:/o/token,
+        case-assignment-api:/noc/check-noc-approval,
+        camunda-rest-engine-api:/evaluate,
+        camunda-rest-engine-api:/history/process-instance,
+        camunda-testing-support-api:/history/process-instance,
+        am-role-assignment-service-api:/am/role-assignments/query,
+        wa:/task,
+        idam-s2s-auth:/lease
 
 court-location:
   specified-claim:

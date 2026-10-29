@@ -104,4 +104,16 @@ public class GaSpecExternalCaseEventTaskHandler extends BaseExternalTaskHandler 
                 .data(objectDataMap)
                 .build();
     }
+
+    /**
+     * Guarded by {@code isEventAlreadyProcessed} in {@code handleTask}. Unlike the other guarded
+     * handlers, this one never writes {@code processInstanceId} itself: the guard only matches
+     * because {@code GaStartGeneralApplicationBusinessProcessTaskHandler} sets it earlier in the
+     * same process. If that stops being true, the guard silently stops matching and a re-run after
+     * a 502/503/504 submits the event again.
+     */
+    @Override
+    protected boolean isRetryGuarded() {
+        return true;
+    }
 }
