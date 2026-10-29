@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.mediation.MediationCorrespondenceType;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
@@ -48,6 +49,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicMultiSelectList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
@@ -78,6 +80,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationCorrespondence;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.ClientContext;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
@@ -422,6 +425,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private  String caseNote;
     private  List<Element<CaseNote>> caseNotes;
+
+    private  DynamicMultiSelectList mediationCorrespondenceParties;
+    private  MediationCorrespondenceType mediationCorrespondenceType;
+    private  LocalDate mediationCorrespondenceDate;
+    private  String mediationCorrespondenceSummary;
+    private  List<Element<MediationCorrespondence>> mediationCorrespondence;
 
     private  String notificationSummary;
 
