@@ -47,7 +47,22 @@ jobs:
           node-version: '24'
       - name: Test documentation PR lifecycle
         if: steps.policy.outputs.mode != 'skip'
-        run: node --test .github/scripts/update-email-docs-pr.test.cjs
+        run: node --test .github/scripts/*email-docs*.test.cjs
+      - name: Package strictly verified documentation
+        id: package
+        if: github.ref == 'refs/heads/master' && steps.policy.outputs.mode == 'sync'
+        run: |
+          tar -C docs -cf "$RUNNER_TEMP/email-docs.tar" .
+          echo "tree=$(git rev-parse HEAD:docs)" >> "$GITHUB_OUTPUT"
+      - name: Retain verified documentation for publication and recovery
+        if: github.ref == 'refs/heads/master' && steps.policy.outputs.mode == 'sync'
+        uses: actions/upload-artifact@v7
+        with:
+          name: verified-email-docs-${{ steps.package.outputs.tree }}
+          path: ${{ runner.temp }}/email-docs.tar
+          retention-days: 90
+          overwrite: true
+          if-no-files-found: error
       - name: No documentation inputs changed
         if: steps.policy.outputs.mode == 'skip'
         run: echo 'No documentation inputs changed; verification is complete.' >> "$GITHUB_STEP_SUMMARY"

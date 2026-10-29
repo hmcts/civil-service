@@ -18,9 +18,26 @@ function fixture(options = {}) {
     sourceBase: options.parent || BASE, same: Boolean(options.same), noDrift: Boolean(options.noDrift),
     files: options.files || [...FILES], pr: options.existing ? { ...PR } : null,
     commits: 0, pushes: 0, failCreate: options.failCreate || 0, failUpdate: options.failUpdate || 0,
+    sameDocs: options.sameDocs ?? Boolean(options.same),
+    masterDocs: options.masterDocs ?? Boolean(options.noDrift),
+    history: options.history,
   };
+  const manifest = (civil, ga) => JSON.stringify({
+    'civil-ccd-definition': civil.repeat(40), 'civil-general-apps-ccd-definition': ga.repeat(40),
+  }) + '\n';
+  state.masterManifest = manifest('a', 'b');
+  state.branchManifest = manifest('c', 'd');
+  const contents = new Map([
+    [FILES[0], '|header|\n|---|\n|data|\n'], [FILES[1], '<html>matrix</html>'],
+    [FILES[2], options.noDrift ? state.masterManifest : options.same ? state.branchManifest : manifest('e', 'f')],
+  ]);
   const summary = { addRaw() { return this; }, async write() {} };
   const clients = {
+    recordedInSync: options.recordedInSync ?? true,
+    files: {
+      readFileSync(path) { assert.ok(contents.has(path)); return contents.get(path); },
+      writeFileSync(path, value) { assert.equal(path, FILES[2]); contents.set(path, value); },
+    },
     context: { repo: { owner: 'hmcts', repo: 'civil-service' }, serverUrl: 'https://example.invalid', runId: 123 },
     core: { info() {}, setOutput() {}, summary },
     exec: {
@@ -42,16 +59,29 @@ function fixture(options = {}) {
           assert.deepEqual(args, ['merge-base', state.base, state.head]);
           return success(state.sourceBase);
         }
+        if (args[0] === 'log') {
+          assert.deepEqual(args, ['log', '--format=%H%x00%ae%x00%ce%x00%s', `${state.sourceBase}..${state.head}`]);
+          return success(state.history ?? [state.head, 'civil-service-bot@users.noreply.github.com',
+            'civil-service-bot@users.noreply.github.com', 'chore: regenerate email notification docs'].join('\0'));
+        }
+        if (args[0] === 'show') {
+          if (args[1] === `${state.base}:${FILES[2]}`) return success(state.masterManifest);
+          assert.equal(args[1], `${state.head}:${FILES[2]}`);
+          return success(state.branchManifest);
+        }
         if (args[0] === 'diff' && args[1] === '--no-renames') {
           assert.deepEqual(args, ['diff', '--no-renames', '--name-only', '-z', state.sourceBase, state.head, '--']);
           if (options.failScope) return { exitCode: 1, stdout: '' };
           return success(state.files.join('\0') + '\0');
         }
         if (args[0] === 'diff' && args[1] === '--quiet') {
-          assert.deepEqual(args.slice(3), ['--', ...FILES]);
-          if (args[2] === 'HEAD') return { exitCode: state.noDrift ? 0 : 1, stdout: '' };
+          const documentsOnly = args.length === 6;
+          assert.deepEqual(args.slice(3), ['--', ...(documentsOnly ? FILES.slice(0, 2) : FILES)]);
+          if (args[2] === 'HEAD') return { exitCode: state.masterDocs
+            && (documentsOnly || contents.get(FILES[2]) === state.masterManifest) ? 0 : 1, stdout: '' };
           assert.equal(args[2], state.head);
-          return { exitCode: state.same ? 0 : 1, stdout: '' };
+          return { exitCode: state.sameDocs
+            && (documentsOnly || contents.get(FILES[2]) === state.branchManifest) ? 0 : 1, stdout: '' };
         }
         if (args[0] === 'checkout') {
           assert.deepEqual(args, ['checkout', '-B', BRANCH]);
@@ -77,6 +107,8 @@ function fixture(options = {}) {
           state.parent = state.base;
           state.sourceBase = state.base;
           state.same = true;
+          state.sameDocs = true;
+          state.branchManifest = contents.get(FILES[2]);
           state.files = [...FILES];
           return success();
         }
@@ -128,7 +160,7 @@ function fixture(options = {}) {
 test('no drift produces no commit, branch push, or PR', async () => {
   const { clients, commands, requests } = fixture({ noDrift: true });
   await update(clients);
-  assert.deepEqual(commands.map(args => args[0]), ['rev-parse', 'diff']);
+  assert.deepEqual(commands.map(args => args[0]), ['rev-parse', 'diff', 'show', 'diff']);
   assert.deepEqual(requests.map(([method]) => method), ['list']);
 });
 
@@ -191,7 +223,7 @@ test('push rejection propagates without creating a misleading PR', async () => {
 test('permission errors and Git failures are not mistaken for absent branches or normal differences', async () => {
   const denied = fixture({ refError: true });
   await assert.rejects(update(denied.clients), /permission denied/);
-  for (const command of ['rev-parse', 'diff', 'fetch', 'merge-base', 'checkout', 'add', '-c']) {
+  for (const command of ['rev-parse', 'diff', 'fetch', 'merge-base', 'log', 'checkout', 'add', '-c']) {
     const failed = fixture({ previous: true, failCommand: command });
     await assert.rejects(update(failed.clients), /git .* failed/);
     assert.ok(!failed.requests.some(([method]) => ['create', 'update'].includes(method)));
@@ -216,7 +248,7 @@ test('retry repairs PR metadata after a successful push and failed API update wi
   assert.match(state.pr.body, /civil-ccd-definition: `[0-9a-f]{40}`/);
   assert.match(state.pr.body, /civil-general-apps-ccd-definition: `[0-9a-f]{40}`/);
   assert.match(state.pr.body, /HTML SHA-256: `[0-9a-f]{64}`/);
-  assert.match(state.pr.body, /actions\/runs\/124/);
+  assert.ok(!state.pr.body.includes('/actions/runs/'));
 });
 
 test('retry creates the missing PR after a successful push and failed API creation without pushing again', async () => {
@@ -259,12 +291,62 @@ test('closed or merged PRs allow creation with an already-correct branch or a de
   }
 });
 
-test('an unchanged branch can refresh the generation-run link without committing or pushing', async () => {
-  const { clients, state } = fixture();
+test('different run IDs and CRLF bodies do not update an unchanged PR', async () => {
+  const { clients, requests, state } = fixture();
   await update(clients);
+  state.pr.body = state.pr.body.replace(/\n/g, '\r\n');
+  requests.length = 0;
   clients.context.runId = 125;
   await update(clients);
   assert.equal(state.commits, 1);
   assert.equal(state.pushes, 1);
-  assert.match(state.pr.body, /actions\/runs\/125/);
+  assert.deepEqual(requests.map(([method]) => method), ['list']);
+});
+
+test('CCD-only revision changes retain master pins when those pins reproduce the documents', async () => {
+  const { clients, state } = fixture({ masterDocs: true });
+  await update(clients);
+  assert.equal(state.commits, 0);
+  assert.equal(state.pushes, 0);
+  assert.equal(state.pr, null);
+  assert.equal(clients.files.readFileSync(FILES[2]), state.masterManifest);
+});
+
+test('a pending PR retains its pins across unrelated CCD commits and new workflow runs', async () => {
+  const { clients, requests, state } = fixture();
+  await update(clients);
+  const manifest = state.branchManifest;
+  clients.files.writeFileSync(FILES[2], JSON.stringify({
+    'civil-ccd-definition': '9'.repeat(40), 'civil-general-apps-ccd-definition': '8'.repeat(40),
+  }));
+  clients.context.runId++;
+  requests.length = 0;
+  await update(clients);
+  assert.equal(state.commits, 1);
+  assert.equal(state.pushes, 1);
+  assert.equal(clients.files.readFileSync(FILES[2]), manifest);
+  assert.deepEqual(requests.map(([method]) => method), ['list']);
+});
+
+test('pins are updated if old revisions no longer reproduce master even when latest outputs match', async () => {
+  const { clients, state } = fixture({ masterDocs: true, recordedInSync: false });
+  await update(clients);
+  assert.equal(state.commits, 1);
+  assert.equal(state.pushes, 1);
+  assert.notEqual(clients.files.readFileSync(FILES[2]), state.masterManifest);
+});
+
+test('manual permitted-file commits and amendments are preserved, including when drift is resolved', async () => {
+  const human = [PREVIOUS, 'maintainer@example.invalid', 'maintainer@example.invalid', 'Edit matrix'].join('\0');
+  const bot = [PREVIOUS, 'civil-service-bot@users.noreply.github.com',
+    'civil-service-bot@users.noreply.github.com', 'chore: regenerate email notification docs'].join('\0');
+  for (const history of [human, `${human}\n${bot}`]) {
+    for (const noDrift of [false, true]) {
+      const { clients, commands, state } = fixture({ existing: true, previous: true, history, noDrift });
+      await assert.rejects(update(clients), /Manual or unexpected commits.*preserved/);
+      assert.deepEqual(state.pr, PR);
+      assert.equal(state.head, PREVIOUS);
+      assert.ok(!commands.some(args => ['checkout', 'add', '-c', 'push', 'show'].includes(args[0])));
+    }
+  }
 });

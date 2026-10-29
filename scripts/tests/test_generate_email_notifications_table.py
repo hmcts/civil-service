@@ -251,6 +251,32 @@ class GeneratorTests(unittest.TestCase):
         self.assertEqual((0, ''), self.run_generator(self.arguments()))
         self.assertIn('Readable request (REQUEST)', self.markdown.read_text())
 
+    def test_non_process_diagrams_warn_without_changing_the_matrix(self):
+        self.assertEqual((0, ''), self.run_generator(self.arguments()))
+        expected = self.markdown.read_bytes(), self.html.read_bytes()
+        for body in ('<collaboration id="pools"><participant id="pool"/></collaboration>',
+                     '<process id="placeholder" isExecutable="false"/>',
+                     '<textAnnotation id="note"><text>Design notes</text></textAnnotation>'):
+            with self.subTest(body=body):
+                (self.bpmn / 'diagram.bpmn').write_text(
+                    '<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL">'
+                    + body + '</definitions>')
+                code, warning = self.run_generator(self.arguments())
+                self.assertEqual(0, code)
+                self.assertIn('skipping BPMN file', warning)
+                self.assertIn('diagram.bpmn', warning)
+                self.assertEqual(expected, (self.markdown.read_bytes(), self.html.read_bytes()))
+
+    def test_empty_executable_process_still_fails_beside_valid_input(self):
+        (self.bpmn / 'executable.bpmn').write_text(
+            '<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL">'
+            '<process id="empty" isExecutable="true"/></definitions>')
+        code, error = self.run_generator(self.arguments())
+        self.assertEqual(1, code)
+        self.assertIn('executable.bpmn', error)
+        self.assertEqual('existing markdown', self.markdown.read_text())
+        self.assertEqual('existing html', self.html.read_text())
+
     def test_each_indexed_id_is_required_alongside_valid_nodes_and_processes(self):
         for attribute in ('', ' id=""', ' id="   "'):
             cases = {

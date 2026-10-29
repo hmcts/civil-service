@@ -430,6 +430,12 @@ def index_bpmn(bpmn_root: Path):
         root, namespaces = parse_bpmn(bpmn_file)
         if root.tag != f"{{{ns['bpmn']}}}definitions":
             raise ValueError(f"Invalid BPMN file {bpmn_file}: expected BPMN 2.0 definitions and namespace")
+        processes = root.findall('bpmn:process', ns)
+        has_flow = any(element.tag in flow_node_tags for element in root.iter())
+        if not has_flow and not any(process.get('isExecutable') == 'true' for process in processes):
+            print(f"Warning: skipping BPMN file {bpmn_file}: no process flow to index "
+                  '(collaboration, annotations or non-executable placeholder).', file=sys.stderr)
+            continue
         indexed_tags = flow_node_tags | {f"{{{ns['bpmn']}}}{name}" for name in ('process', 'message')}
         identifiers = set()
         for element in root.iter():
@@ -442,8 +448,7 @@ def index_bpmn(bpmn_root: Path):
             if identifier in identifiers:
                 raise ValueError(f"Invalid BPMN file {bpmn_file}: duplicate indexed ID {identifier!r}")
             identifiers.add(identifier)
-        processes = root.findall('bpmn:process', ns)
-        if not any(any(child.tag in flow_node_tags for child in process) for process in processes):
+        if not any(element.tag in flow_node_tags for process in processes for element in process.iter()):
             raise ValueError(f"Invalid BPMN file {bpmn_file}: no usable process and flow nodes with IDs")
         parent_map = {child: parent for parent in root.iter() for child in parent}
         messages = {}
@@ -484,6 +489,8 @@ def index_bpmn(bpmn_root: Path):
             for input_param in task.findall('.//camunda:inputParameter', camunda_ns):
                 if input_param.attrib.get('name') == 'caseEvent' and input_param.text:
                     case_event_map[input_param.text.strip()].append(bpmn_file)
+    if not ccd_events:
+        raise ValueError(f"Invalid BPMN files under {bpmn_root}: no usable process flow found")
     return service_map, ccd_events, ccd_event_labels, case_event_map, start_event_file_map
 
 

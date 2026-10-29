@@ -1,21 +1,15 @@
 name: Publish email notification docs
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - 'docs/email-notifications.md'
-      - 'docs/email-notifications.html'
-      - '.github/workflows/deploy-email-docs.yml'
-      - 'scripts/generate_email_notifications_table.py'
-      - 'scripts/email_docs.py'
-      - '.github/email-docs-sources.json'
-      - '.github/actions/email-docs/**'
+  workflow_run:
+    workflows: [Verify email notification documentation]
+    types: [completed]
+    branches: [master]
   workflow_dispatch:
 
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 
@@ -25,24 +19,48 @@ concurrency:
 
 jobs:
   deploy:
-    if: github.ref == 'refs/heads/master'
+    if: >-
+      github.ref == 'refs/heads/master' &&
+      (github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'))
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
+      - name: Check out publication code
         uses: actions/checkout@v7
         with:
+          ref: ${{ github.sha }}
           persist-credentials: false
-      - name: Verify the exact documents being published
-        uses: ./.github/actions/email-docs
+      - name: Select and download strictly verified documentation
+        id: verified
+        uses: actions/github-script@v9
         with:
-          mode: sync
+          script: |
+            const select = require('./.github/scripts/email-docs-artifact.cjs');
+            const tree = await exec.getExecOutput('git', ['rev-parse', 'HEAD:docs']);
+            const result = await select({ github, context, core, docsTree: tree.stdout.trim() });
+            if (!result) return;
+            const archive = await github.rest.actions.downloadArtifact({
+              ...context.repo, artifact_id: result.artefactId, archive_format: 'zip',
+            });
+            require('node:fs').writeFileSync(`${process.env.RUNNER_TEMP}/email-docs.zip`, Buffer.from(archive.data));
+            core.setOutput('found', 'true');
+            await core.summary.addRaw(`Publishing documentation verified at ${result.sha} in Actions run ${result.runId}.\n`).write();
+      - name: Unpack verified documentation
+        if: steps.verified.outputs.found == 'true'
+        run: |
+          mkdir -p "$RUNNER_TEMP/verified-email-docs" "$RUNNER_TEMP/email-docs-package"
+          unzip -q "$RUNNER_TEMP/email-docs.zip" -d "$RUNNER_TEMP/email-docs-package"
+          tar -xf "$RUNNER_TEMP/email-docs-package/email-docs.tar" -C "$RUNNER_TEMP/verified-email-docs"
+          diff -qr docs "$RUNNER_TEMP/verified-email-docs"
       - name: Upload documentation artefact
+        if: steps.verified.outputs.found == 'true'
         uses: actions/upload-pages-artifact@v5
         with:
-          path: docs
+          path: ${{ runner.temp }}/verified-email-docs
       - name: Deploy to GitHub Pages
+        if: steps.verified.outputs.found == 'true'
         id: deployment
         uses: actions/deploy-pages@v5

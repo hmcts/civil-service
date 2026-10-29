@@ -33,6 +33,11 @@ jobs:
           ref: master
           fetch-depth: 0
           token: ${{ secrets.EMAIL_DOCS_BOT_TOKEN }}
+      - name: Check whether recorded CCD revisions still reproduce master
+        id: recorded
+        uses: ./.github/actions/email-docs
+        with:
+          mode: report
       - name: Regenerate with current CCD definitions
         uses: ./.github/actions/email-docs
         with:
@@ -43,11 +48,14 @@ jobs:
         with:
           node-version: '24'
       - name: Test documentation PR lifecycle
-        run: node --test .github/scripts/update-email-docs-pr.test.cjs
+        run: node --test .github/scripts/*email-docs*.test.cjs
       - name: Create or update documentation PR
         uses: actions/github-script@v9
+        env:
+          RECORDED_DOCS_IN_SYNC: ${{ steps.recorded.outputs.in-sync }}
         with:
           github-token: ${{ secrets.EMAIL_DOCS_BOT_TOKEN }}
           script: |
             const update = require('./.github/scripts/update-email-docs-pr.cjs');
-            await update({ github, context, exec, core });
+            await update({ github, context, exec, core,
+              recordedInSync: process.env.RECORDED_DOCS_IN_SYNC === 'true' });

@@ -39,15 +39,15 @@ def load_sources(root: Path = REPO_ROOT) -> dict:
     return {name: revision(sources[name]) for name in REPOSITORIES}
 
 
-def git(*args: str, cwd: Path = REPO_ROOT) -> str:
-    return subprocess.check_output(['git', *args], cwd=cwd, text=True).strip()
+def git(*args: str, cwd: Path = REPO_ROOT, input: str | None = None) -> str:
+    return subprocess.check_output(['git', *args], cwd=cwd, input=input, text=True).strip()
 
 
 def classify(paths) -> str:
     paths = set(paths)
     if any(path in STRICT_FILES or path in WORKFLOWS or path.startswith(STRICT_PREFIXES)
            or (path.startswith('scripts/tests/') and 'email' in path)
-           or path.startswith('.github/scripts/update-email-docs-pr') for path in paths):
+           or path.startswith(('.github/scripts/update-email-docs-pr', '.github/scripts/email-docs-')) for path in paths):
         return 'sync'
     if any(path.startswith(('src/main/java/', 'src/main/resources/camunda/',
                             'src/main/resources/notification-templates/'))
@@ -61,7 +61,14 @@ def classify_commits(base: str, head: str) -> str:
     if base == '0' * 40:
         return 'sync'
     revision(base)
-    # No fetch: full history is supplied by the workflow's checkout.
+    # A force push can leave the old tip outside even a full checkout. Batch mode
+    # distinguishes a missing object from an actual Git failure without fetching.
+    kind = git('cat-file', '--batch-check=%(objecttype)', input=f'{base}^{{commit}}\n')
+    if kind == f'{base}^{{commit}} missing':
+        print('Comparison base is unavailable locally; requiring strict synchronisation.', file=sys.stderr)
+        return 'sync'
+    if kind != 'commit':
+        raise ValueError(f'Unexpected Git object probe result: {kind!r}')
     paths = git('diff', '--no-renames', '--name-only', '-z', base, head, '--').split('\0')
     return classify(paths)
 
@@ -102,6 +109,9 @@ def generate(mode: str, civil_root: Path, ga_root: Path, root: Path = REPO_ROOT)
             f'- Changed outputs: {", ".join(differences) or "none"}', '',
         ])
         print(summary)
+        if os.environ.get('GITHUB_OUTPUT'):
+            with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as stream:
+                stream.write(f'in_sync={str(not differences).lower()}\n')
         if os.environ.get('GITHUB_STEP_SUMMARY'):
             with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as stream:
                 stream.write(summary + '\n')

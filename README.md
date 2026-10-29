@@ -74,8 +74,8 @@ It does not fetch inputs: ensure the supplied directories contain the recorded r
 
 To intentionally refresh the CCD revisions, first prepare the desired local checkouts, then run
 `python3 -B scripts/email_docs.py record --civil-checkout ../civil-ccd-definition --ga-checkout ../civil-general-apps-ccd-definition`
-and regenerate. Include the manifest and both documents together in the PR. A change to either CCD revision
-is recorded even if the visible matrix does not change.
+and regenerate. Include the manifest and both documents together in the PR. This command deliberately records
+the selected revisions; the automated updater retains existing pins when unchanged documents still reproduce.
 
 Need to focus on a single CCD event (or a handful)? Pass one or more `--ccd-event` filters to keep only rows whose
 CCD event column contains the provided substring, e.g.
@@ -100,7 +100,9 @@ An explicit root with no usable definitions fails before either output is change
 omitted, the standalone generator tries sibling checkouts and warns if optional labels are unavailable,
 including when a sibling directory exists but contains no usable definitions. CI always supplies both roots.
 BPMN inputs accept a repository root, resources directory, or a directory containing BPMN files. Each file
-must contain BPMN 2.0 definitions and at least one process containing recognised flow nodes. Every process,
+must contain BPMN 2.0 definitions. Collaboration-only diagrams, annotations and non-executable placeholders
+without flow nodes are skipped with a warning. At least one usable process must remain across the input directory;
+an empty executable process is an error. In files containing process flow, every process,
 recognised flow node (including nested nodes) and message must have a non-blank ID, unique among those elements.
 Message-start references must resolve to named messages in the same document; namespace-qualified local
 references are supported. Invalid IDs or references, empty inputs, malformed XML and non-BPMN XML fail before
@@ -112,16 +114,20 @@ Run the local regression tests without downloads:
 
 ```bash
 python3 -B -m unittest discover -s scripts/tests -p 'test_*email*.py'
-node --test .github/scripts/update-email-docs-pr.test.cjs
+node --test .github/scripts/*email-docs*.test.cjs
 ```
 
-The PR-lifecycle tests use simulated Git and GitHub clients; they do not create commits or contact GitHub.
+The PR-lifecycle and publication tests use simulated Git and GitHub clients; they do not create commits or contact GitHub.
 
-All three workflows share `.github/actions/email-docs`, including Python 3.12, the CCD checkout layout,
-regression tests, and generation settings. Their responsibilities are:
+Updating and verification share `.github/actions/email-docs`, including Python 3.12, the CCD checkout layout,
+regression tests, and generation settings. Publication consumes the verified artefact. Their responsibilities are:
 
 - **Update email notification docs:** runs after master pushes, daily at 06:23 UTC, and on manual dispatch
-  against master. It records current default-branch CCD revisions and maintains one documentation PR.
+  against master. It checks current default-branch CCD revisions and maintains one documentation PR.
+  Unrelated CCD commits do not change the manifest or refresh an unchanged pending PR. Master pins are retained
+  only when generation proves they still reproduce the documents; a pending PR retains its pins when its
+  source baseline and both generated files are unchanged. New pins are committed for changed output or when
+  the previous pins no longer reproduce master, preserving reproducible verification.
   Only the two generated files and source manifest are committed to the automation branch. Repeated runs
   create no new commit when the generated files, recorded CCD revisions and civil-service source baseline
   are unchanged. If master advances while a documentation PR is pending, the updater refreshes that PR's
@@ -129,17 +135,26 @@ regression tests, and generation settings. Their responsibilities are:
 - **Verify email notification documentation:** runs on PRs and master pushes. Source-only changes validate
   generation and report pending drift. Changes to generated documents, the manifest, generator, tests,
   or email workflows require exact synchronisation of both outputs. Unrelated changes return a successful
-  no-work result, so the check can be required without leaving unrelated PRs pending. Manual runs are strict.
-- **Publish email notification docs:** regenerates against recorded CCD revisions and requires both committed
-  files to match before uploading the complete `docs` artefact. Validation and upload use the same checkout.
-  Manual deployment also performs this check and is restricted to master.
+  no-work result, so the check can be required without leaving unrelated PRs pending. An unavailable comparison
+  base after a force push falls back to strict synchronisation. Manual runs are strict. Successful strict runs
+  on master package the complete validated `docs` directory and retain it as an Actions artefact for up to
+  90 days, subject to repository retention limits. PR and report-only runs cannot produce a publication artefact.
+- **Publish email notification docs:** follows successful verification and publishes only its saved artefact
+  matching the complete committed `docs` tree. It does not check out CCD repositories or rerun generation.
+  Manual publication on master can reuse an earlier successful verification artefact when the docs tree is
+  identical, including after unrelated master commits. Missing, expired or mismatched artefacts are never
+  replaced with an unchecked upload of `docs`. The extracted files are compared with the checkout before upload.
 
 The updater uses the repository's existing `actions/github-script` action and
 `.github/scripts/update-email-docs-pr.cjs`, with an explicit lease when updating its automation branch.
 Before reusing, replacing or closing an existing update, it checks the branch's complete changed-file list
 against its common ancestor with master. Unexpected files stop the run and leave the branch and PR intact
-for investigation. If a push succeeds but PR creation or a description update fails, a retry reuses the
-correct branch and repairs the PR without another commit or push.
+for investigation. It also refuses to replace or close a branch containing manual commits or amendments,
+even when they touch only permitted files. Resolve those changes explicitly before retrying automation;
+commit author metadata is an accidental-edit guard, not an authentication boundary.
+If a push succeeds but PR creation or a description update fails, a retry reuses the
+correct branch and repairs the PR without another commit or push. PR descriptions contain stable provenance;
+run history remains available in Actions, and line-ending differences do not cause metadata updates.
 It does not push directly to master. A human must review and merge the documentation PR under normal branch protection.
 
 Before enabling the updater, a repository administrator must configure **`EMAIL_DOCS_BOT_TOKEN`** with a
@@ -152,8 +167,11 @@ both creation and subsequent updates of its PR start the required checks before 
 
 To recover a missed refresh, manually dispatch **Update email notification docs** on master, review the
 resulting PR, and merge it. Publication then runs automatically. If necessary, manually dispatch
-**Publish email notification docs** on master after synchronisation succeeds. Generation summaries and PR
-descriptions include source revisions, data-row counts, and the generated HTML SHA-256; compare the published
+**Publish email notification docs** on master to reuse a retained verification artefact, without requiring CCD
+availability. If that artefact has expired or the docs tree has changed, first run **Verify email notification
+documentation** on master; creating a fresh verified artefact requires the recorded CCD inputs to be reachable.
+Generation summaries and PR descriptions include source revisions, data-row counts, and the generated HTML
+SHA-256; compare the published
 HTML with the merged artefact during rollout. No deployment timestamp is inserted into generated documents.
 
 </details>

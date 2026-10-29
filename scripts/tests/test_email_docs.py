@@ -74,14 +74,44 @@ class VerificationTests(unittest.TestCase):
         self.assertEqual('sync', docs.classify([docs.MANIFEST]))
         self.assertEqual('sync', docs.classify(['.github/actions/email-docs/action.yml']))
         self.assertEqual('sync', docs.classify(['.github/scripts/update-email-docs-pr.cjs']))
+        self.assertEqual('sync', docs.classify(['.github/scripts/email-docs-artifact.cjs']))
+        self.assertEqual('sync', docs.classify(['.github/scripts/email-docs-artifact.test.cjs']))
 
     def test_changed_commit_classification_accounts_for_removed_inputs_and_zero_base(self):
-        with patch.object(docs, 'git', return_value='src/main/resources/camunda/removed.bpmn\0archive/removed.bpmn\0') as git:
+        with patch.object(docs, 'git', side_effect=[
+                'commit', 'src/main/resources/camunda/removed.bpmn\0archive/removed.bpmn\0']) as git:
             self.assertEqual('report', docs.classify_commits('a' * 40, 'b' * 40))
             self.assertIn('--no-renames', git.call_args.args)
         with patch.object(docs, 'git') as git:
             self.assertEqual('sync', docs.classify_commits('0' * 40, 'b' * 40))
             git.assert_not_called()
+
+    def test_missing_comparison_base_requires_sync_without_a_diff(self):
+        base = 'a' * 40
+        with patch.object(docs, 'git', return_value=f'{base}^{{commit}} missing') as git, \
+                contextlib.redirect_stderr(io.StringIO()):
+            self.assertEqual('sync', docs.classify_commits(base, 'b' * 40))
+            git.assert_called_once_with('cat-file', '--batch-check=%(objecttype)', input=f'{base}^{{commit}}\n')
+
+    def test_git_probe_and_diff_failures_are_not_treated_as_missing_bases(self):
+        import subprocess
+        failure = subprocess.CalledProcessError(128, 'git')
+        for responses in ([failure], ['commit', failure], ['unexpected output']):
+            with self.subTest(responses=responses), patch.object(docs, 'git', side_effect=responses):
+                with self.assertRaises((subprocess.CalledProcessError, ValueError)):
+                    docs.classify_commits('a' * 40, 'b' * 40)
+
+    def test_generation_emits_comparison_result_for_actions(self):
+        output = self.root / 'action-output'
+        with patch.object(docs.subprocess, 'run', side_effect=self.generation), \
+                patch.object(docs, 'git', return_value='c' * 40), \
+                patch.dict(os.environ, {'GITHUB_OUTPUT': str(output)}, clear=True), \
+                contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(0, docs.generate('report', self.root / 'civil', self.root / 'ga', self.root))
+            for name, content in zip(docs.DOCUMENTS, (self.markdown, self.html)):
+                (self.root / name).write_text(content)
+            self.assertEqual(0, docs.generate('sync', self.root / 'civil', self.root / 'ga', self.root))
+        self.assertEqual('in_sync=false\nin_sync=true\n', output.read_text())
 
     def test_generation_failure_preserves_outputs_even_in_write_mode(self):
         import subprocess
