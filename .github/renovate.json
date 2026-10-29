@@ -23,14 +23,11 @@
   "helmv3": {
     "bumpVersion": "patch"
   },
-  "regexManagers": [
+  "customManagers": [
     {
-      "fileMatch": [
-        "^Dockerfile$"
-      ],
-      "matchStrings": [
-        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\sARG .*?_VERSION=(?<currentValue>.*)\\s"
-      ]
+      "customType": "regex",
+      "managerFilePatterns": ["/^Dockerfile$/"],
+      "matchStrings": ["datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\sARG .*?_VERSION=(?<currentValue>.*)\\s"]
     }
   ],
   "packageRules": [
@@ -56,10 +53,10 @@
       "description": "Version 1.60.0 requires Spring Boot 4; retain the compatible client until the service migrates"
     },
     {
-      "matchPackagePatterns": [
-        "pact"
-      ],
-      "enabled": false
+      "enabled": false,
+      "matchPackageNames": [
+        "/pact/"
+      ]
     },
     {
       "matchPackageNames": [
@@ -85,13 +82,13 @@
       "automergeType": "pr"
     },
     {
-      "matchPackagePatterns": [
-        "^org\\.camunda\\.bpm"
-      ],
       "groupName": "Camunda updates",
       "groupSlug": "camunda",
       "automerge": false,
-      "description": "Camunda upgrades are isolated in their own group and require manual review to prevent build failures"
+      "description": "Camunda upgrades are isolated in their own group and require manual review to prevent build failures",
+      "matchPackageNames": [
+        "/^org\\.camunda\\.bpm/"
+      ]
     },
     {
       "matchManagers": [
@@ -103,18 +100,18 @@
       "automergeType": "pr"
     },
     {
-      "matchPackagePatterns": [
-        "org.springframework",
-        "org.springdoc",
-        "spring-boot",
-        "spring-cloud",
-        "jakarta.persistence",
-        "org.hibernate"
-      ],
       "groupName": "Spring Boot and related updates",
       "groupSlug": "spring-boot-related",
       "automerge": true,
-      "automergeType": "pr"
+      "automergeType": "pr",
+      "matchPackageNames": [
+        "/org.springframework/",
+        "/org.springdoc/",
+        "/spring-boot/",
+        "/spring-cloud/",
+        "/jakarta.persistence/",
+        "/org.hibernate/"
+      ]
     },
     {
       "matchManagers": [
@@ -126,14 +123,14 @@
       "automergeType": "pr"
     },
     {
-      "matchPackagePatterns": [
-        "org.projectlombok",
-        "io.freefair.lombok"
-      ],
       "groupName": "Lombok updates",
       "groupSlug": "lombok",
       "automerge": true,
-      "automergeType": "pr"
+      "automergeType": "pr",
+      "matchPackageNames": [
+        "/org.projectlombok/",
+        "/io.freefair.lombok/"
+      ]
     }
   ]
 }
