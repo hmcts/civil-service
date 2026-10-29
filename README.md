@@ -43,29 +43,118 @@ Generated business rules from flowstate predicates in
 
 Every Camunda notifier, the parties it contacts, the Gov.Notify templates it uses, and the BPMN/CCD entry points are tracked in [`docs/email-notifications.md`](docs/email-notifications.md). The table is generated automatically by `scripts/generate_email_notifications_table.py`, which walks the notifier/aggregator/generator hierarchy, reads template IDs from `src/main/resources/application.yaml`, and links the referencing BPMN files from `src/main/resources/camunda`.
 
-The same data is published via GitHub Pages at https://hmcts.github.io/civil-service/email-notifications.html, so after commits land on `master` the interactive table is available to anyone with repo access.
+The same data is published via GitHub Pages at https://hmcts.github.io/civil-service/email-notifications.html.
+Source changes on `master` cause the updater to create or refresh a documentation PR on
+`automation/email-notification-docs`. Publication follows normal review and merge of that PR;
+there is a freshness gap until it is merged. Civil maintainers should monitor these PRs alongside updater failures.
 
 <details>
-<summary>How to regenerate `docs/email-notifications.md`</summary>
+<summary>Regeneration, verification, and automation setup</summary>
+
+Use Python 3.12. The generator and its tests use only the standard library. Place local checkouts of
+`civil-ccd-definition` and `civil-general-apps-ccd-definition` alongside this repository. For reproducible
+results, use the exact revisions recorded in `.github/email-docs-sources.json` (which can be inspected with
+`python3 -B scripts/email_docs.py refs`). Do not change a checkout containing unrelated work; a separate
+local snapshot of the recorded definition revision can also be supplied.
+
+Regenerate both committed documents with explicit local roots:
 
 ```bash
-scripts/generate_email_notifications_table.py --bpmn-root src/main/resources
+python3 -B scripts/email_docs.py generate --mode write \
+  --civil-root ../civil-ccd-definition/ccd-definition \
+  --ga-root ../civil-general-apps-ccd-definition/ga-ccd-definition
 ```
+
+Use `--mode sync` with the same arguments to check the files without modifying them. `--mode report`
+reports drift without treating it as a failure and is used for source-only changes awaiting a follow-up
+documentation PR. Both modes leave the repository documents unchanged. Invalid inputs and generation errors
+still fail in every mode.
+The helper always uses `src/main/resources/camunda`, explicit CCD roots, and the catalogue's Notify service ID.
+It does not fetch inputs: ensure the supplied directories contain the recorded revisions and no local definition edits.
+
+To intentionally refresh the CCD revisions, first prepare the desired local checkouts, then run
+`python3 -B scripts/email_docs.py record --civil-checkout ../civil-ccd-definition --ga-checkout ../civil-general-apps-ccd-definition`
+and regenerate. Include the manifest and both documents together in the PR. A change to either CCD revision
+is recorded even if the visible matrix does not change.
 
 Need to focus on a single CCD event (or a handful)? Pass one or more `--ccd-event` filters to keep only rows whose
 CCD event column contains the provided substring, e.g.
 
 ```bash
-scripts/generate_email_notifications_table.py \
-  --bpmn-root src/main/resources \
-  --ccd-event DEFENDANT_RESPONSE_SPEC
+python3 -B scripts/generate_email_notifications_table.py \
+  --bpmn-root src/main/resources/camunda \
+  --ccd-definition-root ../civil-ccd-definition/ccd-definition \
+  --ga-ccd-definition-root ../civil-general-apps-ccd-definition/ga-ccd-definition \
+  --ccd-event DEFENDANT_RESPONSE_SPEC \
+  --output /tmp/email-notifications-filtered.md \
+  --html-output /tmp/email-notifications-filtered.html
 ```
 
-Every run also emits `docs/email-notifications.html`, which mirrors the markdown but adds a CCD event dropdown so you can
-filter interactively in a browser. Use `--html-output /path/to/file.html` to change the destination or `--html-output ""`
-to skip generating it.
+By default, the standalone generator writes `docs/email-notifications.html`, which mirrors the Markdown
+but adds a CCD event dropdown for interactive filtering in a browser. Use `--html-output /path/to/file.html`
+to change the destination, as in the filtered example above, or `--html-output ""` to skip generating it.
 
-The `Verify email notification documentation` GitHub Action executes the same script on every push to `master` and fails if the committed markdown is out of date, so commits should always include any changes produced by the command above.
+An explicitly supplied CCD root must exist, be a directory, and contain usable CaseEvent ID/Name definitions.
+IDs and names must be non-blank strings; surrounding whitespace is removed and unusable entries are ignored.
+An explicit root with no usable definitions fails before either output is changed. When CCD arguments are
+omitted, the standalone generator tries sibling checkouts and warns if optional labels are unavailable,
+including when a sibling directory exists but contains no usable definitions. CI always supplies both roots.
+BPMN inputs accept a repository root, resources directory, or a directory containing BPMN files. Each file
+must contain BPMN 2.0 definitions and at least one process containing recognised flow nodes. Every process,
+recognised flow node (including nested nodes) and message must have a non-blank ID, unique among those elements.
+Message-start references must resolve to named messages in the same document; namespace-qualified local
+references are supported. Invalid IDs or references, empty inputs, malformed XML and non-BPMN XML fail before
+either output changes. Unused messages may omit their names, and timer starts do not need message references.
+Data-row counts exclude Markdown's header and separator, and do not by themselves establish that event labels
+or BPMN links are correct.
+
+Run the local regression tests without downloads:
+
+```bash
+python3 -B -m unittest discover -s scripts/tests -p 'test_*email*.py'
+node --test .github/scripts/update-email-docs-pr.test.cjs
+```
+
+The PR-lifecycle tests use simulated Git and GitHub clients; they do not create commits or contact GitHub.
+
+All three workflows share `.github/actions/email-docs`, including Python 3.12, the CCD checkout layout,
+regression tests, and generation settings. Their responsibilities are:
+
+- **Update email notification docs:** runs after master pushes, daily at 06:23 UTC, and on manual dispatch
+  against master. It records current default-branch CCD revisions and maintains one documentation PR.
+  Only the two generated files and source manifest are committed to the automation branch. Repeated runs
+  create no new commit when the generated files, recorded CCD revisions and civil-service source baseline
+  are unchanged. If master advances while a documentation PR is pending, the updater refreshes that PR's
+  source baseline even when the generated files are identical.
+- **Verify email notification documentation:** runs on PRs and master pushes. Source-only changes validate
+  generation and report pending drift. Changes to generated documents, the manifest, generator, tests,
+  or email workflows require exact synchronisation of both outputs. Unrelated changes return a successful
+  no-work result, so the check can be required without leaving unrelated PRs pending. Manual runs are strict.
+- **Publish email notification docs:** regenerates against recorded CCD revisions and requires both committed
+  files to match before uploading the complete `docs` artefact. Validation and upload use the same checkout.
+  Manual deployment also performs this check and is restricted to master.
+
+The updater uses the repository's existing `actions/github-script` action and
+`.github/scripts/update-email-docs-pr.cjs`, with an explicit lease when updating its automation branch.
+Before reusing, replacing or closing an existing update, it checks the branch's complete changed-file list
+against its common ancestor with master. Unexpected files stop the run and leave the branch and PR intact
+for investigation. If a push succeeds but PR creation or a description update fails, a retry reuses the
+correct branch and repairs the PR without another commit or push.
+It does not push directly to master. A human must review and merge the documentation PR under normal branch protection.
+
+Before enabling the updater, a repository administrator must configure **`EMAIL_DOCS_BOT_TOKEN`** with a
+bot-account token scoped to this repository and **Contents: read/write** and **Pull requests: read/write**,
+plus any organisation approval required for that token. Use a credential whose PR events trigger required
+checks; the workflow deliberately does not fall back to `GITHUB_TOKEN`. The token is used only by the trusted
+master updater. Verification and publication use read-only checkout credentials. The updater fails with an
+actionable message if the secret is absent. Confirm that the bot can update the automation branch and that
+both creation and subsequent updates of its PR start the required checks before relying on automation.
+
+To recover a missed refresh, manually dispatch **Update email notification docs** on master, review the
+resulting PR, and merge it. Publication then runs automatically. If necessary, manually dispatch
+**Publish email notification docs** on master after synchronisation succeeds. Generation summaries and PR
+descriptions include source revisions, data-row counts, and the generated HTML SHA-256; compare the published
+HTML with the merged artefact during rollout. No deployment timestamp is inserted into generated documents.
 
 </details>
 

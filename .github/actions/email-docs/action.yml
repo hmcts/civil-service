@@ -1,0 +1,52 @@
+name: Generate and verify email documentation
+description: Use validated CCD revisions and the same generator settings in every email documentation workflow.
+inputs:
+  mode:
+    description: 'sync rejects drift; report records pending updates; write refreshes the files'
+    default: sync
+  refresh:
+    description: 'Use default CCD branches and record their revisions (updater only)'
+    default: 'false'
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v7
+      with:
+        python-version: '3.12'
+    - name: Select CCD revisions
+      id: sources
+      shell: bash
+      env:
+        REFRESH: ${{ inputs.refresh }}
+      run: |
+        if [[ "$REFRESH" == 'true' ]]; then
+          python3 -B scripts/email_docs.py refs --refresh >> "$GITHUB_OUTPUT"
+        else
+          python3 -B scripts/email_docs.py refs >> "$GITHUB_OUTPUT"
+        fi
+    - name: Check out Civil CCD definitions
+      uses: actions/checkout@v7
+      with:
+        repository: hmcts/civil-ccd-definition
+        path: civil-ccd-definition
+        ref: ${{ steps.sources.outputs.civil_ref }}
+        persist-credentials: false
+    - name: Check out GA CCD definitions
+      uses: actions/checkout@v7
+      with:
+        repository: hmcts/civil-general-apps-ccd-definition
+        path: civil-general-apps-ccd-definition
+        ref: ${{ steps.sources.outputs.ga_ref }}
+        persist-credentials: false
+    - name: Record refreshed CCD revisions
+      if: inputs.refresh == 'true'
+      shell: bash
+      run: python3 -B scripts/email_docs.py record
+    - name: Test generator and verification
+      shell: bash
+      run: python3 -B -m unittest discover -s scripts/tests -p 'test_*email*.py'
+    - name: Generate documentation
+      shell: bash
+      env:
+        MODE: ${{ inputs.mode }}
+      run: python3 -B scripts/email_docs.py generate --mode "$MODE"

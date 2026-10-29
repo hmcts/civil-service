@@ -9,6 +9,9 @@ on:
       - 'docs/email-notifications.html'
       - '.github/workflows/deploy-email-docs.yml'
       - 'scripts/generate_email_notifications_table.py'
+      - 'scripts/email_docs.py'
+      - '.github/email-docs-sources.json'
+      - '.github/actions/email-docs/**'
   workflow_dispatch:
 
 permissions:
@@ -22,14 +25,21 @@ concurrency:
 
 jobs:
   deploy:
+    if: github.ref == 'refs/heads/master'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Check out repository
         uses: actions/checkout@v7
-      - name: Upload docs artifact
+        with:
+          persist-credentials: false
+      - name: Verify the exact documents being published
+        uses: ./.github/actions/email-docs
+        with:
+          mode: sync
+      - name: Upload documentation artefact
         uses: actions/upload-pages-artifact@v5
         with:
           path: docs

@@ -2,48 +2,52 @@ name: Update email notification docs
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
+  schedule:
+    - cron: '23 6 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: update-email-docs
+  cancel-in-progress: false
 
 jobs:
   regenerate-docs:
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - name: Checkout civil-ccd-definition
-        uses: actions/checkout@v7
-        with:
-          repository: hmcts/civil-ccd-definition
-          path: civil-ccd-definition
-          fetch-depth: 0
-      - name: Checkout civil-general-apps-ccd-definition
-        uses: actions/checkout@v7
-        with:
-          repository: hmcts/civil-general-apps-ccd-definition
-          path: civil-general-apps-ccd-definition
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: actions/setup-python@v7
-        with:
-          python-version: '3.x'
-
-      - name: Regenerate docs
-        run: python3 scripts/generate_email_notifications_table.py --ccd-definition-root ../civil-ccd-definition/ccd-definition --ga-ccd-definition-root ../civil-general-apps-ccd-definition/ga-ccd-definition
-
-      - name: Commit changes
+      - name: Require a bot credential that triggers PR checks
+        env:
+          BOT_TOKEN: ${{ secrets.EMAIL_DOCS_BOT_TOKEN }}
         run: |
-          if git diff --quiet docs/email-notifications.md docs/email-notifications.html; then
-            echo "No doc changes detected"
-            exit 0
+          if [[ -z "$BOT_TOKEN" ]]; then
+            echo '::error::Configure EMAIL_DOCS_BOT_TOKEN with contents and pull-request write access; see README.'
+            exit 1
           fi
-          git config user.name "civil-service-bot"
-          git config user.email "civil-service-bot@users.noreply.github.com"
-          git add docs/email-notifications.md docs/email-notifications.html
-          git commit -m "chore: regenerate email notification docs"
-          git push origin HEAD:master
+      - name: Check out current master
+        uses: actions/checkout@v7
+        with:
+          ref: master
+          fetch-depth: 0
+          token: ${{ secrets.EMAIL_DOCS_BOT_TOKEN }}
+      - name: Regenerate with current CCD definitions
+        uses: ./.github/actions/email-docs
+        with:
+          mode: write
+          refresh: 'true'
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+      - name: Test documentation PR lifecycle
+        run: node --test .github/scripts/update-email-docs-pr.test.cjs
+      - name: Create or update documentation PR
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ secrets.EMAIL_DOCS_BOT_TOKEN }}
+          script: |
+            const update = require('./.github/scripts/update-email-docs-pr.cjs');
+            await update({ github, context, exec, core });

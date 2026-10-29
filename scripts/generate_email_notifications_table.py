@@ -135,7 +135,7 @@ class JavaClass:
 class SourceIndex:
     def __init__(self, java_root: Path):
         self.classes: Dict[str, JavaClass] = {}
-        for path in java_root.rglob('*.java'):
+        for path in sorted(java_root.rglob('*.java')):
             cls = JavaClass(path)
             self.classes[cls.name] = cls
 
@@ -388,20 +388,63 @@ def describe_party(index: SourceIndex, class_name: str) -> str:
     return 'Custom'
 
 
+def parse_bpmn(bpmn_file: Path):
+    """Retain namespace scopes for resolving messageRef QName attribute values."""
+    namespaces = {}
+    scopes = []
+    pending = {}
+    try:
+        parser = ET.iterparse(bpmn_file, events=('start-ns', 'start', 'end'))
+        for event, element in parser:
+            if event == 'start-ns':
+                prefix, uri = element
+                pending[prefix] = uri
+            elif event == 'start':
+                scope = {**(scopes[-1] if scopes else {}), **pending}
+                pending.clear()
+                scopes.append(scope)
+                if element.tag == '{http://www.omg.org/spec/BPMN/20100524/MODEL}messageEventDefinition':
+                    namespaces[element] = scope
+            else:
+                scopes.pop()
+    except ET.ParseError as error:
+        raise ValueError(f"Invalid BPMN file {bpmn_file}: {error}") from error
+    return parser.root, namespaces
+
+
 def index_bpmn(bpmn_root: Path):
     ns = {'bpmn': 'http://www.omg.org/spec/BPMN/20100524/MODEL'}
     camunda_ns = {'camunda': 'http://camunda.org/schema/1.0/bpmn'}
+    flow_node_tags = {f"{{{ns['bpmn']}}}{name}" for name in (
+        'startEvent', 'endEvent', 'intermediateCatchEvent', 'intermediateThrowEvent', 'boundaryEvent',
+        'task', 'serviceTask', 'userTask', 'manualTask', 'scriptTask', 'sendTask', 'receiveTask',
+        'businessRuleTask', 'callActivity', 'subProcess', 'transaction', 'adHocSubProcess',
+        'exclusiveGateway', 'inclusiveGateway', 'parallelGateway', 'eventBasedGateway', 'complexGateway',
+    )}
     service_map = defaultdict(list)
     ccd_events = {}
     ccd_event_labels = {}
     case_event_map = defaultdict(list)
     start_event_file_map = defaultdict(list)
     for bpmn_file in sorted(bpmn_root.glob('*.bpmn')):
-        try:
-            tree = ET.parse(bpmn_file)
-        except ET.ParseError:
-            continue
-        root = tree.getroot()
+        root, namespaces = parse_bpmn(bpmn_file)
+        if root.tag != f"{{{ns['bpmn']}}}definitions":
+            raise ValueError(f"Invalid BPMN file {bpmn_file}: expected BPMN 2.0 definitions and namespace")
+        indexed_tags = flow_node_tags | {f"{{{ns['bpmn']}}}{name}" for name in ('process', 'message')}
+        identifiers = set()
+        for element in root.iter():
+            if element.tag not in indexed_tags:
+                continue
+            identifier = element.get('id')
+            if not identifier or not identifier.strip():
+                kind = element.tag.rsplit('}', 1)[-1]
+                raise ValueError(f"Invalid BPMN file {bpmn_file}: {kind} requires a non-blank ID")
+            if identifier in identifiers:
+                raise ValueError(f"Invalid BPMN file {bpmn_file}: duplicate indexed ID {identifier!r}")
+            identifiers.add(identifier)
+        processes = root.findall('bpmn:process', ns)
+        if not any(any(child.tag in flow_node_tags for child in process) for process in processes):
+            raise ValueError(f"Invalid BPMN file {bpmn_file}: no usable process and flow nodes with IDs")
         parent_map = {child: parent for parent in root.iter() for child in parent}
         messages = {}
         for msg in root.findall('.//bpmn:message', ns):
@@ -410,16 +453,28 @@ def index_bpmn(bpmn_root: Path):
         start_labels = {}
         for start in root.findall('.//bpmn:startEvent', ns):
             for msg_def in start.findall('bpmn:messageEventDefinition', ns):
-                ref = msg_def.attrib.get('messageRef')
-                if ref and messages.get(ref):
-                    event_name = messages[ref]
-                    start_events.append(event_name)
-                    parent = parent_map.get(start)
-                    while parent is not None and not parent.tag.endswith('process'):
-                        parent = parent_map.get(parent)
-                    process_name = parent.attrib.get('name') if parent is not None else None
-                    display = f"{process_name} ({event_name})" if process_name else event_name
-                    start_labels[event_name] = display
+                ref = (msg_def.get('messageRef') or '').strip()
+                message_id = ref
+                if ':' in ref:
+                    prefix, message_id = ref.split(':', 1)
+                    namespace = namespaces[msg_def].get(prefix)
+                    if namespace is None or namespace != root.get('targetNamespace'):
+                        raise ValueError(f"Invalid BPMN file {bpmn_file}: messageRef {ref!r} "
+                                         'does not resolve to a local message')
+                if message_id not in messages:
+                    raise ValueError(f"Invalid BPMN file {bpmn_file}: unresolved messageRef {ref!r} "
+                                     f"on startEvent {start.get('id')!r}")
+                event_name = messages[message_id]
+                if not event_name or not event_name.strip():
+                    raise ValueError(f"Invalid BPMN file {bpmn_file}: message {message_id!r} "
+                                     'requires a non-blank name for CCD event enrichment')
+                start_events.append(event_name)
+                parent = parent_map.get(start)
+                while parent is not None and not parent.tag.endswith('process'):
+                    parent = parent_map.get(parent)
+                process_name = parent.attrib.get('name') if parent is not None else None
+                display = f"{process_name} ({event_name})" if process_name else event_name
+                start_labels[event_name] = display
         ccd_events[bpmn_file] = sorted(set(start_events))
         ccd_event_labels[bpmn_file] = start_labels
         for event_name in start_events:
@@ -775,7 +830,7 @@ def normalize_docmosis_title(title: Optional[str]) -> Optional[str]:
 def load_ccd_event_names(definition_root: Path) -> Dict[str, str]:
     if not definition_root or not definition_root.exists():
         return {}
-    case_event_dirs = [d for d in definition_root.rglob("CaseEvent") if d.is_dir()]
+    case_event_dirs = sorted(d for d in definition_root.rglob("CaseEvent") if d.is_dir())
     if not case_event_dirs:
         return {}
     names: Dict[str, tuple[int, str]] = {}
@@ -798,12 +853,15 @@ def load_ccd_event_names(definition_root: Path) -> Dict[str, str]:
                     continue
                 event_id = entry.get("ID")
                 name = entry.get("Name")
+                if not isinstance(event_id, str) or not isinstance(name, str):
+                    continue
+                event_id, name = event_id.strip(), name.strip()
                 if not event_id or not name:
                     continue
                 existing = names.get(event_id)
                 if existing and existing[0] <= priority:
                     continue
-                names[event_id] = (priority, str(name))
+                names[event_id] = (priority, name)
     return {event_id: name for event_id, (_, name) in names.items()}
 
 
@@ -1831,7 +1889,7 @@ def render_combined_html(rows: List[Dict[str, object]], notify_service_id: Optio
         "        const channelValue = (channel.value || '').trim();",
         "        let visible = 0;",
         "        rows.forEach(row => {",
-        "          const tokens = (row.dataset.ccdEvents || '').split(/\s+/).filter(Boolean);",
+        "          const tokens = (row.dataset.ccdEvents || '').split(/\\s+/).filter(Boolean);",
         "          const channelToken = row.dataset.channel || '';",
         "          const matchesCcd = !value || tokens.some(token => token === value);",
         "          const matchesChannel = !channelValue || channelToken === channelValue;",
@@ -1871,17 +1929,42 @@ def render_combined_html(rows: List[Dict[str, object]], notify_service_id: Optio
     return '\n'.join(lines)
 
 
+def resolve_bpmn_root(value: str) -> Path:
+    root = Path(value).expanduser().resolve()
+    if not value.strip() or not root.is_dir():
+        raise ValueError(f"--bpmn-root: directory not found: {root}")
+    for candidate in (root / 'src' / 'main' / 'resources' / 'camunda', root / 'camunda', root):
+        if candidate.is_dir() and any(candidate.glob('*.bpmn')):
+            return candidate
+    raise ValueError(f"--bpmn-root: no BPMN files found under {root}")
+
+
+def validated_ccd_event_names(value: Optional[str], default_root: Path, option: str) -> Dict[str, str]:
+    root = Path(value).expanduser().resolve() if value is not None else default_root
+    try:
+        if (value is not None and not value.strip()) or not root.is_dir():
+            raise ValueError(f"{option}: expected an existing directory: {root}")
+        names = load_ccd_event_names(root)
+        if not names:
+            raise ValueError(f"{option}: no usable CaseEvent ID/Name definitions found under {root}")
+    except (ValueError, OSError) as error:
+        if value is not None:
+            raise
+        print(f"Warning: {option} omitted; {error}. CCD labels will be incomplete.", file=sys.stderr)
+        return {}
+    print(f"Loaded {len(names)} CCD event labels from {root}")
+    return names
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     default_ccd_root = (REPO_ROOT / '..' / 'civil-ccd-definition' / 'ccd-definition').resolve()
     default_ga_root = (REPO_ROOT / '..' / 'civil-general-apps-ccd-definition' / 'ga-ccd-definition').resolve()
     parser = argparse.ArgumentParser(description="Generate docs/email-notifications.md")
-    parser.add_argument('--bpmn-root', default=str((REPO_ROOT / 'src' / 'main' / 'resources').resolve()),
-                        help='Path to directory containing camunda/ BPMN files (default: src/main/resources).')
+    parser.add_argument('--bpmn-root', default=str(RESOURCE_ROOT / 'camunda'),
+                        help='Repository root, resources directory, or BPMN directory (default: src/main/resources/camunda).')
     parser.add_argument('--ccd-definition-root',
-                        default=str(default_ccd_root) if default_ccd_root.exists() else '',
                         help='Path to civil-ccd-definition/ccd-definition (default: sibling directory if present).')
     parser.add_argument('--ga-ccd-definition-root',
-                        default=str(default_ga_root) if default_ga_root.exists() else '',
                         help='Path to civil-general-apps-ccd-definition/ga-ccd-definition (default: sibling directory if present).')
     parser.add_argument('--output', default=str(REPO_ROOT / 'docs' / 'email-notifications.md'),
                         help='Output markdown file path.')
@@ -1896,21 +1979,22 @@ def main(argv: Optional[List[str]] = None) -> int:
                         help='Path for the interactive HTML export (leave blank to skip).')
     args = parser.parse_args(argv)
 
-    bpmn_root = Path(args.bpmn_root)
-    if not bpmn_root.exists():
-        sys.stderr.write(f"BPMN directory not found: {bpmn_root}\n")
+    try:
+        camunda_root = resolve_bpmn_root(args.bpmn_root)
+        civil_event_names = validated_ccd_event_names(
+            args.ccd_definition_root, default_ccd_root, '--ccd-definition-root')
+        ga_event_names = validated_ccd_event_names(
+            args.ga_ccd_definition_root, default_ga_root, '--ga-ccd-definition-root')
+        service_tasks, start_events, start_event_labels, case_event_map, start_event_file_map = index_bpmn(camunda_root)
+    except (ValueError, OSError) as error:
+        print(error, file=sys.stderr)
         return 1
+    print(f"Indexed {len(start_events)} BPMN files from {camunda_root}")
 
     notifications = parse_notifications_config(APPLICATION_YAML)
     index = SourceIndex(JAVA_ROOT)
-    camunda_root = bpmn_root / 'src' / 'main' / 'resources' / 'camunda' if (bpmn_root / 'src').exists() else bpmn_root
-    service_tasks, start_events, start_event_labels, case_event_map, start_event_file_map = index_bpmn(camunda_root)
     scenario_map = load_dashboard_scenarios()
     template_map = load_template_paths()
-    ccd_root = Path(args.ccd_definition_root) if args.ccd_definition_root else None
-    ga_root = Path(args.ga_ccd_definition_root) if args.ga_ccd_definition_root else None
-    civil_event_names = load_ccd_event_names(ccd_root) if ccd_root else {}
-    ga_event_names = load_ccd_event_names(ga_root) if ga_root else {}
     ccd_event_names = merge_ccd_event_names(civil_event_names, ga_event_names)
     email_rows = build_email_rows(index, notifications, camunda_root, service_tasks, start_events, start_event_labels,
                                   case_event_map, start_event_file_map)
