@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -81,6 +82,8 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(AUTH_WHITELIST).permitAll()  // Health and other whitelisted endpoints
                 .requestMatchers("/cases/callbacks/**", "/case/document/generateAnyDoc", "/dashboard/**")
+                .hasAnyAuthority(AUTHORITIES)
+                .requestMatchers(HttpMethod.DELETE, "/case/document/*")
                 .hasAnyAuthority(AUTHORITIES)
                 .anyRequest().authenticated()
             )
