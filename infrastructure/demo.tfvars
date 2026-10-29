@@ -9,93 +9,121 @@ monitor_action_group = {
   }
 }
 
-monitor_scheduler_alerts = {
-  "JudgementBuffer" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
-  }
+scheduler_alerts_enabled = false
+job_not_run_threshold    = 26
 
-  "SettlementNoResponseFromDefendantCheck" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
-  }
+expected_schedulers = [
+  "AutomatedHearingNotice",
+  "BundleCreation",
+  "CaseDismissed",
+  "ClaimDetailsNotificationDeadline",
+  "CoscApplicationProcessor",
+  "DecisionOutcome",
+  "FullAdmitPayImmediatelyNoPaymentFromDefendant",
+  "GADocUploadNotifyScheduler",
+  "GAOrderMadeScheduler",
+  "GAUnlessOrderScheduler",
+  "HearingCvpLink",
+  "JudgementBuffer",
+  "ManageStayWATask",
+  "OrderReviewObligationCheck",
+  "PollingEventEmitter",
+  "RequestForReconsiderationNotification",
+  "SettlementNoResponseFromDefendantCheck",
+  "TakeCaseOffline",
+  "TrialReadyCheck",
+  "TrialReadyNotification"
+]
 
-  "FullAdmitPayImmediatelyNoPaymentFromDefendant" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
-  }
-  "BundleCreation" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
-  }
-  "HearingCvpLink" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
-  }
-  "PollingEventEmitter" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
-  }
-  "AutomatedHearingNotice" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
-  }
-  "GenerateCsvAndSendToMmt" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
-  }
-  "TakeCaseOffline" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
-  }
-  "TrialReadyNotification" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
-  }
-  "TrialReadyCheck" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
-  }
-  "OrderReviewObligationCheck" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
-  }
-  "DecisionOutcome" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
-  }
-  "CaseDismissed" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
-  }
-  "ClaimDetailsNotificationDeadline" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
-  }
-  "GADocUploadNotifyScheduler" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
-  }
-  "CoscApplicationProcessor" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
-  }
-  "GAOrderMadeScheduler" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
-  }
-  "GAUnlessOrderScheduler" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
-  }
-  "RequestForReconsiderationNotification" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
-  }
-  "ManageStayWATask" = {
-    enabled      = false
-    action_group = "demo-civil-service-slack-alert"
+monitor_cmc_db_metric_alerts = {
+  "demo-cmc-db-cpu-warning" = {
+    description = "Five-minute average CPU utilization >= 70%"
+    severity    = 2
+    enabled     = true
+    frequency   = "PT1M"
+    window_size = "PT5M"
+    criteria = [{
+      operator         = "GreaterThanOrEqual"
+      threshold        = 70
+      metric_namespace = "Microsoft.DBforPostgreSQL/flexibleServers"
+      metric_name      = "cpu_percent"
+      aggregation      = "Average"
+    }]
+    action = [{ action_group_name = "demo-civil-service-slack-alert" }]
+  },
+  "demo-cmc-db-cpu-critical" = {
+    description = "Five-minute average CPU utilization >= 85%"
+    severity    = 1
+    enabled     = true
+    frequency   = "PT1M"
+    window_size = "PT5M"
+    criteria = [{
+      operator         = "GreaterThanOrEqual"
+      threshold        = 85
+      metric_namespace = "Microsoft.DBforPostgreSQL/flexibleServers"
+      metric_name      = "cpu_percent"
+      aggregation      = "Average"
+    }]
+    action = [{ action_group_name = "demo-civil-service-slack-alert" }]
+  },
+  "demo-cmc-db-storage-warning" = {
+    description = "Demo CMC DB disk usage >= 80%"
+    severity    = 2
+    enabled     = true
+    frequency   = "PT5M"
+    window_size = "PT15M"
+    criteria = [{
+      operator         = "GreaterThanOrEqual"
+      threshold        = 80
+      metric_namespace = "Microsoft.DBforPostgreSQL/flexibleServers"
+      metric_name      = "storage_percent"
+      aggregation      = "Maximum"
+    }]
+    action = [{ action_group_name = "demo-civil-service-slack-alert" }]
+  },
+  "demo-cmc-db-storage-critical" = {
+    description = "Demo CMC DB disk usage >= 90%"
+    severity    = 0
+    enabled     = true
+    frequency   = "PT5M"
+    window_size = "PT15M"
+    criteria = [{
+      operator         = "GreaterThanOrEqual"
+      threshold        = 90
+      metric_namespace = "Microsoft.DBforPostgreSQL/flexibleServers"
+      metric_name      = "storage_percent"
+      aggregation      = "Maximum"
+    }]
+    action = [{ action_group_name = "demo-civil-service-slack-alert" }]
+  },
+  "demo-cmc-db-memory-warning" = {
+    description = "Demo CMC DB memory usage >= 85%"
+    severity    = 2
+    enabled     = true
+    frequency   = "PT1M"
+    window_size = "PT5M"
+    criteria = [{
+      operator         = "GreaterThanOrEqual"
+      threshold        = 85
+      metric_namespace = "Microsoft.DBforPostgreSQL/flexibleServers"
+      metric_name      = "memory_percent"
+      aggregation      = "Average"
+    }]
+    action = [{ action_group_name = "demo-civil-service-slack-alert" }]
+  },
+  "demo-cmc-db-memory-critical" = {
+    description = "Demo CMC DB memory usage >= 95%"
+    severity    = 0
+    enabled     = true
+    frequency   = "PT1M"
+    window_size = "PT5M"
+    criteria = [{
+      operator         = "GreaterThanOrEqual"
+      threshold        = 95
+      metric_namespace = "Microsoft.DBforPostgreSQL/flexibleServers"
+      metric_name      = "memory_percent"
+      aggregation      = "Average"
+    }]
+    action = [{ action_group_name = "demo-civil-service-slack-alert" }]
   }
 }
-
-job_not_run_threshold = 26
