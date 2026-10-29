@@ -71,6 +71,13 @@ public class EndBusinessProcessTaskHandler extends BaseExternalTaskHandler {
             .build();
     }
 
+    /**
+     * Guarded by checking if {@code businessProcess} status is already {@code FINISHED} in {@code handleTask}.
+     * This prevents duplicate calls to submit the {@code END_BUSINESS_PROCESS} update if the task is retried
+     * after a gateway failure.
+     *
+     * @return true as this handler checks business process status before submitting the update
+     */
     @Override
     protected boolean isRetryGuarded() {
         return true;
