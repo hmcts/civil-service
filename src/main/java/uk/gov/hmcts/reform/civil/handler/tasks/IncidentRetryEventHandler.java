@@ -3,9 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.client.task.ExternalTask;
-import org.camunda.community.rest.client.model.IncidentDto;
-import org.camunda.community.rest.client.model.ProcessInstanceDto;
-import org.camunda.community.rest.client.model.VariableValueDto;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -13,6 +10,9 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
+import uk.gov.hmcts.reform.civil.model.camunda.CamundaIncident;
+import uk.gov.hmcts.reform.civil.model.camunda.CamundaProcessInstance;
+import uk.gov.hmcts.reform.civil.model.camunda.CamundaVariableValue;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeApi;
@@ -170,7 +170,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         String incidentMessageLike
     ) {
         int firstResult = 0;
-        List<ProcessInstanceDto> processInstancesBatch;
+        List<CamundaProcessInstance> processInstancesBatch;
 
         do {
             log.info("Calling process instances for {}, {}, {}, {}",
@@ -187,12 +187,12 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             }
 
             List<String> processInstanceIds = processInstancesBatch.stream()
-                .map(ProcessInstanceDto::getId)
+                .map(CamundaProcessInstance::getId)
                 .toList();
 
             log.info("Calling incidents for {} process instances with firstResult {}", processInstanceIds.size(), firstResult);
 
-            List<IncidentDto> incidents = getLatestIncidentsForProcessInstances(
+            List<CamundaIncident> incidents = getLatestIncidentsForProcessInstances(
                 retryContext.serviceAuthorization,
                 processInstanceIds
             );
@@ -211,7 +211,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     }
 
     private void retryIncidents(
-        List<IncidentDto> incidents,
+        List<CamundaIncident> incidents,
         IncidentRetryContext retryContext
     ) {
         log.info("Retrying {} incidents across process instances", incidents.size());
@@ -237,7 +237,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         }
     }
 
-    private void handleIncidentRetry(IncidentDto incident, IncidentRetryContext retryContext) {
+    private void handleIncidentRetry(CamundaIncident incident, IncidentRetryContext retryContext) {
         retryContext.totalRetries.incrementAndGet();
         try {
             log.info("HandleIncidentRetry: calling retryIncidentSafely {}", incident.getId());
@@ -268,7 +268,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             : incidentEndTime;
     }
 
-    private List<ProcessInstanceDto> fetchProcessInstances(String serviceAuthorization,
+    private List<CamundaProcessInstance> fetchProcessInstances(String serviceAuthorization,
                                                            String incidentStartTime,
                                                            String incidentEndTime,
                                                            String incidentMessageLike,
@@ -297,9 +297,9 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         }
     }
 
-    private boolean retryIncidentSafely(IncidentDto incident, IncidentRetryContext retryContext) {
+    private boolean retryIncidentSafely(CamundaIncident incident, IncidentRetryContext retryContext) {
         String processInstanceId = incident.getProcessInstanceId();
-        Map<String, VariableValueDto> processVariables = fetchProcessVariables(processInstanceId, retryContext.serviceAuthorization);
+        Map<String, CamundaVariableValue> processVariables = fetchProcessVariables(processInstanceId, retryContext.serviceAuthorization);
         String incidentCaseId = resolveVariable(processVariables, CASE_ID_VARIABLE);
         String stateId = resolveVariable(processVariables, STATE_ID_VARIABLE);
         String lastEventId = resolveVariable(processVariables, EVENT_ID_VARIABLE);
@@ -381,7 +381,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
     private boolean hasOpenIncident(String processInstanceId, String originalIncidentId, String serviceAuthorization) {
         try {
-            List<IncidentDto> incidents = camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
+            List<CamundaIncident> incidents = camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
                 serviceAuthorization,
                 true,
                 processInstanceId,
@@ -393,7 +393,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 return false;
             }
 
-            IncidentDto latestIncident = incidents.get(0);
+            CamundaIncident latestIncident = incidents.get(0);
             log.info(
                 "Open incident {} still exists for processInstanceId={} after retry (originalIncidentId={})",
                 latestIncident.getId(),
@@ -472,7 +472,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         }
     }
 
-    private Map<String, VariableValueDto> fetchProcessVariables(String processInstanceId, String serviceAuthorization) {
+    private Map<String, CamundaVariableValue> fetchProcessVariables(String processInstanceId, String serviceAuthorization) {
         try {
             return camundaRuntimeApi.getProcessVariables(
                 processInstanceId,
@@ -484,14 +484,14 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         return Collections.emptyMap();
     }
 
-    private String resolveVariable(Map<String, VariableValueDto> variables, String variableName) {
+    private String resolveVariable(Map<String, CamundaVariableValue> variables, String variableName) {
         if (variables.containsKey(variableName) && variables.get(variableName).getValue() != null) {
             return String.valueOf(variables.get(variableName).getValue());
         }
         return UNKNOWN;
     }
 
-    private void trackStuckCaseEvent(IncidentDto incident,
+    private void trackStuckCaseEvent(CamundaIncident incident,
                                      String caseId,
                                      String stateId,
                                      String lastEventId,
@@ -579,7 +579,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 );
             }
 
-            List<IncidentDto> incidents = camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
+            List<CamundaIncident> incidents = camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
                 serviceAuthorization,
                 true,
                 processInstanceId,
@@ -600,7 +600,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 );
             }
 
-            IncidentDto incident = incidents.get(0);
+            CamundaIncident incident = incidents.get(0);
             String resolvedFailedActivityId = !UNKNOWN.equals(defaultIfBlank(incident.getActivityId()))
                 ? defaultIfBlank(incident.getActivityId())
                 : failedActivityId;
@@ -710,7 +710,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         return StringUtils.isBlank(value) ? UNKNOWN : value;
     }
 
-    private List<IncidentDto> getLatestIncidentsForProcessInstances(
+    private List<CamundaIncident> getLatestIncidentsForProcessInstances(
         String serviceAuthorization,
         List<String> processInstanceIds
     ) {
@@ -718,7 +718,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             .map(processInstanceId -> {
                 try {
                     // Call the API for a single process instance
-                    List<IncidentDto> incidents = camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
+                    List<CamundaIncident> incidents = camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
                         serviceAuthorization,
                         true,                   // open incidents only
                         processInstanceId,       // single process instance
@@ -726,7 +726,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                         "desc",                  // use default sortOrder
                         1                        // use default maxResults
                     );
-                    IncidentDto incidentDto = incidents.isEmpty() ? null : incidents.get(0);
+                    CamundaIncident incidentDto = incidents.isEmpty() ? null : incidents.get(0);
                     if (incidentDto != null) {
                         log.info("Fetched incident {} for process instance {}", incidentDto.getId(), processInstanceId);
                     } else {

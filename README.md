@@ -125,6 +125,15 @@ The project is dependent on other Civil repositories:
 
 Camunda BPMN definitions are included in this repository under `src/main/resources/camunda/`.
 
+The `Render BPMN diagrams` GitHub Action renders changed BPMNs and commits their PNGs
+under `docs/bpmn-diagrams/` to the same repository's PR branch. Renderer or dependency
+changes render all BPMNs. Fork PRs and protected branches receive the `bpmn-diagrams`
+artifact only. To regenerate everything, run `workflow_dispatch` on an unprotected
+working branch and include the resulting commit in a PR. If the branch advances while
+rendering, the workflow leaves the output in the artifact and the newer PR run handles
+it. Commit-back uses `GITHUB_TOKEN`; confirm the required Jenkins check runs on the
+resulting diagram commit before merging.
+
 To set up complete local environment for Civil check [civil-sdk](https://github.com/hmcts/civil-sdk)
 
 ### Building the application
@@ -397,6 +406,25 @@ role-assignment, etc.). Add this label when you need to test against live AAT se
 ## [Scheduler Framework](docs/scheduler-framework.md)
 
 Detailed documentation on core components, safety mechanisms, and instructions for creating new schedulers can be found in [docs/scheduler-framework.md](docs/scheduler-framework.md).
+
+## Null-safety baseline
+
+`./gradlew nullAwayBaseline` runs NullAway in WARN mode against production Java
+sources under `uk.gov.hmcts`. It also runs as part of `check` and `build`.
+The log prints `NullAway warning count (src/main/java): <count>` on every run,
+including when analysis is up to date. Full compiler diagnostics are saved to
+`build/reports/nullaway/diagnostics.txt` instead
+of printing each warning in the console. If analysis compilation fails, its
+diagnostics are also printed in the console and the build fails.
+Use `./gradlew nullAwayBaseline --rerun-tasks` to force a fresh analysis.
+
+Analysis compiles into `build/classes/nullaway`, outside application outputs.
+Normal compilation retains `-Werror`; the analysis compilation omits it and
+only enables the NullAway Error Prone check. Test sources are excluded from the
+production baseline. Warnings are observations, not a build threshold.
+The analysis uses command-line javac to redirect diagnostics. Gradle supports
+up-to-date checks for this task but disables build-cache reuse with an explicit
+compiler executable.
 
 ## License
 

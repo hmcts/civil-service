@@ -93,7 +93,7 @@ properties([
   ])
 ])
 
-@Library("Infrastructure")
+@Library("Infrastructure@2.13.4")
 
 def type = "java"
 def product = "civil"
@@ -208,6 +208,9 @@ def copyPrevPlaywrightLastRunAndTestFilesReport() {
 }
 
 def secrets = [
+  'ccd-${env}': [
+    secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_IDAM_CLIENT_SECRET')
+  ],
   'civil-${env}': [
     secret('microservicekey-civil-service', 'S2S_SECRET'),
     secret('default-password', 'DEFAULT_PASSWORD'),
