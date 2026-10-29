@@ -80,7 +80,6 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
-import uk.gov.hmcts.reform.civil.model.mediation.MediationCorrespondence;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.ClientContext;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
@@ -430,7 +429,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  MediationCorrespondenceType mediationCorrespondenceType;
     private  LocalDate mediationCorrespondenceDate;
     private  String mediationCorrespondenceSummary;
-    private  List<Element<MediationCorrespondence>> mediationCorrespondence;
 
     private  String notificationSummary;
 

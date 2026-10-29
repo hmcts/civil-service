@@ -11,13 +11,14 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.mediation.MediationCorrespondenceType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CaseNote;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.DynamicMultiSelectList;
-import uk.gov.hmcts.reform.civil.model.mediation.MediationCorrespondence;
+import uk.gov.hmcts.reform.civil.service.CaseNoteService;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -34,7 +34,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_CORRESPONDENCE;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -54,8 +55,10 @@ public class MediationCorrespondenceCallbackHandler extends CallbackHandler {
     static final String CONFIRMATION_BODY = "### What happens next%n%n"
         + "The details you have entered will be saved on the Summary and Notes tab.";
 
+    static final String NOTE_TITLE = "Mediation correspondence";
+
     private final ObjectMapper objectMapper;
-    private final UserService userService;
+    private final CaseNoteService caseNoteService;
     private final Time time;
 
     @Override
@@ -107,20 +110,12 @@ public class MediationCorrespondenceCallbackHandler extends CallbackHandler {
 
     private CallbackResponse recordCorrespondence(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String createdBy = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString())
-            .getFullName();
 
-        MediationCorrespondence correspondence = new MediationCorrespondence()
-            .setPartiesInvolved(getSelectedPartyLabels(caseData))
-            .setCorrespondenceType(caseData.getMediationCorrespondenceType())
-            .setCorrespondenceDate(caseData.getMediationCorrespondenceDate())
-            .setSummary(caseData.getMediationCorrespondenceSummary())
-            .setCreatedBy(createdBy)
-            .setCreatedOn(time.now());
-
-        var correspondenceList = ofNullable(caseData.getMediationCorrespondence()).orElse(newArrayList());
-        correspondenceList.add(0, element(correspondence));
-        caseData.setMediationCorrespondence(correspondenceList);
+        CaseNote caseNote = caseNoteService.buildCaseNote(
+            callbackParams.getParams().get(BEARER_TOKEN).toString(),
+            buildNoteText(caseData)
+        );
+        caseData.setCaseNotes(caseNoteService.addNoteToListStart(caseNote, caseData.getCaseNotes()));
 
         caseData.setMediationCorrespondenceParties(null);
         clearCorrespondenceFields(caseData);
@@ -135,6 +130,23 @@ public class MediationCorrespondenceCallbackHandler extends CallbackHandler {
             .confirmationHeader(CONFIRMATION_HEADER)
             .confirmationBody(String.format(CONFIRMATION_BODY))
             .build();
+    }
+
+    private String buildNoteText(CaseData caseData) {
+        String correspondenceType = ofNullable(caseData.getMediationCorrespondenceType())
+            .map(MediationCorrespondenceType::getValue)
+            .orElse("");
+        String correspondenceDate = ofNullable(caseData.getMediationCorrespondenceDate())
+            .map(date -> formatLocalDate(date, DATE))
+            .orElse("");
+        return String.join(
+            "\n",
+            NOTE_TITLE,
+            "Who was involved in this correspondence?: " + getSelectedPartyLabels(caseData),
+            "Which type of correspondence do you want to record?: " + correspondenceType,
+            "What date was the correspondence sent or received?: " + correspondenceDate,
+            "Summary of the correspondence: " + ofNullable(caseData.getMediationCorrespondenceSummary()).orElse("")
+        );
     }
 
     private List<DynamicListElement> getPartyOptions(CaseData caseData) {

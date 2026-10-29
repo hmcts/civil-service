@@ -17,14 +17,14 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.DynamicMultiSelectList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.mediation.MediationCorrespondence;
+import uk.gov.hmcts.reform.civil.model.CaseNote;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.CaseNoteService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -36,7 +36,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_CORRESPONDENCE;
-import static uk.gov.hmcts.reform.civil.enums.mediation.MediationCorrespondenceType.INBOUND_EMAIL;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationCorrespondenceType.OUTBOUND_TELEPHONE_CALL;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.MediationCorrespondenceCallbackHandler.CLAIMANT_1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.MediationCorrespondenceCallbackHandler.DEFENDANT_1;
@@ -64,7 +63,7 @@ class MediationCorrespondenceCallbackHandlerTest extends BaseCallbackHandlerTest
 
     @BeforeEach
     void setUp() {
-        handler = new MediationCorrespondenceCallbackHandler(objectMapper, userService, time);
+        handler = new MediationCorrespondenceCallbackHandler(objectMapper, new CaseNoteService(userService, time), time);
     }
 
     @Test
@@ -163,19 +162,21 @@ class MediationCorrespondenceCallbackHandlerTest extends BaseCallbackHandlerTest
         }
 
         @Test
-        void shouldRecordSelectedPartiesAndClearScreenFields() {
+        void shouldAddCaseNoteWithCheckYourAnswersDetailsAndClearScreenFields() {
             CaseData caseData = completedCase(List.of(CLAIMANT_1, DEFENDANT_1));
 
             CaseData updated = getCaseData(handle(caseData, ABOUT_TO_SUBMIT));
 
-            assertThat(updated.getMediationCorrespondence()).hasSize(1);
-            MediationCorrespondence recorded = updated.getMediationCorrespondence().get(0).getValue();
-            assertThat(recorded.getPartiesInvolved()).isEqualTo("Defendant 1: Mr. Mike Rambo, Claimant 1: Mr. John Rambo");
-            assertThat(recorded.getCorrespondenceType()).isEqualTo(OUTBOUND_TELEPHONE_CALL);
-            assertThat(recorded.getCorrespondenceDate()).isEqualTo(NOW.toLocalDate());
-            assertThat(recorded.getSummary()).isEqualTo("Called the claimant");
-            assertThat(recorded.getCreatedBy()).isEqualTo("Case Worker");
-            assertThat(recorded.getCreatedOn()).isEqualTo(NOW);
+            assertThat(updated.getCaseNotes()).hasSize(1);
+            CaseNote note = updated.getCaseNotes().get(0).getValue();
+            assertThat(note.getCreatedBy()).isEqualTo("Case Worker");
+            assertThat(note.getCreatedOn()).isEqualTo(NOW);
+            assertThat(note.getNote()).isEqualTo(
+                "Mediation correspondence\n"
+                    + "Who was involved in this correspondence?: Defendant 1: Mr. Mike Rambo, Claimant 1: Mr. John Rambo\n"
+                    + "Which type of correspondence do you want to record?: Outbound telephone call\n"
+                    + "What date was the correspondence sent or received?: 28 October 2026\n"
+                    + "Summary of the correspondence: Called the claimant");
 
             assertThat(updated.getMediationCorrespondenceParties()).isNull();
             assertThat(updated.getMediationCorrespondenceType()).isNull();
@@ -190,30 +191,30 @@ class MediationCorrespondenceCallbackHandlerTest extends BaseCallbackHandlerTest
 
             CaseData updated = getCaseData(handle(caseData, ABOUT_TO_SUBMIT));
 
-            assertThat(updated.getMediationCorrespondence().get(0).getValue().getPartiesInvolved())
-                .isEqualTo("Defendant 1: Mr. Mike Rambo, Defendant 2: Mr. Steve Rambo, Claimant 1: Mr. John Rambo");
+            assertThat(updated.getCaseNotes().get(0).getValue().getNote()).contains(
+                "Who was involved in this correspondence?: "
+                    + "Defendant 1: Mr. Mike Rambo, Defendant 2: Mr. Steve Rambo, Claimant 1: Mr. John Rambo\n");
         }
 
         @Test
-        void shouldAddNewRecordToStartAndKeepExistingRecords() {
-            MediationCorrespondence existing = new MediationCorrespondence()
-                .setPartiesInvolved("Defendant 2: Someone")
-                .setCorrespondenceType(INBOUND_EMAIL)
-                .setCorrespondenceDate(LocalDate.of(2026, 10, 1))
-                .setSummary("Earlier email")
+        void shouldAddNewNoteToStartAndKeepExistingCaseNotesUnchanged() {
+            CaseNote existing = new CaseNote()
                 .setCreatedBy("Someone Else")
-                .setCreatedOn(LocalDateTime.of(2026, 10, 1, 9, 0));
+                .setCreatedOn(LocalDateTime.of(2026, 10, 1, 9, 0))
+                .setNote("Existing case note");
             CaseData caseData = completedCase(List.of(DEFENDANT_2));
             caseData.setRespondent2(new PartyBuilder().individual("Steve").build());
-            caseData.setMediationCorrespondence(wrapElements(existing));
+            caseData.setCaseNotes(wrapElements(existing));
 
             CaseData updated = getCaseData(handle(caseData, ABOUT_TO_SUBMIT));
 
-            assertThat(updated.getMediationCorrespondence())
+            assertThat(updated.getCaseNotes())
                 .extracting(Element::getValue)
-                .extracting(MediationCorrespondence::getPartiesInvolved)
-                .containsExactly("Defendant 2: Mr. Steve Rambo", "Defendant 2: Someone");
-            assertThat(updated.getMediationCorrespondence().get(1).getValue()).isEqualTo(existing);
+                .extracting(CaseNote::getCreatedBy)
+                .containsExactly("Case Worker", "Someone Else");
+            assertThat(updated.getCaseNotes().get(0).getValue().getNote())
+                .contains("Who was involved in this correspondence?: Defendant 2: Mr. Steve Rambo\n");
+            assertThat(updated.getCaseNotes().get(1).getValue()).isEqualTo(existing);
         }
     }
 
