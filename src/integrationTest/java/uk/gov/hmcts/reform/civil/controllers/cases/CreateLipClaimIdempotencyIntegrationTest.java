@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
@@ -73,6 +74,9 @@ class CreateLipClaimIdempotencyIntegrationTest extends BaseIntegrationTest {
     @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
 
+    @MockitoBean
+    private FeatureToggleService featureToggleService;
+
     private UUID draftId;
     private String submissionId;
 
@@ -86,6 +90,7 @@ class CreateLipClaimIdempotencyIntegrationTest extends BaseIntegrationTest {
         given(userService.getUserInfo(anyString()))
             .willReturn(UserInfo.builder().uid(USER_ID).sub("lip@test.com").build());
         given(authTokenGenerator.generate()).willReturn(SERVICE_TOKEN);
+        given(featureToggleService.isDraftClaimDatabaseEnabled()).willReturn(true);
 
         CaseDetails createdCase = CaseDetails.builder()
             .id(CREATED_CASE_ID)
