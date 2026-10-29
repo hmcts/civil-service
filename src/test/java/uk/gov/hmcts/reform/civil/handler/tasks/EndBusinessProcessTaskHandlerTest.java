@@ -77,6 +77,7 @@ class EndBusinessProcessTaskHandlerTest {
     void init() {
         lenient().when(mockExternalTask.getTopicName()).thenReturn("test");
         lenient().when(mockExternalTask.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
+        lenient().when(mockExternalTask.getRetries()).thenReturn(null);
 
         lenient().when(mockExternalTask.getAllVariables())
             .thenReturn(Map.of(
@@ -179,6 +180,70 @@ class EndBusinessProcessTaskHandlerTest {
             anyLong()
         );
         verify(externalTaskService, never()).complete(any(), any());
+    }
+
+    @Test
+    void shouldNotResetNewBusinessProcess_whenRetriedAfterNewProcessTriggeredBetweenAttempts() {
+        when(mockExternalTask.getRetries()).thenReturn(2);
+
+        CaseData caseData = new CaseDataBuilder()
+            .atStateClaimDraft()
+            .businessProcess(new BusinessProcess()
+                                 .setStatus(BusinessProcessStatus.READY)
+                                 .setCamundaEvent("NEW_EVENT"))
+            .build();
+
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
+        StartEventResponse startEventResponse = startEventResponse(caseDetails);
+
+        when(coreCaseDataService.startUpdate(CASE_ID, END_BUSINESS_PROCESS)).thenReturn(startEventResponse);
+
+        handler.execute(mockExternalTask, externalTaskService);
+
+        verify(coreCaseDataService, never()).submitUpdate(anyString(), any(CaseDataContent.class));
+        verify(externalTaskService).complete(mockExternalTask, null);
+    }
+
+    @Test
+    void shouldNotResetDispatchedBusinessProcess_whenRetried() {
+        when(mockExternalTask.getRetries()).thenReturn(1);
+
+        CaseData caseData = new CaseDataBuilder()
+            .atStateClaimDraft()
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.DISPATCHED))
+            .build();
+
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
+        when(coreCaseDataService.startUpdate(CASE_ID, END_BUSINESS_PROCESS))
+            .thenReturn(startEventResponse(caseDetails));
+
+        handler.execute(mockExternalTask, externalTaskService);
+
+        verify(coreCaseDataService, never()).submitUpdate(anyString(), any(CaseDataContent.class));
+        verify(externalTaskService).complete(mockExternalTask, null);
+    }
+
+    @Test
+    void shouldResetStartedBusinessProcess_whenRetriedAndFirstAttemptNotApplied() {
+        when(mockExternalTask.getRetries()).thenReturn(2);
+
+        CaseData caseData = new CaseDataBuilder()
+            .atStateClaimDraft()
+            .businessProcess(new BusinessProcess()
+                                 .setStatus(BusinessProcessStatus.STARTED)
+                                 .setProcessInstanceId("parentProcessInstanceId"))
+            .build();
+
+        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
+        StartEventResponse startEventResponse = startEventResponse(caseDetails);
+
+        when(coreCaseDataService.startUpdate(CASE_ID, END_BUSINESS_PROCESS)).thenReturn(startEventResponse);
+        when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+
+        handler.execute(mockExternalTask, externalTaskService);
+
+        verify(coreCaseDataService).submitUpdate(CASE_ID, getCaseDataContent(caseDetails, startEventResponse));
+        verify(externalTaskService).complete(mockExternalTask, null);
     }
 
     private StartEventResponse startEventResponse(CaseDetails caseDetails) {
