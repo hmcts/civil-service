@@ -29,7 +29,8 @@ class MediationTest {
             "mediationNotAttendedReason",
             "mediationCancelledReason",
             "mediationAbandonedReason",
-            "mediationNotSettledReason"
+            "mediationNotSettledReason",
+            "mediationOutcome"
         );
     }
 

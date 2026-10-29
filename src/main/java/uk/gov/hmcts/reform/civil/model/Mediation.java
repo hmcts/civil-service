@@ -38,4 +38,6 @@ public class Mediation {
     private MediationAbandonedReason mediationAbandonedReason;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private MediationNotSettledReason mediationNotSettledReason;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String mediationOutcome;
 }
