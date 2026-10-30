@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
 import uk.gov.hmcts.reform.draftstore.DraftType;
@@ -74,6 +75,9 @@ public class CaseEventServiceTest {
     @Mock
     private CoreCaseDataService coreCaseDataService;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @InjectMocks
     private CaseEventService caseEventService;
 
@@ -107,6 +111,7 @@ public class CaseEventServiceTest {
             .willReturn(CASE_DETAILS);
         given(coreCaseDataApi.submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any()))
             .willReturn(CASE_DETAILS);
+        given(featureToggleService.isDraftClaimDatabaseEnabled()).willReturn(true);
         ReflectionTestUtils.setField(caseEventService, "caseFlagsLoggingEnabled", false);
     }
 
@@ -166,6 +171,27 @@ public class CaseEventServiceTest {
                                                                )
         );
         verifyNoInteractions(draftStoreService, coreCaseDataService);
+    }
+
+    @Test
+    void shouldIgnoreSubmissionIdAndCreateClaimWhenDraftClaimDatabaseDisabled() {
+        given(featureToggleService.isDraftClaimDatabaseEnabled()).willReturn(false);
+        final String redisSubmissionId = USER_ID + ":" + USER_ID + ":2026-10-12T10:00:00Z";
+
+        CaseDetails result = caseEventService.submitEvent(new EventSubmissionParams()
+                                                              .setUpdates(Maps.newHashMap())
+                                                              .setEvent(CaseEvent.CREATE_LIP_CLAIM)
+                                                              .setCaseId(DRAFT)
+                                                              .setUserId(USER_ID)
+                                                              .setAuthorisation(AUTHORISATION)
+                                                              .setSubmissionId(redisSubmissionId));
+
+        assertThat(result).isEqualTo(CASE_DETAILS);
+        verify(coreCaseDataApi).submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any());
+        verify(draftStoreService, never()).claimLegacySubmission(any(), any(), any());
+        verify(draftStoreService, never()).claimSubmission(any(), any(), any(), any());
+        verify(draftStoreService, never()).getDraftBySubmissionId(any(), any(), any());
+        verify(draftStoreService, never()).linkCaseId(any(), any(), any(), any());
     }
 
     @Test
