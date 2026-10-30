@@ -74,8 +74,17 @@ class CivilStitchServiceTest {
 
     @Test
     void shouldIdentifyMalformedPdfAndPreserveParserCause() {
-        byte[] malformedPdf = ("%PDF-1.4\n1 0 obj\n<< /Type /Pages /Kids [] /Count 0 >>\nendobj\n"
-            + "trailer\n<< /Size 2 >>\nstartxref\n0\n%%EOF\n").getBytes(StandardCharsets.US_ASCII);
+        byte[] malformedPdf = """
+            %PDF-1.4
+            1 0 obj
+            << /Type /Pages /Kids [] /Count 0 >>
+            endobj
+            trailer
+            << /Size 2 >>
+            startxref
+            0
+            %%EOF
+            """.getBytes(StandardCharsets.US_ASCII);
 
         assertInvalidDocument(malformedPdf, "http://cdam/documents/upload-id", "upload-id",
                               "Missing root object specification in trailer.");
@@ -94,9 +103,10 @@ class CivilStitchServiceTest {
     private void assertInvalidDocument(byte[] bytes, String url, String expectedId, String causeMessage) {
         Document document = new Document().setDocumentFileName("particulars.pdf").setDocumentUrl(url);
         when(conversionService.convertDocumentToPdf(document, 1L, BEARER_TOKEN)).thenReturn(bytes);
+        List<DocumentMetaData> inputDocuments = List.of(new DocumentMetaData(document, "Particulars", "2026-10-30"));
 
         var assertion = assertThatThrownBy(() -> civilStitchService.generateStitchedCaseDocument(
-            List.of(new DocumentMetaData(document, "Particulars", "2026-10-30")),
+            inputDocuments,
             "sealed-claim.pdf", 1L, SEALED_CLAIM, BEARER_TOKEN
         ))
             .isInstanceOf(PdfMergeException.class)
