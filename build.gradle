@@ -18,7 +18,7 @@ plugins {
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.6"
   id 'hmcts.ccd.sdk' version '7.17.0'
-  id 'com.github.hmcts.rse-cft-lib' version 'civil-cc-10'
+  id 'com.github.hmcts.rse-cft-lib' version 'civil-cc-11'
   id 'net.ltgt.errorprone' version '5.1.1'
 }
 
