@@ -15,17 +15,22 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.DocumentConversionService;
 import uk.gov.hmcts.reform.civil.stitch.PdfMerger;
+import uk.gov.hmcts.reform.civil.stitch.PdfMergeException;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.LITIGANT_IN_PERSON_CLAIM_FORM;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
@@ -65,6 +70,42 @@ class CivilStitchServiceTest {
                                                                                     BEARER_TOKEN);
         assertEquals(STITCHED_DOC, caseDocument);
         pdfMergerMockedStatic.close();
+    }
+
+    @Test
+    void shouldIdentifyMalformedPdfAndPreserveParserCause() {
+        byte[] malformedPdf = ("%PDF-1.4\n1 0 obj\n<< /Type /Pages /Kids [] /Count 0 >>\nendobj\n"
+            + "trailer\n<< /Size 2 >>\nstartxref\n0\n%%EOF\n").getBytes(StandardCharsets.US_ASCII);
+
+        assertInvalidDocument(malformedPdf, "http://cdam/documents/upload-id", "upload-id",
+                              "Missing root object specification in trailer.");
+    }
+
+    @Test
+    void shouldIdentifyInvalidDocumentWithoutUrl() {
+        assertInvalidDocument("not a PDF".getBytes(StandardCharsets.US_ASCII), null, "unknown", null);
+    }
+
+    @Test
+    void shouldIdentifyDocumentWhenConversionReturnsNull() {
+        assertInvalidDocument(null, "http://cdam/documents/upload-id", "upload-id", null);
+    }
+
+    private void assertInvalidDocument(byte[] bytes, String url, String expectedId, String causeMessage) {
+        Document document = new Document().setDocumentFileName("particulars.pdf").setDocumentUrl(url);
+        when(conversionService.convertDocumentToPdf(document, 1L, BEARER_TOKEN)).thenReturn(bytes);
+
+        var assertion = assertThatThrownBy(() -> civilStitchService.generateStitchedCaseDocument(
+            List.of(new DocumentMetaData(document, "Particulars", "2026-10-30")),
+            "sealed-claim.pdf", 1L, SEALED_CLAIM, BEARER_TOKEN
+        ))
+            .isInstanceOf(PdfMergeException.class)
+            .hasMessage("Unable to parse PDF document 'particulars.pdf' (CDAM id: " + expectedId + ") for caseId 1")
+            .hasCauseInstanceOf(IOException.class);
+        if (causeMessage != null) {
+            assertion.hasRootCauseMessage(causeMessage);
+        }
+        verifyNoInteractions(managementService);
     }
 
     private final List<DocumentMetaData> documents = Arrays.asList(
