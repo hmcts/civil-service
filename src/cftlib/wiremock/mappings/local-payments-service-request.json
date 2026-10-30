@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPath": "/service-request"
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "service_request_reference": "2026-{{randomValue length=13 type='NUMERIC'}}"
+    }
+  }
+}
