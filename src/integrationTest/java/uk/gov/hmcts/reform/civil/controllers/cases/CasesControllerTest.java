@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.auth.checker.core.exceptions.BearerTokenInvalidException;
 import uk.gov.hmcts.reform.auth.checker.core.exceptions.BearerTokenMissingException;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -207,6 +208,16 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    void shouldReturnUnauthorisedForClaimantClaimsWhenIdamRejectsToken() {
+        when(userRequestAuthorizerMock.authorise(any()))
+            .thenThrow(new BearerTokenInvalidException(new RuntimeException("IDAM returned 401")));
+
+        doGet(BEARER_TOKEN, CLAIMANT_CLAIMS_URL, "123")
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @SneakyThrows
     void shouldReturnClaimsForDefendantSuccessfully() {
         var dashBoardResponse = new DashboardResponse().setTotalPages(1).setClaims(claimResults);
         when(dashboardClaimInfoService.getDashboardDefendantResponse(
@@ -292,7 +303,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
             "jurisdictionId",
             "caseTypeId"
         )
-            .andExpect(status().isForbidden());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
