@@ -33,6 +33,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
@@ -227,6 +228,17 @@ public class CoreCaseDataService {
         String searchString = query.toString();
         log.info("Searching Elasticsearch with query: " + searchString);
         return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, searchString);
+    }
+
+    public Optional<CaseDetails> findCaseByLipClaimSubmissionId(String submissionId, String authorization) {
+        Query query = new Query(
+            QueryBuilders.matchQuery("data.lipClaimSubmissionId", submissionId), List.of(), 0
+        );
+        SearchResult result = searchCases(query, authorization);
+        if (result == null || result.getCases() == null || result.getCases().isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(result.getCases().get(0));
     }
 
     public SearchResult searchCasesPaginated(PaginatedQuery paginatedQuery) {
