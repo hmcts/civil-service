@@ -122,7 +122,7 @@ class CivilIntegrationsCftlibTest extends CftlibTest {
     private String createCaseWithReviewTask() {
         // A state work allocation's system role can read.
         String caseReference = createCase("JUDICIAL_REFERRAL");
-        cftlib().rejectNextHmiRequest(2000, "cftlib could not list the hearing");
+        cftlib().rejectNextHmiRequest(caseReference, 2000, "cftlib could not list the hearing");
         requestHearing(caseReference);
         await().atMost(WAIT).untilAsserted(
             () -> assertThat(caseEvents(caseReference)).contains("REVIEW_HEARING_EXCEPTION"));
