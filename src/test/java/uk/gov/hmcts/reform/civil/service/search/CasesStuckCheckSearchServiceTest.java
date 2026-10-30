@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.search;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.model.search.Query;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
@@ -30,22 +32,22 @@ class CasesStuckCheckSearchServiceTest {
 
     @Test
     void shouldBuildCorrectQuery() {
-        String timeNow = "2025-01-01T00:00:00Z";
-        Query query = service.query(0, timeNow, "7");
+        Query query = service.query(0);
         String queryStr = query.toString().replaceAll("\\s+", ""); // remove all spaces
 
-        assertThat(queryStr).contains(
-            "\"lt\":\"" + timeNow + "\"",
-            "\"from\":0",
-            "\"_source\":[\"reference\"]",
-            "now-7d",
-            "finished"
-        );
+        assertThat(queryStr)
+            .contains(
+                "\"from\":0",
+                "\"_source\":[\"reference\"]",
+                "finished"
+            )
+            .doesNotContain("last_modified", "range", "now-")
+            .contains("must_not", "data.businessProcess.status.keyword", "case_insensitive",
+                      "\"sort\":[{\"reference.keyword\":\"asc\"}]");
     }
 
     @Test
     void shouldReturnAllResultsFromGetCases() {
-        // Only 2 cases exist according to current service behavior
         CaseDetails c1 = CaseDetails.builder().id(1L).build();
         CaseDetails c2 = CaseDetails.builder().id(2L).build();
 
@@ -55,27 +57,39 @@ class CasesStuckCheckSearchServiceTest {
 
         when(coreCaseDataService.searchCases(any())).thenReturn(searchResult);
 
-        Set<CaseDetails> result = service.getCases("8");
+        Set<CaseDetails> result = service.getCases();
 
         assertThat(result).containsExactlyInAnyOrder(c1, c2);
         verify(coreCaseDataService, times(1)).searchCases(any());
     }
 
     @Test
-    void shouldUseSameTimeNowAcrossPages() {
-        // Simulate multiple pages with only 2 cases total (current service behavior)
-        CaseDetails c1 = CaseDetails.builder().id(1L).build();
-        CaseDetails c2 = CaseDetails.builder().id(2L).build();
+    void shouldReturnAllCasesAcrossMultiplePages() {
+        List<CaseDetails> cases = IntStream.rangeClosed(1, 23)
+            .mapToObj(id -> CaseDetails.builder().id((long) id).build()).toList();
+        when(coreCaseDataService.searchCases(any())).thenReturn(
+            SearchResult.builder().total(23).cases(cases.subList(0, 10)).build(),
+            SearchResult.builder().total(23).cases(cases.subList(10, 20)).build(),
+            SearchResult.builder().total(23).cases(cases.subList(20, 23)).build()
+        );
 
-        SearchResult firstPage = mock(SearchResult.class);
-        when(firstPage.getCases()).thenReturn(List.of(c1, c2));
-        when(firstPage.getTotal()).thenReturn(2); // total results equal page size
+        assertThat(service.getCases()).containsExactlyInAnyOrderElementsOf(cases);
 
-        when(coreCaseDataService.searchCases(any())).thenReturn(firstPage);
+        ArgumentCaptor<Query> queries = ArgumentCaptor.forClass(Query.class);
+        verify(coreCaseDataService, times(3)).searchCases(queries.capture());
+        assertThat(queries.getAllValues()).extracting(Query::toString).satisfiesExactly(
+            query -> assertThat(query).contains("\"from\": 0").doesNotContain("last_modified"),
+            query -> assertThat(query).contains("\"from\": 10").doesNotContain("last_modified"),
+            query -> assertThat(query).contains("\"from\": 20").doesNotContain("last_modified")
+        );
+    }
 
-        Set<CaseDetails> result = service.getCases("7");
+    @Test
+    void shouldReturnEmptySetWhenNoCasesMatch() {
+        when(coreCaseDataService.searchCases(any()))
+            .thenReturn(SearchResult.builder().total(0).cases(List.of()).build());
 
-        assertThat(result).containsExactlyInAnyOrder(c1, c2);
-        verify(coreCaseDataService, times(1)).searchCases(any());
+        assertThat(service.getCases()).isEmpty();
+        verify(coreCaseDataService).searchCases(any());
     }
 }
