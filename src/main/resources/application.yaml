@@ -7,6 +7,9 @@ management:
       show-details: "always"
       probes:
         enabled: true
+      group:
+        s2s:
+          include: s2sSecretReadiness
   endpoints:
     web:
       base-path: /
@@ -42,6 +45,11 @@ spring:
     username: ${CMC_DB_USERNAME:-}
     password: ${CMC_DB_PASSWORD:-}
     url: jdbc:postgresql://${CMC_DB_HOST:}:${CMC_DB_PORT:}/${CMC_DB_NAME:cmc}${CMC_DB_CONNECTION_OPTIONS:}
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 3000
+      idle-timeout: 600000
+      max-lifetime: 1800000
 
   servlet:
     multipart:
@@ -295,6 +303,8 @@ auth:
 
 document_management:
   userRoles: "caseworker-civil,caseworker-civil-solicitor"
+  # Upper bound on a single document download. Matches dm-store's non-media upload limit (MAX_NON_MEDIA_FILE_SIZE).
+  maxDownloadSize: ${DOCUMENT_MANAGEMENT_MAX_DOWNLOAD_SIZE:1024MB}
 
 bankHolidays:
   api:
@@ -936,10 +946,10 @@ spring:
     url: jdbc:tc:postgresql:15://localhost/cmc
     jdbcUrl: jdbc:tc:postgresql:15://localhost/cmc
     hikari:
-      minimum-idle: 1
-      connectionTimeout: 10000
-      idleTimeout: 30000
-      maxLifetime: 60000
+      maximum-pool-size: 3
+      connection-timeout: 10000
+      idle-timeout: 600000
+      max-lifetime: 1800000
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
