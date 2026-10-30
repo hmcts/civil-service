@@ -5,7 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.CCJRequestedDashboardNotificationDefendantHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.ccjrequested.CcjRequestedDefendantDashboardTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -21,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CCJRequestForBrokenSettlementAgreementScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
-    private CCJRequestedDashboardNotificationDefendantHandler handler;
+    private CcjRequestedDefendantDashboardTask handler;
 
     @Test
     void should_create_upon_ccj_request_for_broken_settlement_for_accepted_repayment() throws Exception {
@@ -41,7 +42,7 @@ public class CCJRequestForBrokenSettlementAgreementScenarioTest extends Dashboar
                                                                          .setApplicant1SignedSettlementAgreement(
                                                                              YesOrNo.YES)))
             .build();
-        handler.handle(callbackParams(caseData));
+        handler.execute(DashboardTaskContext.civil(caseData, BEARER_TOKEN));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
@@ -85,7 +86,7 @@ public class CCJRequestForBrokenSettlementAgreementScenarioTest extends Dashboar
                                                                          .setApplicant1SignedSettlementAgreement(
                                                                              YesOrNo.YES)))
             .build();
-        handler.handle(callbackParams(caseData));
+        handler.execute(DashboardTaskContext.civil(caseData, BEARER_TOKEN));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")

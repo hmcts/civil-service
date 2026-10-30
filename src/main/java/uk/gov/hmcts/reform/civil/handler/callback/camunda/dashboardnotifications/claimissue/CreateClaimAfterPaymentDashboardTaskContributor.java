@@ -9,12 +9,14 @@ public class CreateClaimAfterPaymentDashboardTaskContributor extends DashboardTa
 
     public CreateClaimAfterPaymentDashboardTaskContributor(
         CreateClaimAfterPaymentDefendantDashboardTask defendantTask,
-        CreateClaimAfterPaymentApplicantDashboardTask applicantTask
+        CreateClaimAfterPaymentApplicantDashboardTask applicantTask,
+        RemovePaymentDashboardTask removalTask
     ) {
         super(
             DashboardTaskIds.CREATE_CLAIM_AFTER_PAYMENT,
             defendantTask,
-            applicantTask
+            applicantTask,
+            removalTask
         );
     }
 }

@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotific
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_DEFENDANT;
 
 @Service
@@ -27,6 +28,10 @@ public class TrialArrangementsNotifyOtherPartyDefendantDashboardService extends 
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
+        if (caseData.getBusinessProcess() != null
+            && RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS.name().equals(caseData.getBusinessProcess().getCamundaEvent())) {
+            return false;
+        }
         return caseData.isRespondent1NotRepresented();
     }
 

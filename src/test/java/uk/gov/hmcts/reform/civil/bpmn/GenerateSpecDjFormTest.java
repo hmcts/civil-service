@@ -4,6 +4,7 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskIds;
 
 import java.util.Map;
 
@@ -21,14 +22,6 @@ class GenerateSpecDjFormTest extends BpmnBaseTest {
     private static final String NOTIFY_EVENT_ACTIVITY_ID = "GenerateSpecDJFormNotifier";
     private static final String NOTIFY_RPA_EVENT = "NOTIFY_RPA_DJ_SPEC";
     private static final String NOTIFY_RPA_ACTIVITY_ID = "NotifyRPADJSPEC";
-    private static final String DASHBOARD_APPLICATION_OFFLINE_CLAIMANT = "CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_CLAIMANT";
-    private static final String DASHBOARD_APPLICATION_OFFLINE_CLAIMANT_ACTIVITY_ID = "claimantLipApplicationOfflineDashboardNotification";
-    private static final String DASHBOARD_APPLICATION_OFFLINE_DEFENDANT = "CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_DEFENDANT";
-    private static final String DASHBOARD_APPLICATION_OFFLINE_DEFENDANT_ACTIVITY_ID = "defendantLipApplicationOfflineDashboardNotification";
-    private static final String DASHBOARD_CCJ_APPLICANT = "CREATE_DASHBOARD_NOTIFICATION_FOR_CCJ_REQUEST_FOR_APPLICANT1";
-    private static final String DASHBOARD_CCJ_APPLICANT_ACTIVITY_ID = "GenerateDashboardNotificationClaimantIntentCCJRequestedForApplicant1";
-    private static final String DASHBOARD_CCJ_RESPONDENT = "CREATE_DASHBOARD_NOTIFICATION_FOR_CCJ_REQUEST_FOR_RESPONDENT1";
-    private static final String DASHBOARD_CCJ_RESPONDENT_ACTIVITY_ID = "GenerateDashboardNotificationClaimantIntentCCJRequestedForRespondent1_1";
 
     GenerateSpecDjFormTest() {
         super("generate_spec_DJ_form.bpmn", PROCESS_ID);
@@ -54,23 +47,9 @@ class GenerateSpecDjFormTest extends BpmnBaseTest {
         completeDocGeneration(variables);
         completePrimaryNotifications(variables);
 
-        ExternalTask defendantDashboard = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            defendantDashboard,
-            PROCESS_CASE_EVENT,
-            DASHBOARD_APPLICATION_OFFLINE_DEFENDANT,
-            DASHBOARD_APPLICATION_OFFLINE_DEFENDANT_ACTIVITY_ID,
-            variables
-        );
-
-        ExternalTask respondentDashboard = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            respondentDashboard,
-            PROCESS_CASE_EVENT,
-            DASHBOARD_CCJ_RESPONDENT,
-            DASHBOARD_CCJ_RESPONDENT_ACTIVITY_ID,
-            variables
-        );
+        ExternalTask dashboard = assertNextExternalTask(DASHBOARD_NOTIFICATION_TOPIC);
+        assertCompleteExternalTask(dashboard, DASHBOARD_NOTIFICATION_TOPIC,
+            DASHBOARD_NOTIFICATION_EVENT, DashboardTaskIds.GENERATE_SPEC_DJ_FORM, variables);
 
         assertProcessClosed();
     }
@@ -84,41 +63,9 @@ class GenerateSpecDjFormTest extends BpmnBaseTest {
         completeDocGeneration(variables);
         completePrimaryNotifications(variables);
 
-        ExternalTask claimantDashboard = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            claimantDashboard,
-            PROCESS_CASE_EVENT,
-            DASHBOARD_APPLICATION_OFFLINE_CLAIMANT,
-            DASHBOARD_APPLICATION_OFFLINE_CLAIMANT_ACTIVITY_ID,
-            variables
-        );
-
-        ExternalTask applicantCcjNotification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            applicantCcjNotification,
-            PROCESS_CASE_EVENT,
-            DASHBOARD_CCJ_APPLICANT,
-            DASHBOARD_CCJ_APPLICANT_ACTIVITY_ID,
-            variables
-        );
-
-        ExternalTask defendantDashboard = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            defendantDashboard,
-            PROCESS_CASE_EVENT,
-            DASHBOARD_APPLICATION_OFFLINE_DEFENDANT,
-            DASHBOARD_APPLICATION_OFFLINE_DEFENDANT_ACTIVITY_ID,
-            variables
-        );
-
-        ExternalTask respondentDashboard = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(
-            respondentDashboard,
-            PROCESS_CASE_EVENT,
-            DASHBOARD_CCJ_RESPONDENT,
-            DASHBOARD_CCJ_RESPONDENT_ACTIVITY_ID,
-            variables
-        );
+        ExternalTask dashboard = assertNextExternalTask(DASHBOARD_NOTIFICATION_TOPIC);
+        assertCompleteExternalTask(dashboard, DASHBOARD_NOTIFICATION_TOPIC,
+            DASHBOARD_NOTIFICATION_EVENT, DashboardTaskIds.GENERATE_SPEC_DJ_FORM, variables);
 
         assertProcessClosed();
     }
