@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DECISION_REQUEST_FOR_RECONSIDERATION_CLAIMANT;
 
+import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -41,10 +42,11 @@ class DecisionOnRequestForReconsiderationClaimantDashboardServiceTest {
     }
 
     @Test
-    void shouldRecordScenarioForDecisionReconsiderationClaimant() {
+    void shouldRecordScenarioForDecisionReconsiderationClaimantWhenOptionsIsYes() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setApplicant1Represented(YesOrNo.NO);
         caseData.setCcdCaseReference(1234L);
+        caseData.setDecisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.YES);
 
         service.notifyDecisionReconsideration(caseData, AUTH_TOKEN);
 
@@ -54,6 +56,30 @@ class DecisionOnRequestForReconsiderationClaimantDashboardServiceTest {
             "1234",
             new ScenarioRequestParams(new HashMap<>())
         );
+    }
+
+    @Test
+    void shouldNotRecordScenarioForDecisionReconsiderationClaimantWhenOptionsIsCreateSdo() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setCcdCaseReference(1234L);
+        caseData.setDecisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO);
+
+        service.notifyDecisionReconsideration(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @Test
+    void shouldNotRecordScenarioForDecisionReconsiderationClaimantWhenOptionsIsCreateGeneralOrder() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setCcdCaseReference(1234L);
+        caseData.setDecisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_GENERAL_ORDER);
+
+        service.notifyDecisionReconsideration(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
     }
 
     @Test
