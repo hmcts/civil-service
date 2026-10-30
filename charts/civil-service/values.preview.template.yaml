@@ -146,7 +146,6 @@ xui-webapp:
   nodejs:
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
-    image: hmctsprod.azurecr.io/xui/webapp:latest
     ingressHost: xui-${SERVICE_FQDN}
     memoryRequests: 512Mi
     cpuRequests: 50m
@@ -204,7 +203,6 @@ ccd:
 
   ccd-api-gateway-web:
     nodejs:
-      image: hmctsprod.azurecr.io/ccd/api-gateway-web:latest
       imagePullPolicy: Always
       environment:
         ADDRESS_LOOKUP_TOKEN: ${ADDRESS_LOOKUP_TOKEN}
@@ -307,7 +305,6 @@ aac-manage-case-assignment:
     disableKeyVaults: true
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
-    image: hmctsprod.azurecr.io/aac/manage-case-assignment:latest
     ingressHost: manage-case-assignment-${SERVICE_NAME}.preview.platform.hmcts.net
     devcpuRequests: 50m
     environment:
@@ -334,7 +331,6 @@ aac-manage-case-assignment:
 em-ccdorc:
   enabled: true
   java:
-    image: hmctsprod.azurecr.io/em/ccdorc:latest
     releaseNameOverride: ${SERVICE_NAME}-em-ccdorc
     ingressHost: em-ccdorc-${SERVICE_FQDN}
     environment:
@@ -360,7 +356,6 @@ em-stitching:
   java:
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-em-stitching
-    image: hmctsprod.azurecr.io/em/stitching:latest
     ingressHost: em-stitching-${SERVICE_FQDN}
     environment:
       IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
@@ -392,7 +387,6 @@ ccd-case-document-am-api:
   java:
     releaseNameOverride: ${SERVICE_NAME}-cdam
     imagePullPolicy: Always
-    image: hmctsprod.azurecr.io/ccd/case-document-am-api:latest
     ingressHost: ccd-case-document-am-api-${SERVICE_FQDN}
     environment:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
