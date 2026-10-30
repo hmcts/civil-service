@@ -48,8 +48,11 @@ class CivilStitchServiceTest {
     MockedStatic<PdfMerger> pdfMergerMockedStatic;
 
     @Test
-    void shouldReturnStitchedDocuments() {
-        byte[] docArray = {3, 5, 2, 4, 1};
+    void shouldReturnStitchedDocuments() throws Exception {
+        byte[] docArray;
+        try (var input = getClass().getClassLoader().getResourceAsStream("stitch-documents/test1.pdf")) {
+            docArray = input.readAllBytes();
+        }
         when(conversionService.convertDocumentToPdf(any(Document.class), anyLong(), anyString())).thenReturn(docArray);
         when(managementService.uploadDocument(anyString(), any(PDF.class))).thenReturn(STITCHED_DOC);
         pdfMergerMockedStatic = Mockito.mockStatic(PdfMerger.class);
