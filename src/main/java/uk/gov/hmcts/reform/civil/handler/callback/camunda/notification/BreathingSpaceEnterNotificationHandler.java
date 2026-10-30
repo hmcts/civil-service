@@ -28,6 +28,12 @@ import java.util.function.Supplier;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
+/**
+ * Retained for pre-migration breathing-space enter process versions until production confirms they have drained.
+ *
+ * @deprecated Replaced by BreathingSpaceEnterNotifier for new process instances.
+ */
+@Deprecated(forRemoval = true)
 @Service
 @RequiredArgsConstructor
 public class BreathingSpaceEnterNotificationHandler extends CallbackHandler implements NotificationData {
@@ -86,11 +92,17 @@ public class BreathingSpaceEnterNotificationHandler extends CallbackHandler impl
             templateProperties.put("defendantName", caseData.getRespondent2().getPartyName());
         } else if (CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_ENTER.name()
             .equals(callbackParams.getRequest().getEventId())) {
+            if (caseData.isApplicant1NotRepresented()
+                || caseData.getApplicantSolicitor1UserDetails() == null) {
+                return AboutToStartOrSubmitCallbackResponse.builder().build();
+            }
             templateId = notificationsProperties.getBreathingSpaceEnterApplicantEmailTemplate();
             recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
             String claimantLR = getOrganisationName(
                 caseData.getApplicant1OrganisationPolicy(),
-                caseData.getApplicantSolicitor1ClaimStatementOfTruth()::getName
+                () -> Optional.ofNullable(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
+                    .map(statementOfTruth -> statementOfTruth.getName())
+                    .orElse(null)
             );
             templateProperties.put(NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC, claimantLR);
         } else {

@@ -28,6 +28,12 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItem
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
+/**
+ * Retained for pre-migration breathing-space lifted process versions until production confirms they have drained.
+ *
+ * @deprecated Replaced by BreathingSpaceLiftedNotifier for new process instances.
+ */
+@Deprecated(forRemoval = true)
 @Service
 @RequiredArgsConstructor
 public class BreathingSpaceLiftedNotificationHandler extends CallbackHandler implements NotificationData {
@@ -78,7 +84,8 @@ public class BreathingSpaceLiftedNotificationHandler extends CallbackHandler imp
                 addPropertiesForRespondent(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
-        } else {
+        } else if (!caseData.isApplicant1NotRepresented()
+            && caseData.getApplicantSolicitor1UserDetails() != null) {
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
                 notificationsProperties.getBreathingSpaceLiftedApplicantEmailTemplate(),

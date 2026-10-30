@@ -130,14 +130,26 @@ public class InterestCalculator {
     }
 
     private BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate, LocalDate interestToDate) {
+        LocalDate interestFromDate;
         if (InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE.equals(caseData.getInterestClaimFrom())) {
-            LocalDate interestFromDate = getSubmittedDate(caseData);
-            return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate, interestFromDate, interestToDate);
+            interestFromDate = getSubmittedDate(caseData);
         } else if (InterestClaimFromType.FROM_A_SPECIFIC_DATE.equals(caseData.getInterestClaimFrom())) {
-            return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate,
-                caseData.getInterestFromSpecificDate(), interestToDate);
+            interestFromDate = caseData.getInterestFromSpecificDate();
+        } else {
+            return ZERO;
         }
-        return ZERO;
+        return calculateInterestAmountForPeriod(caseData, interestRate, interestFromDate, interestToDate);
+    }
+
+    private BigDecimal calculateInterestAmountForPeriod(CaseData caseData,
+                                                        BigDecimal interestRate,
+                                                        LocalDate interestFromDate,
+                                                        LocalDate interestToDate) {
+        long numberOfDays = getNumberOfDays(interestFromDate, interestToDate);
+        long pausedDays = BreathingSpaceInterestPause.countPausedDays(caseData, interestFromDate, interestToDate);
+        long accruableDays = Math.max(0L, numberOfDays - pausedDays);
+        BigDecimal interestPerDay = getInterestPerDay(caseData.getTotalClaimAmount(), interestRate);
+        return interestPerDay.multiply(BigDecimal.valueOf(accruableDays));
     }
 
     private LocalDate getToDate(CaseData caseData) {
