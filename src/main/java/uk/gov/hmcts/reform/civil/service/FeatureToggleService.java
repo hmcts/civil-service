@@ -170,4 +170,8 @@ public class FeatureToggleService {
     public boolean isHmctsAccessMigrationEnabled() {
         return featureToggleApi.isFeatureEnabled("hmcts-access-migration");
     }
+
+    public boolean isCaseworkerMediationActivitiesEnabled() {
+        return featureToggleApi.isFeatureEnabled("caseworker-mediation-activities");
+    }
 }
