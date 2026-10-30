@@ -36,6 +36,19 @@ public class CamundaRuntimeClient {
         return parsedResponse;
     }
 
+    public boolean isCompletedChildProcess(String childProcessId, String parentProcessId, String definitionKey) {
+        var instances = camundaRestEngineApi.queryProcessInstances(
+            authTokenGenerator.generate(), 0, 1, null, null, Map.of("processInstanceId", childProcessId));
+        if (instances == null || instances.isEmpty()) {
+            throw new IllegalStateException("Cannot verify historic Camunda process " + childProcessId);
+        }
+        var instance = instances.get(0);
+        return childProcessId.equals(instance.getId())
+            && parentProcessId.equals(instance.getSuperProcessInstanceId())
+            && definitionKey.equals(instance.getProcessDefinitionKey())
+            && "COMPLETED".equals(instance.getState());
+    }
+
     /**
      * Sets a single process variable over REST, replacing
      * {@code runtimeService.setVariable(processInstanceId, name, value)}.

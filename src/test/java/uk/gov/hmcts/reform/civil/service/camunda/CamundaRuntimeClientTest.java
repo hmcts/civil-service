@@ -24,10 +24,12 @@ import java.util.Map;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.camunda.CamundaMessageCorrelation;
+import uk.gov.hmcts.reform.civil.model.camunda.CamundaProcessInstance;
 import uk.gov.hmcts.reform.civil.model.camunda.CamundaVariableValue;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -59,6 +61,48 @@ class CamundaRuntimeClientTest {
         authToken = "auth-token";
         processInstanceId = "process-instance-id";
         when(authTokenGenerator.generate()).thenReturn(authToken);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "child, parent, GA_StartGeneralApplicationBusinessProcess, COMPLETED, true",
+        "child, other-parent, GA_StartGeneralApplicationBusinessProcess, COMPLETED, false",
+        "child, parent, OtherProcess, COMPLETED, false",
+        "child, parent, GA_StartGeneralApplicationBusinessProcess, ACTIVE, false",
+        "child, parent, GA_StartGeneralApplicationBusinessProcess, EXTERNALLY_TERMINATED, false",
+        "child, parent, GA_StartGeneralApplicationBusinessProcess, INTERNALLY_TERMINATED, false",
+        "other-child, parent, GA_StartGeneralApplicationBusinessProcess, COMPLETED, false"
+    })
+    void shouldVerifyCompletedChildRelationship(String id, String parentId, String definitionKey,
+                                               String state, boolean expected) {
+        CamundaProcessInstance instance = new CamundaProcessInstance().setId(id)
+            .setSuperProcessInstanceId(parentId).setProcessDefinitionKey(definitionKey).setState(state);
+        when(camundaApi.queryProcessInstances(authToken, 0, 1, null, null, Map.of("processInstanceId", "child")))
+            .thenReturn(List.of(instance));
+
+        assertEquals(expected, camundaClient.isCompletedChildProcess(
+            "child", "parent", "GA_StartGeneralApplicationBusinessProcess"));
+    }
+
+    @Test
+    void shouldFailWhenChildHistoryCannotBeFound() {
+        when(camundaApi.queryProcessInstances(authToken, 0, 1, null, null, Map.of("processInstanceId", "child")))
+            .thenReturn(List.of());
+
+        assertThrows(IllegalStateException.class, () -> camundaClient.isCompletedChildProcess(
+            "child", "parent", "GA_StartGeneralApplicationBusinessProcess"));
+    }
+
+    @Test
+    void shouldReadHistoricProcessRelationshipFields() throws Exception {
+        CamundaProcessInstance instance = mapper.readValue("""
+            {"id":"child","superProcessInstanceId":"parent", "processDefinitionKey":
+            "GA_StartGeneralApplicationBusinessProcess", "state":"COMPLETED", "endTime":"2026-10-09T14:14:03Z"}
+            """, CamundaProcessInstance.class);
+        assertEquals("child", instance.getId());
+        assertEquals("parent", instance.getSuperProcessInstanceId());
+        assertEquals("GA_StartGeneralApplicationBusinessProcess", instance.getProcessDefinitionKey());
+        assertEquals("COMPLETED", instance.getState());
     }
 
     @Test

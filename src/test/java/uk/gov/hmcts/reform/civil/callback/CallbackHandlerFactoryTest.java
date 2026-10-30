@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.callback;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -16,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -123,8 +128,12 @@ class CallbackHandlerFactoryTest {
         assertEquals(EVENT_HANDLED_RESPONSE, callbackResponse);
     }
 
-    @Test
-    void shouldNotProcessEventAgain_whenEventIsAlreadyProcessed() {
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void shouldNotProcessEventAgain_whenEventIsAlreadyProcessed(boolean generalApplication) {
+        SendSealedClaimCallbackHandler handler = spy(new SendSealedClaimCallbackHandler());
+        callbackHandlerFactory = new CallbackHandlerFactory(
+            new CaseDetailsConverter(new ObjectMapper()), new CaseTypeHandlerKeyFactory(), handler);
         CallbackRequest callbackRequest = CallbackRequest
             .builder()
             .eventId(NOTIFY_EVENT.name())
@@ -135,6 +144,7 @@ class CallbackHandlerFactoryTest {
             .build();
 
         CallbackParams params = new CallbackParams()
+            .isGeneralApplicationCaseType(generalApplication)
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
             .version(V_1)
@@ -142,7 +152,10 @@ class CallbackHandlerFactoryTest {
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(params);
 
-        assertEquals(ALREADY_HANDLED_EVENT_RESPONSE, callbackResponse);
+        String eventKey = generalApplication ? "GENERALAPPLICATION-" + NOTIFY_EVENT.name() : NOTIFY_EVENT.name();
+        assertEquals(AboutToStartOrSubmitCallbackResponse.builder()
+                         .errors(List.of(format("Event %s is already processed", eventKey))).build(), callbackResponse);
+        verify(handler, never()).handle(params);
     }
 
     @Test
@@ -311,7 +324,7 @@ class CallbackHandlerFactoryTest {
         }
     }
 
-    private static class SendSealedClaimCallbackHandler extends CallbackHandler {
+    private static class SendSealedClaimCallbackHandler extends CallbackHandler implements MultiCaseTypeCallbackHandler {
         @Override
         protected Map<String, Callback> callbacks() {
             return Map.of(
