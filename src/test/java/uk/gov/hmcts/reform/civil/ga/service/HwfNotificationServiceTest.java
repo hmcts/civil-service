@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -320,6 +321,10 @@ public class HwfNotificationServiceTest {
         properties.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
+        properties.put(NotificationDataGA.CASE_TITLE, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIMANT_V_DEFENDANT, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, GA_REFERENCE);
+        properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
     }
 
@@ -346,6 +351,10 @@ public class HwfNotificationServiceTest {
         properties.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
+        properties.put(NotificationDataGA.CASE_TITLE, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIMANT_V_DEFENDANT, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, GA_REFERENCE);
+        properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
     }
 
@@ -615,6 +624,10 @@ public class HwfNotificationServiceTest {
         properties.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
+        properties.put(NotificationDataGA.CASE_TITLE, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIMANT_V_DEFENDANT, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, GA_REFERENCE);
+        properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
     }
 
@@ -637,6 +650,10 @@ public class HwfNotificationServiceTest {
         properties.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
+        properties.put(NotificationDataGA.CASE_TITLE, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIMANT_V_DEFENDANT, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, GA_REFERENCE);
+        properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
     }
 
@@ -898,6 +915,10 @@ public class HwfNotificationServiceTest {
         properties.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
+        properties.put(NotificationDataGA.CASE_TITLE, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIMANT_V_DEFENDANT, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, GA_REFERENCE);
+        properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
     }
 
@@ -923,6 +944,10 @@ public class HwfNotificationServiceTest {
         properties.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
+        properties.put(NotificationDataGA.CASE_TITLE, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIMANT_V_DEFENDANT, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, GA_REFERENCE);
+        properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
     }
 
@@ -947,6 +972,10 @@ public class HwfNotificationServiceTest {
         properties.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
+        properties.put(NotificationDataGA.CASE_TITLE, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIMANT_V_DEFENDANT, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, GA_REFERENCE);
+        properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
     }
 
@@ -971,6 +1000,10 @@ public class HwfNotificationServiceTest {
         properties.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
+        properties.put(NotificationDataGA.CASE_TITLE, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIMANT_V_DEFENDANT, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, GA_REFERENCE);
+        properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
     }
 
@@ -1087,6 +1120,10 @@ public class HwfNotificationServiceTest {
         properties.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
+        properties.put(NotificationDataGA.CASE_TITLE, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIMANT_V_DEFENDANT, CLAIMANT + " v " + DEFENDANT);
+        properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, GA_REFERENCE);
+        properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
     }
 
@@ -1106,7 +1143,7 @@ public class HwfNotificationServiceTest {
     }
 
     private void mockNotificationPropertiesBilingual() {
-        when(notificationsProperties.getLipGeneralAppApplicantEmailTemplateInWelsh()).thenReturn(
+        when(notificationsProperties.getNotifyApplicantForHwfPaymentOutcomeBilingual()).thenReturn(
             EMAIL_TEMPLATE_HWF_PAYMENT_OUTCOME_WLESH);
         when(notificationsProperties.getNotifyApplicantForHwFMoreInformationNeededWelsh()).thenReturn(
             EMAIL_TEMPLATE_MORE_INFO_HWF_BILINGUAL);

@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -457,7 +458,7 @@ class JudicialApplicantNotificationServiceTest {
                 DUMMY_EMAIL,
 
                 "general-application-apps-judicial-notification-template-lip-id",
-                notificationPropertiesVaryOrder(),
+                notificationPropertiesVaryOrder(true),
                 "general-apps-judicial-notification-make-decision-" + CASE_REFERENCE
             );
         }
@@ -483,7 +484,7 @@ class JudicialApplicantNotificationServiceTest {
                 DUMMY_EMAIL,
 
                 "general-application-apps-judicial-notification-template-id",
-                notificationPropertiesVaryOrder(),
+                notificationPropertiesVaryOrder(false),
                 "general-apps-judicial-notification-make-decision-" + CASE_REFERENCE
             );
         }
@@ -776,6 +777,9 @@ class JudicialApplicantNotificationServiceTest {
 
         private Map<String, String> notificationPropertiesSummeryJudgement() {
 
+            customProp.put(NotificationDataGA.CASE_TITLE, "CL v DEF");
+
+            customProp.put(NotificationData.CLAIMANT_V_DEFENDANT, "CL v DEF");
             customProp.put(NotificationDataGA.CASE_REFERENCE, CASE_REFERENCE.toString());
             customProp.put(NotificationDataGA.GENAPP_REFERENCE, CASE_REFERENCE.toString());
             customProp.put(NotificationDataGA.GA_APPLICATION_TYPE, GeneralApplicationTypes.SUMMARY_JUDGEMENT.getDisplayedValue());
@@ -791,10 +795,16 @@ class JudicialApplicantNotificationServiceTest {
             customProp.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
             customProp.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
                 + "\n For all other matters, call 0300 123 7050");
+            customProp.put(NotificationData.CLAIM_16_DIGIT_NUMBER, CASE_REFERENCE.toString());
+            customProp.put(NotificationData.CASEMAN_REF, "Not provided");
             return customProp;
         }
 
-        private Map<String, String> notificationPropertiesVaryOrder() {
+        private Map<String, String> notificationPropertiesVaryOrder(boolean isLipTemplate) {
+            if (isLipTemplate) {
+                customProp.put(NotificationDataGA.CASE_TITLE, "CL v DEF");
+                customProp.put(NotificationData.CLAIMANT_V_DEFENDANT, "CL v DEF");
+            }
 
             customProp.put(NotificationDataGA.CASE_REFERENCE, CASE_REFERENCE.toString());
             customProp.put(NotificationDataGA.GENAPP_REFERENCE, CASE_REFERENCE.toString());
@@ -812,6 +822,8 @@ class JudicialApplicantNotificationServiceTest {
             customProp.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
             customProp.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
                 + "\n For all other matters, call 0300 123 7050");
+            customProp.put(NotificationData.CLAIM_16_DIGIT_NUMBER, CASE_REFERENCE.toString());
+            customProp.put(NotificationData.CASEMAN_REF, "Not provided");
             return customProp;
         }
 
@@ -2144,6 +2156,8 @@ class JudicialApplicantNotificationServiceTest {
             properties.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
             properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
                 + "\n For all other matters, call 0300 123 7050");
+            properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, CASE_REFERENCE.toString());
+            properties.put(NotificationData.CASEMAN_REF, "Not provided");
             return properties;
         }
 
@@ -2165,6 +2179,8 @@ class JudicialApplicantNotificationServiceTest {
             properties.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
             properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
                 + "\n For all other matters, call 0300 123 7050");
+            properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, CASE_REFERENCE.toString());
+            properties.put(NotificationData.CASEMAN_REF, "Not provided");
             return properties;
         }
 
@@ -2186,6 +2202,8 @@ class JudicialApplicantNotificationServiceTest {
             properties.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
             properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
                 + "\n For all other matters, call 0300 123 7050");
+            properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, CASE_REFERENCE.toString());
+            properties.put(NotificationData.CASEMAN_REF, "Not provided");
             return properties;
         }
 
@@ -2213,6 +2231,8 @@ class JudicialApplicantNotificationServiceTest {
             properties.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
             properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
                 + "\n For all other matters, call 0300 123 7050");
+            properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, CASE_REFERENCE.toString());
+            properties.put(NotificationData.CASEMAN_REF, "Not provided");
             return properties;
         }
 
@@ -2240,6 +2260,8 @@ class JudicialApplicantNotificationServiceTest {
             properties.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
             properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
                 + "\n For all other matters, call 0300 123 7050");
+            properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, CASE_REFERENCE.toString());
+            properties.put(NotificationData.CASEMAN_REF, "Not provided");
             return properties;
         }
 
@@ -2267,6 +2289,8 @@ class JudicialApplicantNotificationServiceTest {
             properties.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
             properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
                 + "\n For all other matters, call 0300 123 7050");
+            properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, CASE_REFERENCE.toString());
+            properties.put(NotificationData.CASEMAN_REF, "Not provided");
             return properties;
         }
 
@@ -2590,6 +2614,8 @@ class JudicialApplicantNotificationServiceTest {
         properties.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
+        properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, CASE_REFERENCE.toString());
+        properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
     }
 
@@ -2598,7 +2624,9 @@ class JudicialApplicantNotificationServiceTest {
             NotificationDataGA.CASE_REFERENCE, CASE_REFERENCE.toString(),
             NotificationDataGA.GENAPP_REFERENCE, CASE_REFERENCE.toString(),
             NotificationDataGA.GA_APPLICATION_TYPE, GeneralApplicationTypes.STAY_THE_CLAIM.getDisplayedValue(),
-            NotificationDataGA.PARTY_REFERENCE, PARTY_REFERENCE
+            NotificationDataGA.PARTY_REFERENCE, PARTY_REFERENCE,
+            NotificationDataGA.CASE_TITLE, "CL v DEF",
+            NotificationData.CLAIMANT_V_DEFENDANT, "CL v DEF"
         ));
         properties.put(NotificationDataGA.WELSH_CONTACT, "E-bost: ymholiadaucymraeg@justice.gov.uk");
         properties.put(NotificationDataGA.WELSH_HMCTS_SIGNATURE, "Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
@@ -2611,12 +2639,15 @@ class JudicialApplicantNotificationServiceTest {
         properties.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
+        properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, CASE_REFERENCE.toString());
+        properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
     }
 
     private Map<String, String> notificationPropertiesToStayTheClaimLipRespondent() {
         HashMap<String, String> properties = new HashMap<>(Map.of(
             "ClaimantvDefendant", "CL v DEF",
+            "claimantvdefendant", "CL v DEF",
             "claimReferenceNumber", "111111",
             "GenAppclaimReferenceNumber", "111111",
             "generalAppType", "Stay the claim",
@@ -2634,6 +2665,8 @@ class JudicialApplicantNotificationServiceTest {
         properties.put(NotificationDataGA.OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
         properties.put(NotificationDataGA.PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
             + "\n For all other matters, call 0300 123 7050");
+        properties.put(NotificationData.CLAIM_16_DIGIT_NUMBER, CASE_REFERENCE.toString());
+        properties.put(NotificationData.CASEMAN_REF, "Not provided");
         return properties;
     }
 

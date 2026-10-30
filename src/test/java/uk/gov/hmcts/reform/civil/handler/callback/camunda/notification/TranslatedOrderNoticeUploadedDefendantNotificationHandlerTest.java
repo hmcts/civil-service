@@ -30,6 +30,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_16_DIGIT_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
@@ -42,6 +45,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @ExtendWith(MockitoExtension.class)
 public class TranslatedOrderNoticeUploadedDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -149,6 +153,9 @@ public class TranslatedOrderNoticeUploadedDefendantNotificationHandlerTest exten
             Map<String, String> expectedProperties = new HashMap<>();
             expectedProperties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
             expectedProperties.put(PARTY_NAME, caseData.getRespondent1().getPartyName());
+            expectedProperties.put(CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString());
+            expectedProperties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
+            expectedProperties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
             expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
             expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
             expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());

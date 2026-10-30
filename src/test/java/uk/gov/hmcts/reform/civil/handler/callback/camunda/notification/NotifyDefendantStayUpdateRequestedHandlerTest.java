@@ -209,7 +209,9 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
         expectedProperties.putAll(Map.of(
             "claimantvdefendant", "Mr. John Rambo V Jack Jackson",
             "claimReferenceNumber", "1594901956117591",
-            "name", "Jack Jackson"
+            "name", "Jack Jackson",
+            "claim16DigitNumber", "1594901956117591",
+            "casemanRef", "000DC001"
         ));
         return expectedProperties;
     }

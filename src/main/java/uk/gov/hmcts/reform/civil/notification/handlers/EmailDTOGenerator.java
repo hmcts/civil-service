@@ -36,6 +36,9 @@ public abstract class EmailDTOGenerator implements NotificationData {
     public Map<String, String> addProperties(CaseData caseData) {
         HashMap<String, String> properties = new HashMap<>();
         templateCommonPropertiesHelper.addBaseProperties(caseData, properties);
+        if (isLipRecipient()) {
+            templateCommonPropertiesHelper.addLipClaimantVDefendant(caseData, properties);
+        }
         templateCommonPropertiesHelper.addCommonFooterSignature(properties);
         templateCommonPropertiesHelper.addCnbcContact(caseData, properties);
         templateCommonPropertiesHelper.addSpecAndUnspecContact(caseData, properties);
@@ -43,6 +46,10 @@ public abstract class EmailDTOGenerator implements NotificationData {
         templateCommonPropertiesHelper.addLipContact(caseData, properties);
         templateCommonPropertiesHelper.addLipContactWelsh(caseData, properties);
         return properties;
+    }
+
+    protected boolean isLipRecipient() {
+        return false;
     }
 
     protected abstract String getEmailAddress(CaseData caseData);

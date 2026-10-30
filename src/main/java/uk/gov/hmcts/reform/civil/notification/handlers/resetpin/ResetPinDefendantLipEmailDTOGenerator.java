@@ -27,6 +27,11 @@ public class ResetPinDefendantLipEmailDTOGenerator extends EmailDTOGenerator {
     private final NotificationsProperties notificationsProperties;
 
     @Override
+    protected boolean isLipRecipient() {
+        return true;
+    }
+
+    @Override
     public Boolean getShouldNotify(CaseData caseData) {
         return caseData.isRespondent1LiP() && caseData.getRespondent1PartyEmail() != null;
     }

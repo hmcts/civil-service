@@ -18,6 +18,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipSubjectProperties;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @RequiredArgsConstructor
@@ -69,6 +70,7 @@ public abstract class AbstractNotifyManageStayHandler extends CallbackHandler im
                 PARTY_NAME, getPartyName(callbackParams),
                 CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
             ));
+            addLipSubjectProperties(caseData, properties);
             addAllFooterItems(caseData, properties, configuration,
                               featureToggleService.isPublicQueryManagementEnabled(caseData));
             return properties;

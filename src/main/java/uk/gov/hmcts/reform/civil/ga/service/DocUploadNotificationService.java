@@ -26,7 +26,8 @@ import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.addAllFooterItems;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addLipClaimantVDefendant;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addSubjectReferences;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.UPLOADED_DOCUMENTS;
 
 @Slf4j
@@ -58,7 +59,7 @@ public class DocUploadNotificationService implements NotificationDataGA {
                         : notificationProperties.getEvidenceUploadTemplate(),
                     addProperties(caseData, civilCaseData, getLegalOrganisationName(
                         caseData.getGeneralAppApplnSolicitor().getOrganisationIdentifier()
-                    )),
+                    ), gaForLipService.isLipApp(caseData)),
                     format(
                             REFERENCE_TEMPLATE_DOC_UPLOAD,
                             caseData.getCcdCaseReference()
@@ -83,7 +84,7 @@ public class DocUploadNotificationService implements NotificationDataGA {
                                 : notificationProperties.getEvidenceUploadTemplate(),
                             addProperties(caseData, civilCaseData, getLegalOrganisationName(
                                 respondentSolicitor.getValue().getOrganisationIdentifier()
-                            )),
+                            ), gaForLipService.isLipResp(caseData)),
                             format(
                                     REFERENCE_TEMPLATE_DOC_UPLOAD,
                                     caseData.getCcdCaseReference()
@@ -108,12 +109,13 @@ public class DocUploadNotificationService implements NotificationDataGA {
     public Map<String, String> addProperties(GeneralApplicationCaseData caseData, GeneralApplicationCaseData mainCaseData) {
         return addProperties(caseData, mainCaseData, getLegalOrganisationName(
             caseData.getGeneralAppApplnSolicitor().getOrganisationIdentifier()
-        ));
+        ), false);
     }
 
     private Map<String, String> addProperties(GeneralApplicationCaseData caseData,
                                               GeneralApplicationCaseData mainCaseData,
-                                              String legalOrganisationName) {
+                                              String legalOrganisationName,
+                                              boolean isLipRecipient) {
         Map<String, String> customProps = new HashMap<>();
 
         if (gaForLipService.isGaForLip(caseData)) {
@@ -145,9 +147,12 @@ public class DocUploadNotificationService implements NotificationDataGA {
         customProps.put(PARTY_REFERENCE,
                         Objects.requireNonNull(getSolicitorReferences(caseData.getEmailPartyReference())));
         customProps.put(GENAPP_REFERENCE, String.valueOf(Objects.requireNonNull(caseData.getCcdCaseReference())));
-        customProps.put(CASEMAN_REF, Objects.requireNonNullElse(mainCaseData.getLegacyCaseReference(), NOT_PROVIDED));
         customProps.put(CLAIM_LEGAL_ORG_NAME_SPEC, legalOrganisationName);
         customProps.put(UPLOADED_DOCUMENTS, getUploadedDocuments(caseData));
+        addSubjectReferences(mainCaseData, caseData.getGeneralAppParentCaseLink().getCaseReference(), customProps);
+        if (isLipRecipient) {
+            addLipClaimantVDefendant(caseData, customProps);
+        }
         addAllFooterItems(caseData, mainCaseData, customProps, configuration,
                            featureToggleService.isPublicQueryManagementEnabledGa(caseData));
         return customProps;
