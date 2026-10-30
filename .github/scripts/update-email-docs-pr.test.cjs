@@ -8,6 +8,94 @@ const BRANCH = 'automation/email-notification-docs';
 const FILES = ['docs/email-notifications.md', 'docs/email-notifications.html', '.github/email-docs-sources.json'];
 const PR = { number: 42, html_url: 'https://example.invalid/pull/42', state: 'open', title: 'Old title', body: 'Old provenance' };
 
+function success(stdout = '') {
+  return { exitCode: 0, stdout };
+}
+
+function simulateDiff(args, state, contents, options) {
+  if (args[1] === '--no-renames') {
+    assert.deepEqual(args, ['diff', '--no-renames', '--name-only', '-z', state.sourceBase, state.head, '--']);
+    if (options.failScope) return { exitCode: 1, stdout: '' };
+    return success(state.files.join('\0') + '\0');
+  }
+  assert.equal(args[1], '--quiet');
+  const documentsOnly = args.length === 6;
+  assert.deepEqual(args.slice(3), ['--', ...(documentsOnly ? FILES.slice(0, 2) : FILES)]);
+  const againstMaster = args[2] === 'HEAD';
+  if (!againstMaster) assert.equal(args[2], state.head);
+  const documentsMatch = againstMaster ? state.masterDocs : state.sameDocs;
+  const manifest = againstMaster ? state.masterManifest : state.branchManifest;
+  const unchanged = documentsMatch && (documentsOnly || contents.get(FILES[2]) === manifest);
+  return { exitCode: unchanged ? 0 : 1, stdout: '' };
+}
+
+function mockGitClient(state, contents, options, commands) {
+  const handlers = {
+    'rev-parse'(args) {
+      if (args[1] === 'HEAD') return success(state.base);
+      assert.equal(args[1], `${state.head}^`);
+      return success(state.parent);
+    },
+    fetch(args) {
+      assert.deepEqual(args, ['fetch', '--no-tags', 'origin', state.head]);
+      return success();
+    },
+    'merge-base'(args) {
+      assert.deepEqual(args, ['merge-base', state.base, state.head]);
+      return success(state.sourceBase);
+    },
+    log(args) {
+      assert.deepEqual(args, ['log', '--format=%H%x00%ae%x00%ce%x00%s', `${state.sourceBase}..${state.head}`]);
+      return success(state.history ?? [state.head, 'civil-service-bot@users.noreply.github.com',
+        'civil-service-bot@users.noreply.github.com', 'chore: regenerate email notification docs'].join('\0'));
+    },
+    show(args) {
+      if (args[1] === `${state.base}:${FILES[2]}`) return success(state.masterManifest);
+      assert.equal(args[1], `${state.head}:${FILES[2]}`);
+      return success(state.branchManifest);
+    },
+    diff: args => simulateDiff(args, state, contents, options),
+    checkout(args) {
+      assert.deepEqual(args, ['checkout', '-B', BRANCH]);
+      return success();
+    },
+    add(args) {
+      assert.deepEqual(args, ['add', '--', ...FILES]);
+      return success();
+    },
+    '-c'(args) {
+      assert.deepEqual(args, ['-c', 'user.name=civil-service-bot', '-c',
+        'user.email=civil-service-bot@users.noreply.github.com', 'commit', '--only',
+        '-m', 'chore: regenerate email notification docs', '--', ...FILES]);
+      state.commits += 1;
+      state.localHead = String(state.commits).padStart(40, '0');
+      return success();
+    },
+    push(args) {
+      assert.deepEqual(args, ['push', `--force-with-lease=refs/heads/${BRANCH}:${state.head}`,
+        'origin', `HEAD:refs/heads/${BRANCH}`]);
+      state.pushes += 1;
+      state.head = state.localHead;
+      state.parent = state.base;
+      state.sourceBase = state.base;
+      state.same = true;
+      state.sameDocs = true;
+      state.branchManifest = contents.get(FILES[2]);
+      state.files = [...FILES];
+      return success();
+    },
+  };
+  return {
+    async getExecOutput(program, args) {
+      assert.equal(program, 'git');
+      commands.push(args);
+      if (args[0] === options.failCommand) return { exitCode: options.failCode || 2, stdout: '' };
+      assert.ok(Object.hasOwn(handlers, args[0]), `Unexpected simulated Git command: ${JSON.stringify(args)}`);
+      return handlers[args[0]](args);
+    },
+  };
+}
+
 // All Git/API effects below are simulated. State persists across invocations to test recovery.
 // Unexpected commands fail rather than silently succeeding. No child process or network client is used.
 function fixture(options = {}) {
@@ -27,9 +115,12 @@ function fixture(options = {}) {
   }) + '\n';
   state.masterManifest = manifest('a', 'b');
   state.branchManifest = manifest('c', 'd');
+  let initialManifest = manifest('e', 'f');
+  if (options.noDrift) initialManifest = state.masterManifest;
+  else if (options.same) initialManifest = state.branchManifest;
   const contents = new Map([
     [FILES[0], '|header|\n|---|\n|data|\n'], [FILES[1], '<html>matrix</html>'],
-    [FILES[2], options.noDrift ? state.masterManifest : options.same ? state.branchManifest : manifest('e', 'f')],
+    [FILES[2], initialManifest],
   ]);
   const summary = { addRaw() { return this; }, async write() {} };
   const clients = {
@@ -40,81 +131,7 @@ function fixture(options = {}) {
     },
     context: { repo: { owner: 'hmcts', repo: 'civil-service' }, serverUrl: 'https://example.invalid', runId: 123 },
     core: { info() {}, setOutput() {}, summary },
-    exec: {
-      async getExecOutput(program, args) {
-        assert.equal(program, 'git');
-        commands.push(args);
-        const success = stdout => ({ exitCode: 0, stdout: stdout || '' });
-        if (args[0] === options.failCommand) return { exitCode: options.failCode || 2, stdout: '' };
-        if (args[0] === 'rev-parse') {
-          if (args[1] === 'HEAD') return success(state.base);
-          assert.equal(args[1], `${state.head}^`);
-          return success(state.parent);
-        }
-        if (args[0] === 'fetch') {
-          assert.deepEqual(args, ['fetch', '--no-tags', 'origin', state.head]);
-          return success();
-        }
-        if (args[0] === 'merge-base') {
-          assert.deepEqual(args, ['merge-base', state.base, state.head]);
-          return success(state.sourceBase);
-        }
-        if (args[0] === 'log') {
-          assert.deepEqual(args, ['log', '--format=%H%x00%ae%x00%ce%x00%s', `${state.sourceBase}..${state.head}`]);
-          return success(state.history ?? [state.head, 'civil-service-bot@users.noreply.github.com',
-            'civil-service-bot@users.noreply.github.com', 'chore: regenerate email notification docs'].join('\0'));
-        }
-        if (args[0] === 'show') {
-          if (args[1] === `${state.base}:${FILES[2]}`) return success(state.masterManifest);
-          assert.equal(args[1], `${state.head}:${FILES[2]}`);
-          return success(state.branchManifest);
-        }
-        if (args[0] === 'diff' && args[1] === '--no-renames') {
-          assert.deepEqual(args, ['diff', '--no-renames', '--name-only', '-z', state.sourceBase, state.head, '--']);
-          if (options.failScope) return { exitCode: 1, stdout: '' };
-          return success(state.files.join('\0') + '\0');
-        }
-        if (args[0] === 'diff' && args[1] === '--quiet') {
-          const documentsOnly = args.length === 6;
-          assert.deepEqual(args.slice(3), ['--', ...(documentsOnly ? FILES.slice(0, 2) : FILES)]);
-          if (args[2] === 'HEAD') return { exitCode: state.masterDocs
-            && (documentsOnly || contents.get(FILES[2]) === state.masterManifest) ? 0 : 1, stdout: '' };
-          assert.equal(args[2], state.head);
-          return { exitCode: state.sameDocs
-            && (documentsOnly || contents.get(FILES[2]) === state.branchManifest) ? 0 : 1, stdout: '' };
-        }
-        if (args[0] === 'checkout') {
-          assert.deepEqual(args, ['checkout', '-B', BRANCH]);
-          return success();
-        }
-        if (args[0] === 'add') {
-          assert.deepEqual(args, ['add', '--', ...FILES]);
-          return success();
-        }
-        if (args[0] === '-c') {
-          assert.deepEqual(args, ['-c', 'user.name=civil-service-bot', '-c',
-            'user.email=civil-service-bot@users.noreply.github.com', 'commit', '--only',
-            '-m', 'chore: regenerate email notification docs', '--', ...FILES]);
-          state.commits += 1;
-          state.localHead = String(state.commits).padStart(40, '0');
-          return success();
-        }
-        if (args[0] === 'push') {
-          assert.deepEqual(args, ['push', `--force-with-lease=refs/heads/${BRANCH}:${state.head}`,
-            'origin', `HEAD:refs/heads/${BRANCH}`]);
-          state.pushes += 1;
-          state.head = state.localHead;
-          state.parent = state.base;
-          state.sourceBase = state.base;
-          state.same = true;
-          state.sameDocs = true;
-          state.branchManifest = contents.get(FILES[2]);
-          state.files = [...FILES];
-          return success();
-        }
-        assert.fail(`Unexpected simulated Git command: ${JSON.stringify(args)}`);
-      },
-    },
+    exec: mockGitClient(state, contents, options, commands),
     github: { rest: {
       pulls: {
         async list(args) {
@@ -294,7 +311,7 @@ test('closed or merged PRs allow creation with an already-correct branch or a de
 test('different run IDs and CRLF bodies do not update an unchanged PR', async () => {
   const { clients, requests, state } = fixture();
   await update(clients);
-  state.pr.body = state.pr.body.replace(/\n/g, '\r\n');
+  state.pr.body = state.pr.body.replaceAll('\n', '\r\n');
   requests.length = 0;
   clients.context.runId = 125;
   await update(clients);

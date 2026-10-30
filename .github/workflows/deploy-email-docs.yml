@@ -20,9 +20,14 @@ concurrency:
 jobs:
   deploy:
     if: >-
+      github.repository == 'hmcts/civil-service' &&
       github.ref == 'refs/heads/master' &&
       (github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'))
+      (github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name == 'hmcts/civil-service' &&
+      github.event.workflow_run.head_branch == 'master' &&
+      (github.event.workflow_run.event == 'push' || github.event.workflow_run.event == 'workflow_dispatch')))
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -31,7 +36,10 @@ jobs:
       - name: Check out publication code
         uses: actions/checkout@v7
         with:
-          ref: ${{ github.sha }}
+          # Execute publication helpers only from the trusted repository's master.
+          # Never use the triggering run's head repository, branch or SHA here.
+          repository: hmcts/civil-service
+          ref: master
           persist-credentials: false
       - name: Select and download strictly verified documentation
         id: verified
