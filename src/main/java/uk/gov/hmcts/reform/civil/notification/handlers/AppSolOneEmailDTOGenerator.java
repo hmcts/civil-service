@@ -9,7 +9,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 
 @AllArgsConstructor
-public abstract class AppSolOneEmailDTOGenerator extends EmailDTOGenerator {
+public abstract class AppSolOneEmailDTOGenerator extends CivilEmailDTOGenerator {
 
     protected final OrganisationService organisationService;
 
