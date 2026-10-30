@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.mediation.MediationAppointmentType;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
@@ -76,6 +77,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationAppointment;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
@@ -413,6 +415,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  MediationContactInformation resp2MediationContactInfo;
     private  MediationAvailability resp1MediationAvailability;
     private  MediationAvailability resp2MediationAvailability;
+
+    private  MediationAppointmentType mediationAppointmentType;
+    private  MediationAppointment mediationAutoAppointment;
+    private  MediationAppointment mediationBulkAppointment;
 
     private final String additionalInformationForJudge;
     @JsonProperty("applicant1AdditionalInformationForJudge")
