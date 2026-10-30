@@ -127,6 +127,20 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
         @Test
+        void shouldRecordDeterminationOfMeansWithoutStartingRetiredProcess() {
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            caseData.setJoJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS);
+            var originalBusinessProcess = caseData.getBusinessProcess();
+            when(recordJudgmentOnlineMapper.addUpdateActiveJudgment(any())).thenReturn(getJudgementDetailsPayInstalments());
+            when(interestCalculator.calculateInterest(any())).thenReturn(BigDecimal.valueOf(85.65));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+            assertThat(response.getData().get("activeJudgment")).isNotNull();
+            assertThat(caseData.getBusinessProcess()).isEqualTo(originalBusinessProcess);
+        }
+
+        @Test
         void shouldPopulateAllJudgmentFields_For_Pay_Instalment() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();

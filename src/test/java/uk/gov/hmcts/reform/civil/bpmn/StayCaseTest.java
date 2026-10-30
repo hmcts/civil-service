@@ -16,29 +16,13 @@ public class StayCaseTest extends BpmnBaseTest {
     public static final String MESSAGE_NAME = "STAY_CASE";
     public static final String PROCESS_ID = "STAY_CASE";
 
-    //CCD CASE EVENT
-    public static final String NOTIFY_CLAIMANT_STAY_CASE
-        = "NOTIFY_CLAIMANT_STAY_CASE";
-    public static final String NOTIFY_DEFENDANT_STAY_CASE
-        = "NOTIFY_DEFENDANT_STAY_CASE";
-    public static final String NOTIFY_DEFENDANT_TWO_STAY_CASE
-        = "NOTIFY_DEFENDANT_TWO_STAY_CASE";
-
-    //ACTIVITY IDs
-    private static final String NOTIFY_CLAIMANT_STAY_CASE_ACTIVITY_ID
-        = "NotifyClaimantStayCase";
-    private static final String NOTIFY_DEFENDANT_STAY_CASE_ACTIVITY_ID
-        = "NotifyDefendantStayCase";
-    private static final String NOTIFY_DEFENDANT_TWO_STAY_CASE_ACTIVITY_ID
-        = "NotifyDefendant2StayCase";
-
     public StayCaseTest() {
         super("stay_case.bpmn", PROCESS_ID);
     }
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldSuccessfullyCompleteAmendRestitchBundle(boolean twoRepresentatives) {
+    void shouldCompleteStayCaseWithOneNotificationTask(boolean twoRepresentatives) {
         //assert process has started
         assertFalse(processInstance.isEnded());
 
@@ -60,31 +44,10 @@ public class StayCaseTest extends BpmnBaseTest {
 
         ExternalTask notificationTask;
 
-        //complete the claimant notification
+        // One framework task selects all recipients, regardless of the former gateway branch.
         notificationTask = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(notificationTask, PROCESS_CASE_EVENT,
-                                   NOTIFY_CLAIMANT_STAY_CASE,
-                                   NOTIFY_CLAIMANT_STAY_CASE_ACTIVITY_ID,
-                                   variables
-        );
-
-        if (twoRepresentatives) {
-            //complete the defendant 2 notification
-            notificationTask = assertNextExternalTask(PROCESS_CASE_EVENT);
-            assertCompleteExternalTask(notificationTask, PROCESS_CASE_EVENT,
-                                       NOTIFY_DEFENDANT_TWO_STAY_CASE,
-                                       NOTIFY_DEFENDANT_TWO_STAY_CASE_ACTIVITY_ID,
-                                       variables
-            );
-        }
-
-        //complete the defendant notification
-        notificationTask = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(notificationTask, PROCESS_CASE_EVENT,
-                                   NOTIFY_DEFENDANT_STAY_CASE,
-                                   NOTIFY_DEFENDANT_STAY_CASE_ACTIVITY_ID,
-                                   variables
-        );
+                                   "NOTIFY_EVENT", "StayCaseNotifyParties", variables);
 
         //complete the dashboard notification
         notificationTask = assertNextExternalTask(PROCESS_CASE_EVENT);
