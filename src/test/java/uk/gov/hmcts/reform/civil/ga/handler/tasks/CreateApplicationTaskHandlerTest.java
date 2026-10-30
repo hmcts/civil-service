@@ -133,6 +133,7 @@ public class CreateApplicationTaskHandlerTest {
             gaStateFlowEngine
         );
         lenient().when(mockTask.getTopicName()).thenReturn("test");
+        lenient().when(mockTask.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
 
         Map<String, Object> variables = Map.of(
             "caseId", CASE_ID,
@@ -631,6 +632,33 @@ public class CreateApplicationTaskHandlerTest {
 
     @Nested
     class CreateGeneralApplicationCCDEvent {
+
+        @Test
+        void shouldCreateApplicantOnlyApplicationWithoutRespondentAgreement() {
+            GeneralApplication application = getGeneralApplication()
+                .setGeneralAppRespondentAgreement(null);
+            buildData(application, NO, NO, false);
+        }
+
+        @Test
+        void shouldCreateApplicantOnlyApplicationWithoutAgreementAnswerOrNotice() {
+            GeneralApplication application = getGeneralApplication()
+                .setGeneralAppRespondentAgreement(new GARespondentOrderAgreement())
+                .setGeneralAppInformOtherParty(null);
+            buildData(application, NO, NO, false);
+        }
+
+        @Test
+        void shouldCreateApplicationWhenStoredChildProcessDiffersFromTaskParentProcess() {
+            GeneralApplication application = getGeneralApplication();
+            when(mockTask.getProcessInstanceId()).thenReturn("parent-process-instance");
+
+            buildData(application, NO, NO, false);
+
+            assertThat(application.getBusinessProcess().getStatus())
+                .isEqualTo(uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED);
+            assertThat(application.getBusinessProcess().getProcessInstanceId()).isEqualTo(PROCESS_INSTANCE_ID);
+        }
 
         @Test
         void shouldTriggerCCDEvent() {

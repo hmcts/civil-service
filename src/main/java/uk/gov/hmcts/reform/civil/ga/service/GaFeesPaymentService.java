@@ -3,7 +3,10 @@ package uk.gov.hmcts.reform.civil.ga.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -19,12 +22,12 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Arrays;
 
-import static java.util.Objects.requireNonNull;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class GaFeesPaymentService {
+
+    private static final String PAYMENT_NOT_READY_MESSAGE = "Payment is not ready yet, please retry in a moment";
 
     private final CaseDetailsConverter caseDetailsConverter;
     private final GaCoreCaseDataService gaCoreCaseDataService;
@@ -40,8 +43,15 @@ public class GaFeesPaymentService {
         String parentCaseRef = caseData.getParentCaseReference();
         GeneralApplicationPbaDetails generalAppPbaDetails = caseData.getGeneralAppPBADetails();
 
-        requireNonNull(generalAppPbaDetails, "Fee Payment details cannot be null");
-        requireNonNull(generalAppPbaDetails.getServiceReqReference(), "Fee Payment service request cannot be null");
+        String serviceRequestReference = null;
+        if (generalAppPbaDetails != null) {
+            serviceRequestReference = caseData.isAdditionalFeeRequested()
+                ? generalAppPbaDetails.getAdditionalPaymentServiceRef() : generalAppPbaDetails.getServiceReqReference();
+        }
+        if (!StringUtils.hasText(serviceRequestReference)) {
+            log.warn("General application payment is not ready for case {}", caseReference);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, PAYMENT_NOT_READY_MESSAGE);
+        }
 
         String returnUrlSubPath = "/general-application/payment-confirmation/" + parentCaseRef + "/gaid/";
 
@@ -55,9 +65,7 @@ public class GaFeesPaymentService {
             .build();
         CardPaymentServiceRequestResponse govPayCardPaymentRequest = paymentStatusService
             .createGovPayCardPaymentRequest(
-                caseData.isAdditionalFeeRequested()
-                    ? generalAppPbaDetails.getAdditionalPaymentServiceRef()
-                    : generalAppPbaDetails.getServiceReqReference(),
+                serviceRequestReference,
                 authorization,
                 requestDto
             );

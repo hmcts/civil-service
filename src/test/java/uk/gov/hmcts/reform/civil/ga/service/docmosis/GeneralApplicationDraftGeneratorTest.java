@@ -104,6 +104,39 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("Site Name 2 - Address2 - 28000");
 
     @Test
+    void shouldGenerateLipDraftWithoutHearingDetails() {
+        GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(NO, YES);
+        caseData.setGeneralAppHearingDetails(null);
+        caseData.setIsGaApplicantLip(YES);
+        when(coreCaseDataService.getCase(PARENT_CCD_REF))
+            .thenReturn(CaseDetails.builder().data(new HashMap<>()).build());
+        when(documentGeneratorService.generateDocmosisDocument(any(GADraftForm.class), eq(GENERAL_APPLICATION_DRAFT)))
+            .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
+
+        generalApplicationDraftGenerator.generate(caseData, BEARER_TOKEN);
+
+        var captor = org.mockito.ArgumentCaptor.forClass(GADraftForm.class);
+        verify(documentGeneratorService).generateDocmosisDocument(captor.capture(), eq(GENERAL_APPLICATION_DRAFT));
+        GADraftForm templateData = captor.getValue();
+        assertThat(templateData.getHearingPreferencesPreferredType()).isNull();
+        assertThat(templateData.getReasonForPreferredHearingType()).isNull();
+        assertThat(templateData.getHearingPreferredLocation()).isNull();
+        assertThat(templateData.getHearingDetailsTelephoneNumber()).isNull();
+        assertThat(templateData.getHearingDetailsEmailId()).isNull();
+        assertThat(templateData.getUnavailableTrialRequiredYesOrNo()).isNull();
+        assertThat(templateData.getUnavailableTrialDates()).isEmpty();
+        assertThat(templateData.getVulnerabilityQuestionsYesOrNo()).isNull();
+        assertThat(templateData.getSupportRequirement()).isNull();
+        assertThat(templateData.getSupportRequirementSignLanguage()).isNull();
+        assertThat(templateData.getSupportRequirementLanguageInterpreter()).isNull();
+        assertThat(templateData.getSupportRequirementOther()).isNull();
+        assertThat(templateData.getIsSignLanguageExists()).isFalse();
+        assertThat(templateData.getIsLanguageInterpreterExists()).isFalse();
+        assertThat(templateData.getIsOtherSupportExists()).isFalse();
+        verify(documentManagementService).uploadDocument(eq(BEARER_TOKEN), any(PDF.class));
+    }
+
+    @Test
     void shouldNotGenerateApplicationDraftDocument() {
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(NO, YES);
 

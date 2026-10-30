@@ -13,9 +13,11 @@ public class PopulateRespondentTabDetails {
     }
 
     public static void updateDataForClaimDetailsTab(CaseData caseData, ObjectMapper objectMapper, boolean respondent2CopyNeeded) {
-        Party respondent1Clone = objectMapper.convertValue(caseData.getRespondent1(), Party.class);
-        respondent1Clone.setFlags(null);
-        caseData.setRespondent1DetailsForClaimDetailsTab(respondent1Clone);
+        if (ofNullable(caseData.getRespondent1()).isPresent()) {
+            Party respondent1Clone = objectMapper.convertValue(caseData.getRespondent1(), Party.class);
+            respondent1Clone.setFlags(null);
+            caseData.setRespondent1DetailsForClaimDetailsTab(respondent1Clone);
+        }
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             Party respondent2Clone = objectMapper.convertValue(caseData.getRespondent2(), Party.class);
