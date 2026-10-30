@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseFormForSpec;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDateTime;
@@ -70,6 +72,7 @@ public class StatementOfTruthPopulatorTest {
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1DQ(respondent1DQ)
             .respondent2DQ(respondent2DQ)
+            .respondent2(new PartyBuilder().individual().build())
             .respondent2ResponseDate(LocalDateTime.now())
             .respondent1ResponseDate(LocalDateTime.now().minusDays(1))
             .build();
@@ -126,5 +129,108 @@ public class StatementOfTruthPopulatorTest {
         statementOfTruthPopulator.populateStatementOfTruthDetails(form, caseData);
         Assertions.assertTrue(form.isCheckCarmToggle());
         verify(featureToggleService).isCarmEnabledForCase(caseData);
+    }
+
+    @Test
+    void shouldSetResponseTypeFromRespondent2_whenMixedFullAndPartAdmitAndRespondent2IsLatest() {
+        StatementOfTruth respondent2StatementOfTruth = new StatementOfTruth();
+        respondent2StatementOfTruth.setName("Respondent 2");
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQStatementOfTruth(respondent2StatementOfTruth);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent2DQ(respondent2DQ)
+            .respondent2(new PartyBuilder().individual().build())
+            .respondent1ResponseDate(LocalDateTime.now().minusDays(1))
+            .respondent2ResponseDate(LocalDateTime.now())
+            .build();
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        caseData.setRespondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.FULL_ADMISSION);
+
+        SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
+        given(featureToggleService.isCarmEnabledForCase(caseData)).willReturn(false);
+
+        statementOfTruthPopulator.populateStatementOfTruthDetails(form, caseData);
+
+        assertEquals(RespondentResponseTypeSpec.PART_ADMISSION, form.getResponseType());
+        assertEquals(respondent2StatementOfTruth, form.getStatementOfTruth());
+    }
+
+    @Test
+    void shouldSetResponseTypeFromRespondent1_whenMixedPartAndFullAdmitAndRespondent1IsLatest() {
+        StatementOfTruth respondent1StatementOfTruth = new StatementOfTruth();
+        respondent1StatementOfTruth.setName("Respondent 1");
+        Respondent1DQ respondent1DQ = new Respondent1DQ();
+        respondent1DQ.setRespondent1DQStatementOfTruth(respondent1StatementOfTruth);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1DQ(respondent1DQ)
+            .respondent2(new PartyBuilder().individual().build())
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent2ResponseDate(LocalDateTime.now().minusDays(1))
+            .build();
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setRespondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.FULL_ADMISSION);
+
+        SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
+        given(featureToggleService.isCarmEnabledForCase(caseData)).willReturn(false);
+
+        statementOfTruthPopulator.populateStatementOfTruthDetails(form, caseData);
+
+        assertEquals(RespondentResponseTypeSpec.PART_ADMISSION, form.getResponseType());
+        assertEquals(respondent1StatementOfTruth, form.getStatementOfTruth());
+    }
+
+    @Test
+    void shouldSetResponseTypeFromRespondent2_whenMixedPartAndFullAdmitAndRespondent2IsLatest() {
+        StatementOfTruth respondent2StatementOfTruth = new StatementOfTruth();
+        respondent2StatementOfTruth.setName("Respondent 2");
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQStatementOfTruth(respondent2StatementOfTruth);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent2DQ(respondent2DQ)
+            .respondent2(new PartyBuilder().individual().build())
+            .respondent1ResponseDate(LocalDateTime.now().minusDays(1))
+            .respondent2ResponseDate(LocalDateTime.now())
+            .build();
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setRespondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.PART_ADMISSION);
+
+        SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
+        given(featureToggleService.isCarmEnabledForCase(caseData)).willReturn(false);
+
+        statementOfTruthPopulator.populateStatementOfTruthDetails(form, caseData);
+
+        assertEquals(RespondentResponseTypeSpec.FULL_ADMISSION, form.getResponseType());
+        assertEquals(respondent2StatementOfTruth, form.getStatementOfTruth());
+    }
+
+    @Test
+    void shouldSetResponseTypeFromRespondent2_whenRespondent2FullAdmitRespondsFirst() {
+        StatementOfTruth respondent2StatementOfTruth = new StatementOfTruth();
+        respondent2StatementOfTruth.setName("Respondent 2");
+        Respondent2DQ respondent2DQ = new Respondent2DQ();
+        respondent2DQ.setRespondent2DQStatementOfTruth(respondent2StatementOfTruth);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent2DQ(respondent2DQ)
+            .respondent2(new PartyBuilder().individual().build())
+            .respondent2ResponseDate(LocalDateTime.now())
+            .build();
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setRespondentClaimResponseTypeForSpecGeneric(RespondentResponseTypeSpec.PART_ADMISSION);
+
+        SealedClaimResponseFormForSpec form = new SealedClaimResponseFormForSpec();
+        given(featureToggleService.isCarmEnabledForCase(caseData)).willReturn(false);
+
+        statementOfTruthPopulator.populateStatementOfTruthDetails(form, caseData);
+
+        assertEquals(RespondentResponseTypeSpec.FULL_ADMISSION, form.getResponseType());
+        assertEquals(respondent2StatementOfTruth, form.getStatementOfTruth());
     }
 }

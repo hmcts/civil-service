@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmati
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -13,19 +13,21 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Component
 public class PartialAdmitPaidFullConfirmationText implements RespondToClaimConfirmationTextSpecGenerator {
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
-        if (!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || NO.equals(caseData.getSpecDefenceAdmittedRequired())) {
+        YesOrNo admittedRequired = caseData.isCurrentDefendantRespondent2()
+            ? caseData.getSpecDefenceAdmitted2Required()
+            : caseData.getSpecDefenceAdmittedRequired();
+        if (!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getCurrentDefendantClaimResponseTypeForSpec())
+            || !YES.equals(admittedRequired)) {
             return Optional.empty();
         }
-        BigDecimal howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
-            .map(RespondToClaim::getHowMuchWasPaid).orElse(null);
+        BigDecimal howMuchWasPaid = (caseData.getResponseToClaim() != null ? caseData.getResponseToClaim().getHowMuchWasPaid() : null);
         BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
         if (Stream.of(howMuchWasPaid, totalClaimAmount)
             .anyMatch(Objects::isNull)) {
