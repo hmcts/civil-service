@@ -73,9 +73,9 @@ class SecuredDocumentManagementServiceRetryTest {
 
     @MockitoBean
     private CaseDocumentClientApi caseDocumentClientApi;
-    @MockBean
+    @MockitoBean
     private CaseDocumentBinaryApiClient caseDocumentBinaryApiClient;
-    @MockBean
+    @MockitoBean
     private DocumentDownloadClientApi documentDownloadClient;
     @MockitoBean
     private AuthTokenGenerator authTokenGenerator;

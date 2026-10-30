@@ -87,7 +87,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     @MockitoBean
     private CaseDocumentClientApi caseDocumentClientApi;
 
-    @MockBean
+    @MockitoBean
     private CaseDocumentBinaryApiClient caseDocumentBinaryApiClient;
 
     @Autowired
