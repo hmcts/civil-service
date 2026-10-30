@@ -42,8 +42,12 @@ Everything under `src/cftlib` runs only under cftlib. It holds configuration, an
 - civil's business processes are deployed to Camunda;
 - this service stores a document through CDAM and cftlib's dm-store and reads it back;
 - tests can sign in through cftlib's `/loginUser`;
-- a hearing HMI cannot list makes this service trigger `REVIEW_HEARING_EXCEPTION`, whose work allocation task appears in Camunda and is configured by task management;
-- a listed hearing makes this service trigger `UPDATE_NEXT_HEARING_DETAILS`.
+- `MOVE_TO_DECISION_OUTCOME` runs its business process in Camunda to the end;
+- a hearing HMI cannot list makes this service trigger `REVIEW_HEARING_EXCEPTION`, whose work allocation task is created and configured;
+- `CASE_PROCEEDS_IN_CASEMAN` cancels that task, and wa-task-monitor's termination job terminates it;
+- a listed hearing makes this service trigger `UPDATE_NEXT_HEARING_DETAILS`, whose callback reads the hearing back from HMC, and work allocation reconfigures the case's tasks.
+
+`CivilIntegrationsCftlibTest` holds these journeys. Its cases are written straight into the data store with only the fields the events read, so they start part way through a claim.
 
 It is not part of `check`, since it needs Docker and access to `hmctsprod.azurecr.io` (`az acr login --name hmctsprod`).
 
