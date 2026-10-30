@@ -10,11 +10,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.NotifyRpaFeedCaseReference;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.notification.robotics.DefaultJudgmentRoboticsNotifier;
 import uk.gov.hmcts.reform.civil.service.notification.robotics.RoboticsNotifier;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -38,12 +41,11 @@ class NotifyRpaFeedTaskTest {
         notifyRpaFeedTask = new NotifyRpaFeedTask(roboticsNotifier, userConfig, userService, defaultJudgmentRoboticsNotifier);
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"NOTIFY_RPA_ON_CONTINUOUS_FEED", "NOTIFY_RPA_ON_CASE_HANDED_OFFLINE"})
-    void shouldNotifyRobotics_whenEventIsNotDjSpecOrUnspec(String notifyEventId) {
+    @Test
+    void shouldNotifyRoboticsWithoutBreathingSpace_whenContinuousFeed() {
         NotifyRpaFeedCaseReference caseReference = new NotifyRpaFeedCaseReference();
         caseReference.setCaseReference("1234567890123456");
-        caseReference.setNotifyEventId(notifyEventId);
+        caseReference.setNotifyEventId("NOTIFY_RPA_ON_CONTINUOUS_FEED");
         String accessToken = "accessToken";
         String userName = "userName";
         String password = "password";
@@ -52,7 +54,35 @@ class NotifyRpaFeedTaskTest {
         given(userConfig.getPassword()).willReturn(password);
         given(userService.getAccessToken(userName, password)).willReturn(accessToken);
 
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseData.builder()
+            .breathing(new BreathingSpaceInfo())
+            .build();
+        notifyRpaFeedTask.migrateCaseData(caseData, caseReference);
+
+        verify(roboticsNotifier).notifyRobotics(
+            argThat(data -> data.getBreathing() == null),
+            eq(accessToken)
+        );
+        assertThat(caseData.getBreathing()).isNotNull();
+        verifyNoInteractions(defaultJudgmentRoboticsNotifier);
+    }
+
+    @Test
+    void shouldNotifyRoboticsWithBreathingSpace_whenCaseHandedOffline() {
+        NotifyRpaFeedCaseReference caseReference = new NotifyRpaFeedCaseReference();
+        caseReference.setCaseReference("1234567890123456");
+        caseReference.setNotifyEventId("NOTIFY_RPA_ON_CASE_HANDED_OFFLINE");
+        String accessToken = "accessToken";
+        String userName = "userName";
+        String password = "password";
+
+        given(userConfig.getUserName()).willReturn(userName);
+        given(userConfig.getPassword()).willReturn(password);
+        given(userService.getAccessToken(userName, password)).willReturn(accessToken);
+
+        CaseData caseData = CaseData.builder()
+            .breathing(new BreathingSpaceInfo())
+            .build();
         notifyRpaFeedTask.migrateCaseData(caseData, caseReference);
 
         verify(roboticsNotifier).notifyRobotics(caseData, accessToken);
