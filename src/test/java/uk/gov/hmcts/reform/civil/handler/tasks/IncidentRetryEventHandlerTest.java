@@ -206,10 +206,8 @@ class IncidentRetryEventHandlerTest {
             any(), anyBoolean(), eq("proc1"), anyString(), anyString(), anyInt());
 
         // caseId exists
-        HashMap<String, VariableValueDto> vars = new HashMap<>();
-        VariableValueDto varDto = new VariableValueDto();
-        varDto.setValue("case-proc1");
-        vars.put("caseId", varDto);
+        HashMap<String, CamundaVariableValue> vars = new HashMap<>();
+        vars.put("caseId", variable("case-proc1"));
         when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any()))
             .thenReturn(vars);
 
