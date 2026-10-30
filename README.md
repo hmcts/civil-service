@@ -140,10 +140,13 @@ regression tests, and generation settings. Publication consumes the verified art
   on master package the complete validated `docs` directory and retain it as an Actions artefact for up to
   90 days, subject to repository retention limits. PR and report-only runs cannot produce a publication artefact.
 - **Publish email notification docs:** follows successful verification and publishes only its saved artefact
-  matching the complete committed `docs` tree. It does not check out CCD repositories or rerun generation.
+  matching the complete committed `docs` tree. This privileged workflow performs no repository checkout and
+  executes no repository helpers or artefact code. It uses inline workflow code and GitHub's Git tree metadata
+  to verify every archived file's path, size, mode and Git object identity before upload. It does not require
+  CCD repositories or rerun generation.
   Manual publication on master can reuse an earlier successful verification artefact when the docs tree is
   identical, including after unrelated master commits. Missing, expired or mismatched artefacts are never
-  replaced with an unchecked upload of `docs`. The extracted files are compared with the checkout before upload.
+  replaced with an unchecked upload of `docs`. Links, unsafe paths, extra files and incomplete archives are rejected.
 
 The updater uses the repository's existing `actions/github-script` action and
 `.github/scripts/update-email-docs-pr.cjs`, with an explicit lease when updating its automation branch.

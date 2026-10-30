@@ -1,6 +1,22 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
-const select = require('./email-docs-artifact.cjs');
+const fs = require('node:fs');
+const path = require('node:path');
+
+// Execute the actual inline workflow script with simulated API and filesystem
+// clients. No checked-out helper, child process or real network client is used.
+const workflow = fs.readFileSync(path.join(__dirname, '../workflows/deploy-email-docs.yml'), 'utf8');
+assert.ok(!workflow.includes('actions/checkout@'), 'Publication must not check out repository code');
+const scriptMarker = '          script: |\n';
+assert.equal(workflow.split(scriptMarker).length, 2, 'Expected one inline publication script');
+const scriptLines = [];
+for (const line of workflow.split(scriptMarker)[1].split('\n')) {
+  if (line.trim() && !line.startsWith('            ')) break;
+  scriptLines.push(line.slice(12));
+}
+const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+const execute = new AsyncFunction('github', 'context', 'core', 'require', scriptLines.join('\n'));
+const select = clients => execute(clients.github, clients.context, clients.core, clients.require);
 
 const TREE = 'd'.repeat(40);
 function fixture({ manual = false } = {}) {
@@ -9,18 +25,51 @@ function fixture({ manual = false } = {}) {
   const state = {
     runs: [run], path: '.github/workflows/email-notifications.yml',
     artefacts: [{ id: 56, name: `verified-email-docs-${TREE}`, expired: false }], calls: [],
+    written: new Map(), outputs: new Map(), rootTruncated: false, docsTruncated: false,
+    root: [{ path: 'docs', type: 'tree', sha: TREE }], entries: [],
   };
   const actions = {
     listWorkflowRuns: Symbol('runs'), listWorkflowRunArtifacts: Symbol('artefacts'),
     async getWorkflow(args) { state.calls.push(['workflow', args]); return { data: { path: state.path } }; },
+    async downloadArtifact(args) {
+      state.calls.push(['download', args]);
+      assert.equal(args.artifact_id, 56); assert.equal(args.archive_format, 'zip');
+      return { data: Buffer.from('simulated ZIP') };
+    },
   };
+  const summary = { addRaw() { return this; }, async write() {} };
   const clients = {
-    docsTree: TREE,
     context: { repo: { owner: 'hmcts', repo: 'civil-service' }, sha: 'b'.repeat(40),
       ref: 'refs/heads/master', eventName: manual ? 'workflow_dispatch' : 'workflow_run',
       payload: { workflow_run: run } },
-    core: { info() {} },
-    github: { rest: { actions }, async paginate(method, args) {
+    core: { info() {}, setOutput(name, value) { state.outputs.set(name, value); }, summary },
+    require(name) {
+      assert.equal(name, 'node:fs');
+      return { writeFileSync(file, content) { state.written.set(path.basename(file), content); } };
+    },
+    github: { rest: { actions,
+      repos: { async getBranch(args) {
+        state.calls.push(['branch', args]);
+        assert.deepEqual(args, { owner: 'hmcts', repo: 'civil-service', branch: 'master' });
+        return { data: { commit: { sha: 'b'.repeat(40) } } };
+      } },
+      git: {
+        async getCommit(args) {
+          state.calls.push(['commit', args]);
+          assert.equal(args.commit_sha, 'b'.repeat(40));
+          return { data: { tree: { sha: 'c'.repeat(40) } } };
+        },
+        async getTree(args) {
+          state.calls.push(['tree', args]);
+          if (args.tree_sha === TREE) {
+            assert.equal(args.recursive, 'true');
+            return { data: { tree: state.entries, truncated: state.docsTruncated } };
+          }
+          assert.equal(args.tree_sha, 'c'.repeat(40));
+          return { data: { tree: state.root, truncated: state.rootTruncated } };
+        },
+      },
+    }, async paginate(method, args) {
       state.calls.push([method, args]);
       assert.equal(args.owner, 'hmcts'); assert.equal(args.repo, 'civil-service');
       if (method === actions.listWorkflowRuns) {
@@ -39,9 +88,12 @@ function fixture({ manual = false } = {}) {
 
 test('publication selects the verified complete docs tree despite unrelated master advancement', async () => {
   for (const manual of [false, true]) {
-    const { clients, run } = fixture({ manual });
+    const { clients, state, run } = fixture({ manual });
     assert.notEqual(clients.context.sha, run.head_sha);
     assert.deepEqual(await select(clients), { artefactId: 56, runId: 12, sha: run.head_sha });
+    assert.equal(state.outputs.get('found'), 'true');
+    assert.deepEqual(JSON.parse(state.written.get('email-docs-tree.json')), state.entries);
+    assert.equal(state.written.get('email-docs.zip').toString(), 'simulated ZIP');
   }
 });
 
@@ -76,7 +128,7 @@ test('PR, fork, non-master and failed runs can never supply publication artefact
 test('a different workflow cannot supply the artefact even with a matching name', async () => {
   const { clients, state } = fixture(); state.path = '.github/workflows/ci.yml';
   assert.equal(await select(clients), null);
-  assert.equal(state.calls.length, 1);
+  assert.ok(!state.calls.some(([method]) => method === 'download'));
 });
 
 test('manual recovery searches earlier successful runs when a newer run has no retained artefact', async () => {
@@ -94,8 +146,17 @@ test('API failures propagate and unsupported publication requests fail', async (
   for (const manual of [false, true]) {
     const otherBranch = fixture({ manual }).clients;
     otherBranch.context.ref = 'refs/heads/feature';
-    await assert.rejects(select(otherBranch), /only be published from master/);
+    await assert.rejects(select(otherBranch), /only be published from hmcts\/civil-service master/);
   }
-  const malformed = fixture().clients; malformed.docsTree = 'HEAD:docs';
-  await assert.rejects(select(malformed), /tree SHA/);
+  const fork = fixture({ manual: true }).clients; fork.context.repo.owner = 'fork';
+  await assert.rejects(select(fork), /only be published from hmcts\/civil-service master/);
+});
+
+test('missing or truncated Git trees stop publication before any archive download', async () => {
+  for (const changes of [{ root: [] }, { rootTruncated: true }, { docsTruncated: true }]) {
+    const { clients, state } = fixture(); Object.assign(state, changes);
+    await assert.rejects(select(clients), /no docs directory|response is incomplete/);
+    assert.ok(!state.calls.some(([method]) => method === 'download'));
+    assert.equal(state.outputs.size, 0);
+  }
 });
