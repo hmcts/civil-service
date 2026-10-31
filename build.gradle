@@ -8,15 +8,15 @@ plugins {
   id 'io.spring.dependency-management' version '1.1.7'
   id 'org.springframework.boot' version '3.5.16'
   id 'org.owasp.dependencycheck' version '13.0.0'
-  id 'com.github.ben-manes.versions' version '0.66.0'
+  id 'com.github.ben-manes.versions' version '0.67.0'
   id 'org.sonarqube' version '7.5.0.8588'
   id 'au.com.dius.pact' version '4.6.17'
   id "io.freefair.lombok" version "9.5.0"
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.6"
-  id 'hmcts.ccd.sdk' version '7.17.0'
-  id 'net.ltgt.errorprone' version '5.1.1'
+  id 'hmcts.ccd.sdk' version '7.20.0'
+  id 'net.ltgt.errorprone' version '5.2.0'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -32,11 +32,11 @@ def versions = [
   swaggerAnnotations: '2.2.55',
   testcontainers    : '1.21.4',
   assertj           : '3.27.7',
-  azureCore         : '1.59.1',
-  azureCoreAmqp     : '2.12.1',
-  azureCoreHttpNetty: '1.16.7',
+  azureCore         : '1.61.0',
+  azureCoreAmqp     : '2.13.0',
+  azureCoreHttpNetty: '1.17.0',
   azureJson         : '1.5.1',
-  azureServiceBus   : '7.18.0',
+  azureServiceBus   : '7.18.1',
   cucumber          : '8.0.4',
   elasticsearch     : '9.5.5',
   httpclient5       : '5.6.5',
@@ -52,7 +52,7 @@ def versions = [
   protonJ           : '0.35.0',
   tika              : '3.3.3',
   tomcat            : '10.1.61',
-  applicationInsights: '3.7.9',
+  applicationInsights: '3.7.10',
   commonsLang3      : '3.21.0'
 ]
 
@@ -73,7 +73,7 @@ allprojects {
 
   checkstyle {
     maxWarnings = 0
-    toolVersion = '14.3.0'
+    toolVersion = '14.4.0'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
     ignoreFailures = System.getenv('CHECKSTYLE_SKIP') == 'true'
   }
@@ -108,7 +108,7 @@ allprojects {
         entry 'guava'
       }
 
-      dependency 'com.squareup.okhttp3:okhttp:5.5.0'
+      dependency 'com.squareup.okhttp3:okhttp:5.5.1'
 
       dependency 'org.slf4j:slf4j-nop:2.0.20'
 
@@ -135,9 +135,9 @@ allprojects {
 
       dependency 'org.apache.commons:commons-lang3:' + versions.commonsLang3
       dependency 'org.bouncycastle:bcprov-jdk18on:1.86'
-      dependency 'io.projectreactor:reactor-core:3.8.7'
-      dependency 'io.micrometer:micrometer-core:1.16.7'
-      dependency 'ch.qos.logback:logback-core:1.6.5'
+      dependency 'io.projectreactor:reactor-core:3.8.8'
+      dependency 'io.micrometer:micrometer-core:1.17.2'
+      dependency 'ch.qos.logback:logback-core:1.6.6'
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.0.3'
@@ -630,8 +630,8 @@ allprojects {
 }
 
 dependencies {
-  errorprone 'com.google.errorprone:error_prone_core:2.50.0'
-  errorprone 'com.uber.nullaway:nullaway:0.14.2'
+  errorprone 'com.google.errorprone:error_prone_core:2.51.0'
+  errorprone 'com.uber.nullaway:nullaway:0.14.3'
   def withoutJunit4 = {
     exclude group: 'junit', module: 'junit'
   }
@@ -672,8 +672,8 @@ dependencies {
   implementation "org.springframework.retry:spring-retry"
   implementation "com.github.hmcts.java-logging:logging:8.0.0"
   implementation "com.microsoft.azure:applicationinsights-web:${versions.applicationInsights}"
-  implementation "com.github.hmcts:befta-fw:9.2.10"
-  implementation "com.github.hmcts:core-case-data-store-client:5.3.0"
+  implementation "com.github.hmcts:befta-fw:9.2.12_CCD-8388"
+  implementation "com.github.hmcts:core-case-data-store-client:5.4.0"
   implementation "com.github.hmcts:document-management-client:7.1.0"
   implementation "com.github.hmcts:send-letter-client:5.1.1"
   implementation "net.logstash.logback:logstash-logback-encoder:9.0"
@@ -712,7 +712,7 @@ dependencies {
   implementation "com.azure:azure-messaging-servicebus:${versions.azureServiceBus}"
   implementation "org.apache.pdfbox:pdfbox:${versions.pdfbox}"
   implementation "org.apache.pdfbox:pdfbox-io:${versions.pdfbox}"
-  implementation "com.github.hmcts:auth-checker-lib:3.1.1"
+  implementation "com.github.hmcts:auth-checker-lib:3.1.2"
   implementation 'org.apache.poi:poi:5.5.1'
   implementation 'org.apache.poi:poi-ooxml:5.5.1'
   implementation "org.apache.httpcomponents.client5:httpclient5:${versions.httpclient5}"
@@ -740,11 +740,11 @@ dependencies {
 
   testImplementation "org.apache.pdfbox:pdfbox-io:${versions.pdfbox}"
   testImplementation("org.apache.pdfbox:preflight:${versions.pdfbox}", withoutJunit4)
-  testImplementation "org.mockito:mockito-core:5.23.0"
-  testImplementation "org.mockito:mockito-junit-jupiter:5.23.0"
+  testImplementation "org.mockito:mockito-core:5.24.0"
+  testImplementation "org.mockito:mockito-junit-jupiter:5.24.0"
   testImplementation "org.mockito:mockito-inline:5.2.0"
-  testImplementation "net.bytebuddy:byte-buddy:1.18.14-jdk5"
-  testImplementation "net.bytebuddy:byte-buddy-agent:1.18.14-jdk5"
+  testImplementation "net.bytebuddy:byte-buddy:1.18.16-jdk5"
+  testImplementation "net.bytebuddy:byte-buddy-agent:1.18.16-jdk5"
   testImplementation libraries.junit5
   testImplementation "org.springframework.boot:spring-boot-starter-test"
   testImplementation "io.rest-assured:rest-assured"
