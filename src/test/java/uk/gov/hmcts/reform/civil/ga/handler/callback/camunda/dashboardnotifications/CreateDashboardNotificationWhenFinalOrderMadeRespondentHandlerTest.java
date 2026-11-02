@@ -52,6 +52,21 @@ class CreateDashboardNotificationWhenFinalOrderMadeRespondentHandlerTest extends
             .isEqualTo("default");
     }
 
+    @Test
+    void shouldSkipScenarioWhenNoticeAndConsentAreMissing() {
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData();
+
+        assertThat(handler.getScenario(caseData)).isEmpty();
+    }
+
+    @Test
+    void shouldRecordConsentScenarioWhenInformOtherPartyIsMissing() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData().build()
+            .copy().generalAppInformOtherParty(null).generalAppConsentOrder(YesOrNo.YES).build();
+
+        assertThat(handler.getScenario(caseData)).isEqualTo(SCENARIO_AAA6_GENERAL_APPLICATION_ORDER_MADE_RESPONDENT.getScenario());
+    }
+
     @Nested
     class AboutToSubmitCallback {
 

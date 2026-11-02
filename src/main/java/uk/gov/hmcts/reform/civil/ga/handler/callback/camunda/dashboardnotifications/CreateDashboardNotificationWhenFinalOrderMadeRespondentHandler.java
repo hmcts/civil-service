@@ -38,7 +38,8 @@ public class CreateDashboardNotificationWhenFinalOrderMadeRespondentHandler exte
     }
 
     private boolean isWithNoticeOrConsent(GeneralApplicationCaseData caseData) {
-        return YES.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice())
+        return (caseData.getGeneralAppInformOtherParty() != null
+            && YES.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice()))
             || caseData.getGeneralAppConsentOrder() == YES;
     }
 }

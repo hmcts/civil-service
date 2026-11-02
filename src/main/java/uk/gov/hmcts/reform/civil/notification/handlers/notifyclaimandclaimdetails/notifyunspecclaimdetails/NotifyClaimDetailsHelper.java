@@ -31,6 +31,9 @@ public class NotifyClaimDetailsHelper {
     }
 
     public Map<String, String> getCustomProperties(CaseData caseData) {
+        if (caseData.getRespondent1ResponseDeadline() == null) {
+            return Map.of();
+        }
         return Map.of(
             RESPONSE_DEADLINE, formatLocalDate(caseData
                                                    .getRespondent1ResponseDeadline()

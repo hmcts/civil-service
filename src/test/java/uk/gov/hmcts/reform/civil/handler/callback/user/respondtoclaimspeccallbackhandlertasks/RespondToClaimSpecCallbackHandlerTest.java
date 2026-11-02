@@ -322,6 +322,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         res2witnesses.setDetails(wrapElements(witness2));
 
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .respondent1DQ()
                 .respondent2DQ()
                 .respondent1Copy(new PartyBuilder().individual().build())
                 .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
@@ -332,6 +333,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atSpecAoSRespondent2HomeAddressRequired(NO)
                 .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
                 .build();
+        // R1 already responded: DQ witnesses are already on the case. Small-claim field may still be
+        // present but must not be re-applied on R2's DEFENDANT_RESPONSE_SPEC (preserves partyIDs/flags).
+        caseData.getRespondent1DQ().setRespondent1DQWitnesses(res1witnesses);
         caseData.setRespondent1DQWitnessesSmallClaim(res1witnesses);
         caseData.setRespondent2DQWitnessesSmallClaim(res2witnesses);
         caseData.setRespondent2ResponseDate(dateTime);

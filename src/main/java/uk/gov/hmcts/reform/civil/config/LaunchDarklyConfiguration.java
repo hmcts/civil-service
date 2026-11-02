@@ -34,11 +34,15 @@ public class LaunchDarklyConfiguration {
     public LDClient ldClient(@Value("${launchdarkly.sdk-key}") String sdkKey,
                              @Value("${launchdarkly.offline-mode:false}") Boolean offlineMode,
                              @Value("${launchdarkly.file:''}") String[] flagFiles) {
+        return new LDClient(sdkKey, configBuilder(offlineMode, flagFiles).build());
+    }
+
+    LDConfig.Builder configBuilder(Boolean offlineMode, String[] flagFiles) {
         LDConfig.Builder builder = new LDConfig.Builder().offline(offlineMode);
         getExistingFiles(flagFiles)
             .map(this::getDataSource)
             .ifPresent(builder::dataSource);
-        return new LDClient(sdkKey, builder.build());
+        return builder;
     }
 
     /**
