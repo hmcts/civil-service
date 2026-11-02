@@ -90,6 +90,12 @@ ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg4@justice
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg4@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-manager" '{"jurisdiction":"CIVIL","primaryLocation":"366774"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg4@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "tribunal-caseworker" '{"jurisdiction":"CIVIL","primaryLocation":"366774","workTypes":"decision_making_work"}' "LEGAL_OPERATIONS"
 
+${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hmcts-legal-operations" '{"jurisdiction":"CIVIL","primaryLocation":"20262"}' "LEGAL_OPERATIONS"
+${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-viewer" '{"jurisdiction":"CIVIL","primaryLocation":"20262"}' "LEGAL_OPERATIONS"
+${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-manager" '{"jurisdiction":"CIVIL","primaryLocation":"20262"}' "LEGAL_OPERATIONS"
+${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "tribunal-caseworker" '{"jurisdiction":"CIVIL","primaryLocation":"20262","workTypes":"decision_making_work"}' "LEGAL_OPERATIONS"
+${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "senior-tribunal-caseworker" '{"jurisdiction":"CIVIL","primaryLocation":"20262","workTypes":"decision_making_work,access_requests"}' "LEGAL_OPERATIONS"
+
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg2@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hmcts-legal-operations" '{"jurisdiction":"CIVIL","primaryLocation":"366774"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg2@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-viewer" '{"jurisdiction":"CIVIL","primaryLocation":"366774"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg2@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-manager" '{"jurisdiction":"CIVIL","primaryLocation":"366774"}' "LEGAL_OPERATIONS"
