@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Result;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.message.CcdEventMessage;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.service.notification.robotics.RoboticsNotifier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -59,7 +61,9 @@ class AddCaseNoteMessageHandlerTest {
     @Test
     public void shouldPublishEventWhenReceivingHandleableMessage() {
         CaseDetails details = CaseDetails.builder().id(Long.parseLong(CASE_ID)).build();
-        CaseData data = CaseData.builder().build();
+        CaseData data = CaseData.builder()
+            .breathing(new BreathingSpaceInfo())
+            .build();
         when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RPA_ON_CONTINUOUS_FEED)).thenReturn(startEventResponse(details));
         when(caseDetailsConverter.toCaseData(eq(details))).thenReturn(data);
         when(userService.getAccessToken(any(), any())).thenReturn(ACCESS_TOKEN);
@@ -79,7 +83,11 @@ class AddCaseNoteMessageHandlerTest {
 
         Result result = addCaseNoteMessageHandler.handle(ccdEventMessage);
 
-        verify(roboticsNotifier).notifyRobotics(data, ACCESS_TOKEN);
+        verify(roboticsNotifier).notifyRobotics(
+            argThat(caseData -> caseData.getBreathing() == null),
+            eq(ACCESS_TOKEN)
+        );
+        assertThat(data.getBreathing()).isNotNull();
         assertThat(result).isInstanceOf(Result.Success.class);
     }
 
@@ -92,7 +100,7 @@ class AddCaseNoteMessageHandlerTest {
         when(userService.getAccessToken(any(), any())).thenReturn(ACCESS_TOKEN);
 
         doThrow(new NotificationException(new RuntimeException("error")))
-            .when(roboticsNotifier).notifyRobotics(data, ACCESS_TOKEN);
+            .when(roboticsNotifier).notifyRobotics(any(), eq(ACCESS_TOKEN));
 
         CcdEventMessage ccdEventMessage = new CcdEventMessage(
             null,

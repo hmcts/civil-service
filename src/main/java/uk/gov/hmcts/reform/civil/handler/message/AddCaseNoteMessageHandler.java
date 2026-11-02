@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.message.CcdEventMessage;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.notification.robotics.RoboticsNotifier;
+import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +42,8 @@ public class AddCaseNoteMessageHandler implements CcdEventMessageHandler {
         try {
             var response = coreCaseDataService.startUpdate(message.getCaseId(), NOTIFY_RPA_ON_CONTINUOUS_FEED);
             CaseData data = caseDetailsConverter.toCaseData(response.getCaseDetails());
-            roboticsNotifier.notifyRobotics(data, getSystemUserToken());
+            // Continuous feed must not transfer Breathing Space (adhoc / handed-offline only).
+            roboticsNotifier.notifyRobotics(RoboticsDataUtil.withoutBreathingSpace(data), getSystemUserToken());
         } catch (Exception e) {
             log.error("Failed to trigger robotics for case {}", message.getCaseId());
             Map<String, String> messageProps = new HashMap<>();
