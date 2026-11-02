@@ -167,6 +167,7 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
      * is about to retry a CCD event submit that failed with 502/503/504. This lets the retries
      * be counted in production. No case data is recorded.
      */
+    @SuppressWarnings("java:S2629")
     private void recordGuardedRetry(ExternalTask externalTask, Throwable e) {
         if (!isRetryGuarded()) {
             return;

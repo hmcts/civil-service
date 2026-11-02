@@ -120,6 +120,7 @@ class FeignFailureHandlingTest {
     private static final List<String> requestLog = new CopyOnWriteArrayList<>();
 
     @BeforeAll
+    @SuppressWarnings("java:S2925") // Used in mock HttpServer to simulate upstream latency and trigger read timeouts
     static void startServer() throws IOException {
         server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         // a delayed handler from a timeout test must not block the next test's request
