@@ -174,4 +174,8 @@ public class FeatureToggleService {
     public boolean isCaseworkerMediationActivitiesEnabled() {
         return featureToggleApi.isFeatureEnabled("caseworker-mediation-activities");
     }
+  
+    public boolean isDraftClaimDatabaseEnabled() {
+        return featureToggleApi.isFeatureEnabled("cui-draft-claim-database");
+    }
 }
