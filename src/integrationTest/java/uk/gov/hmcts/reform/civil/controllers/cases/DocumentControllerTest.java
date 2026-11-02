@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.ClaimFormService;
+import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
@@ -64,9 +65,9 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SE
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 
 @SpringBootTest(classes = {
-    ClaimFormService.class,
+    Application.class,
     JacksonConfiguration.class,
-    JacksonAutoConfiguration.class})
+    Jackson2AutoConfiguration.class})
 public class DocumentControllerTest extends BaseIntegrationTest {
 
     protected static final int DOC_UUID_LENGTH = 36;
@@ -77,13 +78,13 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     @Autowired
     private DocumentController documentController;
 
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
 
-    @MockBean
+    @MockitoBean
     private CaseDocumentClientApi caseDocumentClientApi;
 
-    @MockBean
+    @MockitoBean
     private CaseDocumentBinaryApiClient caseDocumentBinaryApiClient;
 
     @Autowired
@@ -111,10 +112,10 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     @InjectMocks
     private SealedClaimFormGeneratorForSpec sealedClaimFormGenerator;
 
-    @MockBean
+    @MockitoBean
     private RepresentativeService representativeService;
 
-    @MockBean
+    @MockitoBean
     private DocmosisApiClient docmosisApiClient;
 
     private final UserInfo userInfo = UserInfo.builder()

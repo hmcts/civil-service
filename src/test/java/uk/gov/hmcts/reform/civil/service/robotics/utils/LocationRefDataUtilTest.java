@@ -5,7 +5,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -27,7 +27,7 @@ class LocationRefDataUtilTest {
 
     @InjectMocks
     private LocationRefDataUtil locationRefDataUtil;
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
     private static final String BEARER_TOKEN = "Bearer Token";
 

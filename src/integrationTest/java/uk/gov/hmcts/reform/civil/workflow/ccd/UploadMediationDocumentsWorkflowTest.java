@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.workflow.ccd;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
@@ -33,10 +33,10 @@ class UploadMediationDocumentsWorkflowTest extends WorkflowIntegrationTest {
     private static final String RESPONDENT_SOLICITOR_ONE_ROLE = "[RESPONDENTSOLICITORONE]";
     private static final String RESPONDENT_SOLICITOR_TWO_ROLE = "[RESPONDENTSOLICITORTWO]";
 
-    @MockBean
+    @MockitoBean
     private CoreCaseUserService coreCaseUserService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @BeforeEach

@@ -12,10 +12,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.autoconfigure.http.HttpMessageConvertersAutoConfiguration;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.http.converter.autoconfigure.HttpMessageConvertersAutoConfiguration;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.cloud.openfeign.FeignAutoConfiguration;
 import org.springframework.context.ApplicationEventPublisher;
@@ -170,7 +170,7 @@ class FeignFailureHandlingTest {
     @Configuration
     @Profile(PROFILE)
     @EnableFeignClients(clients = CamundaRuntimeApi.class)
-    @ImportAutoConfiguration({FeignAutoConfiguration.class, HttpMessageConvertersAutoConfiguration.class, JacksonAutoConfiguration.class})
+    @ImportAutoConfiguration({FeignAutoConfiguration.class, HttpMessageConvertersAutoConfiguration.class, Jackson2AutoConfiguration.class})
     @Import({HttpClientFeignConfiguration.class, CamundaRuntimeClient.class, EventEmitterService.class})
     static class Config {
 
@@ -187,7 +187,7 @@ class FeignFailureHandlingTest {
         }
     }
 
-    @MockBean
+    @MockitoBean
     private TelemetryClient telemetryClient;
 
     @Autowired

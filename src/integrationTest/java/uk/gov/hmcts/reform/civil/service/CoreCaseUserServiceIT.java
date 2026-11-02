@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
@@ -84,19 +84,19 @@ class CoreCaseUserServiceIT {
     @Autowired
     private CoreCaseUserService coreCaseUserService;
 
-    @MockBean
+    @MockitoBean
     private CaseAccessDataStoreApi caseAccessDataStoreApi;
 
-    @MockBean
+    @MockitoBean
     private CaseAssignmentApi caseAssignmentApi;
 
-    @MockBean
+    @MockitoBean
     private UserService userService;
 
-    @MockBean
+    @MockitoBean
     private CrossAccessUserConfiguration crossAccessUserConfiguration;
 
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
 
     @BeforeEach
