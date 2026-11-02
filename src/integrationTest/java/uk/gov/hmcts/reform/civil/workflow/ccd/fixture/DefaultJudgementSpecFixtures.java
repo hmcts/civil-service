@@ -104,6 +104,7 @@ public final class DefaultJudgementSpecFixtures {
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
             .addRespondent2(YesOrNo.NO)
             .breathing(new BreathingSpaceInfo()
+                           .setActive(YesOrNo.YES)
                            .setEnter(new BreathingSpaceEnterInfo().setStart(LocalDate.now().minusDays(10))))
             .build();
     }
