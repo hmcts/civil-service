@@ -8,6 +8,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResp
 import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.ClaimFormService;
+import uk.gov.hmcts.reform.civil.service.documentmanagement.UploadedDocumentDeletionService;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -39,6 +41,7 @@ public class DocumentController {
 
     private final ClaimFormService claimFormService;
     private final DocumentManagementService documentManagementService;
+    private final UploadedDocumentDeletionService uploadedDocumentDeletionService;
 
     @PostMapping("/generateSealedDoc")
     public ResponseEntity<CaseDocument> uploadSealedDocument(
@@ -75,6 +78,15 @@ public class DocumentController {
         return  ResponseEntity.ok()
             .headers(headers)
             .body(documentResponse.file());
+    }
+
+    @DeleteMapping(value = "/{documentId}")
+    @Operation(summary = "Delete a document uploaded by the calling user")
+    public ResponseEntity<Void> deleteUploadedDocument(
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
+        @NotNull @PathVariable String documentId) {
+        uploadedDocumentDeletionService.deleteOwnDocument(authorisation, documentId);
+        return ResponseEntity.noContent().build();
     }
 
 }
