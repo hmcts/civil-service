@@ -8,12 +8,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_GA_CASE_DATA;
@@ -97,6 +99,33 @@ class GeneralApplicationCaseNameServiceTest {
 
         verify(coreCaseDataService).triggerGeneralApplicationEvent(
             222L, UPDATE_GA_CASE_DATA, Map.of("caseNameGaInternal", NEW_NAME));
+    }
+
+    @Test
+    void shouldUpdateGeneralApplicationsUnconditionally_whenCalledDirectly() {
+        CaseData parent = caseData(ORIGINAL_NAME, generalApplication("111"));
+
+        service.updateGeneralApplications(parent);
+
+        verify(coreCaseDataService).triggerGeneralApplicationEvent(
+            111L, UPDATE_GA_CASE_DATA, Map.of("caseNameGaInternal", ORIGINAL_NAME));
+    }
+
+    @Test
+    void shouldIncludeMasterCollectionLinksOnce_whenUpdatingGeneralApplications() {
+        CaseData parent = caseData(ORIGINAL_NAME, generalApplication("111"));
+        parent.setGaDetailsMasterCollection(wrapElements(
+            new GeneralApplicationsDetails().setCaseLink(new CaseLink("111")),
+            new GeneralApplicationsDetails().setCaseLink(new CaseLink("333")),
+            new GeneralApplicationsDetails()
+        ));
+
+        service.updateGeneralApplications(parent);
+
+        verify(coreCaseDataService, times(1)).triggerGeneralApplicationEvent(
+            111L, UPDATE_GA_CASE_DATA, Map.of("caseNameGaInternal", ORIGINAL_NAME));
+        verify(coreCaseDataService).triggerGeneralApplicationEvent(
+            333L, UPDATE_GA_CASE_DATA, Map.of("caseNameGaInternal", ORIGINAL_NAME));
     }
 
     private static CaseData caseData(String caseName, GeneralApplication... generalApplications) {
