@@ -2,7 +2,7 @@ apiVersion: v2
 description: A Helm chart for civil-service App
 name: civil-service
 home: https://github.com/hmcts/civil-service
-version: 0.0.127
+version: 0.0.129
 maintainers:
   - name: HMCTS Civil team
 
@@ -11,11 +11,11 @@ dependencies:
     version: 6.1.1
     repository: 'oci://hmctsprod.azurecr.io/helm'
   - name: ccd
-    version: 9.2.5
+    version: 9.3.0
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: ccd.enabled
   - name: xui-webapp
-    version: 1.0.55
+    version: 1.0.56
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: xui-webapp.enabled
   - name: camunda-bpm
