@@ -21,7 +21,7 @@ import uk.gov.hmcts.test.helper.CoreCaseDataApiMockHelper;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -78,9 +78,9 @@ public class TakeCaseOfflineSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(takeCaseOfflineScheduledTask).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("TakeCaseOfflineJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("TakeCaseOfflineCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("TakeCaseOfflineJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
     }
 
     @Test
@@ -97,8 +97,8 @@ public class TakeCaseOfflineSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(takeCaseOfflineScheduledTask, never()).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("TakeCaseOfflineJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("TakeCaseOfflineCaseAborted"), anyMap());
-        verify(telemetryService).trackEvent(eq("TakeCaseOfflineJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerCaseAborted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
     }
 }

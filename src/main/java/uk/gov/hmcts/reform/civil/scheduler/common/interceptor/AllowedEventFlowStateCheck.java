@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -41,8 +43,8 @@ public class AllowedEventFlowStateCheck implements SchedulerInterceptor<CaseDeta
             return;
         }
 
-        logNotAllowed(caseData, context.getItem().getId());
-        throw new TaskAbortedException(event.name() + " not allowed in current flow state");
+        recordDiagnosticsAndLog(caseData, context);
+        throw new TaskAbortedException(AbortCategory.FLOW_STATE_DISALLOWED, event.name() + " not allowed in current flow state");
     }
 
     @Override
@@ -59,23 +61,52 @@ public class AllowedEventFlowStateCheck implements SchedulerInterceptor<CaseDeta
             });
     }
 
-    private void logNotAllowed(CaseData caseData, Long caseId) {
-        try {
-            boolean isSpec = SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
-            StateFlow stateFlow = isSpec ? stateFlowEngine.evaluateSpec(caseData) : stateFlowEngine.evaluate(caseData);
-            String stateFlowHistory = stateFlow.getStateHistory().stream()
-                .map(State::getName)
-                .collect(joining(", "));
+    private void recordDiagnosticsAndLog(CaseData caseData, InterceptorContext<CaseDetails> context) {
+        context.recordProperty("targetEvent", event.name());
+        CaseCategory caseAccessCategory = caseData.getCaseAccessCategory();
+        if (caseAccessCategory != null) {
+            context.recordProperty("caseAccessCategory", caseAccessCategory.name());
+        }
+        if (context.getItem() != null && context.getItem().getState() != null) {
+            context.recordProperty("ccdState", context.getItem().getState());
+        }
+        MultiPartyScenario multiPartyScenario = MultiPartyScenario.getMultiPartyScenario(caseData);
+        if (multiPartyScenario != null) {
+            context.recordProperty("multiPartyScenario", multiPartyScenario.name());
+        }
 
-            log.info(
-                "{} is not allowed on the case id {}, current FlowState: {}, stateFlowHistory: {}",
-                event.name(),
-                caseId,
-                FlowState.fromFullName(stateFlow.getState().getName()),
-                stateFlowHistory
-            );
+        evaluateAndRecordStateFlow(caseData, context, caseAccessCategory);
+    }
+
+    private void evaluateAndRecordStateFlow(CaseData caseData,
+                                           InterceptorContext<CaseDetails> context,
+                                           CaseCategory caseAccessCategory) {
+        try {
+            boolean isSpec = SPEC_CLAIM.equals(caseAccessCategory);
+            StateFlow stateFlow = isSpec ? stateFlowEngine.evaluateSpec(caseData) : stateFlowEngine.evaluate(caseData);
+            if (stateFlow != null && stateFlow.getState() != null) {
+                FlowState flowState = FlowState.fromFullName(stateFlow.getState().getName());
+                context.recordProperty("flowState", flowState.fullName());
+                String stateFlowHistory = stateFlow.getStateHistory() != null
+                    ? stateFlow.getStateHistory().stream()
+                        .map(State::getName)
+                        .collect(joining(", "))
+                    : "";
+
+                if (!stateFlowHistory.isBlank()) {
+                    context.recordProperty("stateFlowHistory", stateFlowHistory);
+                }
+
+                log.info(
+                    "{} is not allowed on the case id {}, current FlowState: {}, stateFlowHistory: {}",
+                    event.name(),
+                    context.getItem().getId(),
+                    flowState,
+                    stateFlowHistory
+                );
+            }
         } catch (Exception e) {
-            log.warn("Error during state flow evaluation.", e);
+            log.warn("Error during state flow evaluation for case id {}", context.getItem().getId(), e);
         }
     }
 }
