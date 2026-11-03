@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
@@ -77,31 +79,38 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
         log.debug("Started event update for case ID: {}, event token: {}", caseId, startEventResponse.getToken());
         GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(startEventResponse.getCaseDetails());
         var generalApplications = caseData.getGeneralApplications();
-        GeneralApplicationCaseData generalAppCaseData = null;
-
-        if (generalApplications != null && !generalApplications.isEmpty()) {
-
-            var genApps = generalApplications.stream()
-                .filter(application -> application.getValue() != null
-                    && application.getValue().getBusinessProcess() != null
-                    && application.getValue().getBusinessProcess().getStatus() == BusinessProcessStatus.STARTED
-                    && application.getValue().getBusinessProcess().getProcessInstanceId() != null).findFirst();
-
-            if (genApps.isPresent()) {
-                log.debug("Eligible general application found for processing in case ID: {}", caseId);
-
-                GeneralApplication generalApplication = genApps.get().getValue();
-
-                boolean claimantBilingual = BILINGUAL_TYPES.contains(caseData.getClaimantBilingualLanguagePreference());
-                boolean defendantBilingual = caseData.getRespondent1LiPResponse() != null
-                    && BILINGUAL_TYPES.contains(caseData.getRespondent1LiPResponse().getRespondent1ResponseLanguage());
-                generalAppCaseData = createGeneralApplicationCase(caseId, generalApplication, claimantBilingual, defendantBilingual);
-                log.debug("General application case created with ID: {}", generalAppCaseData.getCcdCaseReference());
-                updateParentCaseGeneralApplication(variables, generalApplication, generalAppCaseData);
-
-                caseData = withoutNoticeNoConsent(generalApplication, caseData, generalAppCaseData);
-            }
+        var matchingApplications = ofNullable(generalApplications).orElse(List.of()).stream()
+            .filter(Objects::nonNull)
+            .map(Element::getValue)
+            .filter(Objects::nonNull)
+            .filter(application -> application.getBusinessProcess() != null
+                && externalTask.getProcessInstanceId() != null
+                && externalTask.getProcessInstanceId().equals(application.getBusinessProcess().getProcessInstanceId()))
+            .toList();
+        if (matchingApplications.size() != 1) {
+            throw new NotRetryableException("Expected one general application for parent case " + caseId
+                + ", process instance " + externalTask.getProcessInstanceId() + "; found " + matchingApplications.size());
         }
+        GeneralApplication generalApplication = matchingApplications.get(0);
+        GeneralApplicationCaseData generalAppCaseData;
+        if (generalApplication.getBusinessProcess().getStatus() == BusinessProcessStatus.FINISHED
+            && generalApplication.getCaseLink() != null
+            && StringUtils.isNotBlank(generalApplication.getCaseLink().getCaseReference())) {
+            generalAppCaseData = new GeneralApplicationCaseData()
+                .ccdCaseReference(Long.valueOf(generalApplication.getCaseLink().getCaseReference())).build();
+            return new ExternalTaskData().setParentCaseData(caseData)
+                .setUpdateGeneralApplicationCaseData(generalAppCaseData);
+        }
+        if (generalApplication.getBusinessProcess().getStatus() != BusinessProcessStatus.STARTED) {
+            throw new NotRetryableException("General application cannot be created or recovered for parent case "
+                + caseId + ", process instance " + externalTask.getProcessInstanceId());
+        }
+        boolean claimantBilingual = BILINGUAL_TYPES.contains(caseData.getClaimantBilingualLanguagePreference());
+        boolean defendantBilingual = caseData.getRespondent1LiPResponse() != null
+            && BILINGUAL_TYPES.contains(caseData.getRespondent1LiPResponse().getRespondent1ResponseLanguage());
+        generalAppCaseData = createGeneralApplicationCase(caseId, generalApplication, claimantBilingual, defendantBilingual);
+        updateParentCaseGeneralApplication(variables, generalApplication, generalAppCaseData);
+        caseData = withoutNoticeNoConsent(generalApplication, caseData, generalAppCaseData);
 
         var parentCaseData = coreCaseDataService.submitUpdate(caseId,
                                                               coreCaseDataService.caseDataContentFromStartEventResponse(
