@@ -85,6 +85,16 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
             .isEqualTo("default");
     }
 
+    @Test
+    void shouldResolveDecisionScenarioWhenInformOtherPartyIsMissing() {
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
+            .judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER));
+
+        assertThat(handler.getScenario(caseData))
+            .isEqualTo(SCENARIO_AAA6_GENERAL_APPLICATION_ORDER_MADE_RESPONDENT.getScenario());
+    }
+
     @Nested
     class AboutToSubmitCallback {
 

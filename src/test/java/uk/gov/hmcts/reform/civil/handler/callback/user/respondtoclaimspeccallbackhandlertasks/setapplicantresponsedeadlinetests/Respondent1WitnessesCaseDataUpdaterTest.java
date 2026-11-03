@@ -64,4 +64,34 @@ class Respondent1WitnessesCaseDataUpdaterTest {
         assertThat(updatedRespondent1DQ).isNotNull();
         assertThat(updatedRespondent1DQ.getRespondent1DQWitnesses()).isNull();
     }
+
+    @Test
+    void shouldNotThrowWhenRespondent1DqIsNullAndSmallClaimWitnessesPresent() {
+        caseData.setRespondent1DQ(null);
+        caseData.setRespondent1DQWitnessesSmallClaim(
+            new Witnesses().setWitnessesToAppear(YES).setDetails(wrapElements(new Witness().setFirstName("A"))));
+
+        updater.update(caseData);
+
+        assertThat(caseData.getRespondent1DQ()).isNull();
+    }
+
+    @Test
+    void shouldPreserveExistingDqWitnessPartyIdsWhenCopyingSmallClaimWitnesses() {
+        Witness existingWitness = new Witness()
+            .setPartyID("existing-witness-id")
+            .setFirstName("Existing")
+            .setLastName("Witness");
+        caseData.getRespondent1DQ().setRespondent1DQWitnesses(
+            new Witnesses().setWitnessesToAppear(YES).setDetails(wrapElements(existingWitness)));
+
+        Witness smallClaimWitness = new Witness().setFirstName("Existing").setLastName("Witness");
+        caseData.setRespondent1DQWitnessesSmallClaim(
+            new Witnesses().setWitnessesToAppear(YES).setDetails(wrapElements(smallClaimWitness)));
+
+        updater.update(caseData);
+
+        assertThat(caseData.getRespondent1DQ().getRespondent1DQWitnesses().getDetails().get(0).getValue().getPartyID())
+            .isEqualTo("existing-witness-id");
+    }
 }

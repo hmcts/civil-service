@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 class NotifyClaimDetailsHelperTest {
 
@@ -41,6 +42,14 @@ class NotifyClaimDetailsHelperTest {
         String actualTemplateId = notifyClaimDetailsHelper.getEmailTemplate();
 
         assertEquals(expectedTemplateId, actualTemplateId);
+    }
+
+    @Test
+    void shouldOmitDeadlinePropertiesWhenResponseDeadlineIsMissing() {
+        Map<String, String> properties = notifyClaimDetailsHelper.getCustomProperties(CaseData.builder().build());
+
+        assertTrue(properties.isEmpty());
+        verifyNoInteractions(deadlinesCalculator);
     }
 
     @Test

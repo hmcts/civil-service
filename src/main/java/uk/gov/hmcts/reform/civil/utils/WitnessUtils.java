@@ -23,6 +23,27 @@ public class WitnessUtils {
         //NO-OP
     }
 
+    /**
+     * Copies partyIDs from existing DQ witnesses onto small-claim witnesses by index when the
+     * small-claim entries have null partyIDs. Prevents FlagDetail loss when Spec DEFENDANT_RESPONSE
+     * re-copies persisted small-claim witness fields on a later defendant response.
+     */
+    public static void preservePartyIdsFromExisting(Witnesses target, Witnesses existing) {
+        if (target == null || target.getDetails() == null || existing == null || existing.getDetails() == null) {
+            return;
+        }
+        List<Element<Witness>> targetDetails = target.getDetails();
+        List<Element<Witness>> existingDetails = existing.getDetails();
+        for (int i = 0; i < targetDetails.size() && i < existingDetails.size(); i++) {
+            Witness targetWitness = targetDetails.get(i).getValue();
+            Witness existingWitness = existingDetails.get(i).getValue();
+            if (targetWitness != null && targetWitness.getPartyID() == null
+                && existingWitness != null && existingWitness.getPartyID() != null) {
+                targetWitness.setPartyID(existingWitness.getPartyID());
+            }
+        }
+    }
+
     private static Witnesses addEventAndDateToWitnesses(Witnesses witnesses, LocalDate dateAdded, String eventAdded) {
         List<Witness> witnessList = unwrapElements(witnesses.getDetails());
         List<Element<Witness>> updatedWitnessDetails = new ArrayList<>();

@@ -20,7 +20,7 @@ public abstract class TrialReadyPartiesEmailGenerator implements PartiesEmailGen
     protected final TrialReadyDefendantTwoEmailDTOGenerator defendantTwoEmailDTOGenerator;
 
     protected EmailDTO getApplicant(CaseData caseData, String taskId) {
-        if (caseData.getTrialReadyApplicant() != null) {
+        if (caseData.getHearingDate() == null || caseData.getTrialReadyApplicant() != null) {
             return null;
         }
 
@@ -29,7 +29,7 @@ public abstract class TrialReadyPartiesEmailGenerator implements PartiesEmailGen
     }
 
     protected EmailDTO getRespondentOne(CaseData caseData, String taskId) {
-        if (caseData.getTrialReadyRespondent1() != null) {
+        if (caseData.getHearingDate() == null || caseData.getTrialReadyRespondent1() != null) {
             return null;
         }
 
@@ -38,6 +38,9 @@ public abstract class TrialReadyPartiesEmailGenerator implements PartiesEmailGen
     }
 
     protected EmailDTO getRespondentTwo(CaseData caseData, String taskId) {
+        if (caseData.getHearingDate() == null) {
+            return null;
+        }
         boolean isTwoLipDefendants = ClaimPredicate.submittedRespondent2Unrepresented.test(caseData);
         if (caseData.getTrialReadyRespondent2() != null || !(isOneVTwoTwoLegalRep(caseData) || isTwoLipDefendants)) {
             return null;
