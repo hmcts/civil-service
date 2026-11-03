@@ -58,6 +58,8 @@ public class MediationUnsuccessfulHandler extends CallbackHandler {
         } else {
             caseData.setShowCarmFields(NO);
         }
+        caseData.setShowCaseworkerMediationActivities(
+            featureToggleService.isCaseworkerMediationActivitiesEnabled() ? YES : NO);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();

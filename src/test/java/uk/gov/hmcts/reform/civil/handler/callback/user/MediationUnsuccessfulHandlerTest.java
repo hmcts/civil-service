@@ -52,12 +52,14 @@ class MediationUnsuccessfulHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssued().build();
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            when(featureToggleService.isCaseworkerMediationActivitiesEnabled()).thenReturn(false);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("showCarmFields").isEqualTo("Yes");
+            assertThat(response.getData()).extracting("showCaseworkerMediationActivities").isEqualTo("No");
         }
 
         @Test
@@ -65,12 +67,27 @@ class MediationUnsuccessfulHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssued().build();
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+            when(featureToggleService.isCaseworkerMediationActivitiesEnabled()).thenReturn(false);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("showCarmFields").isEqualTo("No");
+            assertThat(response.getData()).extracting("showCaseworkerMediationActivities").isEqualTo("No");
+        }
+
+        @Test
+        void shouldShowNewMediationPages_whenCaseworkerMediationActivitiesEnabled() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssued().build();
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            when(featureToggleService.isCaseworkerMediationActivitiesEnabled()).thenReturn(true);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_START));
+
+            assertThat(response.getData()).extracting("showCaseworkerMediationActivities").isEqualTo("Yes");
         }
     }
 
