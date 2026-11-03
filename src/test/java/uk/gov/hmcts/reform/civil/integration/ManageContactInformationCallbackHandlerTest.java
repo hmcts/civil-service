@@ -54,6 +54,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.GeneralApplicationCaseNameService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.PartyDetailsChangedUtil;
@@ -64,6 +65,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -72,9 +74,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -120,6 +122,7 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFE
     PrepareEventTask.class,
     ShowWarningTask.class,
     SubmitChangesTask.class,
+    GeneralApplicationCaseNameService.class,
     ValidateExpertsTask.class,
     ValidateWitnessesTask.class
 })
@@ -936,7 +939,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Test
-        void shouldReturnExpectedResponseCaseData_whenTriggeredByAdmin_withPartyChangesWithGaData() {
+        void shouldNotUpdateGeneralApplications_whenTriggeredByAdmin_withPartyChangesWithGaData() {
             Flags respondent1Flags = new Flags().setPartyName("respondent1name").setRoleOnCase("respondent1");
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1(new Party()
@@ -964,11 +967,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
             when(partyDetailsChangedUtil.buildChangesEvent(any(CaseData.class), any(CaseData.class))).thenReturn(
                 EVENT);
-            when(coreCaseDataService.triggerGeneralApplicationEvent(
-                anyLong(),
-                any(CaseEvent.class),
-                anyMap()
-            )).thenReturn(updatedCaseData);
             CallbackParams params = callbackParamsOf(updatedCaseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -983,9 +981,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 EVENT.copy().setSubmittedByCaseworker(YES),
                 responseData.getContactDetailsUpdatedEvent()
             );
-            verify(coreCaseDataService).triggerGeneralApplicationEvent(
-                eq(1234L),
-                eq(CaseEvent.UPDATE_GA_CASE_DATA),
+            verify(coreCaseDataService, never()).triggerGeneralApplicationEvent(
+                anyLong(),
+                any(CaseEvent.class),
                 anyMap()
             );
         }
@@ -2651,6 +2649,38 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "### What happens next\n" +
                     "Any changes made to contact details have been updated.", response.getConfirmationBody()
             );
+        }
+
+        @Test
+        void shouldUpdateGeneralApplicationCaseName_whenSavedCaseNameChanged() {
+            CaseData caseDataBefore = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseData(CaseDataBuilder.builder().build());
+            caseDataBefore.setCaseNameHmctsInternal("Claimant v Original Defendant");
+            CaseData savedCaseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseData(CaseDataBuilder.builder().build());
+            savedCaseData.setCaseNameHmctsInternal("Claimant v New Defendant");
+
+            handler.handle(callbackParamsOf(savedCaseData, caseDataBefore, SUBMITTED));
+
+            verify(coreCaseDataService).triggerGeneralApplicationEvent(
+                1234L,
+                CaseEvent.UPDATE_GA_CASE_DATA,
+                Map.of("caseNameGaInternal", "Claimant v New Defendant")
+            );
+        }
+
+        @Test
+        void shouldNotUpdateGeneralApplicationCaseName_whenSavedCaseNameUnchanged() {
+            CaseData caseDataBefore = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseData(CaseDataBuilder.builder().build());
+            caseDataBefore.setCaseNameHmctsInternal("Claimant v Original Defendant");
+            CaseData savedCaseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseData(CaseDataBuilder.builder().build());
+            savedCaseData.setCaseNameHmctsInternal("Claimant v Original Defendant");
+
+            handler.handle(callbackParamsOf(savedCaseData, caseDataBefore, SUBMITTED));
+
+            verify(coreCaseDataService, never()).triggerGeneralApplicationEvent(anyLong(), any(CaseEvent.class), anyMap());
         }
     }
 }
