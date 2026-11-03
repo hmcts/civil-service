@@ -77,6 +77,8 @@ public class SubmitChangesTask {
 
     private static final List<String> ADMIN_ROLES = List.of(
         "caseworker-civil-admin", "caseworker-civil-staff");
+    static final String PARTY_NAME_CHANGE_NOT_ALLOWED =
+        "Only court staff can change a party name, after a judge has approved the change";
 
     public SubmitChangesTask(CaseDetailsConverter caseDetailsConverter, ObjectMapper objectMapper,
                              UserService userService, CaseFlagsInitialiser caseFlagsInitialiser,
@@ -92,13 +94,20 @@ public class SubmitChangesTask {
         log.info("Submit changes for case ID {}", caseData.getCcdCaseReference());
 
         String partyChosenId = caseData.getUpdateDetailsForm().getPartyChosenId();
+        CaseData current = caseDetailsConverter.toCaseData(caseDetailsBefore);
+
+        if (isPartyOrLitigationFriend(partyChosenId) && caseNameChanged(current, caseData) && !isAdmin(authToken)) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(PARTY_NAME_CHANGE_NOT_ALLOWED))
+                .build();
+        }
 
         updateExperts(partyChosenId, caseData);
         updateWitnesses(partyChosenId, caseData);
         updateLRIndividuals(partyChosenId, caseData);
         updateOrgIndividuals(partyChosenId, caseData);
 
-        if (isParty(partyChosenId) || isLitigationFriend(partyChosenId)) {
+        if (isPartyOrLitigationFriend(partyChosenId)) {
             // update case name for hmc if applicant/respondent/litigation friend was updated
             caseData.setCaseNameHmctsInternal(CaseNameUtils.buildCaseName(caseData));
             caseData.setCaseNamePublic(buildCaseName(caseData));
@@ -115,7 +124,6 @@ public class SubmitChangesTask {
         // update claim details tab
         updateDataForClaimDetailsTab(caseData, objectMapper, false);
 
-        CaseData current = caseDetailsConverter.toCaseData(caseDetailsBefore);
         ContactDetailsUpdatedEvent changesEvent = partyDetailsChangedUtil.buildChangesEvent(current, caseData);
         //Populate individuals with partyID if they do not exist
         populatePartyIndividuals(caseData);
@@ -135,6 +143,10 @@ public class SubmitChangesTask {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
+    }
+
+    private boolean caseNameChanged(CaseData caseDataBefore, CaseData caseData) {
+        return caseDataBefore != null && !buildCaseName(caseDataBefore).equals(buildCaseName(caseData));
     }
 
     private boolean isAdmin(String userAuthToken) {
@@ -310,6 +322,10 @@ public class SubmitChangesTask {
             }
             default:
         }
+    }
+
+    private boolean isPartyOrLitigationFriend(String partyChosen) {
+        return isParty(partyChosen) || isLitigationFriend(partyChosen);
     }
 
     private Boolean isParty(String partyChosen) {

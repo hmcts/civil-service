@@ -1291,13 +1291,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldReturnExpectedResponseCaseData_whenTriggeredByNonAdmin_withPartyChanges() {
-            Flags respondent1Flags = new Flags().setPartyName("respondent1name").setRoleOnCase("respondent1");
             CaseData caseDataBefore = CaseDataBuilder.builder()
-                .respondent1(new Party()
-                                 .setIndividualFirstName("Dis")
-                                 .setIndividualLastName("Guy")
-                                 .setType(INDIVIDUAL).setFlags(respondent1Flags))
-                .buildClaimIssuedPaymentCaseData();
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
 
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -1324,6 +1321,35 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             assertEquals(READY, responseData.getBusinessProcess().getStatus());
             assertEquals(
                 EVENT.copy().setSubmittedByCaseworker(NO), responseData.getContactDetailsUpdatedEvent());
+        }
+
+        @Test
+        void shouldReturnError_whenTriggeredByNonAdmin_withPartyNameChange() {
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .respondent1(new Party()
+                                 .setIndividualFirstName("Dis")
+                                 .setIndividualLastName("Guy")
+                                 .setType(INDIVIDUAL))
+                .buildClaimIssuedPaymentCaseData();
+
+            CaseData updated = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .updateDetailsForm(new UpdateDetailsForm()
+                                       .setPartyChosen(new DynamicList().setValue(new DynamicListElement().setCode(DEFENDANT_ONE_ID)))
+                                       .setPartyChosenId(DEFENDANT_ONE_ID))
+                .build();
+
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseDataBefore);
+            when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(callbackParamsOf(updated, ABOUT_TO_SUBMIT));
+
+            assertEquals(
+                List.of("Only court staff can change a party name, after a judge has approved the change"),
+                response.getErrors()
+            );
         }
 
         @Test
@@ -1364,6 +1390,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldUpdateInternalCaseName() {
+            when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .addApplicant1LitigationFriend()
@@ -1391,10 +1418,12 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             Flags applicant2Flags = new Flags().setPartyName("applicant2name").setRoleOnCase("applicant2");
 
             CaseData caseDataBefore = CaseData.builder()
-                .applicant1(new Party().setFlags(applicant1Flags))
-                .applicant2(new Party().setFlags(applicant2Flags))
-                .respondent1(new Party().setFlags(respondent1Flags))
-                .respondent2(new Party().setFlags(respondent2Flags))
+                .applicant1(new Party().setType(INDIVIDUAL).setIndividualFirstName("John")
+                                .setIndividualLastName("Doe").setFlags(applicant1Flags))
+                .applicant2(new Party().setType(COMPANY).setCompanyName("Test Company").setFlags(applicant2Flags))
+                .respondent1(new Party().setType(INDIVIDUAL).setIndividualFirstName("Jane")
+                                 .setIndividualLastName("Smith").setFlags(respondent1Flags))
+                .respondent2(new Party().setType(COMPANY).setCompanyName("Defendant Corp").setFlags(respondent2Flags))
                 .build();
 
             @BeforeEach
