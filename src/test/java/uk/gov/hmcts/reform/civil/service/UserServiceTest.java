@@ -26,6 +26,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -165,7 +166,7 @@ class UserServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {500, 502, 503, 504})
     void shouldRetryTokenServerErrors(int status) {
-        FeignException failure = org.mockito.Mockito.mock(FeignException.class);
+        FeignException failure = mock(FeignException.class);
         when(failure.status()).thenReturn(status);
         when(idamClient.getAccessToken(SUB, PASSWORD)).thenThrow(failure).thenReturn(AUTHORISATION);
 
@@ -176,7 +177,7 @@ class UserServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {400, 401, 403, 404, 429})
     void shouldNotRetryTokenClientErrors(int status) {
-        FeignException failure = org.mockito.Mockito.mock(FeignException.class);
+        FeignException failure = mock(FeignException.class);
         when(failure.status()).thenReturn(status);
         when(idamClient.getAccessToken(SUB, PASSWORD)).thenThrow(failure);
 
