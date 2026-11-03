@@ -8,15 +8,23 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
+import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultJudgmentRoboticsNotifierTest {
@@ -55,6 +63,28 @@ class DefaultJudgmentRoboticsNotifierTest {
         defaultJudgmentRoboticsNotifier.sendNotifications(data, false, "auth");
 
         verify(roboticsNotificationService).notifyRobotics(any(), anyBoolean(), any());
+    }
+
+    @Test
+    void shouldOmitBreathingSpace_whenNotifyRobotics() throws Exception {
+        CaseData data = CaseDataBuilder.builder()
+            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+            .respondent1Represented(YesOrNo.YES)
+            .build()
+            .toBuilder()
+            .breathing(new BreathingSpaceInfo())
+            .build();
+        RoboticsCaseData roboticsCaseData = new RoboticsCaseData();
+        when(roboticsDataMapper.toRoboticsCaseData(any(), eq("auth"))).thenReturn(roboticsCaseData);
+        when(jsonSchemaValidationService.validate(any())).thenReturn(Set.of());
+
+        defaultJudgmentRoboticsNotifier.notifyRobotics(data, "auth");
+
+        verify(roboticsDataMapper).toRoboticsCaseData(
+            argThat(caseData -> caseData.getBreathing() == null),
+            eq("auth")
+        );
+        assertThat(data.getBreathing()).isNotNull();
     }
 
 }
