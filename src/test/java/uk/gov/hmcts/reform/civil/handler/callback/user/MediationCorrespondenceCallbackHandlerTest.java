@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.CaseNote;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CaseNoteService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -40,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.enums.mediation.MediationCorrespondenceT
 import static uk.gov.hmcts.reform.civil.handler.callback.user.MediationCorrespondenceCallbackHandler.CLAIMANT_1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.MediationCorrespondenceCallbackHandler.DEFENDANT_1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.MediationCorrespondenceCallbackHandler.DEFENDANT_2;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.MediationCorrespondenceCallbackHandler.ERROR_FEATURE_NOT_ENABLED;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.MediationCorrespondenceCallbackHandler.ERROR_FUTURE_DATE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.MediationCorrespondenceCallbackHandler.ERROR_NO_PARTY_SELECTED;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.MediationCorrespondenceCallbackHandler.SELECT_ALL;
@@ -59,11 +61,15 @@ class MediationCorrespondenceCallbackHandlerTest extends BaseCallbackHandlerTest
     @Mock
     private Time time;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     private MediationCorrespondenceCallbackHandler handler;
 
     @BeforeEach
     void setUp() {
-        handler = new MediationCorrespondenceCallbackHandler(objectMapper, new CaseNoteService(userService, time), time);
+        handler = new MediationCorrespondenceCallbackHandler(objectMapper, new CaseNoteService(userService, time), time,
+                                                             featureToggleService);
     }
 
     @Test
@@ -73,6 +79,11 @@ class MediationCorrespondenceCallbackHandlerTest extends BaseCallbackHandlerTest
 
     @Nested
     class AboutToStart {
+
+        @BeforeEach
+        void setUp() {
+            when(featureToggleService.isCaseworkerMediationActivitiesEnabled()).thenReturn(true);
+        }
 
         @Test
         void shouldPopulateDefendantClaimantAndSelectAll_whenOneVOne() {
@@ -111,6 +122,20 @@ class MediationCorrespondenceCallbackHandlerTest extends BaseCallbackHandlerTest
                 .extracting(DynamicListElement::getLabel)
                 .containsExactly("Defendant 1: Mr. Mike Rambo", "Claimant 1: Mr. John Rambo",
                                  "Claimant 2: Mr. Jane Rambo", "Select all");
+        }
+    }
+
+    @Nested
+    class AboutToStartFeatureDisabled {
+
+        @Test
+        void shouldReturnError_whenCaseworkerMediationActivitiesDisabled() {
+            when(featureToggleService.isCaseworkerMediationActivitiesEnabled()).thenReturn(false);
+
+            AboutToStartOrSubmitCallbackResponse response = handle(oneVOneCase(), ABOUT_TO_START);
+
+            assertThat(response.getErrors()).containsExactly(ERROR_FEATURE_NOT_ENABLED);
+            assertThat(response.getData()).isNull();
         }
     }
 

@@ -171,6 +171,10 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("hmcts-access-migration");
     }
 
+    public boolean isCaseworkerMediationActivitiesEnabled() {
+        return featureToggleApi.isFeatureEnabled("caseworker-mediation-activities");
+    }
+  
     public boolean isDraftClaimDatabaseEnabled() {
         return featureToggleApi.isFeatureEnabled("cui-draft-claim-database");
     }

@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.DynamicMultiSelectList;
 import uk.gov.hmcts.reform.civil.service.CaseNoteService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.util.ArrayList;
@@ -56,10 +57,13 @@ public class MediationCorrespondenceCallbackHandler extends CallbackHandler {
         + "The details you have entered will be saved on the Summary and Notes tab.";
 
     static final String NOTE_TITLE = "Mediation correspondence";
+    static final String ERROR_FEATURE_NOT_ENABLED = "This action cannot currently be performed because it has either "
+        + "already been completed or another action must be completed first.";
 
     private final ObjectMapper objectMapper;
     private final CaseNoteService caseNoteService;
     private final Time time;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -77,6 +81,11 @@ public class MediationCorrespondenceCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse populatePartyOptions(CallbackParams callbackParams) {
+        if (!featureToggleService.isCaseworkerMediationActivitiesEnabled()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(ERROR_FEATURE_NOT_ENABLED))
+                .build();
+        }
         CaseData caseData = callbackParams.getCaseData();
 
         List<DynamicListElement> options = new ArrayList<>(getPartyOptions(caseData));

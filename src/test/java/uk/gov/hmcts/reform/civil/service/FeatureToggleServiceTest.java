@@ -290,6 +290,13 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenCaseworkerMediationActivitiesEnabled(Boolean toggleStat) {
+        givenToggle("caseworker-mediation-activities", toggleStat);
+        assertThat(featureToggleService.isCaseworkerMediationActivitiesEnabled()).isEqualTo(toggleStat);
+    }
+  
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     void shouldCallBoolVariation_whenDraftClaimDatabaseEnabled(Boolean toggleStat) {
         givenToggle("cui-draft-claim-database", toggleStat);
         assertThat(featureToggleService.isDraftClaimDatabaseEnabled()).isEqualTo(toggleStat);
