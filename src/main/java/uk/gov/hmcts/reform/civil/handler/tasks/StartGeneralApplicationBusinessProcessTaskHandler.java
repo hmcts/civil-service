@@ -61,6 +61,8 @@ public class StartGeneralApplicationBusinessProcessTaskHandler extends BaseExter
         var stateFlow = stateFlowEngine.getStateFlow(caseData);
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
         variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
+        // The caller continues in a different process instance after this call activity ends.
+        variables.putValue("generalApplicationProcessInstanceId", externalTask.getProcessInstanceId());
         return new ExternalTaskData().setVariables(variables);
     }
 

@@ -5,8 +5,10 @@ For `GA_INITIATE_PROCESS_ID`, `caseId` is the parent claim ID and
 
 1. Identify the stuck process instance and its parent claim.
 2. Find the submitted application in the claim's `generalApplications` collection.
-   Match its `businessProcess.processInstanceId` to the stuck instance. If it does
-   not match (for example, after a manual restart), establish which application
+   Match its `businessProcess.processInstanceId` to the instance's
+   `generalApplicationProcessInstanceId` variable. This is the ID of the called
+   `GA_StartBusinessProcess` instance, not the outer GA initiation instance. If
+   the variable is absent or does not match, establish which application
    belongs to the instance before proceeding; do not select an arbitrary link.
 3. Check the application's `caseLink.CaseReference` and verify the referenced GA
    case belongs to this application and parent claim.
@@ -18,6 +20,9 @@ For `GA_INITIATE_PROCESS_ID`, `caseId` is the parent claim ID and
 When manually restarting an instance, set `generalApplicationCaseId` before moving
 past `CreateGeneralApplicationCase`. Re-running the create step can recover the
 link only when the application is FINISHED, has a caseLink and belongs to the
-same process instance. Missing or ambiguous matches raise an incident.
+same start subprocess. For an older in-flight instance without
+`generalApplicationProcessInstanceId`, verify the application's recorded start
+subprocess ID against Camunda history and set that variable before re-running
+creation. Missing or ambiguous matches raise an incident.
 
 This change does not repair existing production instances automatically.

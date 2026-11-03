@@ -79,13 +79,16 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
         log.debug("Started event update for case ID: {}, event token: {}", caseId, startEventResponse.getToken());
         GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(startEventResponse.getCaseDetails());
         var generalApplications = caseData.getGeneralApplications();
+        // The application records the ID of the called GA_StartBusinessProcess instance.
+        String applicationProcessInstanceId = StringUtils.defaultIfBlank(
+            variables.getGeneralApplicationProcessInstanceId(), externalTask.getProcessInstanceId());
         var matchingApplications = ofNullable(generalApplications).orElse(List.of()).stream()
             .filter(Objects::nonNull)
             .map(Element::getValue)
             .filter(Objects::nonNull)
             .filter(application -> application.getBusinessProcess() != null
-                && externalTask.getProcessInstanceId() != null
-                && externalTask.getProcessInstanceId().equals(application.getBusinessProcess().getProcessInstanceId()))
+                && applicationProcessInstanceId != null
+                && applicationProcessInstanceId.equals(application.getBusinessProcess().getProcessInstanceId()))
             .toList();
         if (matchingApplications.size() != 1) {
             throw new NotRetryableException("Expected one general application for parent case " + caseId

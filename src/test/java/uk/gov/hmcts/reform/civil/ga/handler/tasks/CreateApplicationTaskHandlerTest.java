@@ -87,7 +87,8 @@ public class CreateApplicationTaskHandlerTest {
 
     private static final String STRING_CONSTANT = "this is a string";
     private static final LocalDate APP_DATE_EPOCH = EPOCH;
-    private static final String PROCESS_INSTANCE_ID = "1";
+    private static final String PROCESS_INSTANCE_ID = "start-subprocess";
+    private static final String OUTER_PROCESS_INSTANCE_ID = "initiate-process";
     private static final String CASE_ID = "1";
     private static final String GA_ID = "2";
     private static final String GA_CASE_TYPES = "Summary judgment";
@@ -134,12 +135,13 @@ public class CreateApplicationTaskHandlerTest {
             objectMapper,
             gaStateFlowEngine
         );
-        lenient().when(mockTask.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
+        lenient().when(mockTask.getProcessInstanceId()).thenReturn(OUTER_PROCESS_INSTANCE_ID);
         lenient().when(mockTask.getTopicName()).thenReturn("test");
 
         Map<String, Object> variables = Map.of(
             "caseId", CASE_ID,
-            "caseEvent", CREATE_GENERAL_APPLICATION_CASE.name()
+            "caseEvent", CREATE_GENERAL_APPLICATION_CASE.name(),
+            "generalApplicationProcessInstanceId", PROCESS_INSTANCE_ID
         );
 
         lenient().when(mockTask.getAllVariables()).thenReturn(variables);
@@ -655,7 +657,7 @@ public class CreateApplicationTaskHandlerTest {
             assertThatThrownBy(() -> createApplicationTaskHandler.handleTask(mockTask))
                 .isInstanceOf(NotRetryableException.class)
                 .hasMessageContaining("parent case " + CASE_ID)
-                .hasMessageContaining("process instance " + PROCESS_INSTANCE_ID);
+                .hasMessageContaining("process instance " + OUTER_PROCESS_INSTANCE_ID);
             verify(coreCaseDataService, never()).createGeneralAppCase(anyMap());
             verify(coreCaseDataService, never()).submitUpdate(any(), any());
         }
@@ -1042,7 +1044,7 @@ public class CreateApplicationTaskHandlerTest {
         assertThatThrownBy(() -> createApplicationTaskHandler.handleTask(mockTask))
             .isInstanceOf(NotRetryableException.class)
             .hasMessageContaining("parent case " + CASE_ID)
-            .hasMessageContaining("process instance " + PROCESS_INSTANCE_ID);
+            .hasMessageContaining("process instance " + OUTER_PROCESS_INSTANCE_ID);
         verify(coreCaseDataService, never()).createGeneralAppCase(anyMap());
         verify(coreCaseDataService, never()).submitUpdate(any(), any());
     }
@@ -1050,7 +1052,7 @@ public class CreateApplicationTaskHandlerTest {
     @Test
     void shouldRecoverFinishedApplicationForCurrentProcess() {
         GeneralApplication unrelated = new GeneralApplication().setBusinessProcess(
-            new BusinessProcess().setStatus(STARTED).setProcessInstanceId("other"));
+            new BusinessProcess().setStatus(STARTED).setProcessInstanceId(OUTER_PROCESS_INSTANCE_ID));
         GeneralApplication finished = new GeneralApplication().setBusinessProcess(
             new BusinessProcess().setStatus(FINISHED)
                 .setProcessInstanceId(PROCESS_INSTANCE_ID))
