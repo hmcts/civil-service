@@ -2,7 +2,7 @@
 
 set -ex
 
-definition_processor_version=latest
+definition_processor_version=pr-352-8831d90
 
 definition_dir=${1}
 definition_output_file=${2}
