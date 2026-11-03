@@ -20,7 +20,8 @@ public class NoCHearingFeeUnpaidAppSolEmailDTOGenerator extends CivilEmailDTOGen
 
     @Override
     public Boolean getShouldNotify(CaseData caseData) {
-        return HearingPredicate.isInReadiness.test(caseData)
+        return !caseData.isApplicant1NotRepresented()
+            && HearingPredicate.isInReadiness.test(caseData)
             && !noCHelper.isHearingFeePaid(caseData)
             && nonNull(caseData.getHearingFee());
     }
