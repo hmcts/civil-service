@@ -1063,8 +1063,8 @@ public class CreateApplicationTaskHandlerTest {
 
         var result = createApplicationTaskHandler.handleTask(mockTask);
 
-        assertThat(createApplicationTaskHandler.getVariableMap(result).get("generalApplicationCaseId"))
-            .isEqualTo(Long.valueOf(GA_ID));
+        assertThat(createApplicationTaskHandler.getVariableMap(result))
+            .containsEntry("generalApplicationCaseId", Long.valueOf(GA_ID));
         verify(coreCaseDataService, never()).createGeneralAppCase(anyMap());
         verify(coreCaseDataService, never()).submitUpdate(any(), any());
     }
