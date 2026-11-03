@@ -76,7 +76,7 @@ public class ExternalTaskCompletionService {
                         ExternalTaskService externalTaskService,
                         ExternalTaskData data) {
         log.error("Completing task '{}' All retry attempts failed, processInstanceId '{}', error message '{}'",
-                  externalTask.getTopicName(), externalTask.getProcessInstanceId(), exception.getMessage()
+                  externalTask.getTopicName(), externalTask.getProcessInstanceId(), exception.getMessage(), exception
         );
         handler.handleTaskFailureNotRetryable(externalTask, externalTaskService, exception);
     }

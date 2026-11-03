@@ -3,12 +3,16 @@ package uk.gov.hmcts.reform.civil.service;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.exceptions.UpstreamIdamException;
 import uk.gov.hmcts.reform.civil.utils.MaskHelper;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
+import java.net.SocketTimeoutException;
+import java.net.http.HttpTimeoutException;
 
 @Service
 public class UserService {
@@ -17,6 +21,11 @@ public class UserService {
     private static final long IDAM_USER_DETAILS_RETRY_DELAY_MILLIS = 250L;
 
     private final IdamClient idamClient;
+    private final RetryTemplate accessTokenRetry = RetryTemplate.builder()
+        .maxAttempts(3)
+        .fixedBackoff(250L)
+        .retryOn(this::isTransientTokenFailure)
+        .build();
 
     @Autowired
     public UserService(IdamClient idamClient) {
@@ -30,7 +39,8 @@ public class UserService {
 
     @Cacheable(value = "accessTokenCache")
     public String getAccessToken(String username, String password) {
-        return idamClient.getAccessToken(username, password);
+        // Retry inside the cached invocation so cache hits never enter the retry policy.
+        return accessTokenRetry.execute(context -> idamClient.getAccessToken(username, password));
     }
 
     public UserDetails getUserDetails(String authorisation) {
@@ -52,6 +62,18 @@ public class UserService {
             }
         }
         throw new UpstreamIdamException("IDAM temporarily unavailable");
+    }
+
+    private boolean isTransientTokenFailure(Throwable failure) {
+        if (failure instanceof FeignException feignException && feignException.status() >= 0) {
+            return isServerError(feignException);
+        }
+        for (Throwable cause = failure; cause != null; cause = cause.getCause()) {
+            if (cause instanceof SocketTimeoutException || cause instanceof HttpTimeoutException) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean isServerError(FeignException exception) {
