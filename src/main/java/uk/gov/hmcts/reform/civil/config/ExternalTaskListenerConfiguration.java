@@ -16,6 +16,7 @@ import org.springframework.retry.annotation.EnableRetry;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.handler.tasks.GuardedTopicRegistry;
 
 @Configuration
 @EnableRetry
@@ -66,8 +67,9 @@ public class ExternalTaskListenerConfiguration {
      * long-poll {@code asyncResponseTimeout} is 29500ms and would race it (EXC-CS-105).
      */
     @Bean
-    public ExternalTaskClient client(BackoffStrategy externalTaskBackoffStrategy) {
-        return ExternalTaskClient.create()
+    public ExternalTaskClient client(BackoffStrategy externalTaskBackoffStrategy,
+                                     GuardedTopicRegistry guardedTopicRegistry) {
+        ExternalTaskClient client = ExternalTaskClient.create()
             .addInterceptor(new ServiceAuthProvider())
             .asyncResponseTimeout(eventProperties.getResponseTimeout())
             .maxTasks(1)
@@ -87,6 +89,8 @@ public class ExternalTaskListenerConfiguration {
                 .addResponseInterceptorLast(new NonJsonCamundaErrorResponseInterceptor())
                 .setRetryStrategy(new CamundaStaleConnectionRetryStrategy()))
             .build();
+        // records each topic and its handler so the hourly incident retry can find the guarded topics
+        return TopicRecordingExternalTaskClient.wrap(client, guardedTopicRegistry);
     }
 
     public class ServiceAuthProvider implements ClientRequestInterceptor {
