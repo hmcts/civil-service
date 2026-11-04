@@ -146,6 +146,28 @@ class CancelUnissuedClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).containsExactly(CancelUnissuedClaimCallbackHandler.EVENT_NOT_ALLOWED);
         }
+
+        @Test
+        void shouldReturnError_whenLipClaimFeePaidAndPendingCaseIssued() {
+            CaseData caseData = eligibleCaseData();
+            caseData.setIssueDate(LocalDate.now());
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(CancelUnissuedClaimCallbackHandler.EVENT_NOT_ALLOWED);
+        }
+
+        @Test
+        void shouldReturnError_whenLrClaimFeePaidAndPendingCaseIssued() {
+            CaseData caseData = eligibleLrCaseData(CaseCategory.SPEC_CLAIM);
+            caseData.setIssueDate(LocalDate.now());
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(CancelUnissuedClaimCallbackHandler.EVENT_NOT_ALLOWED);
+        }
     }
 
     @Nested
