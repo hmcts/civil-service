@@ -8,7 +8,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @AllArgsConstructor
-public abstract class DefendantTwoEmailDTOGenerator extends EmailDTOGenerator {
+public abstract class DefendantTwoEmailDTOGenerator extends CivilEmailDTOGenerator {
 
     @Override
     public Boolean getShouldNotify(CaseData caseData) {
