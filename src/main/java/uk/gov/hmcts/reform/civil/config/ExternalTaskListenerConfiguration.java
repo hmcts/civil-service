@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.handler.tasks.GuardedTopicRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -188,7 +189,9 @@ public class ExternalTaskListenerConfiguration {
      * {@code NoHttpResponseException}. Do not set a 30s response timeout here: the
      * long-poll {@code asyncResponseTimeout} is 29500ms and would race it (EXC-CS-105).
      */
-    private ExternalTaskClient buildClient(BackoffStrategy externalTaskBackoffStrategy, int maxTasks) {
+    private ExternalTaskClient buildClient(BackoffStrategy externalTaskBackoffStrategy,
+                                           GuardedTopicRegistry guardedTopicRegistry,
+                                           int maxTasks) {
         return ExternalTaskClient.create()
             .addInterceptor(new ServiceAuthProvider())
             .asyncResponseTimeout(eventProperties.getResponseTimeout())
@@ -209,6 +212,8 @@ public class ExternalTaskListenerConfiguration {
                 .addResponseInterceptorLast(new NonJsonCamundaErrorResponseInterceptor())
                 .setRetryStrategy(new CamundaStaleConnectionRetryStrategy()))
             .build();
+        // records each topic and its handler so the hourly incident retry can find the guarded topics
+        return TopicRecordingExternalTaskClient.wrap(client, guardedTopicRegistry);
     }
 
     public class ServiceAuthProvider implements ClientRequestInterceptor {
