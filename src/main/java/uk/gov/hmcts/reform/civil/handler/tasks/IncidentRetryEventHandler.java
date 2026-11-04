@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -46,6 +47,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
     private static final class IncidentRetryContext {
         private final String serviceAuthorization;
+        private final boolean clearRetryMarker;
         private final AtomicInteger totalRetries = new AtomicInteger();
         private final AtomicInteger successRetries = new AtomicInteger();
         private final AtomicInteger failedRetries = new AtomicInteger();
@@ -54,8 +56,9 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         private final List<StuckCaseSummaryItem> stuckCasesForManualIntervention =
             Collections.synchronizedList(new ArrayList<>());
 
-        private IncidentRetryContext(String serviceAuthorization) {
+        private IncidentRetryContext(String serviceAuthorization, boolean clearRetryMarker) {
             this.serviceAuthorization = serviceAuthorization;
+            this.clearRetryMarker = clearRetryMarker;
         }
     }
 
@@ -76,6 +79,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     private final CaseTaskTrackingService caseTaskTrackingService;
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final GuardedTopicRegistry guardedTopicRegistry;
 
     public IncidentRetryEventHandler(
         ExternalTaskCompletionService externalTaskCompletionService,
@@ -85,7 +89,8 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         AuthTokenGenerator authTokenGenerator,
         CaseTaskTrackingService caseTaskTrackingService,
         CoreCaseDataService coreCaseDataService,
-        CaseDetailsConverter caseDetailsConverter
+        CaseDetailsConverter caseDetailsConverter,
+        GuardedTopicRegistry guardedTopicRegistry
     ) {
         super(externalTaskCompletionService, eventProperties);
         this.casesStuckCheckSearchService = casesStuckCheckSearchService;
@@ -94,9 +99,26 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         this.caseTaskTrackingService = caseTaskTrackingService;
         this.coreCaseDataService = coreCaseDataService;
         this.caseDetailsConverter = caseDetailsConverter;
+        this.guardedTopicRegistry = guardedTopicRegistry;
     }
 
     private static final int MAX_THREADS = 10;
+    private static final String RETRY_MODE_VARIABLE = "retryMode";
+    private static final String GUARDED_ONLY_MODE = "GUARDED_ONLY";
+    private static final String LOOKBACK_MINUTES_VARIABLE = "incidentLookbackMinutes";
+    private static final long DEFAULT_LOOKBACK_MINUTES = 70L;
+    private static final long MAX_LOOKBACK_MINUTES = 24L * 60L;
+    private static final String FAILED_EXTERNAL_TASK_INCIDENT = "failedExternalTask";
+    private static final String TENANT_ID = "civil";
+    private static final String TOPIC_NAME = "topicName";
+    /**
+     * Process variable set on a process instance when the short-interval run retries it, holding the
+     * id of the activity that was retried. The short-interval run skips a later incident at the same
+     * activity, so a task that keeps failing is retried once and then left to the daily run, which
+     * retries everything and clears the marker. An incident at a different activity is retried and
+     * overwrites the marker.
+     */
+    static final String RETRIED_MARKER_VARIABLE = "incidentAutoRetriedActivityId";
     private static final String CASE_ID_VARIABLE = "caseId";
     private static final String STATE_ID_VARIABLE = "stateId";
     private static final String EVENT_ID_VARIABLE = "eventId";
@@ -119,13 +141,19 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
+        // read from the full variable map so the daily run keeps reading exactly the variables it always did
+        Map<String, Object> allVariables = externalTask.getAllVariables();
+        if (isGuardedOnlyMode(allVariables)) {
+            return handleGuardedOnlyRetry(resolveLookbackMinutes(allVariables));
+        }
+
         String incidentStartTime = resolveStartTime(externalTask.getVariable("incidentStartTime"));
         String incidentEndTime = resolveEndTime(externalTask.getVariable("incidentEndTime"));
         String incidentMessageLike = externalTask.getVariable("incidentMessageLike");
 
         log.info("Incident retry process using date range {} → {}", incidentStartTime, incidentEndTime);
 
-        IncidentRetryContext retryContext = new IncidentRetryContext(authTokenGenerator.generate());
+        IncidentRetryContext retryContext = new IncidentRetryContext(authTokenGenerator.generate(), true);
 
         processAllIncidents(
             retryContext,
@@ -162,6 +190,159 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         );
 
         return new ExternalTaskData();
+    }
+
+    private boolean isGuardedOnlyMode(Map<String, Object> variables) {
+        return variables != null
+            && GUARDED_ONLY_MODE.equalsIgnoreCase(String.valueOf(variables.get(RETRY_MODE_VARIABLE)));
+    }
+
+    private long resolveLookbackMinutes(Map<String, Object> variables) {
+        Object configured = variables.get(LOOKBACK_MINUTES_VARIABLE);
+        if (configured != null) {
+            try {
+                long minutes = Long.parseLong(String.valueOf(configured).trim());
+                if (minutes > MAX_LOOKBACK_MINUTES) {
+                    log.warn("{} value {} exceeds the maximum, using {}",
+                             LOOKBACK_MINUTES_VARIABLE, minutes, MAX_LOOKBACK_MINUTES);
+                    return MAX_LOOKBACK_MINUTES;
+                }
+                if (minutes > 0) {
+                    return minutes;
+                }
+            } catch (NumberFormatException e) {
+                log.warn("Ignoring invalid {} value '{}'", LOOKBACK_MINUTES_VARIABLE, configured);
+            }
+        }
+        return DEFAULT_LOOKBACK_MINUTES;
+    }
+
+    /**
+     * Short-interval run: retries each open incident raised in the last {@code lookbackMinutes}, but
+     * only when the failed task belongs to a retry guarded topic and this run has not already retried
+     * the same activity on its process instance (see {@link #RETRIED_MARKER_VARIABLE}). It sends no
+     * stuck-case events or digest and runs no CCD search; the daily run does all of these.
+     */
+    private ExternalTaskData handleGuardedOnlyRetry(long lookbackMinutes) {
+        Instant now = Instant.now();
+        String raisedAfter = INCIDENT_FORMATTER.format(now.minus(lookbackMinutes, ChronoUnit.MINUTES));
+        String raisedBefore = INCIDENT_FORMATTER.format(now);
+        log.info("Guarded incident retry using incident time range {} -> {}; guarded topics: {}",
+                 raisedAfter, raisedBefore, guardedTopicRegistry.getGuardedTopics());
+
+        IncidentRetryContext retryContext = new IncidentRetryContext(authTokenGenerator.generate(), false);
+
+        List<CamundaIncident> incidents = fetchLatestIncidentPerProcessInstance(
+            retryContext.serviceAuthorization, raisedAfter, raisedBefore);
+        List<CamundaIncident> toRetry = incidents.stream()
+            .filter(incident -> isGuardedIncident(incident, retryContext.serviceAuthorization))
+            .filter(incident -> claimFirstRetry(incident, retryContext.serviceAuthorization))
+            .toList();
+
+        log.info("Guarded incident retry: {} open incidents in window, {} to retry", incidents.size(), toRetry.size());
+        if (!toRetry.isEmpty()) {
+            retryIncidents(toRetry, retryContext);
+        }
+
+        log.info(
+            "Guarded incident retry completed. Total={}, Success={}, Failed={}, caseIds={}",
+            retryContext.totalRetries.get(),
+            retryContext.successRetries.get(),
+            retryContext.failedRetries.get(),
+            retryContext.caseIds
+        );
+        return new ExternalTaskData();
+    }
+
+    private List<CamundaIncident> fetchLatestIncidentPerProcessInstance(String serviceAuthorization,
+                                                                        String raisedAfter,
+                                                                        String raisedBefore) {
+        // newest first, so the first incident seen for a process instance is its latest
+        Map<String, CamundaIncident> latestByProcessInstance = new LinkedHashMap<>();
+        try {
+            int firstResult = 0;
+            List<CamundaIncident> page;
+            do {
+                page = camundaRuntimeApi.getOpenIncidentsRaisedBetween(
+                    serviceAuthorization, true, FAILED_EXTERNAL_TASK_INCIDENT, raisedAfter, raisedBefore,
+                    TENANT_ID, INCIDENT_TIMESTAMP, "desc", firstResult, PAGE_SIZE
+                );
+                page.forEach(incident -> latestByProcessInstance.putIfAbsent(incident.getProcessInstanceId(), incident));
+                firstResult += PAGE_SIZE;
+            } while (page.size() == PAGE_SIZE);
+        } catch (Exception e) {
+            log.error("Error fetching open incidents for guarded incident retry", e);
+        }
+        return new ArrayList<>(latestByProcessInstance.values());
+    }
+
+    private boolean isGuardedIncident(CamundaIncident incident, String serviceAuthorization) {
+        String topic = resolveTopic(incident, serviceAuthorization);
+        boolean guarded = guardedTopicRegistry.isGuarded(topic);
+        if (!guarded) {
+            log.info("Guarded incident retry skipping incident {} (topic={}): not a retry guarded topic",
+                     incident.getId(), topic);
+        }
+        return guarded;
+    }
+
+    private String resolveTopic(CamundaIncident incident, String serviceAuthorization) {
+        if (StringUtils.isBlank(incident.getConfiguration())) {
+            return null;
+        }
+        try {
+            Map<String, Object> externalTask = camundaRuntimeApi.getExternalTask(
+                serviceAuthorization, incident.getConfiguration());
+            Object topic = externalTask == null ? null : externalTask.get(TOPIC_NAME);
+            return topic == null ? null : String.valueOf(topic);
+        } catch (Exception e) {
+            log.warn("Could not resolve topic for incident {} (externalTaskId={})",
+                     incident.getId(), incident.getConfiguration(), e);
+            return null;
+        }
+    }
+
+    /**
+     * Records the incident's activity as retried on its process instance, returning false if that
+     * activity was already retried by this run (since the daily run last cleared the marker) or the
+     * marker could not be set. The marker is set before the retry: if this run dies in between, an
+     * incident is missed rather than retried twice.
+     */
+    private boolean claimFirstRetry(CamundaIncident incident, String serviceAuthorization) {
+        String processInstanceId = incident.getProcessInstanceId();
+        String activityId = incident.getActivityId();
+        if (StringUtils.isBlank(activityId)) {
+            log.info("Guarded incident retry skipping incident {} (processInstanceId={}): no activity id",
+                     incident.getId(), processInstanceId);
+            return false;
+        }
+        CamundaVariableValue marker = fetchProcessVariables(processInstanceId, serviceAuthorization)
+            .get(RETRIED_MARKER_VARIABLE);
+        if (marker != null && activityId.equals(String.valueOf(marker.getValue()))) {
+            log.info("Guarded incident retry skipping processInstanceId={}: activity {} already retried, "
+                         + "leaving it to the daily run", processInstanceId, activityId);
+            return false;
+        }
+        try {
+            camundaRuntimeApi.setProcessVariable(
+                serviceAuthorization,
+                processInstanceId,
+                RETRIED_MARKER_VARIABLE,
+                new CamundaVariableValue().setValue(activityId).setType("String")
+            );
+            return true;
+        } catch (Exception e) {
+            log.warn("Could not mark processInstanceId={} as retried; not retrying it", processInstanceId, e);
+            return false;
+        }
+    }
+
+    private void clearRetriedMarker(String processInstanceId, String serviceAuthorization) {
+        try {
+            camundaRuntimeApi.deleteProcessVariable(serviceAuthorization, processInstanceId, RETRIED_MARKER_VARIABLE);
+        } catch (Exception e) {
+            log.warn("Could not clear retried marker for processInstanceId={}", processInstanceId, e);
+        }
     }
 
     private void processAllIncidents(
@@ -301,6 +482,10 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         String stateId = resolveVariable(processVariables, STATE_ID_VARIABLE);
         String lastEventId = resolveVariable(processVariables, EVENT_ID_VARIABLE);
 
+        if (retryContext.clearRetryMarker && processVariables.containsKey(RETRIED_MARKER_VARIABLE)) {
+            clearRetriedMarker(processInstanceId, retryContext.serviceAuthorization);
+        }
+
         try {
             String failedActivityId = incident.getActivityId();
             retryContext.caseIds.add(incidentCaseId);
@@ -333,7 +518,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                     defaultIfBlank(failedActivityId)
                 ));
                 retryContext.trackedStuckCaseIds.add(incidentCaseId);
-                trackStuckCaseEvent(incident, incidentCaseId, stateId, lastEventId, "retry_failed", null);
+                trackStuckCaseEventForDailyRun(retryContext, incident, incidentCaseId, stateId, lastEventId, "retry_failed", null);
                 return false;
             }
 
@@ -345,7 +530,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                     defaultIfBlank(failedActivityId)
                 ));
                 retryContext.trackedStuckCaseIds.add(incidentCaseId);
-                trackStuckCaseEvent(incident, incidentCaseId, stateId, lastEventId, "retry_validation_failed", null);
+                trackStuckCaseEventForDailyRun(retryContext, incident, incidentCaseId, stateId, lastEventId, "retry_validation_failed", null);
                 return false;
             }
 
@@ -364,7 +549,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 defaultIfBlank(incident.getActivityId())
             ));
             retryContext.trackedStuckCaseIds.add(incidentCaseId);
-            trackStuckCaseEvent(incident, incidentCaseId, stateId, lastEventId, "retry_failed_exception", e.getMessage());
+            trackStuckCaseEventForDailyRun(retryContext, incident, incidentCaseId, stateId, lastEventId, "retry_failed_exception", e.getMessage());
             log.error(
                 "Error retrying incident {} (processInstanceId={}): {}",
                 incident.getId(),
@@ -486,6 +671,22 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
             return String.valueOf(variables.get(variableName).getValue());
         }
         return UNKNOWN;
+    }
+
+    /**
+     * The short-interval run sends no stuck-case events: a failed attempt keeps its marker, so the
+     * daily run retries the instance and reports it if it still fails.
+     */
+    private void trackStuckCaseEventForDailyRun(IncidentRetryContext retryContext,
+                                                CamundaIncident incident,
+                                                String caseId,
+                                                String stateId,
+                                                String lastEventId,
+                                                String retryStatus,
+                                                String retryFailureReason) {
+        if (retryContext.clearRetryMarker) {
+            trackStuckCaseEvent(incident, caseId, stateId, lastEventId, retryStatus, retryFailureReason);
+        }
     }
 
     private void trackStuckCaseEvent(CamundaIncident incident,
