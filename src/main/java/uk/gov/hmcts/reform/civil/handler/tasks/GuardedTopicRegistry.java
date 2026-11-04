@@ -28,7 +28,17 @@ public class GuardedTopicRegistry {
 
     public void register(String topic, ExternalTaskHandler handler) {
         if (topic != null && handler != null) {
-            handlersByTopic.put(topic, handler);
+            ExternalTaskHandler previous = handlersByTopic.put(topic, handler);
+            if (previous != null && previous != handler) {
+                log.warn("Topic {} registered again with a different handler, replacing {}",
+                         topic, previous.getClass().getSimpleName());
+            }
+            if (handler instanceof BaseExternalTaskHandler base && base.isRetryGuarded()) {
+                log.info("Registered retry guarded topic {} (handler {})",
+                         topic, handler.getClass().getSimpleName());
+            } else {
+                log.debug("Registered topic {} as not retry guarded", topic);
+            }
         }
     }
 
