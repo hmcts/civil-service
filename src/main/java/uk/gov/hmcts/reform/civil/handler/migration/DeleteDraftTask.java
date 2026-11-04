@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.migration;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.DraftClaimReference;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.services.DraftStoreService;
 
@@ -12,7 +11,12 @@ public class DeleteDraftTask extends MigrationTask<DraftClaimReference> {
     private final DraftStoreService draftStoreService;
 
     public DeleteDraftTask(DraftStoreService draftStoreService) {
-        super(DraftClaimReference.class);
+        super(
+            DraftClaimReference.class,
+            "DeleteDraftTask",
+            "Delete draft migration",
+            "Deletes drafts listed in the migration input"
+        );
         this.draftStoreService = draftStoreService;
     }
 
@@ -25,23 +29,4 @@ public class DeleteDraftTask extends MigrationTask<DraftClaimReference> {
         );
     }
 
-    @Override
-    protected String getTaskName() {
-        return "DeleteDraftTask";
-    }
-
-    @Override
-    protected String getEventSummary() {
-        return "Delete draft migration";
-    }
-
-    @Override
-    protected String getEventDescription() {
-        return "Deletes drafts listed in the migration input";
-    }
-
-    @Override
-    protected CaseData migrateCaseData(CaseData caseData, DraftClaimReference caseReference) {
-        return caseData;
-    }
 }

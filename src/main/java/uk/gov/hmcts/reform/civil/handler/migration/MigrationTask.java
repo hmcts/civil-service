@@ -17,18 +17,41 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 public abstract class MigrationTask<T extends CaseReference> {
 
     private final Class<T> type;
+    private final String taskName;
+    private final String eventSummary;
+    private final String eventDescription;
 
     protected MigrationTask(Class<T> type) {
-        this.type = type;
+        this(type, null, null, null);
     }
 
-    protected abstract String getTaskName();
+    protected MigrationTask(
+        Class<T> type,
+        String taskName,
+        String eventSummary,
+        String eventDescription
+    ) {
+        this.type = type;
+        this.taskName = taskName;
+        this.eventSummary = eventSummary;
+        this.eventDescription = eventDescription;
+    }
 
-    protected abstract String getEventSummary();
+    protected String getTaskName() {
+        return taskName;
+    }
 
-    protected abstract String getEventDescription();
+    protected String getEventSummary() {
+        return eventSummary;
+    }
 
-    protected abstract CaseData migrateCaseData(CaseData caseData, T caseReference);
+    protected String getEventDescription() {
+        return eventDescription;
+    }
+
+    protected CaseData migrateCaseData(CaseData caseData, T caseReference) {
+        return caseData;
+    }
 
     protected CaseData migrateGeneralApplicationCaseData(
         CaseData caseData,

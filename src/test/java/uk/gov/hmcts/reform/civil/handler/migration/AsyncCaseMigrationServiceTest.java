@@ -120,6 +120,22 @@ class AsyncCaseMigrationServiceTest {
     }
 
     @Test
+    void shouldContinueDraftMigrationWhenOneDraftFails() {
+        @SuppressWarnings("unchecked")
+        MigrationTask<DraftClaimReference> migrationTask = mock(MigrationTask.class);
+        DraftClaimReference failed = draftReference("draft-1", "user-1");
+        DraftClaimReference successful = draftReference("draft-2", "user-2");
+        org.mockito.Mockito.doThrow(new RuntimeException("failure"))
+            .when(migrationTask).migrateUserDrafts(failed);
+
+        asyncCaseMigrationService.migrateUserDrafts(migrationTask, List.of(failed, successful));
+
+        verify(migrationTask).migrateUserDrafts(failed);
+        verify(migrationTask).migrateUserDrafts(successful);
+        assertNull(RequestContextHolder.getRequestAttributes());
+    }
+
+    @Test
     void shouldReadDraftClaimReferenceFromExcelRow() {
         DraftClaimReference reference = new DraftClaimReference();
 
