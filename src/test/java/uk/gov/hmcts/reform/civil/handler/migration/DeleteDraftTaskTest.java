@@ -46,4 +46,11 @@ class DeleteDraftTaskTest {
         assertThat(task.getEventDescription()).isEqualTo("Deletes drafts listed in the migration input");
         assertThat(task.getType()).isEqualTo(DraftClaimReference.class);
     }
+
+    @Test
+    void shouldLeaveCaseDataUnchanged() {
+        DraftClaimReference reference = new DraftClaimReference();
+
+        assertThat(task.migrateCaseData(null, reference)).isNull();
+    }
 }
