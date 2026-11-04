@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 public abstract class MigrationTask<T extends CaseReference> {
 
     private final Class<T> type;
+
     protected MigrationTask(Class<T> type) {
         this.type = type;
     }
