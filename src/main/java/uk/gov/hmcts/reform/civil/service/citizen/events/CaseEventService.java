@@ -118,7 +118,7 @@ public class CaseEventService {
 
     public CaseDetails submitEventForNewClaim(EventSubmissionParams params) {
         if (!params.hasSubmissionId() || !featureToggleService.isDraftClaimDatabaseEnabled()) {
-            return createNewClaim(params);
+            return createNewClaim(params, null);
         }
 
         Optional<DraftStoreEntity> bySubmission = draftStoreService.getDraftBySubmissionId(
