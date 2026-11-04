@@ -8,6 +8,7 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class DraftClaimReference extends CaseReference implements ExcelMappable {
+
     private String userId;
 
     @Override

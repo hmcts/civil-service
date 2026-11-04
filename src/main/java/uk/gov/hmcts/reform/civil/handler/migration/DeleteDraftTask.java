@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.services.DraftStoreService;
 
-
 @Component
 public class DeleteDraftTask extends MigrationTask<DraftClaimReference> {
 

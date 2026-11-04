@@ -40,7 +40,8 @@ public abstract class MigrationTask<T extends CaseReference> {
 
     protected void migrateUserDrafts(
         T reference
-    ) {}
+    ) {
+    }
 
     protected Map<String, Object> migrateCmcCaseData(
         CaseDetails caseDetails,

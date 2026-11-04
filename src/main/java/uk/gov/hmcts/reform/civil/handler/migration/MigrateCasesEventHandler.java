@@ -94,7 +94,6 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
 
         log.info("Found {} case references to process", caseReferences.size());
 
-
         String isDraftCase = externalTask.getVariable(IS_DRAFT_CASE);
         if (isDraftCase != null) {
             return handleDraftTask(externalTask, task, caseReferences);
