@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.services.DraftStoreService;
 
 @Component
-public class DeleteDraftTask extends MigrationTask<DraftClaimReference> {
+public class DeleteDraftTask extends MigrationTaskWithMetadata<DraftClaimReference> {
 
     private final DraftStoreService draftStoreService;
 
@@ -28,5 +28,4 @@ public class DeleteDraftTask extends MigrationTask<DraftClaimReference> {
             DraftType.DRAFT_CLAIM
         );
     }
-
 }
