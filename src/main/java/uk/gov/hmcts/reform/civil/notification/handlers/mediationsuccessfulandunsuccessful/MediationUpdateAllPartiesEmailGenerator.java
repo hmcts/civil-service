@@ -25,7 +25,7 @@ import java.util.Set;
 @Component
 @AllArgsConstructor
 @Slf4j
-public class MediationUpdateAllPartiesEmailGenerator implements PartiesEmailGenerator {
+public class MediationUpdateAllPartiesEmailGenerator implements PartiesEmailGenerator<CaseData> {
 
     private final CarmAppSolOneEmailDTOGenerator carmAppSolOneEmailDTOGenerator;
     private final CarmRespSolOneEmailDTOGenerator carmRespSolOneEmailDTOGenerator;
@@ -61,7 +61,7 @@ public class MediationUpdateAllPartiesEmailGenerator implements PartiesEmailGene
     }
 
     private void addIfPartyNeedsNotification(CaseData caseData,
-                                             EmailDTOGenerator generator,
+                                             EmailDTOGenerator<CaseData> generator,
                                              Set<EmailDTO> partiesToEmail,
                                              String taskId) {
         if ((generator != null) && generator.getShouldNotify(caseData)) {

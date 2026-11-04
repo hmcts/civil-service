@@ -8,7 +8,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @AllArgsConstructor
-public abstract class DefendantEmailDTOGenerator extends EmailDTOGenerator {
+public abstract class DefendantEmailDTOGenerator extends CivilEmailDTOGenerator {
 
     @Override
     public String getEmailAddress(CaseData caseData) {

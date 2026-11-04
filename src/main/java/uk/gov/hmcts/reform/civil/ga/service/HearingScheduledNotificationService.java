@@ -43,7 +43,7 @@ public class HearingScheduledNotificationService implements NotificationDataGA {
     private final NotificationsSignatureConfiguration configuration;
     private final Map<String, String> customProps = new HashMap<>();
     private final GaForLipService gaForLipService;
-    private static final String REFERENCE_TEMPLATE_HEARING = "general-apps-notice-of-hearing-%s";
+    public static final String REFERENCE_TEMPLATE_HEARING = "general-apps-notice-of-hearing-%s";
     private static final String EMPTY_SOLICITOR_REFERENCES_1V1 = "Claimant Reference: Not provided - Defendant Reference: Not provided";
     private static final String RESPONDENT = "respondent";
     private static final String APPLICANT = "applicant";
@@ -131,7 +131,7 @@ public class HearingScheduledNotificationService implements NotificationDataGA {
         return caseData;
     }
 
-    private String getLiPApplicantTemplates(GeneralApplicationCaseData caseData) {
+    public String getLiPApplicantTemplates(GeneralApplicationCaseData caseData) {
         return caseData.isApplicantBilingual()
             ? notificationProperties.getLipGeneralAppApplicantEmailTemplateInWelsh()
             : notificationProperties.getLipGeneralAppApplicantEmailTemplate();
@@ -180,13 +180,13 @@ public class HearingScheduledNotificationService implements NotificationDataGA {
         return caseData;
     }
 
-    private String getLipRespondentEmail(GeneralApplicationCaseData civilCaseData, GeneralApplicationCaseData caseData) {
+    public String getLipRespondentEmail(GeneralApplicationCaseData civilCaseData, GeneralApplicationCaseData caseData) {
         return YES.equals(caseData.getParentClaimantIsApplicant())
             ? gaForLipService.getDefendant1Email(civilCaseData)
             : gaForLipService.getApplicant1Email(civilCaseData);
     }
 
-    private String getLiPRespondentTemplate(GeneralApplicationCaseData caseData) {
+    public String getLiPRespondentTemplate(GeneralApplicationCaseData caseData) {
         return caseData.isRespondentBilingual()
             ? notificationProperties.getLipGeneralAppRespondentEmailTemplateInWelsh()
             : notificationProperties.getLipGeneralAppRespondentEmailTemplate();

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,8 +10,10 @@ import static org.mockito.Mockito.when;
 
 class NotifierFactoryTest {
 
-    Notifier notifier;
+    Notifier<CaseData> notifier;
 
+    // mock() cannot carry the type argument, so the assignment to Notifier<CaseData> is unchecked
+    @SuppressWarnings("unchecked")
     @BeforeEach
     void setUp() {
         notifier  = mock(Notifier.class);
