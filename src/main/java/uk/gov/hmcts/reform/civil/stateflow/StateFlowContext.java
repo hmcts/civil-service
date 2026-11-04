@@ -11,6 +11,7 @@ public class StateFlowContext {
     public static final String EXTENDED_STATE_CASE_KEY = "case";
     public static final String EXTENDED_STATE_HISTORY_KEY = "history";
     public static final String EXTENDED_STATE_FLAGS_KEY = "flags";
+    public static final String EXTENDED_STATE_ERROR_KEY = "stateFlowError";
 
     private final List<String> states = new ArrayList<>();
 
