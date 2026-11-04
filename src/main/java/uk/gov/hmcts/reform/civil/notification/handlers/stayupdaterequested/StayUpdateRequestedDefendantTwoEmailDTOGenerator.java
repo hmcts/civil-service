@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.DefendantTwoEmailDTOGenerator;
-import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 
 import java.util.Map;
@@ -52,7 +51,7 @@ public class StayUpdateRequestedDefendantTwoEmailDTOGenerator extends DefendantT
     }
 
     @Override
-    public EmailDTO buildEmailDTO(CaseData caseData, String taskId) {
-        return helper.withCcdReference(super.buildEmailDTO(caseData, taskId), getReferenceTemplate(), caseData);
+    protected String buildEmailReference(CaseData caseData) {
+        return String.format(getReferenceTemplate(), caseData.getCcdCaseReference());
     }
 }

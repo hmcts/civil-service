@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.coscapplicationafterpaym
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.CivilEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesRefe
 
 @Component
 @RequiredArgsConstructor
-public class CoscApplicationAfterPaymentAppSolOneEmailDTOGenerator extends EmailDTOGenerator {
+public class CoscApplicationAfterPaymentAppSolOneEmailDTOGenerator extends CivilEmailDTOGenerator {
 
     private final NotificationsProperties notificationsProperties;
     private final NotificationsSignatureConfiguration configuration;

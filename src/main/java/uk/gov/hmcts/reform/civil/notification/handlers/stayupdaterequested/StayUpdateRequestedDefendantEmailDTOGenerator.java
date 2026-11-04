@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.DefendantEmailDTOGenerator;
-import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
 
 import java.util.Map;
 
@@ -42,7 +41,7 @@ public class StayUpdateRequestedDefendantEmailDTOGenerator extends DefendantEmai
     }
 
     @Override
-    public EmailDTO buildEmailDTO(CaseData caseData, String taskId) {
-        return helper.withCcdReference(super.buildEmailDTO(caseData, taskId), getReferenceTemplate(), caseData);
+    protected String buildEmailReference(CaseData caseData) {
+        return String.format(getReferenceTemplate(), caseData.getCcdCaseReference());
     }
 }

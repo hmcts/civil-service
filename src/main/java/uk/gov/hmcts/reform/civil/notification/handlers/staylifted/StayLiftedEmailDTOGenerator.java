@@ -2,8 +2,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.staylifted;
 
 import lombok.RequiredArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
-import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.CivilEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -16,7 +15,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItem
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @RequiredArgsConstructor
-public abstract class StayLiftedEmailDTOGenerator extends EmailDTOGenerator {
+public abstract class StayLiftedEmailDTOGenerator extends CivilEmailDTOGenerator {
 
     protected final NotificationsProperties notificationsProperties;
     private final NotificationsSignatureConfiguration configuration;
@@ -29,11 +28,9 @@ public abstract class StayLiftedEmailDTOGenerator extends EmailDTOGenerator {
     }
 
     @Override
-    public EmailDTO buildEmailDTO(CaseData caseData, String taskId) {
-        EmailDTO email = super.buildEmailDTO(caseData, taskId);
+    protected String buildEmailReference(CaseData caseData) {
         // The legacy stay notifications use the CCD reference, rather than the legacy case reference.
-        email.setReference(String.format(getReferenceTemplate(), caseData.getCcdCaseReference()));
-        return email;
+        return String.format(getReferenceTemplate(), caseData.getCcdCaseReference());
     }
 
     @Override

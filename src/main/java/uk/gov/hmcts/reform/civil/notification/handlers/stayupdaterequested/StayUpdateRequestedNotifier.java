@@ -1,13 +1,14 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.stayupdaterequested;
 
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 
 @Component
-public class StayUpdateRequestedNotifier extends Notifier {
+public class StayUpdateRequestedNotifier extends Notifier<CaseData> {
 
     public StayUpdateRequestedNotifier(NotificationService notificationService, CaseTaskTrackingService caseTaskTrackingService,
                             StayUpdateRequestedAllPartiesEmailGenerator partiesNotifier) {
