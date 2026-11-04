@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.trialready.respondentonenotifyotherstrialready;
 
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -8,7 +9,7 @@ import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.Respondent1NotifyOthersTrialReady;
 
 @Component
-public class RespondentOneNotifyOthersTrialReadyNotifier extends Notifier {
+public class RespondentOneNotifyOthersTrialReadyNotifier extends Notifier<CaseData> {
 
     public RespondentOneNotifyOthersTrialReadyNotifier(NotificationService notificationService, CaseTaskTrackingService caseTaskTrackingService,
                                                        RespondentOneNotifyOthersTrialReadyPartiesEmailGenerator partiesNotifier) {
