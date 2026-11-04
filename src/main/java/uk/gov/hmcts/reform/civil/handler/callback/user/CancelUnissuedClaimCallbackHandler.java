@@ -59,6 +59,7 @@ public class CancelUnissuedClaimCallbackHandler extends CallbackHandler {
     private CallbackResponse aboutToStartValidation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         boolean isEligible = CaseState.PENDING_CASE_ISSUED == caseData.getCcdState()
+            && caseData.getIssueDate() == null
             && (isLipClaimantEligible(caseData) || isLrClaimantEligible(caseData));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(isEligible ? Collections.emptyList() : List.of(EVENT_NOT_ALLOWED))
