@@ -229,6 +229,10 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         String raisedBefore = INCIDENT_FORMATTER.format(now);
         log.info("Guarded incident retry using incident time range {} -> {}; guarded topics: {}",
                  raisedAfter, raisedBefore, guardedTopicRegistry.getGuardedTopics());
+        if (guardedTopicRegistry.getGuardedTopics().isEmpty()) {
+            log.warn("Guarded incident retry: no guarded topics are registered, so nothing will be retried. "
+                         + "Check that the external task listeners subscribed through the topic recording client");
+        }
 
         IncidentRetryContext retryContext = new IncidentRetryContext(authTokenGenerator.generate(), false);
 
@@ -278,6 +282,11 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
 
     private boolean isGuardedIncident(CamundaIncident incident, String serviceAuthorization) {
         String topic = resolveTopic(incident, serviceAuthorization);
+        if (topic == null) {
+            log.warn("Guarded incident retry skipping incident {} (externalTaskId={}): topic could not be resolved",
+                     incident.getId(), incident.getConfiguration());
+            return false;
+        }
         boolean guarded = guardedTopicRegistry.isGuarded(topic);
         if (!guarded) {
             log.info("Guarded incident retry skipping incident {} (topic={}): not a retry guarded topic",
