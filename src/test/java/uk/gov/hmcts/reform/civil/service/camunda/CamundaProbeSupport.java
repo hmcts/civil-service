@@ -191,6 +191,23 @@ class CamundaProbeSupport {
         }
 
         @Override
+        public List<CamundaIncident> getOpenIncidentsRaisedBetween(
+            String a, boolean o, String type, String after, String before, String tenants,
+            String sb, String so, int fr, int mr) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Map<String, Object> getExternalTask(String a, String externalTaskId) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void deleteProcessVariable(String a, String processInstanceId, String variableName) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public void setJobRetries(String a, String jobId, Map<String, Object> body) {
             throw new UnsupportedOperationException();
         }

@@ -11,12 +11,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
+import uk.gov.hmcts.reform.civil.handler.tasks.GuardedTopicRegistry;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
+import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 class ExternalTaskListenerConfigurationTest {
 
@@ -101,12 +106,53 @@ class ExternalTaskListenerConfigurationTest {
         });
     }
 
+    @Test
+    void client_shouldRecordGuardedTopicsAsHandlersSubscribe() {
+        context.run(it -> {
+            ExternalTaskClient client = it.getBean(ExternalTaskClient.class);
+            GuardedTopicRegistry registry = it.getBean(GuardedTopicRegistry.class);
+
+            client.subscribe("guardedTopic").handler(new StubHandler(true));
+            client.subscribe("unguardedTopic").handler(new StubHandler(false));
+
+            assertThat(registry.isGuarded("guardedTopic")).isTrue();
+            assertThat(registry.isGuarded("unguardedTopic")).isFalse();
+            assertThat(registry.isGuarded("neverSubscribed")).isFalse();
+            assertThat(registry.getGuardedTopics()).containsExactly("guardedTopic");
+            assertThat(registry.registeredTopicCount()).isEqualTo(2);
+        });
+    }
+
     private static ErrorAwareBackoffStrategy errorAwareStrategy(BackoffStrategy strategy) {
         return (ErrorAwareBackoffStrategy) strategy;
     }
 
+    private static final class StubHandler extends BaseExternalTaskHandler {
+        private final boolean guarded;
+
+        private StubHandler(boolean guarded) {
+            super(mock(ExternalTaskCompletionService.class), new EventProperties());
+            this.guarded = guarded;
+        }
+
+        @Override
+        protected boolean isRetryGuarded() {
+            return guarded;
+        }
+
+        @Override
+        public ExternalTaskData handleTask(ExternalTask externalTask) {
+            return new ExternalTaskData();
+        }
+    }
+
     @Configuration
     static class TestConfig {
+        @Bean
+        public GuardedTopicRegistry guardedTopicRegistry() {
+            return new GuardedTopicRegistry();
+        }
+
         @Bean
         public EventProperties eventProperties() {
             EventProperties props = new EventProperties();

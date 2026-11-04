@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_hourlyIncidentRetry" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.11.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:process id="INCIDENT_RETRY_HOURLY_SCHEDULER" name="Incident retry scheduler (hourly, guarded topics)" isExecutable="true" camunda:historyTimeToLive="P90D">
+    <bpmn:startEvent id="Event_hourlyRetryStart">
+      <bpmn:outgoing>Flow_hourlyRetryToTask</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_hourlyRetry">
+        <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">0 0 6-21 * * ?</bpmn:timeCycle>
+      </bpmn:timerEventDefinition>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_hourlyRetryToTask" sourceRef="Event_hourlyRetryStart" targetRef="Activity_hourlyIncidentRetry" />
+    <bpmn:serviceTask id="Activity_hourlyIncidentRetry" name="Incident Retry Scheduler (guarded topics, last 70 minutes)" camunda:type="external" camunda:topic="INCIDENT_RETRY_EVENT">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="retryMode">GUARDED_ONLY</camunda:inputParameter>
+          <camunda:inputParameter name="incidentLookbackMinutes">70</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_hourlyRetryToTask</bpmn:incoming>
+      <bpmn:outgoing>Flow_hourlyRetryToEnd</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_hourlyRetryEnd">
+      <bpmn:incoming>Flow_hourlyRetryToEnd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_hourlyRetryToEnd" sourceRef="Activity_hourlyIncidentRetry" targetRef="Event_hourlyRetryEnd" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="INCIDENT_RETRY_HOURLY_SCHEDULER">
+      <bpmndi:BPMNEdge id="Flow_hourlyRetryToEnd_di" bpmnElement="Flow_hourlyRetryToEnd">
+        <di:waypoint x="340" y="160" />
+        <di:waypoint x="392" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_hourlyRetryToTask_di" bpmnElement="Flow_hourlyRetryToTask">
+        <di:waypoint x="188" y="160" />
+        <di:waypoint x="240" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_hourlyRetryStart_di" bpmnElement="Event_hourlyRetryStart">
+        <dc:Bounds x="152" y="142" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_hourlyRetryEnd_di" bpmnElement="Event_hourlyRetryEnd">
+        <dc:Bounds x="392" y="142" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_hourlyIncidentRetry_di" bpmnElement="Activity_hourlyIncidentRetry">
+        <dc:Bounds x="240" y="120" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

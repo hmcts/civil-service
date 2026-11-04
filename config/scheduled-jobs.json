@@ -114,6 +114,9 @@
   "Incident retry scheduler": {
     "purpose": "Retries failed external incident tasks each night."
   },
+  "Incident retry scheduler (hourly, guarded topics)": {
+    "purpose": "Retries incidents on retry guarded topics raised in the last 70 minutes, hourly 06:00–21:00."
+  },
   "Judgement buffer scheduler": {
     "purpose": "Processes default judgement requests once the judgement buffer period has expired.",
     "springScheduler": "JudgementBuffer",
