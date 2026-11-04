@@ -20,7 +20,9 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @ExtendWith(MockitoExtension.class)
 class NoCHearingFeeUnpaidAppSolEmailDTOGeneratorTest {
@@ -65,6 +67,17 @@ class NoCHearingFeeUnpaidAppSolEmailDTOGeneratorTest {
         boolean shouldNotify = generator.getShouldNotify(caseData);
 
         assertThat(shouldNotify).isTrue();
+    }
+
+    @Test
+    void shouldNotNotify_WhenApplicantIsLipAndStatementOfTruthIsMissing() {
+        caseData = caseData.toBuilder()
+            .applicant1Represented(NO)
+            .applicantSolicitor1ClaimStatementOfTruth(null)
+            .build();
+
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
+        verifyNoInteractions(noCHelper);
     }
 
     @Test
