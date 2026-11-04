@@ -38,6 +38,10 @@ public abstract class MigrationTask<T extends CaseReference> {
         return migrateCaseData(caseData, caseReference);
     }
 
+    protected void migrateUserDrafts(
+        T reference
+    ) {}
+
     protected Map<String, Object> migrateCmcCaseData(
         CaseDetails caseDetails,
         T caseReference

@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReferenceCsvLoader;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.ExcelCaseReference;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.DraftClaimReference;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -103,6 +104,36 @@ class AsyncCaseMigrationServiceTest {
         assertEquals("summary", contentCaptor.getAllValues().get(0).getEvent().getSummary());
         assertEquals("description", contentCaptor.getAllValues().get(0).getEvent().getDescription());
         assertEquals(migratedData, contentCaptor.getAllValues().get(0).getData());
+    }
+
+    @Test
+    void shouldMigrateUserDraftsForEachDraftReference() {
+        @SuppressWarnings("unchecked")
+        MigrationTask<DraftClaimReference> migrationTask = mock(MigrationTask.class);
+        DraftClaimReference first = draftReference("draft-1", "user-1");
+        DraftClaimReference second = draftReference("draft-2", "user-2");
+
+        asyncCaseMigrationService.migrateUserDrafts(migrationTask, List.of(first, second));
+
+        verify(migrationTask).migrateUserDrafts(first);
+        verify(migrationTask).migrateUserDrafts(second);
+    }
+
+    @Test
+    void shouldReadDraftClaimReferenceFromExcelRow() {
+        DraftClaimReference reference = new DraftClaimReference();
+
+        reference.fromExcelRow(Map.of("caseReference", "draft-1", "userId", "user-1"));
+
+        assertEquals("draft-1", reference.getCaseReference());
+        assertEquals("user-1", reference.getUserId());
+    }
+
+    private DraftClaimReference draftReference(String caseReference, String userId) {
+        DraftClaimReference reference = new DraftClaimReference();
+        reference.setCaseReference(caseReference);
+        reference.setUserId(userId);
+        return reference;
     }
 
     @Test
