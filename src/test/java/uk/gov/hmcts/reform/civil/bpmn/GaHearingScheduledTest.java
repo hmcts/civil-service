@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.bpmn;
 
+import uk.gov.hmcts.reform.civil.notification.handlers.ga.gahearingscheduled.GaHearingScheduledNotifier;
+
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -22,10 +24,10 @@ class GaHearingScheduledTest extends BpmnBaseHearingScheduledGATest {
     private static final String ADD_PDF_EVENT = "ADD_PDF_TO_MAIN_CASE";
     private static final String ADD_PDF_ID = "LinkDocumentToParentCase";
 
-    private static final String NOTIFY_HEARING_NOTICE_CLAIMANT_EVENT = "NOTIFY_HEARING_NOTICE_CLAIMANT";
-    private static final String NOTIFY_HEARING_NOTICE_CLAIMANT_ACTIVITY_ID = "NotifyHearingNoticeClaimant";
-    private static final String NOTIFY_HEARING_NOTICE_DEFENDANT_EVENT = "NOTIFY_HEARING_NOTICE_DEFENDANT";
-    private static final String NOTIFY_HEARING_NOTICE_DEFENDANT_ACTIVITY_ID = "NotifyHearingNoticeDefendant";
+    private static final String NOTIFY_EVENT = "NOTIFY_EVENT";
+    // taken from the notifier rather than repeated, so a rename cannot leave the BPMN and
+    // GaNotifierFactory disagreeing while both tests still pass
+    private static final String NOTIFY_PARTIES_ACTIVITY_ID = GaHearingScheduledNotifier.TASK_ID;
 
     private static final String LIP_APPLICANT = "LIP_APPLICANT";
     private static final String LIP_RESPONDENT = "LIP_RESPONDENT";
@@ -142,23 +144,13 @@ class GaHearingScheduledTest extends BpmnBaseHearingScheduledGATest {
             variables
         );
 
-        //Notify Hearing Notice Claimant
-        ExternalTask notifyHearingNoticeClaimant = assertNextExternalTask(PROCESS_EXTERNAL_CASE_EVENT);
+        //Notify Hearing Notice parties, one task for applicant and respondents
+        ExternalTask notifyHearingNoticeParties = assertNextExternalTask(PROCESS_EXTERNAL_CASE_EVENT);
         assertCompleteExternalTask(
-            notifyHearingNoticeClaimant,
+            notifyHearingNoticeParties,
             PROCESS_EXTERNAL_CASE_EVENT,
-            NOTIFY_HEARING_NOTICE_CLAIMANT_EVENT,
-            NOTIFY_HEARING_NOTICE_CLAIMANT_ACTIVITY_ID,
-            variables
-        );
-
-        //Notify Hearing Notice Defendant(s)
-        ExternalTask notifyHearingNoticeDefendant = assertNextExternalTask(PROCESS_EXTERNAL_CASE_EVENT);
-        assertCompleteExternalTask(
-            notifyHearingNoticeDefendant,
-            PROCESS_EXTERNAL_CASE_EVENT,
-            NOTIFY_HEARING_NOTICE_DEFENDANT_EVENT,
-            NOTIFY_HEARING_NOTICE_DEFENDANT_ACTIVITY_ID,
+            NOTIFY_EVENT,
+            NOTIFY_PARTIES_ACTIVITY_ID,
             variables
         );
 
@@ -222,23 +214,13 @@ class GaHearingScheduledTest extends BpmnBaseHearingScheduledGATest {
             variables
         );
 
-        //Notify Hearing Notice Claimant
-        ExternalTask notifyHearingNoticeClaimant = assertNextExternalTask(PROCESS_EXTERNAL_CASE_EVENT);
+        //Notify Hearing Notice parties, one task for applicant and respondents
+        ExternalTask notifyHearingNoticeParties = assertNextExternalTask(PROCESS_EXTERNAL_CASE_EVENT);
         assertCompleteExternalTask(
-            notifyHearingNoticeClaimant,
+            notifyHearingNoticeParties,
             PROCESS_EXTERNAL_CASE_EVENT,
-            NOTIFY_HEARING_NOTICE_CLAIMANT_EVENT,
-            NOTIFY_HEARING_NOTICE_CLAIMANT_ACTIVITY_ID,
-            variables
-        );
-
-        //Notify Hearing Notice Defendant(s)
-        ExternalTask notifyHearingNoticeDefendant = assertNextExternalTask(PROCESS_EXTERNAL_CASE_EVENT);
-        assertCompleteExternalTask(
-            notifyHearingNoticeDefendant,
-            PROCESS_EXTERNAL_CASE_EVENT,
-            NOTIFY_HEARING_NOTICE_DEFENDANT_EVENT,
-            NOTIFY_HEARING_NOTICE_DEFENDANT_ACTIVITY_ID,
+            NOTIFY_EVENT,
+            NOTIFY_PARTIES_ACTIVITY_ID,
             variables
         );
 
@@ -302,23 +284,13 @@ class GaHearingScheduledTest extends BpmnBaseHearingScheduledGATest {
             variables
         );
 
-        //Notify Hearing Notice Claimant
-        ExternalTask notifyHearingNoticeClaimant = assertNextExternalTask(PROCESS_EXTERNAL_CASE_EVENT);
+        //Notify Hearing Notice parties, one task for applicant and respondents
+        ExternalTask notifyHearingNoticeParties = assertNextExternalTask(PROCESS_EXTERNAL_CASE_EVENT);
         assertCompleteExternalTask(
-            notifyHearingNoticeClaimant,
+            notifyHearingNoticeParties,
             PROCESS_EXTERNAL_CASE_EVENT,
-            NOTIFY_HEARING_NOTICE_CLAIMANT_EVENT,
-            NOTIFY_HEARING_NOTICE_CLAIMANT_ACTIVITY_ID,
-            variables
-        );
-
-        //Notify Hearing Notice Defendant(s)
-        ExternalTask notifyHearingNoticeDefendant = assertNextExternalTask(PROCESS_EXTERNAL_CASE_EVENT);
-        assertCompleteExternalTask(
-            notifyHearingNoticeDefendant,
-            PROCESS_EXTERNAL_CASE_EVENT,
-            NOTIFY_HEARING_NOTICE_DEFENDANT_EVENT,
-            NOTIFY_HEARING_NOTICE_DEFENDANT_ACTIVITY_ID,
+            NOTIFY_EVENT,
+            NOTIFY_PARTIES_ACTIVITY_ID,
             variables
         );
 

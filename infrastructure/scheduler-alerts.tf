@@ -7,7 +7,7 @@ data "azurerm_key_vault_secret" "civil-service-alert-slack-email" {
 
 resource "azurerm_monitor_action_group" "civil-service-action-group" {
   for_each            = var.monitor_action_group
-  name                = "${each.key}-${var.env}"
+  name                = each.key
   resource_group_name = local.civil_service_rg_name
   short_name          = try(each.value.short_name, null)
   tags                = var.common_tags
