@@ -101,6 +101,7 @@
       <bpmn:outgoing>Flow_0ixqpxj</bpmn:outgoing>
       <bpmn:outgoing>Flow_0q2fvfo</bpmn:outgoing>
     </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_01jdire" sourceRef="GenerateDashboardNotificationsGaMakeDecision" targetRef="Gateway_1lb6xgk" />
     <bpmn:serviceTask id="GenerateDashboardNotificationsGaMakeDecision" name="Generate Dashboard Notifications" camunda:type="external" camunda:topic="gaDashboardNotifications">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -110,7 +111,6 @@
       <bpmn:incoming>Flow_1jro4pc</bpmn:incoming>
       <bpmn:outgoing>Flow_01jdire</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_01jdire" sourceRef="GenerateDashboardNotificationsGaMakeDecision" targetRef="Gateway_1lb6xgk" />
   </bpmn:process>
   <bpmn:message id="Message_1opqhjn" name="MAKE_DECISION" />
   <bpmn:message id="Message_1lvd10f" name="HEARING_SCHEDULED_GA" />
@@ -165,7 +165,7 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1yst6oc" bpmnElement="GenerateDashboardNotificationsGaMakeDecision">
-        <dc:Bounds x="850" y="238" width="100" height="80" />
+        <dc:Bounds x="770" y="238" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0qc2eoy_di" bpmnElement="Event_0qc2eoy">
@@ -188,7 +188,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1jro4pc_di" bpmnElement="Flow_1jro4pc">
         <di:waypoint x="690" y="278" />
-        <di:waypoint x="850" y="278" />
+        <di:waypoint x="770" y="278" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0ixqpxj_di" bpmnElement="Flow_0ixqpxj">
         <di:waypoint x="1025" y="278" />
@@ -238,7 +238,7 @@
         <di:waypoint x="1424" y="318" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_01jdire_di" bpmnElement="Flow_01jdire">
-        <di:waypoint x="950" y="278" />
+        <di:waypoint x="870" y="278" />
         <di:waypoint x="975" y="278" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
