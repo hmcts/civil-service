@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.services.DraftStoreService;
@@ -44,6 +45,7 @@ public class CaseEventService {
     private final CaseDetailsConverter caseDetailsConverter;
     private final DraftStoreService draftStoreService;
     private final CoreCaseDataService coreCaseDataService;
+    private final FeatureToggleService featureToggleService;
     @Value("${case-flags.logging.enabled:false}")
     private boolean caseFlagsLoggingEnabled;
     @Value("${draft-store.submission-claim-stale-after-minutes:5}")
@@ -115,8 +117,8 @@ public class CaseEventService {
     }
 
     public CaseDetails submitEventForNewClaim(EventSubmissionParams params) {
-        if (!params.hasSubmissionId()) {
-            return createNewClaim(params, null);
+        if (!params.hasSubmissionId() || !featureToggleService.isDraftClaimDatabaseEnabled()) {
+            return createNewClaim(params);
         }
 
         Optional<DraftStoreEntity> bySubmission = draftStoreService.getDraftBySubmissionId(
