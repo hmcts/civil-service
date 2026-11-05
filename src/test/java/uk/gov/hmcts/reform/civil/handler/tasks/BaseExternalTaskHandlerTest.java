@@ -20,10 +20,15 @@ import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.TelemetryService;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
@@ -43,6 +48,8 @@ class BaseExternalTaskHandlerTest {
     private static final int RETRY_COUNT = 3;
     private static final int BACKOFF_DELAY = 500;
     private static final int DISPATCH_DELAY = 200;
+    private static final String CCD_EVENT_SUBMIT_URL =
+        "http://ccd/caseworkers/1/jurisdictions/CIVIL/case-types/CIVIL/cases/1234/events";
 
     @Mock
     private ExternalTaskCompletionService externalTaskCompletionService;
@@ -52,6 +59,9 @@ class BaseExternalTaskHandlerTest {
 
     @Mock
     private ExternalTaskService externalTaskService;
+
+    @Mock
+    private TelemetryService telemetryService;
 
     private TestBaseExternalTaskHandler handler;
 
@@ -162,6 +172,157 @@ class BaseExternalTaskHandlerTest {
                 eq(228L)
             );
             verify(externalTaskCompletionService, never()).completeTask(any(), any(), any(), any());
+        }
+
+        @Test
+        void shouldCallHandleTaskFailureNotRetryable_whenUnguardedHandlerThrowsBadGatewayOnPost() {
+            handler.throwRetryable(new FeignException.BadGateway(
+                "Bad Gateway on POST",
+                Request.create(Request.HttpMethod.POST, CCD_EVENT_SUBMIT_URL, Map.of(), null, null, null),
+                null,
+                null
+            ));
+
+            handler.execute(externalTask, externalTaskService);
+
+            verify(externalTaskService).handleFailure(
+                eq(externalTask),
+                contains("Bad Gateway"),
+                anyString(),
+                eq(0),
+                eq(1000L)
+            );
+            verify(externalTaskCompletionService, never()).completeTask(any(), any(), any(), any());
+            verify(telemetryService, never()).trackEvent(anyString(), anyMap());
+        }
+
+        @Test
+        void shouldCallHandleTaskFailure_whenGuardedHandlerThrowsBadGatewayOnPost() {
+            handler.setRetryGuarded(true);
+            when(externalTask.getRetries()).thenReturn(null);
+            handler.throwRetryable(new FeignException.BadGateway(
+                "Bad Gateway on POST",
+                Request.create(Request.HttpMethod.POST, CCD_EVENT_SUBMIT_URL, Map.of(), null, null, null),
+                null,
+                null
+            ));
+
+            handler.execute(externalTask, externalTaskService);
+
+            ArgumentCaptor<Long> backoff = ArgumentCaptor.forClass(Long.class);
+            verify(externalTaskService).handleFailure(
+                eq(externalTask),
+                contains("Bad Gateway"),
+                anyString(),
+                eq(RETRY_COUNT - 1),
+                backoff.capture()
+            );
+            assertThat(backoff.getValue()).isPositive();
+            verify(externalTaskCompletionService, never()).completeTask(any(), any(), any(), any());
+        }
+
+        @Test
+        void shouldNotRetry_whenGuardedHandlerThrowsBadGatewayOnPostThatIsNotAnEventSubmit() {
+            handler.setRetryGuarded(true);
+            handler.throwRetryable(new FeignException.BadGateway(
+                "Bad Gateway on POST",
+                Request.create(Request.HttpMethod.POST, "http://documents/cases/documents", Map.of(), null, null, null),
+                null,
+                null
+            ));
+
+            handler.execute(externalTask, externalTaskService);
+
+            verify(externalTaskService).handleFailure(
+                eq(externalTask),
+                contains("Bad Gateway"),
+                anyString(),
+                eq(0),
+                eq(1000L)
+            );
+            verify(telemetryService, never()).trackEvent(anyString(), anyMap());
+        }
+
+        @Test
+        void shouldTrackTelemetry_whenGuardedHandlerRetriesEventSubmitAfterBadGateway() {
+            handler.setRetryGuarded(true);
+            handler.setTelemetryService(telemetryService);
+            when(externalTask.getRetries()).thenReturn(null);
+            when(externalTask.getTopicName()).thenReturn("START_BUSINESS_PROCESS");
+            when(externalTask.getProcessInstanceId()).thenReturn("proc-1");
+            handler.throwRetryable(new FeignException.BadGateway(
+                "Bad Gateway on POST",
+                Request.create(Request.HttpMethod.POST, CCD_EVENT_SUBMIT_URL, Map.of(), null, null, null),
+                null,
+                null
+            ));
+
+            handler.execute(externalTask, externalTaskService);
+
+            @SuppressWarnings("unchecked")
+            ArgumentCaptor<Map<String, String>> properties = ArgumentCaptor.forClass(Map.class);
+            verify(telemetryService).trackEvent(eq(BaseExternalTaskHandler.GUARDED_RETRY_EVENT), properties.capture());
+            assertThat(properties.getValue())
+                .containsEntry("topic", "START_BUSINESS_PROCESS")
+                .containsEntry("processInstanceId", "proc-1")
+                .containsEntry("status", "502")
+                .containsEntry("httpMethod", "POST")
+                .containsEntry("retriesRemaining", String.valueOf(RETRY_COUNT - 1));
+            verify(externalTaskService).handleFailure(eq(externalTask), anyString(), anyString(), eq(RETRY_COUNT - 1), anyLong());
+        }
+
+        @Test
+        void shouldTrackRetriesLeftAfterThisFailure_whenTaskHasFailedBefore() {
+            handler.setRetryGuarded(true);
+            handler.setTelemetryService(telemetryService);
+            when(externalTask.getRetries()).thenReturn(2);
+            handler.throwRetryable(new FeignException.BadGateway(
+                "Bad Gateway on POST",
+                Request.create(Request.HttpMethod.POST, CCD_EVENT_SUBMIT_URL, Map.of(), null, null, null),
+                null,
+                null
+            ));
+
+            handler.execute(externalTask, externalTaskService);
+
+            @SuppressWarnings("unchecked")
+            ArgumentCaptor<Map<String, String>> properties = ArgumentCaptor.forClass(Map.class);
+            verify(telemetryService).trackEvent(eq(BaseExternalTaskHandler.GUARDED_RETRY_EVENT), properties.capture());
+            assertThat(properties.getValue()).containsEntry("retriesRemaining", "1");
+            verify(externalTaskService).handleFailure(eq(externalTask), anyString(), anyString(), eq(1), anyLong());
+        }
+
+        @Test
+        void shouldNotTrackTelemetry_whenUnguardedHandlerHasTelemetryAndFails() {
+            handler.setTelemetryService(telemetryService);
+            handler.throwRetryable(new FeignException.BadGateway(
+                "Bad Gateway on POST",
+                Request.create(Request.HttpMethod.POST, CCD_EVENT_SUBMIT_URL, Map.of(), null, null, null),
+                null,
+                null
+            ));
+
+            handler.execute(externalTask, externalTaskService);
+
+            verify(telemetryService, never()).trackEvent(anyString(), anyMap());
+        }
+
+        @Test
+        void shouldStillRetry_whenGuardedRetryTelemetryFails() {
+            handler.setRetryGuarded(true);
+            handler.setTelemetryService(telemetryService);
+            when(externalTask.getRetries()).thenReturn(null);
+            doThrow(new IllegalStateException("telemetry down")).when(telemetryService).trackEvent(anyString(), anyMap());
+            handler.throwRetryable(new FeignException.BadGateway(
+                "Bad Gateway on POST",
+                Request.create(Request.HttpMethod.POST, CCD_EVENT_SUBMIT_URL, Map.of(), null, null, null),
+                null,
+                null
+            ));
+
+            handler.execute(externalTask, externalTaskService);
+
+            verify(externalTaskService).handleFailure(eq(externalTask), anyString(), anyString(), eq(RETRY_COUNT - 1), anyLong());
         }
     }
 
@@ -319,6 +480,18 @@ class BaseExternalTaskHandlerTest {
                 eq(1000L)
             );
         }
+
+        @Test
+        void shouldDefaultRetryGuardedToFalse() {
+            BaseExternalTaskHandler defaultHandler = new BaseExternalTaskHandler(externalTaskCompletionService, new EventProperties()) {
+                @Override
+                protected ExternalTaskData handleTask(ExternalTask externalTask) {
+                    return null;
+                }
+            };
+
+            assertThat(defaultHandler.isRetryGuarded()).isFalse();
+        }
     }
 
     private static final class TestBaseExternalTaskHandler extends BaseExternalTaskHandler {
@@ -326,12 +499,22 @@ class BaseExternalTaskHandlerTest {
         private RuntimeException retryableException;
         private NotRetryableException notRetryableException;
         private BpmnError bpmnError;
+        private boolean retryGuarded;
 
         private TestBaseExternalTaskHandler(
             ExternalTaskCompletionService externalTaskCompletionService,
             EventProperties eventProperties
         ) {
             super(externalTaskCompletionService, eventProperties);
+        }
+
+        private void setRetryGuarded(boolean retryGuarded) {
+            this.retryGuarded = retryGuarded;
+        }
+
+        @Override
+        protected boolean isRetryGuarded() {
+            return retryGuarded;
         }
 
         private void returnExternalTaskData(ExternalTaskData externalTaskData) {
