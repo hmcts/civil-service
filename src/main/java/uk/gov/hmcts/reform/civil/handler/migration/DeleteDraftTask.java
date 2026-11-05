@@ -23,7 +23,7 @@ public class DeleteDraftTask extends MigrationTaskWithMetadata<DraftClaimReferen
     @Override
     protected void migrateUserDrafts(DraftClaimReference reference) {
         draftStoreService.deleteDraft(
-            java.util.UUID.fromString(reference.getCaseReference()),
+            reference.getDraftUuid(),
             reference.getUserId(),
             DraftType.DRAFT_CLAIM
         );

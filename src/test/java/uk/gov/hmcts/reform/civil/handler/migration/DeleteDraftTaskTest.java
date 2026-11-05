@@ -31,7 +31,7 @@ class DeleteDraftTaskTest {
     void shouldDeleteDraftUsingReferenceDetails() {
         UUID draftId = UUID.randomUUID();
         DraftClaimReference reference = new DraftClaimReference();
-        reference.setCaseReference(draftId.toString());
+        reference.setDraftId(draftId.toString());
         reference.setUserId("user-1");
 
         task.migrateUserDrafts(reference);
