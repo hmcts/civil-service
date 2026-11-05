@@ -68,6 +68,10 @@ class IncidentRetryEventHandlerTest {
 
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
+
+    @Mock
+    private GuardedTopicRegistry guardedTopicRegistry;
+
     @Spy
     private EventProperties eventProperties = configuredEventProperties();
 
@@ -509,6 +513,259 @@ class IncidentRetryEventHandlerTest {
                 && "activity-search-2".equals(properties.get("failedActivityId"))
                 && "stuck_case_open_incident".equals(properties.get("retryStatus")))
         );
+    }
+
+    @Test
+    void guardedOnlyMode_shouldRetryGuardedIncidentOnceAndMarkIt() {
+        CamundaIncident incident = newIncident("proc1", "inc1", "task1");
+        givenGuardedOnlyRun(incident, "processCaseEvent", true);
+        when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any()))
+            .thenReturn(processVariables("case-proc1", "CASE_PROGRESSION", "CASE_EVENT"));
+
+        handler.handleTask(externalTask);
+
+        verify(camundaRuntimeApi).setProcessVariable(
+            eq("serviceAuth"),
+            eq("proc1"),
+            eq(IncidentRetryEventHandler.RETRIED_MARKER_VARIABLE),
+            argThat(value -> "String".equals(value.getType()) && "activity1".equals(value.getValue()))
+        );
+        verify(camundaRuntimeApi).modifyProcessInstance(eq("serviceAuth"), eq("proc1"), anyMap());
+        // only the daily run clears the marker, so a repeat failure at the same activity is left to it
+        verify(camundaRuntimeApi, never()).deleteProcessVariable(any(), any(), any());
+        verify(camundaRuntimeApi, never()).queryProcessInstances(
+            any(), anyInt(), anyInt(), anyString(), anyString(), anyMap());
+    }
+
+    @Test
+    void guardedOnlyMode_shouldCapLookbackWindowAt24Hours() {
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(externalTask.getAllVariables()).thenReturn(Map.of(
+            "retryMode", "GUARDED_ONLY", "incidentLookbackMinutes", "100000"));
+        when(camundaRuntimeApi.getOpenIncidentsRaisedBetween(
+            any(), anyBoolean(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
+            anyInt(), anyInt())).thenReturn(List.of());
+
+        handler.handleTask(externalTask);
+
+        assertThat(capturedLookbackMinutes()).isEqualTo(24L * 60L);
+    }
+
+    @Test
+    void guardedOnlyMode_shouldUseDefaultLookbackWhenConfiguredValueIsInvalid() {
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(externalTask.getAllVariables()).thenReturn(Map.of(
+            "retryMode", "GUARDED_ONLY", "incidentLookbackMinutes", "not-a-number"));
+        when(camundaRuntimeApi.getOpenIncidentsRaisedBetween(
+            any(), anyBoolean(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
+            anyInt(), anyInt())).thenReturn(List.of());
+
+        handler.handleTask(externalTask);
+
+        assertThat(capturedLookbackMinutes()).isEqualTo(70L);
+    }
+
+    @Test
+    void guardedOnlyMode_shouldRetryIncidentAtDifferentActivityAndOverwriteMarker() {
+        CamundaIncident incident = newIncident("proc1", "inc2", "task2");
+        givenGuardedOnlyRun(incident, "processCaseEvent", true);
+        HashMap<String, CamundaVariableValue> vars =
+            processVariables("case-proc1", "CASE_PROGRESSION", "CASE_EVENT");
+        vars.put(IncidentRetryEventHandler.RETRIED_MARKER_VARIABLE, variable("earlierActivity"));
+        when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any())).thenReturn(vars);
+
+        handler.handleTask(externalTask);
+
+        verify(camundaRuntimeApi).setProcessVariable(
+            eq("serviceAuth"),
+            eq("proc1"),
+            eq(IncidentRetryEventHandler.RETRIED_MARKER_VARIABLE),
+            argThat(value -> "activity1".equals(value.getValue()))
+        );
+        verify(camundaRuntimeApi).modifyProcessInstance(eq("serviceAuth"), eq("proc1"), anyMap());
+        verify(camundaRuntimeApi, never()).deleteProcessVariable(any(), any(), any());
+    }
+
+    @Test
+    void guardedOnlyMode_shouldSkipIncidentWithoutActivityId() {
+        CamundaIncident incident = newIncident("proc1", "inc1", "task1");
+        incident.setActivityId(null);
+        givenGuardedOnlyRun(incident, "processCaseEvent", true);
+
+        handler.handleTask(externalTask);
+
+        verify(camundaRuntimeApi, never()).setProcessVariable(any(), any(), any(), any());
+        verify(camundaRuntimeApi, never()).modifyProcessInstance(any(), any(), anyMap());
+    }
+
+    @Test
+    void guardedOnlyMode_failedRetryShouldKeepMarkerAndSendNoStuckCaseEvent() {
+        CamundaIncident incident = newIncident("proc1", "inc1", "task1");
+        givenGuardedOnlyRun(incident, "processCaseEvent", true);
+        when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any()))
+            .thenReturn(processVariables("case-proc1", "CASE_PROGRESSION", "CASE_EVENT"));
+        doThrow(new RuntimeException("Failed to modify process instance"))
+            .when(camundaRuntimeApi).modifyProcessInstance(any(), any(), anyMap());
+
+        handler.handleTask(externalTask);
+
+        verify(camundaRuntimeApi).modifyProcessInstance(eq("serviceAuth"), eq("proc1"), anyMap());
+        verify(camundaRuntimeApi, never()).deleteProcessVariable(any(), any(), any());
+        verifyNoInteractions(caseTaskTrackingService);
+    }
+
+    @Test
+    void guardedOnlyMode_incidentStillOpenAfterRetryShouldKeepMarkerAndSendNoStuckCaseEvent() {
+        CamundaIncident incident = newIncident("proc1", "inc1", "task1");
+        givenGuardedOnlyRun(incident, "processCaseEvent", true);
+        when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any()))
+            .thenReturn(processVariables("case-proc1", "CASE_PROGRESSION", "CASE_EVENT"));
+        when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
+            any(), anyBoolean(), eq("proc1"), any(), any(), anyInt())).thenReturn(List.of(incident));
+
+        handler.handleTask(externalTask);
+
+        verify(camundaRuntimeApi).modifyProcessInstance(eq("serviceAuth"), eq("proc1"), anyMap());
+        verify(camundaRuntimeApi, never()).deleteProcessVariable(any(), any(), any());
+        verifyNoInteractions(caseTaskTrackingService);
+    }
+
+    @Test
+    void guardedOnlyMode_shouldNotSendDigestOrSearchCcd() {
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(externalTask.getAllVariables()).thenReturn(Map.of("retryMode", "GUARDED_ONLY"));
+        when(camundaRuntimeApi.getOpenIncidentsRaisedBetween(
+            any(), anyBoolean(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
+            anyInt(), anyInt())).thenReturn(List.of());
+
+        ExternalTaskData result = handler.handleTask(externalTask);
+
+        assertThat(result).isNotNull();
+        verifyNoInteractions(casesStuckCheckSearchService);
+        verifyNoInteractions(caseTaskTrackingService);
+    }
+
+    @Test
+    void guardedOnlyMode_shouldUseConfiguredLookbackWindow() {
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(externalTask.getAllVariables()).thenReturn(Map.of(
+            "retryMode", "GUARDED_ONLY", "incidentLookbackMinutes", "130"));
+        when(camundaRuntimeApi.getOpenIncidentsRaisedBetween(
+            any(), anyBoolean(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
+            anyInt(), anyInt())).thenReturn(List.of());
+
+        handler.handleTask(externalTask);
+
+        assertThat(capturedLookbackMinutes()).isEqualTo(130L);
+    }
+
+    private long capturedLookbackMinutes() {
+        org.mockito.ArgumentCaptor<String> after = org.mockito.ArgumentCaptor.forClass(String.class);
+        org.mockito.ArgumentCaptor<String> before = org.mockito.ArgumentCaptor.forClass(String.class);
+        verify(camundaRuntimeApi).getOpenIncidentsRaisedBetween(
+            eq("serviceAuth"), eq(true), eq("failedExternalTask"), after.capture(), before.capture(),
+            eq("civil"), eq("incidentTimestamp"), eq("desc"), eq(0), eq(50));
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter
+            .ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        return java.time.Duration.between(
+            java.time.OffsetDateTime.parse(after.getValue(), formatter),
+            java.time.OffsetDateTime.parse(before.getValue(), formatter)).toMinutes();
+    }
+
+    @Test
+    void guardedOnlyMode_shouldSkipIncidentWhoseTopicIsNotGuarded() {
+        CamundaIncident incident = newIncident("proc1", "inc1", "task1");
+        givenGuardedOnlyRun(incident, "generateLetter", false);
+
+        handler.handleTask(externalTask);
+
+        verify(camundaRuntimeApi, never()).setProcessVariable(any(), any(), any(), any());
+        verify(camundaRuntimeApi, never()).modifyProcessInstance(any(), any(), anyMap());
+    }
+
+    @Test
+    void guardedOnlyMode_shouldSkipIncidentAtActivityAlreadyRetried() {
+        CamundaIncident incident = newIncident("proc1", "inc1", "task1");
+        givenGuardedOnlyRun(incident, "processCaseEvent", true);
+        HashMap<String, CamundaVariableValue> vars =
+            processVariables("case-proc1", "CASE_PROGRESSION", "CASE_EVENT");
+        vars.put(IncidentRetryEventHandler.RETRIED_MARKER_VARIABLE, variable("activity1"));
+        when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any())).thenReturn(vars);
+
+        handler.handleTask(externalTask);
+
+        verify(camundaRuntimeApi, never()).setProcessVariable(any(), any(), any(), any());
+        verify(camundaRuntimeApi, never()).modifyProcessInstance(any(), any(), anyMap());
+    }
+
+    @Test
+    void guardedOnlyMode_shouldNotRetryWhenMarkerCannotBeSet() {
+        CamundaIncident incident = newIncident("proc1", "inc1", "task1");
+        givenGuardedOnlyRun(incident, "processCaseEvent", true);
+        when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any()))
+            .thenReturn(processVariables("case-proc1", "CASE_PROGRESSION", "CASE_EVENT"));
+        doThrow(new RuntimeException("camunda down")).when(camundaRuntimeApi)
+            .setProcessVariable(any(), any(), any(), any());
+
+        handler.handleTask(externalTask);
+
+        verify(camundaRuntimeApi, never()).modifyProcessInstance(any(), any(), anyMap());
+    }
+
+    @Test
+    void guardedOnlyMode_shouldRetryOnlyLatestIncidentPerProcessInstance() {
+        CamundaIncident latest = newIncident("proc1", "inc-new", "task-new");
+        CamundaIncident older = newIncident("proc1", "inc-old", "task-old");
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(externalTask.getAllVariables()).thenReturn(Map.of("retryMode", "GUARDED_ONLY"));
+        when(camundaRuntimeApi.getOpenIncidentsRaisedBetween(
+            any(), anyBoolean(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
+            anyInt(), anyInt())).thenReturn(List.of(latest, older));
+        when(camundaRuntimeApi.getExternalTask("serviceAuth", "task-new"))
+            .thenReturn(Map.of("topicName", "processCaseEvent"));
+        when(guardedTopicRegistry.isGuarded("processCaseEvent")).thenReturn(true);
+        when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any()))
+            .thenReturn(processVariables("case-proc1", "CASE_PROGRESSION", "CASE_EVENT"));
+
+        handler.handleTask(externalTask);
+
+        verify(camundaRuntimeApi, never()).getExternalTask(any(), eq("task-old"));
+        verify(camundaRuntimeApi).modifyProcessInstance(eq("serviceAuth"), eq("proc1"), anyMap());
+    }
+
+    @Test
+    void dailyMode_shouldClearRetriedMarkerWhenRetryingIncident() {
+        CamundaProcessInstance pi = newProcessInstance("proc1");
+        HashMap<String, CamundaVariableValue> vars =
+            processVariables("case-proc1", "CASE_PROGRESSION", "CASE_EVENT");
+        vars.put(IncidentRetryEventHandler.RETRIED_MARKER_VARIABLE, variable("activity1"));
+
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(camundaRuntimeApi.queryProcessInstances(
+            any(), anyInt(), anyInt(), anyString(), anyString(), anyMap())).thenReturn(List.of(pi));
+        when(casesStuckCheckSearchService.getCases("7")).thenReturn(Collections.emptySet());
+        CamundaIncident incident = newIncident(pi.getId(), "inc1", "job1");
+        doReturn(List.of(incident), List.of()).when(camundaRuntimeApi).getLatestOpenIncidentForProcessInstance(
+            any(), anyBoolean(), eq("proc1"), anyString(), anyString(), anyInt());
+        when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any())).thenReturn(vars);
+
+        handler.handleTask(externalTask);
+
+        verify(camundaRuntimeApi).deleteProcessVariable(
+            "serviceAuth", "proc1", IncidentRetryEventHandler.RETRIED_MARKER_VARIABLE);
+        verify(camundaRuntimeApi).modifyProcessInstance(eq("serviceAuth"), eq("proc1"), anyMap());
+        verify(camundaRuntimeApi, never()).setProcessVariable(any(), any(), any(), any());
+    }
+
+    private void givenGuardedOnlyRun(CamundaIncident incident, String topic, boolean guarded) {
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(externalTask.getAllVariables()).thenReturn(Map.of("retryMode", "GUARDED_ONLY"));
+        when(camundaRuntimeApi.getOpenIncidentsRaisedBetween(
+            any(), anyBoolean(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(),
+            anyInt(), anyInt())).thenReturn(List.of(incident));
+        when(camundaRuntimeApi.getExternalTask("serviceAuth", incident.getConfiguration()))
+            .thenReturn(Map.of("topicName", topic));
+        when(guardedTopicRegistry.isGuarded(topic)).thenReturn(guarded);
     }
 
     // Helper methods
