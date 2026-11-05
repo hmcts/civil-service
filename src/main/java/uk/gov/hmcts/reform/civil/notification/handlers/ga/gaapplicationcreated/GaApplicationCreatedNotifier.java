@@ -12,8 +12,8 @@ public class GaApplicationCreatedNotifier extends Notifier<GeneralApplicationCas
     public static final String TASK_ID = "NotifyGaApplicationCreated";
 
     public GaApplicationCreatedNotifier(NotificationService notificationService,
-                                                CaseTaskTrackingService caseTaskTrackingService,
-                                                GaApplicationCreatedAllPartiesEmailGenerator partiesNotifier) {
+                                        CaseTaskTrackingService caseTaskTrackingService,
+                                        GaApplicationCreatedAllPartiesEmailGenerator partiesNotifier) {
         super(notificationService, caseTaskTrackingService, partiesNotifier);
     }
 

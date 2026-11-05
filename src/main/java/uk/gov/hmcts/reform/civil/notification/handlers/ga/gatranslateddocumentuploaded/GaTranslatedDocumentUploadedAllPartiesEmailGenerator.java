@@ -25,8 +25,6 @@ public class GaTranslatedDocumentUploadedAllPartiesEmailGenerator extends AllGaP
 
     @Override
     public Set<EmailDTO> getPartiesToNotify(GeneralApplicationCaseData caseData, String taskId) {
-        // Legacy translated-upload callbacks used refreshed addresses for sending but returned no case-data update.
-        // Work on a copy so the shared aggregator does not introduce solicitor-detail persistence on this journey.
         return super.getPartiesToNotify(caseData.copy().build(), taskId);
     }
 }

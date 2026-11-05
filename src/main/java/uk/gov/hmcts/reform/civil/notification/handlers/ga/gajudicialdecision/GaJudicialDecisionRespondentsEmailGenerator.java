@@ -7,9 +7,8 @@ import uk.gov.hmcts.reform.civil.notification.handlers.ga.GaNotificationContext;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
 
 import java.util.HashSet;
-import java.util.Set;
-
 import java.util.Map;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor

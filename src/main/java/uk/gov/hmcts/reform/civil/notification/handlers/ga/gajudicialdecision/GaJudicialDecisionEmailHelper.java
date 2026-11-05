@@ -69,7 +69,6 @@ public class GaJudicialDecisionEmailHelper {
     }
 
     public void prepareCase(GeneralApplicationCaseData data) {
-        // The old respondent callback returned this deadline to CCD, even when no respondent email was sent.
         if (notificationCriterion(data) == REQUEST_FOR_INFORMATION
             && data.getCcdState() == APPLICATION_ADD_PAYMENT
             && data.getJudicialDecisionRequestMoreInfo().getRequestMoreInfoOption() == SEND_APP_TO_OTHER_PARTY) {
@@ -133,7 +132,7 @@ public class GaJudicialDecisionEmailHelper {
         if (gaForLipService.isLipApp(data)) {
             properties.put(GA_LIP_APPLICANT_NAME, Objects.requireNonNull(data.getApplicantPartyName()));
         }
-        // This used to depend on the respondent task id, which the single NOTIFY_EVENT replaces.
+
         boolean respondentDecision = !applicant && ("MAKE_DECISION".equals(data.getBusinessProcess().getCamundaEvent())
             || "UPLOAD_TRANSLATED_DOCUMENT_JUDGE_DECISION".equals(data.getBusinessProcess().getCamundaEvent()));
         if (gaForLipService.isLipResp(data) && (data.getCcdState() == APPLICATION_ADD_PAYMENT || respondentDecision)) {
@@ -145,26 +144,24 @@ public class GaJudicialDecisionEmailHelper {
     }
 
     private void addDecisionProperties(Map<String, String> properties, GeneralApplicationCaseData data, boolean applicant) {
-        switch (notificationCriterion(data)) {
-            case CONCURRENT_WRITTEN_REP -> properties.put(GA_JUDICIAL_CONCURRENT_DATE_TEXT,
+        NotificationCriterion criterion = notificationCriterion(data);
+        if (criterion == NotificationCriterion.CONCURRENT_WRITTEN_REP) {
+            properties.put(GA_JUDICIAL_CONCURRENT_DATE_TEXT,
                 formatDate(data.getJudicialDecisionMakeAnOrderForWrittenRepresentations()
                     .getWrittenConcurrentRepresentationsBy()));
-            case SEQUENTIAL_WRITTEN_REP -> properties.put(GA_JUDICIAL_SEQUENTIAL_DATE_TEXT_RESPONDENT,
+        } else if (criterion == NotificationCriterion.SEQUENTIAL_WRITTEN_REP) {
+            properties.put(GA_JUDICIAL_SEQUENTIAL_DATE_TEXT_RESPONDENT,
                 formatDate(data.getJudicialDecisionMakeAnOrderForWrittenRepresentations()
                     .getSequentialApplicantMustRespondWithin()));
-            case REQUEST_FOR_INFORMATION -> {
-                if (!applicant && data.getCcdState() == APPLICATION_ADD_PAYMENT) {
-                    properties.put(GA_NOTIFICATION_DEADLINE, data.getGeneralAppNotificationDeadlineDate() == null ? null
-                        : DateFormatHelper.formatLocalDateTime(data.getGeneralAppNotificationDeadlineDate(), DATE));
-                } else if (!applicantOnly(data)) {
-                    properties.put(GA_REQUEST_FOR_INFORMATION_DEADLINE,
-                        data.getJudicialDecisionRequestMoreInfo().getJudgeRequestMoreInfoByDate() == null ? null
-                            : DateFormatHelper.formatLocalDate(
-                                data.getJudicialDecisionRequestMoreInfo().getJudgeRequestMoreInfoByDate(), DATE));
-                }
-            }
-            default -> {
-                // Other decisions use only the common properties and have no additional deadline fields.
+        } else if (criterion == REQUEST_FOR_INFORMATION) {
+            if (!applicant && data.getCcdState() == APPLICATION_ADD_PAYMENT) {
+                properties.put(GA_NOTIFICATION_DEADLINE, data.getGeneralAppNotificationDeadlineDate() == null ? null
+                    : DateFormatHelper.formatLocalDateTime(data.getGeneralAppNotificationDeadlineDate(), DATE));
+            } else if (!applicantOnly(data)) {
+                properties.put(GA_REQUEST_FOR_INFORMATION_DEADLINE,
+                    data.getJudicialDecisionRequestMoreInfo().getJudgeRequestMoreInfoByDate() == null ? null
+                        : DateFormatHelper.formatLocalDate(
+                            data.getJudicialDecisionRequestMoreInfo().getJudgeRequestMoreInfoByDate(), DATE));
             }
         }
     }

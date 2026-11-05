@@ -33,7 +33,7 @@ public class GaApplicationCreatedAllPartiesEmailGenerator extends AllGaPartiesEm
         if (!feesService.isFreeApplication(caseData) && caseData.getCcdState().equals(CaseState.PENDING_APPLICATION_ISSUED)) {
             return Set.of();
         }
-        // The legacy callback used refreshed addresses for sending without persisting them on the GA.
+
         return super.getPartiesToNotify(caseData.copy().build(), taskId);
     }
 }

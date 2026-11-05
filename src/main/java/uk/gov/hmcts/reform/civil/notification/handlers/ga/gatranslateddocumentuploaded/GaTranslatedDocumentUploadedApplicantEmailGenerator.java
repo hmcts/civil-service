@@ -74,7 +74,7 @@ public class GaTranslatedDocumentUploadedApplicantEmailGenerator extends GaEmail
                 .findOrganisationById(data.getGeneralAppApplnSolicitor().getOrganisationIdentifier())
                 .map(Organisation::getName).orElseThrow(RuntimeException::new));
         }
-        // The legacy LR applicant email evaluates the query-management flag against the parent claim.
+
         addAllFooterItems(data, context.mainCaseData(), properties, configuration,
             featureToggleService.isPublicQueryManagementEnabledGa(lip ? data : context.mainCaseData()));
         return properties;

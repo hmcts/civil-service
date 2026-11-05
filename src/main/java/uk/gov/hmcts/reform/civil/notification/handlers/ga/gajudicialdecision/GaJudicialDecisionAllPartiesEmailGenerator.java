@@ -29,7 +29,6 @@ public class GaJudicialDecisionAllPartiesEmailGenerator extends AllGaPartiesEmai
 
     @Override
     public Set<EmailDTO> getPartiesToNotify(GeneralApplicationCaseData caseData, String taskId) {
-        // Prepare the persisted case before the shared aggregator builds its validated copy.
         helper.prepareCase(caseData);
         return super.getPartiesToNotify(caseData, taskId);
     }
