@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -441,6 +443,29 @@ class ParentCaseUpdateHelperTest {
         assertThat(mapCaptor.getValue().get("gaDetailsMasterCollection")).isNotNull();
         assertThat(mapCaptor.getValue()).containsEntry("respondentSolGaAppDetails", List.of());
         assertThat(mapCaptor.getValue()).containsEntry("respondentSolTwoGaAppDetails", List.of());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Claimant", "RespondentSol", "RespondentSolTwo"})
+    void shouldPreserveApplicationStateWhenSharingCollectionsAfterPayment(String role) {
+        GeneralApplicationCaseData gaCase = getGaVaryCaseData(role, AWAITING_APPLICATION_PAYMENT, YES);
+        GeneralApplicationCaseData civilCase = getVaryMainCaseDataForCollectionAfterPayment(role);
+        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(civilCase);
+
+        parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(gaCase);
+
+        verify(coreCaseDataService).caseDataContentFromStartEventResponse(any(), mapCaptor.capture());
+        for (String collection : List.of("claimantGaAppDetails", "gaDetailsMasterCollection",
+                                        "respondentSolGaAppDetails", "respondentSolTwoGaAppDetails")) {
+            assertThat(capturedList(collection)).as(collection).isNotEmpty().allSatisfy(entry -> {
+                Object value = ((Element<?>) entry).getValue();
+                String state = value instanceof GADetailsRespondentSol respondent
+                    ? respondent.getCaseState() : ((GeneralApplicationsDetails) value).getCaseState();
+                assertThat(state).as("caseState in %s", collection)
+                    .isEqualTo(AWAITING_APPLICATION_PAYMENT.toString());
+            });
+        }
     }
 
     @Test
