@@ -26,8 +26,8 @@ class InitiateGeneralApplicationAfterPaymentTest extends BpmnBaseGAAfterPaymentT
 
     //Notifying respondents
     public static final String PROCESS_EXTERNAL_CASE_EVENT = "processExternalCaseEventGASpec";
-    private static final String NOTYFYING_RESPONDENTS_EVENT = "NOTIFY_GENERAL_APPLICATION_RESPONDENT";
-    private static final String GENERAL_APPLICATION_NOTIYFYING_ID = "GeneralApplicationNotifying";
+    private static final String NOTYFYING_RESPONDENTS_EVENT = "NOTIFY_EVENT";
+    private static final String GENERAL_APPLICATION_NOTIYFYING_ID = "NotifyGaApplicationCreated";
     private static final String ASSIGNIN_OF_ROLES_EVENT = "ASSIGN_GA_ROLES";
     private static final String ASSIGNIN_OF_ROLES_ID = "AssigningOfRoles";
     private static final String LIP_APPLICANT = "LIP_APPLICANT";

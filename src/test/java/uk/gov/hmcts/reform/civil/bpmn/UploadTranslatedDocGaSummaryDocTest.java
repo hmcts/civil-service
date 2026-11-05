@@ -24,8 +24,8 @@ public class UploadTranslatedDocGaSummaryDocTest extends BpmnBaseGAAfterPaymentT
     private static final String ADD_PDF_EVENT = "ADD_PDF_TO_MAIN_CASE";
     private static final String ADD_PDF_ID = "AddDraftDocToMainCaseID";
     public static final String PROCESS_EXTERNAL_CASE_EVENT = "processExternalCaseEventGASpec";
-    private static final String NOTIFYING_RESPONDENTS_EVENT = "NOTIFY_GENERAL_APPLICATION_RESPONDENT";
-    private static final String GENERAL_APPLICATION_NOTIFYING_ID = "GeneralApplicationNotifying";
+    private static final String NOTIFYING_RESPONDENTS_EVENT = "NOTIFY_EVENT";
+    private static final String GENERAL_APPLICATION_NOTIFYING_ID = "NotifyGaApplicationCreated";
     public static final String APPLICATION_PROCESS_EVENT_GA_SPEC = "applicationProcessCaseEventGASpec";
     private static final String UPDATE_CLAIMANT_DASHBOARD_GA_EVENT = "UPDATE_CLAIMANT_TASK_LIST_GA";
     private static final String UPDATE_RESPONDENT_DASHBOARD_GA_EVENT = "UPDATE_RESPONDENT_TASK_LIST_GA";
