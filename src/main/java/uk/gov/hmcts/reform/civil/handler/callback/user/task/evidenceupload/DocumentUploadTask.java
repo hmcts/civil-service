@@ -68,7 +68,6 @@ public abstract class DocumentUploadTask<L1 extends LegalRepresentativeOneDocume
     }
 
     public CallbackResponse uploadDocuments(CaseData caseData, CaseData caseDataBefore, String selectedRole) {
-        boolean part36Enabled = featureToggleService.isPart36Enabled();
         caseData.setEvidenceUploadNotificationSent(YesOrNo.NO);
         // If notification has already been populated in current day, we want to append to that existing notification
         StringBuilder notificationTextBuilder = initiateNotificationTextBuilder(caseData);
@@ -76,6 +75,7 @@ public abstract class DocumentUploadTask<L1 extends LegalRepresentativeOneDocume
         updateDocumentListUploadedAfterBundle(caseData);
 
         String litigantTypeString = getLegalRepresentativeTypeString(selectedRole);
+        boolean part36Enabled = featureToggleService.isPart36Enabled();
         if (selectedRole.equals(getSolicitorOneRole()) || selectedRole.equals(getSelectedValueForBoth())) {
             for (LegalRepresentativeOneDocumentHandler handler : legalRepresentativeOneDocumentHandlers) {
                 if (!shouldApply(handler, part36Enabled)) {
