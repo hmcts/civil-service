@@ -139,10 +139,11 @@ class AsyncCaseMigrationServiceTest {
     void shouldReadDraftClaimReferenceFromExcelRow() {
         DraftClaimReference reference = new DraftClaimReference();
 
-        reference.fromExcelRow(Map.of("caseReference", "draft-1", "userId", "user-1"));
+        reference.fromExcelRow(Map.of("caseReference", "case-1", "userId", "user-1", "draftId", "draft-1"));
 
-        assertEquals("draft-1", reference.getCaseReference());
+        assertEquals("case-1", reference.getCaseReference());
         assertEquals("user-1", reference.getUserId());
+        assertEquals("draft-1", reference.getDraftId());
     }
 
     private DraftClaimReference draftReference(String caseReference, String userId) {

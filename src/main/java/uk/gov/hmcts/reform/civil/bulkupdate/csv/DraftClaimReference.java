@@ -21,7 +21,7 @@ public class DraftClaimReference extends CaseReference implements ExcelMappable 
     public void fromExcelRow(Map<String, Object> rowValues) {
         setCaseReference(value(rowValues, "caseReference"));
         userId = value(rowValues, "userId");
-        userId = value(rowValues, "draftId");
+        draftId = value(rowValues, "draftId");
     }
 
     private String value(Map<String, Object> values, String key) {
