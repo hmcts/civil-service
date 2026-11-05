@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.ga.gaapplicationcreated;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -138,6 +139,7 @@ class GaApplicationCreatedNotifierTest {
             case "NULL_FIRST_EMAIL" -> respondents.getFirst().getValue().setEmail(null);
             case "INVALID_LATER_ENTRIES" -> {
                 respondents.add(null);
+                respondents.add(new uk.gov.hmcts.reform.civil.model.common.Element<>());
                 respondents.add(element(new GASolicitorDetailsGAspec()));
             }
             case "SAME_SOLICITOR" -> respondents.add(element(respondents.getFirst().getValue()));
@@ -158,6 +160,16 @@ class GaApplicationCreatedNotifierTest {
             ? generator.buildEmailDTOs(context, GaApplicationCreatedNotifier.TASK_ID) : java.util.Set.<EmailDTO>of();
         assertThat(actual).containsExactlyInAnyOrderElementsOf(new java.util.HashSet<>(legacyEmails))
             .hasSize("INVALID_LATER_ENTRIES".equals(scenario) || "SAME_SOLICITOR".equals(scenario) ? 1 : 0);
+    }
+
+    @Test
+    void shouldBuildTheSameFirstRespondentEmailThroughBothGeneratorMethods() {
+        var data = data("WITH_NOTICE", "NORMAL", "FREE", 0, false);
+        var context = new GaNotificationContext(data, new GeneralApplicationCaseData().build());
+        var respondent = new GaApplicationCreatedRespondentsEmailGenerator(templates, lips, service());
+        var email = respondent.buildEmailDTO(context, GaApplicationCreatedNotifier.TASK_ID);
+        assertThat(respondent.buildEmailDTOs(context, GaApplicationCreatedNotifier.TASK_ID)).containsExactly(email);
+        assertThat(email.getTargetEmail()).isEqualTo("old@example.com");
     }
 
     private GeneralApplicationCaseData data(String route, String urgency, String payment, int party, boolean pending) {

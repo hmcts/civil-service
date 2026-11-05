@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
 import uk.gov.hmcts.reform.civil.notification.handlers.GaNotifierFactory;
+import uk.gov.hmcts.reform.civil.notification.handlers.ga.GaNotificationContext;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
@@ -59,6 +60,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEFAULTS;
@@ -100,7 +102,9 @@ class GaJudicialDecisionNotifierTest {
 
     static Stream<Arguments> decisions() {
         return Stream.of("CONCURRENT", "SEQUENTIAL", "NULL_CONCURRENT", "NULL_SEQUENTIAL", "HEARING", "FREE_FORM", "APPROVE", "DISMISS", "DIRECTIONS",
-                         "REQUEST", "UNCLOAK", "UNCLOAK_CONSENT", "ADDITIONAL_PAYMENT", "ADDITIONAL_PAYMENT_EXISTING", "STRIKE_SPEC", "STRIKE_UNSPEC", "CONSENT")
+                         "REQUEST", "UNCLOAK", "UNCLOAK_CONSENT", "ADDITIONAL_PAYMENT", "ADDITIONAL_PAYMENT_EXISTING", "STRIKE_SPEC", "STRIKE_UNSPEC", "CONSENT",
+                         "REQUEST_NULL_DATE", "REQUEST_NULL_NOTICE",
+                         "REQUEST_WITHOUT_NOTICE", "REQUEST_CONSENT", "UNCLOAK_CONSENT_WITH_FEE", "ADDITIONAL_PAYMENT_REQUEST_MORE_INFO")
             .flatMap(decision -> Stream.of(false, true).flatMap(translated -> Stream.of(0, 1, 2, 3)
                 .map(mode -> Arguments.of(decision, translated, mode))));
     }
@@ -133,7 +137,7 @@ class GaJudicialDecisionNotifierTest {
 
         assertThat(factory.getNotifier(GaJudicialDecisionNotifier.TASK_ID)).isSameAs(notifier);
         assertThat(actualEmails).containsExactlyInAnyOrderElementsOf(legacyEmails)
-            .hasSize(decision.startsWith("UNCLOAK") ? 1 : 3);
+            .hasSize("UNCLOAK".equals(decision) || "UNCLOAK_CONSENT".equals(decision) ? 1 : 3);
         assertThat(migrated.getGeneralAppNotificationDeadlineDate())
             .isEqualTo(afterRespondent.getGeneralAppNotificationDeadlineDate());
         assertThat(saved.getGeneralAppNotificationDeadlineDate())
@@ -202,6 +206,27 @@ class GaJudicialDecisionNotifierTest {
         assertThat(data.getGeneralAppNotificationDeadlineDate()).isEqualTo(DEADLINE);
     }
 
+    @Test
+    void shouldBuildTheSameFirstRespondentEmailThroughBothGeneratorMethods() {
+        configure(0);
+        var data = caseData("HEARING", false);
+        var context = new GaNotificationContext(data, new GeneralApplicationCaseData().build());
+        var helper = new GaJudicialDecisionEmailHelper(templates, signatures, toggles, lips, deadlines, time);
+        var respondent = new GaJudicialDecisionRespondentsEmailGenerator(helper);
+        var email = respondent.buildEmailDTO(context, GaJudicialDecisionNotifier.TASK_ID);
+        assertThat(respondent.buildEmailDTOs(context, GaJudicialDecisionNotifier.TASK_ID)).contains(email);
+        assertThat(email.getTargetEmail()).isEqualTo("respondent1@example.com");
+    }
+
+    @Test
+    void shouldRejectTemplateSelectionWithoutANotificationCriterion() {
+        var data = caseData("HEARING", false)
+            .businessProcess(new BusinessProcess().setCamundaEvent("OTHER_EVENT")).build();
+        var helper = new GaJudicialDecisionEmailHelper(templates, signatures, toggles, lips, deadlines, time);
+        assertThatThrownBy(() -> helper.template(data, false)).isInstanceOf(IllegalStateException.class)
+            .hasMessage("No judicial decision notification criterion");
+    }
+
     private GaJudicialDecisionNotifier notifier() {
         return new GaJudicialDecisionNotifier(notify, mock(CaseTaskTrackingService.class), generator());
     }
@@ -237,7 +262,7 @@ class GaJudicialDecisionNotifierTest {
             .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES))
             .generalAppPBADetails(new GeneralApplicationPbaDetails())
             .applicantPartyName("Applicant").claimant1PartyName("Claimant").defendant1PartyName("Defendant")
-            .parentClaimantIsApplicant(YES).applicant1Represented(YES).respondent1Represented(YES)
+            .parentClaimantIsApplicant(translated ? NO : YES).applicant1Represented(YES).respondent1Represented(YES)
             .applicantBilingualLanguagePreference(translated ? YES : NO)
             .respondentBilingualLanguagePreference(translated ? YES : NO)
             .generalAppSuperClaimType("SPEC_CLAIM")
@@ -264,15 +289,18 @@ class GaJudicialDecisionNotifierTest {
                 new GAJudicialMakeAnOrder().setMakeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION));
             case "DIRECTIONS" -> data.judicialDecisionMakeOrder(
                 new GAJudicialMakeAnOrder().setMakeAnOrder(GAJudgeMakeAnOrderOption.GIVE_DIRECTIONS_WITHOUT_HEARING));
-            case "REQUEST", "UNCLOAK", "UNCLOAK_CONSENT", "ADDITIONAL_PAYMENT", "ADDITIONAL_PAYMENT_EXISTING" -> {
+            case "REQUEST", "UNCLOAK", "UNCLOAK_CONSENT", "ADDITIONAL_PAYMENT", "ADDITIONAL_PAYMENT_EXISTING",
+                 "REQUEST_NULL_DATE", "REQUEST_NULL_NOTICE", "REQUEST_WITHOUT_NOTICE", "REQUEST_CONSENT",
+                 "UNCLOAK_CONSENT_WITH_FEE", "ADDITIONAL_PAYMENT_REQUEST_MORE_INFO" -> {
                 data.judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.REQUEST_MORE_INFO))
                     .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
-                        .setRequestMoreInfoOption("REQUEST".equals(kind) ? REQUEST_MORE_INFORMATION : SEND_APP_TO_OTHER_PARTY)
+                        .setRequestMoreInfoOption(kind.startsWith("REQUEST") || "ADDITIONAL_PAYMENT_REQUEST_MORE_INFO".equals(kind)
+                            ? REQUEST_MORE_INFORMATION : SEND_APP_TO_OTHER_PARTY)
                         .setJudgeRequestMoreInfoByDate(LocalDate.of(2026, 12, 3)));
-                if (!"REQUEST".equals(kind)) {
+                if (!kind.startsWith("REQUEST")) {
                     data.generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(NO));
                 }
-                if ("UNCLOAK_CONSENT".equals(kind)) {
+                if (kind.startsWith("UNCLOAK_CONSENT")) {
                     data.generalAppConsentOrder(YES)
                         .generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YES))
                         .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YES));
@@ -288,6 +316,15 @@ class GaJudicialDecisionNotifierTest {
             case "CONSENT" -> data.businessProcess(new BusinessProcess().setCamundaEvent("APPROVE_CONSENT_ORDER"))
                 .approveConsentOrder(new GAApproveConsentOrder());
             default -> throw new IllegalArgumentException(kind);
+        }
+        switch (kind) {
+            case "REQUEST_NULL_DATE" -> data.getJudicialDecisionRequestMoreInfo().setJudgeRequestMoreInfoByDate(null);
+            case "REQUEST_NULL_NOTICE" -> data.generalAppInformOtherParty(null);
+            case "REQUEST_WITHOUT_NOTICE" -> data.generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(NO));
+            case "REQUEST_CONSENT" -> data.generalAppConsentOrder(YES);
+            case "UNCLOAK_CONSENT_WITH_FEE" -> data.generalAppPBADetails(new GeneralApplicationPbaDetails()
+                .setAdditionalPaymentDetails(new PaymentDetails()));
+            default -> { /* Other fixtures are fully configured above. */ }
         }
         return data.build();
     }

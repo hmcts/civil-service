@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
 import uk.gov.hmcts.reform.civil.notification.handlers.GaNotifierFactory;
+import uk.gov.hmcts.reform.civil.notification.handlers.ga.GaNotificationContext;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
@@ -167,6 +168,17 @@ class GaTranslatedDocumentUploadedNotifierTest {
         assertThat(actualEmails).extracting(EmailDTO::getTargetEmail).contains("refreshed@example.com")
             .doesNotContain("applicant@example.com");
         assertThat(saved.getGeneralAppApplnSolicitor().getEmail()).isEqualTo("applicant@example.com");
+    }
+
+    @Test
+    void shouldBuildTheSameFirstRespondentEmailThroughBothGeneratorMethods() {
+        configure(false);
+        var data = caseData("WITH_NOTICE", 0, 0);
+        var context = new GaNotificationContext(data, new GeneralApplicationCaseData().build());
+        var respondent = new GaTranslatedDocumentUploadedRespondentsEmailGenerator(templates, lips, organisations, toggles, signatures);
+        var email = respondent.buildEmailDTO(context, GaTranslatedDocumentUploadedNotifier.TASK_ID);
+        assertThat(respondent.buildEmailDTOs(context, GaTranslatedDocumentUploadedNotifier.TASK_ID)).contains(email);
+        assertThat(email.getTargetEmail()).isEqualTo("respondent1@example.com");
     }
 
     private GaTranslatedDocumentUploadedNotifier notifier(SolicitorEmailValidation emailValidator) {
