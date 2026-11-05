@@ -91,6 +91,10 @@ public class ExternalTaskListenerConfiguration {
      * week, BUNDLE_CREATION_CHECK 185 and HEARING_CVP_LINK 178. HEARING_FEE_CHECK does not sleep
      * but runs a batch capped at 10,000 for about 13 minutes daily.
      *
+     * <p>The GA batch processors (CoscApplicationProcessor and the GA* scheduler topics) search for
+     * every case due and process them in one task. On perftest CoscApplicationProcessor held a
+     * case driven worker for 73 seconds at 16:00 while no case task started on that pod.
+     *
      * <p>Anything absent from this set routes to the case driven client, which is what every topic
      * gets today, so adding a subscription cannot silently change how an existing one is served.
      */
@@ -99,9 +103,16 @@ public class ExternalTaskListenerConfiguration {
         "BUNDLE_CREATION_CHECK",
         "CLAIM_DETAILS_NOTIFICATION_DEADLINE",
         "CLAIM_DISMISSED_DEADLINE",
+        "CoscApplicationProcessor",
         "DEFENDANT_RESPONSE_DEADLINE_CHECK",
         "EVIDENCE_UPLOAD_CHECK",
         "FULL_ADMIT_PAY_IMMEDIATELY_NO_PAYMENT_CHECK",
+        "GADocUploadNotifyScheduler",
+        "GAJudgeRevisitProcessor",
+        "GAOrderMadeScheduler",
+        "GARespondentResponseCheckScheduler",
+        "GAResponseDeadlineProcessor",
+        "GAUnlessOrderScheduler",
         "GenerateCsvAndSendToMmt",
         "GenerateJsonAndSendToMmt",
         "HEARING_CVP_LINK",
@@ -115,6 +126,7 @@ public class ExternalTaskListenerConfiguration {
         "POLLING_EVENT_EMITTER",
         "REQUEST_FOR_RECONSIDERATION_NOTIFICATION_CHECK",
         "RETRIGGER_CASES_EVENTS",
+        "RETRIGGER_GA_UPDATE_CMLOCATION_EVENTS",
         "RETRIGGER_UPDATE_LOCATION_EVENTS",
         "SETTLEMENT_NO_RESPONSE_FROM_DEFENDANT_CHECK",
         "TAKE_CASE_OFFLINE",
