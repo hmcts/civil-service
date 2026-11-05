@@ -113,10 +113,10 @@ class GaApplicationCreatedNotifierTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params(data, "NOTIFY_EVENT"));
 
         assertThat(factory.getNotifier(GaApplicationCreatedNotifier.TASK_ID)).isSameAs(notifier);
-        assertThat(actualEmails).containsExactlyInAnyOrderElementsOf(legacyEmails);
         boolean sends = (free || !pending) && !"WITHOUT_NOTICE".equals(route)
             && ("NORMAL".equals(urgency) || "FREE".equals(payment) || "PAID".equals(payment));
-        assertThat(actualEmails).hasSize(sends ? 2 : 0);
+        assertThat(actualEmails).containsExactlyInAnyOrderElementsOf(legacyEmails)
+            .hasSize(sends ? 2 : 0);
         var saved = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
         assertThat(saved.getGeneralAppRespondentSolicitors()).isEqualTo(data.getGeneralAppRespondentSolicitors());
         assertThat(saved.getBusinessProcess()).isEqualTo(data.getBusinessProcess());
@@ -156,8 +156,8 @@ class GaApplicationCreatedNotifierTest {
         var context = new GaNotificationContext(data, parent);
         var actual = generator.getShouldNotify(context)
             ? generator.buildEmailDTOs(context, GaApplicationCreatedNotifier.TASK_ID) : java.util.Set.<EmailDTO>of();
-        assertThat(actual).containsExactlyInAnyOrderElementsOf(new java.util.HashSet<>(legacyEmails));
-        assertThat(actual).hasSize("INVALID_LATER_ENTRIES".equals(scenario) || "SAME_SOLICITOR".equals(scenario) ? 1 : 0);
+        assertThat(actual).containsExactlyInAnyOrderElementsOf(new java.util.HashSet<>(legacyEmails))
+            .hasSize("INVALID_LATER_ENTRIES".equals(scenario) || "SAME_SOLICITOR".equals(scenario) ? 1 : 0);
     }
 
     private GeneralApplicationCaseData data(String route, String urgency, String payment, int party, boolean pending) {
