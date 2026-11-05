@@ -6,6 +6,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import uk.gov.hmcts.reform.civil.notification.handlers.ga.gatranslateddocumentuploaded.GaTranslatedDocumentUploadedNotifier;
 
 import java.util.Map;
 
@@ -76,22 +77,13 @@ public class NotifyGATranslatedUploadedDocumentsTest extends BpmnBaseGASpecTest 
             "AddDocumentsToMainCaseID",
             variables
         );
-        //complete the applicant notification
+        //notify translated-document parties
         ExternalTask notificationApplicantTask = assertNextExternalTask(NOTIFY_EVENT);
         assertCompleteExternalTask(
             notificationApplicantTask,
             NOTIFY_EVENT,
-            "NOTIFY_APPLICANT_TRANSLATED_DOCUMENT_UPLOADED_GA",
-            "NotifyTranslatedDocumentUploadedToApplicantGA",
-            variables
-        );
-        //complete the respondent notification
-        ExternalTask notificationRespondentTask = assertNextExternalTask(NOTIFY_EVENT);
-        assertCompleteExternalTask(
-            notificationRespondentTask,
-            NOTIFY_EVENT,
-            "NOTIFY_RESPONDENT_TRANSLATED_DOCUMENT_UPLOADED_GA",
-            "NotifyTranslatedDocumentUploadedToRespondentGA",
+            "NOTIFY_EVENT",
+            GaTranslatedDocumentUploadedNotifier.TASK_ID,
             variables
         );
         //complete the respondent dashboard notification
