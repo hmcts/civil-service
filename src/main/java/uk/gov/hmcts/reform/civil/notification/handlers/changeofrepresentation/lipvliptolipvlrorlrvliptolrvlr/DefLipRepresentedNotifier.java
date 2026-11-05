@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.lipvliptolipvlrorlrvliptolrvlr;
 
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -8,7 +9,7 @@ import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.DefendantLipRepresentedWithNoCNotifier;
 
 @Component
-public class DefLipRepresentedNotifier extends Notifier {
+public class DefLipRepresentedNotifier extends Notifier<CaseData> {
 
     public DefLipRepresentedNotifier(NotificationService notificationService,
                                           CaseTaskTrackingService caseTaskTrackingService,
