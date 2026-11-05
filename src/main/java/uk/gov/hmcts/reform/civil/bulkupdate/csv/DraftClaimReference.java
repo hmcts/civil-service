@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.bulkupdate.csv;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,6 +14,7 @@ public class DraftClaimReference extends CaseReference implements ExcelMappable 
     private String userId;
     private String draftId;
 
+    @JsonIgnore
     public UUID getDraftUuid() {
         return UUID.fromString(getDraftId());
     }
