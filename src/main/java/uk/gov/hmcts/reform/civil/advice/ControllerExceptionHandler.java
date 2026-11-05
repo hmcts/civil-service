@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 import uk.gov.hmcts.reform.civil.service.search.exceptions.SearchServiceCaseNotFoundException;
 import uk.gov.hmcts.reform.dashboard.exceptions.DraftClaimNotFoundException;
+import uk.gov.hmcts.reform.dashboard.exceptions.DraftDefendantResponseNotFoundException;
 
 import static uk.gov.hmcts.reform.civil.utils.ContentCachingRequestWrapperUtil.getCaseId;
 import static uk.gov.hmcts.reform.civil.utils.ContentCachingRequestWrapperUtil.getUserId;
@@ -39,6 +40,12 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> draftClaimNotFound(DraftClaimNotFoundException draftClaimNotFoundException) {
         log.info(draftClaimNotFoundException.getMessage());
         return new ResponseEntity<>("Draft claim was not found", new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(DraftDefendantResponseNotFoundException.class)
+    public ResponseEntity<Object> draftDefendantResponseNotFound(DraftDefendantResponseNotFoundException draftDefendantResponseNotFoundException) {
+        log.info(draftDefendantResponseNotFoundException.getMessage());
+        return new ResponseEntity<>("Draft defendant response was not found", new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(CaseNotFoundException.class)
