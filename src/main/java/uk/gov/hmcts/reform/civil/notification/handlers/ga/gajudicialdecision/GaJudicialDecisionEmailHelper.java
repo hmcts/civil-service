@@ -80,13 +80,11 @@ public class GaJudicialDecisionEmailHelper {
 
     public String template(GeneralApplicationCaseData data, boolean applicant) {
         NotificationCriterion criterion = notificationCriterion(data);
-        if (criterion == NotificationCriterion.JUDGE_APPROVED_THE_ORDER) {
-            if (useDamageTemplate(data)) {
-                return templates.getJudgeApproveOrderToStrikeOutDamages();
-            }
-            if (useOcmcTemplate(data)) {
-                return templates.getJudgeApproveOrderToStrikeOutOCMC();
-            }
+        if (criterion == NotificationCriterion.JUDGE_APPROVED_THE_ORDER && useDamageTemplate(data)) {
+            return templates.getJudgeApproveOrderToStrikeOutDamages();
+        }
+        if (criterion == NotificationCriterion.JUDGE_APPROVED_THE_ORDER && useOcmcTemplate(data)) {
+            return templates.getJudgeApproveOrderToStrikeOutOCMC();
         }
         if (applicant ? gaForLipService.isLipApp(data) : gaForLipService.isLipResp(data)) {
             return applicant ? applicantLipTemplate(data) : respondentLipTemplate(data);
@@ -165,7 +163,9 @@ public class GaJudicialDecisionEmailHelper {
                                 data.getJudicialDecisionRequestMoreInfo().getJudgeRequestMoreInfoByDate(), DATE));
                 }
             }
-            default -> { }
+            default -> {
+                // Other decisions use only the common properties and have no additional deadline fields.
+            }
         }
     }
 
