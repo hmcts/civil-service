@@ -19,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLeg
 @Slf4j
 @AllArgsConstructor
 @Component
-public class ClaimantResponseConfirmsToProceedPartiesEmailGenerator implements PartiesEmailGenerator {
+public class ClaimantResponseConfirmsToProceedPartiesEmailGenerator implements PartiesEmailGenerator<CaseData> {
 
     private final ClaimantResponseConfirmsToProceedAppSolOneEmailDTOGenerator appSolOneEmailDTOGenerator;
     private final ClaimantResponseConfirmsToProceedDefendantEmailDTOGenerator defendantEmailDTOGenerator;

@@ -6,6 +6,7 @@ import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.listener.StateMachineListenerAdapter;
 import org.springframework.statemachine.state.State;
 import org.springframework.statemachine.transition.Transition;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.stateflow.utils.StateMachineUtils;
 
 import java.util.ArrayList;
@@ -14,6 +15,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_CASE_KEY;
+import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_ERROR_KEY;
 import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_HISTORY_KEY;
 
 @Slf4j
@@ -38,7 +41,12 @@ public class StateFlowListener extends StateMachineListenerAdapter<String, Strin
                 "Ambiguous transitions permitting state [%s] to move to more than one next states [%s].",
                 sourceState, permittedStates
             );
-            log.error(message);
+            ExtendedState extendedState = stateContext.getStateMachine().getExtendedState();
+            CaseData caseData = extendedState.get(EXTENDED_STATE_CASE_KEY, CaseData.class);
+            String caseId = caseData != null ? String.valueOf(caseData.getCcdCaseReference()) : "unknown";
+            log.error("{} Case ID: {}", message, caseId);
+            Map<Object, Object> variables = extendedState.getVariables();
+            variables.put(EXTENDED_STATE_ERROR_KEY, message);
             stateContext.getStateMachine().setStateMachineError(new IllegalStateException(message));
         }
     }
