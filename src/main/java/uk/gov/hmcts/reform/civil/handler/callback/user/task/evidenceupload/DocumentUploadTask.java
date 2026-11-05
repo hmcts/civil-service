@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentHandler;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.LegalRepresentativeOneDocumentHandler;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -12,7 +13,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOADED;
@@ -21,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOADED;
 public abstract class DocumentUploadTask<L1 extends LegalRepresentativeOneDocumentHandler, L2 extends DocumentHandler> {
 
     private final ObjectMapper objectMapper;
+    private final FeatureToggleService featureToggleService;
     protected final List<L1> legalRepresentativeOneDocumentHandlers;
     protected final List<L2> legalRepresentativeTwoDocumentHandlers;
 
@@ -28,6 +32,7 @@ public abstract class DocumentUploadTask<L1 extends LegalRepresentativeOneDocume
                               ObjectMapper objectMapper,
                               List<L1> legalRepresentativeOneDocumentHandlers,
                               List<L2> legalRepresentativeTwoDocumentHandlers) {
+        this.featureToggleService = featureToggleService;
         this.objectMapper = objectMapper;
         this.legalRepresentativeOneDocumentHandlers = legalRepresentativeOneDocumentHandlers;
         this.legalRepresentativeTwoDocumentHandlers = legalRepresentativeTwoDocumentHandlers;
@@ -63,6 +68,7 @@ public abstract class DocumentUploadTask<L1 extends LegalRepresentativeOneDocume
     }
 
     public CallbackResponse uploadDocuments(CaseData caseData, CaseData caseDataBefore, String selectedRole) {
+        boolean part36Enabled = featureToggleService.isPart36Enabled();
         caseData.setEvidenceUploadNotificationSent(YesOrNo.NO);
         // If notification has already been populated in current day, we want to append to that existing notification
         StringBuilder notificationTextBuilder = initiateNotificationTextBuilder(caseData);
@@ -72,6 +78,9 @@ public abstract class DocumentUploadTask<L1 extends LegalRepresentativeOneDocume
         String litigantTypeString = getLegalRepresentativeTypeString(selectedRole);
         if (selectedRole.equals(getSolicitorOneRole()) || selectedRole.equals(getSelectedValueForBoth())) {
             for (LegalRepresentativeOneDocumentHandler handler : legalRepresentativeOneDocumentHandlers) {
+                if (!shouldApply(handler, part36Enabled)) {
+                    continue;
+                }
                 handler.handleDocuments(caseData, litigantTypeString, notificationTextBuilder);
                 if (selectedRole.equals(getSelectedValueForBoth()) && handler.shouldCopyDocumentsToLegalRep2()) {
                     caseData = handler.copyLegalRep1ChangesToLegalRep2(caseData, caseDataBefore);
@@ -81,6 +90,9 @@ public abstract class DocumentUploadTask<L1 extends LegalRepresentativeOneDocume
         if (selectedRole.equals(getSolicitorTwoRole())) {
 
             for (DocumentHandler handler : legalRepresentativeTwoDocumentHandlers) {
+                if (!shouldApply(handler, part36Enabled)) {
+                    continue;
+                }
                 handler.handleDocuments(caseData, litigantTypeString, notificationTextBuilder);
             }
         }
@@ -90,9 +102,20 @@ public abstract class DocumentUploadTask<L1 extends LegalRepresentativeOneDocume
 
         caseData.setBusinessProcess(BusinessProcess.ready(EVIDENCE_UPLOADED));
 
+        Map<String, Object> data = new HashMap<>(caseData.toMap(objectMapper));
+        if (part36Enabled) {
+            data.put("withoutPrejudiceSelectionEvidence", null);
+            data.put("withoutPrejudiceSelectionEvidenceSmallClaim", null);
+            data.put("withoutPrejudiceSelectionEvidenceSmallClaimRes", null);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
+            .data(data)
             .build();
+    }
+
+    private boolean shouldApply(DocumentHandler<?> handler, boolean part36Enabled) {
+        return part36Enabled || handler.getEvidenceUploadType() != EvidenceUploadType.WITHOUT_PREJUDICE;
     }
 
     private static void clearDocumentCollections(CaseData caseData) {

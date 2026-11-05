@@ -294,4 +294,11 @@ class FeatureToggleServiceTest {
         givenToggle("cui-draft-claim-database", toggleStat);
         assertThat(featureToggleService.isDraftClaimDatabaseEnabled()).isEqualTo(toggleStat);
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenPart36Enabled(Boolean toggleStat) {
+        givenToggle("part36-enabled", toggleStat);
+        assertThat(featureToggleService.isPart36Enabled()).isEqualTo(toggleStat);
+    }
 }
