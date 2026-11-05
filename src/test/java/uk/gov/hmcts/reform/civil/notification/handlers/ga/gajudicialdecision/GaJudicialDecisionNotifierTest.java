@@ -49,7 +49,6 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -133,8 +132,8 @@ class GaJudicialDecisionNotifierTest {
             .convertValue(response.getData(), GeneralApplicationCaseData.class);
 
         assertThat(factory.getNotifier(GaJudicialDecisionNotifier.TASK_ID)).isSameAs(notifier);
-        assertThat(actualEmails).containsExactlyInAnyOrderElementsOf(legacyEmails);
-        assertThat(actualEmails).hasSize(decision.startsWith("UNCLOAK") ? 1 : 3);
+        assertThat(actualEmails).containsExactlyInAnyOrderElementsOf(legacyEmails)
+            .hasSize(decision.startsWith("UNCLOAK") ? 1 : 3);
         assertThat(migrated.getGeneralAppNotificationDeadlineDate())
             .isEqualTo(afterRespondent.getGeneralAppNotificationDeadlineDate());
         assertThat(saved.getGeneralAppNotificationDeadlineDate())

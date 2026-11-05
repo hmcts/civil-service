@@ -103,10 +103,10 @@ class GaTranslatedDocumentUploadedNotifierTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params(data, NOTIFY_EVENT.name()));
 
         assertThat(factory.getNotifier(GaTranslatedDocumentUploadedNotifier.TASK_ID)).isSameAs(notifier);
-        assertThat(actualEmails).containsExactlyInAnyOrderElementsOf(legacyEmails);
-        assertThat(actualEmails).hasSize("WITHOUT_NOTICE".equals(route) ? 1 : 3);
-        assertThat(actualEmails).allSatisfy(email -> assertThat(email.getReference())
-            .isEqualTo("translated-document-uploaded-applicant-notification-2000"));
+        assertThat(actualEmails).containsExactlyInAnyOrderElementsOf(legacyEmails)
+            .hasSize("WITHOUT_NOTICE".equals(route) ? 1 : 3)
+            .allSatisfy(email -> assertThat(email.getReference())
+                .isEqualTo("translated-document-uploaded-applicant-notification-2000"));
         var saved = mapper().convertValue(response.getData(), GeneralApplicationCaseData.class);
         assertThat(saved.getNotificationSummary()).contains("applicant@example.com");
         assertThat(saved.getBusinessProcess()).isEqualTo(data.getBusinessProcess());
@@ -141,9 +141,11 @@ class GaTranslatedDocumentUploadedNotifierTest {
         configure(false);
         when(organisations.findOrganisationById("applicant-org")).thenReturn(Optional.empty());
         var data = caseData("WITH_NOTICE", 0, 0);
-        assertThatThrownBy(() -> legacyApplicant().handle(params(data, NOTIFY_APPLICANT_TRANSLATED_DOCUMENT_UPLOADED_GA.name())))
-            .isInstanceOf(RuntimeException.class);
-        assertThatThrownBy(() -> notifier(validator).notifyParties(data, "NOTIFY_EVENT", GaTranslatedDocumentUploadedNotifier.TASK_ID))
+        var legacyHandler = legacyApplicant();
+        var callbackParams = params(data, NOTIFY_APPLICANT_TRANSLATED_DOCUMENT_UPLOADED_GA.name());
+        var migratedNotifier = notifier(validator);
+        assertThatThrownBy(() -> legacyHandler.handle(callbackParams)).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> migratedNotifier.notifyParties(data, "NOTIFY_EVENT", GaTranslatedDocumentUploadedNotifier.TASK_ID))
             .isInstanceOf(RuntimeException.class);
     }
 
@@ -207,12 +209,12 @@ class GaTranslatedDocumentUploadedNotifierTest {
             .generalAppRespondentSolicitors(List.of(element(new GASolicitorDetailsGAspec().setEmail("respondent1@example.com")
                 .setOrganisationIdentifier("respondent1-org")), element(new GASolicitorDetailsGAspec().setEmail("respondent2@example.com")
                 .setOrganisationIdentifier("respondent2-org"))))
-            .isMultiParty(YES).isGaApplicantLip((representation & 1) != 0 ? YES : NO)
-            .isGaRespondentOneLip((representation & 2) != 0 ? YES : NO).isGaRespondentTwoLip(NO)
-            .applicant1Represented((representation & 1) != 0 ? NO : YES)
-            .respondent1Represented((representation & 2) != 0 ? NO : YES)
-            .applicantBilingualLanguagePreference((language & 1) != 0 ? YES : NO)
-            .respondentBilingualLanguagePreference((language & 2) != 0 ? YES : NO)
+            .isMultiParty(YES).isGaApplicantLip((representation & 1) == 0 ? NO : YES)
+            .isGaRespondentOneLip((representation & 2) == 0 ? NO : YES).isGaRespondentTwoLip(NO)
+            .applicant1Represented((representation & 1) == 0 ? YES : NO)
+            .respondent1Represented((representation & 2) == 0 ? YES : NO)
+            .applicantBilingualLanguagePreference((language & 1) == 0 ? NO : YES)
+            .respondentBilingualLanguagePreference((language & 2) == 0 ? NO : YES)
             .claimant1PartyName("Claimant").defendant1PartyName("Defendant One").defendant2PartyName("Defendant Two")
             .applicantPartyName("Applicant").parentClaimantIsApplicant(YES)
             .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice("WITH_NOTICE".equals(route) ? YES : NO));
