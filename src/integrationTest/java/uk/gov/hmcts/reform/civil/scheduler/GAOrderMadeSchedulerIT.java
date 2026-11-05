@@ -26,7 +26,7 @@ import java.time.LocalDate;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -94,8 +94,8 @@ public class GAOrderMadeSchedulerIT {
         scheduler.runScheduledTask();
 
         verify(gaOrderMadeScheduledTask).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("GAOrderMadeSchedulerJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("GAOrderMadeSchedulerCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("GAOrderMadeSchedulerJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
     }
 }

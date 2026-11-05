@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.workflow.ccd;
 
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -23,7 +24,8 @@ class NotifyEventWorkflowTest extends WorkflowIntegrationTest {
 
     @Test
     void shouldPopulateNotificationSummaryAtAboutToSubmit() throws Exception {
-        Notifier notifier = mock(Notifier.class);
+        @SuppressWarnings("unchecked")
+        Notifier<CaseData> notifier = mock(Notifier.class);
         when(notifierFactory.getNotifier(NotifyEventFixtures.activityId())).thenReturn(notifier);
         when(notifier.notifyParties(any(), eq(CaseEvent.NOTIFY_EVENT.toString()), eq(NotifyEventFixtures.activityId())))
             .thenReturn("Attempted: Example notifier");
