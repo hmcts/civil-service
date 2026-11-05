@@ -493,9 +493,9 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             handler.handle(callbackParamsOf(savedCaseData, caseDataBefore, SUBMITTED));
 
             verify(coreCaseDataService).triggerGeneralApplicationEvent(
-                eq(1234L),
-                eq(UPDATE_GA_CASE_DATA),
-                eq(Map.of("caseNameGaInternal", "John Rambo v Sole Trader represented by Litigation Friend (litigation friend)"))
+                1234L,
+                UPDATE_GA_CASE_DATA,
+                Map.of("caseNameGaInternal", "John Rambo v Sole Trader represented by Litigation Friend (litigation friend)")
             );
         }
     }

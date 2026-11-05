@@ -16,6 +16,19 @@ public class SyncGeneralApplicationCaseNameTask extends MigrationTask<CaseRefere
     }
 
     @Override
+    protected CaseData migrateCaseData(CaseData parentCaseData, CaseReference parentCaseReference) {
+        validate(parentCaseData, parentCaseReference);
+        generalApplicationCaseNameService.updateGeneralApplications(parentCaseData);
+        return parentCaseData;
+    }
+
+    private void validate(CaseData parentCaseData, CaseReference parentCaseReference) {
+        if (parentCaseData == null || parentCaseReference == null) {
+            throw new IllegalArgumentException("Parent case data and parent case reference must be provided");
+        }
+    }
+
+    @Override
     protected String getTaskName() {
         return "SyncGeneralApplicationCaseNameTask";
     }
@@ -28,14 +41,5 @@ public class SyncGeneralApplicationCaseNameTask extends MigrationTask<CaseRefere
     @Override
     protected String getEventDescription() {
         return "Resets the case name on linked general applications to the parent case name";
-    }
-
-    @Override
-    protected CaseData migrateCaseData(CaseData caseData, CaseReference caseReference) {
-        if (caseData == null || caseReference == null) {
-            throw new IllegalArgumentException("CaseData and CaseReference must not be null");
-        }
-        generalApplicationCaseNameService.updateGeneralApplications(caseData);
-        return caseData;
     }
 }

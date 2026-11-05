@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -93,7 +92,7 @@ class GeneralApplicationCaseNameServiceTest {
     void shouldContinueWithRemainingGeneralApplications_whenOneUpdateFails() {
         CaseData saved = caseData(NEW_NAME, generalApplication("111"), generalApplication("222"));
         doThrow(new IllegalStateException("CCD unavailable"))
-            .when(coreCaseDataService).triggerGeneralApplicationEvent(eq(111L), eq(UPDATE_GA_CASE_DATA), eq(Map.of("caseNameGaInternal", NEW_NAME)));
+            .when(coreCaseDataService).triggerGeneralApplicationEvent(111L, UPDATE_GA_CASE_DATA, Map.of("caseNameGaInternal", NEW_NAME));
 
         service.updateGeneralApplicationsIfCaseNameChanged(saved, caseData(ORIGINAL_NAME));
 
