@@ -16,9 +16,11 @@ import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingType;
+import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption;
 import uk.gov.hmcts.reform.civil.ga.enums.welshenhancements.PreTranslationGaDocumentType;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialDecision;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -66,6 +68,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.RELIEF_FROM_SANCTIONS;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SETTLE_BY_CONSENT;
+import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption.REQUEST_MORE_INFO;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CUSTOMER_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -456,20 +459,72 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
     }
 
     @Test
-    void shouldNotGenerateApplicationDraftDocument_whenJudgeHasMadeDecision_LR() {
+    void shouldNotGenerateApplicationDraftDocument_whenJudgeRequestsMoreInfo_LR() {
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
+
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, YES);
         caseData = caseData.copy()
-            .judicialDecision(new uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialDecision())
+            .judicialDecision(new GAJudicialDecision().setDecision(REQUEST_MORE_INFO))
             .generalAppPBADetails(new GeneralApplicationPbaDetails()
                                       .setPaymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
-                                      .setFee(new Fee().setCode("FREE"))).build();
+                                      .setFee(new Fee().setCode("FREE")))
+            .build();
+
         when(generalAppFeesService.isFreeApplication(any())).thenReturn(true);
+
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         handler.handle(params);
 
         verifyNoInteractions(generalApplicationDraftGenerator);
+    }
+
+    @Test
+    void shouldGenerateApplicationDraftDocument_whenJudgeMakesAnOrder_LR() {
+        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+
+        GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, YES);
+        caseData = caseData.copy()
+            .judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER))
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
+                                      .setFee(new Fee().setCode("FREE")))
+            .build();
+
+        when(generalAppFeesService.isFreeApplication(any())).thenReturn(true);
+        when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
+            .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        handler.handle(params);
+
+        verify(generalApplicationDraftGenerator)
+            .generate(any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"));
+    }
+
+    @Test
+    void shouldGenerateApplicationDraftDocument_whenJudicialDecisionIsNull_LR() {
+        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+
+        GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, YES);
+        caseData = caseData.copy()
+            .judicialDecision(null)
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
+                                      .setFee(new Fee().setCode("FREE")))
+            .build();
+
+        when(generalAppFeesService.isFreeApplication(any())).thenReturn(true);
+        when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
+            .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        handler.handle(params);
+
+        verify(generalApplicationDraftGenerator)
+            .generate(any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"));
     }
 
     @Test
