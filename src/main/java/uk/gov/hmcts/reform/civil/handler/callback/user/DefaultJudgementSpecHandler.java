@@ -193,7 +193,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         ArrayList<String> errors = new ArrayList<>();
 
-        if (caseData.hasBreathingSpace()) {
+        if (caseData.hasBreathingSpace() && featureToggleService.isBreathingSpaceEnabled()) {
             errors.add(BREATHING_SPACE);
         }
 
