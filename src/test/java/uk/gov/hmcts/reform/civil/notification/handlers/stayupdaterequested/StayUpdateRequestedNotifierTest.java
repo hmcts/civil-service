@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.stayupdaterequested;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.apache.commons.lang3.StringUtils;
 import org.mockito.ArgumentCaptor;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -114,30 +115,53 @@ class StayUpdateRequestedNotifierTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"NULL", "''"}, nullValues = "NULL")
-    void shouldPreserveLegacyNotificationsWithMissingSolicitorEmails(String email) {
+    @CsvSource(value = {"NULL", "''", "'   '"}, nullValues = "NULL")
+    void shouldExcludeMissingSolicitorEmailsFromSendingAndHistory(String email) {
         CaseData data = caseData(false, false, false, false).toBuilder()
             .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(email))
             .respondentSolicitor1EmailAddress(email).respondentSolicitor2EmailAddress(email).build();
-        assertLegacyParityForAllParties(data);
+        assertValidRecipientParityForAllParties(data);
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"NULL", "''"}, nullValues = "NULL")
+    @CsvSource(value = {"NULL", "''", "'   '"}, nullValues = "NULL")
     void shouldPreserveLipEmailAndSolicitorFallback(String email) {
         CaseData data = caseData(true, true, true, true).toBuilder()
             .claimantUserDetails(new IdamUserDetails().setEmail(email))
             .respondent1(party("Defendant", email)).build();
-        assertLegacyParityForAllParties(data);
+        assertValidRecipientParityForAllParties(data);
     }
 
-    private void assertLegacyParityForAllParties(CaseData data) {
+    @ParameterizedTest
+    @CsvSource(value = {"NULL", "''", "'   '"}, nullValues = "NULL")
+    void shouldExcludeLipDefendantsWithoutAnEmailOrSolicitorFallback(String email) {
+        CaseData data = caseData(false, false, true, false).toBuilder()
+            .respondent1(party("Defendant", email))
+            .respondentSolicitor1EmailAddress(null).respondentSolicitor2EmailAddress(null).build();
+        assertValidRecipientParityForAllParties(data);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"NULL", "''", "'   '"}, nullValues = "NULL")
+    void shouldExcludeOnlyTheSecondDefendantWhenTheirEmailIsMissing(String email) {
+        CaseData data = caseData(false, false, false, false).toBuilder()
+            .respondentSolicitor2EmailAddress(email).build();
+        assertValidRecipientParityForAllParties(data);
+    }
+
+    private void assertValidRecipientParityForAllParties(CaseData data) {
         when(flow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(true);
         sendLegacy(data, CaseEvent.NOTIFY_CLAIMANT_STAY_UPDATE_REQUESTED);
         sendLegacy(data, CaseEvent.NOTIFY_DEFENDANT_STAY_UPDATE_REQUESTED);
         sendLegacy(data, CaseEvent.NOTIFY_DEFENDANT2_STAY_UPDATE_REQUESTED);
-        notifier.notifyParties(data, "NOTIFY_EVENT", "StayUpdateRequestedNotifyParties");
-        assertThat(emails(notificationService, 3)).containsExactlyInAnyOrderElementsOf(emails(legacyService, 3));
+        String summary = notifier.notifyParties(data, "NOTIFY_EVENT", "StayUpdateRequestedNotifyParties");
+        var validLegacyEmails = emails(legacyService, 3).stream()
+            .filter(email -> StringUtils.isNotBlank((String) email.getFirst())).toList();
+        assertThat(emails(notificationService, validLegacyEmails.size())).containsExactlyInAnyOrderElementsOf(validLegacyEmails);
+        assertThat(summary).doesNotContain("null :", "Attempted:  :", " |  :");
+        if (validLegacyEmails.isEmpty()) {
+            assertThat(summary).isEqualTo("Attempted:  || Errors: ");
+        }
         verifyNoInteractions(trackingService);
     }
 
