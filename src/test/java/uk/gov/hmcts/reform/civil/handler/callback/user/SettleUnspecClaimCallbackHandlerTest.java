@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -22,6 +23,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -40,10 +43,14 @@ class SettleUnspecClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private UserService userService;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @BeforeEach
     void setup() {
         objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-        handler = new SettleUnspecClaimCallbackHandler(objectMapper, userService);
+        lenient().when(featureToggleService.isEarlyClaimTerminationEnabled()).thenReturn(true);
+        handler = new SettleUnspecClaimCallbackHandler(objectMapper, userService, featureToggleService);
     }
 
     @Test
@@ -53,6 +60,21 @@ class SettleUnspecClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToSubmitCallback {
+
+        @Test
+        void should_return_error_and_not_change_case_when_early_claim_termination_flag_is_off() {
+            when(featureToggleService.isEarlyClaimTerminationEnabled()).thenReturn(false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).containsExactly(SettleUnspecClaimCallbackHandler.EVENT_NOT_ALLOWED);
+            assertThat(response.getState()).isNull();
+            assertThat(response.getData()).isNull();
+            verifyNoInteractions(userService);
+        }
 
         @Test
         void should_move_case_to_case_settled_when_triggered_by_caseworker() {
