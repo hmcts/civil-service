@@ -40,4 +40,44 @@ class SpecPartAdmitPaidCaseUpdaterTest {
 
         assertThat(caseData.getSpecPartAdmitPaid()).isNull();
     }
+
+    @Test
+    void shouldSetSpecPartAdmitPaidToNo_whenRespondent2PartAdmissionWillPay() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent2(YES);
+        caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        caseData.setSpecDefenceAdmitted2Required(NO);
+
+        updater.update(caseData);
+
+        assertThat(caseData.getSpecPartAdmitPaid()).isEqualTo(NO);
+    }
+
+    @Test
+    void shouldNotUseRespondent1Flags_whenCurrentDefendantIsRespondent2() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent2(YES);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        caseData.setSpecDefenceAdmittedRequired(NO);
+        caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        caseData.setSpecDefenceAdmitted2Required(YES);
+
+        updater.update(caseData);
+
+        assertThat(caseData.getSpecPartAdmitPaid()).isNull();
+    }
+
+    @Test
+    void shouldNotUseRespondent1PartAdmitFlags_whenCurrentDefendantIsRespondent2FullAdmit() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setIsRespondent2(YES);
+        caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        caseData.setSpecDefenceAdmittedRequired(NO);
+        caseData.setRespondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        caseData.setSpecDefenceAdmitted2Required(NO);
+
+        updater.update(caseData);
+
+        assertThat(caseData.getSpecPartAdmitPaid()).isNull();
+    }
 }
