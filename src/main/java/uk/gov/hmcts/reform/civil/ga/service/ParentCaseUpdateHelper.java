@@ -802,6 +802,7 @@ public class ParentCaseUpdateHelper {
     private GADetailsRespondentSol createRespondentSolDetails(GeneralApplicationsDetails source, String caseReference) {
         return new GADetailsRespondentSol()
             .setGeneralApplicationType(source.getGeneralApplicationType())
+            .setCaseState(source.getCaseState())
             .setGeneralAppSubmittedDateGAspec(source.getGeneralAppSubmittedDateGAspec())
             .setCaseLink(new CaseLink(caseReference))
             .setParentClaimantIsApplicant(source.getParentClaimantIsApplicant());
@@ -810,6 +811,7 @@ public class ParentCaseUpdateHelper {
     private GADetailsRespondentSol createRespondentSolDetails(GADetailsRespondentSol source, Long caseReference) {
         return new GADetailsRespondentSol()
             .setGeneralApplicationType(source.getGeneralApplicationType())
+            .setCaseState(source.getCaseState())
             .setGeneralAppSubmittedDateGAspec(source.getGeneralAppSubmittedDateGAspec())
             .setCaseLink(new CaseLink(String.valueOf(caseReference)))
             .setParentClaimantIsApplicant(source.getParentClaimantIsApplicant());
@@ -1092,6 +1094,7 @@ public class ParentCaseUpdateHelper {
     private GeneralApplicationsDetails createGeneralApplicationsDetails(GeneralApplicationsDetails source, String caseReference) {
         return new GeneralApplicationsDetails()
             .setGeneralApplicationType(source.getGeneralApplicationType())
+            .setCaseState(source.getCaseState())
             .setGeneralAppSubmittedDateGAspec(source.getGeneralAppSubmittedDateGAspec())
             .setCaseLink(new CaseLink(caseReference))
             .setParentClaimantIsApplicant(source.getParentClaimantIsApplicant());
@@ -1104,6 +1107,7 @@ public class ParentCaseUpdateHelper {
     private GeneralApplicationsDetails createGeneralApplicationsDetails(GADetailsRespondentSol source, String caseReference) {
         return new GeneralApplicationsDetails()
             .setGeneralApplicationType(source.getGeneralApplicationType())
+            .setCaseState(source.getCaseState())
             .setGeneralAppSubmittedDateGAspec(source.getGeneralAppSubmittedDateGAspec())
             .setCaseLink(new CaseLink(caseReference))
             .setParentClaimantIsApplicant(source.getParentClaimantIsApplicant());
