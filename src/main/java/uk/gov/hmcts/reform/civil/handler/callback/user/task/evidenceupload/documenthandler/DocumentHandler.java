@@ -177,6 +177,10 @@ public abstract class DocumentHandler<T> {
         renameUploadEvidenceDocumentType(documentUploads, evidenceUploadType.getDocumentTypeDisplayName());
     }
 
+    protected boolean shouldPopulatePostBundleUploadList() {
+        return true;
+    }
+
     private String issuedDateSegment(LocalDate issuedDate) {
         return issuedDate == null
             ? ""
@@ -184,7 +188,9 @@ public abstract class DocumentHandler<T> {
     }
 
     public void addUploadDocList(CaseData caseData) {
-
+        if (!shouldPopulatePostBundleUploadList()) {
+            return;
+        }
         if (getDocumentList(caseData) == null || getDocumentList(caseData).isEmpty()) {
             return;
         }
