@@ -55,7 +55,7 @@ public class DraftStoreTransactionService {
         Objects.requireNonNull(userId, "userId must not be null");
         Objects.requireNonNull(draftType, "draftType must not be null");
         entityManager.joinTransaction();
-        log.info("Deleting draft type={} draftId={}", draftType, draftId);
+        log.info("Deleting draft type={} draftId={} with userId={}", draftType, draftId, userId);
         long deleted = draftStoreRepository.deleteByIdAndUserIdAndDraftType(
             draftId,
             userId,

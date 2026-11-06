@@ -46,7 +46,7 @@ class NotificationHandlerTest extends BaseCallbackHandlerTest {
     NotifierFactory notifierFactory;
 
     @Mock
-    Notifier notifier;
+    Notifier<CaseData> notifier;
 
     @Mock
     CoreCaseDataService coreCaseDataService;
