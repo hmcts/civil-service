@@ -111,49 +111,56 @@ public class RespondentDivergentResponseStrategy implements EventHistoryStrategy
                         : caseData.getRespondent2ResponseDate();
 
         if (respondent1ResponseDate != null && !isUnspecResponseTypeMissing(caseData, true)) {
-            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-                RespondentResponseTypeSpec responseType = resolveRespondent1SpecResponse(caseData);
-                addSpecResponseEvents(
-                        eventHistory, caseData, responseType, respondent1ResponseDate, RESPONDENT_ID, true);
-            } else {
-                addUnspecResponseEvents(
-                        eventHistory,
-                        caseData,
-                        caseData.getRespondent1ClaimResponseType(),
-                        respondent1ResponseDate,
-                        RESPONDENT_ID,
-                        true);
-            }
-
-            if (shouldAddMiscEvent(caseData, goingOffline, true)) {
-                addMiscellaneous(
-                        eventHistory, caseData, caseData.getRespondent1(), true, respondent1ResponseDate);
-            }
+            contributeRespondent1Events(eventHistory, caseData, respondent1ResponseDate, goingOffline);
         }
 
         if (defendant2DivergentResponseExists.test(caseData) && !isUnspecResponseTypeMissing(caseData, false)) {
-            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-                addSpecResponseEvents(
-                        eventHistory,
-                        caseData,
-                        caseData.getRespondent2ClaimResponseTypeForSpec(),
-                        respondent2ResponseDate,
-                        RESPONDENT2_ID,
-                        false);
-            } else {
-                addUnspecResponseEvents(
-                        eventHistory,
-                        caseData,
-                        caseData.getRespondent2ClaimResponseType(),
-                        respondent2ResponseDate,
-                        RESPONDENT2_ID,
-                        false);
-            }
+            contributeRespondent2Events(eventHistory, caseData, respondent2ResponseDate, goingOffline);
+        }
+    }
 
-            if (shouldAddMiscEvent(caseData, goingOffline, false)) {
-                addMiscellaneous(
-                        eventHistory, caseData, caseData.getRespondent2(), false, respondent2ResponseDate);
-            }
+    private void contributeRespondent1Events(
+            EventHistory eventHistory, CaseData caseData, LocalDateTime responseDate, boolean goingOffline) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            RespondentResponseTypeSpec responseType = resolveRespondent1SpecResponse(caseData);
+            addSpecResponseEvents(eventHistory, caseData, responseType, responseDate, RESPONDENT_ID, true);
+        } else {
+            addUnspecResponseEvents(
+                    eventHistory,
+                    caseData,
+                    caseData.getRespondent1ClaimResponseType(),
+                    responseDate,
+                    RESPONDENT_ID,
+                    true);
+        }
+
+        if (shouldAddMiscEvent(caseData, goingOffline, true)) {
+            addMiscellaneous(eventHistory, caseData, caseData.getRespondent1(), true, responseDate);
+        }
+    }
+
+    private void contributeRespondent2Events(
+            EventHistory eventHistory, CaseData caseData, LocalDateTime responseDate, boolean goingOffline) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            addSpecResponseEvents(
+                    eventHistory,
+                    caseData,
+                    caseData.getRespondent2ClaimResponseTypeForSpec(),
+                    responseDate,
+                    RESPONDENT2_ID,
+                    false);
+        } else {
+            addUnspecResponseEvents(
+                    eventHistory,
+                    caseData,
+                    caseData.getRespondent2ClaimResponseType(),
+                    responseDate,
+                    RESPONDENT2_ID,
+                    false);
+        }
+
+        if (shouldAddMiscEvent(caseData, goingOffline, false)) {
+            addMiscellaneous(eventHistory, caseData, caseData.getRespondent2(), false, responseDate);
         }
     }
 
