@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -45,32 +44,23 @@ public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHand
 
     @Override
     public ExternalTaskData  handleTask(ExternalTask externalTask) {
-        try {
-            ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
+        ExternalTaskInput variables = toExternalTaskInput(externalTask, mapper);
 
-            String civilCaseId =
-                ofNullable(variables.getGeneralAppParentCaseLink())
-                    .orElseThrow(() -> new InvalidCaseDataException(
-                        "General application parent case link not found"));
-            CaseEvent caseEvent = ofNullable(variables.getCaseEvent())
-                .orElseThrow(() -> new InvalidCaseDataException("The case event was not provided"));
+        String civilCaseId =
+            ofNullable(variables.getGeneralAppParentCaseLink())
+                .orElseThrow(() -> new InvalidCaseDataException(
+                    "General application parent case link not found"));
+        CaseEvent caseEvent = ofNullable(variables.getCaseEvent())
+            .orElseThrow(() -> new InvalidCaseDataException("The case event was not provided"));
 
-            StartEventResponse startEventResponse = coreCaseDataService.startUpdate(civilCaseId, caseEvent);
+        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(civilCaseId, caseEvent);
 
-            Map<String, Object> updates = caseEvent == CaseEvent.NOTIFY_EVENT
-                ? Map.of("businessProcess", Map.of("activityId", externalTask.getActivityId()))
-                : Map.of();
-            var data = coreCaseDataService.submitUpdate(
-                civilCaseId, caseDataContentFromStartEventResponse(startEventResponse, updates));
-            return new ExternalTaskData().setCaseData(data);
-
-        } catch (NumberFormatException ne) {
-            throw new InvalidCaseDataException(
-                "Conversion to long datatype failed for general application for a case ", ne
-            );
-        } catch (IllegalArgumentException | ValueMapperException e) {
-            throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
-        }
+        Map<String, Object> updates = caseEvent == CaseEvent.NOTIFY_EVENT
+            ? Map.of("businessProcess", Map.of("activityId", externalTask.getActivityId()))
+            : Map.of();
+        var data = coreCaseDataService.submitUpdate(
+            civilCaseId, caseDataContentFromStartEventResponse(startEventResponse, updates));
+        return new ExternalTaskData().setCaseData(data);
     }
 
     @Override
