@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.support;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
@@ -16,6 +17,7 @@ import static java.time.format.DateTimeFormatter.ISO_DATE;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class RoboticsManualOfflineSupport {
 
     private final RoboticsEventTextFormatter textFormatter;
@@ -26,8 +28,13 @@ public class RoboticsManualOfflineSupport {
         requireNonNull(caseData, "caseData must not be null");
         CaseCategory category = caseData.getCaseAccessCategory();
         if (CaseCategory.UNSPEC_CLAIM.equals(category)) {
-            ClaimProceedsInCaseman unspecDetails = requireNonNull(caseData.getClaimProceedsInCaseman(),
-                "claimProceedsInCaseman must not be null");
+            ClaimProceedsInCaseman unspecDetails = caseData.getClaimProceedsInCaseman();
+            if (unspecDetails == null && caseData.getTakenOfflineByStaffDate() != null) {
+                log.warn("Missing claimProceedsInCaseman for caseId {}; using taken offline by staff fallback with date {}",
+                         caseData.getCcdCaseReference(), caseData.getTakenOfflineByStaffDate());
+                return textFormatter.caseTakenOfflineByStaff();
+            }
+            requireNonNull(unspecDetails, "claimProceedsInCaseman must not be null");
             return buildDetails(resolveReason(unspecDetails.getReason(), unspecDetails.getOther()),
                                 unspecDetails.getDate());
         }
