@@ -83,7 +83,8 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
      * @param e                   the exception thrown by business logic.
      */
     public void handleTaskFailureNotRetryable(ExternalTask externalTask, ExternalTaskService externalTaskService, Throwable e) {
-        log.info("Handle task failure Not Retryable, processInstanceId: '{}' ", externalTask.getProcessInstanceId());
+        log.error("Handle task failure Not Retryable, topic: '{}', processInstanceId: '{}'",
+                  externalTask.getTopicName(), externalTask.getProcessInstanceId(), e);
         externalTaskService.handleFailure(
             externalTask,
             e.getMessage(),
@@ -101,7 +102,8 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
      * @param e                   the exception thrown by business logic.
      */
     public void handleTaskFailure(ExternalTask externalTask, ExternalTaskService externalTaskService, Throwable e) {
-        log.info("Handle task failure Retryable, processInstanceId: '{}' ", externalTask.getProcessInstanceId());
+        log.warn("Handle task failure Retryable, topic: '{}', processInstanceId: '{}'",
+                 externalTask.getTopicName(), externalTask.getProcessInstanceId(), e);
         int maxRetries = getMaxAttempts();
         Integer extRetries = externalTask.getRetries();
         int remainingRetries = extRetries != null ? extRetries : maxRetries;

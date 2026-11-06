@@ -6,19 +6,27 @@ import feign.Request;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.civil.exceptions.UpstreamIdamException;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -153,6 +161,72 @@ class UserServiceTest {
 
         assertThat(exception).isSameAs(unauthorized);
         verify(idamClient).getUserDetails(AUTHORISATION);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {500, 502, 503, 504})
+    void shouldRetryTokenServerErrors(int status) {
+        FeignException failure = mock(FeignException.class);
+        when(failure.status()).thenReturn(status);
+        when(idamClient.getAccessToken(SUB, PASSWORD)).thenThrow(failure).thenReturn(AUTHORISATION);
+
+        assertThat(userService.getAccessToken(SUB, PASSWORD)).isEqualTo(AUTHORISATION);
+        verify(idamClient, times(2)).getAccessToken(SUB, PASSWORD);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {400, 401, 403, 404, 429})
+    void shouldNotRetryTokenClientErrors(int status) {
+        FeignException failure = mock(FeignException.class);
+        when(failure.status()).thenReturn(status);
+        when(idamClient.getAccessToken(SUB, PASSWORD)).thenThrow(failure);
+
+        assertThat(assertThrows(FeignException.class, () -> userService.getAccessToken(SUB, PASSWORD)))
+            .isSameAs(failure);
+        verify(idamClient).getAccessToken(SUB, PASSWORD);
+    }
+
+    @Test
+    void shouldStopAfterThreeTokenAttemptsAndPreserveFailure() {
+        FeignException failure = internalServerError();
+        when(idamClient.getAccessToken(SUB, PASSWORD)).thenThrow(failure);
+
+        assertThat(assertThrows(FeignException.class, () -> userService.getAccessToken(SUB, PASSWORD)))
+            .isSameAs(failure);
+        verify(idamClient, times(3)).getAccessToken(SUB, PASSWORD);
+    }
+
+    @Test
+    void shouldRetryTokenTimeout() {
+        when(idamClient.getAccessToken(SUB, PASSWORD))
+            .thenThrow(new RuntimeException(new SocketTimeoutException("Timed out")))
+            .thenReturn(AUTHORISATION);
+
+        assertThat(userService.getAccessToken(SUB, PASSWORD)).isEqualTo(AUTHORISATION);
+        verify(idamClient, times(2)).getAccessToken(SUB, PASSWORD);
+    }
+
+    @Test
+    void shouldCacheTokenAfterRetryAndBypassClientOnCacheHit() {
+        when(idamClient.getAccessToken(SUB, PASSWORD))
+            .thenThrow(internalServerError()).thenReturn(AUTHORISATION);
+        try (var context = new AnnotationConfigApplicationContext()) {
+            context.register(TokenCacheConfiguration.class);
+            context.registerBean("cacheManager", ConcurrentMapCacheManager.class,
+                                 () -> new ConcurrentMapCacheManager("accessTokenCache"));
+            context.registerBean(UserService.class, () -> new UserService(idamClient));
+            context.refresh();
+            UserService cachedService = context.getBean(UserService.class);
+
+            assertThat(cachedService.getAccessToken(SUB, PASSWORD)).isEqualTo(AUTHORISATION);
+            assertThat(cachedService.getAccessToken(SUB, PASSWORD)).isEqualTo(AUTHORISATION);
+            verify(idamClient, times(2)).getAccessToken(SUB, PASSWORD);
+        }
+    }
+
+    @Configuration
+    @EnableCaching
+    static class TokenCacheConfiguration {
     }
 
     private FeignException.InternalServerError internalServerError() {
