@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.civil.helpers;
 import feign.FeignException;
 import feign.Request;
 import feign.RetryableException;
-
-import java.util.Arrays;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import static org.apache.hc.core5.http.Method.isIdempotent;
 
@@ -90,9 +90,12 @@ public class ExternalTaskExceptionHelper {
         }
 
         if (throwable instanceof FeignException feignException) {
-            return feignException.contentUTF8();
+            String body = feignException.contentUTF8();
+            if (StringUtils.isNotBlank(body)) {
+                return body;
+            }
         }
 
-        return Arrays.toString(throwable.getStackTrace());
+        return ExceptionUtils.getStackTrace(throwable);
     }
 }
