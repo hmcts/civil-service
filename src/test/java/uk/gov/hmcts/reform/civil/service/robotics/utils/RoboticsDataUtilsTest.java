@@ -5,13 +5,17 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisationCollectionItem;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 class RoboticsDataUtilsTest {
 
@@ -95,6 +99,29 @@ class RoboticsDataUtilsTest {
         OrganisationPolicy policy = new OrganisationPolicy();
         policy.setPreviousOrganisations(previousOrgs);
         return policy;
+    }
+
+    @Nested
+    class WithoutBreathingSpace {
+
+        @Test
+        void shouldReturnSameInstance_whenBreathingSpaceAbsent() {
+            CaseData caseData = CaseData.builder().build();
+
+            assertSame(caseData, RoboticsDataUtil.withoutBreathingSpace(caseData));
+        }
+
+        @Test
+        void shouldClearBreathingSpace_whenPresent() {
+            CaseData caseData = CaseData.builder()
+                .breathing(new BreathingSpaceInfo())
+                .build();
+
+            CaseData result = RoboticsDataUtil.withoutBreathingSpace(caseData);
+
+            assertNull(result.getBreathing());
+            assertNotNull(caseData.getBreathing());
+        }
     }
 
 }

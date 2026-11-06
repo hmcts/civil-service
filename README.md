@@ -76,6 +76,7 @@ The project defines a set of timer-driven Camunda and Spring schedulers that kee
 <!-- SCHEDULED_JOBS_TABLE_START -->
 | Job | Purpose | Scheduler Name | Camunda topic(s) | Schedule (cron, UTC) | When it runs |
 | --- | --- | --- | --- | --- | --- |
+| Breathing space lift pending scheduler | Lifts breathing space when a saved end date has been reached. |  | `BREATHING_SPACE_LIFT_PENDING` | `0 5 0 * * ?` | Daily at 00:05 |
 | Bundle creation scheduler | Builds bundles for eligible hearings each evening. | BundleCreation | `BUNDLE_CREATION_CHECK` | `0 0 21 * * ?` | Daily at 21:00 |
 | Decision outcome scheduler | Moves cases awaiting judicial decisions into the decision outcome workflow. | DecisionOutcome | `MOVE_TO_DECISION_OUTCOME` | `0 40 0 * * ?` | Daily at 00:40 |
 | Defendant response deadline check scheduler | Sweeps for defendants whose response deadline elapsed and triggers enforcement. | DefendantResponseDeadline | `DEFENDANT_RESPONSE_DEADLINE_CHECK` | `0 1 16 * * ?` | Daily at 16:01 |

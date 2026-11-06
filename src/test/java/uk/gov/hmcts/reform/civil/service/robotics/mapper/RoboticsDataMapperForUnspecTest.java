@@ -30,6 +30,10 @@ import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.NoticeOfChange;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
@@ -506,6 +510,36 @@ class RoboticsDataMapperForUnspecTest {
                 new NoticeOfChange().setLitigiousPartyID("002").setDateOfNoC(res1NocDate.format(ISO_DATE)),
                 new NoticeOfChange().setLitigiousPartyID("003").setDateOfNoC(res2NocDate.format(ISO_DATE)))
         );
+    }
+
+    @Test
+    void shouldMapActiveBreathingSpaceWhenCaseGoesOffline() {
+        LocalDate startDate = LocalDate.of(2026, 9, 1);
+        LocalDate endDate = LocalDate.of(2026, 10, 1);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePaymentSuccessful()
+            .build();
+        caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+        caseData.setBreathing(new BreathingSpaceInfo()
+                                  .setEnter(new BreathingSpaceEnterInfo()
+                                                .setReference("BS-12345")
+                                                .setStart(startDate)
+                                                .setType(BreathingSpaceType.STANDARD))
+                                  .setLift(new BreathingSpaceLiftInfo()
+                                               .setExpectedEnd(endDate)
+                                               .setReasonToLift("reason to lift")));
+
+        RoboticsCaseData mapped = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
+        assertThat(mapped.getBreathingSpace())
+            .extracting(
+                breathingSpace -> breathingSpace.getReference(),
+                breathingSpace -> breathingSpace.getStartDate(),
+                breathingSpace -> breathingSpace.getType(),
+                breathingSpace -> breathingSpace.getEndDate(),
+                breathingSpace -> breathingSpace.getReasonForLifting()
+            )
+            .containsExactly("BS-12345", startDate, BreathingSpaceType.STANDARD, endDate, "reason to lift");
     }
 
     @Test

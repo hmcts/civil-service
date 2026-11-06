@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.notification.robotics.RoboticsNotifier;
+import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -44,9 +45,13 @@ public class NotifyRoboticsOnContinuousFeedHandler extends CallbackHandler {
         String authToken = (String) callbackParams.getParams().get(BEARER_TOKEN);
         String caseReference = caseData.getLegacyCaseReference();
 
-        log.info("Notifying RPA on continuous feed for case: {}", caseReference);
+        log.info(
+            "Notifying RPA on continuous feed for case: {} (Breathing Space omitted from payload)",
+            caseReference
+        );
         try {
-            roboticsNotifier.notifyRobotics(caseData, authToken);
+            // Continuous feed must not transfer Breathing Space (adhoc / handed-offline only).
+            roboticsNotifier.notifyRobotics(RoboticsDataUtil.withoutBreathingSpace(caseData), authToken);
         } catch (Exception e) {
             log.error("Failed to notify RPA on continuous feed for case: {}, error: {}",
                       caseReference, e.getMessage(), e);
