@@ -5,14 +5,24 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.LoggerFactory;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -45,10 +55,15 @@ class RespondentDivergentResponseStrategyTest {
 
     private RoboticsRespondentResponseSupport respondentResponseSupport;
     private RespondentDivergentResponseStrategy strategy;
+    private final Logger logger = (Logger) LoggerFactory.getLogger(RespondentDivergentResponseStrategy.class);
+    private ListAppender<ILoggingEvent> logAppender;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        logAppender = new ListAppender<>();
+        logAppender.start();
+        logger.addAppender(logAppender);
         RoboticsEventTextFormatter formatter = new RoboticsEventTextFormatter();
         RoboticsTimelineHelper timelineHelper = new RoboticsTimelineHelper(() -> NOW);
         respondentResponseSupport = new RoboticsRespondentResponseSupport(formatter, timelineHelper);
@@ -57,6 +72,12 @@ class RespondentDivergentResponseStrategyTest {
                         sequenceGenerator, respondentResponseSupport, stateFlowEngine);
 
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
+    }
+
+    @AfterEach
+    void tearDown() {
+        logger.detachAppender(logAppender);
+        logAppender.stop();
     }
 
     @Test
@@ -425,6 +446,128 @@ class RespondentDivergentResponseStrategyTest {
         strategy.contribute(builder, caseData, null);
 
         assertThat(builder.getDefenceFiled()).extracting(Event::getLitigiousPartyID).contains("003");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CaseCategory.class, names = "UNSPEC_CLAIM")
+    @NullSource
+    void skipsAllResponseEventsWhenOnlyRespondentHasNoResponseType(CaseCategory category) {
+        givenDivergentState();
+        CaseData caseData = CaseDataBuilder.builder()
+                .caseReference(1234567890123456L)
+                .respondent1ResponseDate(NOW)
+                .build();
+        caseData.setCaseAccessCategory(category);
+        caseData.setRespondent1ClaimResponseType(null);
+
+        EventHistory eventHistory = new EventHistory();
+        strategy.contribute(eventHistory, caseData, null);
+
+        assertThat(eventHistory.getDefenceFiled()).isNullOrEmpty();
+        assertThat(eventHistory.getStatesPaid()).isNullOrEmpty();
+        assertThat(eventHistory.getDirectionsQuestionnaireFiled()).isNullOrEmpty();
+        assertThat(eventHistory.getReceiptOfAdmission()).isNullOrEmpty();
+        assertThat(eventHistory.getReceiptOfPartAdmission()).isNullOrEmpty();
+        assertThat(eventHistory.getMiscellaneous()).isNullOrEmpty();
+        verifyNoInteractions(sequenceGenerator);
+        assertMissingResponseWarning("respondent 002", "respondent1ClaimResponseType");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CaseCategory.class, names = "UNSPEC_CLAIM")
+    @NullSource
+    void preservesRespondent1EventsWhenRespondent2ResponseTypeMissing(CaseCategory category) {
+        givenDivergentState();
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(1, 2);
+        CaseData caseData = createUnspecDivergentCase();
+        caseData.setCaseAccessCategory(category);
+        caseData.setCcdCaseReference(1234567890123456L);
+        caseData.setRespondent2ClaimResponseType(null);
+
+        EventHistory eventHistory = new EventHistory();
+        strategy.contribute(eventHistory, caseData, null);
+
+        assertThat(eventHistory.getDefenceFiled()).extracting(Event::getLitigiousPartyID).containsExactly("002");
+        assertThat(eventHistory.getDirectionsQuestionnaireFiled())
+                .extracting(Event::getLitigiousPartyID).containsExactly("002");
+        assertThat(eventHistory.getReceiptOfAdmission()).isNullOrEmpty();
+        assertThat(eventHistory.getReceiptOfPartAdmission()).isNullOrEmpty();
+        assertThat(eventHistory.getMiscellaneous()).isNullOrEmpty();
+        assertMissingResponseWarning("respondent 003", "respondent2ClaimResponseType");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CaseCategory.class, names = "UNSPEC_CLAIM")
+    @NullSource
+    void preservesRespondent2EventsWhenRespondent1ResponseTypeMissing(CaseCategory category) {
+        givenDivergentState();
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(1, 2);
+        CaseData caseData = createUnspecDivergentCase();
+        caseData.setCaseAccessCategory(category);
+        caseData.setCcdCaseReference(1234567890123456L);
+        caseData.setRespondent1ClaimResponseType(null);
+
+        EventHistory eventHistory = new EventHistory();
+        strategy.contribute(eventHistory, caseData, null);
+
+        assertThat(eventHistory.getDefenceFiled()).isNullOrEmpty();
+        assertThat(eventHistory.getDirectionsQuestionnaireFiled()).isNullOrEmpty();
+        assertThat(eventHistory.getReceiptOfPartAdmission())
+                .extracting(Event::getLitigiousPartyID).containsExactly("003");
+        assertThat(eventHistory.getMiscellaneous()).extracting(Event::getEventDetailsText)
+                .containsExactly(respondentResponseSupport.prepareRespondentResponseText(
+                        caseData, caseData.getRespondent2(), false));
+        assertMissingResponseWarning("respondent 002", "respondent1ClaimResponseType");
+    }
+
+    @Test
+    void skipsRespondent2WithoutResponseTypeWhenDivergentResponseUsesSameSolicitor() {
+        givenDivergentState();
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(1, 2);
+        CaseData caseData = createUnspecDivergentCase();
+        caseData.setCcdCaseReference(1234567890123456L);
+        caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
+        caseData.setRespondentResponseIsSame(YesOrNo.NO);
+        caseData.setRespondent2ResponseDate(null);
+        caseData.setRespondent2ClaimResponseType(null);
+
+        EventHistory eventHistory = new EventHistory();
+        strategy.contribute(eventHistory, caseData, null);
+
+        assertThat(eventHistory.getDefenceFiled()).extracting(Event::getLitigiousPartyID).containsExactly("002");
+        assertThat(eventHistory.getDirectionsQuestionnaireFiled())
+                .extracting(Event::getLitigiousPartyID).containsExactly("002");
+        assertThat(eventHistory.getReceiptOfPartAdmission()).isNullOrEmpty();
+        assertThat(eventHistory.getMiscellaneous()).isNullOrEmpty();
+        assertMissingResponseWarning("respondent 003", "respondent2ClaimResponseType");
+    }
+
+    @Test
+    void doesNotWarnWhenNeitherRespondentHasResponded() {
+        givenDivergentState();
+        CaseData caseData = createUnspecDivergentCase();
+        caseData.setRespondent1ResponseDate(null);
+        caseData.setRespondent2ResponseDate(null);
+        caseData.setRespondent1ClaimResponseType(null);
+        caseData.setRespondent2ClaimResponseType(null);
+
+        EventHistory eventHistory = new EventHistory();
+        strategy.contribute(eventHistory, caseData, null);
+
+        verifyNoInteractions(sequenceGenerator);
+        assertThat(logAppender.list).noneMatch(event -> event.getLevel() == Level.WARN);
+    }
+
+    private void givenDivergentState() {
+        State state = State.from(FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE.fullName());
+        when(stateFlow.getStateHistory()).thenReturn(List.of(state));
+        when(stateFlow.getState()).thenReturn(state);
+    }
+
+    private void assertMissingResponseWarning(String respondent, String field) {
+        assertThat(logAppender.list).filteredOn(event -> event.getLevel() == Level.WARN)
+                .singleElement().satisfies(event -> assertThat(event.getFormattedMessage())
+                        .contains("1234567890123456", respondent, field));
     }
 
     private CaseData createUnspecDivergentCase() {

@@ -18,7 +18,6 @@ import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSu
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.createEvent;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
-import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2DivergentResponseExists;
 
 import java.math.BigDecimal;
@@ -111,7 +110,7 @@ public class RespondentDivergentResponseStrategy implements EventHistoryStrategy
                         ? caseData.getRespondent1ResponseDate()
                         : caseData.getRespondent2ResponseDate();
 
-        if (defendant1ResponseExists.test(caseData)) {
+        if (respondent1ResponseDate != null && !isUnspecResponseTypeMissing(caseData, true)) {
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
                 RespondentResponseTypeSpec responseType = resolveRespondent1SpecResponse(caseData);
                 addSpecResponseEvents(
@@ -132,7 +131,7 @@ public class RespondentDivergentResponseStrategy implements EventHistoryStrategy
             }
         }
 
-        if (defendant2DivergentResponseExists.test(caseData)) {
+        if (defendant2DivergentResponseExists.test(caseData) && !isUnspecResponseTypeMissing(caseData, false)) {
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
                 addSpecResponseEvents(
                         eventHistory,
@@ -156,6 +155,25 @@ public class RespondentDivergentResponseStrategy implements EventHistoryStrategy
                         eventHistory, caseData, caseData.getRespondent2(), false, respondent2ResponseDate);
             }
         }
+    }
+
+    private boolean isUnspecResponseTypeMissing(CaseData caseData, boolean isRespondent1) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return false;
+        }
+
+        RespondentResponseType responseType = isRespondent1
+                ? caseData.getRespondent1ClaimResponseType()
+                : caseData.getRespondent2ClaimResponseType();
+        if (responseType != null) {
+            return false;
+        }
+
+        log.warn("Skipping robotics response events for caseId {} and respondent {} because {} is missing",
+                 caseData.getCcdCaseReference(),
+                 isRespondent1 ? RESPONDENT_ID : RESPONDENT2_ID,
+                 isRespondent1 ? "respondent1ClaimResponseType" : "respondent2ClaimResponseType");
+        return true;
     }
 
     private RespondentResponseTypeSpec resolveRespondent1SpecResponse(CaseData caseData) {
