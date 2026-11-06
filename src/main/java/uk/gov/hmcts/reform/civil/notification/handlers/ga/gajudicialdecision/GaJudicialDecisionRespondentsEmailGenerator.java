@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.ga.gajudicialdecision;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.civil.notification.handlers.ga.GaEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.ga.GaNotificationContext;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
@@ -25,6 +26,9 @@ public class GaJudicialDecisionRespondentsEmailGenerator extends GaEmailDTOGener
     public Set<EmailDTO> buildEmailDTOs(GaNotificationContext context, String taskId) {
         Set<EmailDTO> emails = new HashSet<>();
         context.gaCaseData().getGeneralAppRespondentSolicitors().forEach(respondent -> {
+            if (StringUtils.isBlank(respondent.getValue().getEmail())) {
+                return;
+            }
             EmailDTO email = new EmailDTO();
             email.setTargetEmail(respondent.getValue().getEmail());
             email.setEmailTemplate(getEmailTemplateId(context));

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.ga.gaapplicationcreated;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.GeneralApplicationCreationNotificationService;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
@@ -35,7 +36,7 @@ public class GaApplicationCreatedRespondentsEmailGenerator extends GaEmailDTOGen
     public Set<EmailDTO> buildEmailDTOs(GaNotificationContext context, String taskId) {
         return context.gaCaseData().getGeneralAppRespondentSolicitors().stream()
             .filter(respondent -> respondent != null && respondent.getValue() != null
-                && respondent.getValue().getEmail() != null)
+                && StringUtils.isNotBlank(respondent.getValue().getEmail()))
             .map(respondent -> new EmailDTO(respondent.getValue().getEmail(), getEmailTemplateId(context),
                 addProperties(context), buildEmailReference(context)))
             .collect(Collectors.toSet());

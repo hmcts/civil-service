@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
@@ -170,6 +171,26 @@ class GaApplicationCreatedNotifierTest {
         var email = respondent.buildEmailDTO(context, GaApplicationCreatedNotifier.TASK_ID);
         assertThat(respondent.buildEmailDTOs(context, GaApplicationCreatedNotifier.TASK_ID)).containsExactly(email);
         assertThat(email.getTargetEmail()).isEqualTo("old@example.com");
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   "})
+    void shouldExcludeMissingRespondentEmailsFromSendingAndHistory(String email) {
+        var parent = new GeneralApplicationCaseData().ccdState(CaseState.CASE_PROGRESSION).build();
+        when(converter.toGeneralApplicationCaseData(any())).thenReturn(parent);
+        when(validator.validateSolicitorEmail(any(), any())).thenAnswer(invocation -> invocation.getArgument(1));
+        var data = data("WITH_NOTICE", "NORMAL", "FREE", 0, false);
+        data.setGeneralAppRespondentSolicitors(List.of(element(new GASolicitorDetailsGAspec().setEmail("valid@example.com")),
+            element(new GASolicitorDetailsGAspec().setEmail(email))));
+        var actualEmailsForMissingAddress = new ArrayList<EmailDTO>();
+        capture(newMail, actualEmailsForMissingAddress);
+        var respondent = new GaApplicationCreatedRespondentsEmailGenerator(templates, lips, service());
+        var parties = new GaApplicationCreatedAllPartiesEmailGenerator(respondent, converter, ccd, validator, fees);
+        var notifier = new GaApplicationCreatedNotifier(newMail, mock(CaseTaskTrackingService.class), parties);
+        String summary = notifier.notifyParties(data, "NOTIFY_EVENT", GaApplicationCreatedNotifier.TASK_ID);
+        assertThat(actualEmailsForMissingAddress).extracting(EmailDTO::getTargetEmail).containsExactly("valid@example.com");
+        assertThat(summary).contains("valid@example.com").doesNotContain("null :", "   :", " | ");
     }
 
     private GeneralApplicationCaseData data(String route, String urgency, String payment, int party, boolean pending) {

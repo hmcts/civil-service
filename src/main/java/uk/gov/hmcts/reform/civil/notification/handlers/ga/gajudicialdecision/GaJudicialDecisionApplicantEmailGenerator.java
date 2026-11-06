@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.ga.gajudicialdecision;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.civil.notification.handlers.ga.GaEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.ga.GaNotificationContext;
 
@@ -15,7 +16,7 @@ public class GaJudicialDecisionApplicantEmailGenerator extends GaEmailDTOGenerat
 
     @Override
     public Boolean getShouldNotify(GaNotificationContext context) {
-        return helper.shouldNotify(context.gaCaseData(), true);
+        return helper.shouldNotify(context.gaCaseData(), true) && StringUtils.isNotBlank(getEmailAddress(context));
     }
 
     @Override

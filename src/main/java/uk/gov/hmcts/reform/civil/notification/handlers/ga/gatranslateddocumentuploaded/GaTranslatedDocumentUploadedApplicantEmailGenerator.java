@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.ga.gatranslateddocumentu
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.civil.ga.service.DocUploadNotificationService;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.notification.handlers.ga.GaEmailDTOGenerator;
@@ -36,7 +37,7 @@ public class GaTranslatedDocumentUploadedApplicantEmailGenerator extends GaEmail
 
     @Override
     public Boolean getShouldNotify(GaNotificationContext context) {
-        return true;
+        return StringUtils.isNotBlank(getEmailAddress(context));
     }
 
     @Override

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.ga.gatranslateddocumentu
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.civil.ga.service.DocUploadNotificationService;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
@@ -50,6 +51,7 @@ public class GaTranslatedDocumentUploadedRespondentsEmailGenerator extends GaEma
     @Override
     public Set<EmailDTO> buildEmailDTOs(GaNotificationContext context, String taskId) {
         return context.gaCaseData().getGeneralAppRespondentSolicitors().stream()
+            .filter(respondent -> StringUtils.isNotBlank(respondent.getValue().getEmail()))
             .map(respondent -> new EmailDTO(respondent.getValue().getEmail(), getEmailTemplateId(context),
                 properties(context, respondent.getValue()), buildEmailReference(context)))
             .collect(Collectors.toSet());

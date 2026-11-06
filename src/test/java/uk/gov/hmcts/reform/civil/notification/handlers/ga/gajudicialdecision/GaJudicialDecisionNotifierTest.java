@@ -227,6 +227,39 @@ class GaJudicialDecisionNotifierTest {
             .hasMessage("No judicial decision notification criterion");
     }
 
+    static Stream<Arguments> missingAddresses() {
+        return Stream.of("APPLICANT", "FIRST_RESPONDENT", "SECOND_RESPONDENT", "ALL")
+            .flatMap(party -> Stream.<String>of(null, "", "   ").flatMap(email -> Stream.of(0, 1, 2, 3)
+                .map(mode -> Arguments.of(party, email, mode))));
+    }
+
+    @ParameterizedTest
+    @MethodSource("missingAddresses")
+    void shouldOmitMissingAddressesFromSendingAndHistory(String party, String email, int mode) {
+        configure(mode);
+        var data = caseData("HEARING", false);
+        var expected = new ArrayList<>(List.of("applicant@example.com", "respondent1@example.com", "respondent2@example.com"));
+        if ("APPLICANT".equals(party) || "ALL".equals(party)) {
+            data.getGeneralAppApplnSolicitor().setEmail(email);
+            expected.remove("applicant@example.com");
+        }
+        if ("FIRST_RESPONDENT".equals(party) || "ALL".equals(party)) {
+            data.getGeneralAppRespondentSolicitors().getFirst().getValue().setEmail(email);
+            expected.remove("respondent1@example.com");
+        }
+        if ("SECOND_RESPONDENT".equals(party) || "ALL".equals(party)) {
+            data.getGeneralAppRespondentSolicitors().get(1).getValue().setEmail(email);
+            expected.remove("respondent2@example.com");
+        }
+        capture(notify, actualEmails);
+        String summary = notifier().notifyParties(data, "NOTIFY_EVENT", GaJudicialDecisionNotifier.TASK_ID);
+        assertThat(actualEmails).extracting(EmailDTO::getTargetEmail).containsExactlyInAnyOrderElementsOf(expected);
+        assertThat(summary).doesNotContain("null :", "   :");
+        if (expected.isEmpty()) {
+            assertThat(summary).isEqualTo("Attempted:  || Errors: ");
+        }
+    }
+
     private GaJudicialDecisionNotifier notifier() {
         return new GaJudicialDecisionNotifier(notify, mock(CaseTaskTrackingService.class), generator());
     }
