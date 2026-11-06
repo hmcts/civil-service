@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.workflow.ccd.fixture.RecordJudgmentFixtures;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT_NOTIFICATION;
 
 @SuppressWarnings({"java:S5960", "java:S6813"})
 class RecordJudgmentWorkflowTest extends WorkflowIntegrationTest {
@@ -80,7 +79,7 @@ class RecordJudgmentWorkflowTest extends WorkflowIntegrationTest {
     }
 
     @Test
-    void shouldTriggerNotificationForDeterminationOfMeans() throws Exception {
+    void shouldRecordDeterminationOfMeansWithoutStartingRetiredProcess() throws Exception {
         CaseData fixture = RecordJudgmentFixtures.recordJudgmentDeterminationOfMeans();
 
         startWorkflow(fixture)
@@ -90,9 +89,8 @@ class RecordJudgmentWorkflowTest extends WorkflowIntegrationTest {
                 assertThat(result.response().getErrors()).isNullOrEmpty();
 
                 CaseData updated = result.caseData();
-                assertThat(updated.getBusinessProcess()).isNotNull();
-                assertThat(updated.getBusinessProcess().getCamundaEvent())
-                    .isEqualTo(RECORD_JUDGMENT_NOTIFICATION.name());
+                assertThat(updated.getActiveJudgment()).isNotNull();
+                assertThat(updated.getBusinessProcess()).isEqualTo(fixture.getBusinessProcess());
             });
     }
 
