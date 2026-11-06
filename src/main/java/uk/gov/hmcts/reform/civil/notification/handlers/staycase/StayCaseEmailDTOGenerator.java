@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.staycase;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.CivilEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -23,8 +24,7 @@ public abstract class StayCaseEmailDTOGenerator extends CivilEmailDTOGenerator {
 
     @Override
     public Boolean getShouldNotify(CaseData caseData) {
-        String email = getEmailAddress(caseData);
-        return email != null && !email.isEmpty();
+        return StringUtils.isNotBlank(getEmailAddress(caseData));
     }
 
     @Override

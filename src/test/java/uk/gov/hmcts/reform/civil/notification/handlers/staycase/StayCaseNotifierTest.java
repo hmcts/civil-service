@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.staycase;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
@@ -113,24 +112,41 @@ class StayCaseNotifierTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"NULL", "''"}, nullValues = "NULL")
+    @CsvSource(value = {"NULL", "''", "'   '"}, nullValues = "NULL")
     void shouldSkipMissingSolicitorEmails(String email) {
         CaseData data = caseData(false, false, false, false).toBuilder()
             .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(email))
             .respondentSolicitor1EmailAddress(email).respondentSolicitor2EmailAddress(email).build();
         when(flow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(true);
-        notifier.notifyParties(data, "NOTIFY_EVENT", "StayCaseNotifyParties");
+        String summary = notifier.notifyParties(data, "NOTIFY_EVENT", "StayCaseNotifyParties");
+        assertThat(summary).isEqualTo("Attempted:  || Errors: ");
         verifyNoInteractions(notificationService, trackingService);
     }
 
-    @Test
-    void shouldSkipMissingLipEmails() {
+    @ParameterizedTest
+    @CsvSource(value = {"NULL", "''", "'   '"}, nullValues = "NULL")
+    void shouldSkipMissingLipEmails(String email) {
         CaseData data = caseData(true, false, true, false).toBuilder()
-            .claimantUserDetails(new IdamUserDetails())
-            .respondent1(party("Defendant", null)).build();
+            .claimantUserDetails(new IdamUserDetails().setEmail(email))
+            .respondent1(party("Defendant", email)).build();
         when(flow.isFlagSet(UNREPRESENTED_DEFENDANT_TWO)).thenReturn(true);
-        notifier.notifyParties(data, "NOTIFY_EVENT", "StayCaseNotifyParties");
+        String summary = notifier.notifyParties(data, "NOTIFY_EVENT", "StayCaseNotifyParties");
+        assertThat(summary).isEqualTo("Attempted:  || Errors: ");
         verifyNoInteractions(notificationService, trackingService);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"NULL", "''", "'   '"}, nullValues = "NULL")
+    void shouldKeepOnlyTheClaimantWhenLipDefendantsHaveNoEmail(String email) {
+        CaseData data = caseData(false, false, true, false).toBuilder()
+            .respondent1(party("Defendant", email)).build();
+        when(flow.isFlagSet(UNREPRESENTED_DEFENDANT_TWO)).thenReturn(true);
+
+        String summary = notifier.notifyParties(data, "NOTIFY_EVENT", "StayCaseNotifyParties");
+
+        assertThat(emails(notificationService, 1).getFirst().getFirst()).isEqualTo("claimant-sol@example.com");
+        assertThat(summary).startsWith("Attempted: claimant-sol@example.com :").doesNotContain("null :", " | ");
+        verifyNoInteractions(trackingService);
     }
 
     private CaseData caseData(boolean claimantLip, boolean claimantWelsh, boolean defendantLip, boolean defendantWelsh) {

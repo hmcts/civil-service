@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.coscapplicationafterpayment;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.CivilEmailDTOGenerator;
@@ -24,8 +25,7 @@ public class CoscApplicationAfterPaymentAppSolOneEmailDTOGenerator extends Civil
 
     @Override
     public Boolean getShouldNotify(CaseData caseData) {
-        // The BPMN selects this notification only for a represented claimant with an unpaid judgment.
-        return true;
+        return caseData.getApplicantSolicitor1UserDetails() != null && StringUtils.isNotBlank(getEmailAddress(caseData));
     }
 
     @Override
