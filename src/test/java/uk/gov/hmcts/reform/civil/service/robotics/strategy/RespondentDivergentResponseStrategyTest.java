@@ -427,6 +427,57 @@ class RespondentDivergentResponseStrategyTest {
         assertThat(builder.getDefenceFiled()).extracting(Event::getLitigiousPartyID).contains("003");
     }
 
+    @Test
+    void skipsUnspecResponseEventsWhenRespondent2ResponseTypeNull() {
+        when(stateFlow.getStateHistory())
+                .thenReturn(
+                        List.of(
+                                State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())));
+        when(stateFlow.getState())
+                .thenReturn(State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()));
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(110, 111, 112, 113);
+
+        CaseData caseData = createUnspecDivergentCase();
+        caseData.setRespondent2ClaimResponseType(null);
+
+        EventHistory builder = new EventHistory();
+        strategy.contribute(builder, caseData, null);
+
+        assertThat(builder.getDefenceFiled())
+                .extracting(Event::getLitigiousPartyID)
+                .containsExactly("002");
+        assertThat(builder.getDirectionsQuestionnaireFiled())
+                .extracting(Event::getLitigiousPartyID)
+                .containsExactly("002");
+        assertThat(builder.getReceiptOfPartAdmission()).isNullOrEmpty();
+        assertThat(builder.getReceiptOfAdmission()).isNullOrEmpty();
+        assertThat(builder.getStatesPaid()).isNullOrEmpty();
+    }
+
+    @Test
+    void skipsSpecResponseEventsWhenRespondent2ResponseTypeNull() {
+        when(stateFlow.getStateHistory())
+                .thenReturn(
+                        List.of(State.from(FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName())));
+        when(stateFlow.getState())
+                .thenReturn(State.from(FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName()));
+        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(120, 121, 122, 123);
+
+        CaseData caseData = createSpecDivergentCase();
+        caseData.setRespondent2ClaimResponseTypeForSpec(null);
+
+        EventHistory builder = new EventHistory();
+        strategy.contribute(builder, caseData, null);
+
+        assertThat(builder.getReceiptOfPartAdmission())
+                .extracting(Event::getLitigiousPartyID)
+                .containsExactly("002");
+        assertThat(builder.getDefenceFiled()).isNullOrEmpty();
+        assertThat(builder.getDirectionsQuestionnaireFiled()).isNullOrEmpty();
+        assertThat(builder.getStatesPaid()).isNullOrEmpty();
+        assertThat(builder.getReceiptOfAdmission()).isNullOrEmpty();
+    }
+
     private CaseData createUnspecDivergentCase() {
         return StrategyTestDataFactory.unspecTwoDefendantSolicitorsCase()
                 .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
