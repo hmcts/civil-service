@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.robotics.support;
 
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -27,6 +28,7 @@ import static java.time.format.DateTimeFormatter.ISO_DATE;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class RoboticsCaseDataSupport {
 
     private final RoboticsAddressMapper addressMapper;
@@ -39,8 +41,12 @@ public class RoboticsCaseDataSupport {
         String id,
         String solicitorId,
         String solicitorOrganisationId,
-        LocalDate dateOfService
+        LocalDate dateOfService,
+        Long caseReference
     ) {
+        if (party.getPrimaryAddress() == null) {
+            log.warn("Missing primaryAddress for RPA party {} in case {}; mapping addresses as null", id, caseReference);
+        }
         return new LitigiousParty()
             .setId(id)
             .setSolicitorID(solicitorId)
