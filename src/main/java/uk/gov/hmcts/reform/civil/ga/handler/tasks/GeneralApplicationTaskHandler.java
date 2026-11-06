@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
@@ -50,7 +51,12 @@ public class GeneralApplicationTaskHandler extends BaseExternalTaskHandler {
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
         String generalApplicationCaseId = variables.getGeneralApplicationCaseId();
-        if (generalApplicationCaseId == null) {
+        if (StringUtils.isBlank(generalApplicationCaseId)) {
+            if ("GA_INITIATE_PROCESS_ID".equals(externalTask.getProcessDefinitionKey())) {
+                throw new NotRetryableException("generalApplicationCaseId missing for parent case "
+                    + variables.getCaseId() + ", process instance " + externalTask.getProcessInstanceId());
+            }
+            // Other GA workflows use caseId for the GA case itself.
             generalApplicationCaseId = variables.getCaseId();
         }
         StartEventResponse startEventResponse = coreCaseDataService.startGaUpdate(generalApplicationCaseId,

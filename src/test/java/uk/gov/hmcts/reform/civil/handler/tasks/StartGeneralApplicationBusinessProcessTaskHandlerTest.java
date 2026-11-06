@@ -136,6 +136,7 @@ class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallback
     void init() {
         variables.putValue(FLOW_STATE, "MAIN.DRAFT");
         variables.putValue(FLOW_FLAGS, Map.of());
+        variables.putValue("generalApplicationProcessInstanceId", PROCESS_INSTANCE_ID);
 
         when(mockTask.getAllVariables()).thenReturn(Map.of(
             "caseId", CASE_ID,

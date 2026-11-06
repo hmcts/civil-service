@@ -19,4 +19,5 @@ public class ExternalTaskInput {
     String generalAppParentCaseLink;
     Boolean triggeredViaScheduler;
     String generalApplicationCaseId;
+    String generalApplicationProcessInstanceId;
 }
