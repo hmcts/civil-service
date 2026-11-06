@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.List;
@@ -27,21 +28,26 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_DOCUMENTS;
 
 @ExtendWith(MockitoExtension.class)
 class ManageDocumentsHandlerTest extends BaseCallbackHandlerTest {
 
+    private static final String WITHOUT_PREJUDICE_CATEGORY_ID = "WithoutPrejudice";
+
     private ManageDocumentsHandler handler;
     private ObjectMapper objectMapper;
     @Mock
     private TaskListService taskListService;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setup() {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        handler = new ManageDocumentsHandler(objectMapper, taskListService);
+        handler = new ManageDocumentsHandler(objectMapper, taskListService, featureToggleService);
     }
 
     @Nested
@@ -100,6 +106,153 @@ class ManageDocumentsHandlerTest extends BaseCallbackHandlerTest {
 
             //Then
             assertThat(response.getData()).extracting("manageDocuments").isNotNull();
+        }
+
+        @Test
+        void shouldAssignWithoutPrejudiceCategoryIdForWithoutPrejudiceDocumentType() {
+            when(featureToggleService.isPart36Enabled()).thenReturn(true);
+            ManageDocument manageDocument = new ManageDocument();
+            manageDocument.setDocumentType(ManageDocumentType.WITHOUT_PREJUDICE_PART_36_OFFER_OR_REJECTIONS);
+            manageDocument.setDocumentName("without prejudice document");
+            manageDocument.setDocumentLink(new Document()
+                .setDocumentUrl("http://test.com")
+                .setDocumentBinaryUrl("http://test.com/binary")
+                .setDocumentFileName("document.pdf"));
+
+            CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1L).build();
+            caseData.setManageDocuments(List.of(new Element<>(UUID.randomUUID(), manageDocument)));
+
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            List<Element<ManageDocument>> manageDocuments = convertToMap(response.getData().get("manageDocuments"));
+
+            assertEquals(WITHOUT_PREJUDICE_CATEGORY_ID,
+                         manageDocuments.getFirst().getValue().getDocumentLink().getCategoryID());
+        }
+
+        @Test
+        void shouldPreserveWithoutPrejudiceCategoryIdWhenAmendingExistingDocument() {
+            when(featureToggleService.isPart36Enabled()).thenReturn(true);
+            ManageDocument manageDocument = new ManageDocument();
+            manageDocument.setDocumentType(ManageDocumentType.WITHOUT_PREJUDICE_PART_36_OFFER_OR_REJECTIONS);
+            manageDocument.setDocumentName("without prejudice document");
+            Document document = new Document()
+                .setDocumentUrl("http://test.com")
+                .setDocumentBinaryUrl("http://test.com/binary")
+                .setDocumentFileName("document.pdf")
+                .setCategoryID(WITHOUT_PREJUDICE_CATEGORY_ID);
+            manageDocument.setDocumentLink(document);
+
+            Element<ManageDocument> existingDocument = new Element<>(UUID.randomUUID(), manageDocument);
+            CaseData caseDataBefore = CaseDataBuilder.builder().build();
+            caseDataBefore.setManageDocuments(List.of(existingDocument));
+
+            CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1L).build();
+            caseData.setManageDocuments(List.of(existingDocument));
+
+            CallbackParams params = callbackParamsOf(caseData, caseDataBefore, CallbackType.ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            List<Element<ManageDocument>> manageDocuments = convertToMap(response.getData().get("manageDocuments"));
+
+            assertEquals(WITHOUT_PREJUDICE_CATEGORY_ID,
+                         manageDocuments.getFirst().getValue().getDocumentLink().getCategoryID());
+        }
+
+        @Test
+        void shouldRemoveWithoutPrejudiceCategoryWhenDocumentTypeChangedAwayFromWithoutPrejudice() {
+            when(featureToggleService.isPart36Enabled()).thenReturn(true);
+            Document sharedFile = new Document()
+                .setDocumentUrl("http://test.com")
+                .setDocumentBinaryUrl("http://test.com/binary")
+                .setDocumentFileName("document.pdf")
+                .setCategoryID(WITHOUT_PREJUDICE_CATEGORY_ID);
+
+            ManageDocument before = new ManageDocument();
+            before.setDocumentType(ManageDocumentType.WITHOUT_PREJUDICE_PART_36_OFFER_OR_REJECTIONS);
+            before.setDocumentName("wp doc");
+            before.setDocumentLink(sharedFile);
+
+            ManageDocument after = new ManageDocument();
+            after.setDocumentType(ManageDocumentType.N9A_PAPER_ADMISSION_FULL_OR_PART);
+            after.setDocumentName("wp doc");
+            after.setDocumentLink(new Document()
+                .setDocumentUrl(sharedFile.getDocumentUrl())
+                .setDocumentBinaryUrl(sharedFile.getDocumentBinaryUrl())
+                .setDocumentFileName(sharedFile.getDocumentFileName()));
+
+            CaseData caseDataBefore = CaseDataBuilder.builder().build();
+            caseDataBefore.setManageDocuments(List.of(new Element<>(UUID.randomUUID(), before)));
+
+            CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1L).build();
+            caseData.setManageDocuments(List.of(new Element<>(UUID.randomUUID(), after)));
+
+            CallbackParams params = callbackParamsOf(caseData, caseDataBefore, CallbackType.ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            List<Element<ManageDocument>> manageDocuments = convertToMap(response.getData().get("manageDocuments"));
+
+            assertNull(manageDocuments.getFirst().getValue().getDocumentLink().getCategoryID());
+        }
+
+        @Test
+        void shouldNotAssignWithoutPrejudiceCategoryWhenPart36Disabled() {
+            when(featureToggleService.isPart36Enabled()).thenReturn(false);
+            ManageDocument manageDocument = new ManageDocument();
+            manageDocument.setDocumentType(ManageDocumentType.WITHOUT_PREJUDICE_PART_36_OFFER_OR_REJECTIONS);
+            manageDocument.setDocumentName("without prejudice document");
+            manageDocument.setDocumentLink(new Document()
+                .setDocumentUrl("http://test.com")
+                .setDocumentBinaryUrl("http://test.com/binary")
+                .setDocumentFileName("document.pdf"));
+
+            CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1L).build();
+            caseData.setManageDocuments(List.of(new Element<>(UUID.randomUUID(), manageDocument)));
+
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            List<Element<ManageDocument>> manageDocuments = convertToMap(response.getData().get("manageDocuments"));
+
+            assertNull(manageDocuments.getFirst().getValue().getDocumentLink().getCategoryID());
+        }
+
+        @Test
+        void shouldKeepWithoutPrejudiceCategoryWhenPart36DisabledAndTypeChanges() {
+            when(featureToggleService.isPart36Enabled()).thenReturn(false);
+            Document sharedFile = new Document()
+                .setDocumentUrl("http://test.com")
+                .setDocumentBinaryUrl("http://test.com/binary")
+                .setDocumentFileName("document.pdf")
+                .setCategoryID(WITHOUT_PREJUDICE_CATEGORY_ID);
+
+            ManageDocument before = new ManageDocument();
+            before.setDocumentType(ManageDocumentType.WITHOUT_PREJUDICE_PART_36_OFFER_OR_REJECTIONS);
+            before.setDocumentName("wp doc");
+            before.setDocumentLink(sharedFile);
+
+            ManageDocument after = new ManageDocument();
+            after.setDocumentType(ManageDocumentType.N9A_PAPER_ADMISSION_FULL_OR_PART);
+            after.setDocumentName("wp doc");
+            after.setDocumentLink(new Document()
+                .setDocumentUrl(sharedFile.getDocumentUrl())
+                .setDocumentBinaryUrl(sharedFile.getDocumentBinaryUrl())
+                .setDocumentFileName(sharedFile.getDocumentFileName()));
+
+            CaseData caseDataBefore = CaseDataBuilder.builder().build();
+            caseDataBefore.setManageDocuments(List.of(new Element<>(UUID.randomUUID(), before)));
+
+            CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1L).build();
+            caseData.setManageDocuments(List.of(new Element<>(UUID.randomUUID(), after)));
+
+            CallbackParams params = callbackParamsOf(caseData, caseDataBefore, CallbackType.ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            List<Element<ManageDocument>> manageDocuments = convertToMap(response.getData().get("manageDocuments"));
+
+            assertEquals(WITHOUT_PREJUDICE_CATEGORY_ID,
+                         manageDocuments.getFirst().getValue().getDocumentLink().getCategoryID());
         }
     }
 
