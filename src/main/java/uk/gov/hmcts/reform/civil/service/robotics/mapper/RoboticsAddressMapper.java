@@ -33,9 +33,9 @@ public class RoboticsAddressMapper {
     }
 
     public RoboticsAddresses toRoboticsAddresses(Address address) {
-        requireNonNull(address);
-        return new RoboticsAddresses()
-            .setContactAddress(toRoboticsAddress(address));
+        return address == null
+            ? null
+            : new RoboticsAddresses().setContactAddress(toRoboticsAddress(address));
     }
 
     public RoboticsAddresses toRoboticsAddresses(List<ContactInformation> contactInformation) {
