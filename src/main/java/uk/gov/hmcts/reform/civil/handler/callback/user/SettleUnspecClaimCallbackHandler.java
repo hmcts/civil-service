@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 
 import java.util.List;
@@ -34,10 +35,12 @@ public class SettleUnspecClaimCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(SETTLE_CLAIM_UNSPEC);
     private static final List<String> CASEWORKER_ROLES = List.of("caseworker-civil-admin", "caseworker-civil-staff");
+    static final String EVENT_NOT_ALLOWED = "Event Not Allowed";
     public static final String CONFIRMATION_HEADER = "### This claim has been marked as settled";
 
     private final ObjectMapper objectMapper;
     private final UserService userService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -53,6 +56,11 @@ public class SettleUnspecClaimCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse submitChanges(CallbackParams callbackParams) {
+        if (!featureToggleService.isEarlyClaimTerminationEnabled()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(EVENT_NOT_ALLOWED))
+                .build();
+        }
         CaseData caseData = callbackParams.getCaseData();
 
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =

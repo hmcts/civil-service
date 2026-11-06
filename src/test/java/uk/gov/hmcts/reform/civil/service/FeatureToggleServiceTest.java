@@ -294,4 +294,11 @@ class FeatureToggleServiceTest {
         givenToggle("cui-draft-claim-database", toggleStat);
         assertThat(featureToggleService.isDraftClaimDatabaseEnabled()).isEqualTo(toggleStat);
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenEarlyClaimTerminationEnabled(Boolean toggleStat) {
+        givenToggle("early-claim-termination", toggleStat);
+        assertThat(featureToggleService.isEarlyClaimTerminationEnabled()).isEqualTo(toggleStat);
+    }
 }
