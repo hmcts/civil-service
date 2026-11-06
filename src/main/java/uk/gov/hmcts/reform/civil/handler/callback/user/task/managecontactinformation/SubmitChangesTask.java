@@ -96,7 +96,7 @@ public class SubmitChangesTask {
         String partyChosenId = caseData.getUpdateDetailsForm().getPartyChosenId();
         CaseData current = caseDetailsConverter.toCaseData(caseDetailsBefore);
 
-        if (isPartyOrLitigationFriend(partyChosenId) && caseNameChanged(current, caseData) && !isAdmin(authToken)) {
+        if (caseNameChanged(current, caseData) && !isAdmin(authToken)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(PARTY_NAME_CHANGE_NOT_ALLOWED))
                 .build();
@@ -107,7 +107,7 @@ public class SubmitChangesTask {
         updateLRIndividuals(partyChosenId, caseData);
         updateOrgIndividuals(partyChosenId, caseData);
 
-        if (isPartyOrLitigationFriend(partyChosenId)) {
+        if (isParty(partyChosenId) || isLitigationFriend(partyChosenId)) {
             // update case name for hmc if applicant/respondent/litigation friend was updated
             caseData.setCaseNameHmctsInternal(CaseNameUtils.buildCaseName(caseData));
             caseData.setCaseNamePublic(buildCaseName(caseData));
@@ -322,10 +322,6 @@ public class SubmitChangesTask {
             }
             default:
         }
-    }
-
-    private boolean isPartyOrLitigationFriend(String partyChosen) {
-        return isParty(partyChosen) || isLitigationFriend(partyChosen);
     }
 
     private Boolean isParty(String partyChosen) {

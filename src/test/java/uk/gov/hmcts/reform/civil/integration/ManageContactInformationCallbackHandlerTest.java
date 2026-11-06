@@ -1431,6 +1431,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseDataBefore);
             }
 
+            private void useSamePartiesInCaseDataBefore(CaseData caseData) {
+                caseDataBefore.setApplicant1(caseData.getApplicant1());
+                caseDataBefore.setApplicant2(caseData.getApplicant2());
+                caseDataBefore.setRespondent1(caseData.getRespondent1());
+                caseDataBefore.setRespondent2(caseData.getRespondent2());
+            }
+
             @ParameterizedTest
             @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID})
             void shouldCopyFlagsForApplicants(String partyChosenId) {
@@ -1522,6 +1529,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .applicant1DQ(new Applicant1DQ()
                                       .setApplicant1DQExperts(new Experts().setDetails(wrapElements(dqExpert))))
                     .build();
+                useSamePartiesInCaseDataBefore(caseData);
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1544,6 +1552,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .respondent1DQ(new Respondent1DQ()
                                        .setRespondent1DQExperts(new Experts().setDetails(wrapElements(dqExpert))))
                     .build();
+                useSamePartiesInCaseDataBefore(caseData);
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1566,6 +1575,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .respondent1DQ(new Respondent1DQ()
                                        .setRespondent1DQExperts(new Experts()))
                     .build();
+                useSamePartiesInCaseDataBefore(caseData);
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1588,6 +1598,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .respondent2DQ(new Respondent2DQ()
                                        .setRespondent2DQExperts(new Experts().setDetails(wrapElements(dqExpert))))
                     .build();
+                useSamePartiesInCaseDataBefore(caseData);
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1615,6 +1626,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .applicant2DQ(new Applicant2DQ()
                                       .setApplicant2DQExperts(new Experts().setDetails(wrapElements(dqExpert))))
                     .build();
+                useSamePartiesInCaseDataBefore(caseData);
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1643,6 +1655,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .respondent2DQ(new Respondent2DQ()
                                        .setRespondent2DQExperts(new Experts().setDetails(wrapElements(dqExpert))))
                     .build();
+                useSamePartiesInCaseDataBefore(caseData);
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1667,6 +1680,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .respondent2DQ(new Respondent2DQ()
                                        .setRespondent2DQExperts(new Experts()))
                     .build();
+                useSamePartiesInCaseDataBefore(caseData);
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1694,6 +1708,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .applicant2DQ(new Applicant2DQ()
                                       .setApplicant2DQWitnesses(new Witnesses().setDetails(wrapElements(dqWitness))))
                     .build();
+                useSamePartiesInCaseDataBefore(caseData);
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1718,6 +1733,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .respondent2DQ(new Respondent2DQ()
                                        .setRespondent2DQWitnesses(new Witnesses().setDetails(wrapElements(dqWitness))))
                     .build();
+                useSamePartiesInCaseDataBefore(caseData);
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1740,6 +1756,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .respondent2DQ(new Respondent2DQ()
                                        .setRespondent2DQWitnesses(new Witnesses().setDetails(wrapElements(dqWitness))))
                     .build();
+                useSamePartiesInCaseDataBefore(caseData);
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1767,6 +1784,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .applicant2DQ(new Applicant2DQ()
                                       .setApplicant2DQWitnesses(new Witnesses().setDetails(wrapElements(dqWitness))))
                     .build();
+                useSamePartiesInCaseDataBefore(caseData);
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1796,6 +1814,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .respondent2DQ(new Respondent2DQ()
                                        .setRespondent2DQWitnesses(new Witnesses().setDetails(wrapElements(dqWitness))))
                     .build();
+                useSamePartiesInCaseDataBefore(caseData);
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1821,6 +1840,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .respondent1DQ(new Respondent1DQ()
                                        .setRespondent1DQWitnesses(new Witnesses()))
                     .build();
+                useSamePartiesInCaseDataBefore(caseData);
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1843,6 +1863,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .respondent2DQ(new Respondent2DQ()
                                        .setRespondent2DQWitnesses(new Witnesses()))
                     .build();
+                useSamePartiesInCaseDataBefore(caseData);
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1866,6 +1887,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                       .setApplicant1DQExperts(new Experts()
                                                                .setExpertRequired(NO)))
                     .build();
+                useSamePartiesInCaseDataBefore(caseData);
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1890,6 +1912,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                .setExpertRequired(YES)
                                                                .setDetails(wrapElements(dqExpert))))
                     .build();
+                useSamePartiesInCaseDataBefore(caseData);
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1912,6 +1935,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                        .setRespondent1DQWitnesses(new Witnesses()
                                                                    .setWitnessesToAppear(NO)))
                     .build();
+                useSamePartiesInCaseDataBefore(caseData);
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -1937,6 +1961,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                    .setDetails(wrapElements(dqWitness))
                                                                    .setWitnessesToAppear(YES)))
                     .build();
+                useSamePartiesInCaseDataBefore(caseData);
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler

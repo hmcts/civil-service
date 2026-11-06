@@ -31,6 +31,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.managecontactinformation.SubmitChangesTask.PARTY_NAME_CHANGE_NOT_ALLOWED;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_LITIGATION_FRIEND_ID;
 
@@ -130,6 +131,16 @@ class SubmitChangesTaskTest {
         when(userService.getUserInfo(anyString())).thenReturn(userWithRole("caseworker-civil-solicitor"));
 
         AboutToStartOrSubmitCallbackResponse response = submitDefendantOneNameChange(DEFENDANT_ONE_ID, "New Company ltd");
+
+        assertThat(response.getErrors()).containsExactly(PARTY_NAME_CHANGE_NOT_ALLOWED);
+        assertThat(response.getData()).isNull();
+    }
+
+    @Test
+    void shouldReturnError_whenLegalRepChangesDefendantNameWhileUpdatingNonParty() {
+        when(userService.getUserInfo(anyString())).thenReturn(userWithRole("caseworker-civil-solicitor"));
+
+        AboutToStartOrSubmitCallbackResponse response = submitDefendantOneNameChange(DEFENDANT_ONE_EXPERTS_ID, "New Company ltd");
 
         assertThat(response.getErrors()).containsExactly(PARTY_NAME_CHANGE_NOT_ALLOWED);
         assertThat(response.getData()).isNull();
