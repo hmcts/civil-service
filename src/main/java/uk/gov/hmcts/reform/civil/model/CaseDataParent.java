@@ -478,6 +478,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private FastTrackAllocation fastTrackAllocation;
 
     private YesOrNo showCarmFields;
+    private YesOrNo showCaseworkerMediationActivities;
 
     @JsonUnwrapped
     private UploadMediationDocumentsForm uploadMediationDocumentsForm;
