@@ -4,6 +4,7 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.notification.handlers.ga.gajudicialdecision.GaJudicialDecisionNotifier;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -22,13 +23,6 @@ public class CaseworkerMakesDecisionGATest extends BpmnBaseJudgeGASpecTest {
 
     private static final String ADD_PDF_EVENT = "ADD_PDF_TO_MAIN_CASE";
     private static final String ADD_PDF_ID = "AddDocumentToParentCase";
-
-    private static final String NOTIFY_CONSENT_ORDER_CLAIMANT_EVENT =
-        "START_APPLICANT_NOTIFICATION_PROCESS_MAKE_DECISION";
-    private static final String NOTIFY_CONSENT_ORDER_CLAIMANT_ACTIVITY_ID = "NotifyConsentOrderClaimant";
-    private static final String NOTIFY_CONSENT_ORDER_DEFENDANT_EVENT =
-        "START_RESPONDENT_NOTIFICATION_PROCESS_MAKE_DECISION";
-    private static final String NOTIFY_CONSENT_ORDER_DEFENDANT_ACTIVITY_ID = "NotifyConsentOrderDefendant";
 
     public CaseworkerMakesDecisionGATest() {
         super("caseworker_makes_decision_general_application.bpmn", PROCESS_ID);
@@ -80,18 +74,8 @@ public class CaseworkerMakesDecisionGATest extends BpmnBaseJudgeGASpecTest {
         assertCompleteExternalTask(
             notifyHearingNoticeClaimant,
             PROCESS_EXTERNAL_CASE_EVENT,
-            NOTIFY_CONSENT_ORDER_CLAIMANT_EVENT,
-            NOTIFY_CONSENT_ORDER_CLAIMANT_ACTIVITY_ID,
-            variables
-        );
-
-        //Notify Consent Order Defendant(s)
-        ExternalTask notifyHearingNoticeDefendant = assertNextExternalTask(PROCESS_EXTERNAL_CASE_EVENT);
-        assertCompleteExternalTask(
-            notifyHearingNoticeDefendant,
-            PROCESS_EXTERNAL_CASE_EVENT,
-            NOTIFY_CONSENT_ORDER_DEFENDANT_EVENT,
-            NOTIFY_CONSENT_ORDER_DEFENDANT_ACTIVITY_ID,
+            "NOTIFY_EVENT",
+            GaJudicialDecisionNotifier.TASK_ID,
             variables
         );
 

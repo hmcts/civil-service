@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0yyqken" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.41.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0yyqken" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.35.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
   <bpmn:collaboration id="JudgeMakesDecision">
     <bpmn:participant id="Participant_058zit7" name="Judge Makes Decision&#10;" processRef="GA_MAKE_DECISION_PROCESS_ID" />
   </bpmn:collaboration>
@@ -67,14 +67,14 @@
     <bpmn:sequenceFlow id="Flow_1fu6lq5" name="Yes" sourceRef="Gateway_1dro5z9" targetRef="Activity_1cweuly">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${(!empty flowFlags.WELSH_ENABLED_FOR_JUDGE_DECISION &amp;&amp; flowFlags.WELSH_ENABLED_FOR_JUDGE_DECISION)}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:serviceTask id="StartApplicantNotificationProcessMakeDecision" name="Start Applicant Notification Process Make Decision" camunda:type="external" camunda:topic="processExternalCaseEventGASpec">
+    <bpmn:serviceTask id="NotifyGaJudicialDecision" name="Notify decision parties" camunda:type="external" camunda:topic="processExternalCaseEventGASpec">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">START_APPLICANT_NOTIFICATION_PROCESS_MAKE_DECISION</camunda:inputParameter>
+          <camunda:inputParameter name="caseEvent">NOTIFY_EVENT</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1dvy97c</bpmn:incoming>
-      <bpmn:outgoing>Flow_1qwcdun</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0y9mjen</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="AddPDFDocumentToMainCase" name="Add PDF Document To Main Case" camunda:type="external" camunda:topic="updateFromGACaseEvent">
       <bpmn:extensionElements>
@@ -88,9 +88,8 @@
     <bpmn:sequenceFlow id="Flow_0lj56bb" sourceRef="Activity_1cweuly" targetRef="Event_0tam17y" />
     <bpmn:sequenceFlow id="Flow_1830oky" sourceRef="Activity_0sa4hmt" targetRef="Event_0tam17y" />
     <bpmn:sequenceFlow id="Flow_1yq12jn" sourceRef="GenerateDashboardNotificationsGaMakeDecision" targetRef="Activity_0sa4hmt" />
-    <bpmn:sequenceFlow id="Flow_0y9mjen" sourceRef="StartRespondentNotificationProcessMakeDecision" targetRef="GenerateDashboardNotificationsGaMakeDecision" />
-    <bpmn:sequenceFlow id="Flow_1qwcdun" sourceRef="StartApplicantNotificationProcessMakeDecision" targetRef="StartRespondentNotificationProcessMakeDecision" />
-    <bpmn:sequenceFlow id="Flow_1dvy97c" sourceRef="AddPDFDocumentToMainCase" targetRef="StartApplicantNotificationProcessMakeDecision" />
+    <bpmn:sequenceFlow id="Flow_0y9mjen" sourceRef="NotifyGaJudicialDecision" targetRef="GenerateDashboardNotificationsGaMakeDecision" />
+    <bpmn:sequenceFlow id="Flow_1dvy97c" sourceRef="AddPDFDocumentToMainCase" targetRef="NotifyGaJudicialDecision" />
     <bpmn:callActivity id="Activity_1cweuly" name="End GA Business Process without State Changes and WA task" calledElement="GA_EndBusinessProcessWithoutWATask">
       <bpmn:extensionElements>
         <camunda:in variables="all" />
@@ -98,15 +97,6 @@
       <bpmn:incoming>Flow_1fu6lq5</bpmn:incoming>
       <bpmn:outgoing>Flow_0lj56bb</bpmn:outgoing>
     </bpmn:callActivity>
-    <bpmn:serviceTask id="StartRespondentNotificationProcessMakeDecision" name="Start Respondent Notification Process Make Decision" camunda:type="external" camunda:topic="processExternalCaseEventGASpec">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">START_RESPONDENT_NOTIFICATION_PROCESS_MAKE_DECISION</camunda:inputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1qwcdun</bpmn:incoming>
-      <bpmn:outgoing>Flow_0y9mjen</bpmn:outgoing>
-    </bpmn:serviceTask>
     <bpmn:serviceTask id="GenerateDashboardNotificationsGaMakeDecision" name="Create Dashboard notification" camunda:type="external" camunda:topic="gaDashboardNotifications">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -161,7 +151,7 @@
           <dc:Bounds x="951" y="193" width="86" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0d7dqyf_di" bpmnElement="StartApplicantNotificationProcessMakeDecision">
+      <bpmndi:BPMNShape id="Activity_0d7dqyf_di" bpmnElement="NotifyGaJudicialDecision">
         <dc:Bounds x="1290" y="208" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
@@ -172,19 +162,15 @@
         <dc:Bounds x="940" y="360" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_1iw3i8y" bpmnElement="StartRespondentNotificationProcessMakeDecision">
-        <dc:Bounds x="1450" y="208" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1vqp3lv_di" bpmnElement="GenerateDashboardNotificationsGaMakeDecision">
-        <dc:Bounds x="1610" y="208" width="100" height="80" />
+        <dc:Bounds x="1460" y="208" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0sa4hmt_di" bpmnElement="Activity_0sa4hmt">
-        <dc:Bounds x="1760" y="206" width="100" height="80" />
+        <dc:Bounds x="1620" y="206" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0tam17y_di" bpmnElement="Event_0tam17y">
-        <dc:Bounds x="1892" y="228" width="36" height="36" />
+        <dc:Bounds x="1792" y="228" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0qc2eoy_di" bpmnElement="Event_0qc2eoy">
         <dc:Bounds x="341" y="190" width="36" height="36" />
@@ -232,24 +218,20 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0lj56bb_di" bpmnElement="Flow_0lj56bb">
         <di:waypoint x="1040" y="400" />
-        <di:waypoint x="1910" y="400" />
-        <di:waypoint x="1910" y="264" />
+        <di:waypoint x="1810" y="400" />
+        <di:waypoint x="1810" y="264" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1830oky_di" bpmnElement="Flow_1830oky">
-        <di:waypoint x="1860" y="246" />
-        <di:waypoint x="1892" y="246" />
+        <di:waypoint x="1720" y="246" />
+        <di:waypoint x="1792" y="246" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1yq12jn_di" bpmnElement="Flow_1yq12jn">
-        <di:waypoint x="1710" y="248" />
-        <di:waypoint x="1760" y="248" />
+        <di:waypoint x="1560" y="248" />
+        <di:waypoint x="1620" y="248" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0y9mjen_di" bpmnElement="Flow_0y9mjen">
-        <di:waypoint x="1550" y="248" />
-        <di:waypoint x="1610" y="248" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1qwcdun_di" bpmnElement="Flow_1qwcdun">
         <di:waypoint x="1390" y="248" />
-        <di:waypoint x="1450" y="248" />
+        <di:waypoint x="1460" y="248" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1dvy97c_di" bpmnElement="Flow_1dvy97c">
         <di:waypoint x="1230" y="248" />

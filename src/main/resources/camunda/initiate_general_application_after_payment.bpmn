@@ -28,10 +28,10 @@
     <bpmn:sequenceFlow id="Flow_0nufgia" sourceRef="Activity_099a8bs" targetRef="Event_0pltq59" />
     <bpmn:sequenceFlow id="Flow_1lowlui" sourceRef="Event_19ttrus" targetRef="Activity_099a8bs" />
     <bpmn:sequenceFlow id="Flow_0n6ts4r" sourceRef="Activity_0eo8p2p" targetRef="Event_0ii7uzg" />
-    <bpmn:sequenceFlow id="Flow_15ok91n" sourceRef="AddDraftDocToMainCaseID" targetRef="GeneralApplicationNotifying" />
+    <bpmn:sequenceFlow id="Flow_15ok91n" sourceRef="AddDraftDocToMainCaseID" targetRef="NotifyGaApplicationCreated" />
     <bpmn:sequenceFlow id="Flow_0ksbz12" sourceRef="Activity_099a8bs" targetRef="AssigningOfRoles" />
     <bpmn:sequenceFlow id="Flow_0p2nz8j" sourceRef="AssigningOfRoles" targetRef="GenerateDraftDocumentId" />
-    <bpmn:sequenceFlow id="Flow_1lx6vdp" sourceRef="GeneralApplicationNotifying" targetRef="GenerateDashboardNotificationsGaApplicationSubmitted" />
+    <bpmn:sequenceFlow id="Flow_1lx6vdp" sourceRef="NotifyGaApplicationCreated" targetRef="GenerateDashboardNotificationsGaApplicationSubmitted" />
     <bpmn:serviceTask id="AssigningOfRoles" name="Assigning of GA roles" camunda:type="external" camunda:topic="applicationProcessCaseEventGASpec">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -50,10 +50,10 @@
       <bpmn:incoming>Flow_0p2nz8j</bpmn:incoming>
       <bpmn:outgoing>Flow_1id0afk</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="GeneralApplicationNotifying" name="Notifying respondents" camunda:type="external" camunda:topic="processExternalCaseEventGASpec">
+    <bpmn:serviceTask id="NotifyGaApplicationCreated" name="Notifying respondents" camunda:type="external" camunda:topic="processExternalCaseEventGASpec">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="caseEvent">NOTIFY_GENERAL_APPLICATION_RESPONDENT</camunda:inputParameter>
+          <camunda:inputParameter name="caseEvent">NOTIFY_EVENT</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_15ok91n</bpmn:incoming>
@@ -155,7 +155,7 @@
         <dc:Bounds x="590" y="208" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0whee0o_di" bpmnElement="GeneralApplicationNotifying">
+      <bpmndi:BPMNShape id="Activity_0whee0o_di" bpmnElement="NotifyGaApplicationCreated">
         <dc:Bounds x="980" y="208" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1cajp65" bpmnElement="AddDraftDocToMainCaseID">
