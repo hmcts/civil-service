@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
@@ -75,40 +74,42 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
+        ExternalTaskInput variables = toExternalTaskInput(externalTask, mapper);
+
+        String generalAppCaseId =
+            ofNullable(variables.getCaseId())
+                .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
+        String civilCaseId =
+            ofNullable(variables.getGeneralAppParentCaseLink())
+                .orElseThrow(() -> new InvalidCaseDataException(
+                    "General application parent case link not found"));
+
+        var generalAppCaseData = caseDetailsConverter.toGACaseData(coreCaseDataService
+            .getCase(toGeneralAppCaseReference(generalAppCaseId)));
+
+        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
+            civilCaseId,
+            variables.getCaseEvent()
+        );
+        var caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
+
+        coreCaseDataService.submitUpdate(
+            civilCaseId,
+            CaseDataContentConverter.caseDataContentFromStartEventResponse(
+                startEventResponse,
+                getUpdatedCaseData(caseData, generalAppCaseData)
+            )
+        );
+        return new ExternalTaskData().setCaseData(caseData).setGeneralApplicationData(generalAppCaseData);
+    }
+
+    private static long toGeneralAppCaseReference(String generalAppCaseId) {
         try {
-            ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
-
-            String generalAppCaseId =
-                ofNullable(variables.getCaseId())
-                    .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
-            String civilCaseId =
-                ofNullable(variables.getGeneralAppParentCaseLink())
-                    .orElseThrow(() -> new InvalidCaseDataException(
-                        "General application parent case link not found"));
-
-            var generalAppCaseData = caseDetailsConverter.toGACaseData(coreCaseDataService
-                .getCase(parseLong(generalAppCaseId)));
-
-            StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
-                civilCaseId,
-                variables.getCaseEvent()
-            );
-            var caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
-
-            coreCaseDataService.submitUpdate(
-                civilCaseId,
-                CaseDataContentConverter.caseDataContentFromStartEventResponse(
-                    startEventResponse,
-                    getUpdatedCaseData(caseData, generalAppCaseData)
-                )
-            );
-            return new ExternalTaskData().setCaseData(caseData).setGeneralApplicationData(generalAppCaseData);
+            return parseLong(generalAppCaseId);
         } catch (NumberFormatException ne) {
             throw new InvalidCaseDataException(
                 "Conversion to long datatype failed for general application for a case ", ne
             );
-        } catch (IllegalArgumentException | ValueMapperException e) {
-            throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
         }
     }
 
