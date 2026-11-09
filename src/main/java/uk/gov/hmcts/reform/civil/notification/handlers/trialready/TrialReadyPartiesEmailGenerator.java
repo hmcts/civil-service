@@ -10,7 +10,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 
 @AllArgsConstructor
-public abstract class TrialReadyPartiesEmailGenerator implements PartiesEmailGenerator {
+public abstract class TrialReadyPartiesEmailGenerator implements PartiesEmailGenerator<CaseData> {
 
     protected final TrialReadyAppSolOneEmailDTOGenerator appSolOneEmailDTOGenerator;
     protected final TrialReadyClaimantEmailDTOGenerator claimantEmailDTOGenerator;

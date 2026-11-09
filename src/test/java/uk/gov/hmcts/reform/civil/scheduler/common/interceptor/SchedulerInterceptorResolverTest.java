@@ -84,6 +84,27 @@ class SchedulerInterceptorResolverTest {
         assertThat(resolved).containsExactly(defaultInterceptor, specificInterceptor);
     }
 
+    @Test
+    void shouldNotAutoApplyCustomInterceptors_unlessInConfiguration() {
+        // Given
+        SchedulerInterceptor<CaseDetails> customInterceptor = new CustomCaseDetailsInterceptor();
+        allInterceptors.add(customInterceptor);
+
+        ScheduledTask<CaseDetails, Long> task = new CaseDetailsTask();
+
+        ScheduledTaskConfiguration<CaseDetails, Long> withoutCustom = ScheduledTaskConfiguration.<CaseDetails, Long>builder()
+            .scheduledTask(task)
+            .build();
+        ScheduledTaskConfiguration<CaseDetails, Long> withCustom = ScheduledTaskConfiguration.<CaseDetails, Long>builder()
+            .scheduledTask(task)
+            .interceptors(List.of(customInterceptor))
+            .build();
+
+        // Then
+        assertThat(resolver.resolveInterceptors(withoutCustom)).isEmpty();
+        assertThat(resolver.resolveInterceptors(withCustom)).containsExactly(customInterceptor);
+    }
+
     private <T> InterceptorBuilder<T> interceptorFor(Class<T> type) {
         return new InterceptorBuilder<>(type);
     }
@@ -113,7 +134,7 @@ class SchedulerInterceptorResolverTest {
         }
     }
 
-    private static class CaseDetailsInterceptor implements SchedulerInterceptor<CaseDetails> {
+    private static class CaseDetailsInterceptor implements DefaultSchedulerInterceptor<CaseDetails> {
         private final int order;
 
         public CaseDetailsInterceptor(int order) {
@@ -131,7 +152,14 @@ class SchedulerInterceptorResolverTest {
         }
     }
 
-    private static class StringInterceptor implements SchedulerInterceptor<String> {
+    private static class CustomCaseDetailsInterceptor implements SchedulerInterceptor<CaseDetails> {
+        @Override
+        public void accept(InterceptorContext<CaseDetails> context, InterceptorChain<CaseDetails> chain) {
+            //Do nothing
+        }
+    }
+
+    private static class StringInterceptor implements DefaultSchedulerInterceptor<String> {
         private final int order;
 
         public StringInterceptor(int order) {

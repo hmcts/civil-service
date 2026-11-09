@@ -37,4 +37,33 @@ class InterceptorContextTest {
         assertThat(context.getSchedulerName()).isEqualTo("testScheduler");
         assertThat(context.getItem()).isEqualTo("item");
     }
+
+    @Test
+    void shouldRecordAndRetrieveMetric() {
+        InterceptorContext<String> context = new InterceptorContext<>("testScheduler", "item");
+        context.recordMetric("duration", 150L);
+
+        assertThat(context.getMetrics()).containsEntry("duration", 150L);
+    }
+
+    @Test
+    void shouldRecordAndRetrieveProperties() {
+        InterceptorContext<String> context = new InterceptorContext<>("testScheduler", "item");
+        context.recordProperty("flowState", "MAIN.DRAFT");
+        context.recordProperty("businessProcessStatus", "STARTED");
+
+        assertThat(context.getProperties())
+            .containsEntry("flowState", "MAIN.DRAFT")
+            .containsEntry("businessProcessStatus", "STARTED");
+    }
+
+    @Test
+    void shouldIgnoreNullOrBlankPropertyValues() {
+        InterceptorContext<String> context = new InterceptorContext<>("testScheduler", "item");
+        context.recordProperty("nullProp", null);
+        context.recordProperty("emptyProp", "");
+        context.recordProperty("blankProp", "   ");
+
+        assertThat(context.getProperties()).isEmpty();
+    }
 }

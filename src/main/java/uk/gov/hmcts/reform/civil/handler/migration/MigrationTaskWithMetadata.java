@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.migration;
 
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 
 abstract class MigrationTaskWithMetadata<T extends CaseReference> extends MigrationTask<T> {
 
@@ -33,5 +34,10 @@ abstract class MigrationTaskWithMetadata<T extends CaseReference> extends Migrat
     @Override
     protected final String getEventDescription() {
         return eventDescription;
+    }
+
+    @Override
+    protected CaseData migrateCaseData(CaseData caseData, T caseReference) {
+        return caseData;
     }
 }

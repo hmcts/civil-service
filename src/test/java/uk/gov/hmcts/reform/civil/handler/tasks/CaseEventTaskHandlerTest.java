@@ -59,6 +59,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -255,7 +256,7 @@ class CaseEventTaskHandlerTest {
             verify(coreCaseDataService, never()).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).handleFailure(
                 eq(mockTask),
-                eq("Mapper conversion failed due to incompatible types"),
+                eq("Invalid full name:null"),
                 anyString(),
                 eq(0),
                 eq(1000L)
@@ -1142,7 +1143,8 @@ class CaseEventTaskHandlerTest {
             //then: Retry should not happen in this case
             verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
-                anyString(),
+                eq("Mapper conversion failed due to incompatible types: "
+                       + "Mapper conversion failed due to incompatible types"),
                 anyString(),
                 eq(0),
                 anyLong()
@@ -1162,11 +1164,48 @@ class CaseEventTaskHandlerTest {
             //then: Retry should not happen in this case
             verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
-                anyString(),
+                startsWith("Mapper conversion failed due to incompatible types: "),
                 anyString(),
                 eq(0),
                 anyLong()
             );
+        }
+
+        @Test
+        void shouldReportMalformedCaseDataField_whenCaseDataCannotBeConverted() {
+            when(mockTask.getAllVariables()).thenReturn(Map.of("caseId", CASE_ID, "caseEvent", NOTIFY_EVENT.name()));
+            CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(new BusinessProcess()
+                                     .setStatus(BusinessProcessStatus.READY)
+                                     .setProcessInstanceId("processInstanceId"))
+                .build();
+            CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
+            caseDetails.getData().put("respondent1ResponseDeadline", "not-a-date");
+
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_EVENT))
+                .thenReturn(StartEventResponse.builder()
+                                .caseDetails(caseDetails)
+                                .eventId(NOTIFY_EVENT.name())
+                                .build());
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            ArgumentCaptor<String> errorMessage = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<String> errorDetails = ArgumentCaptor.forClass(String.class);
+            verify(coreCaseDataService, never()).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
+            verify(externalTaskService).handleFailure(
+                eq(mockTask),
+                errorMessage.capture(),
+                errorDetails.capture(),
+                eq(0),
+                eq(1000L)
+            );
+            assertThat(errorMessage.getValue())
+                .doesNotContain("Mapper conversion failed")
+                .contains("respondent1ResponseDeadline");
+            assertThat(errorDetails.getValue())
+                .contains("java.lang.IllegalArgumentException")
+                .contains("Caused by: com.fasterxml.jackson");
         }
 
         @Test
