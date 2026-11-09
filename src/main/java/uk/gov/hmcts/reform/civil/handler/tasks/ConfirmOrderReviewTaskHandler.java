@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -52,29 +51,21 @@ public class ConfirmOrderReviewTaskHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        try {
-            ExternalTaskInput taskVariables = parseExternalTaskVariables(externalTask);
+        ExternalTaskInput taskVariables = toExternalTaskInput(externalTask, mapper);
 
-            String caseIdentifier = validateCaseId(taskVariables.getCaseId());
-            CaseEvent event = validateCaseEvent(taskVariables.getCaseEvent());
+        String caseIdentifier = validateCaseId(taskVariables.getCaseId());
+        CaseEvent event = validateCaseEvent(taskVariables.getCaseEvent());
 
-            StartEventResponse startEvent = coreCaseDataService.startUpdate(caseIdentifier, event);
+        StartEventResponse startEvent = coreCaseDataService.startUpdate(caseIdentifier, event);
 
-            coreCaseDataService.submitUpdate(caseIdentifier, caseDataContent(startEvent, externalTask));
+        coreCaseDataService.submitUpdate(caseIdentifier, caseDataContent(startEvent, externalTask));
 
-            return new ExternalTaskData();
-        } catch (ValueMapperException | IllegalArgumentException ex) {
-            throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", ex);
-        }
+        return new ExternalTaskData();
     }
 
     @Override
     public int getMaxAttempts() {
         return 1;
-    }
-
-    private ExternalTaskInput parseExternalTaskVariables(ExternalTask externalTask) {
-        return mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
     }
 
     private String validateCaseId(String caseId) {
