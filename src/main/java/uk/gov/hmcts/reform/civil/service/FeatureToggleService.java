@@ -172,6 +172,6 @@ public class FeatureToggleService {
     }
 
     public boolean isDraftClaimDatabaseEnabled() {
-        return featureToggleApi.isFeatureEnabled("cui-draft-claim-database");
+        return true;
     }
 }
