@@ -4,6 +4,7 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskIds;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -306,12 +307,12 @@ class DefendantResponseSpecTest extends BpmnBaseTest {
     }
 
     private void createDefendantDashboardNotification() {
-        ExternalTask notificationTask = assertNextExternalTask(PROCESS_CASE_EVENT);
+        ExternalTask notificationTask = assertNextExternalTask(DASHBOARD_NOTIFICATION_TOPIC);
         assertCompleteExternalTask(
             notificationTask,
-            PROCESS_CASE_EVENT,
-            "DASHBOARD_NOTIFICATION_EVENT",
-            "GenerateDashboardNotificationsDefendantResponse"
+            DASHBOARD_NOTIFICATION_TOPIC,
+            DASHBOARD_NOTIFICATION_EVENT,
+            DashboardTaskIds.DEFENDANT_RESPONSE
         );
     }
 
@@ -434,12 +435,12 @@ class DefendantResponseSpecTest extends BpmnBaseTest {
             "Activity_0nakdad"
         );
 
-        ExternalTask removeDJNotificationTask = assertNextExternalTask(PROCESS_CASE_EVENT);
+        ExternalTask welshDashboardNotification = assertNextExternalTask(DASHBOARD_NOTIFICATION_TOPIC);
         assertCompleteExternalTask(
-            removeDJNotificationTask,
-            PROCESS_CASE_EVENT,
-            "REMOVE_CLAIMANT_DJ_DASHBOARD_NOTIFICATION",
-            "Activity_1phjbuy"
+            welshDashboardNotification,
+            DASHBOARD_NOTIFICATION_TOPIC,
+            DASHBOARD_NOTIFICATION_EVENT,
+            DashboardTaskIds.DEFENDANT_RESPONSE
         );
 
         //end business process
@@ -484,12 +485,12 @@ class DefendantResponseSpecTest extends BpmnBaseTest {
             "Activity_0nakdad"
         );
 
-        ExternalTask removeDJNotificationTask = assertNextExternalTask(PROCESS_CASE_EVENT);
+        ExternalTask welshDashboardNotification = assertNextExternalTask(DASHBOARD_NOTIFICATION_TOPIC);
         assertCompleteExternalTask(
-            removeDJNotificationTask,
-            PROCESS_CASE_EVENT,
-            "REMOVE_CLAIMANT_DJ_DASHBOARD_NOTIFICATION",
-            "Activity_1phjbuy"
+            welshDashboardNotification,
+            DASHBOARD_NOTIFICATION_TOPIC,
+            DASHBOARD_NOTIFICATION_EVENT,
+            DashboardTaskIds.DEFENDANT_RESPONSE
         );
 
         //end business process
