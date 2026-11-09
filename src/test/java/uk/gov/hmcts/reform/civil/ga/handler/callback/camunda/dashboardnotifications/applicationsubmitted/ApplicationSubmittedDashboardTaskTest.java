@@ -9,14 +9,19 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.dashboardnotifications.applicationsubmitted.ApplicationSubmittedApplicantDashboardService;
 import uk.gov.hmcts.reform.civil.ga.service.dashboardnotifications.applicationsubmitted.ApplicationSubmittedRespondentDashboardService;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ApplicationSubmittedDashboardTaskTest {
 
     private static final String AUTH_TOKEN = "Bearer token";
+
+    @Mock
+    private DashboardNotificationHelper dashboardNotificationHelper;
 
     @Mock
     private ApplicationSubmittedApplicantDashboardService applicantDashboardService;
@@ -36,7 +41,7 @@ class ApplicationSubmittedDashboardTaskTest {
     @Test
     void applicantTaskShouldDelegateToService() {
         ApplicationSubmittedApplicantDashboardTask task =
-            new ApplicationSubmittedApplicantDashboardTask(applicantDashboardService);
+            new ApplicationSubmittedApplicantDashboardTask(applicantDashboardService, dashboardNotificationHelper);
 
         task.execute(context);
 
@@ -46,10 +51,20 @@ class ApplicationSubmittedDashboardTaskTest {
     @Test
     void respondentTaskShouldDelegateToService() {
         ApplicationSubmittedRespondentDashboardTask task =
-            new ApplicationSubmittedRespondentDashboardTask(respondentDashboardService);
+            new ApplicationSubmittedRespondentDashboardTask(respondentDashboardService, dashboardNotificationHelper);
 
         task.execute(context);
 
         verify(respondentDashboardService).notifyApplicationSubmitted(caseData, AUTH_TOKEN);
+    }
+
+    @Test
+    void shouldDeferBothPartiesWhileWelshSubmissionAwaitsTranslation() {
+        when(dashboardNotificationHelper.isAwaitingWelshTranslation(caseData)).thenReturn(true);
+
+        new ApplicationSubmittedApplicantDashboardTask(applicantDashboardService, dashboardNotificationHelper).execute(context);
+        new ApplicationSubmittedRespondentDashboardTask(respondentDashboardService, dashboardNotificationHelper).execute(context);
+
+        verifyNoInteractions(applicantDashboardService, respondentDashboardService);
     }
 }
