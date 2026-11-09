@@ -547,7 +547,11 @@ def sonarExclusions = [
   "**/notification/handlers/staycase/StayCaseDefendantTwoEmailDTOGenerator.java",
   "**/notification/handlers/staylifted/StayLiftedClaimantEmailDTOGenerator.java",
   "**/notification/handlers/staylifted/StayLiftedDefendantEmailDTOGenerator.java",
-  "**/notification/handlers/staylifted/StayLiftedDefendantTwoEmailDTOGenerator.java"
+  "**/notification/handlers/staylifted/StayLiftedDefendantTwoEmailDTOGenerator.java",
+  "**/notification/handlers/staycase/StayCaseEmailDTOGenerator.java",
+  "**/notification/handlers/staylifted/StayLiftedEmailDTOGenerator.java",
+  "**/notification/handlers/stayupdaterequested/StayUpdateRequestedDefendantEmailDTOGenerator.java",
+  "**/notification/handlers/stayupdaterequested/StayUpdateRequestedDefendantTwoEmailDTOGenerator.java"
 ]
 
 def sonarCoverageExclusions = [
