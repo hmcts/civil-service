@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -209,6 +211,45 @@ public class DocUploadNotificationServiceTest {
                 DUMMY_EMAIL,
                 "ga-notice-of-document-lip-appln-welsh-template-id",
                 getNotificationDataMapForLip(YES, NO),
+                "general-apps-notice-of-document-upload-" + CASE_REFERENCE
+            );
+        }
+
+        @ParameterizedTest
+        @CsvSource({"true, false", "true, true", "false, false", "false, true"})
+        void lipVersusLipNotificationsShouldIncludeBothNames(boolean applicant, boolean bilingual) {
+            String template = "lip-document-upload-template";
+            if (applicant) {
+                if (bilingual) {
+                    when(notificationsProperties.getLipGeneralAppApplicantEmailTemplateInWelsh()).thenReturn(template);
+                } else {
+                    when(notificationsProperties.getLipGeneralAppApplicantEmailTemplate()).thenReturn(template);
+                }
+            } else if (bilingual) {
+                when(notificationsProperties.getLipGeneralAppRespondentEmailTemplateInWelsh()).thenReturn(template);
+            } else {
+                when(notificationsProperties.getLipGeneralAppRespondentEmailTemplate()).thenReturn(template);
+            }
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(gaForLipService.isGaForLip(any())).thenReturn(true);
+            when(gaForLipService.isLipApp(any())).thenReturn(true);
+            when(gaForLipService.isLipResp(any())).thenReturn(true);
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(parentCaseData());
+            GeneralApplicationCaseData caseData = getCaseData(true, YES, YES).copy()
+                .applicantBilingualLanguagePreference(bilingual ? YES : NO)
+                .respondentBilingualLanguagePreference(bilingual ? YES : NO)
+                .build();
+            Map<String, String> expectedProperties = getNotificationDataMapForLip(YES, YES);
+            if (applicant) {
+                expectedProperties.put(NotificationDataGA.CLAIM_LEGAL_ORG_NAME_SPEC, APPLICANT_ORG_NAME);
+                docUploadNotificationService.notifyApplicantEvidenceUpload(caseData);
+            } else {
+                docUploadNotificationService.notifyRespondentEvidenceUpload(caseData);
+            }
+            verify(notificationService, times(applicant ? 1 : 2)).sendMail(
+                DUMMY_EMAIL, template, expectedProperties,
                 "general-apps-notice-of-document-upload-" + CASE_REFERENCE
             );
         }
