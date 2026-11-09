@@ -83,7 +83,7 @@ public class RecordNotificationClickControllerTest extends BaseIntegrationTest {
     void shouldReturnUnauthorisedWhenBearerTokenMissing() {
         when(userRequestAuthorizerMock.authorise(any())).thenReturn(null);
         doPut("", null, NOTIFICATION_CLICK_END_POINT, UUID.randomUUID())
-            .andExpect(status().isForbidden());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test

@@ -11,7 +11,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLeg
 
 @AllArgsConstructor
 @Slf4j
-public class AllLegalRepsEmailGenerator implements PartiesEmailGenerator {
+public class AllLegalRepsEmailGenerator implements PartiesEmailGenerator<CaseData> {
 
     private final AppSolOneEmailDTOGenerator appSolOneEmailGenerator;
     private final RespSolOneEmailDTOGenerator respSolOneEmailGenerator;

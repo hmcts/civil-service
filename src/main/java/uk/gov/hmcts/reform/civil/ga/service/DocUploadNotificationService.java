@@ -128,17 +128,14 @@ public class DocUploadNotificationService implements NotificationDataGA {
 
             customProps.put(GA_LIP_APPLICANT_NAME, Objects.requireNonNull(isLipAppName));
 
-        } else if (gaForLipService.isLipResp(caseData)) {
+        }
+        if (gaForLipService.isLipResp(caseData)) {
 
             String isLipRespondentName = caseData.getDefendant1PartyName();
             customProps.put(
                 GA_LIP_RESP_NAME,
                 Objects.requireNonNull(isLipRespondentName)
             );
-        } else {
-            customProps.remove(GA_LIP_APPLICANT_NAME);
-            customProps.remove(GA_LIP_RESP_NAME);
-            customProps.remove(CASE_TITLE);
         }
 
         customProps.put(CASE_REFERENCE, caseData.getCcdCaseReference().toString());

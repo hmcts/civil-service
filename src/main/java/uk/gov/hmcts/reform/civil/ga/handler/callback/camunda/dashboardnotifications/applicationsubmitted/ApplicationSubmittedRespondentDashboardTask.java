@@ -4,18 +4,24 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.dashboardnotifications.applicationsubmitted.ApplicationSubmittedRespondentDashboardService;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.GaDashboardServiceTask;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
 
 @Component
 public class ApplicationSubmittedRespondentDashboardTask extends GaDashboardServiceTask {
 
+    private final DashboardNotificationHelper dashboardNotificationHelper;
     private final ApplicationSubmittedRespondentDashboardService dashboardService;
 
-    public ApplicationSubmittedRespondentDashboardTask(ApplicationSubmittedRespondentDashboardService dashboardService) {
+    public ApplicationSubmittedRespondentDashboardTask(ApplicationSubmittedRespondentDashboardService dashboardService,
+                                                        DashboardNotificationHelper dashboardNotificationHelper) {
         this.dashboardService = dashboardService;
+        this.dashboardNotificationHelper = dashboardNotificationHelper;
     }
 
     @Override
     protected void notifyDashboard(GeneralApplicationCaseData caseData, String authToken) {
-        dashboardService.notifyApplicationSubmitted(caseData, authToken);
+        if (!dashboardNotificationHelper.isAwaitingWelshTranslation(caseData)) {
+            dashboardService.notifyApplicationSubmitted(caseData, authToken);
+        }
     }
 }

@@ -8,17 +8,17 @@ import java.util.List;
 import java.util.Set;
 
 @Slf4j
-public class AllPartiesEmailGenerator implements PartiesEmailGenerator {
+public class AllPartiesEmailGenerator implements PartiesEmailGenerator<CaseData> {
 
-    private final List<EmailDTOGenerator> generators;
+    private final List<? extends EmailDTOGenerator<CaseData>> generators;
 
-    public AllPartiesEmailGenerator(List<EmailDTOGenerator> generators) {
+    public AllPartiesEmailGenerator(List<? extends EmailDTOGenerator<CaseData>> generators) {
         this.generators = generators;
     }
 
     public Set<EmailDTO> getPartiesToNotify(final CaseData caseData, String taskId) {
         Set<EmailDTO> partiesToEmail = new HashSet<>();
-        for (EmailDTOGenerator generator : generators) {
+        for (EmailDTOGenerator<CaseData> generator : generators) {
             if ((generator != null) && generator.getShouldNotify(caseData)) {
                 log.info("Generating email for party [{}] for case ID: {}",
                     generator.getClass().getSimpleName(), caseData.getCcdCaseReference());
