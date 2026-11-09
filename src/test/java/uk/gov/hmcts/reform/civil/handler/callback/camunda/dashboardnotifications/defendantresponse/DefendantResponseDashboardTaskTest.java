@@ -10,14 +10,20 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.defendantresponse.DefendantResponseClaimantDashboardService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.defendantresponse.DefendantResponseDefendantDashboardService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.DashboardNotificationHelper;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 
 @ExtendWith(MockitoExtension.class)
 class DefendantResponseDashboardTaskTest {
 
     private static final String AUTH_TOKEN = "BEARER";
+
+    @Mock
+    private DashboardNotificationHelper dashboardNotificationHelper;
 
     @Mock
     private DefendantResponseClaimantDashboardService claimantService;
@@ -36,7 +42,7 @@ class DefendantResponseDashboardTaskTest {
 
     @Test
     void claimantTaskShouldDelegateToService() {
-        DefendantResponseClaimantDashboardTask task = new DefendantResponseClaimantDashboardTask(claimantService);
+        DefendantResponseClaimantDashboardTask task = new DefendantResponseClaimantDashboardTask(claimantService, dashboardNotificationHelper);
 
         task.execute(context);
 
@@ -45,10 +51,20 @@ class DefendantResponseDashboardTaskTest {
 
     @Test
     void defendantTaskShouldDelegateToService() {
-        DefendantResponseDefendantDashboardTask task = new DefendantResponseDefendantDashboardTask(defendantService);
+        DefendantResponseDefendantDashboardTask task = new DefendantResponseDefendantDashboardTask(defendantService, dashboardNotificationHelper);
 
         task.execute(context);
 
         verify(defendantService).notifyDefendantResponse(caseData, AUTH_TOKEN);
+    }
+
+    @Test
+    void shouldDeferBothPartiesWhileWelshResponseAwaitsTranslation() {
+        when(dashboardNotificationHelper.isAwaitingWelshTranslation(caseData, DEFENDANT_RESPONSE_SPEC)).thenReturn(true);
+
+        new DefendantResponseClaimantDashboardTask(claimantService, dashboardNotificationHelper).execute(context);
+        new DefendantResponseDefendantDashboardTask(defendantService, dashboardNotificationHelper).execute(context);
+
+        verifyNoInteractions(claimantService, defendantService);
     }
 }

@@ -5,7 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.TrialArrangementsNotifyOtherPartyNotificationHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.trialarrangementsnotifyotherparty.TrialArrangementsNotifyOtherPartyClaimantDashboardTask;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -13,18 +15,19 @@ import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS;
 
 public class TrialArrangementsNotifyOtherPartyScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
-    private TrialArrangementsNotifyOtherPartyNotificationHandler handler;
+    private TrialArrangementsNotifyOtherPartyClaimantDashboardTask handler;
 
     @Test
     void should_create_notification_for_claimant_when_defendant_finalises_trial_arrangements() throws Exception {
         String caseId = "10002348";
         CaseData caseData = createCaseData(caseId, YesOrNo.NO);
 
-        handler.handle(callbackParams(caseData));
+        handler.execute(DashboardTaskContext.civil(caseData, BEARER_TOKEN));
 
         verifyNotificationCreated(caseId);
         verifyTaskStatus(caseId, "DEFENDANT", TaskStatus.DONE);
@@ -35,7 +38,7 @@ public class TrialArrangementsNotifyOtherPartyScenarioTest extends DashboardBase
         String caseId = "10002348";
         CaseData caseData = createCaseData(caseId, YesOrNo.YES);
 
-        handler.handle(callbackParams(caseData));
+        handler.execute(DashboardTaskContext.civil(caseData, BEARER_TOKEN));
 
         verifyNotificationNotCreated(caseId);
         verifyTaskStatus(caseId, "DEFENDANT", TaskStatus.DONE);
@@ -47,6 +50,8 @@ public class TrialArrangementsNotifyOtherPartyScenarioTest extends DashboardBase
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(applicant1Represented)
+            .businessProcess(BusinessProcess.ready(RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS))
+            .trialReadyRespondent1(YesOrNo.YES)
             .respondent1(new Party().setType(Party.Type.INDIVIDUAL))
             .build();
     }
