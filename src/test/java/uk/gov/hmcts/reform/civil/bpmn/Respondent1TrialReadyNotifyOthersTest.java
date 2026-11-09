@@ -4,6 +4,7 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskIds;
 
 import java.util.Map;
 
@@ -19,15 +20,11 @@ class Respondent1TrialReadyNotifyOthersTest extends BpmnBaseTest {
     public static final String NOTIFY_EVENT = "NOTIFY_EVENT";
     public static final String GENERATE_TRIAL_READY_FORM_RESPONDENT1
             = "GENERATE_TRIAL_READY_FORM_RESPONDENT1";
-    public static final String CREATE_DASHBOARD_NOTIFICATION_TRIAL_ARRANGEMENTS_NOTIFY_CLAIMANT
-            = "CREATE_DASHBOARD_NOTIFICATION_TRIAL_ARRANGEMENTS_NOTIFY_CLAIMANT";
     //ACTIVITY IDs
     public static final String RESPONDENT1_NOTIFY_OTHERS_TRIAL_READY_ACTIVITY_ID
             = "Respondent1NotifyOthersTrialReady";
     public static final String GENERATE_TRIAL_READY_FORM_RESPONDENT1_ACTIVITY_ID
             = "GenerateTrialReadyFormRespondent1";
-    public static final String CREATE_DASHBOARD_NOTIFICATION_TRIAL_ARRANGEMENTS_NOTIFY_CLAIMANT_ACTIVITY_ID
-            = "GenerateDashboardNotificationsRespondent1TrialReadyNotifyOthers";
 
     public Respondent1TrialReadyNotifyOthersTest() {
         super("respondent1_trial_ready_notify_others.bpmn", PROCESS_ID);
@@ -69,10 +66,10 @@ class Respondent1TrialReadyNotifyOthersTest extends BpmnBaseTest {
                 variables
         );
 
-        notificationTask = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(notificationTask, PROCESS_CASE_EVENT,
-                CREATE_DASHBOARD_NOTIFICATION_TRIAL_ARRANGEMENTS_NOTIFY_CLAIMANT,
-                CREATE_DASHBOARD_NOTIFICATION_TRIAL_ARRANGEMENTS_NOTIFY_CLAIMANT_ACTIVITY_ID,
+        notificationTask = assertNextExternalTask(DASHBOARD_NOTIFICATION_TOPIC);
+        assertCompleteExternalTask(notificationTask, DASHBOARD_NOTIFICATION_TOPIC,
+                DASHBOARD_NOTIFICATION_EVENT,
+                DashboardTaskIds.TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY,
                 variables
         );
 
@@ -119,10 +116,10 @@ class Respondent1TrialReadyNotifyOthersTest extends BpmnBaseTest {
                 variables
         );
 
-        notificationTask = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(notificationTask, PROCESS_CASE_EVENT,
-                CREATE_DASHBOARD_NOTIFICATION_TRIAL_ARRANGEMENTS_NOTIFY_CLAIMANT,
-                CREATE_DASHBOARD_NOTIFICATION_TRIAL_ARRANGEMENTS_NOTIFY_CLAIMANT_ACTIVITY_ID,
+        notificationTask = assertNextExternalTask(DASHBOARD_NOTIFICATION_TOPIC);
+        assertCompleteExternalTask(notificationTask, DASHBOARD_NOTIFICATION_TOPIC,
+                DASHBOARD_NOTIFICATION_EVENT,
+                DashboardTaskIds.TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY,
                 variables
         );
 

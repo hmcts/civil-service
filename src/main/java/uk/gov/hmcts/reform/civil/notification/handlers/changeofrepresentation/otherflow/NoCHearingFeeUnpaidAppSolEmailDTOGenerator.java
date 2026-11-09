@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.o
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.CivilEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.flowstate.predicate.HearingPredicate;
 
@@ -13,7 +13,7 @@ import static java.util.Objects.nonNull;
 
 @Component
 @AllArgsConstructor
-public class NoCHearingFeeUnpaidAppSolEmailDTOGenerator extends EmailDTOGenerator {
+public class NoCHearingFeeUnpaidAppSolEmailDTOGenerator extends CivilEmailDTOGenerator {
 
     private final NoCHelper noCHelper;
     private final NotificationsProperties notificationsProperties;
