@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
+import uk.gov.hmcts.reform.civil.ga.service.GaNotificationHistoryService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.notification.handlers.GaNotifierFactory;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
@@ -50,7 +51,7 @@ class GaNotificationHandlerTest {
         gaNotifierFactory = mock(GaNotifierFactory.class);
         notifier = mock(Notifier.class);
         gaCoreCaseDataService = mock(GaCoreCaseDataService.class);
-        handler = new GaNotificationHandler(gaNotifierFactory, gaCoreCaseDataService, new ObjectMapper());
+        handler = new GaNotificationHandler(gaNotifierFactory, new GaNotificationHistoryService(gaCoreCaseDataService), new ObjectMapper());
 
         BusinessProcess businessProcess = new BusinessProcess();
         businessProcess.setActivityId(TASK_ID);

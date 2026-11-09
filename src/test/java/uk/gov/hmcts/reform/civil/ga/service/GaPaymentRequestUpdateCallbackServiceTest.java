@@ -9,6 +9,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
+import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.aop.support.DefaultIntroductionAdvisor;
+import org.springframework.retry.annotation.AnnotationAwareRetryOperationsInterceptor;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -18,11 +24,13 @@ import org.springframework.retry.backoff.NoBackOffPolicy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
+import uk.gov.hmcts.reform.civil.exceptions.GaNotificationHistoryException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -30,22 +38,22 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDe
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
-import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -77,6 +85,8 @@ class GaPaymentRequestUpdateCallbackServiceTest {
 
     @Mock
     private JudicialNotificationService judicialNotificationService;
+    @Mock
+    private GaNotificationHistoryService notificationHistoryService;
     @Mock
     Time time;
     @InjectMocks
@@ -178,7 +188,7 @@ class GaPaymentRequestUpdateCallbackServiceTest {
 
         verify(coreCaseDataService, times(1)).startGaUpdate(any(), any());
         verify(coreCaseDataService, times(1)).submitGaUpdate(any(), any());
-        verify(judicialNotificationService, times(1)).sendNotification(any(), any());
+        verify(judicialNotificationService, times(1)).sendNotificationAndGetSummary(any(), any());
     }
 
     @Test
@@ -203,19 +213,17 @@ class GaPaymentRequestUpdateCallbackServiceTest {
             .thenReturn(startEventResponse(details, CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID));
         when(caseDetailsConverter.toGeneralApplicationCaseData(details)).thenReturn(caseData.copy().build());
         when(coreCaseDataService.submitGaUpdate(any(), any())).thenReturn(caseData);
-        doThrow(buildNotificationException())
-            .when(judicialNotificationService)
-            .sendNotification(caseData, "respondent");
-
+        String summary = "Attempted: respondent@example.com : ref : template || Errors: Notify unavailable";
+        when(judicialNotificationService.sendNotificationAndGetSummary(caseData, "respondent")).thenReturn(summary);
         ServiceRequestUpdateDto serviceRequestUpdateDto = buildServiceDto(PAID);
 
-        assertThatThrownBy(() -> paymentRequestUpdateCallbackService.processServiceRequest(serviceRequestUpdateDto, caseData, false))
-            .isInstanceOf(CaseDataUpdateException.class);
+        paymentRequestUpdateCallbackService.processServiceRequest(serviceRequestUpdateDto, caseData, false);
 
-        var ordered = inOrder(coreCaseDataService, judicialNotificationService);
+        var ordered = inOrder(coreCaseDataService, judicialNotificationService, notificationHistoryService);
         ordered.verify(coreCaseDataService).startGaUpdate(any(), any());
         ordered.verify(coreCaseDataService).submitGaUpdate(any(), any());
-        ordered.verify(judicialNotificationService).sendNotification(caseData, "respondent");
+        ordered.verify(judicialNotificationService).sendNotificationAndGetSummary(caseData, "respondent");
+        ordered.verify(notificationHistoryService).recordNotifications(CASE_ID, summary);
     }
 
     @Test
@@ -246,7 +254,7 @@ class GaPaymentRequestUpdateCallbackServiceTest {
 
         verify(coreCaseDataService, times(1)).startGaUpdate(any(), any());
         verify(coreCaseDataService, times(1)).submitGaUpdate(any(), any());
-        verify(judicialNotificationService, never()).sendNotification(any(), any());
+        verify(judicialNotificationService, never()).sendNotificationAndGetSummary(any(), any());
     }
 
     @Test
@@ -446,46 +454,94 @@ class GaPaymentRequestUpdateCallbackServiceTest {
         ordered.verify(coreCaseDataService).submitGaUpdate(any(), any());
         ordered.verify(coreCaseDataService).startGaUpdate(any(), any());
         ordered.verify(coreCaseDataService).submitGaUpdate(any(), any());
-        ordered.verify(judicialNotificationService).sendNotification(data, "respondent");
-        verify(judicialNotificationService).sendNotification(data, "respondent");
+        ordered.verify(judicialNotificationService).sendNotificationAndGetSummary(data, "respondent");
+        verify(judicialNotificationService).sendNotificationAndGetSummary(data, "respondent");
     }
 
-    @Test
-    void shouldNotResendWhenAFailureOccursAfterTheNotificationWasSent() {
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void shouldRetryOnlyHistoryAndSurfaceExhaustedFailures(boolean failPermanently) {
         var data = additionalPaymentCaseData();
         var details = buildCaseDetails(data);
-        var paid = data.copy().generalAppPBADetails(new GeneralApplicationPbaDetails()
-            .setAdditionalPaymentDetails(new PaymentDetails().setStatus(SUCCESS).setReference(REFERENCE))).build();
-        var paidDetails = buildCaseDetails(paid);
-        when(coreCaseDataService.startGaUpdate(any(), eq(CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID)))
-            .thenReturn(startEventResponse(details, CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID))
-            .thenReturn(startEventResponse(paidDetails, CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID));
+        when(coreCaseDataService.startGaUpdate(CASE_ID, CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID))
+            .thenReturn(startEventResponse(details, CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID));
         when(caseDetailsConverter.toGeneralApplicationCaseData(details)).thenReturn(data.copy().build());
-        when(caseDetailsConverter.toGeneralApplicationCaseData(paidDetails)).thenReturn(paid);
-        when(coreCaseDataService.submitGaUpdate(any(), any())).thenReturn(paid);
-        doAnswer(invocation -> {
-            throw new RuntimeException("Failure after sending the respondent notification");
-        }).when(judicialNotificationService).sendNotification(data, "respondent");
+        when(coreCaseDataService.submitGaUpdate(any(), any())).thenReturn(data);
+        when(coreCaseDataService.startGaUpdate(CASE_ID, CaseEvent.RECORD_NOTIFICATIONS))
+            .thenReturn(historyStart("history-token-1"), historyStart("history-token-2"), historyStart("history-token-3"));
+        String summary = "Attempted: respondent@example.com : ref : template || Errors: send failed";
+        when(judicialNotificationService.sendNotificationAndGetSummary(data, "respondent")).thenReturn(summary);
+        var failure = new RuntimeException("CCD history update conflict");
+        var historySubmission = when(coreCaseDataService.submitGaUpdate(eq(CASE_ID), argThat(content ->
+            content != null && CaseEvent.RECORD_NOTIFICATIONS.name().equals(content.getEvent().getId()))));
+        if (failPermanently) {
+            historySubmission.thenThrow(failure);
+        } else {
+            historySubmission.thenThrow(failure).thenReturn(data);
+        }
+        var historyService = retryProxy(new GaNotificationHistoryService(coreCaseDataService));
+        var service = retryProxy(new GaPaymentRequestUpdateCallbackService(caseDetailsConverter, coreCaseDataService,
+            judicialNotificationService, historyService, objectMapper, time, stateGeneratorService));
         var dto = buildServiceDto(PAID);
-        var retry = new RetryTemplate();
-        retry.setBackOffPolicy(new NoBackOffPolicy());
 
-        retry.execute(context -> paymentRequestUpdateCallbackService.processServiceRequest(dto, data, false));
+        if (failPermanently) {
+            assertThatThrownBy(() -> service.processServiceRequest(dto, data, false))
+                .isInstanceOf(GaNotificationHistoryException.class).hasCause(failure).hasMessageContaining(CASE_ID);
+        } else {
+            assertThat(service.processServiceRequest(dto, data, false)).isNotNull();
+        }
 
-        verify(coreCaseDataService, times(2)).startGaUpdate(any(), any());
-        verify(coreCaseDataService).submitGaUpdate(any(), any());
-        verify(judicialNotificationService).sendNotification(data, "respondent");
+        int historyAttempts = failPermanently ? 3 : 2;
+        verify(coreCaseDataService).startGaUpdate(CASE_ID, CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID);
+        verify(coreCaseDataService, times(historyAttempts)).startGaUpdate(CASE_ID, CaseEvent.RECORD_NOTIFICATIONS);
+        verify(judicialNotificationService).sendNotificationAndGetSummary(data, "respondent");
+        var submitted = ArgumentCaptor.forClass(CaseDataContent.class);
+        verify(coreCaseDataService, times(historyAttempts + 1)).submitGaUpdate(eq(CASE_ID), submitted.capture());
+        var history = submitted.getAllValues().stream()
+            .filter(content -> CaseEvent.RECORD_NOTIFICATIONS.name().equals(content.getEvent().getId())).toList();
+        assertThat(history).hasSize(historyAttempts).allSatisfy(content -> {
+            assertThat(content.getEvent().getSummary()).isEqualTo("respondent@example.com : ref : template");
+            assertThat(content.getEvent().getDescription()).isEqualTo("Errors: send failed");
+        });
+        assertThat(history.getLast().getEventToken()).isEqualTo("history-token-" + historyAttempts);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T retryProxy(T target) {
+        var proxy = new ProxyFactory(target);
+        proxy.setProxyTargetClass(true);
+        proxy.addAdvisor(new DefaultIntroductionAdvisor(new AnnotationAwareRetryOperationsInterceptor(),
+            org.springframework.retry.interceptor.Retryable.class));
+        return (T) proxy.getProxy();
+    }
+
+    private StartEventResponse historyStart(String token) {
+        return StartEventResponse.builder().eventId(CaseEvent.RECORD_NOTIFICATIONS.name()).token(token)
+            .caseDetails(CaseDetails.builder().data(new HashMap<>()).build()).build();
     }
 
     @Test
     void shouldKeepAdditionalHwfNotificationsWithoutStartingANestedCcdEvent() {
         var data = additionalPaymentCaseData();
+        String summary = "Attempted: respondent@example.com : ref : template || Errors: ";
+        when(judicialNotificationService.sendNotificationAndGetSummary(data, "respondent")).thenReturn(summary);
 
         var result = paymentRequestUpdateCallbackService.processServiceRequest(buildServiceDto(PAID), data, true);
 
         assertThat(result.getGeneralAppPBADetails().getAdditionalPaymentDetails().getStatus()).isEqualTo(SUCCESS);
-        verify(judicialNotificationService).sendNotification(data, "respondent");
+        verify(judicialNotificationService).sendNotificationAndGetSummary(data, "respondent");
+        assertThat(result.getNotificationSummary()).isEqualTo(summary);
         verify(coreCaseDataService, never()).startGaUpdate(any(), any());
+        verifyNoInteractions(notificationHistoryService);
+    }
+
+    @Test
+    void shouldNotRecordAStaleSummaryForConsentOrderHwfPayments() {
+        var data = additionalPaymentCaseData().copy().generalAppConsentOrder(YesOrNo.YES)
+            .notificationSummary("Attempted: previous@example.com : ref : template || Errors: ").build();
+        var result = paymentRequestUpdateCallbackService.processServiceRequest(buildServiceDto(PAID), data, true);
+        assertThat(result.getNotificationSummary()).isNull();
+        verifyNoInteractions(judicialNotificationService, notificationHistoryService);
     }
 
     private GeneralApplicationCaseData additionalPaymentCaseData() {
@@ -494,10 +550,6 @@ class GaPaymentRequestUpdateCallbackServiceTest {
             .generalAppPBADetails(new GeneralApplicationPbaDetails()
                 .setAdditionalPaymentDetails(new PaymentDetails().setStatus(FAILED).setReference(REFERENCE)))
             .build();
-    }
-
-    private NotificationException buildNotificationException() {
-        return new NotificationException(new Exception("Notification Exception"));
     }
 
     @Test
@@ -578,7 +630,7 @@ class GaPaymentRequestUpdateCallbackServiceTest {
 
         verify(coreCaseDataService, times(1)).startGaUpdate(any(), any());
         verify(coreCaseDataService, never()).submitGaUpdate(any(), any());
-        verify(judicialNotificationService, never()).sendNotification(any(), any());
+        verify(judicialNotificationService, never()).sendNotificationAndGetSummary(any(), any());
     }
 
     @Test
