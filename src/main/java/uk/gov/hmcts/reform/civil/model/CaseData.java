@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model;
 
+import uk.gov.hmcts.reform.civil.notification.handlers.NotifiableCaseData;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -127,7 +128,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @Jacksonized
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class CaseData extends CaseDataParent implements MappableObject {
+public class CaseData extends CaseDataParent implements MappableObject, NotifiableCaseData {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private  Long ccdCaseReference;
