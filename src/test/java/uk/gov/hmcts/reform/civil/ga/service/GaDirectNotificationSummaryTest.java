@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -16,9 +17,11 @@ import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.DocUpl
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import org.mockito.ArgumentCaptor;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption;
+import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeWrittenRepresentationsOptions;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialDecision;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialRequestMoreInfo;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialWrittenRepresentations;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -38,6 +41,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -137,6 +141,74 @@ class GaDirectNotificationSummaryTest {
         when(organisations.findOrganisationById("applicant-org")).thenThrow(new RuntimeException("Organisation lookup failed"));
         String summary = evidence(recordedMail).notifyEvidenceUploadAndGetSummary(data);
         assertThat(NotificationSummaryParser.errors(summary)).contains("applicant", "Organisation lookup failed");
+        assertThat(NotificationSummaryParser.attempted(summary)).contains("respondent1@example.com", "respondent2@example.com");
+    }
+
+    @Test
+    void shouldRecordRespondentPreparationFailureAfterNotifyingApplicant() {
+        configure();
+        var parent = new GeneralApplicationCaseData().ccdState(CaseState.CASE_PROGRESSION)
+            .legacyCaseReference("000MC001").build();
+        when(converter.toGeneralApplicationCaseData(any())).thenReturn(parent)
+            .thenThrow(new RuntimeException("Parent case unavailable for respondents"));
+        var emails = new ArrayList<EmailDTO>();
+        capture(recordedMail, emails);
+
+        String summary = evidence(recordedMail).notifyEvidenceUploadAndGetSummary(data(0, false, true));
+
+        assertThat(emails).extracting(EmailDTO::getTargetEmail).containsExactly("applicant@example.com");
+        assertThat(NotificationSummaryParser.attempted(summary)).startsWith("applicant@example.com :").doesNotContain("respondent");
+        assertThat(NotificationSummaryParser.errors(summary)).contains("respondent", "Parent case unavailable for respondents");
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   "})
+    void shouldSkipMissingJudicialRecipientAndStillNotifyTheOtherRespondent(String email) {
+        configure();
+        var data = data(0, false, true);
+        data.getGeneralAppRespondentSolicitors().getFirst().getValue().setEmail(email);
+        var emails = new ArrayList<EmailDTO>();
+        capture(recordedMail, emails);
+
+        String summary = judicial(recordedMail).sendNotificationAndGetSummary(data, "respondent");
+
+        assertThat(emails).extracting(EmailDTO::getTargetEmail).containsExactly("respondent2@example.com");
+        assertThat(NotificationSummaryParser.attempted(summary)).startsWith("respondent2@example.com :").doesNotContain(" | ");
+        assertThat(NotificationSummaryParser.errors(summary)).isNull();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"CONCURRENT", "SEQUENTIAL", "HEARING"})
+    void shouldPreserveRepresentedRespondentEmailsForOtherJudicialDecisions(String decision) {
+        configure();
+        var data = data(0, false, true).copy().ccdState(CaseState.ORDER_MADE).build();
+        String expectedTemplate;
+        if ("HEARING".equals(decision)) {
+            data.setJudicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.LIST_FOR_A_HEARING));
+            expectedTemplate = "getJudgeListsForHearingRespondentEmailTemplate";
+        } else {
+            boolean concurrent = "CONCURRENT".equals(decision);
+            data.setJudicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER));
+            data.setJudicialDecisionMakeAnOrderForWrittenRepresentations(new GAJudicialWrittenRepresentations()
+                .setWrittenOption(concurrent ? GAJudgeWrittenRepresentationsOptions.CONCURRENT_REPRESENTATIONS
+                    : GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS)
+                .setWrittenConcurrentRepresentationsBy(LocalDate.of(2026, 11, 20))
+                .setSequentialApplicantMustRespondWithin(LocalDate.of(2026, 11, 21)));
+            expectedTemplate = concurrent ? "getWrittenRepConcurrentRepresentationRespondentEmailTemplate"
+                : "getWrittenRepSequentialRepresentationRespondentEmailTemplate";
+        }
+        var legacyEmails = new ArrayList<EmailDTO>();
+        var recordedEmails = new ArrayList<EmailDTO>();
+        capture(legacyMail, legacyEmails);
+        capture(recordedMail, recordedEmails);
+
+        judicial(legacyMail).sendNotification(data, "respondent");
+        String summary = judicial(recordedMail).sendNotificationAndGetSummary(data, "respondent");
+
+        assertThat(recordedEmails).containsExactlyElementsOf(legacyEmails).hasSize(2)
+            .allSatisfy(email -> assertThat(email.getEmailTemplate()).isEqualTo(expectedTemplate));
+        assertThat(NotificationSummaryParser.errors(summary)).isNull();
         assertThat(NotificationSummaryParser.attempted(summary)).contains("respondent1@example.com", "respondent2@example.com");
     }
 
