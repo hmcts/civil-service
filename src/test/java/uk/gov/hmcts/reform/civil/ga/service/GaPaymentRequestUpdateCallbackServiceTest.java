@@ -13,6 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
+import org.springframework.retry.support.RetryTemplate;
+import org.springframework.retry.backoff.NoBackOffPolicy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -42,6 +44,8 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -178,7 +182,7 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     }
 
     @Test
-    public void shouldThrowCaseDataUpdateException_WhenAdditionalPaymentExist_AndNotificationServiceIsDown() {
+    public void shouldApplyPaymentBeforeAttemptingNotificationWhenNotificationServiceIsDown() {
 
         final GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .judicialOrderMadeWithUncloakApplication(YesOrNo.NO)
@@ -194,6 +198,11 @@ class GaPaymentRequestUpdateCallbackServiceTest {
                                       )
             .build();
 
+        CaseDetails details = buildCaseDetails(caseData);
+        when(coreCaseDataService.startGaUpdate(any(), eq(CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID)))
+            .thenReturn(startEventResponse(details, CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID));
+        when(caseDetailsConverter.toGeneralApplicationCaseData(details)).thenReturn(caseData.copy().build());
+        when(coreCaseDataService.submitGaUpdate(any(), any())).thenReturn(caseData);
         doThrow(buildNotificationException())
             .when(judicialNotificationService)
             .sendNotification(caseData, "respondent");
@@ -203,8 +212,10 @@ class GaPaymentRequestUpdateCallbackServiceTest {
         assertThatThrownBy(() -> paymentRequestUpdateCallbackService.processServiceRequest(serviceRequestUpdateDto, caseData, false))
             .isInstanceOf(CaseDataUpdateException.class);
 
-        verify(coreCaseDataService, never()).startGaUpdate(any(), any());
-        verify(coreCaseDataService, never()).submitGaUpdate(any(), any());
+        var ordered = inOrder(coreCaseDataService, judicialNotificationService);
+        ordered.verify(coreCaseDataService).startGaUpdate(any(), any());
+        ordered.verify(coreCaseDataService).submitGaUpdate(any(), any());
+        ordered.verify(judicialNotificationService).sendNotification(caseData, "respondent");
     }
 
     @Test
@@ -412,6 +423,79 @@ class GaPaymentRequestUpdateCallbackServiceTest {
 
     }
 
+    @Test
+    void shouldSendOnceWhenPaymentSubmissionIsRetried() {
+        var data = additionalPaymentCaseData();
+        var details = buildCaseDetails(data);
+        when(coreCaseDataService.startGaUpdate(any(), eq(CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID)))
+            .thenReturn(startEventResponse(details, CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID));
+        when(caseDetailsConverter.toGeneralApplicationCaseData(details)).thenAnswer(invocation ->
+            data.copy().generalAppPBADetails(data.getGeneralAppPBADetails().copy()).build());
+        when(coreCaseDataService.submitGaUpdate(any(), any()))
+            .thenThrow(new RuntimeException("CCD update conflict"))
+            .thenReturn(data);
+        var dto = buildServiceDto(PAID);
+        var retry = new RetryTemplate();
+        retry.setBackOffPolicy(new NoBackOffPolicy());
+
+        retry.execute(context -> paymentRequestUpdateCallbackService.processServiceRequest(dto, data, false));
+
+        verify(coreCaseDataService, times(2)).submitGaUpdate(any(), any());
+        var ordered = inOrder(coreCaseDataService, judicialNotificationService);
+        ordered.verify(coreCaseDataService).startGaUpdate(any(), any());
+        ordered.verify(coreCaseDataService).submitGaUpdate(any(), any());
+        ordered.verify(coreCaseDataService).startGaUpdate(any(), any());
+        ordered.verify(coreCaseDataService).submitGaUpdate(any(), any());
+        ordered.verify(judicialNotificationService).sendNotification(data, "respondent");
+        verify(judicialNotificationService).sendNotification(data, "respondent");
+    }
+
+    @Test
+    void shouldNotResendWhenAFailureOccursAfterTheNotificationWasSent() {
+        var data = additionalPaymentCaseData();
+        var details = buildCaseDetails(data);
+        var paid = data.copy().generalAppPBADetails(new GeneralApplicationPbaDetails()
+            .setAdditionalPaymentDetails(new PaymentDetails().setStatus(SUCCESS).setReference(REFERENCE))).build();
+        var paidDetails = buildCaseDetails(paid);
+        when(coreCaseDataService.startGaUpdate(any(), eq(CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID)))
+            .thenReturn(startEventResponse(details, CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID))
+            .thenReturn(startEventResponse(paidDetails, CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID));
+        when(caseDetailsConverter.toGeneralApplicationCaseData(details)).thenReturn(data.copy().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(paidDetails)).thenReturn(paid);
+        when(coreCaseDataService.submitGaUpdate(any(), any())).thenReturn(paid);
+        doAnswer(invocation -> {
+            throw new RuntimeException("Failure after sending the respondent notification");
+        }).when(judicialNotificationService).sendNotification(data, "respondent");
+        var dto = buildServiceDto(PAID);
+        var retry = new RetryTemplate();
+        retry.setBackOffPolicy(new NoBackOffPolicy());
+
+        retry.execute(context -> paymentRequestUpdateCallbackService.processServiceRequest(dto, data, false));
+
+        verify(coreCaseDataService, times(2)).startGaUpdate(any(), any());
+        verify(coreCaseDataService).submitGaUpdate(any(), any());
+        verify(judicialNotificationService).sendNotification(data, "respondent");
+    }
+
+    @Test
+    void shouldKeepAdditionalHwfNotificationsWithoutStartingANestedCcdEvent() {
+        var data = additionalPaymentCaseData();
+
+        var result = paymentRequestUpdateCallbackService.processServiceRequest(buildServiceDto(PAID), data, true);
+
+        assertThat(result.getGeneralAppPBADetails().getAdditionalPaymentDetails().getStatus()).isEqualTo(SUCCESS);
+        verify(judicialNotificationService).sendNotification(data, "respondent");
+        verify(coreCaseDataService, never()).startGaUpdate(any(), any());
+    }
+
+    private GeneralApplicationCaseData additionalPaymentCaseData() {
+        return GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YesOrNo.NO).build()
+            .copy().ccdCaseReference(Long.valueOf(CASE_ID)).ccdState(APPLICATION_ADD_PAYMENT)
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                .setAdditionalPaymentDetails(new PaymentDetails().setStatus(FAILED).setReference(REFERENCE)))
+            .build();
+    }
+
     private NotificationException buildNotificationException() {
         return new NotificationException(new Exception("Notification Exception"));
     }
@@ -494,6 +578,7 @@ class GaPaymentRequestUpdateCallbackServiceTest {
 
         verify(coreCaseDataService, times(1)).startGaUpdate(any(), any());
         verify(coreCaseDataService, never()).submitGaUpdate(any(), any());
+        verify(judicialNotificationService, never()).sendNotification(any(), any());
     }
 
     @Test

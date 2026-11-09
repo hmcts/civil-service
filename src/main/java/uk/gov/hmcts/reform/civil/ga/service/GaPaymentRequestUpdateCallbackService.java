@@ -113,15 +113,14 @@ public class GaPaymentRequestUpdateCallbackService {
                                                     boolean hwf) {
         log.info("Processing the callback for making Additional Payment"
                      + "for the caseId {}", serviceRequestUpdateDto.getCcdCaseNumber());
-        if (!isGeneralAppConsentOrder(caseData)) {
-            judicialNotificationService.sendNotification(caseData, "respondent");
+        GeneralApplicationCaseData notificationCaseData = caseData;
+        caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData);
+        boolean paymentApplied = hwf || createEvent(caseData, MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID,
+            serviceRequestUpdateDto.getCcdCaseNumber());
+        if (paymentApplied && !isGeneralAppConsentOrder(notificationCaseData)) {
+            judicialNotificationService.sendNotification(notificationCaseData, "respondent");
         }
 
-        caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData);
-        if (!hwf) {
-            createEvent(caseData, MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID,
-                        serviceRequestUpdateDto.getCcdCaseNumber());
-        }
         return caseData;
     }
 
@@ -179,7 +178,7 @@ public class GaPaymentRequestUpdateCallbackService {
             .setErrorMessage(null);
     }
 
-    private void createEvent(GeneralApplicationCaseData updatedStaleCaseData, CaseEvent eventName, String generalApplicationCaseId) {
+    private boolean createEvent(GeneralApplicationCaseData updatedStaleCaseData, CaseEvent eventName, String generalApplicationCaseId) {
         StartEventResponse startEventResponse = coreCaseDataService.startGaUpdate(
             generalApplicationCaseId,
             eventName
@@ -192,7 +191,7 @@ public class GaPaymentRequestUpdateCallbackService {
         if (isPaymentAlreadyApplied(intendedPayment, freshPayment)) {
             log.info("{} Payment already applied for case {}. Skipping submission.",
                      eventName == INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT ? "Application" : "Additional", generalApplicationCaseId);
-            return;
+            return false;
         }
 
         populateFreshData(updatedStaleCaseData, eventName, freshData);
@@ -205,6 +204,7 @@ public class GaPaymentRequestUpdateCallbackService {
             freshData.getGeneralAppParentCaseLink()
         );
         coreCaseDataService.submitGaUpdate(generalApplicationCaseId, caseDataContent);
+        return true;
     }
 
     private static void populateFreshData(GeneralApplicationCaseData updatedStaleCaseData, CaseEvent eventName, GeneralApplicationCaseData freshData) {
