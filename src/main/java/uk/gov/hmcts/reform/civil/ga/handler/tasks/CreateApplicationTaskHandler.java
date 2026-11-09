@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
@@ -88,7 +89,8 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
                     && application.getValue().getBusinessProcess().getProcessInstanceId() != null).findFirst();
 
             if (genApps.isPresent()) {
-                log.debug("Eligible general application found for processing in case ID: {}", caseId);
+                log.info("Selected general application element ID: {} for case ID: {}, process instance ID: {}",
+                         genApps.get().getId(), caseId, externalTask.getProcessInstanceId());
 
                 GeneralApplication generalApplication = genApps.get().getValue();
 
@@ -311,11 +313,17 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
     }
 
     private YesOrNo checkVisibility(GeneralApplication generalApplication) {
+        YesOrNo hasAgreed = ofNullable(generalApplication.getGeneralAppRespondentAgreement())
+            .map(GARespondentOrderAgreement::getHasAgreed).orElse(null);
+        if (hasAgreed == null) {
+            return NO;
+        }
+
         /*
          * Respondent Agreement is No and without notice application.
          * Application should be visible to solicitor who initiates the ga
          * */
-        if ((generalApplication.getGeneralAppRespondentAgreement().getHasAgreed().equals(NO)
+        if ((NO.equals(hasAgreed)
             && ofNullable(generalApplication.getGeneralAppInformOtherParty()).isPresent()
             && NO.equals(generalApplication.getGeneralAppInformOtherParty().getIsWithNotice()))) {
             return NO;
@@ -325,10 +333,10 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
          * Application should be visible to all solicitors
          * Consent order should be visible to all solicitors
          * */
-        if ((generalApplication.getGeneralAppRespondentAgreement().getHasAgreed().equals(NO)
+        if ((NO.equals(hasAgreed)
             && ofNullable(generalApplication.getGeneralAppInformOtherParty()).isPresent()
             && YES.equals(generalApplication.getGeneralAppInformOtherParty().getIsWithNotice()))
-            || generalApplication.getGeneralAppRespondentAgreement().getHasAgreed().equals(YES)) {
+            || YES.equals(hasAgreed)) {
             return YES;
         }
 
