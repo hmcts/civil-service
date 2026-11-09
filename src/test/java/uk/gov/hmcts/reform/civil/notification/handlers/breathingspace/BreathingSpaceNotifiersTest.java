@@ -134,7 +134,7 @@ class BreathingSpaceNotifiersTest {
     }
 
     private void assertParity(CaseData data, boolean enter, boolean twoRepresentatives) {
-        Notifier notifier;
+        Notifier<CaseData> notifier;
         String taskId;
         if (enter) {
             when(engine.evaluate(data)).thenReturn(flow);
