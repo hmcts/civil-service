@@ -7,7 +7,8 @@ import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.EvidenceUploadedClaimantNotificationHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.evidenceuploaded.EvidenceUploadedClaimantDashboardTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
@@ -21,7 +22,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 public class EvidenceUploadedClaimantScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
-    private EvidenceUploadedClaimantNotificationHandler handler;
+    private EvidenceUploadedClaimantDashboardTask handler;
 
     @Test
     void should_enable_view_documents_task_list_when_claimant_uploads_document_scenario() throws Exception {
@@ -40,7 +41,7 @@ public class EvidenceUploadedClaimantScenarioTest extends DashboardBaseIntegrati
             .orderType(OrderType.DECIDE_DAMAGES)
             .build();
 
-        handler.handle(callbackParams(caseData));
+        handler.execute(DashboardTaskContext.civil(caseData, BEARER_TOKEN));
 
         //Verify Task List
 
@@ -75,7 +76,7 @@ public class EvidenceUploadedClaimantScenarioTest extends DashboardBaseIntegrati
             .orderType(OrderType.DECIDE_DAMAGES)
             .build();
 
-        handler.handle(callbackParams(caseData));
+        handler.execute(DashboardTaskContext.civil(caseData, BEARER_TOKEN));
 
         //Verify Task List
 
