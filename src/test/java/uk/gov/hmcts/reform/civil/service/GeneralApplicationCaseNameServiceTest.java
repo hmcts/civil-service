@@ -11,9 +11,12 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -104,10 +107,35 @@ class GeneralApplicationCaseNameServiceTest {
     void shouldUpdateGeneralApplicationsUnconditionally_whenCalledDirectly() {
         CaseData parent = caseData(ORIGINAL_NAME, generalApplication("111"));
 
-        service.updateGeneralApplications(parent);
+        List<String> failedReferences = service.updateGeneralApplications(parent);
 
         verify(coreCaseDataService).triggerGeneralApplicationEvent(
             111L, UPDATE_GA_CASE_DATA, Map.of("caseNameGaInternal", ORIGINAL_NAME));
+        assertThat(failedReferences).isEmpty();
+    }
+
+    @Test
+    void shouldAttemptEveryGeneralApplicationAndReturnFailures_whenUpdatesFail() {
+        CaseData parent = caseData(ORIGINAL_NAME, generalApplication("111"), generalApplication("222"),
+                                   generalApplication("333"));
+        lenient().doThrow(new IllegalStateException("CCD unavailable"))
+            .when(coreCaseDataService).triggerGeneralApplicationEvent(111L, UPDATE_GA_CASE_DATA, Map.of("caseNameGaInternal", ORIGINAL_NAME));
+        lenient().doThrow(new IllegalStateException("CCD unavailable"))
+            .when(coreCaseDataService).triggerGeneralApplicationEvent(333L, UPDATE_GA_CASE_DATA, Map.of("caseNameGaInternal", ORIGINAL_NAME));
+
+        List<String> failedReferences = service.updateGeneralApplications(parent);
+
+        verify(coreCaseDataService).triggerGeneralApplicationEvent(
+            222L, UPDATE_GA_CASE_DATA, Map.of("caseNameGaInternal", ORIGINAL_NAME));
+        assertThat(failedReferences).containsExactly("111", "333");
+    }
+
+    @Test
+    void shouldReturnNoFailures_whenParentCaseNameMissing() {
+        CaseData parent = caseData(null, generalApplication("111"));
+
+        assertThat(service.updateGeneralApplications(parent)).isEmpty();
+        verifyNoInteractions(coreCaseDataService);
     }
 
     @Test

@@ -32,14 +32,15 @@ public class GeneralApplicationCaseNameService {
         }
     }
 
-    public void updateGeneralApplications(CaseData parentCaseData) {
+    public List<String> updateGeneralApplications(CaseData parentCaseData) {
         String caseName = parentCaseData.getCaseNameHmctsInternal();
         if (caseName == null) {
-            return;
+            return List.of();
         }
 
-        linkedGeneralApplicationReferences(parentCaseData)
-            .forEach(gaCaseReference -> updateCaseName(gaCaseReference, caseName, parentCaseData.getCcdCaseReference()));
+        return linkedGeneralApplicationReferences(parentCaseData).stream()
+            .filter(gaCaseReference -> !updateCaseName(gaCaseReference, caseName, parentCaseData.getCcdCaseReference()))
+            .toList();
     }
 
     private List<String> linkedGeneralApplicationReferences(CaseData parentCaseData) {
@@ -60,16 +61,18 @@ public class GeneralApplicationCaseNameService {
             .toList();
     }
 
-    private void updateCaseName(String gaCaseReference, String caseName, Long parentCaseReference) {
+    private boolean updateCaseName(String gaCaseReference, String caseName, Long parentCaseReference) {
         try {
             coreCaseDataService.triggerGeneralApplicationEvent(
                 Long.parseLong(gaCaseReference),
                 UPDATE_GA_CASE_DATA,
                 Map.of("caseNameGaInternal", caseName)
             );
+            return true;
         } catch (RuntimeException e) {
             log.error("Failed to update case name on general application {} for parent case {}",
                       gaCaseReference, parentCaseReference, e);
+            return false;
         }
     }
 }
