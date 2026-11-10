@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications.defendantresponse;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -32,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.service.dashboardnotifications.defendant
 import static uk.gov.hmcts.reform.civil.service.dashboardnotifications.defendantresponse.DefendantResponseScenarioHelper.scenarioForRespondentPartyType;
 
 @Service
+@Slf4j
 public class DefendantResponseClaimantDashboardService extends DashboardScenarioService {
 
     private final FeatureToggleService featureToggleService;
@@ -69,6 +71,9 @@ public class DefendantResponseClaimantDashboardService extends DashboardScenario
 
         boolean isJudgmentRequestedCancelled = featureToggleService.isJudgmentBufferEnabled()
             && YesOrNo.YES.equals(caseData.getIsJoRequested());
+
+        log.info("Recording toggle {}, getIsJoRequested, {}, isJudgmentRequestedCancelled {}",
+                 featureToggleService.isJudgmentBufferEnabled(),caseData.getIsJoRequested(), isJudgmentRequestedCancelled);
 
         return Map.of(
             SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario(),
