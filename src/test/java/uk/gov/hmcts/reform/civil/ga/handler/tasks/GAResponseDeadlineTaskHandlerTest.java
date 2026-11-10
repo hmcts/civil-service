@@ -233,12 +233,14 @@ class GAResponseDeadlineTaskHandlerTest {
                    "isGaApplicantLip",  YesOrNo.YES)).build();
         when(caseSearchService.getGeneralApplications(AWAITING_RESPONDENT_RESPONSE))
             .thenReturn(Set.of());
-        when(caseSearchService.getGeneralApplications(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION))
+        when(caseSearchService.getUncheckedResponseDeadlineApplications(AWAITING_RESPONDENT_RESPONSE))
+            .thenReturn(Set.of());
+        when(caseSearchService.getUncheckedResponseDeadlineApplications(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION))
             .thenReturn(Set.of(caseDetails6, caseDetails7, caseDetails8));
 
         gaResponseDeadlineTaskHandler.execute(externalTask, externalTaskService);
 
-        verify(caseSearchService).getGeneralApplications(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION);
+        verify(caseSearchService).getUncheckedResponseDeadlineApplications(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION);
         verify(coreCaseDataService).triggerEvent(1L, RESPONDENT_RESPONSE_DEADLINE_CHECK);
         verify(coreCaseDataService).triggerEvent(2L, RESPONDENT_RESPONSE_DEADLINE_CHECK);
         verifyNoMoreInteractions(coreCaseDataService);
@@ -264,6 +266,45 @@ class GAResponseDeadlineTaskHandlerTest {
 
         verify(caseSearchService).getGeneralApplications(AWAITING_RESPONDENT_RESPONSE);
         verifyNoInteractions(coreCaseDataService);
+        verify(externalTaskService).complete(any(), any());
+    }
+
+    @Test
+    void shouldSkipCheckedNotificationsButStillChangeState() {
+        CaseDetails checkedCase = CaseDetails.builder().id(1L).data(Map.of(
+            "generalAppNotificationDeadlineDate", deadlineCrossed.toString(),
+            "isGaApplicantLip", YesOrNo.YES,
+            "respondentResponseDeadlineChecked", YesOrNo.YES
+        )).build();
+        when(caseSearchService.getGeneralApplications(AWAITING_RESPONDENT_RESPONSE))
+            .thenReturn(Set.of(checkedCase));
+
+        gaResponseDeadlineTaskHandler.execute(externalTask, externalTaskService);
+
+        verify(caseSearchService).getUncheckedResponseDeadlineApplications(AWAITING_RESPONDENT_RESPONSE);
+        verify(coreCaseDataService).triggerEvent(1L, CHANGE_STATE_TO_AWAITING_JUDICIAL_DECISION);
+        verifyNoMoreInteractions(coreCaseDataService);
+        verify(externalTaskService).complete(any(), any());
+    }
+
+    @Test
+    void shouldProcessUncheckedNotificationsReturnedByQuery() {
+        CaseDetails uncheckedCase = CaseDetails.builder().id(2L).data(Map.of(
+            "generalAppNotificationDeadlineDate", deadlineCrossed.toString(),
+            "isGaRespondentOneLip", YesOrNo.YES,
+            "respondentResponseDeadlineChecked", YesOrNo.NO
+        )).build();
+        when(caseSearchService.getGeneralApplications(AWAITING_RESPONDENT_RESPONSE))
+            .thenReturn(Set.of());
+        when(caseSearchService.getUncheckedResponseDeadlineApplications(AWAITING_RESPONDENT_RESPONSE))
+            .thenReturn(Set.of());
+        when(caseSearchService.getUncheckedResponseDeadlineApplications(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION))
+            .thenReturn(Set.of(uncheckedCase));
+
+        gaResponseDeadlineTaskHandler.execute(externalTask, externalTaskService);
+
+        verify(coreCaseDataService).triggerEvent(2L, RESPONDENT_RESPONSE_DEADLINE_CHECK);
+        verifyNoMoreInteractions(coreCaseDataService);
         verify(externalTaskService).complete(any(), any());
     }
 
