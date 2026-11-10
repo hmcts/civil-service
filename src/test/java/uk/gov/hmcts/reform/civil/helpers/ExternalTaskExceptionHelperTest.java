@@ -6,6 +6,7 @@ import feign.RetryableException;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -144,6 +145,44 @@ class ExternalTaskExceptionHelperTest {
     @Test
     void shouldReturnStackTraceWhenLoggerIsNull() {
         assertThat(ExternalTaskExceptionHelper.getStackTrace(new RuntimeException("boom")))
+            .contains("ExternalTaskExceptionHelperTest");
+    }
+
+    @Test
+    void shouldIncludeExceptionClassMessageAndCauseChainInStackTrace() {
+        Throwable cause = new IllegalArgumentException("Cannot deserialize value of type `java.time.LocalDate`");
+        Throwable exception = new IllegalStateException("outer failure", cause);
+
+        assertThat(ExternalTaskExceptionHelper.getStackTrace(exception))
+            .contains("java.lang.IllegalStateException: outer failure")
+            .contains("Caused by: java.lang.IllegalArgumentException: Cannot deserialize value of type `java.time.LocalDate`")
+            .contains("ExternalTaskExceptionHelperTest");
+    }
+
+    @Test
+    void shouldReturnResponseBodyForFeignException() {
+        Throwable exception = new FeignException.BadRequest(
+            "Bad request",
+            Request.create(Request.HttpMethod.GET, "url", Map.of(), null, null, null),
+            "{\"message\":\"field is invalid\"}".getBytes(StandardCharsets.UTF_8),
+            null
+        );
+
+        assertThat(ExternalTaskExceptionHelper.getStackTrace(exception))
+            .isEqualTo("{\"message\":\"field is invalid\"}");
+    }
+
+    @Test
+    void shouldFallBackToStackTraceForFeignExceptionWithoutBody() {
+        Throwable exception = new FeignException.BadRequest(
+            "Bad request",
+            Request.create(Request.HttpMethod.GET, "url", Map.of(), null, null, null),
+            null,
+            null
+        );
+
+        assertThat(ExternalTaskExceptionHelper.getStackTrace(exception))
+            .contains("FeignException$BadRequest: Bad request")
             .contains("ExternalTaskExceptionHelperTest");
     }
 
