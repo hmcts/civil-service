@@ -7,7 +7,8 @@ gradle.taskGraph.beforeTask { task ->
     started[task.path] = System.nanoTime()
 }
 gradle.taskGraph.afterTask { task, state ->
-    def entry = [task: task.path, seconds: (System.nanoTime() - started[task.path]) / 1e9,
+    def entry = [task: task.path, phase: System.getenv('UNIT_BENCHMARK_PHASE'),
+                 seconds: (System.nanoTime() - started[task.path]) / 1e9, skipMessage: state.skipMessage,
                  upToDate: state.upToDate, skipped: state.skipped, didWork: state.didWork,
                  failed: state.failure != null]
     if (task instanceof Test) {

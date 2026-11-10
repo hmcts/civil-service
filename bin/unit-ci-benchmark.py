@@ -186,8 +186,9 @@ def main():
         if coverage_file.exists():
             coverage_file.unlink()
         prepare_tasks = ['clean', 'testClasses'] if number == 1 else ['testClasses']
-        prepare = measure(command + prepare_tasks, directory / 'prepare', environment)
-        unit = measure(command + ['test', 'jacocoTestReport'], directory / 'unit', environment) if prepare['exitCode'] == 0 else None
+        prepare = measure(command + prepare_tasks, directory / 'prepare', dict(environment, UNIT_BENCHMARK_PHASE='prepare'))
+        unit = measure(command + ['test', 'jacocoTestReport'], directory / 'unit',
+                       dict(environment, UNIT_BENCHMARK_PHASE='unit')) if prepare['exitCode'] == 0 else None
         cases, states = test_results(root)
         with (directory / 'test-states.csv').open('w', newline='') as file:
             writer = csv.DictWriter(file, fieldnames=['class', 'name', 'state', 'seconds'])
