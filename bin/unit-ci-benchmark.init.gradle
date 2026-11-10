@@ -1,0 +1,35 @@
+import groovy.json.JsonOutput
+import org.gradle.api.tasks.testing.Test
+
+def output = new File(System.getenv('UNIT_BENCHMARK_TASKS'))
+def started = new java.util.concurrent.ConcurrentHashMap()
+gradle.taskGraph.beforeTask { task ->
+    started[task.path] = System.nanoTime()
+}
+gradle.taskGraph.afterTask { task, state ->
+    def entry = [task: task.path, seconds: (System.nanoTime() - started[task.path]) / 1e9,
+                 upToDate: state.upToDate, skipped: state.skipped, didWork: state.didWork,
+                 failed: state.failure != null]
+    if (task instanceof Test) {
+        entry.maxParallelForks = task.maxParallelForks
+        entry.gradleMaxWorkers = gradle.startParameter.maxWorkerCount
+        entry.processors = Runtime.runtime.availableProcessors()
+        entry.maxHeap = task.maxHeapSize
+        entry.failFast = task.failFast
+    }
+    output.parentFile.mkdirs()
+    synchronized (output) {
+        output << JsonOutput.toJson(entry) + '\n'
+    }
+}
+gradle.projectsEvaluated {
+    allprojects {
+        tasks.withType(Test).configureEach { task ->
+            if (task.name == 'test') {
+                // Both measured repetitions must execute the entire suite.
+                task.outputs.upToDateWhen { false }
+                task.failFast = false
+            }
+        }
+    }
+}

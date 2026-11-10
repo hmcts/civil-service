@@ -12,6 +12,41 @@ on:
       - '*'
 
 jobs:
+  unit-benchmark:
+    if: github.event_name == 'pull_request' && github.head_ref == 'DTSCCI-6919'
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/cache@v6
+        id: benchmark-cache
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle-
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21.0.13+9.0.LTS
+      - name: Verify benchmark measurement helpers
+        run: python3 bin/test_unit_ci_benchmark.py
+      - name: Two measured unit runs
+        env:
+          BENCHMARK_CACHE_HIT: ${{ steps.benchmark-cache.outputs.cache-hit }}
+        run: python3 bin/unit-ci-benchmark.py --provider actions --workers 2
+      - name: Publish benchmark data
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: unit-benchmark-actions
+          path: benchmark-results/actions
+          if-no-files-found: error
+          retention-days: 14
+
   pii-log-check:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
@@ -41,6 +76,7 @@ jobs:
           python .semgrep/annotate.py semgrep-results.json
 
   build:
+    if: github.event_name != 'pull_request' || github.head_ref != 'DTSCCI-6919'
     runs-on: ubuntu-latest
     env:
       GRADLE_OPTS: -Dorg.gradle.workers.max=2
