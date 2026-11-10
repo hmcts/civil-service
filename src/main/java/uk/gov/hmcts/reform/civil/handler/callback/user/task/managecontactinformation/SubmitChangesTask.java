@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ContactDetailsUpdatedEvent;
+import uk.gov.hmcts.reform.civil.model.LitigationFriend;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
@@ -29,6 +31,8 @@ import uk.gov.hmcts.reform.civil.utils.CaseNameUtils;
 import uk.gov.hmcts.reform.civil.utils.PartyDetailsChangedUtil;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
@@ -79,6 +83,18 @@ public class SubmitChangesTask {
         "caseworker-civil-admin", "caseworker-civil-staff");
     static final String PARTY_NAME_CHANGE_NOT_ALLOWED =
         "Only court staff can change a party name, after a judge has approved the change";
+    private static final List<Function<CaseData, Party>> PARTIES = List.of(
+        CaseData::getApplicant1, CaseData::getApplicant2, CaseData::getRespondent1, CaseData::getRespondent2);
+    private static final List<Function<Party, Object>> PARTY_NAME_FIELDS = List.of(
+        Party::getType, Party::getIndividualTitle, Party::getIndividualFirstName, Party::getIndividualLastName,
+        Party::getCompanyName, Party::getOrganisationName, Party::getSoleTraderTitle,
+        Party::getSoleTraderFirstName, Party::getSoleTraderLastName, Party::getSoleTraderTradingAs,
+        Party::getBulkClaimPartyName);
+    private static final List<Function<CaseData, LitigationFriend>> LITIGATION_FRIENDS = List.of(
+        CaseData::getApplicant1LitigationFriend, CaseData::getApplicant2LitigationFriend,
+        CaseData::getRespondent1LitigationFriend, CaseData::getRespondent2LitigationFriend);
+    private static final List<Function<LitigationFriend, Object>> LITIGATION_FRIEND_NAME_FIELDS = List.of(
+        LitigationFriend::getFullName, LitigationFriend::getFirstName, LitigationFriend::getLastName);
 
     public SubmitChangesTask(CaseDetailsConverter caseDetailsConverter, ObjectMapper objectMapper,
                              UserService userService, CaseFlagsInitialiser caseFlagsInitialiser,
@@ -96,7 +112,7 @@ public class SubmitChangesTask {
         String partyChosenId = caseData.getUpdateDetailsForm().getPartyChosenId();
         CaseData current = caseDetailsConverter.toCaseData(caseDetailsBefore);
 
-        if (caseNameChanged(current, caseData) && !isAdmin(authToken)) {
+        if (partyNameChanged(current, caseData) && !isAdmin(authToken)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(PARTY_NAME_CHANGE_NOT_ALLOWED))
                 .build();
@@ -145,8 +161,24 @@ public class SubmitChangesTask {
             .build();
     }
 
-    private boolean caseNameChanged(CaseData caseDataBefore, CaseData caseData) {
-        return caseDataBefore != null && !buildCaseName(caseDataBefore).equals(buildCaseName(caseData));
+    private boolean partyNameChanged(CaseData caseDataBefore, CaseData caseData) {
+        return caseDataBefore != null
+            && (namesChanged(caseDataBefore, caseData, PARTIES, PARTY_NAME_FIELDS)
+                || namesChanged(caseDataBefore, caseData, LITIGATION_FRIENDS, LITIGATION_FRIEND_NAME_FIELDS));
+    }
+
+    private static <T> boolean namesChanged(CaseData caseDataBefore, CaseData caseData,
+                                            List<Function<CaseData, T>> nameHolders,
+                                            List<Function<T, Object>> nameFields) {
+        return nameHolders.stream().anyMatch(holder -> nameFields.stream().anyMatch(
+            field -> !Objects.equals(nameValue(caseDataBefore, holder, field), nameValue(caseData, holder, field))));
+    }
+
+    private static <T> Object nameValue(CaseData caseData, Function<CaseData, T> nameHolder,
+                                        Function<T, Object> nameField) {
+        T holder = nameHolder.apply(caseData);
+        Object value = holder == null ? null : nameField.apply(holder);
+        return value instanceof String text && text.isBlank() ? null : value;
     }
 
     private boolean isAdmin(String userAuthToken) {

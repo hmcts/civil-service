@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.utils.PartyDetailsChangedUtil;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -184,6 +185,110 @@ class SubmitChangesTaskTest {
             (AboutToStartOrSubmitCallbackResponse) handler.submitChanges(caseData, caseDetails, "authToken");
 
         assertThat(response.getErrors()).containsExactly(PARTY_NAME_CHANGE_NOT_ALLOWED);
+    }
+
+    @Test
+    void shouldReturnError_whenLegalRepChangesOnlyDefendantTitle() {
+        when(userService.getUserInfo(anyString())).thenReturn(userWithRole("caseworker-civil-solicitor"));
+
+        AboutToStartOrSubmitCallbackResponse response = submitIndividualDefendantOneChange(
+            party -> party.setIndividualTitle("Dr"));
+
+        assertThat(response.getErrors()).containsExactly(PARTY_NAME_CHANGE_NOT_ALLOWED);
+    }
+
+    @Test
+    void shouldReturnError_whenLegalRepChangesDefendantNamesMaskedByBulkClaimPartyName() {
+        when(userService.getUserInfo(anyString())).thenReturn(userWithRole("caseworker-civil-solicitor"));
+
+        AboutToStartOrSubmitCallbackResponse response = submitIndividualDefendantOneChange(
+            party -> party.setIndividualFirstName("Changed"),
+            party -> party.setBulkClaimPartyName("Bulk Defendant"));
+
+        assertThat(response.getErrors()).containsExactly(PARTY_NAME_CHANGE_NOT_ALLOWED);
+    }
+
+    @Test
+    void shouldReturnError_whenLegalRepChangesOnlyBulkClaimPartyName() {
+        when(userService.getUserInfo(anyString())).thenReturn(userWithRole("caseworker-civil-solicitor"));
+
+        AboutToStartOrSubmitCallbackResponse response = submitIndividualDefendantOneChange(
+            party -> party.setBulkClaimPartyName("Changed Bulk Defendant"),
+            party -> party.setBulkClaimPartyName("Bulk Defendant"));
+
+        assertThat(response.getErrors()).containsExactly(PARTY_NAME_CHANGE_NOT_ALLOWED);
+    }
+
+    @Test
+    void shouldReturnError_whenLegalRepChangesSoleTraderTradingName() {
+        when(userService.getUserInfo(anyString())).thenReturn(userWithRole("caseworker-civil-solicitor"));
+        Party originalRespondent1 = new PartyBuilder().soleTrader().build();
+        Party updatedRespondent1 = new PartyBuilder().soleTrader().build();
+        updatedRespondent1.setSoleTraderTradingAs("Changed Trading Name");
+
+        AboutToStartOrSubmitCallbackResponse response = submitDefendantOneChange(originalRespondent1, updatedRespondent1);
+
+        assertThat(response.getErrors()).containsExactly(PARTY_NAME_CHANGE_NOT_ALLOWED);
+    }
+
+    @Test
+    void shouldReturnError_whenLegalRepChangesLitigationFriendFullName() {
+        when(userService.getUserInfo(anyString())).thenReturn(userWithRole("caseworker-civil-solicitor"));
+        Party applicant1 = new PartyBuilder().company().build();
+        Party respondent1 = new PartyBuilder().individual().build();
+        CaseData oldCaseData = CaseDataBuilder.builder().applicant1(applicant1).respondent1(respondent1)
+            .addRespondent1LitigationFriend().build();
+        CaseData caseData = CaseDataBuilder.builder().applicant1(applicant1).respondent1(respondent1)
+            .addRespondent1LitigationFriend()
+            .updateDetailsForm(updateDetailsForm(DEFENDANT_ONE_LITIGATION_FRIEND_ID))
+            .build();
+        caseData.getRespondent1LitigationFriend().setFullName("Changed Full Name");
+        CaseDetails caseDetails = CaseDetails.builder().build();
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(oldCaseData);
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) handler.submitChanges(caseData, caseDetails, "authToken");
+
+        assertThat(response.getErrors()).containsExactly(PARTY_NAME_CHANGE_NOT_ALLOWED);
+    }
+
+    @Test
+    void shouldNotReturnError_whenBlankTitleReplacesMissingTitle() {
+        AboutToStartOrSubmitCallbackResponse response = submitIndividualDefendantOneChange(
+            party -> party.setIndividualTitle(""),
+            party -> party.setIndividualTitle(null));
+
+        assertThat(response.getErrors()).isNull();
+        assertThat(response.getData()).isNotEmpty();
+    }
+
+    private AboutToStartOrSubmitCallbackResponse submitIndividualDefendantOneChange(Consumer<Party> change) {
+        return submitIndividualDefendantOneChange(change, party -> { });
+    }
+
+    private AboutToStartOrSubmitCallbackResponse submitIndividualDefendantOneChange(Consumer<Party> change,
+                                                                                   Consumer<Party> initialState) {
+        Party originalRespondent1 = new PartyBuilder().individual().build();
+        Party updatedRespondent1 = new PartyBuilder().individual().build();
+        initialState.accept(originalRespondent1);
+        initialState.accept(updatedRespondent1);
+        change.accept(updatedRespondent1);
+        return submitDefendantOneChange(originalRespondent1, updatedRespondent1);
+    }
+
+    private AboutToStartOrSubmitCallbackResponse submitDefendantOneChange(Party originalRespondent1,
+                                                                          Party updatedRespondent1) {
+        Party applicant1 = new PartyBuilder().company().build();
+        CaseData oldCaseData = CaseDataBuilder.builder().applicant1(applicant1).respondent1(originalRespondent1).build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1(applicant1)
+            .respondent1(updatedRespondent1)
+            .updateDetailsForm(updateDetailsForm(DEFENDANT_ONE_ID))
+            .build();
+        CaseDetails caseDetails = CaseDetails.builder().build();
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(oldCaseData);
+
+        return (AboutToStartOrSubmitCallbackResponse) handler.submitChanges(caseData, caseDetails, "authToken");
     }
 
     private AboutToStartOrSubmitCallbackResponse submitDefendantOneNameChange(String partyChosenId, String newCompanyName) {
