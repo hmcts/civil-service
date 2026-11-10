@@ -203,7 +203,7 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
 
     private boolean isJDDraftAllowed(GeneralApplicationCaseData caseData) {
         return caseData.getJudicialDecision() == null
-            || !REQUEST_MORE_INFO.equals(caseData.getJudicialDecision().getDecision());
+            || REQUEST_MORE_INFO.equals(caseData.getJudicialDecision().getDecision());
     }
 
     private CaseDocument generateDraftDocument(CallbackParams callbackParams, GeneralApplicationCaseData caseData) {

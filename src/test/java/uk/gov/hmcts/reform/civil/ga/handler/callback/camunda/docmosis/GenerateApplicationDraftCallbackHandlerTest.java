@@ -459,7 +459,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
     }
 
     @Test
-    void shouldNotGenerateApplicationDraftDocument_whenJudgeRequestsMoreInfo_LR() {
+    void shouldGenerateApplicationDraftDocument_whenJudgeRequestsMoreInfo_LR() {
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
 
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, YES);
@@ -473,14 +473,17 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         when(generalAppFeesService.isFreeApplication(any())).thenReturn(true);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
+            .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
 
         handler.handle(params);
 
-        verifyNoInteractions(generalApplicationDraftGenerator);
+        verify(generalApplicationDraftGenerator)
+            .generate(any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"));
     }
 
     @Test
-    void shouldGenerateApplicationDraftDocument_whenJudgeMakesAnOrder_LR() {
+    void shouldNotGenerateApplicationDraftDocument_whenJudgeMakesAnOrder_LR() {
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
 
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, YES);
@@ -492,15 +495,12 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
             .build();
 
         when(generalAppFeesService.isFreeApplication(any())).thenReturn(true);
-        when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
-            .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         handler.handle(params);
 
-        verify(generalApplicationDraftGenerator)
-            .generate(any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"));
+        verifyNoInteractions(generalApplicationDraftGenerator);
     }
 
     @Test
