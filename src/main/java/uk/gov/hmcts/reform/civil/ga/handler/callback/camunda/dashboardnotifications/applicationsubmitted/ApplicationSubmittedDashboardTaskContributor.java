@@ -8,13 +8,17 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications
 @Component
 public class ApplicationSubmittedDashboardTaskContributor extends DashboardTaskContributor {
 
-    public ApplicationSubmittedDashboardTaskContributor(ApplicationSubmittedApplicantDashboardTask applicantTask,
-                                                        ApplicationSubmittedRespondentDashboardTask respondentTask) {
+    public ApplicationSubmittedDashboardTaskContributor(
+        ApplicationSubmittedApplicantDashboardTask applicantTask,
+        ApplicationSubmittedRespondentDashboardTask respondentTask,
+        DeleteApplicationPaymentDashboardTask removalTask
+    ) {
         super(
             DashboardCaseType.GENERAL_APPLICATION,
             DashboardTaskIds.GA_APPLICATION_SUBMITTED,
             applicantTask,
-            respondentTask
+            respondentTask,
+            removalTask
         );
     }
 }

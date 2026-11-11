@@ -17,13 +17,16 @@ class DefendantResponseDashboardTaskContributorTest {
     @Mock
     private DefendantResponseDefendantDashboardTask defendantTask;
 
+    @Mock
+    private RemoveDefaultJudgmentDashboardTask removalTask;
+
     @Test
     void shouldExposeTaskIdAndHandlers() {
         DefendantResponseDashboardTaskContributor contributor =
-            new DefendantResponseDashboardTaskContributor(claimantTask, defendantTask);
+            new DefendantResponseDashboardTaskContributor(claimantTask, defendantTask, removalTask);
 
         assertThat(contributor.taskId()).isEqualTo(DashboardTaskIds.DEFENDANT_RESPONSE);
-        assertThat(contributor.dashboardTasks()).containsExactly(claimantTask, defendantTask);
+        assertThat(contributor.dashboardTasks()).containsExactly(claimantTask, defendantTask, removalTask);
         assertThatThrownBy(() -> contributor.dashboardTasks().add(claimantTask))
             .isInstanceOf(UnsupportedOperationException.class);
     }
