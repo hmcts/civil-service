@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.helpers;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -16,6 +17,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.helpers.CaseTypeIdentifier.isGeneralApplication;
 
 @Service
+@Slf4j
 public class CaseDetailsConverter {
 
     private static final String CCD_CASE_REFERENCE = "ccdCaseReference";
@@ -37,16 +39,22 @@ public class CaseDetailsConverter {
 
     public CaseData toCaseData(CaseDetails caseDetails) {
         Map<String, Object> data = new HashMap<>(caseDetails.getData());
+        log.info("CCD isJoRequested before CaseData conversion: {}", data.get("isJoRequested"));
         data.put(CCD_CASE_REFERENCE, caseDetails.getId());
         if (caseDetails.getState() != null) {
             data.put(CCD_STATE, CaseState.valueOf(caseDetails.getState()));
         }
 
-        return objectMapper.convertValue(data, CaseData.class);
+        CaseData caseData = objectMapper.convertValue(data, CaseData.class);
+        log.info("isJoRequested after CaseData conversion: {}", caseData.getIsJoRequested());
+        return caseData;
     }
 
     public CaseData toCaseData(Map<String, Object> caseDataMap) {
-        return objectMapper.convertValue(caseDataMap, CaseData.class);
+        log.info("CCD isJoRequested before CaseData map conversion: {}", caseDataMap.get("isJoRequested"));
+        CaseData caseData = objectMapper.convertValue(caseDataMap, CaseData.class);
+        log.info("isJoRequested after CaseData map conversion: {}", caseData.getIsJoRequested());
+        return caseData;
     }
 
     public GeneralApplicationCaseData toGeneralApplicationCaseData(CaseDetails caseDetails) {

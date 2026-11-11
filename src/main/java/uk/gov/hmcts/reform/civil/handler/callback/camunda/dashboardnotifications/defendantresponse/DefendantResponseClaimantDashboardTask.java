@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendantresponse;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardServiceTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper.Dashboard
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 
 @Component
+@Slf4j
 public class DefendantResponseClaimantDashboardTask extends DashboardServiceTask {
 
     private final DashboardNotificationHelper dashboardNotificationHelper;
@@ -23,6 +25,8 @@ public class DefendantResponseClaimantDashboardTask extends DashboardServiceTask
 
     @Override
     protected void notifyDashboard(CaseData caseData, String authToken) {
+        log.info("Defendant response dashboard task received isJoRequested={}",
+                 caseData.getIsJoRequested());
         if (!dashboardNotificationHelper.isAwaitingWelshTranslation(caseData, DEFENDANT_RESPONSE_SPEC)) {
             dashboardService.notifyDefendantResponse(caseData, authToken);
         }

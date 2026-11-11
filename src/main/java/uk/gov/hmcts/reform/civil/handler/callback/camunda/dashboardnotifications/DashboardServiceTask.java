@@ -13,6 +13,8 @@ public abstract class DashboardServiceTask extends DashboardWorkflowTask {
         CaseData caseData = context.caseData();
         String authToken = Objects.requireNonNull(context.authToken(), "Missing auth token for dashboard notification task");
         log.info("Executing dashboard task {} for case {}", taskName(), caseData != null ? caseData.getCcdCaseReference() : null);
+        log.info("Dashboard task {} received isJoRequested: {}", taskName(),
+                 caseData != null ? caseData.getIsJoRequested() : null);
         notifyDashboard(caseData, authToken);
     }
 

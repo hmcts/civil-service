@@ -82,9 +82,13 @@ public class DashboardNotificationTaskHandler extends BaseExternalTaskHandler {
 
     private CaseData processCivilDashboardNotification(ExternalTask externalTask, String caseId) {
         CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(Long.valueOf(caseId)));
+        log.info("Dashboard case {} loaded from CCD, isJoRequested={}",
+                 caseId, caseData.getIsJoRequested());
         CaseData dashboardCaseData = caseData.toBuilder()
             .businessProcess(dashboardBusinessProcess(caseData.getBusinessProcess(), externalTask))
             .build();
+        log.info("Dashboard case {} after businessProcess copy, isJoRequested={}",
+                 caseId, dashboardCaseData.getIsJoRequested());
 
         log.info("Dispatch dashboard notifications for caseId {} activityId {}", caseId, externalTask.getActivityId());
         dashboardNotificationTransactionalService.dispatch(
