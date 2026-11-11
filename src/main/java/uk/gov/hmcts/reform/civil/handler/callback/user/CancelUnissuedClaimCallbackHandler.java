@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -28,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CANCEL_UNISSUED_CLAIM
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CancelUnissuedClaimCallbackHandler extends CallbackHandler {
@@ -60,7 +62,10 @@ public class CancelUnissuedClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToStartValidation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        boolean isEligible = featureToggleService.isEarlyClaimTerminationEnabled()
+        boolean isFlagEnabled = featureToggleService.isEarlyClaimTerminationEnabled();
+        log.info("CANCEL_UNISSUED_CLAIM about-to-start: early-claim-termination flag is {} for caseId {}",
+                 isFlagEnabled ? "ON" : "OFF", caseData.getCcdCaseReference());
+        boolean isEligible = isFlagEnabled
             && CaseState.PENDING_CASE_ISSUED == caseData.getCcdState()
             && caseData.getIssueDate() == null
             && (isLipClaimantEligible(caseData) || isLrClaimantEligible(caseData));
