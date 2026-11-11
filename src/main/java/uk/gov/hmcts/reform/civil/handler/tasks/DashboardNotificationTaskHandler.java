@@ -83,13 +83,18 @@ public class DashboardNotificationTaskHandler extends BaseExternalTaskHandler {
 
     private CaseData processCivilDashboardNotification(ExternalTask externalTask, String caseId) {
         CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(caseId));
-        log.info("Full dashboard CCD case data for caseId {}: {}", caseId, caseDetails.getData());
         log.info(
-            "Raw dashboard CCD response: id={}, legacyCaseReference={}, containsIsJoRequested={}, isJoRequested={}",
+            "Full dashboard CCD case data for caseId {}:\n{}",
+            caseId,
+            mapper.valueToTree(caseDetails.getData()).toPrettyString()
+        );
+        log.info(
+            "Raw dashboard CCD response: id={}, legacyCaseReference={}, containsIsJoRequested={}, isJoRequested={}, activity={}",
             caseDetails.getId(),
             caseDetails.getData().get("legacyCaseReference"),
             caseDetails.getData().containsKey("isJoRequested"),
-            caseDetails.getData().get("isJoRequested")
+            caseDetails.getData().get("isJoRequested"),
+            externalTask.getActivityId()
         );
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         log.info("Dashboard case {} loaded from CCD, isJoRequested={}",
