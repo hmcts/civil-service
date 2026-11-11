@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
 import lombok.Data;
@@ -361,6 +362,8 @@ public class CaseDataCaseProgression extends CivilCaseData implements MappableOb
     private String joRepaymentSummaryObject;
     private YesOrNo respondForImmediateOption;
     private LocalDateTime joDJCreatedDate;
+
+    @JsonProperty("isJoRequested")
     private YesOrNo isJoRequested;
 
     private  TransferCaseDetails transferCaseDetails;

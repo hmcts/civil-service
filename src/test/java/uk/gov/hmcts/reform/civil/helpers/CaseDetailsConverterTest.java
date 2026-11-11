@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.BaseCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -59,5 +60,18 @@ class CaseDetailsConverterTest {
         assertEquals("Details of Claim", civilCaseData.getDetailsOfClaim());
         assertEquals(CASE_REFERENCE, civilCaseData.getCcdCaseReference());
         assertEquals(CASE_ISSUED, civilCaseData.getCcdState());
+    }
+
+    @Test
+    public void shouldMapJudgmentOnlineRequestFromCcdData() {
+        final CaseDetails caseDetails = CaseDetails.builder()
+            .caseTypeId(CASE_TYPE)
+            .id(CASE_REFERENCE)
+            .data(Map.of("isJoRequested", "Yes"))
+            .build();
+
+        final CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+
+        assertEquals(YesOrNo.YES, caseData.getIsJoRequested());
     }
 }
