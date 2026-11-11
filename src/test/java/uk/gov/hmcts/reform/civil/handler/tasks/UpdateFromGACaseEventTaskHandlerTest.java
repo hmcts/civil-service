@@ -1256,12 +1256,10 @@ public class UpdateFromGACaseEventTaskHandlerTest {
     void expectInvalidCaseDataExceptionOnToGaCaseData() {
         when(mockExternalTask.getAllVariables())
             .thenReturn(Map.of(
-                "caseId", GENERAL_APP_CASE_ID,
+                "caseId", "not-a-number",
                 "caseEvent", ADD_PDF_TO_MAIN_CASE,
                 "generalAppParentCaseLink", CIVIL_CASE_ID
             ));
-
-        when(caseDetailsConverter.toGACaseData(any())).thenThrow(NumberFormatException.class);
 
         InvalidCaseDataException exceptionThrown = assertThrows(InvalidCaseDataException.class, () -> handler.handleTask(mockExternalTask));
 
