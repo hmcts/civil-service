@@ -84,7 +84,10 @@ definition_output_file="$(realpath ".")/build/ccd-development-config/ccd-civil-d
   "${definition_output_file}" \
   "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
 
-rm -rf "$(pwd)/ccd-definition"
+# ccd-definition/ is tracked (a mirror of civil-ccd-definition), so put it back rather than delete it.
+echo "Restoring the tracked ccd-definition/ mirror"
+git checkout -- ccd-definition
+git clean -fdq -- ccd-definition
 rm -rf "$(pwd)/build/ccd-development-config"
 rm -rf "$(pwd)/camunda"
 rm -rf "$(pwd)/wa-dmn"
