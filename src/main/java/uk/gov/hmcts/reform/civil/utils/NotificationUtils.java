@@ -296,7 +296,9 @@ public class NotificationUtils {
     }
 
     public static Map<String, String> addLipSubjectProperties(CaseData caseData, Map<String, String> properties) {
-        properties.put(CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString());
+        String claimNumber = caseData.getCcdCaseReference().toString();
+        properties.put(CLAIM_16_DIGIT_NUMBER, claimNumber);
+        properties.putIfAbsent(CLAIM_REFERENCE_NUMBER, claimNumber);
         properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
         properties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
         return properties;

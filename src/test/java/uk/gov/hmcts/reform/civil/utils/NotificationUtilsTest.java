@@ -29,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_16_DIGIT_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
@@ -73,8 +74,22 @@ class NotificationUtilsTest {
 
         assertThat(properties)
             .containsEntry(CLAIM_16_DIGIT_NUMBER, "1594901956117591")
+            .containsEntry(CLAIM_REFERENCE_NUMBER, "1594901956117591")
             .containsEntry(CASEMAN_REF, "000DC001")
             .containsEntry(CLAIMANT_V_DEFENDANT, "Claimant Ltd V Defendant Ltd");
+    }
+
+    @Test
+    void shouldKeepExistingClaimReferenceNumberWhenAddingLipSubjectProperties() {
+        CaseData caseData = lipCaseData();
+        Map<String, String> properties = new HashMap<>();
+        properties.put(CLAIM_REFERENCE_NUMBER, "000DC001");
+
+        addLipSubjectProperties(caseData, properties);
+
+        assertThat(properties)
+            .containsEntry(CLAIM_REFERENCE_NUMBER, "000DC001")
+            .containsEntry(CLAIM_16_DIGIT_NUMBER, "1594901956117591");
     }
 
     private CaseData lipCaseData() {
