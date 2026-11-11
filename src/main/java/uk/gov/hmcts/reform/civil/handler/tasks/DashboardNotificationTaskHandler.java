@@ -5,6 +5,7 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
@@ -81,7 +82,15 @@ public class DashboardNotificationTaskHandler extends BaseExternalTaskHandler {
     }
 
     private CaseData processCivilDashboardNotification(ExternalTask externalTask, String caseId) {
-        CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(Long.valueOf(caseId)));
+        CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(caseId));
+        log.info(
+            "Raw dashboard CCD response: id={}, legacyCaseReference={}, containsIsJoRequested={}, isJoRequested={}",
+            caseDetails.getId(),
+            caseDetails.getData().get("legacyCaseReference"),
+            caseDetails.getData().containsKey("isJoRequested"),
+            caseDetails.getData().get("isJoRequested")
+        );
+        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         log.info("Dashboard case {} loaded from CCD, isJoRequested={}",
                  caseId, caseData.getIsJoRequested());
         CaseData dashboardCaseData = caseData.toBuilder()
