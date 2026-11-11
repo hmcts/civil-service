@@ -19,20 +19,30 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - name: Require a bot credential that triggers PR checks
-        env:
-          BOT_TOKEN: ${{ secrets.EMAIL_DOCS_BOT_TOKEN }}
-        run: |
-          if [[ -z "$BOT_TOKEN" ]]; then
-            echo '::error::Configure EMAIL_DOCS_BOT_TOKEN with contents and pull-request write access; see README.'
-            exit 1
-          fi
+      - name: Mint a GitHub App token that triggers PR checks
+        # A GitHub App installation token, not GITHUB_TOKEN: events from the latter
+        # do not start workflow runs, so the documentation PR would never acquire its
+        # required checks. A fine-grained PAT would also work but is not the HMCTS
+        # pattern and binds the updater to one person's repository access, because a
+        # PAT's effective permissions are the intersection of its scopes and the
+        # holder's own. See DTSPO-34545 and DTSPO-36344.
+        #
+        # The App must be installed on hmcts/civil-service with contents and
+        # pull-requests write. Access is granted per repository in the App settings;
+        # the secrets being readable here does not by itself grant it.
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.EMAIL_DOCS_APP_ID }}
+          private-key: ${{ secrets.EMAIL_DOCS_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
       - name: Check out current master
         uses: actions/checkout@v7
         with:
           ref: master
           fetch-depth: 0
-          token: ${{ secrets.EMAIL_DOCS_BOT_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
       - name: Check whether recorded CCD revisions still reproduce master
         id: recorded
         uses: ./.github/actions/email-docs
@@ -54,7 +64,7 @@ jobs:
         env:
           RECORDED_DOCS_IN_SYNC: ${{ steps.recorded.outputs.in-sync }}
         with:
-          github-token: ${{ secrets.EMAIL_DOCS_BOT_TOKEN }}
+          github-token: ${{ steps.app-token.outputs.token }}
           script: |
             const update = require('./.github/scripts/update-email-docs-pr.cjs');
             await update({ github, context, exec, core,

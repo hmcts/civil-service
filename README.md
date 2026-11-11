@@ -160,10 +160,14 @@ correct branch and repairs the PR without another commit or push. PR description
 run history remains available in Actions, and line-ending differences do not cause metadata updates.
 It does not push directly to master. A human must review and merge the documentation PR under normal branch protection.
 
-Before enabling the updater, a repository administrator must configure **`EMAIL_DOCS_BOT_TOKEN`** with a
-bot-account token scoped to this repository and **Contents: read/write** and **Pull requests: read/write**,
-plus any organisation approval required for that token. Use a credential whose PR events trigger required
-checks; the workflow deliberately does not fall back to `GITHUB_TOKEN`. The token is used only by the trusted
+Before enabling the updater, a repository administrator must configure **`EMAIL_DOCS_APP_ID`** and
+**`EMAIL_DOCS_APP_PRIVATE_KEY`** for a GitHub App installed on this repository with **Contents: read/write**
+and **Pull requests: read/write**. Request one through PlatOps; DTSPO-34545 is the precedent and DTSPO-36344
+raised this one. Access is granted per repository in the App settings, so the secrets being readable here does
+not by itself grant it. An App installation token is used rather than `GITHUB_TOKEN`, whose events do not start
+workflow runs, so a PR opened with it would never acquire its required checks. A fine-grained PAT is
+deliberately not used: its effective permissions are the intersection of its scopes and the holder's own access,
+which ties a scheduled job on master to one person. The credential is used only by the trusted
 master updater. Verification and publication use read-only checkout credentials. The updater fails with an
 actionable message if the secret is absent. Confirm that the bot can update the automation branch and that
 both creation and subsequent updates of its PR start the required checks before relying on automation.
