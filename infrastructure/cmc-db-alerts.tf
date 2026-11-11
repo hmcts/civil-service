@@ -8,7 +8,7 @@ data "azurerm_postgresql_flexible_server" "cmc_db" {
 # ================================================================================================
 resource "azurerm_monitor_metric_alert" "civil-ci-alerts" {
   for_each            = var.monitor_cmc_db_metric_alerts
-  name                = "${each.key}-${var.env}"
+  name                = each.key
   resource_group_name = local.cmc_db_rg_name
   description         = each.value.description
   severity            = each.value.severity
