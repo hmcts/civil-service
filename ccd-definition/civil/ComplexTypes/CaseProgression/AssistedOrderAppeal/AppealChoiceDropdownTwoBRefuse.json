@@ -1,0 +1,39 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "refusedLabelLinkB",
+    "ID": "AppealChoiceSecondDropdownBRefuse",
+    "ElementLabel": "at the appropriate appeal centre prescribed in  \n\n<a target=\"_blank\" href=\"https://www.justice.gov.uk/courts/procedure-rules/civil/rules/part52/practice-direction-52b-appeals-in-the-county-courts-and-high-court\">CPR52PDB Table B.</a> \n\n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "refusedDateLabel1B",
+    "ID": "AppealChoiceSecondDropdownBRefuse",
+    "ElementLabel": "Any further application for permission to appeal shall be made to the above appeal centre and heard by a Circuit Judge of the County Court.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "refusedDateLabel2B",
+    "ID": "AppealChoiceSecondDropdownBRefuse",
+    "ElementLabel": "### The appellant's notice shall be filed at the appeal centre no later than 4pm on",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "appealGrantedRefusedDate",
+    "ID": "AppealChoiceSecondDropdownBRefuse",
+    "ElementLabel": " ",
+    "HintText": "For example, 16 4 2021",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

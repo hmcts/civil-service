@@ -1,0 +1,15 @@
+[
+  {
+    "ID": "InterestOptions",
+    "ListElementCode": "SAME_RATE_INTEREST",
+    "ListElement": "Same rate for whole period of time",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "InterestOptions",
+    "ListElementCode": "BREAK_DOWN_INTEREST",
+    "ListElement": "Break down interest for different periods of time, or items. \n\n\n You can only use this service if any claim for interest is made at the same rate and from the same date. To claim interest at different rates or for different periods of time, you should issue your claim on paper",
+    "HintText": "You can only use this service if any claim for interest is made at the same rate and from the same date. To claim interest at different rates or for different periods of time, you should issue your claim on paper",
+    "DisplayOrder": 2
+  }
+]

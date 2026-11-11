@@ -1,0 +1,19 @@
+[
+  {
+    "ID": "DisposalHearingClaimSettling",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingClaimSettling",
+    "ListElementCode": "text",
+    "FieldType": "Label",
+    "ElementLabel": "The Claimant must notify the court immediately if the case is settled. Where appropriate the Claimant must use the portal to notify the court of settlement.",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]
+

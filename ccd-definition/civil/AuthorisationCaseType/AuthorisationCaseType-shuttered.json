@@ -1,0 +1,20 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "UserRoles": [
+      "caseworker-civil-solicitor",
+      "caseworker-civil-admin",
+      "caseworker-caa",
+      "caseworker-civil-staff",
+      "caseworker-approver"
+    ],
+    "CRUD": "D"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "UserRoles": [
+      "caseworker-civil-systemupdate"
+    ],
+    "CRUD": "CRUD"
+  }
+]

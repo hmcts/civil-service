@@ -1,0 +1,10 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "UserRoles": [
+      "citizen-profile",
+      "cui-admin-profile"
+    ],
+    "CRUD": "RU"
+  }
+]

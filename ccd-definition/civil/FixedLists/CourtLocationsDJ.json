@@ -1,0 +1,1214 @@
+[
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "1",
+    "ListElement": "Aberystwyth County Court",
+    "ListElementCode": "102"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "2",
+    "ListElement": "Aberystwyth Magistrates' Court",
+    "ListElementCode": "10004"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "3",
+    "ListElement": "Administrative Court",
+    "ListElementCode": "601"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "4",
+    "ListElement": "Administrative Support Centre Hagley Road",
+    "ListElementCode": "982"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "5",
+    "ListElement": "Administrative Support Centre Leicestershire Charity",
+    "ListElementCode": "932"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "6",
+    "ListElement": "Administrative Support Centre Leicestershire Environment",
+    "ListElementCode": "934"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "7",
+    "ListElement": "Administrative Support Centre Leicestershire Estate Agents Appeals",
+    "ListElementCode": "935"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "8",
+    "ListElement": "Administrative Support Centre Leicestershire Gambling Appeals",
+    "ListElementCode": "936"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "9",
+    "ListElement": "Administrative Support Centre Leicestershire Gender Recognition",
+    "ListElementCode": "937"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "10",
+    "ListElement": "Administrative Support Centre Leicestershire Information Rights",
+    "ListElementCode": "938"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "11",
+    "ListElement": "Administrative Support Centre Leicestershire Mental Health",
+    "ListElementCode": "939"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "12",
+    "ListElement": "Admiralty and Commercial Courts",
+    "ListElementCode": "603"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "13",
+    "ListElement": "Agricultural Land and Drainage Tribunal",
+    "ListElementCode": "986"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "14",
+    "ListElement": "Aldershot County Court",
+    "ListElementCode": "104"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "15",
+    "ListElement": "Aldershot Magistrates' Court",
+    "ListElementCode": "10007"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "16",
+    "ListElement": "Anchorage House Social Security and Child Support Tribunal",
+    "ListElementCode": "967"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "17",
+    "ListElement": "Asylum Support Tribunal",
+    "ListElementCode": "901"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "18",
+    "ListElement": "Avon and Somerset Central Enforcement",
+    "ListElementCode": "6000"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "19",
+    "ListElement": "Aylesbury Crown Court",
+    "ListElementCode": "401"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "20",
+    "ListElement": "Banbury County Court",
+    "ListElementCode": "114"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "21",
+    "ListElement": "Banbury Magistrates' Court",
+    "ListElementCode": "10017"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "22",
+    "ListElement": "Bankruptcy and Companies Court",
+    "ListElementCode": "605"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "23",
+    "ListElement": "Barkingside (Redbridge) Magistrates' Court",
+    "ListElementCode": "10281"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "24",
+    "ListElement": "Barnet County Court",
+    "ListElementCode": "117"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "25",
+    "ListElement": "Barnsley County Court",
+    "ListElementCode": "118"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "26",
+    "ListElement": "Barnsley Magistrates' Court",
+    "ListElementCode": "10022"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "27",
+    "ListElement": "Barnstaple County Court",
+    "ListElementCode": "119"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "28",
+    "ListElement": "Barnstaple Magistrates' Court",
+    "ListElementCode": "10023"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "29",
+    "ListElement": "Barrow Crown Court",
+    "ListElementCode": "120-A"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "30",
+    "ListElement": "Barrow In Furness County Court",
+    "ListElementCode": "120"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "31",
+    "ListElement": "Barrow in Furness Magistrates' Court",
+    "ListElementCode": "10024"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "32",
+    "ListElement": "Basildon County Court",
+    "ListElementCode": "153"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "33",
+    "ListElement": "Basildon Crown Court",
+    "ListElementCode": "461"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "34",
+    "ListElement": "Basildon Magistrates' Court",
+    "ListElementCode": "10026"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "35",
+    "ListElement": "Basingstoke County Court",
+    "ListElementCode": "122"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "36",
+    "ListElement": "Basingstoke Magistrates' Court",
+    "ListElementCode": "10027"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "37",
+    "ListElement": "Bath Law Courts",
+    "ListElementCode": "123"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "38",
+    "ListElement": "Bath Magistrates' Court",
+    "ListElementCode": "10028"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "39",
+    "ListElement": "Bedford County Court",
+    "ListElementCode": "124"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "40",
+    "ListElement": "Bedford Employment Tribunal",
+    "ListElementCode": "946"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "41",
+    "ListElement": "Bedford Magistrates' Court",
+    "ListElementCode": "10030"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "42",
+    "ListElement": "Berwick upon Tweed Magistrates' Court",
+    "ListElementCode": "10033"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "43",
+    "ListElement": "Beverley Magistrates' Court",
+    "ListElementCode": "10034"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "44",
+    "ListElement": "Bexley Magistrates' Court",
+    "ListElementCode": "10035"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "45",
+    "ListElement": "Birkenhead County Court",
+    "ListElementCode": "126"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "46",
+    "ListElement": "Birkenhead Magistrates' Court",
+    "ListElementCode": "10038"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "47",
+    "ListElement": "Birmingham (Immigration and Asylum Chamber)",
+    "ListElementCode": "929"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "48",
+    "ListElement": "Birmingham County Court",
+    "ListElementCode": "127"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "49",
+    "ListElement": "Birmingham Crown Court",
+    "ListElementCode": "404"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "50",
+    "ListElement": "Birmingham Employment Tribunal",
+    "ListElementCode": "928"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "51",
+    "ListElement": "Birmingham Magistrates' Court (Corporation St)",
+    "ListElementCode": "10039"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "52",
+    "ListElement": "Birmingham Social Security and Child Support Tribunal",
+    "ListElementCode": "930"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "53",
+    "ListElement": "Blackburn County Court",
+    "ListElementCode": "130"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "54",
+    "ListElement": "Blackburn Magistrates' Court",
+    "ListElementCode": "10043"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "55",
+    "ListElement": "Blackpool County Court",
+    "ListElementCode": "131"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "56",
+    "ListElement": "Blackpool Magistrates' Court",
+    "ListElementCode": "10044"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "57",
+    "ListElement": "Blackwood County and Family Court",
+    "ListElementCode": "132"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "58",
+    "ListElement": "Bodmin County Court",
+    "ListElementCode": "136"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "59",
+    "ListElement": "Bodmin Magistrates' Court",
+    "ListElementCode": "10048"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "60",
+    "ListElement": "Bolton Crown Court",
+    "ListElementCode": "470"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "61",
+    "ListElement": "Bolton Magistrates' Court",
+    "ListElementCode": "10049"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "62",
+    "ListElement": "Bootle Magistrates' Court",
+    "ListElementCode": "10050"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "63",
+    "ListElement": "Boston County Court",
+    "ListElementCode": "138"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "64",
+    "ListElement": "Boston Magistrates' Court",
+    "ListElementCode": "10051"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "65",
+    "ListElement": "Bournemouth County Court",
+    "ListElementCode": "139"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "66",
+    "ListElement": "Bournemouth Crown Court",
+    "ListElementCode": "406"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "67",
+    "ListElement": "Bradford (Immigration and Asylum Chamber)",
+    "ListElementCode": "905"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "68",
+    "ListElement": "Bradford County Court",
+    "ListElementCode": "141"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "69",
+    "ListElement": "Bradford Crown Court",
+    "ListElementCode": "402"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "70",
+    "ListElement": "Bradford Direct Lodgement Centre",
+    "ListElementCode": "995"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "71",
+    "ListElement": "Bradford Magistrates' Court",
+    "ListElementCode": "10056"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "72",
+    "ListElement": "Brentford County Court",
+    "ListElementCode": "144"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "73",
+    "ListElement": "Bridlington Magistrates' Court",
+    "ListElementCode": "10062"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "74",
+    "ListElement": "Brighton SSCS",
+    "ListElementCode": "1294897"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "75",
+    "ListElement": "Brighton County Court",
+    "ListElementCode": "150"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "76",
+    "ListElement": "Brighton Family Centre",
+    "ListElementCode": "148"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "77",
+    "ListElement": "Brighton Magistrates' Court",
+    "ListElementCode": "10064"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "78",
+    "ListElement": "Brighton Probate",
+    "ListElementCode": "5004"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "79",
+    "ListElement": "Bristol County Court",
+    "ListElementCode": "151"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "80",
+    "ListElement": "Bristol Crown Court",
+    "ListElementCode": "408"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "81",
+    "ListElement": "Bristol Employment Tribunal",
+    "ListElementCode": "923"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "82",
+    "ListElement": "Bristol Magistrates' Court",
+    "ListElementCode": "10065"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "83",
+    "ListElement": "Bromley County Court",
+    "ListElementCode": "152"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "84",
+    "ListElement": "Bromley Magistrates' Court (London Road)",
+    "ListElementCode": "10066"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "85",
+    "ListElement": "Burnley County Court",
+    "ListElementCode": "154"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "86",
+    "ListElement": "Burnley Crown Court",
+    "ListElementCode": "409"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "87",
+    "ListElement": "Burnley Magistrates' Court",
+    "ListElementCode": "10068"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "88",
+    "ListElement": "Bury St Edmunds County Court",
+    "ListElementCode": "157"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "89",
+    "ListElement": "Bury St Edmunds Employment Tribunal",
+    "ListElementCode": "949"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "90",
+    "ListElement": "Caernarfon Crown Court",
+    "ListElementCode": "755"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "91",
+    "ListElement": "Caernarfon Justice Centre",
+    "ListElementCode": "159"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "92",
+    "ListElement": "Caernarfon Magistrates' Court",
+    "ListElementCode": "10073"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "93",
+    "ListElement": "Camberwell Green Magistrates' Court ",
+    "ListElementCode": "10077"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "94",
+    "ListElement": "Cambridge County Court",
+    "ListElementCode": "162"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "95",
+    "ListElement": "Cambridge Crown Court",
+    "ListElementCode": "410"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "96",
+    "ListElement": "Cambridge Essex Norfolk and Suffolk National Compliance and Enforcement Services ",
+    "ListElementCode": "6037"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "97",
+    "ListElement": "Cambridge Magistrates' Court",
+    "ListElementCode": "10079"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "98",
+    "ListElement": "Cannock Magistrates' Court",
+    "ListElementCode": "10080"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "99",
+    "ListElement": "Canterbury County Court",
+    "ListElementCode": "163"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "100",
+    "ListElement": "Canterbury Crown Court",
+    "ListElementCode": "479"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "101",
+    "ListElement": "Canterbury Magistrates' Court",
+    "ListElementCode": "10081"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "102",
+    "ListElement": "Cardiff Civil and Family Justice Centre",
+    "ListElementCode": "164"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "103",
+    "ListElement": "Cardiff Crown Court",
+    "ListElementCode": "411"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "104",
+    "ListElement": "Cardiff Magistrates' Court",
+    "ListElementCode": "10082"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "105",
+    "ListElement": "Cardiff Social Security and Child Support Tribunal ",
+    "ListElementCode": "920"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "106",
+    "ListElement": "Care Standards",
+    "ListElementCode": "908"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "107",
+    "ListElement": "Carlisle County Court",
+    "ListElementCode": "165"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "108",
+    "ListElement": "Carlisle Crown Court",
+    "ListElementCode": "412"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "109",
+    "ListElement": "Carlisle Magistrates' Court",
+    "ListElementCode": "10084"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "110",
+    "ListElement": "Central Criminal Court",
+    "ListElementCode": "413"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "111",
+    "ListElement": "Central Family Court",
+    "ListElementCode": "115"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "112",
+    "ListElement": "Central London County Court",
+    "ListElementCode": "372"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "113",
+    "ListElement": "Central London County Court (Bankruptcy)",
+    "ListElementCode": "630"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "114",
+    "ListElement": "Chancery Associates",
+    "ListElementCode": "608"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "115",
+    "ListElement": "Chancery Listing",
+    "ListElementCode": "606"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "116",
+    "ListElement": "Chelmsford Administration Centre",
+    "ListElementCode": "779629"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "117",
+    "ListElement": "Chelmsford County Court",
+    "ListElementCode": "167"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "118",
+    "ListElement": "Chelmsford Crown Court",
+    "ListElementCode": "414"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "119",
+    "ListElement": "Chelmsford Magistrates' Court",
+    "ListElementCode": "10088"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "120",
+    "ListElement": "Cheltenham Magistrates' Court (St George's Road)",
+    "ListElementCode": "10089"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "121",
+    "ListElement": "Cheshire and Merseyside Payments and Enforcement Centre",
+    "ListElementCode": "6003"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "122",
+    "ListElement": "Chester County Court",
+    "ListElementCode": "170"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "123",
+    "ListElement": "Chester Crown Court",
+    "ListElementCode": "415"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "124",
+    "ListElement": "Chester Magistrates' Court",
+    "ListElementCode": "10092"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "125",
+    "ListElement": "Chesterfield County Court",
+    "ListElementCode": "171"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "126",
+    "ListElement": "Chesterfield Magistrates' Court",
+    "ListElementCode": "10397"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "127",
+    "ListElement": "Chippenham Magistrates' Court",
+    "ListElementCode": "10097"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "128",
+    "ListElement": "Chippenham and Trowbridge County Court",
+    "ListElementCode": "353"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "129",
+    "ListElement": "Chorley Magistrates' Court",
+    "ListElementCode": "10098"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "130",
+    "ListElement": "City of London Magistrates' Court",
+    "ListElementCode": "10100"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "131",
+    "ListElement": "Civil Appeals Office",
+    "ListElementCode": "609"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "132",
+    "ListElement": "Clerkenwell and Shoreditch County Court",
+    "ListElementCode": "321"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "133",
+    "ListElement": "Cleveland Durham and Northumbria Enforcement",
+    "ListElementCode": "6001"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "134",
+    "ListElement": "Colchester Magistrates' Court",
+    "ListElementCode": "10103"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "135",
+    "ListElement": "Community Right to Bid",
+    "ListElementCode": "989"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "136",
+    "ListElement": "Copyright Licensing",
+    "ListElementCode": "997"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "137",
+    "ListElement": "County Court Bulk Centre in Northampton – Traffic Enforcement Centre",
+    "ListElementCode": "335"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "138",
+    "ListElement": "County Court Money Claims Centre",
+    "ListElementCode": "390"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "139",
+    "ListElement": "Court Recording and Transcription Unit",
+    "ListElementCode": "624"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "140",
+    "ListElement": "Court of Protection",
+    "ListElementCode": "199"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "141",
+    "ListElement": "Courts and Tribunals Service Centre (Crime)",
+    "ListElementCode": "1027413"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "142",
+    "ListElement": "Courts and Tribunal Service Centre (VHS)",
+    "ListElementCode": "1331081"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "143",
+    "ListElement": "Coventry County Court",
+    "ListElementCode": "180"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "144",
+    "ListElement": "Coventry Crown Court",
+    "ListElementCode": "417"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "145",
+    "ListElement": "Coventry Magistrates' Court",
+    "ListElementCode": "10107"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "146",
+    "ListElement": "Crawley Magistrates' Court",
+    "ListElementCode": "10108"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "147",
+    "ListElement": "Crewe County Court",
+    "ListElementCode": "181"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "148",
+    "ListElement": "Crewe Magistrates' Court",
+    "ListElementCode": "10109"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "149",
+    "ListElement": "Criminal Appeals Office",
+    "ListElementCode": "613"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "150",
+    "ListElement": "Criminal Injuries Compensation",
+    "ListElementCode": "974"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "151",
+    "ListElement": "Croydon County Court",
+    "ListElementCode": "182"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "152",
+    "ListElement": "Croydon Crown Court",
+    "ListElementCode": "418"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "153",
+    "ListElement": "Croydon Employment Tribunal",
+    "ListElementCode": "972"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "154",
+    "ListElement": "Croydon Magistrates' Court",
+    "ListElementCode": "10111"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "155",
+    "ListElement": "CTSC – Probate",
+    "ListElementCode": "1023113"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "156",
+    "ListElement": "CTSC – Divorce",
+    "ListElementCode": "1023213"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "157",
+    "ListElement": "CTSC – SJS",
+    "ListElementCode": "1023313"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "158",
+    "ListElement": "CTSC – SSCS",
+    "ListElementCode": "1023228"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "159",
+    "ListElement": "Cwmbran Magistrates' Court",
+    "ListElementCode": "10113"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "160",
+    "ListElement": "Darlington County Court",
+    "ListElementCode": "183"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "161",
+    "ListElement": "Darlington Magistrates' Court",
+    "ListElementCode": "10114"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "162",
+    "ListElement": "Dartford County Court",
+    "ListElementCode": "184"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "163",
+    "ListElement": "Derby County Court",
+    "ListElementCode": "185"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "164",
+    "ListElement": "Derby Crown Court",
+    "ListElementCode": "419"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "165",
+    "ListElement": "Derby Magistrates' Court",
+    "ListElementCode": "10398"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "166",
+    "ListElement": "Derbyshire Enforcement Unit",
+    "ListElementCode": "6005"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "167",
+    "ListElement": "Devon and Cornwall Central Fines and Enforcement",
+    "ListElementCode": "6006"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "168",
+    "ListElement": "Doncaster County Court",
+    "ListElementCode": "187"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "169",
+    "ListElement": "Doncaster Crown Court",
+    "ListElementCode": "420"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "170",
+    "ListElement": "Doncaster Magistrates' Court",
+    "ListElementCode": "10125"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "171",
+    "ListElement": "Dorset Fines and Enforcement - Central Finance Office",
+    "ListElementCode": "6007"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "172",
+    "ListElement": "Driving Standards Agency",
+    "ListElementCode": "987"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "173",
+    "ListElement": "Dudley County Court",
+    "ListElementCode": "189"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "174",
+    "ListElement": "Dudley Magistrates' Court",
+    "ListElementCode": "10130"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "175",
+    "ListElement": "Dundee Employment Tribunal",
+    "ListElementCode": "975"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "176",
+    "ListElement": "Durham County Court",
+    "ListElementCode": "190"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "177",
+    "ListElement": "Durham Crown Court",
+    "ListElementCode": "422"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "178",
+    "ListElement": "Ealing Magistrates' Court",
+    "ListElementCode": "10133"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "179",
+    "ListElement": "East London Family Court",
+    "ListElementCode": "192"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "180",
+    "ListElement": "East London Tribunal Centre",
+    "ListElementCode": "968"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "181",
+    "ListElement": "Edinburgh Employment Tribunal",
+    "ListElementCode": "976"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "182",
+    "ListElement": "Edmonton County Court",
+    "ListElementCode": "194"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "183",
+    "ListElement": "Electronic Communications and Postal Services",
+    "ListElementCode": "996"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "184",
+    "ListElement": "Employment Appeals Tribunal (Rolls Building)",
+    "ListElementCode": "1002"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "185",
+    "ListElement": "Examination Board",
+    "ListElementCode": "992"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "186",
+    "ListElement": "Exeter County Court",
+    "ListElementCode": "198"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "187",
+    "ListElement": "Exeter Crown Court",
+    "ListElementCode": "423"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "188",
+    "ListElement": "Exeter Magistrates' Court",
+    "ListElementCode": "10141"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "189",
+    "ListElement": "Exeter Tribunals",
+    "ListElementCode": "907026"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "190",
+    "ListElement": "Field House Upper Tribunal (Immigration and Asylum Chamber)",
+    "ListElementCode": "952"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "191",
+    "ListElement": "Financial Services and Markets and Pensions Regulator",
+    "ListElementCode": "985"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "192",
+    "ListElement": "First Tier Tax Tribunal",
+    "ListElementCode": "984"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "193",
+    "ListElement": "First Tier Transport Tribunal",
+    "ListElementCode": "988"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "194",
+    "ListElement": "Fixed Penalty Unit, Ailsa House, Leeds",
+    "ListElementCode": "6009"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "195",
+    "ListElement": "Fixed Penalty Unit, Loughborough Magistrates' Court",
+    "ListElementCode": "6010"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "196",
+    "ListElement": "Fixed Penalty Unit, Southend Magistrates' Court",
+    "ListElementCode": "6011"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "197",
+    "ListElement": "Fleetwood Family Hearing Centre",
+    "ListElementCode": "1992"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "198",
+    "ListElement": "Folkestone Magistrates' Court",
+    "ListElementCode": "10148"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "199",
+    "ListElement": "Fox Court Social Security and Child Support Tribunal",
+    "ListElementCode": "955"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "200",
+    "ListElement": "Gangmasters Licensing Authority",
+    "ListElementCode": "915"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "201",
+    "ListElement": "Birmingham Courts and Tribunal Service Centre",
+    "ListElementCode": "779434"
+  },
+  {
+    "ID": "CourtCode",
+    "DisplayOrder": "202",
+    "ListElement": "Carmarthen County and Family Court",
+    "ListElementCode": "166"
+  }
+]

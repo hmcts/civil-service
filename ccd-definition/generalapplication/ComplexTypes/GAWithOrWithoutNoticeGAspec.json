@@ -1,0 +1,25 @@
+[
+  {
+    "ID": "GAWithOrWithoutNotice",
+    "ListElementCode": "isWithNoticeLabel",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAWithOrWithoutNotice",
+    "ListElementCode": "isWithNotice",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "GARadioYesOrNo",
+    "ElementLabel": "With notice",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAWithOrWithoutNotice",
+    "ListElementCode": "reasonsForWithoutNotice",
+    "ElementLabel": "Why do you not want the court to inform the other party?\n",
+    "FieldType": "TextArea",
+    "FieldShowCondition": "isWithNotice = \"No\"",
+    "SecurityClassification": "Public"
+  }
+]

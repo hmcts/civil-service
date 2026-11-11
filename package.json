@@ -5,12 +5,16 @@
   "description": "Node.js tooling for rendering Camunda BPMN diagrams in CI (not the main application).",
   "type": "module",
   "scripts": {
-    "render:bpmn": "node scripts/render-bpmn-diagrams.mjs"
+    "render:bpmn": "node scripts/render-bpmn-diagrams.mjs",
+    "test:definitions": "mocha 'ccd-definition/test/definitions/**/*.test.js'"
   },
   "dependencies": {
     "bpmn-to-image": "0.10.0"
   },
   "devDependencies": {
+    "chai": "6.3.0",
+    "lodash": "4.18.1",
+    "mocha": "11.8.0",
     "puppeteer": "25.16.0"
   },
   "overrides": {

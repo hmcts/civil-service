@@ -1,0 +1,8 @@
+[
+  {
+    "ID": "StatementOfTruthConsentGAspec",
+    "ListElementCode": "ConsentAgreementCheckBox",
+    "ListElement": "The application believes that the facts stated above (and any continuation sheets) are true. I am authorised by the applicant to sign this statement",
+    "DisplayOrder": 1
+  }
+]

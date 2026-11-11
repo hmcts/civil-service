@@ -1,0 +1,170 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmApplicantSolicitorQueries",
+    "ListElementCode": "caseMessages",
+    "UserRole": "RES-SOL-ONE-SPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmApplicantSolicitorQueries",
+    "ListElementCode": "caseMessages",
+    "UserRole": "RES-SOL-ONE-UNSPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmApplicantSolicitorQueries",
+    "ListElementCode": "caseMessages.attachments",
+    "UserRole": "RES-SOL-ONE-SPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmApplicantSolicitorQueries",
+    "ListElementCode": "caseMessages.attachments",
+    "UserRole": "RES-SOL-ONE-UNSPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmApplicantSolicitorQueries",
+    "ListElementCode": "caseMessages",
+    "UserRole": "RES-SOL-TWO-SPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmApplicantSolicitorQueries",
+    "ListElementCode": "caseMessages",
+    "UserRole": "RES-SOL-TWO-UNSPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmApplicantSolicitorQueries",
+    "ListElementCode": "caseMessages.attachments",
+    "UserRole": "RES-SOL-TWO-SPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmApplicantSolicitorQueries",
+    "ListElementCode": "caseMessages.attachments",
+    "UserRole": "RES-SOL-TWO-UNSPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmRespondentSolicitor1Queries",
+    "ListElementCode": "caseMessages",
+    "UserRole": "APP-SOL-SPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmRespondentSolicitor1Queries",
+    "ListElementCode": "caseMessages",
+    "UserRole": "APP-SOL-UNSPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmRespondentSolicitor1Queries",
+    "ListElementCode": "caseMessages.attachments",
+    "UserRole": "APP-SOL-SPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmRespondentSolicitor1Queries",
+    "ListElementCode": "caseMessages.attachments",
+    "UserRole": "APP-SOL-UNSPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmRespondentSolicitor1Queries",
+    "ListElementCode": "caseMessages",
+    "UserRole": "RES-SOL-TWO-SPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmRespondentSolicitor1Queries",
+    "ListElementCode": "caseMessages",
+    "UserRole": "RES-SOL-TWO-UNSPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmRespondentSolicitor1Queries",
+    "ListElementCode": "caseMessages.attachments",
+    "UserRole": "RES-SOL-TWO-SPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmRespondentSolicitor1Queries",
+    "ListElementCode": "caseMessages.attachments",
+    "UserRole": "RES-SOL-TWO-UNSPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmRespondentSolicitor2Queries",
+    "ListElementCode": "caseMessages",
+    "UserRole": "APP-SOL-SPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmRespondentSolicitor2Queries",
+    "ListElementCode": "caseMessages",
+    "UserRole": "APP-SOL-UNSPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmRespondentSolicitor2Queries",
+    "ListElementCode": "caseMessages.attachments",
+    "UserRole": "APP-SOL-SPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmRespondentSolicitor2Queries",
+    "ListElementCode": "caseMessages.attachments",
+    "UserRole": "APP-SOL-UNSPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmRespondentSolicitor2Queries",
+    "ListElementCode": "caseMessages",
+    "UserRole": "RES-SOL-ONE-SPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmRespondentSolicitor2Queries",
+    "ListElementCode": "caseMessages.attachments",
+    "UserRole": "RES-SOL-ONE-SPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmRespondentSolicitor2Queries",
+    "ListElementCode": "caseMessages",
+    "UserRole": "RES-SOL-ONE-UNSPEC-PROFILE",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "qmRespondentSolicitor2Queries",
+    "ListElementCode": "caseMessages.attachments",
+    "UserRole": "RES-SOL-ONE-UNSPEC-PROFILE",
+    "CRUD": "R"
+  }
+]

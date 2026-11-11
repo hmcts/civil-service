@@ -1,0 +1,23 @@
+[
+  {
+    "ID": "uploadDocumentByType",
+    "ListElementCode": "typeOfDocument",
+    "FieldType": "Text",
+    "FieldTypeParameter": "UploadDocumentType",
+    "ElementLabel": "Type of document",
+    "HintText": "For example, Bundle, costs schedule, witness statement",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "uploadDocumentByType",
+    "ListElementCode": "documentUpload",
+    "ElementLabel": "Upload a file",
+    "HintText": "Each document must be less than 100MB. You can upload the following file types: Word, Excel, PowerPoint, PDF, RTF, TXT, CSV, JPG, JPEG, PNG, BMG, TIF, TIFF",
+    "FieldType": "Document",
+    "Category": "applications",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

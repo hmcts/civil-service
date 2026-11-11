@@ -1,0 +1,67 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "UPDATE_HELP_WITH_FEE_NUMBER",
+    "CaseFieldID": "helpWithFees",
+    "DisplayContext": "READONLY",
+    "PageID": "updateHwfNumber",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "caseTitleWithHWFClaimFeeNumber=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "UPDATE_HELP_WITH_FEE_NUMBER",
+    "CaseFieldID": "hwfFeeType",
+    "DisplayContext": "READONLY",
+    "PageID": "updateHwfNumber",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "caseTitleWithHWFClaimFeeNumber=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "UPDATE_HELP_WITH_FEE_NUMBER",
+    "CaseFieldID": "caseTitleWithHWFClaimFeeNumber",
+    "DisplayContext": "READONLY",
+    "PageID": "updateHwfNumber",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 3,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "hwfFeeType = \"CLAIMISSUED\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "UPDATE_HELP_WITH_FEE_NUMBER",
+    "CaseFieldID": "subTitleHwfDetails",
+    "DisplayContext": "READONLY",
+    "PageID": "updateHwfNumber",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 4,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "UPDATE_HELP_WITH_FEE_NUMBER",
+    "CaseFieldID": "claimFeeLabel",
+    "DisplayContext": "READONLY",
+    "PageID": "updateHwfNumber",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 5,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "hwfFeeType=\"CLAIMISSUED\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "UPDATE_HELP_WITH_FEE_NUMBER",
+    "CaseFieldID": "claimIssuedHwfDetails",
+    "DisplayContext": "COMPLEX",
+    "PageID": "updateHwfNumber",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 6,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "hwfFeeType = \"CLAIMISSUED\""
+  }
+]

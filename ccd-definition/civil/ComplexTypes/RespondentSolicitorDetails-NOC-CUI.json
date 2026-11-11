@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "RespondentSolicitorDetails",
+    "ListElementCode": "orgName",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RespondentSolicitorDetails",
+    "ListElementCode": "address",
+    "ElementLabel": " ",
+    "FieldType": "AddressUK",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

@@ -1,0 +1,51 @@
+[
+  {
+    "ID": "TrialHearingTrialDJ",
+    "ListElementCode": "input1",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "TrialHearingTrialDJ",
+    "ListElementCode": "date1",
+    "FieldType": "Date",
+    "ElementLabel": "Date from",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "TrialHearingTrialDJ",
+    "ListElementCode": "date2",
+    "FieldType": "Date",
+    "ElementLabel": "Date to",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "TrialHearingTrialDJ",
+    "ListElementCode": "input2",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "TrialHearingTrialDJ",
+    "ListElementCode": "input3",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "TrialHearingTrialDJ",
+    "ListElementCode": "type",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "TrialHearingBundleType",
+    "ElementLabel": "Bundle type",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

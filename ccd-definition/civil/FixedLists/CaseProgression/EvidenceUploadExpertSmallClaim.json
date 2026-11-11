@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "EvidenceUploadExpertSmallClaim",
+    "ListElementCode": "EXPERT_REPORT",
+    "ListElement": "Expert's report",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "EvidenceUploadExpertSmallClaim",
+    "ListElementCode": "JOINT_STATEMENT",
+    "ListElement": "Joint Statement of Experts / Single Joint Expert Report",
+    "DisplayOrder": 2
+  }
+]

@@ -1,0 +1,94 @@
+[
+  {
+    "ID": "Expert",
+    "ListElementCode": "name",
+    "FieldType": "Text",
+    "ElementLabel": "Expert's name",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Expert",
+    "ListElementCode": "fieldOfExpertise",
+    "FieldType": "Text",
+    "ElementLabel": "Field of expertise",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Expert",
+    "ListElementCode": "whyRequired",
+    "FieldType": "TextArea",
+    "ElementLabel": "Why do you need this expert?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Expert",
+    "ListElementCode": "estimatedCost",
+    "FieldType": "MoneyGBP",
+    "ElementLabel": "Estimated cost",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Expert",
+    "ListElementCode": "firstName",
+    "FieldType": "Text",
+    "ElementLabel": "First name",
+    "SecurityClassification": "Public",
+    "Max": 40,
+    "Searchable": "N"
+  },
+  {
+    "ID": "Expert",
+    "ListElementCode": "lastName",
+    "FieldType": "Text",
+    "ElementLabel": "Last name",
+    "SecurityClassification": "Public",
+    "Max": 40,
+    "Searchable": "N"
+  },
+  {
+    "ID": "Expert",
+    "ListElementCode": "emailAddress",
+    "FieldType": "Email",
+    "ElementLabel": "Email address",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Expert",
+    "ListElementCode": "phoneNumber",
+    "FieldType": "PhoneUK",
+    "ElementLabel": "Phone number",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Expert",
+    "ListElementCode": "partyID",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "phoneNumber = \"DO NOT SHOW\"",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Expert",
+    "ListElementCode": "eventAdded",
+    "FieldType": "Text",
+    "ElementLabel": "Event added",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Expert",
+    "ListElementCode": "dateAdded",
+    "FieldType": "Date",
+    "ElementLabel": "Date added",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

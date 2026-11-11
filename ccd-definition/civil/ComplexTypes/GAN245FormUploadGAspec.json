@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "GAN245FormUpload",
+    "ListElementCode": "generalAppN245Download",
+    "FieldType": "Label",
+    "ElementLabel": "<p class=\"govuk-inset-text\">if you have not already completed it, <a href=\"https://www.gov.uk/government/publications/form-n245-application-for-suspension-of-a-warrant-and-or-variation-of-an-order#:~:text=Form-,Form%20N245%3A%20Apply%20to%20suspend%20a%20warrant%20or%20vary%20payments,warrant%20issued%20by%20a%20court\" rel=\"noreferrer noopener\" target=\"_blank\">download the N245 form.</a>.</p>",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "GAN245FormUpload",
+    "ListElementCode": "generalAppN245Label",
+    "ElementLabel": "## How to upload your evidence \n Before uploading your form, include N245 in the name, for example \"N245 Applicant Name\" \n\n Each document must be less than 100MB. You can upload the following file types: \n\n Word, Excel, PowerPoint, PDF, RTF, TXT, CSV, JPG, JPEG, PNG, BMP, TIF, TIFF.\n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

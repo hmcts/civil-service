@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "ChangeLanguagePreference",
+    "ListElementCode": "userType",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "ChangeLanguagePreferenceUserType",
+    "ElementLabel": "Which user does this change apply to?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ChangeLanguagePreference",
+    "ListElementCode": "preferredLanguage",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "PreferredLanguage",
+    "ElementLabel": "What is their preferred language?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

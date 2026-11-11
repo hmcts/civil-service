@@ -1,0 +1,10 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "History",
+    "TabLabel": "History",
+    "TabDisplayOrder": 3,
+    "CaseFieldID": "caseHistory",
+    "TabFieldDisplayOrder": 1
+  }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "asyncStitchingComplete",
+    "CaseFieldID": "bundleError",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "READONLY",
+    "EventElementLabel": "  ",
+    "EventHintText": "  ",
+    "PageID": "WorkAllocationIntegrationFields",
+    "PageDisplayOrder": 2,
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  }
+]

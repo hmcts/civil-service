@@ -1,0 +1,212 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "responseClaimAdmitPartOfClaimSpecExtraCostsLabel",
+    "Label": "The claim fee and any fixed costs claimed are payable in addition to the claim amount admitted.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "responseClaimAdmitPartOfClaimSpecExtraCostsLabel2",
+    "Label": "The claim fee and any fixed costs claimed are payable in addition to the claim amount admitted.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "responseClaimAdmitPartOfClaimSpecExtraCostsLabelBothDefendants",
+    "Label": "The claim fee and any fixed costs claimed are payable in addition to the claim amount admitted.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "responseClaimAdmitFullClaimWhenToPaySpecLabel",
+    "Label": "<h2 class=\"govuk-heading-l\">When does ${respondent1.partyName} want to pay the £${totalClaimAmountPlusInterestString}?</h2>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "responseClaimAdmitFullClaimWhenToPaySpecLabel2",
+    "Label": "<h2 class=\"govuk-heading-l\">When does ${respondent2.partyName} want to pay the £${totalClaimAmountPlusInterestString}?</h2>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "responseClaimAdmitFullClaimWhenToPaySpecLabelBothDefendants",
+    "Label": "<h2 class=\"govuk-heading-l\">When do ${respondent1.partyName} and ${respondent2.partyName} want to pay the £${totalClaimAmountPlusInterestString}?</h2>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondent1ClaimAdmitFullInterestLabel",
+    "Label": "This amount includes interest if it has been claimed which may continue to accrue on the amount outstanding up to the date of judgment or earlier payment.\n\nThe above amount does not include the claim fee and any fixed costs claimed which are payable in addition and if judgment is entered on an admission will be included in the total judgment sum.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondent2ClaimAdmitFullInterestLabel",
+    "Label": "This amount includes interest if it has been claimed which may continue to accrue on the amount outstanding up to the date of judgment or earlier payment.\n\nThe above amount does not include the claim fee and any fixed costs claimed which are payable in addition and if judgment is entered on an admission will be included in the total judgment sum.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "totalClaimAmountPlusInterest",
+    "Label": "Total Claim amount + interest",
+    "FieldType": "Number",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "totalClaimAmountPlusInterestString",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "totalClaimAmountPlusInterestAdmitPart",
+    "Label": "Total Claim amount + interest",
+    "FieldType": "Number",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "totalClaimAmountPlusInterestAdmitPartString",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "responseToClaimAdmitPartTotalAmountWithInterestLabel1",
+    "Label": "## The total amount, including any interest claimed to date, is £${totalClaimAmountPlusInterestAdmitPartString}.",
+    "FieldType": "Label",
+    "Searchable": "N",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondToAdmittedClaimOwingAmount",
+    "Label": "How much money does your client admit to owing?",
+    "HintText": "The amount to be considered is the claim amount and any interest claimed. The claim fee and any \n\nfixed costs claimed are not included in this figure but are payable in addition and if judgment is \n\nentered on an admission will be included in the total judgment sum.",
+    "FieldType": "MoneyGBP",
+    "Searchable": "N",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "responseToClaimAdmitPartTotalAmountWithInterestLabel2",
+    "Label": "## The total amount, including any interest claimed to date, is £${totalClaimAmountPlusInterestAdmitPartString}.",
+    "FieldType": "Label",
+    "Searchable": "N",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondToAdmittedClaimOwingAmount2",
+    "Label": "How much money does your client admit to owing?",
+    "HintText": "The amount to be considered is the claim amount and any interest claimed. The claim fee and any \n\nfixed costs claimed are not included in this figure but are payable in addition and if judgment is \n\nentered on an admission will be included in the total judgment sum.",
+    "FieldType": "MoneyGBP",
+    "Searchable": "N",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondent1RepaymentPlanAdmitFullLabel",
+    "Label": "The total amount claimed is £${totalClaimAmountPlusInterestString}.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondent1RepaymentPlanAdmitFullInterestLabel",
+    "Label": "This amount includes interest if it has been claimed which may continue to accrue on the amount outstanding up to the date of judgment or earlier payment.\n\nThe above amount does not include the claim fee and any fixed costs claimed which are payable in addition and if judgment is entered on an admission will be included in the total judgment sum.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondent2RepaymentPlanAdmitFullLabel",
+    "Label": "The total amount claimed is £${totalClaimAmountPlusInterestString}.",
+    "FieldType": "Label",
+    "Searchable": "N",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondent2RepaymentPlanAdmitFullInterestLabel",
+    "Label": "This amount includes interest if it has been claimed which may continue to accrue on the amount outstanding up to the date of judgment or earlier payment.\n\nThe above amount does not include the claim fee and any fixed costs claimed which are payable in addition and if judgment is entered on an admission will be included in the total judgment sum.",
+    "FieldType": "Label",
+    "Searchable": "N",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "ccjJudgmentAmountShowInterest",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondent1RepaymentPlanLabelPartAdmit",
+    "Label": "<p>The amount admitted is £${respondToAdmittedClaimOwingAmountPounds}</p> <p>The amount includes interest if it has been claimed.</br>The claim fee and any fixed costs claimed are not included in this figure but are payable in addition and if judgment is entered on an admission will be included in the total judgment sum.</p>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondentGenericRepaymentPlanLabelPartAdmit",
+    "Label": "<p>The amount admitted is £${respondToAdmittedClaimOwingAmountPounds}</p> <p>The amount includes interest if it has been claimed.</br>The claim fee and any fixed costs claimed are not included in this figure but are payable in addition and if judgment is entered on an admission will be included in the total judgment sum.</p>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondent2RepaymentPlanLabelPartAdmit",
+    "Label": "<p>The amount admitted is £${respondToAdmittedClaimOwingAmountPounds2}</p> <p>The amount includes interest if it has been claimed.</br>The claim fee and any fixed costs claimed are not included in this figure but are payable in addition and if judgment is entered on an admission will be included in the total judgment sum.</p>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "partAdmit1v1Defendant",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "partAdmissionWhenWillDefendantPayImmediatelyLRALabel",
+    "Label": "If the claimant accepts, you must contact the claimant and pay the full amount within 5 days. Any cheques or transfers must be clear in their account.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

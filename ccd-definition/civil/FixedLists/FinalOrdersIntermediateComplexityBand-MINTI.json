@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "FinalOrdersIntermediateComplexityBand",
+    "ListElementCode": "BAND_1",
+    "ListElement": "band 1: claims where only one issue is in dispute and the hearing is expected to last for less than one day. For example, personal injury claims where either liability or the amount of money being claimed is disputed or defendant debt claims.",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "FinalOrdersIntermediateComplexityBand",
+    "ListElementCode": "BAND_2",
+    "ListElement": "band 2: most other claims where more than one issue is in dispute. For example, personal injury where liability and the amount of money being claimed is disputed.",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "FinalOrdersIntermediateComplexityBand",
+    "ListElementCode": "BAND_3",
+    "ListElement": "band 3: any other claim where more than one issue is in dispute. For example, noise induced hearing loss or employer liability for diseases.",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "FinalOrdersIntermediateComplexityBand",
+    "ListElementCode": "BAND_4",
+    "ListElement": "band 4: any claim which is not suitable for bands 1 to 3. For example, complex personal injury claims with serious issues of fact or law.",
+    "DisplayOrder": 4
+  }
+]

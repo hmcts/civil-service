@@ -1,0 +1,8 @@
+[
+  {
+    "ID": "StatementOfTruthConsentGAspec",
+    "ListElementCode": "ConsentAgreementCheckBox",
+    "ListElement": "The applicant believes that the facts stated above are true. I am authorised by the applicant to sign this statement. The Applicant understands that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth.",
+    "DisplayOrder": 1
+  }
+]

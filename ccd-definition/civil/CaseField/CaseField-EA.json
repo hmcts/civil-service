@@ -1,0 +1,11 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "eaCourtLocation",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "Searchable": "N",
+    "SecurityClassification": "Public",
+    "Publish": "Y"
+  }
+]
