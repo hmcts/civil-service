@@ -45,6 +45,25 @@ jobs:
           fi
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
 
+      # Checkout fetches any commit in the repo, including unmerged branches and pull request heads.
+      # The mirror must only ever be taken from master.
+      - name: Check the commit is on civil-ccd-definition master
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ steps.source.outputs.sha }}
+        run: |
+          if ! status=$(gh api "repos/hmcts/civil-ccd-definition/compare/${SOURCE_SHA}...master" --jq .status); then
+            echo "::error file=ccd-definition/.source-sha::Could not compare ${SOURCE_SHA} with hmcts/civil-ccd-definition master. Check the commit exists."
+            exit 1
+          fi
+          case "$status" in
+            ahead|identical) ;;
+            *)
+              echo "::error file=ccd-definition/.source-sha::${SOURCE_SHA} is not on hmcts/civil-ccd-definition master (compare status: ${status}). Copy the mirror from a master commit."
+              exit 1
+              ;;
+          esac
+
       - name: Check out civil-ccd-definition at that commit
         uses: actions/checkout@v7
         with:
