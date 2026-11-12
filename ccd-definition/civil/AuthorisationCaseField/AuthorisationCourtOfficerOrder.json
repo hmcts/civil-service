@@ -1,0 +1,66 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "caseParticipants",
+    "UserRoles": [
+      "court-officer-order"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "courtOfficerOrderedLabel",
+    "UserRoles": [
+      "court-officer-order"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "courtOfficerOrdered",
+    "UserRoles": [
+      "court-officer-order"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "UserRoles": [
+      "court-officer-order"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "courtOfficerGiveReasonsLabel",
+    "UserRoles": [
+      "court-officer-order"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "courtOfficerGiveReasonsYesNo",
+    "UserRoles": [
+      "court-officer-order"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "courtOfficerGiveReasonsComplex",
+    "UserRoles": [
+      "court-officer-order"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "previewCourtOfficerOrder",
+    "UserRoles": [
+      "court-officer-order"
+    ],
+    "CRUD": "CRU"
+  }
+]

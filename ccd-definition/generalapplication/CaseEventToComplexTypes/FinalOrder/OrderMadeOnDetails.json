@@ -1,0 +1,66 @@
+[
+  {
+    "ID": "orderMadeOnOwnInitiative",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "orderMadeOnOwnInitiative",
+    "ListElementCode": "orderMadeOnOwnInitiative.ownInitiativeLabel",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "orderMadeOnOwnInitiative",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "orderMadeOnOwnInitiative",
+    "ListElementCode": "orderMadeOnOwnInitiative.detailText",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "orderMadeOnOwnInitiative",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "orderMadeOnOwnInitiative",
+    "ListElementCode": "orderMadeOnOwnInitiative.ownInitiativeDateLabel",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "orderMadeOnOwnInitiative",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "orderMadeOnOwnInitiative",
+    "ListElementCode": "orderMadeOnOwnInitiative.date",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "orderMadeOnWithOutNotice",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "orderMadeOnWithOutNotice",
+    "ListElementCode": "orderMadeOnWithOutNotice.withOutNoticeLabel",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "orderMadeOnWithOutNotice",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "orderMadeOnWithOutNotice",
+    "ListElementCode": "orderMadeOnWithOutNotice.detailText",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "orderMadeOnWithOutNotice",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "orderMadeOnWithOutNotice",
+    "ListElementCode": "orderMadeOnWithOutNotice.withOutNoticeDateLabel",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "orderMadeOnWithOutNotice",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "orderMadeOnWithOutNotice",
+    "ListElementCode": "orderMadeOnWithOutNotice.date",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  }
+]

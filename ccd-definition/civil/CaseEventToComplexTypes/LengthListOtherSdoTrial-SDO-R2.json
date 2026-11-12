@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "SdoR2TrialHearingLengthOther",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2Trial",
+    "ListElementCode": "lengthListOther.trialLengthDays",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "COMPLEX"
+  },
+  {
+    "ID": "SdoR2TrialHearingLengthOther",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2Trial",
+    "ListElementCode": "lengthListOther.trialLengthHours",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "COMPLEX"
+  },
+  {
+    "ID": "SdoR2TrialHearingLengthOther",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2Trial",
+    "ListElementCode": "lengthListOther.trialLengthMinutes",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "COMPLEX"
+  }
+]

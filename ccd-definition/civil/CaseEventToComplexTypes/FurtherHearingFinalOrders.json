@@ -1,0 +1,354 @@
+[
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "label",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "listFromLabel",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "listFromDate",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "dateToLabel",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "dateToDate",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "lengthLabel",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "lengthList",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "lengthListOther",
+    "FieldDisplayOrder": 8,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "datesToAvoidLabel",
+    "FieldDisplayOrder": 9,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "datesToAvoidYesNo",
+    "FieldDisplayOrder": 10,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "datesToAvoidDateDropdown",
+    "FieldDisplayOrder": 11,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearingDatesAvoid",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "datesToAvoidDateDropdown.datesToAvoidDatesTopText",
+    "FieldDisplayOrder": 12,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearingDatesAvoid",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "datesToAvoidDateDropdown.datesToAvoidDates",
+    "FieldDisplayOrder": 13,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearingDatesAvoid",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "datesToAvoidDateDropdown.datesToAvoidDatesBottomText",
+    "FieldDisplayOrder": 14,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "alternativeHearingLabel",
+    "FieldDisplayOrder": 15,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "hearingLocationList",
+    "FieldDisplayOrder": 16,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "alternativeHearingDropdownLabel",
+    "FieldDisplayOrder": 17,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "alternativeHearingList",
+    "FieldDisplayOrder": 18,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "hearingMethodLabel",
+    "FieldDisplayOrder": 19,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "hearingMethodList",
+    "FieldDisplayOrder": 20,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "hearingNotesLabel",
+    "FieldDisplayOrder": 21,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderFurtherHearingComplex",
+    "ListElementCode": "hearingNotesText",
+    "FieldDisplayOrder": 22,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "label",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "listFromLabel",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "listFromDate",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "dateToLabel",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "dateToDate",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "lengthLabel",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "lengthList",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "lengthListOther",
+    "FieldDisplayOrder": 8,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "datesToAvoidLabel",
+    "FieldDisplayOrder": 9,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "datesToAvoidYesNo",
+    "FieldDisplayOrder": 10,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "datesToAvoidDateDropdown",
+    "FieldDisplayOrder": 11,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearingDatesAvoid",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "datesToAvoidDateDropdown.datesToAvoidDatesTopText",
+    "FieldDisplayOrder": 12,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearingDatesAvoid",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "datesToAvoidDateDropdown.datesToAvoidDates",
+    "FieldDisplayOrder": 13,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearingDatesAvoid",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "datesToAvoidDateDropdown.datesToAvoidDatesBottomText",
+    "FieldDisplayOrder": 14,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "alternativeHearingLabel",
+    "FieldDisplayOrder": 15,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "hearingLocationList",
+    "FieldDisplayOrder": 16,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "alternativeHearingDropdownLabel",
+    "FieldDisplayOrder": 17,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "alternativeHearingList",
+    "FieldDisplayOrder": 18,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "hearingMethodLabel",
+    "FieldDisplayOrder": 19,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "hearingMethodList",
+    "FieldDisplayOrder": 20,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "hearingNotesLabel",
+    "FieldDisplayOrder": 21,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "FinalOrderFurtherHearing",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "courtOfficerFurtherHearingComplex",
+    "ListElementCode": "hearingNotesText",
+    "FieldDisplayOrder": 22,
+    "DisplayContext": "OPTIONAL"
+  }
+]

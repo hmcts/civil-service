@@ -1,0 +1,22 @@
+[
+  {
+  "CaseTypeID": "CIVIL",
+  "ID": "NotSuitable_SDO",
+  "Name": "Not suitable for SDO",
+  "Description": "Not suitable for SDO",
+  "DisplayOrder": 20,
+  "PreConditionState(s)": "JUDICIAL_REFERRAL",
+  "PostConditionState": "*",
+  "SecurityClassification": "Public",
+  "CallBackURLAboutToStartEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-start",
+  "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+  "CallBackURLSubmittedEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/submitted",
+  "ShowSummary": "Y",
+  "ShowEventNotes": "N",
+  "EndButtonLabel": "Submit",
+  "RetriesTimeoutAboutToStartEvent": 0,
+  "RetriesTimeoutURLAboutToSubmitEvent": 0,
+  "Publish": "Y",
+  "EventEnablingCondition": "detailsOfDirection = \"Only available through tasks\""
+}
+]

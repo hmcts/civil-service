@@ -1,0 +1,12 @@
+[
+  {
+    "ID": "GAUrgencyRecordPage",
+    "CaseEventID": "END_JUDGE_BUSINESS_PROCESS_GASPEC",
+    "CaseFieldID": "generalAppUrgencyRequirement",
+    "ListElementCode": "generalAppUrgency",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "Publish": "Y"
+  }
+]

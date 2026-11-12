@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "SettleDiscontinueYesOrNoList",
+    "ListElementCode": "YES",
+    "ListElement": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "SettleDiscontinueYesOrNoList",
+    "ListElementCode": "NO",
+    "ListElement": "No",
+    "DisplayOrder": 2
+  }
+]

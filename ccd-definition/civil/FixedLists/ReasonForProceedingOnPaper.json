@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "ReasonForProceedingOnPaper",
+    "ListElementCode": "APPLICATION",
+    "ListElement": "Application",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ReasonForProceedingOnPaper",
+    "ListElementCode": "JUDGEMENT_REQUEST",
+    "ListElement": "Judgment request",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "ReasonForProceedingOnPaper",
+    "ListElementCode": "CASE_SETTLED",
+    "ListElement": "Case settled",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "ReasonForProceedingOnPaper",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 4
+  }
+]

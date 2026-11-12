@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "GAJudgeWrittenRepresentationsOptionsGAspec",
+    "ListElementCode": "SEQUENTIAL_REPRESENTATIONS",
+    "ListElement": "Sequential representations",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "GAJudgeWrittenRepresentationsOptionsGAspec",
+    "ListElementCode": "CONCURRENT_REPRESENTATIONS",
+    "ListElement": "Concurrent representations",
+    "DisplayOrder": 2
+  }
+]

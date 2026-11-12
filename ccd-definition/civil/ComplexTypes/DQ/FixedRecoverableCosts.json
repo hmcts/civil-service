@@ -1,0 +1,58 @@
+[
+  {
+    "ID": "FixedRecoverableCosts",
+    "ListElementCode": "isSubjectToFixedRecoverableCostRegime",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Is this claim subject to the Fixed Recoverable Cost Regime requiring the court to determine a complexity band?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FixedRecoverableCosts",
+    "ListElementCode": "bandLabel",
+    "ElementLabel": " ",
+    "FieldType": "Label",
+    "FieldShowCondition": "isSubjectToFixedRecoverableCostRegime = \"Yes\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FixedRecoverableCosts",
+    "ListElementCode": "band",
+    "ElementLabel": "Which complexity band do you believe this claim falls into?",
+    "FieldType": "FixedRadioList",
+    "FieldShowCondition": "isSubjectToFixedRecoverableCostRegime = \"Yes\"",
+    "FieldTypeParameter": "ComplexityBand",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FixedRecoverableCosts",
+    "ListElementCode": "complexityBandingAgreed",
+    "ElementLabel": "Has this complexity band been agreed with the other party?",
+    "FieldType": "YesOrNo",
+    "FieldShowCondition": "isSubjectToFixedRecoverableCostRegime = \"Yes\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FixedRecoverableCosts",
+    "ListElementCode": "reasons",
+    "ElementLabel": "Please give your reasons",
+    "FieldType": "TextArea",
+    "FieldShowCondition": "isSubjectToFixedRecoverableCostRegime = \"Yes\" OR isSubjectToFixedRecoverableCostRegime = \"No\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "_comment": "It would not show when isSubjectToFixedRecoverableCostRegime is not selected"
+  },
+  {
+    "ID": "FixedRecoverableCosts",
+    "ListElementCode": "frcSupportingDocument",
+    "FieldType": "Document",
+    "ElementLabel": "Upload supporting evidence",
+    "FieldShowCondition": "isSubjectToFixedRecoverableCostRegime = \"DONOTSHOW\"",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

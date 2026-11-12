@@ -1,0 +1,15 @@
+[
+  {
+    "ID": "InterestClaimUntil",
+    "ListElementCode": "UNTIL_CLAIM_SUBMIT_DATE",
+    "ListElement": "When you submit the claim.",
+    "HintText": "When you submit the claim.",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "InterestClaimUntil",
+    "ListElementCode": "UNTIL_SETTLED_OR_JUDGEMENT_MADE",
+    "ListElement": "Until the claim is settled or judgment made.",
+    "DisplayOrder": 2
+  }
+]

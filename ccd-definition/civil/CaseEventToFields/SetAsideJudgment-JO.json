@@ -1,0 +1,97 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "SET_ASIDE_JUDGMENT",
+    "CaseFieldID": "lblRecordJudgment",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "SetAsideJudgment",
+    "PageLabel": "Judgment details",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "SET_ASIDE_JUDGMENT",
+    "CaseFieldID": "joPartiesNames",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "READONLY",
+    "PageID": "SetAsideJudgment",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+  "CaseTypeID": "CIVIL",
+  "CaseEventID": "SET_ASIDE_JUDGMENT",
+  "CaseFieldID": "joSetAsideReason",
+  "PageFieldDisplayOrder": 3,
+  "DisplayContext": "MANDATORY",
+  "PageID": "SetAsideJudgment",
+  "PageDisplayOrder": 1,
+  "PageColumnNumber": 1,
+  "ShowSummaryChangeOption": "Y"
+  },
+  {
+  "CaseTypeID": "CIVIL",
+  "CaseEventID": "SET_ASIDE_JUDGMENT",
+  "CaseFieldID": "joSetAsideJudgmentErrorText",
+  "PageFieldDisplayOrder": 4,
+  "DisplayContext": "MANDATORY",
+  "PageID": "SetAsideJudgment",
+  "PageDisplayOrder": 1,
+  "PageColumnNumber": 1,
+  "ShowSummaryChangeOption": "Y",
+  "FieldShowCondition": "joSetAsideReason=\"JUDGMENT_ERROR\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "SET_ASIDE_JUDGMENT",
+    "CaseFieldID": "joSetAsideOrderDate",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": "SetAsideOrderType",
+    "PageLabel": "Judgment details",
+    "PageDisplayOrder": 2,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "SET_ASIDE_JUDGMENT",
+    "CaseFieldID": "joSetAsideOrderType",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "PageID": "SetAsideOrderType",
+    "PageDisplayOrder": 2,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y",
+    "PageShowCondition": "joSetAsideReason=\"JUDGE_ORDER\"",
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-set-aside-dates"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "SET_ASIDE_JUDGMENT",
+    "CaseFieldID": "joSetAsideApplicationDate",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY",
+    "PageID": "SetAsideOrderType",
+    "PageDisplayOrder": 2,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "joSetAsideOrderType=\"ORDER_AFTER_APPLICATION\""
+  },
+  {
+  "CaseTypeID": "CIVIL",
+  "CaseEventID": "SET_ASIDE_JUDGMENT",
+  "CaseFieldID": "joSetAsideDefenceReceivedDate",
+  "PageFieldDisplayOrder": 4,
+  "DisplayContext": "MANDATORY",
+  "PageID": "SetAsideOrderType",
+  "PageDisplayOrder": 2,
+  "PageColumnNumber": 1,
+  "ShowSummaryChangeOption": "Y",
+  "FieldShowCondition": "joSetAsideOrderType=\"ORDER_AFTER_DEFENCE\""
+  }
+]

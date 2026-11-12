@@ -1,0 +1,20 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "CREATE_APPLICATION_RESPONDED_DASHBOARD_NOTIFICATION",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRU"
+  },
+   {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "ADD_APPLICATION_TO_TRANSLATION_COLLECTION",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "DELETE_APPLICATION_PAYMENT_DASHBOARD_NOTIFICATION",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRU"
+  }
+]

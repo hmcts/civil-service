@@ -1,0 +1,208 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "flagLauncher",
+    "TabFieldDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "caseFlags",
+    "TabFieldDisplayOrder": 2,
+    "FieldShowCondition": "flagLauncher = \"Do not show in UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "applicant1",
+    "TabFieldDisplayOrder": 3,
+    "FieldShowCondition": "flagLauncher = \"Do not show in UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "applicant2",
+    "TabFieldDisplayOrder": 4,
+    "FieldShowCondition": "flagLauncher = \"Do not show in UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "respondent1",
+    "TabFieldDisplayOrder": 5,
+    "FieldShowCondition": "flagLauncher = \"Do not show in UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "respondent2",
+    "TabFieldDisplayOrder": 6,
+    "FieldShowCondition": "flagLauncher = \"Do not show in UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "applicant1LitigationFriend",
+    "TabFieldDisplayOrder": 7,
+    "FieldShowCondition": "flagLauncher = \"Do not show in UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "applicant2LitigationFriend",
+    "TabFieldDisplayOrder": 8,
+    "FieldShowCondition": "flagLauncher = \"Do not show in UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "respondent1LitigationFriend",
+    "TabFieldDisplayOrder": 9,
+    "FieldShowCondition": "flagLauncher = \"Do not show in UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "respondent2LitigationFriend",
+    "TabFieldDisplayOrder": 10,
+    "FieldShowCondition": "flagLauncher = \"Do not show in UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "applicantExperts",
+    "TabFieldDisplayOrder": 11,
+    "FieldShowCondition": "flagLauncher = \"DO NO SHOW IN UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "applicantWitnesses",
+    "TabFieldDisplayOrder": 12,
+    "FieldShowCondition": "flagLauncher = \"DO NO SHOW IN UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "respondent1Witnesses",
+    "TabFieldDisplayOrder": 13,
+    "FieldShowCondition": "flagLauncher = \"DO NO SHOW IN UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "respondent1Experts",
+    "TabFieldDisplayOrder": 14,
+    "FieldShowCondition": "flagLauncher = \"DO NO SHOW IN UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "respondent2Witnesses",
+    "TabFieldDisplayOrder": 15,
+    "FieldShowCondition": "flagLauncher = \"DO NO SHOW IN UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "respondent2Experts",
+    "TabFieldDisplayOrder": 16,
+    "FieldShowCondition": "flagLauncher = \"DO NO SHOW IN UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "applicant1LRIndividuals",
+    "TabFieldDisplayOrder": 17,
+    "FieldShowCondition": "flagLauncher = \"Do not show in UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "respondent1LRIndividuals",
+    "TabFieldDisplayOrder": 18,
+    "FieldShowCondition": "flagLauncher = \"Do not show in UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "respondent2LRIndividuals",
+    "TabFieldDisplayOrder": 19,
+    "FieldShowCondition": "flagLauncher = \"Do not show in UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "applicant1OrgIndividuals",
+    "TabFieldDisplayOrder": 20,
+    "FieldShowCondition": "flagLauncher = \"Do not show in UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "applicant2OrgIndividuals",
+    "TabFieldDisplayOrder": 21,
+    "FieldShowCondition": "flagLauncher = \"Do not show in UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "respondent1OrgIndividuals",
+    "TabFieldDisplayOrder": 22,
+    "FieldShowCondition": "flagLauncher = \"Do not show in UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "caseFlags",
+    "TabLabel": "Case Flags",
+    "TabDisplayOrder": 13,
+    "CaseFieldID": "respondent2OrgIndividuals",
+    "TabFieldDisplayOrder": 23,
+    "FieldShowCondition": "flagLauncher = \"Do not show in UI\""
+  }
+]

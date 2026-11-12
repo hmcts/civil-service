@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "FinalOrderMakeAnOrderClaimantThirdList",
+    "ListElementCode": "YES",
+    "ListElement": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "FinalOrderMakeAnOrderClaimantThirdList",
+    "ListElementCode": "NO",
+    "ListElement": "No",
+    "DisplayOrder": 2
+  }
+]

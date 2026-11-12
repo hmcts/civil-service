@@ -1,0 +1,37 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ServiceRequest",
+    "TabLabel": "Service Request",
+    "TabDisplayOrder": 6,
+    "CaseFieldID": "hwfFeeType",
+    "FieldShowCondition": "casePaymentWaysToPay=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ServiceRequest",
+    "TabLabel": "Service Request",
+    "TabDisplayOrder": 6,
+    "CaseFieldID": "businessProcess",
+    "TabFieldDisplayOrder": 1,
+    "FieldShowCondition": "casePaymentWaysToPay=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ServiceRequest",
+    "TabLabel": "Service Request",
+    "TabDisplayOrder": 6,
+    "CaseFieldID": "casePaymentWaysToPay",
+    "TabFieldDisplayOrder": 2,
+    "FieldShowCondition": "hwfFeeType!=\"CLAIMISSUED\" AND businessProcess.status=\"FINISHED\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ServiceRequest",
+    "TabLabel": "Service Request",
+    "TabDisplayOrder": 6,
+    "CaseFieldID": "unfinishedBackEndProcess",
+    "TabFieldDisplayOrder": 3,
+    "FieldShowCondition": "businessProcess.status!=\"FINISHED\""
+  }
+]

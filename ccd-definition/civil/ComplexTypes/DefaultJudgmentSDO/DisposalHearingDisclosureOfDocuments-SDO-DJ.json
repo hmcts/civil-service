@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "DisposalHearingDisclosureOfDocumentsDJ",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": "## Disclosure of documents ##",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingDisclosureOfDocumentsDJ",
+    "ListElementCode": "input",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingDisclosureOfDocumentsDJ",
+    "ListElementCode": "date",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

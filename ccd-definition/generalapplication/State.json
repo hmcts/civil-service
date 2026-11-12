@@ -1,0 +1,146 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "PENDING_APPLICATION_ISSUED",
+    "Name": "General Application Issue Pending",
+    "Description": "Holding state whilst payment is taken",
+    "DisplayOrder": 1,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameGaInternal}"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "AWAITING_RESPONDENT_RESPONSE",
+    "Name": "Awaiting Respondent Response",
+    "Description": "Awaiting Respondent Response",
+    "DisplayOrder": 2,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameGaInternal}"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION",
+    "Name": "Application Submitted - Awaiting Judicial Decision",
+    "Description": "Application Submitted - Awaiting Judicial Decision",
+    "DisplayOrder": 3,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameGaInternal}"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "ADDITIONAL_RESPONSE_TIME_EXPIRED",
+    "Name": "Additional Response Time Expired",
+    "Description": "Additional Response Time Expired",
+    "DisplayOrder": 4,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameGaInternal}"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "ADDITIONAL_RESPONSE_TIME_PROVIDED",
+    "Name": "Additional Response Time Provided",
+    "Description": "Additional Response Time Provided",
+    "DisplayOrder": 5,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameGaInternal}"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "AWAITING_DIRECTIONS_ORDER_DOCS",
+    "Name": "Directions Order Made",
+    "Description": "Directions Order Made",
+    "DisplayOrder": 6,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameGaInternal}"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "ORDER_MADE",
+    "Name": "Order Made",
+    "Description": "Order Made",
+    "DisplayOrder": 7,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameGaInternal}"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "LISTING_FOR_A_HEARING",
+    "Name": "List for hearing",
+    "Description": "List for hearing",
+    "DisplayOrder": 8,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameGaInternal}"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "AWAITING_WRITTEN_REPRESENTATIONS",
+    "Name": "Awaiting Written Representations",
+    "Description": "Awaiting Written Representations",
+    "DisplayOrder": 9,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameGaInternal}"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "AWAITING_ADDITIONAL_INFORMATION",
+    "Name": "Additional Information Required",
+    "Description": "Additional Information Required",
+    "DisplayOrder": 10,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameGaInternal}"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "APPLICATION_DISMISSED",
+    "Name": "Application Dismissed",
+    "Description": "Application Dismissed",
+    "DisplayOrder": 11,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameGaInternal}"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "APPLICATION_CLOSED",
+    "Name": "Application Closed",
+    "Description": "Application Closed",
+    "DisplayOrder": 12,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameGaInternal}"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "PENDING_CASE_ISSUED",
+    "Name": "Claim Issue Pending",
+    "Description": "Holding state whilst payment is taken",
+    "DisplayOrder": 13,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameGaInternal}"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "PROCEEDS_IN_HERITAGE",
+    "Name": "Proceeds in Heritage",
+    "Description": "Proceeds in Heritage",
+    "DisplayOrder": 14,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameGaInternal}"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "APPLICATION_ADD_PAYMENT",
+    "Name": "Application Additional Payment",
+    "Description": "Application Additional Payment",
+    "DisplayOrder": 15,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameGaInternal}"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "APPLICATION_PAYMENT_FAILED",
+    "Name": "Application Payment Failed",
+    "Description": "Application Payment Failed",
+    "DisplayOrder": 16,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameGaInternal}"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "HEARING_SCHEDULED",
+    "Name": "Hearing Scheduled",
+    "Description": "Hearing Scheduled",
+    "DisplayOrder": 17,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameGaInternal}"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "AWAITING_APPLICATION_PAYMENT",
+    "Name": "Awaiting Application Payment",
+    "Description": "Awaiting Application Payment",
+    "DisplayOrder": 18,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameGaInternal}"
+  }
+]

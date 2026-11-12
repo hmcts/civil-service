@@ -1,0 +1,21 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "headingHelpWithFeesDetails",
+    "FieldShowCondition": "claimIssuedHwfForTab = \"*\" OR hearingHwfForTab = \"*\"",
+    "TabFieldDisplayOrder": 128
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "claimIssuedHwfForTab",
+    "TabFieldDisplayOrder": 129
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "hearingHwfForTab",
+    "TabFieldDisplayOrder": 130
+  }
+]

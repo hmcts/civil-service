@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "FastTrackVariationOfDirections",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackVariationOfDirections",
+    "ListElementCode": "text",
+    "FieldType": "Label",
+    "ElementLabel": "The parties may, by written agreement, extend time for compliance with a direction where that is permitted by CPR 3.8(4). Otherwise, the time for compliance with a direction may only be extended by making an application.",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

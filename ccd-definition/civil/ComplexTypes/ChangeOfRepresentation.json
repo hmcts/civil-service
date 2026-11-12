@@ -1,0 +1,50 @@
+[
+  {
+    "ID": "ChangeOfRepresentation",
+    "ListElementCode": "organisationToAddID",
+    "FieldType": "Text",
+    "ElementLabel": "organisationToAddID",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ChangeOfRepresentation",
+    "ListElementCode": "organisationToRemoveID",
+    "FieldType": "Text",
+    "ElementLabel": "organisationToRemoveID",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ChangeOfRepresentation",
+    "ListElementCode": "caseRole",
+    "FieldType": "Text",
+    "ElementLabel": "caseRole",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ChangeOfRepresentation",
+    "ListElementCode": "timestamp",
+    "FieldType": "DateTime",
+    "ElementLabel": "timestamp",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ChangeOfRepresentation",
+    "ListElementCode": "formerRepresentationEmailAddress",
+    "FieldType": "Email",
+    "ElementLabel": "formerRepresentationEmailAddress",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ChangeOfRepresentation",
+    "ListElementCode": "formerRepresentationReference",
+    "FieldType": "Text",
+    "ElementLabel": "formerRepresentationReference",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

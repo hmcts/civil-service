@@ -1,0 +1,42 @@
+[
+  {
+    "ID": "RequestedCourtForTabDetails",
+    "ListElementCode": "requestedCourt",
+    "ElementLabel": "The applicant legal representative requested the following court location code.",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RequestedCourtForTabDetails",
+    "ListElementCode": "requestedCourtName",
+    "ElementLabel": "Court name",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RequestedCourtForTabDetails",
+    "ListElementCode": "reasonForHearingAtSpecificCourt",
+    "FieldType": "TextArea",
+    "ElementLabel": "Briefly explain your reasons for requesting this Court location.",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RequestedCourtForTabDetails",
+    "ListElementCode": "requestHearingHeldRemotely",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Do you want to ask for the hearing to be held remotely?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RequestedCourtForTabDetails",
+    "ListElementCode": "requestHearingHeldRemotelyReason",
+    "FieldType": "TextArea",
+    "ElementLabel": "Briefly explain your reasons for having a remote hearing.",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]
