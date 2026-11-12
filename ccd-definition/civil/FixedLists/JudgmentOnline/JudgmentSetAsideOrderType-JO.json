@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "JoSetAsideOrderTypeList",
+    "ListElementCode": "ORDER_AFTER_APPLICATION",
+    "ListElement": "Order following an application to set aside",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "JoSetAsideOrderTypeList",
+    "ListElementCode": "ORDER_AFTER_DEFENCE",
+    "ListElement": "Order following defence received",
+    "DisplayOrder": 2
+  }
+]

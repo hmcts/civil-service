@@ -1,0 +1,89 @@
+[
+  {
+    "ID": "ExpertDetails",
+    "ListElementCode": "expertDetails",
+    "ElementLabel": "## Expert details \n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ExpertDetails",
+    "ListElementCode": "firstName",
+    "FieldType": "Text",
+    "ElementLabel": "First name",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Max": 40
+  },
+  {
+    "ID": "ExpertDetails",
+    "ListElementCode": "lastName",
+    "FieldType": "Text",
+    "ElementLabel": "Last name",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Max": 40
+  },
+  {
+    "ID": "ExpertDetails",
+    "ListElementCode": "phoneNumber",
+    "FieldType": "PhoneUK",
+    "ElementLabel": "Phone number",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ExpertDetails",
+    "ListElementCode": "emailAddress",
+    "FieldType": "Email",
+    "ElementLabel": "Email address",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ExpertDetails",
+    "ListElementCode": "whyRequired",
+    "FieldType": "TextArea",
+    "ElementLabel": "Why do you need this expert?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ExpertDetails",
+    "ListElementCode": "expertName",
+    "FieldType": "Text",
+    "ElementLabel": "Expert name",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Label": "Expert name"
+  },
+  {
+    "ID": "ExpertDetails",
+    "ListElementCode": "fieldofExpertise",
+    "FieldType": "TextArea",
+    "ElementLabel": "Field of expertise",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Label": "Field of expertise"
+  },
+  {
+    "ID": "ExpertDetails",
+    "ListElementCode": "estimatedCost",
+    "FieldType": "MoneyGBP",
+    "ElementLabel": "Estimated cost",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Label": "Estimated cost"
+  },
+  {
+    "ID": "ExpertDetails",
+    "ListElementCode": "partyID",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "phoneNumber = \"DO NOT SHOW\"",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  }
+]

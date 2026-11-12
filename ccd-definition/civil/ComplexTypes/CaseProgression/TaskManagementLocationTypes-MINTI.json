@@ -1,0 +1,34 @@
+[
+  {
+    "ID": "TaskManagementLocationTypes",
+    "ListElementCode": "cmcListingLocation",
+    "ElementLabel": "Case conference location",
+    "FieldType": "TaskManagementLocationsModel",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "ID": "TaskManagementLocationTypes",
+    "ListElementCode": "ccmcListingLocation",
+    "ElementLabel": "Cost conference location",
+    "FieldType": "TaskManagementLocationsModel",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "ID": "TaskManagementLocationTypes",
+    "ListElementCode": "ptrListingLocation",
+    "ElementLabel": "Pre Trial Location",
+    "FieldType": "TaskManagementLocationsModel",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "ID": "TaskManagementLocationTypes",
+    "ListElementCode": "trialListingLocation",
+    "ElementLabel": "Trial Location",
+    "FieldType": "TaskManagementLocationsModel",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  }
+]

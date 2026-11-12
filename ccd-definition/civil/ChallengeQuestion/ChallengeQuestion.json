@@ -1,0 +1,12 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "NoCChallenge",
+    "DisplayOrder": "1",
+    "QuestionText": "Your Client's name as it appears as written on the case.",
+    "AnswerFieldType": "Text",
+    "Answer": "${applicant1.partyName}|${applicant2.partyName}:[APPLICANTSOLICITORONE],${respondent1.partyName}:[RESPONDENTSOLICITORONE],${respondent2.partyName}:[RESPONDENTSOLICITORTWO]",
+    "QuestionId": "clientName",
+    "IgnoreNULLFields": "Yes"
+  }
+]

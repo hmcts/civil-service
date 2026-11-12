@@ -1,0 +1,50 @@
+[
+  {
+    "ID": "ReferToJudge",
+    "CaseEventID": "REFER_TO_JUDGE",
+    "CaseFieldID": "referToJudge",
+    "ListElementCode": "judgeReferEventDescription",
+    "EventElementLabel": "  ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "ReferToJudge",
+    "CaseEventID": "REFER_TO_JUDGE",
+    "CaseFieldID": "referToJudge",
+    "ListElementCode": "judgeReferAdditionalInfo",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "GAUrgencyRecordPage",
+    "CaseEventID": "REFER_TO_JUDGE",
+    "CaseFieldID": "generalAppUrgencyRequirement",
+    "ListElementCode": "generalAppUrgency",
+    "EventElementLabel": " ",
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "GATypePage",
+    "CaseEventID": "REFER_TO_JUDGE",
+    "CaseFieldID": "generalAppType",
+    "ListElementCode": "types",
+    "EventElementLabel": "  ",
+    "EventHintText": "  ",
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "GAJudicialDecision",
+    "CaseEventID": "REFER_TO_JUDGE",
+    "CaseFieldID": "judicialDecision",
+    "ListElementCode": "decision",
+    "EventElementLabel": "  ",
+    "EventHintText": "  ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  }
+]

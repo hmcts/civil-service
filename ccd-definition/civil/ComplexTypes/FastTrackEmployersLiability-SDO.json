@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "FastTrackEmployersLiability",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackEmployersLiability",
+    "ListElementCode": "text",
+    "FieldType": "Label",
+    "ElementLabel": "Subject to any direction, ruling, or finding of the trial judge, any employer's accident report and Health and Safety Executive report with witness statements will be admissible in evidence.",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackEmployersLiability",
+    "ListElementCode": "line",
+    "FieldType": "Label",
+    "ElementLabel": "****",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "EvidenceUploadExpert",
+    "ListElementCode": "EXPERT_REPORT",
+    "ListElement": "Expert's report",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "EvidenceUploadExpert",
+    "ListElementCode": "JOINT_STATEMENT",
+    "ListElement": "Joint Statement of Experts / Single Joint Expert Report",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "EvidenceUploadExpert",
+    "ListElementCode": "QUESTIONS_FOR_EXPERTS",
+    "ListElement": "Questions asked of other party expert",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "EvidenceUploadExpert",
+    "ListElementCode": "ANSWERS_FOR_EXPERTS",
+    "ListElement": "Answer to questions asked",
+    "DisplayOrder": 4
+  }
+]

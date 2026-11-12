@@ -1,0 +1,10 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ApplicationsStaff",
+    "TabLabel": "Applications",
+    "TabDisplayOrder": 8,
+    "CaseFieldID": "gaDetailsTranslationCollection",
+    "TabFieldDisplayOrder": 2
+  }
+]

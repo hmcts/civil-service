@@ -1,0 +1,43 @@
+[
+  {
+  "ID": "JudgeDecisionOnReconsiderationSelect",
+  "ListElementCode": "reasonForReconsiderationLblYes",
+  "ElementLabel": "### Yes",
+  "FieldType": "Label",
+  "SecurityClassification": "Public",
+  "Searchable": "N"
+  },
+  {
+    "ID": "JudgeDecisionOnReconsiderationSelect",
+    "ListElementCode": "reasonForReconsiderationTxtYes",
+    "ElementLabel": "Reason for upholding previous order",
+    "HintText": "State the reason why previous order is upheld (i.e. previous order doesn't need amending, all information on the claim has been taken into account and directions order drawn are all in order)\n",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JudgeDecisionOnReconsiderationSelect",
+    "ListElementCode": "reasonForReconsiderationLblNoTitle",
+    "ElementLabel": "### No, create a new SDO",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JudgeDecisionOnReconsiderationSelect",
+    "ListElementCode": "reasonForReconsiderationLblNoTxt",
+    "ElementLabel": "If you select this option, a new SDO task for this case is created and appears in \"Available Tasks\" on the main dashboard. You will need to go there to re-select the case to continue.\n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "JudgeDecisionOnReconsiderationSelect",
+    "ListElementCode": "reasonForReconsiderationLblAmendingTitle",
+    "ElementLabel": "### No, previous order needs amending",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

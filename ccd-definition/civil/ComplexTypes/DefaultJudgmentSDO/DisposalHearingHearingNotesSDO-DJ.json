@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "DisposalHearingHearingNotesDJ",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingHearingNotesDJ",
+    "ListElementCode": "input",
+    "FieldType": "TextArea",
+    "ElementLabel": "This is only seen by the listing officer.",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingHearingNotesDJ",
+    "ListElementCode": "line",
+    "FieldType": "Label",
+    "ElementLabel": "****",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

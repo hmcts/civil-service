@@ -1,0 +1,460 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "componentLauncher",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "nbc-team-leader",
+          "ctsc",
+          "ctsc-team-leader"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "systemGeneratedCaseDocuments",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+
+
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "hearingDocuments",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "trialReadyDocuments",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "caseBundles",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentDisclosureList",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentForDisclosure",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentWitnessStatement",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentWitnessSummary",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentHearsayNotice",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentReferredInStatement",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentExpertReport",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentJointStatement",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentQuestions",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentAnswers",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentCaseSummary",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentSkeletonArgument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentAuthorities",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentCosts",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentEvidenceForTrial",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentForDisclosureRes",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentDisclosureListRes",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentWitnessStatementRes",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentWitnessSummaryRes",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentHearsayNoticeRes",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentReferredInStatementRes",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentExpertReportRes",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentJointStatementRes",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentQuestionsRes",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentAnswersRes",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentCaseSummaryRes",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentSkeletonArgumentRes",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentAuthoritiesRes",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentCostsRes",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "documentEvidenceForTrialRes",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "cui-nbc-profile",
+          "cui-admin-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  }
+]

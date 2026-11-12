@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "AssistedOrderReasons",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderGiveReasonsDetails",
+    "ListElementCode": "reasonsLabel",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "AssistedOrderReasons",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderGiveReasonsDetails",
+    "ListElementCode": "reasonsText",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  }
+]

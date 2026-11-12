@@ -1,0 +1,58 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "courtOfficerOrderedLabel",
+    "Label": "## Order \n ### The Court orders that",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "courtOfficerOrdered",
+    "Label": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "courtOfficerFurtherHearingComplex",
+    "Label": " ",
+    "FieldType": "FinalOrderFurtherHearing",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "courtOfficerGiveReasonsLabel",
+    "Label": "## Reasons \n ### Do you want to give reasons for the order?",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "courtOfficerGiveReasonsYesNo",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "courtOfficerGiveReasonsComplex",
+    "Label": " ",
+    "FieldType": "AssistedOrderReasons",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "previewCourtOfficerOrder",
+    "Label": "Order document",
+    "FieldType": "CaseDocument",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

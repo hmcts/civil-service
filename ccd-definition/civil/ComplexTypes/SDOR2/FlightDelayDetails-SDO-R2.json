@@ -1,0 +1,43 @@
+[
+  {
+    "ID": "FlightDelayDetails",
+    "ListElementCode": "airlineList",
+    "FieldType": "DynamicList",
+    "ElementLabel": "Airline",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FlightDelayDetails",
+    "ListElementCode": "nameOfAirline",
+    "FieldType": "Text",
+    "ElementLabel": "Name of airline",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FlightDelayDetails",
+    "ListElementCode": "flightNumber",
+    "FieldType": "Text",
+    "ElementLabel": "Flight number",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FlightDelayDetails",
+    "ListElementCode": "scheduledDate",
+    "FieldType": "Date",
+    "ElementLabel": "Date of flight",
+    "HintText": "For example, 16 04 2021",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FlightDelayDetails",
+    "ListElementCode": "flightCourtLocation",
+    "FieldType": "CaseLocationCivil",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

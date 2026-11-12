@@ -1,0 +1,42 @@
+[
+  {
+    "ID": "SdoR2TrialFromTo",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2Trial",
+    "ListElementCode": "sdoR2TrialWindow.sdoR2TrialWindowLabel",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "SdoR2TrialFromTo",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2Trial",
+    "ListElementCode": "sdoR2TrialWindow.listFromLabel",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "SdoR2TrialFromTo",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2Trial",
+    "ListElementCode": "sdoR2TrialWindow.listFrom",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "COMPLEX"
+  },
+  {
+    "ID": "SdoR2TrialFromTo",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2Trial",
+    "ListElementCode": "sdoR2TrialWindow.dateToLabel",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "SdoR2TrialFromTo",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2Trial",
+    "ListElementCode": "sdoR2TrialWindow.dateTo",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "COMPLEX"
+  }
+]

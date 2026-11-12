@@ -1,0 +1,25 @@
+[
+
+  {
+    "ID": "CaseLocationCivil",
+    "CaseFieldID": "region",
+    "ListElementCode": "region",
+    "ElementLabel": "Region",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "RetainHiddenValue": "Y",
+    "FieldShowCondition": "baseLocation = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "CaseLocationCivil",
+    "CaseFieldID": "baseLocation",
+    "ListElementCode": "baseLocation",
+    "ElementLabel": "Base location",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "RetainHiddenValue": "Y",
+    "FieldShowCondition": "baseLocation = \"DO_NOT_SHOW_IN_UI\""
+  }
+]

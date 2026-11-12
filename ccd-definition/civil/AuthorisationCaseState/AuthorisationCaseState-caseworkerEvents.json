@@ -1,0 +1,14 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "CASE_STAYED",
+    "UserRole": "caseworker-caa",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "CASE_STAYED",
+    "UserRole": "caseworker-approver",
+    "CRUD": "CRUD"
+  }
+]

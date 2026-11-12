@@ -1,0 +1,116 @@
+[
+  {
+    "ID": "HearingLengthCasePro",
+    "ListElementCode": "MINUTES_5",
+    "ListElement": "5 minutes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "HearingLengthCasePro",
+    "ListElementCode": "MINUTES_10",
+    "ListElement": "10 minutes",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "HearingLengthCasePro",
+    "ListElementCode": "MINUTES_15",
+    "ListElement": "15 minutes",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "HearingLengthCasePro",
+    "ListElementCode": "MINUTES_20",
+    "ListElement": "20 minutes",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "HearingLengthCasePro",
+    "ListElementCode": "MINUTES_25",
+    "ListElement": "25 minutes",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "HearingLengthCasePro",
+    "ListElementCode": "MINUTES_30",
+    "ListElement": "30 minutes",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "HearingLengthCasePro",
+    "ListElementCode": "MINUTES_35",
+    "ListElement": "35 minutes",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "HearingLengthCasePro",
+    "ListElementCode": "MINUTES_40",
+    "ListElement": "40 minutes",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "HearingLengthCasePro",
+    "ListElementCode": "MINUTES_45",
+    "ListElement": "45 minutes",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "HearingLengthCasePro",
+    "ListElementCode": "MINUTES_50",
+    "ListElement": "50 minutes",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "HearingLengthCasePro",
+    "ListElementCode": "MINUTES_55",
+    "ListElement": "55 minutes",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "HearingLengthCasePro",
+    "ListElementCode": "MINUTES_60",
+    "ListElement": "1 hour",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "HearingLengthCasePro",
+    "ListElementCode": "MINUTES_90",
+    "ListElement": "1 and half hours",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "HearingLengthCasePro",
+    "ListElementCode": "MINUTES_120",
+    "ListElement": "2 hours",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "HearingLengthCasePro",
+    "ListElementCode": "MINUTES_150",
+    "ListElement": "2 and half hours",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "HearingLengthCasePro",
+    "ListElementCode": "MINUTES_180",
+    "ListElement": "3 hours",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "HearingLengthCasePro",
+    "ListElementCode": "MINUTES_240",
+    "ListElement": "4 hours",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "HearingLengthCasePro",
+    "ListElementCode": "DAY_1",
+    "ListElement": "1 day",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "HearingLengthCasePro",
+    "ListElementCode": "DAY_2",
+    "ListElement": "2 days",
+    "DisplayOrder": 19
+  }
+]

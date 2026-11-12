@@ -1,0 +1,11 @@
+[
+  {
+    "ID": "CPRCertifyAcceptanceDJ",
+    "ListElementCode": "acceptance",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "CPRCertifyAcceptanceDJ",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

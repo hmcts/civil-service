@@ -1,0 +1,45 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "UPLOAD_TRANSLATED_DOCUMENT",
+    "CaseFieldID": "claimant1PartyName",
+    "DisplayContext": "READONLY",
+    "PageID": "UploadTranslatedDocument",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "caseTitleTranslatedDoc=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "UPLOAD_TRANSLATED_DOCUMENT",
+    "CaseFieldID": "defendant1PartyName",
+    "DisplayContext": "READONLY",
+    "PageID": "UploadTranslatedDocument",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "caseTitleTranslatedDoc=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "UPLOAD_TRANSLATED_DOCUMENT",
+    "CaseFieldID": "caseTitleTranslatedDoc",
+    "DisplayContext": "READONLY",
+    "PageID": "UploadTranslatedDocument",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 3,
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "UPLOAD_TRANSLATED_DOCUMENT",
+    "CaseFieldID": "translatedDocuments",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 4,
+    "DisplayContext": "COMPLEX",
+    "PageID": "UploadTranslatedDocument",
+    "ShowSummaryChangeOption": "Y",
+    "CaseEventFieldLabel": "Translated Document"
+  }
+]

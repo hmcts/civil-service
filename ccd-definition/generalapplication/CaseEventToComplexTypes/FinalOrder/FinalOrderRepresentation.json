@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "assistedOrderRepresentation",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "representationType",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "assistedOrderRepresentation",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "assistedOrderRepresentation",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "otherRepresentation",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  }
+]

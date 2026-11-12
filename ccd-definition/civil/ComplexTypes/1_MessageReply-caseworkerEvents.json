@@ -1,0 +1,78 @@
+[
+  {
+    "ID": "MessageReply",
+    "ListElementCode": "messageId",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "FieldShowCondition": "isUrgent=\"DO NOT SHOW IN UI\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MessageReply",
+    "ListElementCode": "senderRoleType",
+    "FieldType": "Text",
+    "ElementLabel": "From",
+    "FieldShowCondition": "isUrgent=\"DO NOT SHOW IN UI\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MessageReply",
+    "ListElementCode": "sentTime",
+    "FieldType": "DateTime",
+    "ElementLabel": "Date and time sent",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MessageReply",
+    "ListElementCode": "senderName",
+    "FieldType": "Text",
+    "ElementLabel": "Sender's name",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MessageReply",
+    "ListElementCode": "recipientRoleType",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "RolePool",
+    "ElementLabel": "Recipient",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MessageReply",
+    "ListElementCode": "isUrgent",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Urgency",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MessageReply",
+    "ListElementCode": "subjectType",
+    "ElementLabel": "What is it about",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "SendMessageSubjectOptionsList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MessageReply",
+    "ListElementCode": "subject",
+    "FieldType": "Text",
+    "ElementLabel": "Subject",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MessageReply",
+    "ListElementCode": "messageContent",
+    "FieldType": "TextArea",
+    "ElementLabel": "Message details",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

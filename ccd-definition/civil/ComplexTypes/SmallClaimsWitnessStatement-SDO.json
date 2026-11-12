@@ -1,0 +1,62 @@
+[
+  {
+    "ID": "SmallClaimsWitnessStatement",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimsWitnessStatement",
+    "ListElementCode": "input1",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimsWitnessStatement",
+    "ListElementCode": "smallClaimsNumberOfWitnessesToggle",
+    "FieldType": "MultiSelectList",
+    "ElementLabel": " ",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimsWitnessStatement",
+    "ListElementCode": "input2",
+    "FieldType": "Number",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "smallClaimsNumberOfWitnessesToggle=\"SHOW\""
+  },
+  {
+    "ID": "SmallClaimsWitnessStatement",
+    "ListElementCode": "input3",
+    "FieldType": "Number",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "smallClaimsNumberOfWitnessesToggle=\"SHOW\""
+  },
+  {
+    "ID": "SmallClaimsWitnessStatement",
+    "ListElementCode": "input4",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "smallClaimsNumberOfWitnessesToggle=\"SHOW\""
+  },
+  {
+    "ID": "SmallClaimsWitnessStatement",
+    "ListElementCode": "text",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

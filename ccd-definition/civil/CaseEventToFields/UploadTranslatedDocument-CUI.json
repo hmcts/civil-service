@@ -1,0 +1,13 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "UPLOAD_TRANSLATED_DOCUMENT",
+    "CaseFieldID": "translatedDocuments",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "COMPLEX",
+    "PageID": "UploadTranslatedDocument",
+    "ShowSummaryChangeOption": "Y",
+    "CaseEventFieldLabel": "Translated Document"
+  }
+]

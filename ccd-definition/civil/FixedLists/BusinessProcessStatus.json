@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "BusinessProcessStatus",
+    "ListElementCode": "READY",
+    "ListElement": "Business process ready",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "BusinessProcessStatus",
+    "ListElementCode": "DISPATCHED",
+    "ListElement": "Business process dispatched",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "BusinessProcessStatus",
+    "ListElementCode": "STARTED",
+    "ListElement": "Business process started",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "BusinessProcessStatus",
+    "ListElementCode": "FINISHED",
+    "ListElement": "Business process finished",
+    "DisplayOrder": 4
+  }
+]

@@ -1,0 +1,87 @@
+[
+  {
+    "ID": "GeneralApplicationTypesGAspec",
+    "ListElementCode": "ADJOURN_HEARING",
+    "ListElement": "Adjourn a hearing",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "GeneralApplicationTypesGAspec",
+    "ListElementCode": "AMEND_A_STMT_OF_CASE",
+    "ListElement": "Amend a statement of case",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "GeneralApplicationTypesGAspec",
+    "ListElementCode": "EXTEND_TIME",
+    "ListElement": "Extend time",
+    "DisplayOrder": 3
+  },
+
+  {
+    "ID": "GeneralApplicationTypesGAspec",
+    "ListElementCode": "RELIEF_FROM_SANCTIONS",
+    "ListElement": "Relief from sanctions",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "GeneralApplicationTypesGAspec",
+    "ListElementCode": "SET_ASIDE_JUDGEMENT",
+    "ListElement": "Set aside judgment",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "GeneralApplicationTypesGAspec",
+    "ListElementCode": "SETTLE_BY_CONSENT",
+    "ListElement": "Settle by consent",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "GeneralApplicationTypesGAspec",
+    "ListElementCode": "STAY_THE_CLAIM",
+    "ListElement": "Stay the claim",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "GeneralApplicationTypesGAspec",
+    "ListElementCode": "STRIKE_OUT",
+    "ListElement": "Strike out",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "GeneralApplicationTypesGAspec",
+    "ListElementCode": "SUMMARY_JUDGEMENT",
+    "ListElement": "Summary judgment",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "GeneralApplicationTypesGAspec",
+    "ListElementCode": "UNLESS_ORDER",
+    "ListElement": "Unless order",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "GeneralApplicationTypesGAspec",
+    "ListElementCode": "VARY_PAYMENT_TERMS_OF_JUDGMENT",
+    "ListElement": "Vary payment terms of judgment",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "GeneralApplicationTypesGAspec",
+    "ListElementCode": "VARY_ORDER",
+    "ListElement": "Vary order",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "GeneralApplicationTypesGAspec",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "GeneralApplicationTypesGAspec",
+    "ListElementCode": "CONFIRM_CCJ_DEBT_PAID",
+    "ListElement": "Confirm you've paid a judgment debt",
+    "DisplayOrder": 14
+  }
+]

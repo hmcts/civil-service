@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "PaymentTypeList",
+    "ListElementCode": "IMMEDIATELY",
+    "ListElement": "Immediately",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "PaymentTypeList",
+    "ListElementCode": "SET_DATE",
+    "ListElement": "By a set date",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "PaymentTypeList",
+    "ListElementCode": "REPAYMENT_PLAN",
+    "ListElement": "By repayment plan",
+    "DisplayOrder": 3
+  }
+]
