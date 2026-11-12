@@ -1,0 +1,10 @@
+[
+  {
+    "ID":"TrialHearingAddNewDirectionsDJ",
+    "ListElementCode":"directionComment",
+    "FieldType":"TextArea",
+    "ElementLabel":"Enter the direction",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

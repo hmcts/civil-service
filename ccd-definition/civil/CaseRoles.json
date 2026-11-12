@@ -1,0 +1,58 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "[APPLICANTSOLICITORONE]",
+    "Name": "Applicant Solicitor 1",
+    "Description": "Applicant Solicitor 1 role",
+    "JurisdictionID": "CIVIL",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "[APPLICANTSOLICITORTWO]",
+    "Name": "Applicant Solicitor 2",
+    "Description": "Applicant Solicitor 2 role",
+    "JurisdictionID": "CIVIL",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "[RESPONDENTSOLICITORONE]",
+    "Name": "Respondent Solicitor 1",
+    "Description": "Respondent Solicitor 1 role",
+    "JurisdictionID": "CIVIL",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "[RESPONDENTSOLICITORTWO]",
+    "Name": "Respondent Solicitor 2",
+    "Description": "Respondent Solicitor 2 role",
+    "JurisdictionID": "CIVIL",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "[CREATOR]",
+    "Name": "Creator",
+    "Description": "Creator of case",
+    "JurisdictionID": "CIVIL",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "[CLAIMANT]",
+    "Name": "Citizen Claimant",
+    "Description": "Citizen Claimant",
+    "JurisdictionID": "CIVIL",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "[DEFENDANT]",
+    "Name": "Citizen Defendant",
+    "Description": "Citizen Defendant",
+    "JurisdictionID": "CIVIL",
+    "SecurityClassification": "Public"
+  }
+]

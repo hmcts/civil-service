@@ -1,0 +1,34 @@
+[
+  {
+    "ID": "SmallClaimsOrderAndHearingDetails",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimsOrderAndHearingDetails",
+    "ListElementCode": "text1",
+    "FieldType": "Label",
+    "ElementLabel": "# Order details \nWarning: You must comply with the terms imposed upon you by this order otherwise your claim or the defence of it is liable to be struck out or some other sanction imposed. If you cannot comply, you are expected to make formal application to the court before any deadline imposed upon you expires.",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimsOrderAndHearingDetails",
+    "ListElementCode": "text2",
+    "FieldType": "Label",
+    "ElementLabel": "You are encouraged to try to settle the case with the other side. You may also contact the Small Claims Mediation Service to arrange a mediation appointment. The service is free and can be contacted on (01604) 795511.",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimsOrderAndHearingDetails",
+    "ListElementCode": "line",
+    "FieldType": "Label",
+    "ElementLabel": "****",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

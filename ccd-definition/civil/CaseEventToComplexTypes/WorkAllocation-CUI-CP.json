@@ -1,0 +1,74 @@
+[
+  {
+    "ID": "RespondentLiPResponse",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "respondent1LiPResponse",
+    "ListElementCode": "timelineComment",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "RespondentLiPResponse",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "respondent1LiPResponse",
+    "ListElementCode": "evidenceComment",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "RespondentLiPResponse",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "respondent1LiPResponse",
+    "ListElementCode": "respondent1LiPFinancialDetails",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "RespondentLiPResponse",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "respondent1LiPResponse",
+    "ListElementCode": "respondent1MediationLiPResponse",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "RespondentLiPResponse",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "respondent1LiPResponse",
+    "ListElementCode": "respondent1DQExtraDetails",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "RespondentLiPResponse",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "respondent1LiPResponse",
+    "ListElementCode": "respondent1DQHearingSupportLip",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "RespondentLiPResponse",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "respondent1LiPResponse",
+    "ListElementCode": "respondent1LiPContactPerson",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "RespondentLiPResponse",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "respondent1LiPResponse",
+    "ListElementCode": "respondent1LiPCorrespondenceAddress",
+    "FieldDisplayOrder": 8,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "RespondentLiPResponse",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "respondent1LiPResponse",
+    "ListElementCode": "respondent1ResponseLanguage",
+    "FieldDisplayOrder": 9,
+    "DisplayContext": "READONLY"
+  }
+]

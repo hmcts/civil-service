@@ -1,0 +1,38 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "generalAppAskForCosts",
+    "Label": "Ask For Costs",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "generalAppHelpWithFees",
+    "Label": " ",
+    "FieldType": "HelpWithFees",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "generalAppDetailsOfOrderColl",
+    "Label": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "TextArea",
+    "Max": 4000,
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "generalAppReasonsOfOrderColl",
+    "Label": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "TextArea",
+    "Max": 4000,
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

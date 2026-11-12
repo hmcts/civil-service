@@ -1,0 +1,63 @@
+[
+  {
+    "ID": "DocumentAndNote",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": "Case note",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DocumentAndNote",
+    "ListElementCode": "documentName",
+    "FieldType": "Text",
+    "ElementLabel": "Name of document",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DocumentAndNote",
+    "ListElementCode": "document",
+    "FieldType": "Document",
+    "ElementLabel": "Document",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png"
+  },
+  {
+    "ID": "DocumentAndNote",
+    "ListElementCode": "documentNote",
+    "FieldType": "TextArea",
+    "ElementLabel": "Add a note about this document",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DocumentAndNote",
+    "ListElementCode": "createdDateTime",
+    "FieldType": "DateTime",
+    "ElementLabel": "Date added",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "label = \"DO_NOT_SHOW\""
+  },
+  {
+    "ID": "DocumentAndNote",
+    "ListElementCode": "createdBy",
+    "FieldType": "Text",
+    "ElementLabel": "Created by",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "label = \"DO_NOT_SHOW\""
+  },
+  {
+    "ID": "DocumentAndNote",
+    "ListElementCode": "documentNoteForTab",
+    "_comment": "used to populate column label for case tab table",
+    "FieldType": "TextArea",
+    "ElementLabel": "Note",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "label = \"DO_NOT_SHOW\""
+  }
+]

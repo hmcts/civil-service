@@ -1,0 +1,30 @@
+[
+
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "GENERATE_RESPONSE_CUI_SEALED",
+    "Name": "Generate Sealed Form",
+    "Description": "Generates Sealed Form Claim Response",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "GENERATE_RESPONSE_DQ_LIP_SEALED",
+    "Name": "Generate Sealed Form",
+    "Description": "Generates Sealed DQ",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0,
+    "Publish": "Y"
+  }
+]

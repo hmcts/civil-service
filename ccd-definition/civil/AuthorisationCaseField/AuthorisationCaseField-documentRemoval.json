@@ -1,0 +1,12 @@
+{
+  "CaseTypeID": "CIVIL",
+  "CaseFieldID": "documentToKeepCollection",
+  "AccessControl": [
+    {
+      "UserRoles": [
+        "caseworker-civil-doc-removal"
+      ],
+      "CRUD": "CRUD"
+    }
+  ]
+}

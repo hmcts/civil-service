@@ -1,0 +1,33 @@
+[ {
+  "CaseTypeID": "CIVIL",
+  "ID": "gaDetailsTranslationCollection",
+  "Label": "Applications in translation ",
+  "ElementLabel": "Application Type",
+  "FieldType": "Collection",
+  "FieldTypeParameter": "GeneralApplicationDetailsGAspec",
+  "SecurityClassification": "Public",
+  "Searchable": "N",
+  "_Definition":  "The details of the child application on the case for wlu",
+  "_Category":  "COMMON"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "preTranslationGaDocsApplicant",
+    "Label": "Documents to be translated",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "preTranslationGaDocsRespondent",
+    "Label": "Documents to be translated",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

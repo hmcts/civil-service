@@ -1,0 +1,86 @@
+[
+  {
+    "ID": "GAHearingDurationGAspec",
+    "ListElementCode": "MINUTES_05",
+    "ListElement": "5 minutes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "GAHearingDurationGAspec",
+    "ListElementCode": "MINUTES_10",
+    "ListElement": "10 minutes",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "GAHearingDurationGAspec",
+    "ListElementCode": "MINUTES_15",
+    "ListElement": "15 minutes",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "GAHearingDurationGAspec",
+    "ListElementCode": "MINUTES_20",
+    "ListElement": "20 minutes",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "GAHearingDurationGAspec",
+    "ListElementCode": "MINUTES_25",
+    "ListElement": "25 minutes",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "GAHearingDurationGAspec",
+    "ListElementCode": "MINUTES_30",
+    "ListElement": "30 minutes",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "GAHearingDurationGAspec",
+    "ListElementCode": "MINUTES_35",
+    "ListElement": "35 minutes",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "GAHearingDurationGAspec",
+    "ListElementCode": "MINUTES_40",
+    "ListElement": "40 minutes",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "GAHearingDurationGAspec",
+    "ListElementCode": "MINUTES_45",
+    "ListElement": "45 minutes",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "GAHearingDurationGAspec",
+    "ListElementCode": "MINUTES_50",
+    "ListElement": "50 minutes",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "GAHearingDurationGAspec",
+    "ListElementCode": "MINUTES_55",
+    "ListElement": "55 minutes",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "GAHearingDurationGAspec",
+    "ListElementCode": "HOUR_1",
+    "ListElement": "1 hour",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "GAHearingDurationGAspec",
+    "ListElementCode": "HOURS_2",
+    "ListElement": "2 hours",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "GAHearingDurationGAspec",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 14
+  }
+]

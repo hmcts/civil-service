@@ -1,0 +1,28 @@
+[
+  {
+    "ID": "CertOfSC",
+    "ListElementCode": "defendantFinalPaymentDate",
+    "ElementLabel": " ",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+
+  {
+    "ID": "CertOfSC",
+    "ListElementCode": "debtPaymentEvidence",
+    "ElementLabel": " ",
+    "FieldType": "DebtPaymentEvidence",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "CertOfSC",
+    "ListElementCode": "proofOfDebtDoc",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

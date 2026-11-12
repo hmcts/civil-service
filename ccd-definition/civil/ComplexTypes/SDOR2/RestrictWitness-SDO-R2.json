@@ -1,0 +1,27 @@
+[
+  {
+    "ID": "SdoR2RestrictWitness",
+    "ListElementCode": "sdoR2RestrictWitnessLabel",
+    "FieldType": "Label",
+    "ElementLabel": "### Restrict number of witnesses",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2RestrictWitness",
+    "ListElementCode": "isRestrictWitness",
+    "FieldType": "YesOrNo",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2RestrictWitness",
+    "ListElementCode": "restrictNoOfWitnessDetails",
+    "FieldType": "SdoR2RestrictNoOfWitnessDetails",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "isRestrictWitness = \"Yes\""
+  }
+]

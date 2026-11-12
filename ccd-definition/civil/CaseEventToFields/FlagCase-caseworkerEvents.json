@@ -1,0 +1,57 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "CONFIRM_ORDER_REVIEW",
+    "CaseFieldID": "obligationDatePresent",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": "ObligationDate",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "CONFIRM_ORDER_REVIEW",
+    "CaseFieldID": "obligationData",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": "EnterObligationData",
+    "ShowSummaryChangeOption": "Y",
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-obligation-date",
+    "PageShowCondition": "obligationDatePresent = \"Yes\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "CONFIRM_ORDER_REVIEW",
+    "CaseFieldID": "isFinalOrder",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": "IsFinalOrder",
+    "ShowSummaryChangeOption": "Y",
+    "PageShowCondition": "obligationDatePresent = \"No\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "CONFIRM_ORDER_REVIEW",
+    "CaseFieldID": "courtStaffNextSteps",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": "NextSteps",
+    "ShowSummaryChangeOption": "Y",
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-tasks-left"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "CONFIRM_ORDER_REVIEW",
+    "CaseFieldID": "stillTasksText",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "READONLY",
+    "PageID": "NextSteps",
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "courtStaffNextSteps = \"STILL_TASKS\""
+  }
+]

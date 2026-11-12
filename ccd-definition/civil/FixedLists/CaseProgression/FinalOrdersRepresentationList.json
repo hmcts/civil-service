@@ -1,0 +1,128 @@
+[
+  {
+    "ID": "FinalOrdersRepresentationList",
+    "ListElementCode": "CLAIMANT_AND_DEFENDANT",
+    "ListElement": "Claimant(s) and defendant(s)",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "FinalOrdersRepresentationList",
+    "ListElementCode": "OTHER_REPRESENTATION",
+    "ListElement": "Other representation (free text)",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "FinalOrdersClaimantRepresentationList",
+    "ListElementCode": "COUNSEL_FOR_CLAIMANT",
+    "ListElement": "Counsel for the claimant",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "FinalOrdersClaimantRepresentationList",
+    "ListElementCode": "SOLICITOR_FOR_CLAIMANT",
+    "ListElement": "Solicitor for the claimant",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "FinalOrdersClaimantRepresentationList",
+    "ListElementCode": "COST_DRAFTSMAN_FOR_THE_CLAIMANT",
+    "ListElement": "Costs draftsman for the claimant",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "FinalOrdersClaimantRepresentationList",
+    "ListElementCode": "THE_CLAIMANT_IN_PERSON",
+    "ListElement": "The claimant in person",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "FinalOrdersClaimantRepresentationList",
+    "ListElementCode": "LAY_REPRESENTATIVE_FOR_THE_CLAIMANT",
+    "ListElement": "Lay representative for the claimant",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "FinalOrdersClaimantRepresentationList",
+    "ListElementCode": "LEGAL_EXECUTIVE_FOR_THE_CLAIMANT",
+    "ListElement": "Legal Executive",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "FinalOrdersClaimantRepresentationList",
+    "ListElementCode": "SOLICITORS_AGENT_FOR_THE_CLAIMANT",
+    "ListElement": "Solicitor's Agent",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "FinalOrdersClaimantRepresentationList",
+    "ListElementCode": "CLAIMANT_NOT_ATTENDING",
+    "ListElement": "The claimant not attending",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "FinalOrdersDefendantRepresentationList",
+    "ListElementCode": "COUNSEL_FOR_DEFENDANT",
+    "ListElement": "Counsel for the defendant",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "FinalOrdersDefendantRepresentationList",
+    "ListElementCode": "SOLICITOR_FOR_DEFENDANT",
+    "ListElement": "Solicitor for the defendant",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "FinalOrdersDefendantRepresentationList",
+    "ListElementCode": "COST_DRAFTSMAN_FOR_THE_DEFENDANT",
+    "ListElement": "Costs draftsman for the defendant",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "FinalOrdersDefendantRepresentationList",
+    "ListElementCode": "THE_DEFENDANT_IN_PERSON",
+    "ListElement": "The defendant in person",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "FinalOrdersDefendantRepresentationList",
+    "ListElementCode": "LAY_REPRESENTATIVE_FOR_THE_DEFENDANT",
+    "ListElement": "Lay representative for the defendant",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "FinalOrdersDefendantRepresentationList",
+    "ListElementCode": "LEGAL_EXECUTIVE_FOR_THE_DEFENDANT",
+    "ListElement": "Legal Executive",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "FinalOrdersDefendantRepresentationList",
+    "ListElementCode": "SOLICITORS_AGENT_FOR_THE_DEFENDANT",
+    "ListElement": "Solicitor's Agent",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "FinalOrdersDefendantRepresentationList",
+    "ListElementCode": "DEFENDANT_NOT_ATTENDING",
+    "ListElement": "The defendant not attending",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "FinalOrdersClaimantDefendantNotAttending",
+    "ListElementCode": "SATISFIED_REASONABLE_TO_PROCEED",
+    "ListElement": "Satisfied reasonable to proceed",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "FinalOrdersClaimantDefendantNotAttending",
+    "ListElementCode": "SATISFIED_NOTICE_OF_TRIAL",
+    "ListElement": "Satisfied notice of trial received, not reasonable to proceed",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "FinalOrdersClaimantDefendantNotAttending",
+    "ListElementCode": "NOT_SATISFIED_NOTICE_OF_TRIAL",
+    "ListElement": "Not satisfied notice of trial received, not reasonable to proceed",
+    "DisplayOrder": 3
+  }
+]

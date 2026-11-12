@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "PPI",
+    "ListElementCode": "title",
+    "FieldType": "Label",
+    "ElementLabel": "#### Defendant(s) shall send to the claimant(s)",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "PPI",
+    "ListElementCode": "ppiDate",
+    "FieldType": "Date",
+    "ElementLabel": "The Defendant(s) shall by",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "PPI",
+    "ListElementCode": "text",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

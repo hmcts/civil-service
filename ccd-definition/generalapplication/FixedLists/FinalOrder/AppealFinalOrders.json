@@ -1,0 +1,32 @@
+[
+  {
+    "ID": "AppealOriginTypes",
+    "ListElementCode": "CLAIMANT",
+    "ListElement": "Claimant's",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "AppealOriginTypes",
+    "ListElementCode": "DEFENDANT",
+    "ListElement": "Defendant's",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "AppealOriginTypes",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "PermissionToAppealTypes",
+    "ListElementCode": "GRANTED",
+    "ListElement": "granted",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "PermissionToAppealTypes",
+    "ListElementCode": "REFUSED",
+    "ListElement": "refused",
+    "DisplayOrder": 2
+  }
+]

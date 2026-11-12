@@ -1,0 +1,26 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "SET_ASIDE_JUDGMENT",
+    "CaseFieldID": "featureToggleWA",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "WorkAllocation",
+    "PageShowCondition": "joSetAsideReason=\"DO NOT SHOW IN UI\"",
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REFER_JUDGE_DEFENCE_RECEIVED",
+    "CaseFieldID": "featureToggleWA",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 6,
+    "DisplayContext": "READONLY",
+    "PageID": "ReferJudgeDefenceReceived",
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "confirmReferToJudgeDefenceReceived=\"DO NOT SHOW IN UI\"",
+    "Publish": "Y"
+  }
+]

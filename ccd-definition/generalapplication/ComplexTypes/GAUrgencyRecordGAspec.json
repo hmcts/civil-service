@@ -1,0 +1,34 @@
+[
+  {
+    "ID": "GAUrgencyRecordGAspec",
+    "ListElementCode": "generalAppUrgency",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Urgent application",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAUrgencyRecordGAspec",
+    "ListElementCode": "urgentAppConsiderationDate",
+    "FieldType": "Date",
+    "ElementLabel": "Enter the date by which this application must be considered by a judge.\n",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "generalAppUrgency = \"Yes\""
+  },
+  {
+    "ID": "GAUrgencyRecordGAspec",
+    "ListElementCode": "reasonsForUrgency",
+    "ElementLabel": "Reasons for urgency. Disclose all relevant information to the court, including any information that may undermine the need for urgency.\n",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "generalAppUrgency = \"Yes\""
+  },
+  {
+    "ID": "GAUrgencyRecordGAspec",
+    "ListElementCode": "ConsentAgreementCheckBox",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "GAUrgencyConsentGAspec",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "generalAppUrgency = \"Yes\""
+  }
+]

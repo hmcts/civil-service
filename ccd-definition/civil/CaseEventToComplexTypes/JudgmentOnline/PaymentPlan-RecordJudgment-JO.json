@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "JoPaymentPlan",
+    "CaseEventID": "RECORD_JUDGMENT",
+    "CaseFieldID": "joPaymentPlan",
+    "ListElementCode": "type",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "JoPaymentPlan",
+    "CaseEventID": "RECORD_JUDGMENT",
+    "CaseFieldID": "joPaymentPlan",
+    "ListElementCode": "paymentDeadlineDate",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  }
+]

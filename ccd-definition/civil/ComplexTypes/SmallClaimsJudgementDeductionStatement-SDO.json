@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "SmallClaimsJudgementDeductionStatement",
+    "ListElementCode": "line",
+    "FieldType": "Label",
+    "ElementLabel": "****",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimsJudgementDeductionStatement",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": "## Judgment for the claimant for an sum to be decided by the court ##",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

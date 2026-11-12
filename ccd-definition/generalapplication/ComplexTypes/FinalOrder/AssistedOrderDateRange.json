@@ -1,0 +1,28 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "dateRangeLabel",
+    "ID": "AssistedOrderDateRangeHeard",
+    "ElementLabel": "## Date range",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "dateRangeFrom",
+    "ID": "AssistedOrderDateRangeHeard",
+    "ElementLabel": "Date From",
+    "HintText": "For example, 16 4 2021",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "dateRangeTo",
+    "ID": "AssistedOrderDateRangeHeard",
+    "ElementLabel": "Date to",
+    "HintText": "For example, 16 4 2021",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
+  }
+]

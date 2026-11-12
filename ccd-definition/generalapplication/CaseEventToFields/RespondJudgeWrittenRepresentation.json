@@ -1,0 +1,25 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION",
+    "CaseFieldID": "generalAppWrittenRepUploadLabel",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "GAUploadDocForWrittenRepScreen",
+    "PageLabel": "Upload a file in response to Judge's written representations",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION",
+    "CaseFieldID": "generalAppWrittenRepUpload",
+    "PageID": "GAUploadDocForWrittenRepScreen",
+    "PageFieldDisplayOrder": 2,
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "DisplayContext": "MANDATORY",
+    "ShowSummaryChangeOption": "Y"
+  }
+]

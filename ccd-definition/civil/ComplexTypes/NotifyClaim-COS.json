@@ -1,0 +1,135 @@
+[
+  {
+    "ID": "NotifyClaimCoS",
+    "ListElementCode": "cosDateOfServiceForDefendant",
+    "ElementLabel": "On what day did you serve?",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Definition":  "Enter the date you served the documents"
+  },
+  {
+    "ID": "NotifyClaimCoS",
+    "ListElementCode": "cosDateDeemedServedForDefendant",
+    "ElementLabel": "The date of service is",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Definition":  "Enter the date of service"
+  },
+  {
+    "ID": "NotifyClaimCoS",
+    "ListElementCode": "cosServedDocumentFiles",
+    "ElementLabel": "What documents did you serve?",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Definition":  "Enter details of the documents you served"
+  },
+  {
+    "ID": "NotifyClaimCoS",
+    "ListElementCode": "cosRecipient",
+    "ElementLabel": "Who did you serve the claim to?",
+    "HintText": "Include their position if they have one, for example - partner, director",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Definition":  "Enter the name of the person you served the documents to"
+  },
+  {
+    "ID": "NotifyClaimCoS",
+    "ListElementCode": "cosRecipientServeType",
+    "ElementLabel": "How did you serve the documents?",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "ServeTypeCoS",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Definition":  "Select an option for how you served the documents"
+  },
+  {
+    "ID": "NotifyClaimCoS",
+    "ListElementCode": "cosRecipientServeLocation",
+    "ElementLabel": "Where did you serve the documents?",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Definition":  "Enter the details of where you served the documents",
+    "HintText": "Enter the postal address, email address, fax or DX number"
+  },
+  {
+    "ID": "NotifyClaimCoS",
+    "ListElementCode": "cosRecipientServeLocationOwnerType",
+    "ElementLabel": "The location where you served the documents was the:",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "ServeLocationOwnerTypeCoS",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Definition":  "Select the person at whose location you served the documents"
+  },
+  {
+    "ID": "NotifyClaimCoS",
+    "ListElementCode": "cosRecipientServeLocationType",
+    "ElementLabel": "Select the type of location where you served the documents",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "ServeLocationTypeCoS",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Definition":  "Select the type of location where you served the documents"
+  },
+  {
+    "ID": "NotifyClaimCoS",
+    "ListElementCode": "cosRecipientServeLocationTypeOther",
+    "ElementLabel": "Other",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Definition":  "Other",
+    "HintText": "Tell us the other type of location where you served the documents",
+    "FieldShowCondition": "cosRecipientServeLocationType = \"OTHER\""
+  },
+  {
+    "ID": "NotifyClaimCoS",
+    "ListElementCode": "cosSender",
+    "ElementLabel": "Your name",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Definition":  "Enter your name"
+  },
+  {
+    "ID": "NotifyClaimCoS",
+    "ListElementCode": "cosSenderFirm",
+    "ElementLabel": "Your firm",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Definition":  "Enter the name of your firm"
+  },
+  {
+    "ID": "NotifyClaimCoS",
+    "ListElementCode": "cosSenderStatementOfTruthLabel",
+    "ElementLabel": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "NotifyClaimStatement",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Definition":  "Confirm that you believe that the facts stated in the certificate are true"
+  },
+  {
+    "ID": "NotifyClaimCoS",
+    "ListElementCode": "cosUISenderStatementOfTruthLabel",
+    "ElementLabel": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "NotifyClaimStatement",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Definition":  "Confirm that you believe that the facts stated in the certificate are true"
+  },
+  {
+    "ID": "NotifyClaimCoS",
+    "ListElementCode": "cosStatementOfTruthLabel",
+    "ElementLabel": "## Statement of truth\nI believe that the facts stated in this certificate of service are true. \n\nI understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

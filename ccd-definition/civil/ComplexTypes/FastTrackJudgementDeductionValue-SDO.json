@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "FastTrackJudgementDeductionValue",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackJudgementDeductionValue",
+    "ListElementCode": "text",
+    "FieldType": "Label",
+    "ElementLabel": "Subject to a deduction of:",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackJudgementDeductionValue",
+    "ListElementCode": "value",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

@@ -1,0 +1,8 @@
+[
+  {
+    "ID": "ConfirmPaymentMade",
+    "ListElementCode": "Yes",
+    "ListElement": "Confirm payment",
+    "DisplayOrder": 1
+  }
+]
