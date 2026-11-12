@@ -1,0 +1,10 @@
+[
+  {
+    "ID": "SmallClaimsMediation",
+    "ListElementCode": "input",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

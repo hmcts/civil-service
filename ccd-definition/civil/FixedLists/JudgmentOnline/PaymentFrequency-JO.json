@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "PaymentFrequencyList",
+    "ListElementCode": "MONTHLY",
+    "ListElement": "Every month",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "PaymentFrequencyList",
+    "ListElementCode": "EVERY_TWO_WEEKS",
+    "ListElement": "Every two weeks",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "PaymentFrequencyList",
+    "ListElementCode": "WEEKLY",
+    "ListElement": "Every week",
+    "DisplayOrder": 3
+  }
+]

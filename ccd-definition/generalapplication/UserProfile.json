@@ -1,0 +1,26 @@
+[
+  {
+    "UserIDAMId": "solicitor@example.com",
+    "WorkBasketDefaultJurisdiction": "CIVIL",
+    "WorkBasketDefaultCaseType": "GENERALAPPLICATION",
+    "WorkBasketDefaultState": "PENDING_APPLICATION_ISSUED"
+  },
+  {
+    "UserIDAMId": "hmcts.civil+organisation.1.solicitor.1@gmail.com",
+    "WorkBasketDefaultJurisdiction": "CIVIL",
+    "WorkBasketDefaultCaseType": "GENERALAPPLICATION",
+    "WorkBasketDefaultState": "PENDING_APPLICATION_ISSUED"
+  },
+  {
+    "UserIDAMId": "hmcts.civil+organisation.2.solicitor.1@gmail.com",
+    "WorkBasketDefaultJurisdiction": "CIVIL",
+    "WorkBasketDefaultCaseType": "GENERALAPPLICATION",
+    "WorkBasketDefaultState": "PENDING_APPLICATION_ISSUED"
+  },
+  {
+    "UserIDAMId": "judge-civil-01@example.com",
+    "WorkBasketDefaultJurisdiction": "CIVIL",
+    "WorkBasketDefaultCaseType": "GENERALAPPLICATION",
+    "WorkBasketDefaultState": "APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION"
+  }
+]

@@ -1,0 +1,223 @@
+[
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "makeAnOrder",
+    "ElementLabel": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "GAJudgeMakeAnOrderOptionGAspec",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "preTranslationGaDocumentType",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "makeAnOrder=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "judgeRecitalLabel",
+    "ElementLabel": "### Recitals",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "judgeRecitalText",
+    "ElementLabel": "The court records that:",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "judgeOrderLabel",
+    "ElementLabel": "### Order",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "orderText",
+    "ElementLabel": "The court orders that:",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "makeAnOrder=\"APPROVE_OR_EDIT\" AND preTranslationGaDocumentType != \"*\""
+
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "judgeApproveEditOptionDoc",
+    "ElementLabel": "For which document?",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "GAJudgeOrderClaimantOrDefenseFixedList",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "makeAnOrder=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "judgeApproveEditOptionDate",
+    "ElementLabel": "Order for Stay to End",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "displayjudgeApproveEditOptionDate",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "makeAnOrder=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "displayjudgeApproveEditOptionDoc",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "makeAnOrder=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "dismissalOrderText",
+    "ElementLabel": "The court orders that:",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "makeAnOrder = \"DISMISS_THE_APPLICATION\""
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "directionsText",
+    "ElementLabel": "The court orders that:",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "makeAnOrder = \"GIVE_DIRECTIONS_WITHOUT_HEARING\""
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "directionsResponseByDate",
+    "ElementLabel": "When should this application be referred to a Judge again?",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "makeAnOrder = \"GIVE_DIRECTIONS_WITHOUT_HEARING\""
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "isOrderProcessedByStayScheduler",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "makeAnOrder=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "isOrderProcessedByUnlessScheduler",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "makeAnOrder=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "judicialByCourtsInitiative",
+    "ElementLabel": "Select as appropriate",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "GAByCourtsInitiativeGAspec",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "judgeApproveEditOptionDateForUnlessOrder",
+    "ElementLabel": "Date for Unless Order to end",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "displayjudgeApproveEditOptionDateForUnlessOrder",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "makeAnOrder=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "judicialByCourtsInitiativeLabel",
+    "ElementLabel": "### Order made on court's own initiative/without notice",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "orderCourtOwnInitiative",
+    "ElementLabel": "Order on court's own initiative",
+    "FieldType": "TextArea",
+    "FieldShowCondition": "judicialByCourtsInitiative=\"OPTION_1\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "orderCourtOwnInitiativeDate",
+    "ElementLabel": "Please enter date",
+    "FieldType": "Date",
+    "HintText": "For example, 16 4 2021",
+    "FieldShowCondition": "judicialByCourtsInitiative=\"OPTION_1\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "orderWithoutNotice",
+    "ElementLabel": "Order without notice",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "judicialByCourtsInitiative=\"OPTION_2\""
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "orderWithoutNoticeDate",
+    "ElementLabel": "Please enter date",
+    "FieldType": "Date",
+    "HintText": "For example, 16 4 2021",
+    "FieldShowCondition": "judicialByCourtsInitiative=\"OPTION_2\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "reasonForDecisionLabel",
+    "ElementLabel": "### Reasons",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "showReasonForDecision",
+    "ElementLabel": "Do you want to give reasons for the order?",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "reasonForDecisionText",
+    "ElementLabel": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "ID": "GAJudicialMakeAnOrderGAspec",
+    "ListElementCode": "showJudgeRecitalText",
+    "ElementLabel": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "FinalOrderJudgeHeardShowHide",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "preTranslationGaDocumentType != \"*\""
+  }
+]

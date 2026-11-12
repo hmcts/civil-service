@@ -1,0 +1,34 @@
+[
+  {
+    "ID": "TaskManagementLocationsModel",
+    "ListElementCode": "region",
+    "ElementLabel": "Region",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "ID": "TaskManagementLocationsModel",
+    "ListElementCode": "regionName",
+    "ElementLabel": "Region Name",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "ID": "TaskManagementLocationsModel",
+    "ListElementCode": "location",
+    "ElementLabel": "Location",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "ID": "TaskManagementLocationsModel",
+    "ListElementCode": "locationName",
+    "ElementLabel": "Location Name",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  }
+]

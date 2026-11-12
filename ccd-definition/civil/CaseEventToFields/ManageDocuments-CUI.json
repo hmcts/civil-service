@@ -1,0 +1,23 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "MANAGE_DOCUMENTS",
+    "CaseFieldID": "manageDocuments",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "COMPLEX",
+    "PageID": "ManageDocuments",
+    "ShowSummaryChangeOption": "Y",
+    "CaseEventFieldLabel": "Bulk scanned or emailed documents"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "MANAGE_DOCUMENTS",
+    "CaseFieldID": "caseTitleWithReference",
+    "DisplayContext": "READONLY",
+    "PageID": "ManageDocuments",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
+  }
+]

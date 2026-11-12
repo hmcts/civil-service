@@ -1,0 +1,74 @@
+[
+  {
+    "ID": "PreTranslationGaDocumentType",
+    "ListElementCode": "APPLICATION_SUMMARY_DOC",
+    "ListElement": "Application Summary doc",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "PreTranslationGaDocumentType",
+    "ListElementCode": "RESPOND_TO_APPLICATION_SUMMARY_DOC",
+    "ListElement": "Respondent Response doc",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "PreTranslationGaDocumentType",
+    "ListElementCode": "WRITTEN_REPRESENTATION_ORDER_DOC",
+    "ListElement": "Written concurrent doc",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "PreTranslationGaDocumentType",
+    "ListElementCode": "REQUEST_MORE_INFORMATION_ORDER_DOC",
+    "ListElement": "Request More Information doc",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "PreTranslationGaDocumentType",
+    "ListElementCode": "DIRECTIONS_ORDER_DOC",
+    "ListElement": "Directions doc",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "PreTranslationGaDocumentType",
+    "ListElementCode": "HEARING_ORDER_DOC",
+    "ListElement": "Hearing Order doc",
+     "DisplayOrder": 6
+  },
+  {
+    "ID": "PreTranslationGaDocumentType",
+    "ListElementCode": "GENERAL_ORDER_DOC",
+    "ListElement": "Approve edit doc",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "PreTranslationGaDocumentType",
+    "ListElementCode": "HEARING_NOTICE_DOC",
+    "ListElement": "Hearing Notice doc",
+     "DisplayOrder": 8
+  },
+  {
+    "ID": "PreTranslationGaDocumentType",
+    "ListElementCode": "DISMISSAL_ORDER_DOC",
+    "ListElement": "Dismissal doc",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "PreTranslationGaDocumentType",
+    "ListElementCode": "FINAL_ORDER_DOC",
+    "ListElement": "Final order doc",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "PreTranslationGaDocumentType",
+    "ListElementCode": "WRITTEN_REPS_RESPONSE_DOC",
+    "ListElement": "written rep response doc",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "PreTranslationGaDocumentType",
+    "ListElementCode": "MORE_INFO_RESPONSE_DOC",
+    "ListElement": "more info response doc",
+    "DisplayOrder": 12
+  }
+]

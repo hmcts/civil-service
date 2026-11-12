@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "GAHearingScheduleGAspec",
+    "ListElementCode": "Yes",
+    "ListElement": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "GAHearingScheduleGAspec",
+    "ListElementCode": "No",
+    "ListElement": "No",
+    "DisplayOrder": 2
+  }
+]

@@ -1,0 +1,74 @@
+[
+  {
+    "ID": "OrderMadeOnDetails",
+    "ListElementCode": "ownInitiativeLabel",
+    "ElementLabel": "### Order on court's own initiative",
+    "HintText": " ",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "OrderMadeOnDetails",
+    "ListElementCode": "ownInitiativeText",
+    "ElementLabel": " ",
+    "HintText": "",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "OrderMadeOnDetails",
+    "ListElementCode": "ownInitiativeDateLabel",
+    "ElementLabel": "### Please enter date",
+    "HintText": " ",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "OrderMadeOnDetails",
+    "ListElementCode": "ownInitiativeDate",
+    "ElementLabel": " ",
+    "HintText": "For example, 16 4 2021",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "OrderMadeOnDetailsOrderWithoutNotice",
+    "ListElementCode": "withOutNoticeLabel",
+    "ElementLabel": "### Order without notice",
+    "HintText": " ",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "OrderMadeOnDetailsOrderWithoutNotice",
+    "ListElementCode": "withOutNoticeText",
+    "ElementLabel": " ",
+    "HintText": "",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "OrderMadeOnDetailsOrderWithoutNotice",
+    "ListElementCode": "withOutNoticeDateLabel",
+    "ElementLabel": "### Please enter date",
+    "HintText": " ",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "OrderMadeOnDetailsOrderWithoutNotice",
+    "ListElementCode": "withOutNoticeDate",
+    "ElementLabel": " ",
+    "HintText": "For example, 16 4 2021",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

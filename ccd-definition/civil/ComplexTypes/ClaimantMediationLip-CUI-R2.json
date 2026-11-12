@@ -1,0 +1,83 @@
+[
+  {
+    "ID": "ClaimantMediationLip",
+    "ListElementCode": "canWeUseMediationLiP",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "hasAgreedFreeMediation = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "ClaimantMediationLip",
+    "ListElementCode": "canWeUseMediationPhoneLiP",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "hasAgreedFreeMediation = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "ClaimantMediationLip",
+    "ListElementCode": "mediationDisagreementLiP",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "hasAgreedFreeMediation = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "ClaimantMediationLip",
+    "ListElementCode": "noMediationReasonLiP",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "hasAgreedFreeMediation = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "ClaimantMediationLip",
+    "ListElementCode": "noMediationOtherReasonLiP",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "hasAgreedFreeMediation = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "ClaimantMediationLip",
+    "ListElementCode": "companyTelephoneOptionMediationLiP",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "hasAgreedFreeMediation = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "ClaimantMediationLip",
+    "ListElementCode": "companyTelephoneConfirmationMediationLiP",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "hasAgreedFreeMediation = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "ClaimantMediationLip",
+    "ListElementCode": "companyTelephoneContactPersonMediationLiP",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "hasAgreedFreeMediation = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "ClaimantMediationLip",
+    "ListElementCode": "companyTelephonePhoneNumberMediationLiP",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "hasAgreedFreeMediation = \"DO_NOT_SHOW_IN_UI\""
+  }
+]

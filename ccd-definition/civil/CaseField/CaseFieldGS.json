@@ -1,0 +1,26 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "caseNameHmctsInternal",
+    "Label": "case Name Hmcts Internal",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "SearchCriteria",
+    "Label": "Search Criteria",
+    "FieldType": "SearchCriteria",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "caseManagementCategory",
+    "Label": " ",
+    "FieldType": "CaseManagementCategory",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

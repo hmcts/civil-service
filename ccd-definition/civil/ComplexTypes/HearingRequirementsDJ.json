@@ -1,0 +1,126 @@
+[
+
+  {
+    "ID": "HearingSupportRequirementsListDJ",
+    "CaseEventID": "DEFAULT_JUDGEMENT",
+    "CaseFieldID": "hearingType",
+    "ListElementCode": "hearingType",
+    "ElementLabel": "Choose your preferred type of hearing ",
+    "HintText": "A judge will still need to approve the hearing",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "hearingType",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HearingSupportRequirementsListDJ",
+    "CaseEventID": "DEFAULT_JUDGEMENT",
+    "CaseFieldID": "hearingTypeTelephoneHearing",
+    "ListElementCode": "hearingTypeTelephoneHearing",
+    "ElementLabel": "Who will set up the telephone hearing ?",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "hearingType = \"TELEPHONE_HEARING\""
+  },
+  {
+    "ID": "HearingSupportRequirementsListDJ",
+    "ListElementCode": "hearingTemporaryLocation",
+    "ElementLabel": "Preferred location",
+    "HintText": "This is needed if the judge decides to hold the hearing in person",
+    "FieldType": "DynamicList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HearingSupportRequirementsListDJ",
+    "ListElementCode": "hearingPreferredLocation",
+    "ElementLabel": "Preferred Location",
+    "FieldType": "Text",
+    "DefaultHidden": "No",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HearingSupportRequirementsListDJ",
+    "CaseEventID": "DEFAULT_JUDGEMENT",
+    "CaseFieldID": "hearingPreferredTelephoneNumber1",
+    "ListElementCode": "hearingPreferredTelephoneNumber1",
+    "ElementLabel": "Preferred telephone number",
+    "FieldType": "PhoneUK",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HearingSupportRequirementsListDJ",
+    "CaseEventID": "DEFAULT_JUDGEMENT",
+    "CaseFieldID": "hearingPreferredEmail",
+    "ListElementCode": "hearingPreferredEmail",
+    "ElementLabel": "Preferred email",
+    "FieldType": "Email",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HearingSupportRequirementsListDJ",
+    "CaseEventID": "DEFAULT_JUDGEMENT",
+    "CaseFieldID": "hearingLengthEstimate",
+    "ListElementCode": "hearingLengthEstimate",
+    "ElementLabel": "How long do you estimate the hearing will take?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "HearingLengthEstimate",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HearingSupportRequirementsListDJ",
+    "CaseEventID": "DEFAULT_JUDGEMENT",
+    "CaseFieldID": "hoursEstimateOther",
+    "ListElementCode": "hoursEstimateOther",
+    "ElementLabel": "Hours",
+    "FieldType": "Number",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "hearingLengthEstimate = \"OTHER\""
+  },
+  {
+    "ID": "HearingSupportRequirementsListDJ",
+    "CaseEventID": "DEFAULT_JUDGEMENT",
+    "CaseFieldID": "hearingUnavailableDates",
+    "ListElementCode": "hearingUnavailableDates",
+    "ElementLabel": "Are there any dates when you cannot attend a hearing within the next 3 months?",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HearingSupportRequirementsListDJ",
+    "CaseEventID": "DEFAULT_JUDGEMENT",
+    "CaseFieldID": "hearingDates",
+    "ListElementCode": "hearingDates",
+    "ElementLabel": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "hearingDatesParam",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "hearingUnavailableDates = \"Yes\""
+  },
+  {
+    "ID": "HearingSupportRequirementsListDJ",
+    "ListElementCode": "hearingSupportQuestion",
+    "ElementLabel": "Does anyone require support for a court hearing?",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Publish": "Y"
+  },
+  {
+    "ID": "HearingSupportRequirementsListDJ",
+    "ListElementCode": "hearingSupportAdditional",
+    "ElementLabel": "Please name all people who need support and the kind of support they will need. For example, Jane Smith: requires wheelchair access.",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "hearingSupportQuestion=\"Yes\""
+  }
+]

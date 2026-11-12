@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "SmallTrack",
+    "ListElementCode": "smallClaimCreditHire",
+    "ListElement": "Credit Hire",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "SmallTrack",
+    "ListElementCode": "smallClaimRoadTrafficAccident",
+    "ListElement": "Road Traffic Accident",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "SmallTrack",
+    "ListElementCode": "smallClaimHousingDisrepair",
+    "ListElement": "Housing Disrepair",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "SmallTrack",
+    "ListElementCode": "smallClaimPPI",
+    "ListElement": "Payment Protection Insurance (PPI)",
+    "DisplayOrder": 5
+  }
+]

@@ -1,0 +1,218 @@
+[
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoEvidenceAcousticEngineerTxt",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoInstructionOfTheExpertLbl",
+    "ElementLabel": "### a. Instruction of the expert",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoInstructionOfTheExpertTxt",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoInstructionOfTheExpertDate",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoInstructionOfTheExpertTxtArea",
+    "ElementLabel": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoExpertReportLbl",
+    "ElementLabel": "### b. Expert report",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoExpertReportTxt",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoExpertReportDate",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoExpertReportDigitalPortalLbl",
+    "ElementLabel": "add the report uploaded to the Digital Portal",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoExpertReportDigitalPortalTxt",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoWrittenQuestionsLbl",
+    "ElementLabel": "### c. Written questions",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoWrittenQuestionsTxt",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoWrittenQuestionsDate",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoWrittenQuestionsDigitalPortalLbl",
+    "ElementLabel": "add the report uploaded to the Digital Portal",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoWrittenQuestionsDigitalPortalTxt",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoRepliesLbl",
+    "ElementLabel": "### d. Replies",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoRepliesTheExpertLbl",
+    "ElementLabel": "The expert shall",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoRepliesTxt",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoRepliesDate",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoRepliesDigitalPortalLbl",
+    "ElementLabel": "and the answers uploaded to the Digital Portal",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoRepliesDigitalPortalTxt",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoServiceOfOrderLbl",
+    "ElementLabel": "### e. Service of order",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoServiceOfOrderTxt",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoExpertMayApplyMainLbl",
+    "ElementLabel": "### f. Expert may apply direct to the court for directions",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoExpertMayApplyLbl",
+    "ElementLabel": "The expert may apply direct to the court for directions where necessary under Rule 35.14 of the Civil Procedure Rules.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoFeesAndExpensesMainLbl",
+    "ElementLabel": "### g. Fees and expenses of the expert",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2EvidenceAcousticEngineer",
+    "ListElementCode": "sdoFeesAndExpensesLbl",
+    "ElementLabel": "Unless the parties agree in writing or the Court orders otherwise, the fees and expenses of the expert shall be paid by the parties giving instructions for the report equally save that the costs of answering questions shall be paid by the party asking.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

@@ -1,0 +1,10 @@
+[
+  {
+    "ID":"SdoR2AddNewDirection",
+    "ListElementCode":"directionComment",
+    "FieldType":"TextArea",
+    "ElementLabel":"Enter the direction",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

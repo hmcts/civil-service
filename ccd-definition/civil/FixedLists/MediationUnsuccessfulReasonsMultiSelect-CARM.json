@@ -1,0 +1,44 @@
+[
+  {
+    "ID": "MediationUnsuccessfulReasonsMultiSelect",
+    "ListElementCode": "PARTY_WITHDRAWS",
+    "ListElement": "Party withdraws from mediation",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "MediationUnsuccessfulReasonsMultiSelect",
+    "ListElementCode": "APPOINTMENT_NO_AGREEMENT",
+    "ListElement": "Appointment no agreement reached",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "MediationUnsuccessfulReasonsMultiSelect",
+    "ListElementCode": "APPOINTMENT_NOT_ASSIGNED",
+    "ListElement": "Appointment not assigned",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "MediationUnsuccessfulReasonsMultiSelect",
+    "ListElementCode": "NOT_CONTACTABLE_CLAIMANT_ONE",
+    "ListElement": "Mediation not attended - claimant 1 not contactable",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "MediationUnsuccessfulReasonsMultiSelect",
+    "ListElementCode": "NOT_CONTACTABLE_CLAIMANT_TWO",
+    "ListElement": "Mediation not attended - claimant 2 not contactable",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "MediationUnsuccessfulReasonsMultiSelect",
+    "ListElementCode": "NOT_CONTACTABLE_DEFENDANT_ONE",
+    "ListElement": "Mediation not attended - defendant 1 not contactable",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "MediationUnsuccessfulReasonsMultiSelect",
+    "ListElementCode": "NOT_CONTACTABLE_DEFENDANT_TWO",
+    "ListElement": "Mediation not attended - defendant 2 not contactable",
+    "DisplayOrder": 7
+  }
+]

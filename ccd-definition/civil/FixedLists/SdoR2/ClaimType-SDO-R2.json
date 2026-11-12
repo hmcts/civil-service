@@ -1,0 +1,8 @@
+[
+  {
+    "ID": "ClaimType",
+    "ListElementCode": "FLIGHT_DELAY",
+    "ListElement": "Flight delay",
+    "DisplayOrder": 8
+  }
+]

@@ -1,0 +1,209 @@
+[
+  {
+    "ID": "Party",
+    "ListElementCode": "type",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "PartyType",
+    "ElementLabel": "Party type",
+    "SecurityClassification": "Public",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "individualTitle",
+    "FieldType": "Text",
+    "ElementLabel": "Title",
+    "FieldShowCondition": "type = \"INDIVIDUAL\"",
+    "SecurityClassification": "Public",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "individualFirstName",
+    "FieldType": "Text",
+    "ElementLabel": "First name",
+    "FieldShowCondition": "type = \"INDIVIDUAL\"",
+    "SecurityClassification": "Public",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "individualLastName",
+    "FieldType": "Text",
+    "ElementLabel": "Last name",
+    "FieldShowCondition": "type = \"INDIVIDUAL\"",
+    "SecurityClassification": "Public",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "individualDateOfBirth",
+    "FieldType": "Date",
+    "ElementLabel": "Date of birth",
+    "FieldShowCondition": "type = \"INDIVIDUAL\"",
+    "SecurityClassification": "Public",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "companyName",
+    "FieldType": "Text",
+    "ElementLabel": "Name",
+    "FieldShowCondition": "type = \"COMPANY\"",
+    "SecurityClassification": "Public",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "organisationName",
+    "FieldType": "Text",
+    "ElementLabel": "Name",
+    "FieldShowCondition": "type = \"ORGANISATION\"",
+    "SecurityClassification": "Public",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "soleTraderTitle",
+    "FieldType": "Text",
+    "ElementLabel": "Title",
+    "FieldShowCondition": "type = \"SOLE_TRADER\"",
+    "SecurityClassification": "Public",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "soleTraderFirstName",
+    "FieldType": "Text",
+    "ElementLabel": "First name",
+    "FieldShowCondition": "type = \"SOLE_TRADER\"",
+    "SecurityClassification": "Public",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "soleTraderLastName",
+    "FieldType": "Text",
+    "ElementLabel": "Last name",
+    "FieldShowCondition": "type = \"SOLE_TRADER\"",
+    "SecurityClassification": "Public",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "soleTraderTradingAs",
+    "FieldType": "Text",
+    "ElementLabel": "Trading as",
+    "FieldShowCondition": "type = \"SOLE_TRADER\"",
+    "SecurityClassification": "Public",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "soleTraderDateOfBirth",
+    "FieldType": "Date",
+    "ElementLabel": "Date of birth",
+    "FieldShowCondition": "type = \"SOLE_TRADER\"",
+    "SecurityClassification": "Public",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "primaryAddress",
+    "FieldType": "AddressUK",
+    "ElementLabel": "Address",
+    "SecurityClassification": "Public",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "partyName",
+    "FieldType": "Text",
+    "ElementLabel": "Party name",
+    "SecurityClassification": "Public",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "bulkClaimPartyName",
+    "FieldType": "Text",
+    "ElementLabel": "Party name",
+    "SecurityClassification": "Public",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N",
+    "FieldShowCondition": "type = \"DO_NOT_SHOW\""
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "partyTypeDisplayValue",
+    "FieldType": "Text",
+    "ElementLabel": "Party type displayed value",
+    "SecurityClassification": "Public",
+    "_Comments": "Field interpolation used on fixed list field will display its code instead of text, hence the workaround field populated on claim creation.",
+    "_Category": "WORKAROUND",
+    "RetainHiddenValue": "Y",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "unavailableDates",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "UnavailableDate",
+    "ElementLabel": "Unavailable date",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "RetainHiddenValue": "Y"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "partyEmail",
+    "FieldType": "Email",
+    "ElementLabel": "Email",
+    "SecurityClassification": "Public",
+    "Max": "320",
+    "Searchable": "N",
+    "RetainHiddenValue": "Y"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "partyPhone",
+    "FieldType": "PhoneUK",
+    "ElementLabel": "Phone",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "RetainHiddenValue": "Y"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "flags",
+    "FieldType": "Flags",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "RetainHiddenValue": "Y"
+  },
+  {
+    "ID": "Party",
+    "ListElementCode": "partyID",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "type = \"DO NOT SHOW\"",
+    "RetainHiddenValue": "Y"
+  }
+]

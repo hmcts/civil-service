@@ -1,0 +1,19 @@
+[
+  {
+    "ID": "ClaimValue",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": "Your fee will be calculated based on the statement of value",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ClaimValue",
+    "ListElementCode": "statementOfValueInPennies",
+    "FieldType": "MoneyGBP",
+    "ElementLabel": "Statement of value",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Min": 100
+  }
+]

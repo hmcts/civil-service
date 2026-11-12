@@ -1,0 +1,37 @@
+[
+  {
+    "ID": "DocumentAndName",
+    "ListElementCode": "documentName",
+    "FieldType": "Text",
+    "ElementLabel": "Name of document",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DocumentAndName",
+    "ListElementCode": "document",
+    "FieldType": "Document",
+    "ElementLabel": "Document",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png"
+  },
+  {
+    "ID": "DocumentAndName",
+    "ListElementCode": "createdDateTime",
+    "FieldType": "DateTime",
+    "ElementLabel": "Date added",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "document = \"DO_NOT_SHOW\""
+  },
+  {
+    "ID": "DocumentAndName",
+    "ListElementCode": "createdBy",
+    "FieldType": "Text",
+    "ElementLabel": "Created by",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "createdDateTime = \"DO_NOT_SHOW\""
+  }
+]

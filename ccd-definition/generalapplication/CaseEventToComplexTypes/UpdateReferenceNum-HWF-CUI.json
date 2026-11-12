@@ -1,0 +1,22 @@
+[
+  {
+    "ID": "HelpWithFeesDetails",
+    "CaseEventID": "UPDATE_HELP_WITH_FEE_NUMBER_GA",
+    "CaseFieldID": "gaHwfDetails",
+    "ListElementCode": "hwfReferenceNumber",
+    "EventElementLabel": "HwF reference number",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "hwfFeeType = \"APPLICATION\""
+  },
+  {
+    "ID": "HelpWithFeesDetails",
+    "CaseEventID": "UPDATE_HELP_WITH_FEE_NUMBER_GA",
+    "CaseFieldID": "additionalHwfDetails",
+    "ListElementCode": "hwfReferenceNumber",
+    "EventElementLabel": "HwF reference number",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "hwfFeeType = \"ADDITIONAL\""
+  }
+]
