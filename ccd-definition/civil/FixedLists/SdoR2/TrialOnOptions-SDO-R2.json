@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "TrialOnRadioOptions",
+    "ListElementCode": "OPEN_DATE",
+    "ListElement": "First open date after",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "TrialOnRadioOptions",
+    "ListElementCode": "TRIAL_WINDOW",
+    "ListElement": "Trial window",
+    "DisplayOrder": 2
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "ID": "Fee",
+    "ListElementCode": "calculatedAmountInPence",
+    "FieldType": "MoneyGBP",
+    "ElementLabel": "Amount to pay",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Fee",
+    "ListElementCode": "code",
+    "FieldType": "Text",
+    "ElementLabel": "Fee Code",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Fee",
+    "ListElementCode": "version",
+    "FieldType": "Text",
+    "ElementLabel": "Version",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "calculatedAmountInPence = \"DONT_SHOW_UI\""
+  }
+]

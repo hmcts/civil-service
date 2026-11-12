@@ -1,0 +1,32 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "PROCEEDS_IN_HERITAGE_SYSTEM",
+    "CaseFieldID": "respondent1ClaimResponseTypeForSpec",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "WorkAllocationIntegrationFields",
+    "PageDisplayOrder": 99,
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "PROCEEDS_IN_HERITAGE_SYSTEM",
+    "CaseFieldID": "applicant1Represented",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "READONLY",
+    "PageID": "WorkAllocationIntegrationFields",
+    "PageDisplayOrder": 99,
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "PROCEEDS_IN_HERITAGE_SYSTEM",
+    "CaseFieldID": "respondent1Represented",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "READONLY",
+    "PageID": "WorkAllocationIntegrationFields",
+    "PageDisplayOrder": 99,
+    "Publish": "Y"
+  }
+]

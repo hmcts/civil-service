@@ -1,0 +1,56 @@
+[
+  {
+    "ID": "HwfInformationProofList",
+    "ListElementCode": "BANK_STATEMENTS",
+    "ListElement": "Bank Statements",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "HwfInformationProofList",
+    "ListElementCode": "WAGE_SLIPS",
+    "ListElement": "Wage Slips",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "HwfInformationProofList",
+    "ListElementCode": "CHILD_MAINTENANCE",
+    "ListElement": "Child Maintenance",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "HwfInformationProofList",
+    "ListElementCode": "BENEFITS_AND_TAX_CREDITS",
+    "ListElement": "Benefits and Tax Credits",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "HwfInformationProofList",
+    "ListElementCode": "PENSIONS",
+    "ListElement": "Pensions",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "HwfInformationProofList",
+    "ListElementCode": "RENTAL_INCOME",
+    "ListElement": "Rental Income",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "HwfInformationProofList",
+    "ListElementCode": "INCOME_FROM_SELLING_GOODS",
+    "ListElement": "Income from Selling Goods",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "HwfInformationProofList",
+    "ListElementCode": "PRISONERS_INCOME",
+    "ListElement": "Prisoner's Income",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "HwfInformationProofList",
+    "ListElementCode": "ANY_OTHER_INCOME",
+    "ListElement": "Any Other Income",
+    "DisplayOrder": 9
+  }
+]

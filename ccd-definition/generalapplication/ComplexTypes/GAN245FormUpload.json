@@ -1,0 +1,16 @@
+[
+  {
+    "ID": "GAN245FormUpload",
+    "ListElementCode": "generalAppN245Download",
+    "FieldType": "Label",
+    "ElementLabel": "<p class=\"govuk-inset-text\">if you have not already completed it, <a href=\"https://www.gov.uk/government/publications/form-n245-application-for-suspension-of-a-warrant-and-or-variation-of-an-order#:~:text=Form-,Form%20N245%3A%20Apply%20to%20suspend%20a%20warrant%20or%20vary%20payments,warrant%20issued%20by%20a%20court\" rel=\"noreferrer noopener\" target=\"_blank\">download the N245 form.</a>.</p>",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAN245FormUpload",
+    "ListElementCode": "generalAppN245Label",
+    "ElementLabel": "<br/>When you upload the form, include the case number in the file name.\n\nIf you have printed off the form and filled it in by hand, make sure the size of your saved file is no more than 100MB.\n\nSave your file as either: JPG, PNG, SVG, GIF, DOC, DOCX or PDF",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  }
+]

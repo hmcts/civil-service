@@ -1,0 +1,39 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "PROCESS_CLAIM_ISSUE_SPEC",
+    "Name": "Issue claim",
+    "Description": "Issue claim for Spec",
+    "PreConditionState(s)": "PENDING_CASE_ISSUED;CASE_ISSUED",
+    "PostConditionState": "CASE_ISSUED",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "PROCESS_FULL_DEFENCE_SPEC",
+    "Name": "Full defence",
+    "Description": "Full defence",
+    "PreConditionState(s)": "AWAITING_APPLICANT_INTENTION",
+    "PostConditionState": "AWAITING_APPLICANT_INTENTION",
+    "SecurityClassification": "Public",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "PROCESS_PART_ADMISSION_DEFENCE_SPEC",
+    "Name": "Part Admission",
+    "Description": "Part Admission",
+    "PreConditionState(s)": "PROCEEDS_IN_HERITAGE_SYSTEM",
+    "PostConditionState": "PROCEEDS_IN_HERITAGE_SYSTEM",
+    "SecurityClassification": "Public",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  }
+]

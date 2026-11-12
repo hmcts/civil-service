@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "RespondentResponsePartAdmissionPaymentTimeLRspec",
+    "ListElementCode": "IMMEDIATELY",
+    "ListElement": "Immediately",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "RespondentResponsePartAdmissionPaymentTimeLRspec",
+    "ListElementCode": "BY_SET_DATE",
+    "ListElement": "By a set date",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "RespondentResponsePartAdmissionPaymentTimeLRspec",
+    "ListElementCode": "SUGGESTION_OF_REPAYMENT_PLAN",
+    "ListElement": "I'll suggest a repayment plan for my client",
+    "DisplayOrder": 3
+  }
+]

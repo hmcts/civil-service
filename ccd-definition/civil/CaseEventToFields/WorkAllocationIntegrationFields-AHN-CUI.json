@@ -1,0 +1,22 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "LIP_CLAIM_SETTLED",
+    "CaseFieldID": "applicant1Represented",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "WorkAllocationIntegrationFields",
+    "PageDisplayOrder": 99,
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "LIP_CLAIM_SETTLED",
+    "CaseFieldID": "respondent1Represented",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "WorkAllocationIntegrationFields",
+    "PageDisplayOrder": 99,
+    "Publish": "Y"
+  }
+]

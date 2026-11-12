@@ -1,0 +1,21 @@
+[
+  {
+    "ID": "HelpWithFees",
+    "ListElementCode": "helpWithFeesReferenceNumber",
+    "ElementLabel": "HwF reference number",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Publish": "Y"
+  },
+  {
+    "ID": "HelpWithFees",
+    "ListElementCode": "helpWithFee",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "helpWithFeesReferenceNumber = \"DONT_SHOW_UI\"",
+    "Publish": "Y"
+  }
+]

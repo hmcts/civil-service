@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "AssistedOrderCostsMakeAnOrderTopList",
+    "ListElementCode": "COSTS",
+    "ListElement": "costs (both fixed and summarily assessed as appropriate)",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "AssistedOrderCostsMakeAnOrderTopList",
+    "ListElementCode": "SUBJECT_DETAILED_ASSESSMENT",
+    "ListElement": "to be subject to a detailed assessment",
+    "DisplayOrder": 2
+  }
+]

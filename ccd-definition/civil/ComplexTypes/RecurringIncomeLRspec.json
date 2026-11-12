@@ -1,0 +1,37 @@
+[
+  {
+    "ID": "RecurringIncome",
+    "ListElementCode": "type",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "IncomeType",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RecurringIncome",
+    "ListElementCode": "typeOtherDetails",
+    "FieldType": "Text",
+    "ElementLabel": "Type of income",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "type = \"OTHER\""
+  },
+  {
+    "ID": "RecurringIncome",
+    "ListElementCode": "amount",
+    "FieldType": "MoneyGBP",
+    "ElementLabel": "Amount received",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RecurringIncome",
+    "ListElementCode": "frequency",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "WeekMonthPeriod",
+    "ElementLabel": "Paid every:",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

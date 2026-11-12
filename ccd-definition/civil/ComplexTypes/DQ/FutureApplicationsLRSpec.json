@@ -1,0 +1,19 @@
+[
+  {
+    "ID": "FutureApplications",
+    "ListElementCode": "intentionToMakeFutureApplications",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Do you intend to make any applications in the future?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FutureApplications",
+    "ListElementCode": "whatWillFutureApplicationsBeMadeFor",
+    "FieldType": "Text",
+    "ElementLabel": "What for?",
+    "FieldShowCondition": "intentionToMakeFutureApplications = \"Yes\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

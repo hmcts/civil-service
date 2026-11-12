@@ -1,0 +1,58 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "specRespondent1DQDisclosureOfElectronicDocuments",
+    "TabFieldDisplayOrder": 40,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "specRespondent2DQDisclosureOfElectronicDocuments",
+    "TabFieldDisplayOrder": 41,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "specRespondent1DQDisclosureOfNonElectronicDocuments",
+    "TabFieldDisplayOrder": 42,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "specRespondent2DQDisclosureOfNonElectronicDocuments",
+    "TabFieldDisplayOrder": 43,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "respondent1DQClaimantDocumentsToBeConsidered",
+    "TabFieldDisplayOrder": 46,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\" OR responseClaimTrack = \"MULTI_CLAIM\" OR allocatedTrack = \"MULTI_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "specApplicant1DQDisclosureOfElectronicDocuments",
+    "TabFieldDisplayOrder": 76,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "specApplicant1DQDisclosureOfNonElectronicDocuments",
+    "TabFieldDisplayOrder": 78,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ClaimDetails",
+    "CaseFieldID": "applicant1DQDefendantDocumentsToBeConsidered",
+    "TabFieldDisplayOrder": 82,
+    "FieldShowCondition": "responseClaimTrack = \"INTERMEDIATE_CLAIM\" OR allocatedTrack = \"INTERMEDIATE_CLAIM\" OR responseClaimTrack = \"MULTI_CLAIM\" OR allocatedTrack = \"MULTI_CLAIM\""
+  }
+]

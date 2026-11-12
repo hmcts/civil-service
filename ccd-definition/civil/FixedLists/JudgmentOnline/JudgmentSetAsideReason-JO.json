@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "JoSetAsideReasonList",
+    "ListElementCode": "JUDGE_ORDER",
+    "ListElement": "A judge has made an order",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "JoSetAsideReasonList",
+    "ListElementCode": "JUDGMENT_ERROR",
+    "ListElement": "A judgment has been made in error",
+    "DisplayOrder": 2
+  }
+]

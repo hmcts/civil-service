@@ -1,0 +1,16 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "CaseFieldID": "caseManagementLocationTab",
+    "TabFieldDisplayOrder": 89
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "CaseFieldID": "taskManagementLocationsTab",
+    "TabFieldDisplayOrder": 90
+  }
+]

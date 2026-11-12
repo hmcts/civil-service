@@ -1,0 +1,129 @@
+[
+  {
+    "ID": "RecurringExpense",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondent1DQRecurringExpenses",
+    "ListElementCode": "type",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RecurringExpense",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondent1DQRecurringExpenses",
+    "ListElementCode": "typeOtherDetails",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RecurringExpense",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondent1DQRecurringExpenses",
+    "ListElementCode": "amount",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RecurringExpense",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondent1DQRecurringExpenses",
+    "ListElementCode": "frequency",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },{
+  "ID": "RecurringExpense",
+  "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+  "CaseFieldID": "respondent2DQRecurringExpenses",
+  "ListElementCode": "type",
+  "FieldDisplayOrder": 1,
+  "DisplayContext": "MANDATORY"
+},
+  {
+    "ID": "RecurringExpense",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondent2DQRecurringExpenses",
+    "ListElementCode": "typeOtherDetails",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RecurringExpense",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondent2DQRecurringExpenses",
+    "ListElementCode": "amount",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RecurringExpense",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondent2DQRecurringExpenses",
+    "ListElementCode": "frequency",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RecurringExpense",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondent1DQRecurringExpensesFA",
+    "ListElementCode": "type",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RecurringExpense",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondent1DQRecurringExpensesFA",
+    "ListElementCode": "typeOtherDetails",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RecurringExpense",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondent1DQRecurringExpensesFA",
+    "ListElementCode": "amount",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RecurringExpense",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondent1DQRecurringExpensesFA",
+    "ListElementCode": "frequency",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RecurringExpense",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondent2DQRecurringExpensesFA",
+    "ListElementCode": "type",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RecurringExpense",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondent2DQRecurringExpensesFA",
+    "ListElementCode": "typeOtherDetails",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RecurringExpense",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondent2DQRecurringExpensesFA",
+    "ListElementCode": "amount",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "RecurringExpense",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondent2DQRecurringExpensesFA",
+    "ListElementCode": "frequency",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  }
+]

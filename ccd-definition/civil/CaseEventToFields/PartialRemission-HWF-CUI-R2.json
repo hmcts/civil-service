@@ -1,0 +1,66 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "PARTIAL_REMISSION_HWF_GRANTED",
+    "CaseFieldID": "hwfFeeType",
+    "DisplayContext": "READONLY",
+    "PageID": "partRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "caseTitleWithHWFClaimFeeNumber=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "PARTIAL_REMISSION_HWF_GRANTED",
+    "CaseFieldID": "helpWithFees",
+    "DisplayContext": "READONLY",
+    "PageID": "partRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "caseTitleWithHWFClaimFeeNumber=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "PARTIAL_REMISSION_HWF_GRANTED",
+    "CaseFieldID": "caseTitleWithHWFClaimFeeNumber",
+    "DisplayContext": "READONLY",
+    "PageID": "partRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "FieldShowCondition": "hwfFeeType = \"CLAIMISSUED\"",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "PARTIAL_REMISSION_HWF_GRANTED",
+    "CaseFieldID": "remissionFeeAmountWarningMessage",
+    "DisplayContext": "READONLY",
+    "PageID": "partRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 3
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "PARTIAL_REMISSION_HWF_GRANTED",
+    "CaseFieldID": "claimFeeLabel",
+    "DisplayContext": "READONLY",
+    "PageID": "partRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 4,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "hwfFeeType=\"CLAIMISSUED\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "PARTIAL_REMISSION_HWF_GRANTED",
+    "CaseFieldID": "claimIssuedHwfDetails",
+    "DisplayContext": "COMPLEX",
+    "PageID": "partRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 5,
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/remission-amount",
+    "ShowSummaryChangeOption": "Y"
+  }
+]

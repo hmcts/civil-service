@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "MediationUnsuccessfulReasons",
+    "ListElementCode": "PARTY_WITHDRAWS",
+    "ListElement": "Party withdraws from mediation",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "MediationUnsuccessfulReasons",
+    "ListElementCode": "APPOINTMENT_NO_AGREEMENT",
+    "ListElement": "Appointment no agreement reached",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "MediationUnsuccessfulReasons",
+    "ListElementCode": "APPOINTMENT_NOT_ASSIGNED",
+    "ListElement": "Appointment not assigned",
+    "DisplayOrder": 3
+  }
+]

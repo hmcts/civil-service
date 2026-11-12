@@ -1,0 +1,111 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "FEE_PAYMENT_OUTCOME",
+    "CaseFieldID": "applicant1",
+    "DisplayContext": "READONLY",
+    "PageID": "FeePaymentOutcome",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "caseTitle=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "FEE_PAYMENT_OUTCOME",
+    "CaseFieldID": "respondent1",
+    "DisplayContext": "READONLY",
+    "PageID": "FeePaymentOutcome",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "caseTitle=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "FEE_PAYMENT_OUTCOME",
+    "CaseFieldID": "hwfFeeType",
+    "DisplayContext": "READONLY",
+    "PageID": "FeePaymentOutcome",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "caseTitle=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "FEE_PAYMENT_OUTCOME",
+    "CaseFieldID": "claimIssuedHwfDetails",
+    "DisplayContext": "READONLY",
+    "PageID": "FeePaymentOutcome",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "caseTitle=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "FEE_PAYMENT_OUTCOME",
+    "CaseFieldID": "caseTitle",
+    "DisplayContext": "READONLY",
+    "PageID": "FeePaymentOutcome",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "FEE_PAYMENT_OUTCOME",
+    "CaseFieldID": "hwfNumberAvailable",
+    "DisplayContext": "MANDATORY",
+    "PageID": "FeePaymentOutcome",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "ShowSummaryChangeOption": "Y",
+    "CaseEventFieldLabel": "Is there a Help with Fees reference number?"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "FEE_PAYMENT_OUTCOME",
+    "CaseFieldID": "hwfNumberForFeePaymentOutcome",
+    "DisplayContext": "MANDATORY",
+    "PageID": "FeePaymentOutcome",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 3,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "hwfNumberAvailable = \"Yes\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "FEE_PAYMENT_OUTCOME",
+    "CaseFieldID": "caseTitle2",
+    "DisplayContext": "READONLY",
+    "PageID": "FeePaymentOutcomeGrantedRemission",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "FEE_PAYMENT_OUTCOME",
+    "CaseFieldID": "hwfFullRemissionGrantedForClaimIssue",
+    "DisplayContext": "MANDATORY",
+    "PageID": "FeePaymentOutcomeGrantedRemission",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 2,
+    "ShowSummaryChangeOption": "Y",
+    "CaseEventFieldLabel": "Was this a Full Remission HwF - granted outcome?",
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/remission-type",
+    "FieldShowCondition": "hwfFeeType = \"CLAIMISSUED\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "FEE_PAYMENT_OUTCOME",
+    "CaseFieldID": "hwfOutstandingFeePaymentDoneForClaimIssue",
+    "DisplayContext": "MANDATORY",
+    "PageID": "FeePaymentOutcomeGrantedRemission",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 3,
+    "FieldShowCondition": "hwfFeeType = \"CLAIMISSUED\" AND hwfFullRemissionGrantedForClaimIssue = \"No\""
+  }
+]

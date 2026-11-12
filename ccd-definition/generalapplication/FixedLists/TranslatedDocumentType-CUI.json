@@ -1,0 +1,92 @@
+[
+  {
+    "ID": "TranslatedDocumentType",
+    "ListElementCode": "APPLICATION_SUMMARY_DOCUMENT",
+    "ListElement": "Application summary document",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "TranslatedDocumentType",
+    "ListElementCode": "APPLICATION_SUMMARY_DOCUMENT_RESPONDED",
+    "ListElement": "Application summary document - responded",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "TranslatedDocumentType",
+    "ListElementCode": "REQUEST_FOR_MORE_INFORMATION_ORDER",
+    "ListElement": "Request for more information order",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "TranslatedDocumentType",
+    "ListElementCode": "HEARING_ORDER",
+    "ListElement": "Hearing Order",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "TranslatedDocumentType",
+    "ListElementCode": "GENERAL_ORDER",
+    "ListElement": "General Order",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "TranslatedDocumentType",
+    "ListElementCode": "DISMISSAL_ORDER",
+    "ListElement": "Dismissal order",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "TranslatedDocumentType",
+    "ListElementCode": "JUDGES_DIRECTIONS_ORDER",
+    "ListElement": "Judges Directions order",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "TranslatedDocumentType",
+    "ListElementCode": "WRITTEN_REPRESENTATIONS_ORDER_CONCURRENT",
+    "ListElement": "Written representations order - concurrent",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "TranslatedDocumentType",
+    "ListElementCode": "WRITTEN_REPRESENTATIONS_ORDER_SEQUENTIAL",
+    "ListElement": "Written representations order - sequential",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "TranslatedDocumentType",
+    "ListElementCode": "HEARING_NOTICE",
+    "ListElement": "Hearing Notice",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "TranslatedDocumentType",
+    "ListElementCode": "WRITTEN_REPRESENTATIONS_APPLICANT",
+    "ListElement": "Written representations - applicant",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "TranslatedDocumentType",
+    "ListElementCode": "WRITTEN_REPRESENTATIONS_RESPONDENT",
+    "ListElement": "Written representations - respondent",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "TranslatedDocumentType",
+    "ListElementCode": "REQUEST_MORE_INFORMATION_APPLICANT",
+    "ListElement": "Request more information - applicant",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "TranslatedDocumentType",
+    "ListElementCode": "REQUEST_MORE_INFORMATION_RESPONDENT",
+    "ListElement": "Request more information - respondent",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "TranslatedDocumentType",
+    "ListElementCode": "APPROVE_OR_EDIT_ORDER",
+    "ListElement": "Approve or edit order",
+    "DisplayOrder": 15
+  }
+]

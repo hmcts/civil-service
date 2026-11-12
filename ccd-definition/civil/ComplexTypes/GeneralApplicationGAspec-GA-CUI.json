@@ -1,0 +1,36 @@
+[
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppAskForCosts",
+    "FieldType": "YesOrNo",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppHelpWithFees",
+    "FieldType": "HelpWithFees",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppDetailsOfOrderColl",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppReasonsOfOrderColl",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

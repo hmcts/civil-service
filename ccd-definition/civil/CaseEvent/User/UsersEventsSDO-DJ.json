@@ -1,0 +1,20 @@
+{
+  "CaseTypeID": "CIVIL",
+  "ID": "STANDARD_DIRECTION_ORDER_DJ",
+  "Name": "Directions Order (Judgment)",
+  "Description": "Standard Directions Order (Judgment)",
+  "DisplayOrder": 18,
+  "EventEnablingCondition": "detailsOfDirection = \"None\"",
+  "PreConditionState(s)": "JUDICIAL_REFERRAL",
+  "PostConditionState": "*",
+  "SecurityClassification": "Public",
+  "CallBackURLAboutToStartEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-start",
+  "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+  "CallBackURLSubmittedEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/submitted",
+  "ShowSummary": "Y",
+  "ShowEventNotes": "N",
+  "RetriesTimeoutAboutToStartEvent": 0,
+  "RetriesTimeoutURLAboutToSubmitEvent": 0,
+  "RetriesTimeoutURLSubmittedEvent": 0,
+  "Publish": "Y"
+}

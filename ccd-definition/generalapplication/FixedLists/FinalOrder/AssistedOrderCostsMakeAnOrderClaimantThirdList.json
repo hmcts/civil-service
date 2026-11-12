@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "AssistedOrderCostsMakeAnOrderClaimantThirdList",
+    "ListElementCode": "YES",
+    "ListElement": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "AssistedOrderCostsMakeAnOrderClaimantThirdList",
+    "ListElementCode": "NO",
+    "ListElement": "No",
+    "DisplayOrder": 2
+  }
+]

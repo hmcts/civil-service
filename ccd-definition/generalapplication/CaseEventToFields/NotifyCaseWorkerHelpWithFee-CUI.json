@@ -1,0 +1,40 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "NOTIFY_HELP_WITH_FEE",
+    "CaseFieldID": "generalAppUrgencyRequirement",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "GAUrgencyRecordPage",
+    "PageDisplayOrder": 3,
+    "PageColumnNumber": 1,
+    "PageShowCondition": "generalAppHelpWithFees = \"DO_NOT_SHOW_IN_UI\"",
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "NOTIFY_HELP_WITH_FEE",
+    "CaseFieldID": "generalAppHelpWithFees",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "isMultiPartyPage3",
+    "PageDisplayOrder": 9,
+    "PageColumnNumber": 1,
+    "PageShowCondition": "generalAppUrgencyRequirement = \"DO_NOT_SHOW_IN_UI\"",
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "NOTIFY_HELP_WITH_FEE",
+    "CaseFieldID": "gaWaTrackLabel",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "isMultiPartyPage3",
+    "PageDisplayOrder": 9,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  }
+]

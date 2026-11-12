@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "OtherRemedyFee",
+    "ListElementCode": "calculatedAmountInPence",
+    "FieldType": "MoneyGBP",
+    "ElementLabel": "Amount to pay",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "OtherRemedyFee",
+    "ListElementCode": "code",
+    "FieldType": "Text",
+    "ElementLabel": "Code",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "OtherRemedyFee",
+    "ListElementCode": "version",
+    "FieldType": "Text",
+    "ElementLabel": "Version",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

@@ -1,0 +1,236 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "uploadMediationDocumentsExplanation",
+    "Label": "If you or your client did not attend the mediation appointment to represent your case the judge may issue a penalty. The Judge may order your party to pay costs or automatically rule in the other party's favour. \n\nIf you or your client were unable to attend mediation due to exceptional circumstances, you can explain why with supporting evidence such as a doctor's note or a photograph. If the Judge accepts the reasons given for non-attendance, your party will not be issued with a penalty.\n\nYou do not have to upload supporting evidence if you or your client attended the mediation appointment.\n\nYou cannot withdraw a document once you have submitted it. If you want to add more information to something you have already submitted. you can upload the document again. You should add a version number to the name, for example, 'version 2'.\n\nThe other parties will be able to see the documents you have uploaded and you will be able to see their documents.\n\n### Deadlines for uploading documents\n\n You have until 14 days before the hearing to submit documents. You do not have to upload all documents at once. You can return to upload them later.\n\n### Before you upload your documents\n\n Before you upload a document, give it a name that tells the court what it is, for example \"Mediation non-attendance statement by Jane Smith\".\n\nEach document must be less than 100MB. You can upload the following file types: DOC/DOCX (Word), XLS/XLSM (Excel). PPT/PPTX (PowerPoint). PDF, RTF, TXT, CSV. LPG/JPEG, PNG. BMP. TIF /TIFF.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "whoIsDocumentForLabel",
+    "Label": "You can use the options below to let the court know who this document is from",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "uploadMediationDocumentsPartyChosen",
+    "Label": "Select one of the options",
+    "FieldType": "DynamicRadioList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "documentTypeLabel1",
+    "Label": "You can select more than one type of document \n\n ## Mediation non-attendance",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "documentTypeLabel2",
+    "Label": "<details><summary><u>Mediation non-attendance</u></summary><div class=\"panel\">\n\n ### Non-attendance statement \n\n A written statement explaining why the mediation appointment was not attended \n\n ### Documents referred to in the statement \n\n Documents referred to in the statement - for example emails, photographs of relevant documents or doctor’s notes</div></details><br />",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "mediationDocumentsType",
+    "Label": "Select the type of document you want to upload",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "MediationDocumentsType",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "mediationDocumentUploadLabel",
+    "Label": "## Mediation non-attendance",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "mediationDocumentUploadWarning",
+    "Label": "<div class=\"govuk-warning-text\"><span class=\"govuk-warning-text__icon\" aria-hidden=\"true\">!</span><strong class=\"govuk-warning-text__text\"><span class=\"govuk-warning-text__assistive\">Warning</span>You cannot withdraw a document once you have uploaded it</strong></div>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "nonAttendanceStatementForm",
+    "Label": "Non-attendance statement",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "NonAttendanceMediationStatement",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "documentsReferredForm",
+    "Label": "Documents referred to in statement",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "DocumentsReferred",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "app1MediationNonAttendanceDocs",
+    "Label": "Claimant One - Non-attendance statement",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "NonAttendanceMediationStatement",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "app1MediationDocumentsReferred",
+    "Label": "Claimant One - Documents referred to in statement",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "DocumentsReferred",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "app2MediationNonAttendanceDocs",
+    "Label": "Claimant Two - Non-attendance statement",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "NonAttendanceMediationStatement",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "app2MediationDocumentsReferred",
+    "Label": "Claimant Two - Documents referred to in statement",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "DocumentsReferred",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "res1MediationNonAttendanceDocs",
+    "Label": "Defendant One - Non-attendance statement",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "NonAttendanceMediationStatement",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "res1MediationDocumentsReferred",
+    "Label": "Defendant One - Documents referred to in statement",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "DocumentsReferred",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "res2MediationNonAttendanceDocs",
+    "Label": "Defendant Two - Non-attendance statement",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "NonAttendanceMediationStatement",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "res2MediationDocumentsReferred",
+    "Label": "Defendant Two - Documents referred to in statement",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "DocumentsReferred",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "app1MediationContactInfo",
+    "Label": "Claimant Mediation Contact Information",
+    "FieldType": "MediationContactInformation",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "app1MediationAvailability",
+    "Label": "Claimant Mediation Availability",
+    "FieldType": "MediationAvailability",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "resp1MediationContactInfo",
+    "Label": "Defendant 1 Mediation Contact Information",
+    "FieldType": "MediationContactInformation",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "resp2MediationContactInfo",
+    "Label": "Defendant 2 Mediation Contact information",
+    "FieldType": "MediationContactInformation",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "resp1MediationAvailability",
+    "Label": "Defendant 1 Mediation Availability",
+    "FieldType": "MediationAvailability",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "resp2MediationAvailability",
+    "Label": "Defendant 2 Mediation Availability",
+    "FieldType": "MediationAvailability",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondent1LiPResponseCarm",
+    "Label": "Defendant 1 Mediation",
+    "FieldType": "MediationLiPCarm",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "applicant1LiPResponseCarm",
+    "Label": "Applicant 1 Mediation",
+    "FieldType": "MediationLiPCarm",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "contactDetailsLabel",
+    "Label": "## Mediation contact information\n\nPlease provide the contact details of the individual who will conduct the mediation appointment.\n\nThis should be a party to the claim or their legal representative.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "mediationFileSentToMmt",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  }
+]

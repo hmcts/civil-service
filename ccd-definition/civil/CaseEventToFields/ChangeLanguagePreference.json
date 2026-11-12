@@ -1,0 +1,23 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "CHANGE_LANGUAGE_PREFERENCE",
+    "CaseFieldID": "changeLanguagePreferenceLabel",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "ChangeLanguagePreference",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "CHANGE_LANGUAGE_PREFERENCE",
+    "CaseFieldID": "changeLanguagePreference",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "Mandatory",
+    "PageID": "ChangeLanguagePreference",
+    "PageDisplayOrder": 1,
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-lang-pref",
+    "ShowSummaryChangeOption": "Y"
+  }
+]

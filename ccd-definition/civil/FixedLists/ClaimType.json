@@ -1,0 +1,56 @@
+[
+  {
+    "ID": "ClaimType",
+    "ListElementCode": "PERSONAL_INJURY",
+    "ListElement": "Personal injury",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ClaimType",
+    "ListElementCode": "CLINICAL_NEGLIGENCE",
+    "ListElement": "Clinical negligence",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "ClaimType",
+    "ListElementCode": "PROFESSIONAL_NEGLIGENCE",
+    "ListElement": "Professional negligence",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "ClaimType",
+    "ListElementCode": "BREACH_OF_CONTRACT",
+    "ListElement": "Breach of contract",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "ClaimType",
+    "ListElementCode": "CONSUMER",
+    "ListElement": "Consumer",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "ClaimType",
+    "ListElementCode": "CONSUMER_CREDIT",
+    "ListElement": "Consumer credit",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "ClaimType",
+    "ListElementCode": "HOUSING_DISREPAIR",
+    "ListElement": "Housing disrepair",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "ClaimType",
+    "ListElementCode": "DAMAGES_AND_OTHER_REMEDY",
+    "ListElement": "Damages and an ‘other’ remedy e.g. Payment Protection Insurance (PPI), Motor finance",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "ClaimType",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 9
+  }
+]

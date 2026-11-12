@@ -1,0 +1,43 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "lengthListOtherLabel",
+    "ID": "CaseHearingLengthElement",
+    "ElementLabel": "### Length of hearing",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "lengthListOtherDays",
+    "ID": "CaseHearingLengthElement",
+    "ElementLabel": "Days",
+    "HintText": "For example, 2",
+    "FieldType": "Number",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "lengthListOtherHours",
+    "ID": "CaseHearingLengthElement",
+    "ElementLabel": "Hours",
+    "HintText": "For example, 4",
+    "FieldType": "Number",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "RegularExpression": "^([0-9]|[1-9][0-9]|[1-9][0-9][0-9])$"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "lengthListOtherMinutes",
+    "ID": "CaseHearingLengthElement",
+    "ElementLabel": "Minutes",
+    "HintText": "For example, 0",
+    "FieldType": "Number",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "RegularExpression": "[0-9]|[0-5][0-9]"
+  }
+]
