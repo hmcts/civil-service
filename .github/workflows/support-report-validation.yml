@@ -1,0 +1,32 @@
+name: Support report infrastructure checks
+on:
+  pull_request:
+    paths:
+      - infrastructure/**
+      - .github/workflows/support-report-validation.yml
+  push:
+    branches: [master]
+permissions:
+  contents: read
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
+        with:
+          terraform_version: 1.17.0
+      - name: Use HTTPS for public Terraform modules
+        run: |
+          git config --global url."https://github.com/".insteadOf 'git@github.com:'
+          git config --global --add url."https://github.com/".insteadOf 'ssh://git@github.com/'
+      - run: terraform -chdir=infrastructure init -backend=false -input=false
+      - run: terraform -chdir=infrastructure validate
+      - name: Check formatting of reporting changes
+        run: |
+          terraform -chdir=infrastructure fmt -check support-reports.tf
+          terraform -chdir=infrastructure fmt -check -recursive modules/support-report
+      - name: Test plans with mock providers (no Azure access)
+        run: |
+          terraform -chdir=infrastructure/modules/support-report init -backend=false -input=false
+          terraform -chdir=infrastructure/modules/support-report test
