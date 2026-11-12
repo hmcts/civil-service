@@ -1,0 +1,32 @@
+[
+  {
+    "ID": "OrderWithoutNotice",
+    "ListElementCode": "withoutNoticeSelectionLabel",
+    "FieldType": "Label",
+    "ElementLabel": "### Order without notice",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "OrderWithoutNotice",
+    "ListElementCode": "withoutNoticeSelectionTextArea",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "OrderWithoutNotice",
+    "ListElementCode": "withoutNoticeSelectionDateLabel",
+    "FieldType": "Label",
+    "ElementLabel": "### Please enter date",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "OrderWithoutNotice",
+    "ListElementCode": "withoutNoticeSelectionDate",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "HintText": "For example, 16 4 2021",
+    "SecurityClassification": "Public",
+    "DisplayContextParameter": "#DATETIMEDISPLAY(d LLLL yyyy)"
+  }
+]

@@ -1,0 +1,66 @@
+[
+  {
+    "ID": "SdoR2PermissionToRelyOnExpert",
+    "ListElementCode": "label",
+    "ElementLabel": "### Permission to rely on expert evidence",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2PermissionToRelyOnExpert",
+    "ListElementCode": "sdoPermissionToRelyOnExpertTxt",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2PermissionToRelyOnExpert",
+    "ListElementCode": "sdoPermissionToRelyOnExpertDate",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2PermissionToRelyOnExpert",
+    "ListElementCode": "sdoJointMeetingOfExpertsLbl",
+    "ElementLabel": "### Joint meeting of experts",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2PermissionToRelyOnExpert",
+    "ListElementCode": "sdoJointMeetingOfExpertsTxt",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+  "ID": "SdoR2PermissionToRelyOnExpert",
+  "ListElementCode": "sdoJointMeetingOfExpertsDate",
+  "FieldType": "Date",
+  "ElementLabel": " ",
+  "SecurityClassification": "Public",
+  "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2PermissionToRelyOnExpert",
+    "ListElementCode": "sdoUploadedToDigitalPortalLbl",
+    "FieldType": "Label",
+    "ElementLabel": "and uploaded to the Digital Portal",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2PermissionToRelyOnExpert",
+    "ListElementCode": "sdoUploadedToDigitalPortalTxt",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

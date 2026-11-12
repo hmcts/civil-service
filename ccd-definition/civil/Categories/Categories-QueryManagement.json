@@ -1,0 +1,37 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CategoryID": "QueryDocuments",
+    "CategoryLabel": "Query documents",
+    "DisplayOrder": "13",
+    "ParentCategoryID": ""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CategoryID": "ClaimantQueryDocuments",
+    "CategoryLabel": "Claimant",
+    "DisplayOrder": "1",
+    "ParentCategoryID": "QueryDocuments"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CategoryID": "ClaimantQueryDocumentAttachments",
+    "CategoryLabel": "Attachments",
+    "DisplayOrder": "1",
+    "ParentCategoryID": "ClaimantQueryDocuments"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CategoryID": "DefendantQueryDocuments",
+    "CategoryLabel": "Defendant",
+    "DisplayOrder": "2",
+    "ParentCategoryID": "QueryDocuments"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CategoryID": "DefendantQueryDocumentAttachments",
+    "CategoryLabel": "Attachments",
+    "DisplayOrder": "1",
+    "ParentCategoryID": "DefendantQueryDocuments"
+  }
+]

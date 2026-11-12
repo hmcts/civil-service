@@ -1,0 +1,231 @@
+[
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "individualTitle",
+    "FieldDisplayOrder": 2,
+    "FieldShowCondition": "partyChosenType=\"CLAIMANT_2_ADMIN_INDIVIDUAL\"",
+    "RetainHiddenValue": "Y",
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "individualFirstName",
+    "FieldDisplayOrder": 3,
+    "FieldShowCondition": "partyChosenType=\"CLAIMANT_2_ADMIN_INDIVIDUAL\"",
+    "RetainHiddenValue": "Y",
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "individualLastName",
+    "FieldShowCondition": "partyChosenType=\"CLAIMANT_2_ADMIN_INDIVIDUAL\"",
+    "RetainHiddenValue": "Y",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "individualDateOfBirth",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "companyName",
+    "FieldDisplayOrder": 6,
+    "FieldShowCondition": "partyChosenType=\"CLAIMANT_2_ADMIN_COMPANY\"",
+    "RetainHiddenValue": "Y",
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "organisationName",
+    "FieldDisplayOrder": 7,
+    "FieldShowCondition": "partyChosenType=\"CLAIMANT_2_ADMIN_ORGANISATION\"",
+    "RetainHiddenValue": "Y",
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "soleTraderTitle",
+    "FieldDisplayOrder": 8,
+    "FieldShowCondition": "partyChosenType=\"CLAIMANT_2_ADMIN_SOLE_TRADER\"",
+    "RetainHiddenValue": "Y",
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "soleTraderFirstName",
+    "FieldDisplayOrder": 9,
+    "FieldShowCondition": "partyChosenType=\"CLAIMANT_2_ADMIN_SOLE_TRADER\"",
+    "RetainHiddenValue": "Y",
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "soleTraderLastName",
+    "FieldDisplayOrder": 10,
+    "FieldShowCondition": "partyChosenType=\"CLAIMANT_2_ADMIN_SOLE_TRADER\"",
+    "RetainHiddenValue": "Y",
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "soleTraderTradingAs",
+    "FieldDisplayOrder": 11,
+    "FieldShowCondition": "partyChosenType=\"CLAIMANT_2_ADMIN_SOLE_TRADER\"",
+    "RetainHiddenValue": "Y",
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "soleTraderDateOfBirth",
+    "FieldDisplayOrder": 12,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "primaryAddress.AddressLine1",
+    "FieldDisplayOrder": 13,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "primaryAddress",
+    "FieldDisplayOrder": 13,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "primaryAddress.AddressLine2",
+    "FieldDisplayOrder": 14,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "primaryAddress.AddressLine3",
+    "FieldDisplayOrder": 15,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "primaryAddress.PostTown",
+    "FieldDisplayOrder": 16,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "primaryAddress.County",
+    "FieldDisplayOrder": 17,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "primaryAddress.Country",
+    "FieldDisplayOrder": 18,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "primaryAddress.PostCode",
+    "FieldDisplayOrder": 19,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "partyEmail",
+    "FieldDisplayOrder": 20,
+    "DisplayContext": "OPTIONAL",
+    "RetainHiddenValue": "Y",
+    "FieldShowCondition": "applicant2.type = \"INDIVIDUAL\" OR applicant2.type = \"SOLE_TRADER\" OR applicant2.type = \"ORGANISATION\" OR applicant2.type = \"COMPANY\""
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "partyPhone",
+    "FieldDisplayOrder": 21,
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "applicant2.type = \"INDIVIDUAL\" OR applicant2.type = \"SOLE_TRADER\""
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "partyID",
+    "FieldDisplayOrder": 22,
+    "DisplayContext": "MANDATORY",
+    "RetainHiddenValue": "Y",
+    "FieldShowCondition": "applicant2 = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "applicant2",
+    "ListElementCode": "flags",
+    "FieldDisplayOrder": 23,
+    "DisplayContext": "OPTIONAL",
+    "RetainHiddenValue": "Y",
+    "FieldShowCondition": "applicant2 = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "respondent1",
+    "ListElementCode": "flags.roleOnCase",
+    "FieldDisplayOrder": 24,
+    "DisplayContext": "OPTIONAL",
+    "RetainHiddenValue": "Y",
+    "FieldShowCondition": "applicant2 = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "SecondClaimant",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "respondent1",
+    "ListElementCode": "flags.partyName",
+    "FieldDisplayOrder": 25,
+    "DisplayContext": "OPTIONAL",
+    "RetainHiddenValue": "Y",
+    "FieldShowCondition": "applicant2 = \"DO_NOT_SHOW_IN_UI\""
+  }
+]

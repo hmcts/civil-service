@@ -11,7 +11,19 @@ service_name="civil-service-${user}"
 dev_env_file=$(mktemp)
 additional_values_template="values.devuser-preview-local.yaml"
 additional_values_file="charts/civil-service/${additional_values_template}"
-trap 'rm -f "${dev_env_file}" "${additional_values_file}"' EXIT
+# ccd-definition/civil and ccd-definition/generalapplication are tracked (a mirror of civil-ccd-definition,
+# see ccd-definition/README.md). pull-latest-civil-ccd-files.sh replaces them with the branch being
+# imported, so put them back on exit, including when the import fails.
+ccd_definition_replaced=false
+restore_ccd_definition_mirror() {
+  if [ "${ccd_definition_replaced}" = "true" ]; then
+    echo "Restoring the tracked ccd-definition/ mirror"
+    git checkout -- ccd-definition/civil ccd-definition/generalapplication
+    git clean -fdq -- ccd-definition/civil ccd-definition/generalapplication
+    ccd_definition_replaced=false
+  fi
+}
+trap 'rm -f "${dev_env_file}" "${additional_values_file}"; restore_ccd_definition_mirror' EXIT
 
 cat > "${dev_env_file}" <<EOF
 PREVIEW_ACA_SERVICE_API_BASEURL=http://${service_name}-aac-manage-case-assignment
@@ -70,7 +82,8 @@ cp -r src/main/resources/camunda .
 ./gradlew camundaHighLevelDataSetup
 
 echo "Importing CCD definitions"
-./bin/pull-latest-civil-ccd-files.sh "${ccd_branch}"
+ccd_definition_replaced=true
+CCD_DEFINITION_MIRROR_RESTORED_BY_CALLER=true ./bin/pull-latest-civil-ccd-files.sh "${ccd_branch}"
 
 if [ ! -d "ccd-definition/civil" ]; then
   echo "Unable to locate civil CCD definition directory at ccd-definition/civil."
@@ -84,7 +97,7 @@ definition_output_file="$(realpath ".")/build/ccd-development-config/ccd-civil-d
   "${definition_output_file}" \
   "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
 
-rm -rf "$(pwd)/ccd-definition"
+restore_ccd_definition_mirror
 rm -rf "$(pwd)/build/ccd-development-config"
 rm -rf "$(pwd)/camunda"
 rm -rf "$(pwd)/wa-dmn"

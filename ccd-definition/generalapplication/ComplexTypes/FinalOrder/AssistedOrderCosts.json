@@ -1,0 +1,226 @@
+[
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "detailsRepresentationLabel",
+    "ElementLabel": "### Costs reserved",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "detailsRepresentationSecondLabel",
+    "ElementLabel": "### Please type in any additional detail to follow 'Costs reserved' (Optional)",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "detailsRepresentationText",
+    "ElementLabel": " ",
+    "HintText": "For example, to whom the costs are reserved (eg 'to the hearing judge')",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "makeAnOrderForCostsLabel",
+    "ElementLabel": "### Make an order for detailed costs/summary costs \n ### The",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "makeAnOrderForCostsList",
+    "ElementLabel": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "ClaimantOrDefendant",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "assistedOrderClaimantDefendantFirstDropdownLabelType1",
+    "ElementLabel": "### shall pay the defendant's",
+    "FieldType": "Label",
+    "FieldShowCondition": "assistedOrderClaimantDefendantFirstDropdown = \"COSTS\" AND  makeAnOrderForCostsList = \"CLAIMANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "assistedOrderClaimantDefendantFirstDropdownLabelType2",
+    "ElementLabel": "### shall pay the defendant's costs",
+    "FieldType": "Label",
+    "FieldShowCondition": "assistedOrderClaimantDefendantFirstDropdown = \"SUBJECT_DETAILED_ASSESSMENT\" AND makeAnOrderForCostsList = \"CLAIMANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "assistedOrderDefendantFirstDropdownLabelType1",
+    "ElementLabel": "### shall pay the claimant's",
+    "FieldType": "Label",
+    "FieldShowCondition": "assistedOrderClaimantDefendantFirstDropdown = \"COSTS\" AND  makeAnOrderForCostsList = \"DEFENDANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "assistedOrderDefendantFirstDropdownLabelType2",
+    "ElementLabel": "### shall pay the claimant's costs",
+    "FieldType": "Label",
+    "FieldShowCondition": "assistedOrderClaimantDefendantFirstDropdown = \"SUBJECT_DETAILED_ASSESSMENT\" AND makeAnOrderForCostsList = \"DEFENDANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "assistedOrderClaimantDefendantFirstDropdown",
+    "ElementLabel": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "AssistedOrderCostsMakeAnOrderTopList",
+    "FieldShowCondition": "makeAnOrderForCostsList = \"CLAIMANT\" OR makeAnOrderForCostsList = \"DEFENDANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "assistedOrderCostsFirstDropdownAmountLabel",
+    "ElementLabel": "### in the sum of £",
+    "FieldType": "Label",
+    "FieldShowCondition": "assistedOrderClaimantDefendantFirstDropdown = \"COSTS\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "assistedOrderCostsFirstDropdownAmount",
+    "ElementLabel": " ",
+    "FieldType": "MoneyGBP",
+    "HintText": "For example, 145.00",
+    "FieldShowCondition": "assistedOrderClaimantDefendantFirstDropdown = \"COSTS\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "assistedOrderCostsFirstDropdownDateLabel",
+    "ElementLabel": "### Such sum shall be made by 4pm on",
+    "FieldType": "Label",
+    "FieldShowCondition": "assistedOrderClaimantDefendantFirstDropdown = \"COSTS\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "assistedOrderCostsFirstDropdownDate",
+    "ElementLabel": " ",
+    "FieldType": "Date",
+    "HintText": "For example, 16 4 2021",
+    "FieldShowCondition": "assistedOrderClaimantDefendantFirstDropdown = \"COSTS\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "assistedOrderAssessmentSecondDropdownList1",
+    "ElementLabel": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "AssistedOrderCostsMakeAnOrderClaimantSecondList",
+    "FieldShowCondition": "assistedOrderClaimantDefendantFirstDropdown = \"SUBJECT_DETAILED_ASSESSMENT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "assistedOrderAssessmentSecondDropdownListLabel",
+    "ElementLabel": " ### Interim payment required?",
+    "FieldType": "Label",
+    "FieldShowCondition": "assistedOrderClaimantDefendantFirstDropdown = \"SUBJECT_DETAILED_ASSESSMENT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "assistedOrderAssessmentSecondDropdownList2",
+    "ElementLabel": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "AssistedOrderCostsMakeAnOrderClaimantThirdList",
+    "FieldShowCondition": "assistedOrderClaimantDefendantFirstDropdown = \"SUBJECT_DETAILED_ASSESSMENT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "assistedOrderClaimantThirdDropdownLabel",
+    "ElementLabel": "### The claimant shall pay £",
+    "FieldType": "Label",
+    "FieldShowCondition": "assistedOrderAssessmentSecondDropdownList2 = \"YES\" AND assistedOrderClaimantDefendantFirstDropdown = \"SUBJECT_DETAILED_ASSESSMENT\" AND makeAnOrderForCostsList = \"CLAIMANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "assistedOrderDefendantThirdDropdownLabel",
+    "ElementLabel": "### The defendant shall pay £",
+    "FieldType": "Label",
+    "FieldShowCondition": "assistedOrderAssessmentSecondDropdownList2 = \"YES\" AND assistedOrderClaimantDefendantFirstDropdown = \"SUBJECT_DETAILED_ASSESSMENT\" AND makeAnOrderForCostsList = \"DEFENDANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "assistedOrderAssessmentThirdDropdownAmount",
+    "ElementLabel": " ",
+    "HintText": "For example, 145.00",
+    "FieldType": "MoneyGBP",
+    "FieldShowCondition": "assistedOrderAssessmentSecondDropdownList2 = \"YES\" AND assistedOrderClaimantDefendantFirstDropdown = \"SUBJECT_DETAILED_ASSESSMENT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "assistedOrderAssessmentThirdDropdownDateLabel",
+    "ElementLabel": "on account of costs \n ### Such sum shall be made by 4pm on",
+    "FieldType": "Label",
+    "FieldShowCondition": "assistedOrderAssessmentSecondDropdownList2 = \"YES\" AND assistedOrderClaimantDefendantFirstDropdown = \"SUBJECT_DETAILED_ASSESSMENT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "assistedOrderAssessmentThirdDropdownDate",
+    "ElementLabel": " ",
+    "HintText": "For example, 16 4 2021",
+    "FieldType": "Date",
+    "FieldShowCondition": "assistedOrderAssessmentSecondDropdownList2 = \"YES\" AND assistedOrderClaimantDefendantFirstDropdown = \"SUBJECT_DETAILED_ASSESSMENT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "makeAnOrderForCostsQOCSLabel",
+    "ElementLabel": "### Does the paying party have QOCS protection?",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "makeAnOrderForCostsQOCSYesOrNo",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "makeAnOrderForCostsQOCSText",
+    "ElementLabel": "Other than by way of permitted set off, there shall be no enforcement of any costs assessed under this order without permission of the Court.",
+    "FieldType": "Label",
+    "FieldShowCondition": "makeAnOrderForCostsQOCSYesOrNo = \"Yes\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "beSpokeCostDetailsLabel",
+    "ElementLabel": "### Bespoke costs order",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "beSpokeCostDetailsSecondLabel",
+    "ElementLabel": "### Please insert cost order you wish to make",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "CostReservedDetails",
+    "ListElementCode": "beSpokeCostDetailsText",
+    "ElementLabel": " ",
+    "HintText": "",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  }
+]

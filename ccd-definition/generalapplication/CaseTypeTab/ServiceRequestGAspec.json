@@ -1,0 +1,29 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "ServiceRequestTab",
+    "TabLabel": "Service Request",
+    "TabDisplayOrder": 6,
+    "CaseFieldID": "businessProcess",
+    "TabFieldDisplayOrder": 1,
+    "FieldShowCondition": "ServiceRequest=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "ServiceRequestTab",
+    "TabLabel": "Service Request",
+    "TabDisplayOrder": 6,
+    "CaseFieldID": "ServiceRequest",
+    "TabFieldDisplayOrder": 2,
+    "FieldShowCondition": "businessProcess.status=\"FINISHED\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "ServiceRequestTab",
+    "TabLabel": "Service Request",
+    "TabDisplayOrder": 6,
+    "CaseFieldID": "unfinishedBackEndProcess",
+    "TabFieldDisplayOrder": 3,
+    "FieldShowCondition": "businessProcess.status!=\"FINISHED\""
+  }
+]

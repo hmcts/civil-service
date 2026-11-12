@@ -1,0 +1,55 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "NOTIFY_INTERIM_JUDGMENT_CLAIMANT",
+    "Name": "Notify IJ Claimant",
+    "Description": "Notify interim judgment to claimant",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "NOTIFY_INTERIM_JUDGMENT_DEFENDANT",
+    "Name": "Email: Notify Defendant",
+    "Description": "Notify interim judgment to defendant",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0,
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "NOTIFY_INTERIM_JUDGMENT",
+    "Name": "Notify Interim Judgement",
+    "Description": "Notify interim judgment",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "JUDICIAL_REFERRAL",
+    "SecurityClassification": "Public",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0,
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "NOTIFY_RPA_DJ_UNSPEC",
+    "Name": "Notify RPA",
+    "Description": "Notify RPA",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  }
+]

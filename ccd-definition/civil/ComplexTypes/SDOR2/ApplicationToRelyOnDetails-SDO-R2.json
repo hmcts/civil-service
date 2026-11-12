@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "SdoR2ApplicationToRelyOnFurtherDetails",
+    "ListElementCode": "applicationToRelyDetailsTxt",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2ApplicationToRelyOnFurtherDetails",
+    "ListElementCode": "applicationToRelyDetailsDate",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

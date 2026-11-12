@@ -1,0 +1,21 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "bespokeRangeLabel",
+    "ID": "BespokeDateHeardFinalOrders",
+    "ElementLabel": "## Bespoke range",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "bespokeRangeTextArea",
+    "ID": "BespokeDateHeardFinalOrders",
+    "ElementLabel": "Enter a bespoke range of dates for hearing",
+    "HintText": "For example, 16 4 2021, 19-20 4 2021 and 11-12 5 2021",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

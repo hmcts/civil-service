@@ -1,0 +1,44 @@
+[
+  {
+    "ID": "ListOfEvidences",
+    "ListElementCode": "CONTRACTS_AND_AGREEMENTS",
+    "ListElement": "Contracts and agreements",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ListOfEvidences",
+    "ListElementCode": "EXPERT_WITNESS",
+    "ListElement": "Expert witness",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "ListOfEvidences",
+    "ListElementCode": "LETTERS_EMAILS_AND_OTHER_CORRESPONDENCE",
+    "ListElement": "Letters, emails and other correspondence",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "ListOfEvidences",
+    "ListElementCode": "PHOTO_EVIDENCE",
+    "ListElement": "Photo Evidence",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "ListOfEvidences",
+    "ListElementCode": "RECEIPTS",
+    "ListElement": "Receipts",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "ListOfEvidences",
+    "ListElementCode": "STATEMENT_OF_ACCOUNT",
+    "ListElement": "Statement of account",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "ListOfEvidences",
+    "ListElementCode": "OTHER",
+    "ListElement": "other",
+    "DisplayOrder": 7
+  }
+]

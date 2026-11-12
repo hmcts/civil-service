@@ -1,0 +1,116 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingHelpFeesReferenceNumber",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingHwfDetails",
+    "FieldType": "HelpWithFeesDetails",
+    "Label": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "helpWithFeesMoreInformationHearing",
+    "Label": " ",
+    "FieldType": "HelpWithFeesMoreInformation",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hwfFullRemissionGrantedForHearingFee",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hwfOutstandingFeePaymentDoneForHearingFee",
+    "Label": "Confirm payment of £${hearingHwfDetails.outstandingFeeInPounds} has been taken.",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "ConfirmPaymentMade",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+  "CaseTypeID": "CIVIL",
+  "ID": "caseLabelHearingReference",
+  "Label": "${hearingHelpFeesReferenceNumber}",
+  "FieldType": "Label",
+  "SecurityClassification": "Public",
+  "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingFeeLabel",
+    "FieldType": "Label",
+    "Label": "Help with Fees type: HwF Hearing fee",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "caseTitleWithHWFHearingNumber",
+    "Label": "<h2 class=\"govuk-heading-1\"> ${hearingHelpFeesReferenceNumber} ${applicant1.partyName} Vs ${respondent1.partyName} </h2>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "requestForReconsiderationDocument",
+    "Label": " ",
+    "FieldType": "CaseDocument",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "requestForReconsiderationDocumentRes",
+    "Label": " ",
+    "FieldType": "CaseDocument",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "requestForReviewCommentsClaimant",
+    "Label": "Request Recon claimant",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "requestForReviewCommentsDefendant",
+    "Label": "Request Recon defendant",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "orderRequestedForReviewClaimant",
+    "Label": "Request Recon claimant",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "orderRequestedForReviewDefendant",
+    "Label": "Request Recon defendant",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  }
+]

@@ -1,0 +1,31 @@
+[
+  {
+    "ID": "FinalOrderFastTrackAllocation",
+    "ListElementCode": "assignComplexityBand",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Do you assign a complexity band to the case?",
+    "HintText": "Please note, noise induced deafness claims are not within the scope of CPR 26.15",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FinalOrderFastTrackAllocation",
+    "ListElementCode": "band",
+    "ElementLabel": "and the court assigns the claim to complexity",
+    "FieldType": "FixedRadioList",
+    "FieldShowCondition": "assignComplexityBand = \"Yes\"",
+    "FieldTypeParameter": "FastTrackComplexityBand",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FinalOrderFastTrackAllocation",
+    "ListElementCode": "reasons",
+    "ElementLabel": "because",
+    "FieldType": "TextArea",
+    "FieldShowCondition": "assignComplexityBand = \"Yes\" OR assignComplexityBand = \"No\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "_comment": "Field will not show when assignComplexityBand is not selected"
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "ID": "Upload",
+    "CaseEventID": "CREATE_CLAIM_SPEC",
+    "CaseFieldID": "servedDocumentFiles",
+    "ListElementCode": "medicalReport",
+    "DisplayContext": "OPTIONAL",
+    "FieldDisplayOrder": 6,
+    "FieldShowCondition": "claimType=\"CLINICAL_NEGLIGENCE\" OR claimType=\"PERSONAL_INJURY\"",
+    "Comment": "medicalreports.document is just the document input,so this must be defined to hide the whole element"
+  }
+]

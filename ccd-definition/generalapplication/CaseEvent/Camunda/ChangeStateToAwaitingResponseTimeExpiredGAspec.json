@@ -1,0 +1,17 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "CHANGE_STATE_TO_ADDITIONAL_RESPONSE_TIME_EXPIRED",
+    "Name": "Change application state",
+    "Description": "Change state to ADDITIONAL_RESPONSE_TIME_EXPIRED",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "ADDITIONAL_RESPONSE_TIME_EXPIRED",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/submitted",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0,
+    "Publish": "Y"
+  }
+]

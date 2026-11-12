@@ -1,0 +1,10 @@
+[
+  {
+    "ID": "GAJudicialDecisionGAspec",
+    "ListElementCode": "decision",
+    "ElementLabel": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "GAJudgeDecisionOptionGAspec",
+    "SecurityClassification": "Public"
+  }
+]

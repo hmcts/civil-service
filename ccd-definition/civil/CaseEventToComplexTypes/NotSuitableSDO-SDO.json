@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "ReasonNotSuitableSDO",
+    "CaseEventID": "NotSuitable_SDO",
+    "CaseFieldID": "reasonNotSuitableSDO",
+    "ListElementCode": "label",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ReasonNotSuitableSDO",
+    "CaseEventID": "NotSuitable_SDO",
+    "CaseFieldID": "reasonNotSuitableSDO",
+    "ListElementCode": "text",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ReasonNotSuitableSDO",
+    "CaseEventID": "NotSuitable_SDO",
+    "CaseFieldID": "reasonNotSuitableSDO",
+    "ListElementCode": "input",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  }
+]

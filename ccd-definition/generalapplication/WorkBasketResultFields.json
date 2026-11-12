@@ -1,0 +1,44 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "[CASE_REFERENCE]",
+    "Label": "Application case reference",
+    "DisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "[STATE]",
+    "Label": "State",
+    "DisplayOrder": 2
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "applicationTypes",
+    "Label": "Application Types",
+    "DisplayOrder": 3
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "parentCaseReference",
+    "Label": "Parent Case Reference",
+    "DisplayOrder": 4
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimant1PartyName",
+    "Label": "Claimant Name",
+    "DisplayOrder": 5
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "defendant1PartyName",
+    "Label": "Defendant 1 Name",
+    "DisplayOrder": 6
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "defendant2PartyName",
+    "Label": "Defendant 2 Name",
+    "DisplayOrder": 7
+  }
+]

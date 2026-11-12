@@ -1,0 +1,125 @@
+[
+  {
+    "ID": "SolicitorReferences",
+    "CaseEventID": "ACKNOWLEDGE_CLAIM",
+    "CaseFieldID": "solicitorReferences",
+    "ListElementCode": "respondentSolicitor1Reference",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "SolicitorReferences",
+    "CaseEventID": "ACKNOWLEDGE_CLAIM",
+    "CaseFieldID": "solicitorReferences",
+    "ListElementCode": "respondentSolicitor2Reference",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "SolicitorReferences",
+    "CaseEventID": "ACKNOWLEDGE_SERVICE",
+    "CaseFieldID": "solicitorReferences",
+    "ListElementCode": "applicantSolicitor1Reference",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "respondentSolicitor1Reference = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "Party",
+    "CaseEventID": "ACKNOWLEDGE_CLAIM",
+    "CaseFieldID": "respondent1",
+    "ListElementCode": "individualDateOfBirth",
+    "EventElementLabel": "Date of birth",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "respondent1Copy.type=\"INDIVIDUAL\"",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "ID": "Party",
+    "CaseEventID": "ACKNOWLEDGE_CLAIM",
+    "CaseFieldID": "respondent1",
+    "ListElementCode": "soleTraderDateOfBirth",
+    "EventElementLabel": "Date of birth",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "respondent1Copy.type=\"SOLE_TRADER\"",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "ID": "Party",
+    "CaseEventID": "ACKNOWLEDGE_CLAIM",
+    "CaseFieldID": "respondent2",
+    "ListElementCode": "individualDateOfBirth",
+    "EventElementLabel": "Date of birth",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "respondent2Copy.type=\"INDIVIDUAL\"",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "ID": "Party",
+    "CaseEventID": "ACKNOWLEDGE_CLAIM",
+    "CaseFieldID": "respondent2",
+    "ListElementCode": "soleTraderDateOfBirth",
+    "EventElementLabel": "Date of birth",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "respondent2Copy.type=\"SOLE_TRADER\"",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "ID": "Party",
+    "CaseEventID": "ACKNOWLEDGE_CLAIM",
+    "CaseFieldID": "respondent1",
+    "ListElementCode": "flags",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "respondent1=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "Party",
+    "CaseEventID": "ACKNOWLEDGE_CLAIM",
+    "CaseFieldID": "respondent1",
+    "ListElementCode": "flags.roleOnCase",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "respondent1=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "Party",
+    "CaseEventID": "ACKNOWLEDGE_CLAIM",
+    "CaseFieldID": "respondent1",
+    "ListElementCode": "flags.partyName",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "respondent1=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "Party",
+    "CaseEventID": "ACKNOWLEDGE_CLAIM",
+    "CaseFieldID": "respondent2",
+    "ListElementCode": "flags",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "respondent2=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "Party",
+    "CaseEventID": "ACKNOWLEDGE_CLAIM",
+    "CaseFieldID": "respondent2",
+    "ListElementCode": "flags.roleOnCase",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "respondent2=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "Party",
+    "CaseEventID": "ACKNOWLEDGE_CLAIM",
+    "CaseFieldID": "respondent2",
+    "ListElementCode": "flags.partyName",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "respondent2=\"DO_NOT_SHOW_IN_UI\""
+  }
+]

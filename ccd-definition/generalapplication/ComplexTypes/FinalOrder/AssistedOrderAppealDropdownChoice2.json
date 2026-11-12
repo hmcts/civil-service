@@ -1,0 +1,27 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "assistedOrderAppealSecondOptionLabelB",
+    "ID": "AssistedOrderAppealSecondOptionGranted",
+    "ElementLabel": "at the appropriate appeal centre prescribed in  \n\n<a target=\"_blank\" href=\"https://www.justice.gov.uk/courts/procedure-rules/civil/rules/part52/practice-direction-52b-appeals-in-the-county-courts-and-high-court\">CPR52PDB Table B.</a> \n\n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "assistedOrderAppealSecondOptionDateLabelB",
+    "ID": "AssistedOrderAppealSecondOptionGranted",
+    "ElementLabel": "### The appellant's notice shall be filed at the appeal centre no later than 4pm on",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "assistedOrderAppealDate",
+    "ID": "AssistedOrderAppealSecondOptionGranted",
+    "ElementLabel": " ",
+    "HintText": "For example, 16 4 2021",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
+  }
+]

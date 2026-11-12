@@ -1,0 +1,21 @@
+[
+    {
+      "ID": "GAJudgeMakeAnOrderOptionGAspec",
+      "ListElementCode": "APPROVE_OR_EDIT",
+      "ListElement": "Approve or edit the order requested by the applicant",
+      "DisplayOrder": 1
+    },
+    {
+      "ID": "GAJudgeMakeAnOrderOptionGAspec",
+      "ListElementCode": "DISMISS_THE_APPLICATION",
+      "ListElement": "Dismiss the application",
+      "DisplayOrder": 2
+    },
+    {
+      "ID": "GAJudgeMakeAnOrderOptionGAspec",
+      "ListElementCode": "GIVE_DIRECTIONS_WITHOUT_HEARING",
+      "ListElement": "Give directions without listing for hearing",
+      "DisplayOrder": 3
+    }
+]
+  

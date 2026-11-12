@@ -1,0 +1,16 @@
+[
+  {
+    "ID": "GAUserDetailsGAspec",
+    "ListElementCode": "email",
+    "FieldType": "Email",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAUserDetailsGAspec",
+    "ListElementCode": "id",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "SdoR2Settlement",
+    "ListElementCode": "includeInOrderToggle",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "IncludeInOrderToggle",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2Settlement",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": "Each party must inform the Court immediately if the case is settled whether or not it is then possible to upload to the Digital Portal a draft consent order to give effect to their agreement.",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "includeInOrderToggle = \"INCLUDE\""
+  }
+]

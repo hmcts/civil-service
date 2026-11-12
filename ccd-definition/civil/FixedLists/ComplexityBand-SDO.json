@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "FastTrackComplexityBand",
+    "ListElementCode": "BAND_1",
+    "ListElement": "band 1: road traffic accident without personal injury; debt claims",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "FastTrackComplexityBand",
+    "ListElementCode": "BAND_2",
+    "ListElement": "band 2: road traffic accident with personal injury covered by protocol; personal injury; package travel claims",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "FastTrackComplexityBand",
+    "ListElementCode": "BAND_3",
+    "ListElement": "band 3: road traffic accident with personal injury but not covered by protocol; employer liability (accident): public liability (personal injury); housing disrepair; other money claims",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "FastTrackComplexityBand",
+    "ListElementCode": "BAND_4",
+    "ListElement": "band 4: employer liability (disease, but not noise induced hearing loss) complex housing disrepair, property/building disputes; professional negligence; complex claims",
+    "DisplayOrder": 4
+  }
+]

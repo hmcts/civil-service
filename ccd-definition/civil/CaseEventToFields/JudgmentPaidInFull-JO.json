@@ -1,0 +1,39 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "JUDGMENT_PAID_IN_FULL",
+    "CaseFieldID": "lblMarkPaidInFull",
+    "PageID": "MarkJudgmentPaidInFull",
+    "PageLabel": "Mark judgment as paid in full",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "DisplayContext": "READONLY",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "JUDGMENT_PAID_IN_FULL",
+    "CaseFieldID": "joPartiesNames",
+    "PageID": "MarkJudgmentPaidInFull",
+    "PageLabel": "Mark judgment as paid in full",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "PageColumnNumber": 1,
+    "DisplayContext": "READONLY",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "JUDGMENT_PAID_IN_FULL",
+    "CaseFieldID": "joJudgmentPaidInFull",
+    "PageID": "MarkJudgmentPaidInFull",
+    "PageLabel": "Mark a judgment as paid in full",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "COMPLEX",
+    "ShowSummaryChangeOption": "N",
+    "RetriesTimeoutURLMidEvent": 0,
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-payment-date"
+  }
+]

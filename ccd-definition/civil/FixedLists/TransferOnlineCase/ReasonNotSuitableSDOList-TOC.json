@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "ReasonNotSuitableSDOList",
+    "ListElementCode": "CHANGE_LOCATION",
+    "ListElement": "The case should be sent to another hearing centre for directions",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ReasonNotSuitableSDOList",
+    "ListElementCode": "OTHER_REASONS",
+    "ListElement": "Other reason",
+    "DisplayOrder": 2
+  }
+]

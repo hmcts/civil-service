@@ -1,0 +1,8 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "APPLY_NOC_DECISION",
+    "UserRole": "caseworker-approver",
+    "CRUD": "CRUD"
+  }
+]

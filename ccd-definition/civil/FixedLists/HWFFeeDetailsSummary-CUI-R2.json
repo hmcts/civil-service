@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "HWFFeesSummaryType",
+    "ListElementCode": "NOT_QUALIFY_FEE_ASSISTANCE",
+    "ListElement": "Does not qualify for Help with Fees assistance",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "HWFFeesSummaryType",
+    "ListElementCode": "INCORRECT_EVIDENCE",
+    "ListElement": "Incorrect evidence supplied",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "HWFFeesSummaryType",
+    "ListElementCode": "INSUFFICIENT_EVIDENCE",
+    "ListElement": "Insufficient evidence supplied",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "HWFFeesSummaryType",
+    "ListElementCode": "FEES_REQUIREMENT_NOT_MET",
+    "ListElement": "Income / outgoings calculation determines Help with Fees requirement not met",
+    "DisplayOrder": 4
+  }
+]

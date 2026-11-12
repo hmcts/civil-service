@@ -1,0 +1,35 @@
+[
+  {
+    "ID": "ExpertLiP",
+    "ListElementCode": "caseNeedsAnExpert",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ExpertLiP",
+    "ListElementCode": "expertCanStillExamineDetails",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ExpertLiP",
+    "ListElementCode": "expertReportRequired",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ExpertLiP",
+    "ListElementCode": "details",
+    "ElementLabel": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "ExpertReportLiP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

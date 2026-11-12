@@ -1,0 +1,14 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "EXTEND_RESPONSE_DEADLINE",
+    "CaseFieldID": "respondentSolicitor1AgreedDeadlineExtension",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": "ResponseDeadlineExtension",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "Y",
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/response-deadline-extension",
+    "RetriesTimeoutURLMidEvent": 0
+  }
+]

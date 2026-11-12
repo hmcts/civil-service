@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "REQUEST_FOR_RECONSIDERATION",
+    "ListElement": "Request for reconsideration",
+    "DisplayOrder": 24
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "ORDER_NOTICE_TRANSLATED_DOCUMENT",
+    "ListElement": "Translated order",
+    "DisplayOrder": 25
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "ListingOrRelisting",
+    "ListElementCode": "LISTING",
+    "ListElement": "Listing",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ListingOrRelisting",
+    "ListElementCode": "RELISTING",
+    "ListElement": "Relisting",
+    "DisplayOrder": 2
+  }
+]

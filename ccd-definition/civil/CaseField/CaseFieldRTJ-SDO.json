@@ -1,0 +1,19 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "eventDescription",
+    "Label": "Event Description",
+    "FieldType": "Text",
+    "HintText": "A few words describing the purpose of the event",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "additionalInformation",
+    "Label": "Additional Information ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]
