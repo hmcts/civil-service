@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "JudgmentType",
+    "ListElementCode": "DEFAULT_JUDGMENT",
+    "ListElement": "Default Judgment",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "JudgmentType",
+    "ListElementCode": "JUDGMENT_BY_ADMISSION",
+    "ListElement": "Judgment by admission",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "JudgmentType",
+    "ListElementCode": "JUDGMENT_FOLLOWING_HEARING",
+    "ListElement": "Judgment following hearing",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "JudgmentType",
+    "ListElementCode": "INTERLOCUTORY_JUDGMENT",
+    "ListElement": "Interlocutory Judgment",
+    "DisplayOrder": 4
+  }
+]

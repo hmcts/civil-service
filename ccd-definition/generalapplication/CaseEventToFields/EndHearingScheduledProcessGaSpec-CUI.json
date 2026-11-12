@@ -1,0 +1,79 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "END_HEARING_SCHEDULED_PROCESS_GASPEC",
+    "CaseFieldID": "isGaApplicantLip",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "WAFieldsCUI1",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "END_HEARING_SCHEDULED_PROCESS_GASPEC",
+    "CaseFieldID": "isGaRespondentOneLip",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "WAFieldsCUI2",
+    "PageDisplayOrder": 2,
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "END_HEARING_SCHEDULED_PROCESS_GASPEC",
+    "CaseFieldID": "applicantBilingualLanguagePreference",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "WAFieldsCUI3",
+    "PageDisplayOrder": 3,
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "END_HEARING_SCHEDULED_PROCESS_GASPEC",
+    "CaseFieldID": "respondentBilingualLanguagePreference",
+    "PageFieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "WAFieldsCUI4",
+    "PageDisplayOrder": 4,
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "END_HEARING_SCHEDULED_PROCESS_GASPEC",
+    "CaseFieldID": "gaWaTrackLabel",
+    "PageFieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "WAFieldsCUI5",
+    "PageDisplayOrder": 5,
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "END_HEARING_SCHEDULED_PROCESS_GASPEC",
+    "CaseFieldID": "generalAppInformOtherParty",
+    "PageFieldDisplayOrder": 6,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "WAFieldsCUI6",
+    "PageDisplayOrder": 6,
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "END_HEARING_SCHEDULED_PROCESS_GASPEC",
+    "CaseFieldID": "applicationIsCloaked",
+    "PageFieldDisplayOrder": 7,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "WAFieldsCUI7",
+    "PageDisplayOrder": 7,
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  }
+]

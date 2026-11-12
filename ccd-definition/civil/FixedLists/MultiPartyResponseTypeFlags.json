@@ -1,0 +1,32 @@
+[
+  {
+    "ID": "MultiPartyResponseTypeFlags",
+    "ListElementCode": "FULL_DEFENCE",
+    "ListElement": "Reject all of the claim",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "MultiPartyResponseTypeFlags",
+    "ListElementCode": "NOT_FULL_DEFENCE",
+    "ListElement": "Not Reject all of the claim",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "MultiPartyResponseTypeFlags",
+    "ListElementCode": "COUNTER_ADMIT_OR_ADMIT_PART",
+    "ListElement": "Counter, admit or admit part",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "MultiPartyResponseTypeFlags",
+    "ListElementCode": "FULL_ADMISSION",
+    "ListElement": "Admits all of the claim",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "MultiPartyResponseTypeFlags",
+    "ListElementCode": "PART_ADMISSION",
+    "ListElement": "Admits part of the claim",
+    "DisplayOrder": 5
+  }
+]

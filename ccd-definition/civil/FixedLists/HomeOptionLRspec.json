@@ -1,0 +1,32 @@
+[
+  {
+    "ID": "HomeOption",
+    "ListElementCode": "OWNED_HOME",
+    "ListElement": "Home they own or pay a mortgage on",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "HomeOption",
+    "ListElementCode": "JOINTLY_OWNED_HOME",
+    "ListElement": "Jointly-owned home (or jointly mortgaged home)",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "HomeOption",
+    "ListElementCode": "PRIVATE_RENTAL",
+    "ListElement": "Private rental",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "HomeOption",
+    "ListElementCode": "ASSOCIATION_HOME",
+    "ListElement": "Council or housing association home",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "HomeOption",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 5
+  }
+]

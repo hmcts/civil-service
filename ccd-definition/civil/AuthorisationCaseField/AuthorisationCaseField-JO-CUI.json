@@ -1,0 +1,140 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "joDefendantName1",
+    "UserRoles": [
+      "CITIZEN-CLAIMANT-PROFILE"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "joIsDisplayInJudgmentTab",
+    "UserRoles": [
+      "CITIZEN-CLAIMANT-PROFILE"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "joDefendantName2",
+    "UserRoles": [
+      "CITIZEN-CLAIMANT-PROFILE"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "joPaymentPlanSelected",
+    "UserRoles": [
+      "CITIZEN-CLAIMANT-PROFILE"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "joRepaymentAmount",
+    "UserRoles": [
+      "CITIZEN-CLAIMANT-PROFILE"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "joRepaymentStartDate",
+    "UserRoles": [
+      "CITIZEN-CLAIMANT-PROFILE"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "joRepaymentFrequency",
+    "UserRoles": [
+      "CITIZEN-CLAIMANT-PROFILE"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "joIssueDate",
+    "UserRoles": [
+      "CITIZEN-CLAIMANT-PROFILE"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "joState",
+    "UserRoles": [
+      "CITIZEN-CLAIMANT-PROFILE"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "joFullyPaymentMadeDate",
+    "UserRoles": [
+      "CITIZEN-CLAIMANT-PROFILE"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "joSetAsideCreatedDate",
+    "UserRoles": [
+      "CITIZEN-CLAIMANT-PROFILE"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "joRepaymentSummaryObject",
+    "UserRoles": [
+      "CITIZEN-CLAIMANT-PROFILE"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "joRepaymentSummaryLabel",
+    "UserRoles": [
+      "CITIZEN-CLAIMANT-PROFILE"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "joOrderedAmount",
+    "UserRoles": [
+      "CITIZEN-CLAIMANT-PROFILE"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "joCosts",
+    "UserRoles": [
+      "CITIZEN-CLAIMANT-PROFILE"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "joTotalAmount",
+    "UserRoles": [
+      "CITIZEN-CLAIMANT-PROFILE"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "joIsLiveJudgmentExists",
+    "UserRoles": [
+      "CITIZEN-CLAIMANT-PROFILE",
+      "CITIZEN-DEFENDANT-PROFILE",
+      "citizen-profile"
+    ],
+    "CRUD": "CRU"
+  }
+]

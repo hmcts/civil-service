@@ -1,0 +1,34 @@
+[
+  {
+    "ID": "OrgIndividuals",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "updateOrgIndividualsForm",
+    "ListElementCode": "firstName",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "OrgIndividuals",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "updateOrgIndividualsForm",
+    "ListElementCode": "lastName",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "OrgIndividuals",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "updateOrgIndividualsForm",
+    "ListElementCode": "emailAddress",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "OrgIndividuals",
+    "CaseEventID": "MANAGE_CONTACT_INFORMATION",
+    "CaseFieldID": "updateOrgIndividualsForm",
+    "ListElementCode": "phoneNumber",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  }
+]

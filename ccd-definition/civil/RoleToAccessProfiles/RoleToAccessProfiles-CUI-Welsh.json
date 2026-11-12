@@ -1,0 +1,20 @@
+[
+  {
+    "RoleName" : "idam:wlu-admin",
+    "Authorisation": "",
+    "CaseTypeID": "CIVIL",
+    "AccessProfiles": "wlu-admin,GS_profile",
+    "ReadOnly": "N",
+    "Disabled": "F",
+    "CaseAccessCategories": "SPEC_CLAIM"
+  },
+  {
+    "RoleName": "wlu-team-leader",
+    "Authorisation": "",
+    "CaseTypeID": "CIVIL",
+    "AccessProfiles": "wlu-admin,GS_profile",
+    "ReadOnly": "N",
+    "Disabled": "F",
+    "CaseAccessCategories": "SPEC_CLAIM"
+  }
+]

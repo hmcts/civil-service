@@ -1,0 +1,21 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "singleDateLabel",
+    "ID": "SingleDateHeardFinalOrders",
+    "ElementLabel": "## Single date",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "singleDate",
+    "ID": "SingleDateHeardFinalOrders",
+    "ElementLabel": "Single date",
+    "HintText": "For example, 16 4 2021",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

@@ -1,0 +1,19 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "caseTitleWithReference",
+    "Label": "### ${legacyCaseReference} ${applicant1.partyName} Vs ${respondent1.partyName}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "manageDocuments",
+    "Label": "Bulk scanned or emailed documents",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "StaffDocument",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

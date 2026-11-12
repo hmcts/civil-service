@@ -1,0 +1,14 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "AMEND_PARTY_DETAILS",
+    "CaseFieldID": "specRespondentSolicitor1EmailAddress",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "CaseEventFieldLabel": "Defendant's legal representative's details",
+    "PageID": "Email",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "respondent1Represented = \"Yes\""
+  }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "END_SCHEDULER_CHECK_UNLESS_ORDER_DEADLINE",
+    "Name": "Unless Order Date Scheduler",
+    "Description": "Trigger Unless Order End Date Scheduler",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "ORDER_MADE",
+    "SecurityClassification": "Public",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0,
+    "Publish": "Y"
+  }
+]

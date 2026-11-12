@@ -1,0 +1,17 @@
+[
+  {
+    "ID": "GAOrderCourtOwnInitiativeGAspec",
+    "ListElementCode": "orderCourtOwnInitiative",
+    "ElementLabel": "Order on court's own initiative",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAOrderCourtOwnInitiativeGAspec",
+    "ListElementCode": "orderCourtOwnInitiativeDate",
+    "ElementLabel": "Please enter date",
+    "FieldType": "Date",
+    "HintText": "For example, 16 4 2021",
+    "SecurityClassification": "Public"
+  }
+]

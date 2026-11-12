@@ -1,0 +1,23 @@
+[
+  {
+    "ID": "GAUrgencyRecordPage",
+    "CaseEventID": "CHANGE_STATE_TO_AWAITING_JUDICIAL_DECISION",
+    "CaseFieldID": "generalAppUrgencyRequirement",
+    "ListElementCode": "generalAppUrgency",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "Publish": "Y"
+  },
+  {
+    "ID": "GATypePage",
+    "CaseEventID": "CHANGE_STATE_TO_AWAITING_JUDICIAL_DECISION",
+    "CaseFieldID": "generalAppType",
+    "ListElementCode": "types",
+    "EventElementLabel": "  ",
+    "EventHintText": "  ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "Publish": "Y"
+  }
+]

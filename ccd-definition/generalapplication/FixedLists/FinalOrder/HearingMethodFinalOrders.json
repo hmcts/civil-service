@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "HearingMethodFinalOrderList",
+    "ListElementCode": "VIDEO",
+    "ListElement": "Video",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "HearingMethodFinalOrderList",
+    "ListElementCode": "TELEPHONE",
+    "ListElement": "Telephone",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "HearingMethodFinalOrderList",
+    "ListElementCode": "IN_PERSON",
+    "ListElement": "In person",
+    "DisplayOrder": 3
+  }
+]

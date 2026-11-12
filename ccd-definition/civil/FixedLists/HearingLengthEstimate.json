@@ -1,0 +1,38 @@
+[
+  {
+    "ID": "HearingLengthEstimate",
+    "ListElementCode": "15_MINUTES",
+    "ListElement": "15 minutes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "HearingLengthEstimate",
+    "ListElementCode": "30_MINUTES",
+    "ListElement": "30 minutes",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "HearingLengthEstimate",
+    "ListElementCode": "45_MINUTES",
+    "ListElement": "45 minutes",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "HearingLengthEstimate",
+    "ListElementCode": "1_HOUR",
+    "ListElement": "1 hour",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "HearingLengthEstimate",
+    "ListElementCode": "2_HOURS",
+    "ListElement": "2 hours",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "HearingLengthEstimate",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 6
+  }
+]

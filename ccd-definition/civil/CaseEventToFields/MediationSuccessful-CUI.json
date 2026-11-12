@@ -1,0 +1,74 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "MEDIATION_SUCCESSFUL",
+    "CaseFieldID": "caseTitle",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "MediationSuccessful",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "MEDIATION_SUCCESSFUL",
+    "CaseFieldID": "defendantNameLabel",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "READONLY",
+    "PageID": "MediationSuccessful",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "MEDIATION_SUCCESSFUL",
+    "CaseFieldID": "defendantName",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "READONLY",
+    "PageID": "MediationSuccessful",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "MEDIATION_SUCCESSFUL",
+    "CaseFieldID": "mediationSettlementAgreedAt",
+    "PageFieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY",
+    "PageID": "MediationSuccessful",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "Y",
+    "RetriesTimeoutURLMidEvent": 0
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "MEDIATION_SUCCESSFUL",
+    "CaseFieldID": "mediationAgreementTitle",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "MediationAgreement",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "MEDIATION_SUCCESSFUL",
+    "CaseFieldID": "staffUploadedDocumentsLabel",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "READONLY",
+    "PageID": "MediationAgreement",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "MEDIATION_SUCCESSFUL",
+    "CaseFieldID": "mediationAgreement",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "COMPLEX",
+    "PageID": "MediationAgreement",
+    "PageDisplayOrder": 2,
+    "ShowSummaryChangeOption": "Y",
+    "RetriesTimeoutURLMidEvent": 0
+  }
+]

@@ -1,0 +1,35 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "coSCApplicationStatus",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "CoscApplicationStatus",
+    "Label": "CoSC Application Status",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "coscSchedulerDeadline",
+    "Label": " ",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "certOfSC",
+    "Label": " ",
+    "FieldType": "CertOfSC",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "generalAppTypeLR",
+    "Label": " ",
+    "FieldType": "GATypeGAspecLR",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

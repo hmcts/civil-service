@@ -1,0 +1,19 @@
+{
+  "CaseTypeID": "CIVIL",
+  "ID": "REMOVE_DOCUMENT",
+  "Name": "Remove document",
+  "Description": "Remove document/s",
+  "DisplayOrder":1,
+  "PreConditionState(s)": "*",
+  "PostConditionState": "*",
+  "SecurityClassification": "Public",
+  "CallBackURLAboutToStartEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-start",
+  "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+  "CallBackURLSubmittedEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/submitted",
+  "Comment": "Needs to be made available for certain roles only",
+  "ShowSummary": "Y",
+  "ShowEventNotes": "Y",
+  "RetriesTimeoutAboutToStartEvent": 0,
+  "RetriesTimeoutURLAboutToSubmitEvent": 0,
+  "RetriesTimeoutURLSubmittedEvent": 0
+}

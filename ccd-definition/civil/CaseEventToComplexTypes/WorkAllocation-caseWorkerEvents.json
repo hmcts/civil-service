@@ -1,0 +1,42 @@
+[
+  {
+    "ID": "SendMessageMetadata",
+    "CaseEventID": "SEND_AND_REPLY",
+    "CaseFieldID": "lastMessage",
+    "ListElementCode": "recipientRoleType",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "SendMessageMetadata",
+    "CaseEventID": "SEND_AND_REPLY",
+    "CaseFieldID": "lastMessage",
+    "ListElementCode": "isUrgent",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "ObligationWAFlag",
+    "CaseEventID": "ORDER_REVIEW_OBLIGATION_CHECK",
+    "CaseFieldID": "obligationWAFlag",
+    "ListElementCode": "obligationReason",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "ObligationWAFlag",
+    "CaseEventID": "ORDER_REVIEW_OBLIGATION_CHECK",
+    "CaseFieldID": "obligationWAFlag",
+    "ListElementCode": "obligationReasonDisplayValue",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "ObligationWAFlag",
+    "CaseEventID": "ORDER_REVIEW_OBLIGATION_CHECK",
+    "CaseFieldID": "obligationWAFlag",
+    "ListElementCode": "currentDate",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  }
+]

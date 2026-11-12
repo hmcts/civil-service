@@ -1,0 +1,41 @@
+[
+  {
+    "ID": "AssistedOrderMadeDateSelection",
+    "ListElementCode": "assistedOrderMadeListLabel",
+    "ElementLabel": "#### Enter date(s) of hearing",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "AssistedOrderMadeDateSelection",
+    "ListElementCode": "assistedOrderMadeDateList",
+    "ElementLabel": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "AssistedOrderMadeDateList",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "AssistedOrderMadeDateSelection",
+    "ListElementCode": "singleDateSelection",
+    "ElementLabel": " ",
+    "FieldType": "AssistedOrderSingleDateHeard",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "assistedOrderMadeDateList=\"SINGLE_DATE\""
+  },
+  {
+    "ID": "AssistedOrderMadeDateSelection",
+    "ListElementCode": "dateRangeSelection",
+    "ElementLabel": " ",
+    "FieldType": "AssistedOrderDateRangeHeard",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "assistedOrderMadeDateList=\"DATE_RANGE\""
+  },
+  {
+    "ID": "AssistedOrderMadeDateSelection",
+    "ListElementCode": "bespokeRangeSelection",
+    "ElementLabel": " ",
+    "FieldType": "AssistedOrderBespokeDateHeard",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "assistedOrderMadeDateList=\"BESPOKE_RANGE\""
+  }
+]

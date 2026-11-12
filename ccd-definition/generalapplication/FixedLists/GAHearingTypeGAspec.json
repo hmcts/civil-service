@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "GAHearingTypeGAspec",
+    "ListElementCode": "IN_PERSON",
+    "ListElement": "In person",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "GAHearingTypeGAspec",
+    "ListElementCode": "WITHOUT_HEARING",
+    "ListElement": "Without a hearing",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "GAHearingTypeGAspec",
+    "ListElementCode": "VIDEO",
+    "ListElement": "Video conference hearing",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "GAHearingTypeGAspec",
+    "ListElementCode": "TELEPHONE",
+    "ListElement": "Telephone hearing",
+    "DisplayOrder": 4
+  }
+]

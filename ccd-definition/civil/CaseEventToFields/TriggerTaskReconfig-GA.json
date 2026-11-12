@@ -1,0 +1,24 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "TRIGGER_TASK_RECONFIG_GA",
+    "CaseFieldID": "gaEaCourtLocation",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "WorkAllocation",
+    "PageShowCondition": "gaDraftDocRespondentSolTwo=\"DO NOT SHOW IN UI\"",
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "TRIGGER_TASK_RECONFIG_GA",
+    "CaseFieldID": "gaDraftDocRespondentSolTwo",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "WorkAllocation",
+    "ShowSummaryChangeOption": "N"
+  }
+]

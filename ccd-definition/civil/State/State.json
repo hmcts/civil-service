@@ -1,0 +1,146 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "PENDING_CASE_ISSUED",
+    "Name": "Claim Issue Pending",
+    "Description": "Holding state whilst payment is taken",
+    "DisplayOrder": 1,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameHmctsInternal}"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "CASE_ISSUED",
+    "Name": "Awaiting Claim Notification",
+    "Description": "Claim is created",
+    "DisplayOrder": 2,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameHmctsInternal}"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "AWAITING_CASE_DETAILS_NOTIFICATION",
+    "Name": "Awaiting Claim Details Notification",
+    "Description": "Awaiting Claim Details Notification",
+    "DisplayOrder": 3,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameHmctsInternal}"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "AWAITING_RESPONDENT_ACKNOWLEDGEMENT",
+    "Name": "Awaiting Defendant Response",
+    "Description": "Awaiting Defendant Response",
+    "DisplayOrder": 4,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameHmctsInternal}"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "AWAITING_APPLICANT_INTENTION",
+    "Name": "Claimant Intent Pending",
+    "Description": "Claimant Intent Pending",
+    "DisplayOrder": 5,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameHmctsInternal}"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "CASE_DISMISSED",
+    "Name": "Claim Dismissed",
+    "Description": "Claim has been dismissed",
+    "DisplayOrder": 6,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameHmctsInternal}"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "PROCEEDS_IN_HERITAGE_SYSTEM",
+    "Name": "Case Proceeds Offline",
+    "Description": "Claim is not able to be progressed online in CCD and will be taken offline",
+    "DisplayOrder": 7,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameHmctsInternal}"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "JUDICIAL_REFERRAL",
+    "Name": "Judicial Referral",
+    "Description": "Claim is moved onto judges",
+    "DisplayOrder": 8,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameHmctsInternal}"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "CASE_PROGRESSION",
+    "Name": "Case Progression",
+    "Description": "Claim proceeds online",
+    "DisplayOrder": 9,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameHmctsInternal}"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "HEARING_READINESS",
+    "Name": "Hearing Readiness",
+    "Description": "placeholder",
+    "DisplayOrder": 10,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameHmctsInternal}"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "PREPARE_FOR_HEARING_CONDUCT_HEARING",
+    "Name": "Prepare For Hearing Conduct Hearing",
+    "Description": "Placeholder",
+    "DisplayOrder": 11,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameHmctsInternal}"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "IN_MEDIATION",
+    "Name": "In Mediation",
+    "Description": "Placeholder",
+    "DisplayOrder": 12,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameHmctsInternal}"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "DECISION_OUTCOME",
+    "Name": "Decision Outcome",
+    "Description": "Day of Trial state",
+    "DisplayOrder": 13,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameHmctsInternal}"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "All_FINAL_ORDERS_ISSUED",
+    "Name": "All final orders issued",
+    "Description": "All final orders issued",
+    "DisplayOrder": 14,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameHmctsInternal}"
+   },
+   {
+    "CaseTypeID": "CIVIL",
+    "ID": "CASE_SETTLED",
+    "Name": "Case Settled",
+    "Description": "Case settled",
+    "DisplayOrder": 15,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameHmctsInternal}"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "CASE_STAYED",
+    "Name": "Case Stayed",
+    "Description": "Case stayed",
+    "DisplayOrder": 16,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameHmctsInternal}"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "CLOSED",
+    "Name": "Closed",
+    "Description": "Closed",
+    "DisplayOrder": 17,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameHmctsInternal}"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "CASE_DISCONTINUED",
+    "Name": "Case Discontinued",
+    "Description": "Case Discontinued",
+    "DisplayOrder": 18,
+    "TitleDisplay": "# #${[CASE_REFERENCE]} <br/> ${caseNameHmctsInternal}"
+  }
+]

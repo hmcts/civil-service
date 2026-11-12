@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "DisposalHearingJudgementDeductionValue",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingJudgementDeductionValue",
+    "ListElementCode": "text",
+    "FieldType": "Label",
+    "ElementLabel": "Subject to a deduction of:",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingJudgementDeductionValue",
+    "ListElementCode": "value",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]
