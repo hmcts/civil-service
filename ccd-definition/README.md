@@ -30,9 +30,15 @@ git checkout -- ccd-definition/civil ccd-definition/generalapplication && git cl
 duplicates, missing references and invalid values, and need no running services.
 
 ```bash
-npm ci
+npm ci --ignore-scripts
 npm run test:definitions
 ```
+
+`--ignore-scripts` stops puppeteer, which the BPMN rendering tooling uses, from downloading Chrome.
+The specs don't need it.
+
+Use Node 20.19+ or 22.12+ (`.nvmrc` has the version CI uses). chai 6 is published only as an ES
+module, and older Node versions can't `require` it.
 
 `test/package.json` sets `"type": "commonjs"`, because the root `package.json` is an ES module
 package and the specs use `require`.
