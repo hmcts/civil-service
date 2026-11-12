@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "GADebtorPaymentPlanGAspec",
+    "ListElementCode": "INSTALMENT",
+    "ListElement": "I will accept the following instalments per month",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "GADebtorPaymentPlanGAspec",
+    "ListElementCode": "PAYFULL",
+    "ListElement": "I will accept payment in full by a set date",
+    "DisplayOrder": 2
+  }
+]

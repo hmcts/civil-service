@@ -1,0 +1,36 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REFER_JUDGE_DEFENCE_RECEIVED",
+    "CaseFieldID": "lblRecordJudgment",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "ReferJudgeDefenceReceived",
+    "PageLabel": "Refer to judge (defence received in time)",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REFER_JUDGE_DEFENCE_RECEIVED",
+    "CaseFieldID": "joPartiesNames",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "READONLY",
+    "PageID": "ReferJudgeDefenceReceived",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REFER_JUDGE_DEFENCE_RECEIVED",
+    "CaseFieldID": "confirmReferToJudgeDefenceReceived",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY",
+    "PageID": "ReferJudgeDefenceReceived",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N"
+  }
+]

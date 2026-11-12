@@ -1,0 +1,17 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "certOfSC",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "CITIZEN-CLAIMANT-PROFILE",
+          "CITIZEN-DEFENDANT-PROFILE",
+          "caseworker-civil-systemupdate",
+          "citizen-profile"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  }
+]

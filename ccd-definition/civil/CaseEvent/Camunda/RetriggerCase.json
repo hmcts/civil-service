@@ -1,0 +1,57 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "RETRIGGER_CASES",
+    "Name": "Retrigger case",
+    "DisplayOrder": 1,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0,
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "RETRIGGER_CLAIMANT_RESPONSE",
+    "Name": "Retrigger claimant res",
+    "DisplayOrder": 1,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0,
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "RETRIGGER_CLAIMANT_RESPONSE_SPEC",
+    "Name": "Retrigger claimant res spec",
+    "DisplayOrder": 1,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0,
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "RETRIGGER_MEDIATION_UNSUCCESSFUL",
+    "Name": "Retrigger med unsuccessful",
+    "DisplayOrder": 1,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0,
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "RETRIGGER_NOTIFY_INTERIM_JUDGMENT_DEFENDANT",
+    "Name": "Retrigger notify interim DJ",
+    "DisplayOrder": 1,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0,
+    "Publish": "Y"
+  }
+]

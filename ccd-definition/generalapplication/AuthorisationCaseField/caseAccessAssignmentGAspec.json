@@ -1,0 +1,26 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppParentCaseLink",
+    "UserRole": "caseworker-caa",
+    "CRUD": "CRU"
+  },
+  {
+  "CaseTypeID": "GENERALAPPLICATION",
+  "CaseFieldID": "generalApplications",
+  "UserRole": "caseworker-caa",
+  "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolGaAppDetails",
+    "UserRole": "caseworker-caa",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolTwoGaAppDetails",
+    "UserRole": "caseworker-caa",
+    "CRUD": "CRU"
+  }
+]

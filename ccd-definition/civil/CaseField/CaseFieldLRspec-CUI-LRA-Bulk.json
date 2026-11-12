@@ -1,0 +1,58 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "applicant1AcceptAdmitAmountPaidSpec",
+    "Label": "Does the claimant want to settle the claim for the £${respondToAdmittedClaimOwingAmountPounds} including any interest claimed but exclusive of the claim fee and any fixed costs claimed which are payable in addition?",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondent1ClaimPartAdmitImmediatelyLabelWithInterest",
+    "Label": "${respondent1.partyName} admits they owe the claimant £${respondToAdmittedClaimOwingAmountPounds} including any interest claimed but exclusive of the claim fee and any fixed costs \nclaimed which are payable in addition. \n\nThey have offered to pay £${respondToAdmittedClaimOwingAmountPounds} immediately, plus claim fee and any fixed costs claimed. \n\n If the claimant accepts, they must contact the claimant and pay the full amount within the 5 days. Any cheques or transfers must be clear in the claimant's account.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondent1ClaimPartAdmitBySetDateLabelWithInterest",
+    "Label": "${respondent1.partyName} admits they owe the claimant £${respondToAdmittedClaimOwingAmountPounds} including any interest claimed but exclusive of the claim fee and any fixed costs \nclaimed which are payable in addition. \n\nThey have offered to pay by ${respondent1PaymentDateToStringSpec}.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondent1ClaimPartAdmitInstalmentLabelWithInterest",
+    "Label": "${respondent1.partyName} admits they owe the claimant £${respondToAdmittedClaimOwingAmountPounds} including any interest claimed but exclusive of the claim fee and any fixed costs claimed which are payable in addition. \n\nIf judgment is entered on an admission the claim fee and any fixed costs claimed will be included in the total judgment sum. \n\nThey have offered to pay in instalments. \n\n Details of the repayment plan can be found in the Defendant Response form.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "ccjJudgmentAmountClaimAmountWithInterestLabel",
+    "Label": "### Claim amount (including interest if it has been claimed)\n\n£${ccjJudgmentAmountClaimAmount}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "ccjJudgmentAmountClaimAmountLabel",
+    "Label": "### Claim amount (including interest if it has been claimed)\n\n£${ccjJudgmentAmountClaimAmount}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "claimFixedCostsExist",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

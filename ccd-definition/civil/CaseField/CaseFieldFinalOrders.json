@@ -1,0 +1,496 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "caseParticipants",
+    "Label": "${caseNameHmctsInternal}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderSelectionLabel",
+    "Label": "**** \n ### What type of order do you wish to make?",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderSelection",
+    "Label": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "FinalOrderSelection",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "caseParticipantsAssistedOrder",
+    "Label": "${caseNameHmctsInternal}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "caseParticipantsFreeForm",
+    "Label": "${caseNameHmctsInternal}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderMadeLabel",
+    "Label": "**** \n ## Order Made",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderMadeSelectionLabel",
+    "Label": "#### Is this order made following a hearing?",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderMadeSelection",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderDateHeardComplex",
+    "Label": " ",
+    "FieldType": "FinalOrderMadeDatesDropdown",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderJudgePapersLabel",
+    "Label": "**** \n ## Judge considered the papers",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderJudgePapers",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "FinalOrdersJudgePapers",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderJudgeHeardLabel",
+    "Label": "**** \n ## Judge heard from",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderJudgeHeardFrom",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "FinalOrderJudgeHeardShowHide",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderRepresentation",
+    "Label": " ",
+    "FieldType": "FinalOrderRepresentation",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderRecitalsLabel",
+    "Label": "**** \n ## Recitals",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderRecitals",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "FinalOrderJudgeHeardShowHide",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderRecitalsRecorded",
+    "Label": " ",
+    "FieldType": "FinalOrderRecitalsRecorded",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderOrdered",
+    "Label": "**** \n ## Order",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderOrderedThat",
+    "Label": "### The court orders that:",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderOrderedThatText",
+    "HintText": "Please insert paragraph numbers before each term of the Order as you wish them to appear, as they will not be automatically generated",
+    "Label": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderCost",
+    "Label": "**** \n ## Costs",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderCostSecondaryLabel",
+    "Label": "### Select as appropriate",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "assistedOrderCostList",
+    "Label": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "AssistedCostTypesList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "assistedOrderCostsReserved",
+    "Label": " ",
+    "FieldType": "AssistedOrderCostDetails",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "assistedOrderMakeAnOrderForCosts",
+    "Label": " ",
+    "FieldType": "AssistedOrderCostDetails",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "assistedOrderCostsBespoke",
+    "Label": " ",
+    "FieldType": "AssistedOrderCostDetails",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "publicFundingCostsProtectionLabel",
+    "Label": "### Does the paying party have public funding costs protection?",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "publicFundingCostsProtection",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "publicFundingCostsProtectionDropdown",
+    "Label": "The paying party has the benefit of cost protection under section 26 of the Legal Aid, Sentencing and Punishment of Offenders Act 2012. The amount of costs that the paying party shall pay shall be determined on an application by the receiving party under rule 16 of the Civil legal Aid (Costs) Regulations 2013. Any objection by the paying party to the amount of costs claimed shall be dealt with on that occasion",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderFurtherHearingLabel",
+    "Label": "**** \n ## Further hearing (part heard or adjourned)",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderFurtherHearingToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "FinalOrderJudgeHeardShowHide",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderFurtherHearingComplex",
+    "Label": " ",
+    "FieldType": "FinalOrderFurtherHearing",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderAppealLabel",
+    "Label": "**** \n ## Appeal",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderAppealToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "FinalOrderJudgeHeardShowHide",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderAppealComplex",
+    "Label": " ",
+    "FieldType": "FinalOrderAppeal",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "orderMadeOnDetailsPrimaryLabel",
+    "Label": "**** \n ## Order made on court's own initiative/without notice",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "orderMadeOnDetailsSecondaryLabel",
+    "Label": "### Select as appropriate",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "orderMadeOnDetailsList",
+    "Label": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "OrderMadeOnTypes",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "orderMadeOnDetailsOrderCourt",
+    "Label": " ",
+    "FieldType": "OrderMadeOnDetails",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "orderMadeOnDetailsOrderWithoutNotice",
+    "Label": " ",
+    "FieldType": "OrderMadeOnDetailsOrderWithoutNotice",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderReasonsLabel",
+    "Label": "**** \n ## Reasons",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderGiveReasonsLabel",
+    "Label": "### Do you want to give reasons for the order? (including any reasons for refusing/granting permission to appeal)",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderGiveReasonsYesNo",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderGiveReasonsComplex",
+    "Label": " ",
+    "FieldType": "AssistedOrderReasons",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "freeFormRecitalAndOrderLabel",
+    "Label": "**** \n ## Recitals",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "freeFormRecordedTextAreaLabel",
+    "Label": "### The court records that:",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "freeFormRecordedTextArea",
+    "Label": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "freeFormOrderedLabel",
+    "Label": "**** \n ## Order \n ### The court orders that:",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "freeFormOrderedTextArea",
+    "HintText": "Please insert paragraph numbers before each term of the Order as you wish them to appear, as they will not be automatically generated",
+    "Label": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "orderOnCourtsListLabel",
+    "Label": "**** \n ## Order made on court's own initiative/without notice \n ### Select as appropriate",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "orderOnCourtsList",
+    "Label": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "OrderOnCourtsList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "orderOnCourtInitiative",
+    "Label": " ",
+    "FieldType": "OrderOnCourtInitiative",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "orderWithoutNotice",
+    "Label": " ",
+    "FieldType": "OrderWithoutNotice",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "freeFormHearingNotesLabel",
+    "Label": "### Hearing notes (Optional)",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "freeFormHearingNotes",
+    "Label": " ",
+    "HintText": "For example, potentially violent, reading time needed, CVP for hearing",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderDocument",
+    "Label": " ",
+    "FieldType": "CaseDocument",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "finalOrderDocumentCollection",
+    "Label": "System generated Case Documents",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "assistedOrderPenalNoticeTitle",
+    "Label": "## Penal notice (optional)",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "assistedOrderPenalNoticeToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "AssistedOrderPenalNoticeToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "assistedOrderPenalNoticeContent",
+    "Label": "Note: Paragraph numbers and the parties' name to which the penal notice applies must be entered in the box below.",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

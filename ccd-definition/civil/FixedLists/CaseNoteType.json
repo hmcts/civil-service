@@ -1,0 +1,21 @@
+[
+  {
+    "ID": "CaseNoteType",
+    "ListElementCode": "NOTE_ONLY",
+    "ListElement": "Note Only",
+    "DisplayOrder": 1
+
+  },
+  {
+    "ID": "CaseNoteType",
+    "ListElementCode": "DOCUMENT_AND_NOTE",
+    "ListElement": "Document with a note",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "CaseNoteType",
+    "ListElementCode": "DOCUMENT_ONLY",
+    "ListElement": "Document only",
+    "DisplayOrder": 3
+  }
+]

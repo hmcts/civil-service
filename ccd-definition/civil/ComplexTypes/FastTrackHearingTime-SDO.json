@@ -1,0 +1,78 @@
+[
+  {
+    "ID": "FastTrackHearingTime",
+    "ListElementCode": "dateFromLabel",
+    "FieldType": "Label",
+    "ElementLabel": "Date from",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackHearingTime",
+    "ListElementCode": "dateFrom",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackHearingTime",
+    "ListElementCode": "dateToToggle",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "DateToShowToggle",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackHearingTime",
+    "ListElementCode": "dateTo",
+    "ElementLabel": "Date to",
+    "FieldType": "Date",
+    "FieldShowCondition": "dateToToggle=\"SHOW\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackHearingTime",
+    "ListElementCode": "hearingDuration",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "FastTrackTimeEstimate",
+    "ElementLabel": "The time estimate is",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackHearingTime",
+    "ListElementCode": "otherHours",
+    "FieldType": "Number",
+    "ElementLabel": "Hours",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackHearingTime",
+    "ListElementCode": "otherMinutes",
+    "FieldType": "Number",
+    "ElementLabel": "Minutes",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackHearingTime",
+    "ListElementCode": "helpText1",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackHearingTime",
+    "ListElementCode": "helpText2",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "_comment": "legacy field no longer in use"
+  }
+]

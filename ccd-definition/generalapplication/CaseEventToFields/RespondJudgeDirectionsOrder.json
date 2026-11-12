@@ -1,0 +1,37 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "RESPOND_TO_JUDGE_DIRECTIONS",
+    "CaseFieldID": "generalAppWrittenRepUploadLabel",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "GAUploadDocForDirectionOrderScreen",
+    "PageLabel": "Upload a file in response to Judge's directions",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "RESPOND_TO_JUDGE_DIRECTIONS",
+    "CaseFieldID": "generalAppDirOrderUpload",
+    "PageID": "GAUploadDocForDirectionOrderScreen",
+    "PageFieldDisplayOrder": 2,
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "DisplayContext": "MANDATORY",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "RESPOND_TO_JUDGE_DIRECTIONS",
+    "CaseFieldID": "gaWaTrackLabel",
+    "PageID": "GAUploadDocForDirectionOrderScreen",
+    "PageFieldDisplayOrder": 2,
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "generalAppDirOrderUpload = \"DO_NOT_SHOW_IN_UI\"",
+    "ShowSummaryChangeOption": "Y"
+  }
+]

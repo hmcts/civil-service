@@ -1,0 +1,28 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "GENERATE_CLAIM_FORM_SPEC",
+    "Name": "Generate claim form",
+    "Description": "Generates claim form after successful payment",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "GENERATE_ACKNOWLEDGEMENT_OF_CLAIM_SPEC",
+    "Name": "Generate AoS",
+    "Description": "Generates acknowledgement of service",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  }
+]

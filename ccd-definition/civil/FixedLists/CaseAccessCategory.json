@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "CaseAccessCategory",
+    "ListElementCode": "UNSPEC_CLAIM",
+    "ListElement": "UNSPEC_CLAIM",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "CaseAccessCategory",
+    "ListElementCode": "SPEC_CLAIM",
+    "ListElement": "SPEC_CLAIM",
+    "DisplayOrder": 2
+  }
+]

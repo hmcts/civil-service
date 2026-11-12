@@ -1,0 +1,43 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "mediationUnsuccessfulReasonsMultiSelect",
+    "Label": "Mediation failed reason",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "MediationUnsuccessfulReasonsMultiSelect",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "defendantDQLanguageMediationHint",
+    "Label": "<details><summary>More information about asking to use Welsh</summary><div class=\"panel panel-border-narrow\"><p>You can also use Welsh at mediation. This will not delay the mediation appointment.</p><p>The spoken language chosen here includes the language that you or the defendant will speak at mediation.</p></div></details><br /> ",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "claimantDQLanguageMediationHint",
+    "Label": "<details><summary>More information about asking to use Welsh</summary><div class=\"panel panel-border-narrow\"><p>You can also use Welsh at mediation. This will not delay the mediation appointment.</p><p>The spoken language chosen here includes the language that you or the claimant will speak at mediation.</p></div></details><br />",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "defendantDQSupportMediationHint",
+    "Label": "This includes support for you or the defendant at mediation.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "claimantDQSupportMediationHint",
+    "Label": "This includes support for you or the claimant at mediation.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

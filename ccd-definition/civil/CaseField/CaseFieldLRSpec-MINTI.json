@@ -1,0 +1,10 @@
+[
+  {
+  "CaseTypeID": "CIVIL",
+  "ID": "specEligibilityQuestions",
+  "Label": "## Issue civil court proceedings\nTo use this service you must be:\n* issuing a claim for a specified (fixed) amount of money\n* issuing a claim to the county court.  Claims cannot be issued to the High Court using this service\n* have an address in England or Wales and an email address\n* able to pay the full issue fee using Payment by Account (PBA) or card payment\n* serving a claim form in English\n\nThe claimant must:\n\n* have an address in England or Wales\n* not have a civil proceedings order, civil restraint order, or all proceedings order against them\n\nThe claim you’re issuing must not:\n* Contain interest with a breakdown for different periods of time or items\n* ordinarily follow the Part 8 procedure\n* be brought under the Consumer Credit Act 1974\n* be against the Crown",
+  "FieldType": "Label",
+  "SecurityClassification": "Public",
+  "Searchable": "N"
+  }
+]

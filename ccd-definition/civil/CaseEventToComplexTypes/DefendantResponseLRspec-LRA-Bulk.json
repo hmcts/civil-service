@@ -1,0 +1,206 @@
+[
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToAdmittedClaim",
+    "ListElementCode": "howMuchWasPaidLabel",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "respondentClaimResponseTypeForSpecGeneric != \"PART_ADMISSION\""
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToAdmittedClaim",
+    "ListElementCode": "howMuchWasPaidWithInterestLabel",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "respondentClaimResponseTypeForSpecGeneric = \"PART_ADMISSION\""
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToAdmittedClaim",
+    "ListElementCode": "howMuchWasPaid",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToAdmittedClaim",
+    "ListElementCode": "whenWasThisAmountPaid",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToAdmittedClaim",
+    "ListElementCode": "howWasThisAmountPaid",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToAdmittedClaim",
+    "ListElementCode": "howWasThisAmountPaidOther",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "respondToAdmittedClaim.howWasThisAmountPaid = \"OTHER\""
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToAdmittedClaim2",
+    "ListElementCode": "howMuchWasPaidLabel",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "respondentClaimResponseTypeForSpecGeneric != \"PART_ADMISSION\""
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToAdmittedClaim2",
+    "ListElementCode": "howMuchWasPaidWithInterestLabel",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "respondentClaimResponseTypeForSpecGeneric = \"PART_ADMISSION\""
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToAdmittedClaim2",
+    "ListElementCode": "howMuchWasPaid",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToAdmittedClaim2",
+    "ListElementCode": "whenWasThisAmountPaid",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToAdmittedClaim2",
+    "ListElementCode": "howWasThisAmountPaid",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToAdmittedClaim2",
+    "ListElementCode": "howWasThisAmountPaidOther",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "respondToAdmittedClaim2.howWasThisAmountPaid = \"OTHER\""
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToClaim",
+    "ListElementCode": "howMuchWasPaidLabel",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "respondentClaimResponseTypeForSpecGeneric != \"PART_ADMISSION\""
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToClaim",
+    "ListElementCode": "howMuchWasPaidWithInterestLabel",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "respondentClaimResponseTypeForSpecGeneric = \"PART_ADMISSION\""
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToClaim",
+    "ListElementCode": "howMuchWasPaid",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToClaim",
+    "ListElementCode": "whenWasThisAmountPaid",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToClaim",
+    "ListElementCode": "howWasThisAmountPaid",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToClaim",
+    "ListElementCode": "howWasThisAmountPaidOther",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "respondToClaim.howWasThisAmountPaid = \"OTHER\""
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToClaim2",
+    "ListElementCode": "howMuchWasPaidLabel",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "respondentClaimResponseTypeForSpecGeneric != \"PART_ADMISSION\""
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToClaim2",
+    "ListElementCode": "howMuchWasPaidWithInterestLabel",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "respondentClaimResponseTypeForSpecGeneric = \"PART_ADMISSION\""
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToClaim2",
+    "ListElementCode": "howMuchWasPaid",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToClaim2",
+    "ListElementCode": "whenWasThisAmountPaid",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToClaim2",
+    "ListElementCode": "howWasThisAmountPaid",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SpecAoSCorrespondenceAddress",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondToClaim2",
+    "ListElementCode": "howWasThisAmountPaidOther",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "respondToClaim2.howWasThisAmountPaid = \"OTHER\""
+  }
+]

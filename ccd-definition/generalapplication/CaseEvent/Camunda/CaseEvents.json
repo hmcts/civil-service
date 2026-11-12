@@ -1,0 +1,26 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "LINK_GENERAL_APPLICATION_CASE_TO_PARENT_CASE",
+    "Name": "Link Application",
+    "Description": "Link Application",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "RETRIGGER_GA_CASES",
+    "Name": "Retrigger ga case",
+    "Description": "Only to re-create wa task",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "Publish": "Y"
+  }
+]

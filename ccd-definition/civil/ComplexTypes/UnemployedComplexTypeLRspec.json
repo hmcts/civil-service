@@ -1,0 +1,35 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "unemployedComplexTypeRequired",
+    "ID": "UnemployedComplexTypeLRspec",
+    "Label": " ",
+    "ElementLabel": "Is your client unemployed or retired?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "UnemployedRadioFixedListLRspec",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "lengthOfUnemployment",
+    "ID": "UnemployedComplexTypeLRspec",
+    "ElementLabel": " ",
+    "FieldType": "LengthOfUnemploymentComplexTypeLRspec",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Label": " ",
+    "FieldShowCondition": "unemployedComplexTypeRequired = \"UNEMPLOYED\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "otherUnemployment",
+    "ID": "UnemployedComplexTypeLRspec",
+    "ElementLabel": "Provide details",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Label": " ",
+    "FieldShowCondition": "unemployedComplexTypeRequired = \"OTHER\""
+  }
+]

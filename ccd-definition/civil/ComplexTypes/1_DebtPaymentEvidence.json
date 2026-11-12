@@ -1,0 +1,19 @@
+[
+  {
+    "ID": "DebtPaymentEvidence",
+    "ListElementCode": "debtPaymentOption",
+    "ElementLabel": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "DebtPaymentOptions",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DebtPaymentEvidence",
+    "ListElementCode": "provideDetails",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

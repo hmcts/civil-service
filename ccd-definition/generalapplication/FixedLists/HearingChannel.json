@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "HearingChannel",
+    "ListElementCode": "IN_PERSON",
+    "ListElement": "In Person",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "HearingChannel",
+    "ListElementCode": "VIDEO",
+    "ListElement": "Video",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "HearingChannel",
+    "ListElementCode": "TELEPHONE",
+    "ListElement": "Telephone",
+    "DisplayOrder": 3
+  }
+]

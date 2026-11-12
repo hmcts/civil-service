@@ -1,0 +1,41 @@
+[
+  {
+    "ID": "MediationUnavailableDate",
+    "ListElementCode": "unavailableDateType",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "UnavailableDateChoice",
+    "ElementLabel": "Add a single date or a date range",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MediationUnavailableDate",
+    "ListElementCode": "date",
+    "FieldType": "Date",
+    "ElementLabel": "Unavailable date",
+    "HintText": "This date cannot be in the past and must not be more than three months in the future",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "unavailableDateType = \"SINGLE_DATE\"",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MediationUnavailableDate",
+    "ListElementCode": "fromDate",
+    "FieldType": "Date",
+    "ElementLabel": "Date from",
+    "HintText": "This date cannot be in the past and must not be more than three months in the future",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "unavailableDateType = \"DATE_RANGE\"",
+    "Searchable": "N"
+  },
+  {
+    "ID": "MediationUnavailableDate",
+    "ListElementCode": "toDate",
+    "FieldType": "Date",
+    "ElementLabel": "Date to",
+    "HintText": "This date cannot be in the past and must not be more than three months in the future",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "unavailableDateType = \"DATE_RANGE\"",
+    "Searchable": "N"
+  }
+]

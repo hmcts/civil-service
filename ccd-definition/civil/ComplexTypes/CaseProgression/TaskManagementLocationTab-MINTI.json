@@ -1,0 +1,42 @@
+[
+  {
+    "ID": "TaskManagementLocationTab",
+    "ListElementCode": "caseManagementLocation",
+    "ElementLabel": "Case management location",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "ID": "TaskManagementLocationTab",
+    "ListElementCode": "cmcListingLocation",
+    "ElementLabel": "Case management conference listings",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "ID": "TaskManagementLocationTab",
+    "ListElementCode": "ccmcListingLocation",
+    "ElementLabel": "Cost and case management conference listings",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "ID": "TaskManagementLocationTab",
+    "ListElementCode": "ptrListingLocation",
+    "ElementLabel": "Pre-trial review listings",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "ID": "TaskManagementLocationTab",
+    "ListElementCode": "trialListingLocation",
+    "ElementLabel": "Trial listings",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  }
+]

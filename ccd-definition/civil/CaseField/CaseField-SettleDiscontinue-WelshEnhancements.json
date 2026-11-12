@@ -1,0 +1,11 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "typeOfDiscontinuance",
+    "Label": "Is this a full or part discontinuance?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "DiscontinuanceTypeList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

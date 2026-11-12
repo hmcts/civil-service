@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "GAByCourtsInitiativeGAspec",
+    "ListElementCode": "OPTION_1",
+    "ListElement": "Order on court's own initiative",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "GAByCourtsInitiativeGAspec",
+    "ListElementCode": "OPTION_2",
+    "ListElement": "Order without notice",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "GAByCourtsInitiativeGAspec",
+    "ListElementCode": "OPTION_3",
+    "ListElement": "Not applicable",
+    "DisplayOrder": 3
+  }
+]

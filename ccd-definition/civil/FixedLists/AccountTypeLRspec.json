@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "AccountType",
+    "ListElementCode": "CURRENT",
+    "ListElement": "Current account",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "AccountType",
+    "ListElementCode": "SAVINGS",
+    "ListElement": "Savings account",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "AccountType",
+    "ListElementCode": "ISA",
+    "ListElement": "ISA",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "AccountType",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 4
+  }
+]

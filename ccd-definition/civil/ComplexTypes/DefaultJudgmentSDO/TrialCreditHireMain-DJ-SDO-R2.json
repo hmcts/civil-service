@@ -1,0 +1,76 @@
+[
+  {
+    "ID": "SdoDJR2TrialCreditHire",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHire",
+    "ListElementCode": "input1",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHire",
+    "ListElementCode": "detailsShowToggle",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "AddOrRemoveToggle",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHire",
+    "ListElementCode": "sdoDJR2TrialCreditHireDetails",
+    "FieldType": "SdoDJR2TrialCreditHireDetails",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "detailsShowToggle = \"ADD\""
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHire",
+    "ListElementCode": "input6",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHire",
+    "ListElementCode": "date3",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHire",
+    "ListElementCode": "input7",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHire",
+    "ListElementCode": "date4",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHire",
+    "ListElementCode": "input8",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

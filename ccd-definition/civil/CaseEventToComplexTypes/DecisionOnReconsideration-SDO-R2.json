@@ -1,0 +1,11 @@
+[
+  {
+    "ID": "DecisionOnReconsiderationOrderDocumentPage",
+    "CaseEventID": "DECISION_ON_RECONSIDERATION_REQUEST",
+    "CaseFieldID": "decisionOnReconsiderationDocument",
+    "ListElementCode": "documentLink",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "EventElementLabel": "Draft Order"
+  }
+]

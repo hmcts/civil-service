@@ -1,0 +1,431 @@
+[
+  {
+    "ID": "generalApplicationCaseList",
+    "ListElementCode": "generalApplicationCaseListLabel",
+    "FieldType": "Text",
+    "Label": "Application Type",
+    "ElementLabel": "Application Type",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppParentCaseLink",
+    "FieldType": "CaseLink",
+    "Label": "Application ID",
+    "ElementLabel": "Application ID",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "caseLink",
+    "FieldType": "CaseLink",
+    "Label": "Application ID",
+    "ElementLabel": "Application ID",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppType",
+    "FieldType": "GATypeGAspec",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppRespondentAgreement",
+    "FieldType": "GARespondentAgreementGAspec",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppConsentOrder",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "With notice",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "generalAppConsentOrder = \"No\""
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppVaryJudgementType",
+    "ElementLabel": "Vary payment terms of judgment GA Type",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "gaUploadN245FormUploadLabel",
+    "ElementLabel": "Upload your completed N245 form",
+    "FieldType": "GAN245FormUpload",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppN245FormUpload",
+    "ElementLabel": "Upload your completed N245 form",
+    "FieldType": "Document",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppHearingDate",
+    "ElementLabel": "Hearing date for all GA types",
+    "FieldType": "GAHearingDateGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppUrgencyRequirement",
+    "FieldType": "GAUrgencyRecordGAspec",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppInformOtherParty",
+    "FieldType": "GAWithOrWithoutNotice",
+    "ElementLabel": " ",
+    "FieldShowCondition": "generalAppConsentOrder = \"\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppStatementOfTruth",
+    "ElementLabel": " ",
+    "FieldType": "GAStatementOfTruthGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppDetailsOfOrder",
+    "ElementLabel": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppReasonsOfOrder",
+    "ElementLabel": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppHearingDetails",
+    "ElementLabel": " ",
+    "FieldType": "GAHearingDetailsGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppPBADetails",
+    "ElementLabel": " ",
+    "FieldType": "GAPBADetailsGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppApplnSolicitor",
+    "ElementLabel": " ",
+    "FieldType": "GASolicitorDetailsGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppApplicantAddlSolicitors",
+    "ElementLabel": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "GASolicitorDetailsGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppRespondentSolicitors",
+    "ElementLabel": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "GASolicitorDetailsGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppEvidenceDocument",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "ElementLabel": " ",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "businessProcess",
+    "ElementLabel": " ",
+    "FieldType": "BusinessProcess",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "isMultiParty",
+    "FieldType": "YesOrNo",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "applicantPartyName",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "litigiousPartyID",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "claimant1PartyName",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "claimant2PartyName",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "defendant1PartyName",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "defendant2PartyName",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "caseManagementLocation",
+    "FieldType": "GACaseLocationGAspec",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "isCcmccLocation",
+    "FieldType": "YesOrNo",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "caseManagementCategory",
+    "FieldType": "GACaseManagementCategory",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "parentClaimantIsApplicant",
+    "FieldType": "YesOrNo",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppSubmittedDateGAspec",
+    "FieldType": "DateTime",
+    "Label": "Submitted on",
+    "ElementLabel": "Submitted on",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppDateDeadline",
+    "ElementLabel": " ",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "civilServiceUserRoles",
+    "ElementLabel": " ",
+    "FieldType": "GAUserDetailsGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "applicantSolicitors",
+    "ElementLabel": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "GASolicitorsDetailsGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "defendantSolicitors",
+    "ElementLabel": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "GASolicitorsDetailsGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "respondentsResponses",
+    "ElementLabel": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "GAResondentResponseGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "generalAppSuperClaimType",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "CaseAccessCategory",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "_Definition":  "Case Access Category",
+    "_Category":  "GENERALAPPLICATION"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "locationName",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "judicialMakeOrderDocPreview",
+    "FieldType": "Document",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "judicialListHearingDocPreview",
+    "FieldType": "Document",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "judicialWrittenRepDocPreview",
+    "FieldType": "Document",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "judicialRequestMoreInfoDocPreview",
+    "FieldType": "Document",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "judicialByCourtsInitiativeListForHearing",
+    "FieldType": "Document",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "judicialByCourtsInitiativeForWrittenRep",
+    "FieldType": "Document",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "gaFinalOrderDocPreview",
+    "FieldType": "Document",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "consentOrderDocPreview",
+    "FieldType": "Document",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "gaApplicantDisplayName",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "gaFinalOrderDocPreview = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "isDocumentVisible",
+    "FieldType": "YesOrNo",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "isGaApplicantLip",
+    "FieldType": "YesOrNo",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "isGaRespondentOneLip",
+    "FieldType": "YesOrNo",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "isGaRespondentTwoLip",
+    "FieldType": "YesOrNo",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "caseNameGaInternal",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "gaWaTrackLabel",
+    "ElementLabel": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "emailPartyReference",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GeneralApplicationGAspec",
+    "ListElementCode": "mainCaseSubmittedDate",
+    "FieldType": "DateTime",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "ID": "ObligationReason",
+    "ListElementCode": "UNLESS_ORDER",
+    "ListElement": "Unless order",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ObligationReason",
+    "ListElementCode": "STAY_A_CASE",
+    "ListElement": "Stay a case",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "ObligationReason",
+    "ListElementCode": "LIFT_A_STAY",
+    "ListElement": "Lift a stay",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "ObligationReason",
+    "ListElementCode": "DISMISS_CASE",
+    "ListElement": "Dismiss case",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "ObligationReason",
+    "ListElementCode": "PRE_TRIAL_CHECKLIST",
+    "ListElement": "Pre-trial checklist",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "ObligationReason",
+    "ListElementCode": "GENERAL_ORDER",
+    "ListElement": "General order",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "ObligationReason",
+    "ListElementCode": "RESERVE_JUDGMENT",
+    "ListElement": "Reserve judgment",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "ObligationReason",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 8
+  }
+]

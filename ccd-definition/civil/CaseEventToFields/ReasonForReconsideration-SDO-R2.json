@@ -1,0 +1,122 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REQUEST_FOR_RECONSIDERATION",
+    "CaseFieldID": "reasonForReconsiderationPartiesName",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "RequestForReconsideration",
+    "PageLabel": "Request For Reconsideration",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REQUEST_FOR_RECONSIDERATION",
+    "CaseFieldID": "reasonForReconsiderationSeparator",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "READONLY",
+    "PageID": "RequestForReconsideration",
+    "PageLabel": "Request For Reconsideration",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REQUEST_FOR_RECONSIDERATION",
+    "CaseFieldID": "casePartyRequestForReconsideration",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "READONLY",
+    "PageID": "RequestForReconsideration",
+    "PageLabel": "Request For Reconsideration",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "reasonForReconsiderationPartiesName = \"DO_NOT_SHOW\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REQUEST_FOR_RECONSIDERATION",
+    "CaseFieldID": "reasonForReconsiderationApplicant",
+    "PageFieldDisplayOrder": 4,
+    "DisplayContext": "COMPLEX",
+    "PageID": "RequestForReconsideration",
+    "PageLabel": "Request For Reconsideration",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "casePartyRequestForReconsideration = \"Applicant\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REQUEST_FOR_RECONSIDERATION",
+    "CaseFieldID": "reasonForReconsiderationRespondent1",
+    "PageFieldDisplayOrder": 5,
+    "DisplayContext": "COMPLEX",
+    "PageID": "RequestForReconsideration",
+    "PageLabel": "Request For Reconsideration",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "casePartyRequestForReconsideration = \"Respondent1\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REQUEST_FOR_RECONSIDERATION",
+    "CaseFieldID": "reasonForReconsiderationRespondent2",
+    "PageFieldDisplayOrder": 5,
+    "DisplayContext": "COMPLEX",
+    "PageID": "RequestForReconsideration",
+    "PageLabel": "Request For Reconsideration",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "casePartyRequestForReconsideration = \"Respondent2\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REQUEST_FOR_RECONSIDERATION",
+    "CaseFieldID": "allocatedTrack",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 4,
+    "DisplayContext": "READONLY",
+    "PageID": "RequestForReconsideration",
+    "FieldShowCondition": "reasonForReconsiderationPartiesName=\"DO NOT SHOW IN UI\"",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REQUEST_FOR_RECONSIDERATION",
+    "CaseFieldID": "claimValue",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 5,
+    "DisplayContext": "READONLY",
+    "PageID": "RequestForReconsideration",
+    "FieldShowCondition": "reasonForReconsiderationPartiesName=\"DO NOT SHOW IN UI\"",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REQUEST_FOR_RECONSIDERATION",
+    "CaseFieldID": "totalClaimAmount",
+    "PageFieldDisplayOrder": 6,
+    "DisplayContext": "READONLY",
+    "PageID": "RequestForReconsideration",
+    "PageDisplayOrder": 1,
+    "FieldShowCondition": "reasonForReconsiderationPartiesName=\"DO NOT SHOW IN UI\"",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REQUEST_FOR_RECONSIDERATION",
+    "CaseFieldID": "responseClaimTrack",
+    "PageFieldDisplayOrder": 7,
+    "DisplayContext": "READONLY",
+    "PageID": "RequestForReconsideration",
+    "PageDisplayOrder": 1,
+    "FieldShowCondition": "reasonForReconsiderationPartiesName=\"DO NOT SHOW IN UI\"",
+    "Publish": "Y"
+  }
+]

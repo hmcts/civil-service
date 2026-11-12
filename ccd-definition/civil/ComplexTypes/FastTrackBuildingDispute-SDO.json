@@ -1,0 +1,66 @@
+[
+  {
+    "ID": "FastTrackBuildingDispute",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackBuildingDispute",
+    "ListElementCode": "input1",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackBuildingDispute",
+    "ListElementCode": "input2",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackBuildingDispute",
+    "ListElementCode": "input3",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackBuildingDispute",
+    "ListElementCode": "date1",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackBuildingDispute",
+    "ListElementCode": "input4",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackBuildingDispute",
+    "ListElementCode": "date2",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackBuildingDispute",
+    "ListElementCode": "line",
+    "FieldType": "Label",
+    "ElementLabel": "****",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

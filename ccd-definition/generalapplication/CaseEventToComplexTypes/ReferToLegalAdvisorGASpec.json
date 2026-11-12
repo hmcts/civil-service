@@ -1,0 +1,52 @@
+[
+  {
+    "ID": "ReferToLegalAdvisor",
+    "CaseEventID": "REFER_TO_LEGAL_ADVISOR",
+    "CaseFieldID": "referToLegalAdvisor",
+    "ListElementCode": "legalAdvisorEventDescription",
+    "EventElementLabel": "  ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "ReferToLegalAdvisor",
+    "CaseEventID": "REFER_TO_LEGAL_ADVISOR",
+    "CaseFieldID": "referToLegalAdvisor",
+    "ListElementCode": "legalAdvisorAdditionalInfo",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "GAUrgencyRecordPage",
+    "CaseEventID": "REFER_TO_LEGAL_ADVISOR",
+    "CaseFieldID": "generalAppUrgencyRequirement",
+    "ListElementCode": "generalAppUrgency",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "GATypePage",
+    "CaseEventID": "REFER_TO_LEGAL_ADVISOR",
+    "CaseFieldID": "generalAppType",
+    "ListElementCode": "types",
+    "EventElementLabel": "  ",
+    "EventHintText": "  ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "GAJudicialDecision",
+    "CaseEventID": "REFER_TO_LEGAL_ADVISOR",
+    "CaseFieldID": "judicialDecision",
+    "ListElementCode": "decision",
+    "EventElementLabel": "  ",
+    "EventHintText": "  ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  }
+]

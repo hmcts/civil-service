@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "FinalOrderMakeAnOrderClaimantSecondList",
+    "ListElementCode": "STANDARD_BASIS",
+    "ListElement": "on standard basis if not agreed.",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "FinalOrderMakeAnOrderClaimantSecondList",
+    "ListElementCode": "INDEMNITY_BASIS",
+    "ListElement": "on the indemnity basis if not agreed.",
+    "DisplayOrder": 2
+  }
+]

@@ -1,0 +1,10 @@
+[
+  {
+    "ID": "RespondentLiPResponse",
+    "ListElementCode": "respondent1ResponseLanguage",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

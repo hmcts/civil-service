@@ -1,0 +1,15 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "DEFAULT_JUDGEMENT_GRANTED_SPEC",
+    "Name": "Issue Default Judgment",
+    "Description": "Issue Default Judgment",
+    "PreConditionState(s)": "JUDGMENT_REQUESTED",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/submitted",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N"
+  }
+]
