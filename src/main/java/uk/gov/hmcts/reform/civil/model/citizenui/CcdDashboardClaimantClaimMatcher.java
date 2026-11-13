@@ -314,13 +314,6 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     @Override
-    public boolean isDecisionForReconsiderationMade() {
-        return caseData.getHearingDate() == null && caseData.getDecisionOnReconsiderationDocumentFromList().isPresent()
-            && !isSDODoneAfterDecisionForReconsiderationMade()
-            && !isGeneralOrderAfterDecisionForReconsiderationMade();
-    }
-
-    @Override
     public boolean isClaimantDefaultJudgement() {
         return (caseData.isCcjRequestJudgmentByAdmission()
             && CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getCcdState()))
