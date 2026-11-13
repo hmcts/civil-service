@@ -24,6 +24,21 @@ git checkout -- ccd-definition/civil ccd-definition/generalapplication && git cl
 
 `bin/dev-setup/start-devuser-preview-environment.sh` does that for you, including when the import fails.
 
+## Building the spreadsheets
+
+`bin/build-civil-xlsx-definitions.sh <environment> [true|false]` builds
+`build/ccd-release-config/civil-ccd-<environment>.xlsx` and `civil-ga-ccd-<environment>.xlsx`. `true` builds
+the shuttered variant. Which files each environment leaves out is set in [`exclusions.json`](exclusions.json),
+which the specs below also read, so the specs check exactly what each environment imports. The patterns are
+passed to `json2xlsx -e`: `*` matches any characters, matching ignores case, and a pattern that matches any
+folder or file name in a path leaves that file out.
+
+Until the cutover, civil-ccd-definition's `bin/build-release-ccd-definition.sh` is still the build that
+imports. `bin/compare-ccd-definition-builds.sh` builds every environment, and the shuttered prod variant,
+with both scripts from the definitions at `.source-sha`, and fails unless the spreadsheets are identical.
+The mirror workflow runs it on every PR that touches this folder or the build scripts. Change an exclusion
+rule in civil-ccd-definition first, then here when the mirror is re-synced past that change.
+
 ## Definition specs
 
 `test/` holds civil-ccd-definition's mocha specs from `e2e/tests/unit`. They check the JSON for
