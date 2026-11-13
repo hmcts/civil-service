@@ -168,7 +168,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnError_WhenAboutToStartAndInBreathingSpace() {
+        void shouldReturnError_WhenAboutToStartAndInBreathingSpaceAndFlagOn() {
+            when(featureToggleService.isBreathingSpaceEnabled()).thenReturn(true);
             BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
             breathingSpaceInfo.setActive(YES);
 
@@ -180,6 +181,22 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
             assertThat(response.getErrors()).contains("Default judgment cannot be applied for while claim is "
                 + "in breathing space");
+        }
+
+        @Test
+        void shouldNotReturnError_WhenAboutToStartAndInBreathingSpaceAndFlagOff() {
+            when(featureToggleService.isBreathingSpaceEnabled()).thenReturn(false);
+            BreathingSpaceInfo breathingSpaceInfo = new BreathingSpaceInfo();
+            breathingSpaceInfo.setActive(YES);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setBreathing(breathingSpaceInfo);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getErrors()).doesNotContain("Default judgment cannot be applied for while claim is "
+                                                          + "in breathing space");
         }
 
         @Test
