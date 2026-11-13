@@ -1,5 +1,7 @@
 import au.com.dius.pact.provider.gradle.Broker
 import au.com.dius.pact.provider.gradle.PactPublish
+import uk.gov.hmcts.rse.AuthMode
+import uk.gov.hmcts.rse.CftlibExec
 
 plugins {
   id 'application'
@@ -16,6 +18,7 @@ plugins {
   id 'maven-publish'
   id "org.gradle.test-retry" version "1.6.6"
   id 'hmcts.ccd.sdk' version '7.17.0'
+  id 'com.github.hmcts.rse-cft-lib' version 'civil-cc-12'
   id 'net.ltgt.errorprone' version '5.1.1'
 }
 
@@ -954,3 +957,188 @@ tasks.register('validateIdamOtpToolImage', Exec) {
 tasks.named('check') {
   dependsOn tasks.named('testIdamServiceToken'), tasks.named('testCamundaImportScripts'), tasks.named('validateIdamOtpToolImage')
 }
+
+// Local development on rse-cft-lib: `./gradlew bootWithCCD` runs this service with CCD, XUI, Camunda and wiremock.
+// See docs/cftlib.md.
+def cftlibDir = layout.buildDirectory.dir('cftlib')
+
+def fetchCftlibCcdDefinitions = tasks.register('fetchCftlibCcdDefinitions') {
+  description = 'Fetches the civil-ccd-definition JSON that bootWithCCD imports, unless CIVIL_CCD_DEFINITIONS_DIR is set.'
+  def output = cftlibDir.map { it.dir('ccd-definition') }
+  outputs.dir output
+  outputs.upToDateWhen { false }
+  onlyIf { !System.getenv('CIVIL_CCD_DEFINITIONS_DIR') }
+  doLast {
+    def dir = output.get().asFile
+    project.delete(dir)
+    def branch = dataSetupBranch('CCD_DEFINITION_BRANCH')
+    def archive = new File(temporaryDir, 'civil-ccd-definition.tar.gz')
+    new URL("https://codeload.github.com/hmcts/civil-ccd-definition/tar.gz/refs/heads/${branch}")
+      .withInputStream { input -> archive.withOutputStream { it << input } }
+    project.copy {
+      from(project.tarTree(project.resources.gzip(archive))) {
+        include '*/ccd-definition/**'
+        eachFile { it.relativePath = new RelativePath(true, it.relativePath.segments.drop(2) as String[]) }
+        includeEmptyDirs = false
+      }
+      into dir
+    }
+  }
+}
+
+// ccd-definition-processor's template, which the JSON import uses as preview's xlsx build does: it decides the
+// columns each sheet keeps.
+def fetchCftlibCcdTemplate = tasks.register('fetchCftlibCcdTemplate') {
+  description = 'Fetches the ccd-definition-processor template that bootWithCCD imports the JSON definitions with.'
+  def template = cftlibDir.map { it.file('ccd-template.xlsx') }
+  outputs.file template
+  doLast {
+    new URL('https://raw.githubusercontent.com/hmcts/ccd-definition-processor/master/data/ccd-template.xlsx')
+      .withInputStream { input -> template.get().asFile.withOutputStream { it << input } }
+  }
+}
+
+// civil-wa-task-configuration's DMNs, which bootWithCCD deploys to Camunda for work allocation.
+def fetchCftlibWaDmns = tasks.register('fetchCftlibWaDmns') {
+  description = 'Fetches the civil-wa-task-configuration DMNs that bootWithCCD deploys, unless CIVIL_WA_DMNS_DIR is set.'
+  def output = cftlibDir.map { it.dir('wa-dmn') }
+  outputs.dir output
+  outputs.upToDateWhen { false }
+  onlyIf { !System.getenv('CIVIL_WA_DMNS_DIR') }
+  doLast {
+    def dir = output.get().asFile
+    project.delete(dir)
+    def branch = dataSetupBranch('WA_TASK_CONFIGURATION_BRANCH')
+    def archive = new File(temporaryDir, 'civil-wa-task-configuration.tar.gz')
+    new URL("https://codeload.github.com/hmcts/civil-wa-task-configuration/tar.gz/refs/heads/${branch}")
+      .withInputStream { input -> archive.withOutputStream { it << input } }
+    project.copy {
+      from(project.tarTree(project.resources.gzip(archive))) {
+        include '*/src/main/resources/*.dmn'
+        eachFile { it.relativePath = new RelativePath(true, it.name) }
+        includeEmptyDirs = false
+      }
+      into dir
+    }
+  }
+}
+
+def startCftlibWiremock = tasks.register('startCftlibWiremock') {
+  description = 'Starts wiremock with civil-wiremock-mappings and the local stubs in src/cftlib/wiremock, on port 8765.'
+  def root = cftlibDir.map { it.dir('wiremock') }
+  outputs.upToDateWhen { false }
+  doLast {
+    def dir = root.get().asFile
+    project.delete(dir)
+    def branch = dataSetupBranch('WIREMOCK_MAPPINGS_BRANCH')
+    def archive = new File(temporaryDir, 'civil-wiremock-mappings.tar.gz')
+    new URL("https://codeload.github.com/hmcts/civil-wiremock-mappings/tar.gz/refs/heads/${branch}")
+      .withInputStream { input -> archive.withOutputStream { it << input } }
+    project.copy {
+      from(project.tarTree(project.resources.gzip(archive))) {
+        include '*/mappings/**', '*/__files/**'
+        eachFile { it.relativePath = new RelativePath(true, it.relativePath.segments.drop(1) as String[]) }
+        includeEmptyDirs = false
+      }
+      from('src/cftlib/wiremock')
+      into dir
+    }
+    new ProcessBuilder('docker', 'rm', '-f', 'civil-cftlib-wiremock').inheritIO().start().waitFor()
+    def started = new ProcessBuilder('docker', 'run', '-d', '--name', 'civil-cftlib-wiremock', '-p', '8765:8080',
+      '-v', "${dir}/mappings:/home/wiremock/mappings".toString(),
+      '-v', "${dir}/__files:/home/wiremock/__files".toString(),
+      'wiremock/wiremock:3.13.1', '--global-response-templating').inheritIO().start().waitFor()
+    if (started != 0) {
+      throw new GradleException('Could not start wiremock')
+    }
+  }
+}
+
+dependencies {
+  cftlibTestImplementation "org.springframework.boot:spring-boot-starter-test"
+  cftlibTestImplementation platform("org.junit:junit-bom:${versions.junit}")
+  cftlibTestImplementation 'org.junit.jupiter:junit-jupiter'
+  cftlibTestImplementation 'org.junit.platform:junit-platform-console'
+}
+
+tasks.withType(CftlibExec).configureEach {
+  group = 'ccd tasks'
+  dependsOn fetchCftlibCcdDefinitions, fetchCftlibCcdTemplate, fetchCftlibWaDmns, startCftlibWiremock
+  authMode = AuthMode.Local
+
+  def definitions = System.getenv('CIVIL_CCD_DEFINITIONS_DIR') ?: cftlibDir.get().dir('ccd-definition').asFile.path
+  def wiremock = 'http://localhost:8765'
+  // Work allocation, which brings Camunda, and hearings, which bring the Service Bus emulator.
+  features 'wa', 'hmc'
+  // As in AAT, WA's system user reads civil's cases through civil's own roles.
+  environment 'RSE_LIB_WA_SYSTEM_USER_ROLES', 'caseworker-civil,caseworker-civil-systemupdate'
+  environment 'RSE_LIB_SERVICEBUS_CONFIG', file('src/cftlib/servicebus.json').path
+  // The shared cftlib database volume other services' cftlib runs create, as dtsse-ccd-config-generator's e2e does.
+  environment 'POSTGRES_VERSION', '15'
+  environment 'RSE_LIB_ADDITIONAL_DATABASES', 'cmc'
+  environment 'XUI_JURISDICTIONS', 'CIVIL'
+  environment 'CIVIL_CFTLIB_CCD_DEFINITIONS_DIR', definitions
+  environment 'CIVIL_CFTLIB_CCD_TEMPLATE', cftlibDir.get().file('ccd-template.xlsx').asFile.path
+  environment 'CIVIL_CFTLIB_CAMUNDA_DIR', file('src/main/resources').path
+  environment 'CIVIL_CFTLIB_WA_DMNS_DIR', System.getenv('CIVIL_WA_DMNS_DIR') ?: cftlibDir.get().dir('wa-dmn').asFile.path
+
+  // This service
+  environment 'SPRING_PROFILES_ACTIVE', 'local'
+  environment 'CMC_DB_HOST', 'localhost'
+  environment 'CMC_DB_PORT', '6432'
+  environment 'CMC_DB_USERNAME', 'postgres'
+  environment 'CMC_DB_PASSWORD', 'postgres'
+  environment 'REFERENCE_DATABASE_MIGRATION', 'true'
+  // As in preview: concurrent index migrations wait forever on a transactional Flyway lock.
+  environment 'SPRING_FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK', 'false'
+  environment 'LAUNCHDARKLY_OFFLINEMODE', 'true'
+  environment 'IDAM_CLIENT_ID', 'civil-service'
+  environment 'IDAM_WEB_URL', 'http://localhost:5062'
+  environment 'IDAM_S2S_AUTH_URL', 'http://localhost:8489'
+  environment 'CAMUNDA_URL', 'http://localhost:8999/engine-rest/'
+  environment 'COURT_LOCATION_WA_DMN_ENABLED', 'true'
+  environment 'LAUNCH_DARKLY_OFFLINE_MODE', 'true'
+  environment 'GOV_NOTIFY_API_KEY', 'cftlib-00000000-0000-0000-0000-000000000000-00000000-0000-0000-0000-000000000000'
+  environment 'GOV_NOTIFY_BASE_URL', wiremock
+  environment 'CIVIL_SYSTEM_UPDATE_USERNAME', 'civil-system-update@mailnesia.com'
+  environment 'CIVIL_SYSTEM_UPDATE_PASSWORD', 'password'
+  environment 'CIVIL_PRD_ADMIN_USERNAME', 'civil.prd.admin@example.com'
+  environment 'CIVIL_PRD_ADMIN_PASSWORD', 'password'
+  environment 'CIVIL_CROSS_ACCESS_USERNAME', 'caseworker-caa@mailnesia.com'
+  environment 'CIVIL_CROSS_ACCESS_PASSWORD', 'password'
+  ['FEES_API_URL', 'PAYMENTS_API_URL', 'RD_PROFESSIONAL_API_URL', 'RD_COMMONDATA_API_URL', 'GENAPP_LRD_URL',
+   'SEND_LETTER_URL', 'CLAIM_STORE_URL', 'DOCMOSIS_TORNADO_URL', 'EM_CCD_ORCHESTRATOR_URL',
+   'PRD_HOST'].each { environment it, wiremock }
+  // cftlib's hmc-cft-hearing-service, whose updates this service receives on the hmc-to-cft topic. The listener
+  // builds its connection string from these parts, which together make the Service Bus emulator's.
+  environment 'HMC_API_URL', 'http://localhost:4561'
+  environment 'HMC_HEARINGS_SUBSCRIPTION_ENABLED', 'true'
+  environment 'HMC_HEARINGS_TOPIC_NAMESPACE', 'localhost'
+  environment 'HMC_HEARINGS_TOPIC_CONNECTION_POSTFIX', ''
+  environment 'HMC_HEARINGS_TOPIC_POLICY_NAME', 'RootManageSharedAccessKey'
+  environment 'HMC_HEARINGS_TOPIC_ACCESS_KEY', 'SAS_KEY_VALUE;UseDevelopmentEmulator=true'
+  environment 'HMC_HEARINGS_TOPIC_NAME', 'hmc-to-cft'
+  environment 'HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME', 'hmc-to-civil-subscription'
+  environment 'STITCHING_API_ENABLED', 'false'
+  // Robotics emails go to SendGrid, which civil-wiremock-mappings stubs; test mode sends them over plain HTTP.
+  environment 'SENDGRID_API_KEY', 'cftlib'
+  environment 'SENDGRID_HOST', 'localhost:8765'
+  environment 'SENDGRID_TEST', 'true'
+
+  // CCD and AAC. With local auth cftlib provides dm-store, and data store's IDAM system user.
+  environment 'DATA_STORE_S2S_AUTHORISED_SERVICES',
+    'ccd_gw,ccd_data,ccd_ps,xui_webapp,civil_service,ccd_case_document_am_api,aac_manage_case_assignment,em_ccd_orchestrator'
+  environment 'CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES', 'civil_service,aac_manage_case_assignment'
+  environment 'ROLE_ASSIGNMENT_S2S_AUTHORISED_SERVICES',
+    'ccd_gw,am_role_assignment_service,xui_webapp,aac_manage_case_assignment,ccd_data,civil_service'
+
+  // CIVIL_DECENTRALISED_ENABLED=true keeps CIVIL and GENERALAPPLICATION cases in this service, as in preview.
+  if (System.getenv('CIVIL_DECENTRALISED_ENABLED') == 'true') {
+    environment 'CIVIL_DECENTRALISED_ENABLED', 'true'
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_CIVIL', 'http://localhost:4000'
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_GENERALAPPLICATION', 'http://localhost:4000'
+    // Decentralised case events are queued in this service's database, for work allocation.
+    environment 'RSE_LIB_WA_CASE_EVENT_SOURCES', 'cmc:ccd'
+  }
+}
+
