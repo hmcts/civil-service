@@ -68,7 +68,7 @@ ${dir}/organisational-role-assignment.sh "DJ.Angel.Morgan@ejudiciary.net" "${JUD
 
 # --- ADMIN (Hearing Centre) ---
 
-${dir}/organisational-role-assignment.sh "hearing_center_admin_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hmcts-admin" '{"jurisdiction":"CIVIL","primaryLocation":"20262"}' "ADMIN"
+${dir}/organisational-role-assignment.sh "hearing_center_admin_reg1@justice.gov.uk" "${ADMIN_PWD}" "PRIVATE" "hmcts-admin" '{"primaryLocation":"20262"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "task-supervisor" '{"jurisdiction":"CIVIL","primaryLocation":"20262","workTypes":"routine_work,hearing_work,access_requests"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-viewer" '{"jurisdiction":"CIVIL","primaryLocation":"20262"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-manager" '{"jurisdiction":"CIVIL","primaryLocation":"20262"}' "ADMIN"
@@ -76,42 +76,42 @@ ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg1@justice.gov.
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-centre-admin" '{"jurisdiction":"CIVIL","primaryLocation":"20262","workTypes":"hearing_work,routine_work,multi_track_hearing_work,intermediate_track_hearing_work,query_work"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "case-allocator" '{"jurisdiction":"CIVIL","primaryLocation":"20262"}' "ADMIN"
 
-${dir}/organisational-role-assignment.sh "hearing_center_admin_reg2@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hmcts-admin" '{"jurisdiction":"CIVIL","primaryLocation":"20262"}' "ADMIN"
+${dir}/organisational-role-assignment.sh "hearing_center_admin_reg2@justice.gov.uk" "${ADMIN_PWD}" "PRIVATE" "hmcts-admin" '{"primaryLocation":"20262"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg2@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-manager" '{"jurisdiction":"CIVIL","primaryLocation":"20262"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg2@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "task-supervisor" '{"jurisdiction":"CIVIL","primaryLocation":"20262","workTypes":"routine_work,hearing_work,access_requests"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg2@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-centre-team-leader" '{"jurisdiction":"CIVIL","primaryLocation":"20262","workTypes":"hearing_work,access_requests"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg2@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-centre-admin" '{"jurisdiction":"CIVIL","primaryLocation":"20262","workTypes":"hearing_work"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg2@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-viewer" '{"jurisdiction":"CIVIL","primaryLocation":"20262"}' "ADMIN"
 
-${dir}/organisational-role-assignment.sh "hearing_center_admin_reg3@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hmcts-admin" '{"jurisdiction":"CIVIL","primaryLocation":"455174"}' "ADMIN"
+${dir}/organisational-role-assignment.sh "hearing_center_admin_reg3@justice.gov.uk" "${ADMIN_PWD}" "PRIVATE" "hmcts-admin" '{"primaryLocation":"455174"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg3@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-manager" '{"jurisdiction":"CIVIL","primaryLocation":"455174"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg3@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "task-supervisor" '{"jurisdiction":"CIVIL","primaryLocation":"455174"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg3@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-centre-team-leader" '{"jurisdiction":"CIVIL","primaryLocation":"455174","workTypes":"hearing_work,access_requests"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg3@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-centre-admin" '{"jurisdiction":"CIVIL","primaryLocation":"455174","workTypes":"hearing_work,multi_track_hearing_work,intermediate_track_hearing_work,routine_work"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg3@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-viewer" '{"jurisdiction":"CIVIL","primaryLocation":"455174"}' "ADMIN"
 
-${dir}/organisational-role-assignment.sh "hearing_center_admin_reg4@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hmcts-admin" '{"jurisdiction":"CIVIL","primaryLocation":"345663"}' "ADMIN"
+${dir}/organisational-role-assignment.sh "hearing_center_admin_reg4@justice.gov.uk" "${ADMIN_PWD}" "PRIVATE" "hmcts-admin" '{"primaryLocation":"345663"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg4@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-manager" '{"jurisdiction":"CIVIL","primaryLocation":"345663"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg4@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "task-supervisor" '{"jurisdiction":"CIVIL","primaryLocation":"345663"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg4@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-centre-team-leader" '{"jurisdiction":"CIVIL","primaryLocation":"345663","workTypes":"hearing_work,access_requests"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg4@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-centre-admin" '{"jurisdiction":"CIVIL","primaryLocation":"345663","workTypes":"hearing_work,multi_track_hearing_work,intermediate_track_hearing_work,routine_work,query_work"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg4@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-viewer" '{"jurisdiction":"CIVIL","primaryLocation":"345663"}' "ADMIN"
 
-${dir}/organisational-role-assignment.sh "hearing_center_admin_reg5@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hmcts-admin" '{"jurisdiction":"CIVIL","primaryLocation":"185657"}' "ADMIN"
+${dir}/organisational-role-assignment.sh "hearing_center_admin_reg5@justice.gov.uk" "${ADMIN_PWD}" "PRIVATE" "hmcts-admin" '{"primaryLocation":"185657"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg5@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-manager" '{"jurisdiction":"CIVIL","primaryLocation":"185657"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg5@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "task-supervisor" '{"jurisdiction":"CIVIL","primaryLocation":"185657","workTypes":"routine_work,hearing_work,access_requests"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg5@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-centre-team-leader" '{"jurisdiction":"CIVIL","primaryLocation":"185657","workTypes":"hearing_work,access_requests,query_work"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg5@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-centre-admin" '{"jurisdiction":"CIVIL","primaryLocation":"185657","workTypes":"hearing_work,multi_track_hearing_work,intermediate_track_hearing_work,routine_work,query_work"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg5@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-viewer" '{"jurisdiction":"CIVIL","primaryLocation":"185657"}' "ADMIN"
 
-${dir}/organisational-role-assignment.sh "hearing_center_admin_reg6@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hmcts-admin" '{"jurisdiction":"CIVIL","primaryLocation":"819890"}' "ADMIN"
+${dir}/organisational-role-assignment.sh "hearing_center_admin_reg6@justice.gov.uk" "${ADMIN_PWD}" "PRIVATE" "hmcts-admin" '{"primaryLocation":"819890"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg6@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-manager" '{"jurisdiction":"CIVIL","primaryLocation":"819890"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg6@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "task-supervisor" '{"jurisdiction":"CIVIL","primaryLocation":"819890","workTypes":"routine_work,hearing_work,access_requests"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg6@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-centre-team-leader" '{"jurisdiction":"CIVIL","primaryLocation":"819890","workTypes":"hearing_work,access_requests,query_work"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg6@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-centre-admin" '{"jurisdiction":"CIVIL","primaryLocation":"819890","workTypes":"hearing_work,multi_track_hearing_work,intermediate_track_hearing_work,routine_work,query_work"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg6@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-viewer" '{"jurisdiction":"CIVIL","primaryLocation":"819890"}' "ADMIN"
 
-${dir}/organisational-role-assignment.sh "hearing_center_admin_reg7@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hmcts-admin" '{"jurisdiction":"CIVIL","primaryLocation":"234850"}' "ADMIN"
+${dir}/organisational-role-assignment.sh "hearing_center_admin_reg7@justice.gov.uk" "${ADMIN_PWD}" "PRIVATE" "hmcts-admin" '{"primaryLocation":"234850"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg7@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-manager" '{"jurisdiction":"CIVIL","primaryLocation":"234850"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg7@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "task-supervisor" '{"jurisdiction":"CIVIL","primaryLocation":"234850","workTypes":"routine_work,hearing_work,access_requests"}' "ADMIN"
 ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg7@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-centre-team-leader" '{"jurisdiction":"CIVIL","primaryLocation":"234850","workTypes":"hearing_work,access_requests,query_work"}' "ADMIN"
@@ -120,43 +120,43 @@ ${dir}/organisational-role-assignment.sh "hearing_center_admin_reg7@justice.gov.
 
 # --- LEGAL OPERATIONS ---
 
-${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hmcts-legal-operations" '{"jurisdiction":"CIVIL","primaryLocation":"20262"}' "LEGAL_OPERATIONS"
+${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg1@justice.gov.uk" "${ADMIN_PWD}" "PRIVATE" "hmcts-legal-operations" '{"primaryLocation":"20262"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-viewer" '{"jurisdiction":"CIVIL","primaryLocation":"20262"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-manager" '{"jurisdiction":"CIVIL","primaryLocation":"20262"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "tribunal-caseworker" '{"jurisdiction":"CIVIL","primaryLocation":"20262","workTypes":"decision_making_work"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg1@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "senior-tribunal-caseworker" '{"jurisdiction":"CIVIL","primaryLocation":"20262","workTypes":"decision_making_work,access_requests"}' "LEGAL_OPERATIONS"
 
-${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg2@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hmcts-legal-operations" '{"jurisdiction":"CIVIL","primaryLocation":"231596"}' "LEGAL_OPERATIONS"
+${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg2@justice.gov.uk" "${ADMIN_PWD}" "PRIVATE" "hmcts-legal-operations" '{"primaryLocation":"231596"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg2@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-viewer" '{"jurisdiction":"CIVIL","primaryLocation":"231596"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg2@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-manager" '{"jurisdiction":"CIVIL","primaryLocation":"231596"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg2@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "tribunal-caseworker" '{"jurisdiction":"CIVIL","primaryLocation":"231596","workTypes":"decision_making_work"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg2@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "senior-tribunal-caseworker" '{"jurisdiction":"CIVIL","primaryLocation":"231596","workTypes":"decision_making_work,access_requests"}' "LEGAL_OPERATIONS"
 
-${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg3@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hmcts-legal-operations" '{"jurisdiction":"CIVIL","primaryLocation":"455174"}' "LEGAL_OPERATIONS"
+${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg3@justice.gov.uk" "${ADMIN_PWD}" "PRIVATE" "hmcts-legal-operations" '{"primaryLocation":"455174"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg3@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-viewer" '{"jurisdiction":"CIVIL","primaryLocation":"455174"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg3@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-manager" '{"jurisdiction":"CIVIL","primaryLocation":"455174"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg3@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "tribunal-caseworker" '{"jurisdiction":"CIVIL","primaryLocation":"455174","workTypes":"decision_making_work"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg3@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "senior-tribunal-caseworker" '{"jurisdiction":"CIVIL","primaryLocation":"455174","workTypes":"decision_making_work,access_requests"}' "LEGAL_OPERATIONS"
 
-${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg4@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hmcts-legal-operations" '{"jurisdiction":"CIVIL","primaryLocation":"345663"}' "LEGAL_OPERATIONS"
+${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg4@justice.gov.uk" "${ADMIN_PWD}" "PRIVATE" "hmcts-legal-operations" '{"primaryLocation":"345663"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg4@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-viewer" '{"jurisdiction":"CIVIL","primaryLocation":"345663"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg4@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-manager" '{"jurisdiction":"CIVIL","primaryLocation":"345663"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg4@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "tribunal-caseworker" '{"jurisdiction":"CIVIL","primaryLocation":"345663","workTypes":"decision_making_work"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg4@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "senior-tribunal-caseworker" '{"jurisdiction":"CIVIL","primaryLocation":"345663","workTypes":"decision_making_work,access_requests"}' "LEGAL_OPERATIONS"
 
-${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg5@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hmcts-legal-operations" '{"jurisdiction":"CIVIL","primaryLocation":"185657"}' "LEGAL_OPERATIONS"
+${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg5@justice.gov.uk" "${ADMIN_PWD}" "PRIVATE" "hmcts-legal-operations" '{"primaryLocation":"185657"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg5@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-viewer" '{"jurisdiction":"CIVIL","primaryLocation":"185657"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg5@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-manager" '{"jurisdiction":"CIVIL","primaryLocation":"185657"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg5@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "tribunal-caseworker" '{"jurisdiction":"CIVIL","primaryLocation":"185657","workTypes":"decision_making_work"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg5@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "senior-tribunal-caseworker" '{"jurisdiction":"CIVIL","primaryLocation":"185657","workTypes":"decision_making_work,access_requests"}' "LEGAL_OPERATIONS"
 
-${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg6@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hmcts-legal-operations" '{"jurisdiction":"CIVIL","primaryLocation":"819890"}' "LEGAL_OPERATIONS"
+${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg6@justice.gov.uk" "${ADMIN_PWD}" "PRIVATE" "hmcts-legal-operations" '{"primaryLocation":"819890"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg6@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-viewer" '{"jurisdiction":"CIVIL","primaryLocation":"819890"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg6@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-manager" '{"jurisdiction":"CIVIL","primaryLocation":"819890"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg6@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "tribunal-caseworker" '{"jurisdiction":"CIVIL","primaryLocation":"819890","workTypes":"decision_making_work"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg6@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "senior-tribunal-caseworker" '{"jurisdiction":"CIVIL","primaryLocation":"819890","workTypes":"decision_making_work,access_requests"}' "LEGAL_OPERATIONS"
 
-${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg7@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hmcts-legal-operations" '{"jurisdiction":"CIVIL","primaryLocation":"234850"}' "LEGAL_OPERATIONS"
+${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg7@justice.gov.uk" "${ADMIN_PWD}" "PRIVATE" "hmcts-legal-operations" '{"primaryLocation":"234850"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg7@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-viewer" '{"jurisdiction":"CIVIL","primaryLocation":"234850"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg7@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "hearing-manager" '{"jurisdiction":"CIVIL","primaryLocation":"234850"}' "LEGAL_OPERATIONS"
 ${dir}/organisational-role-assignment.sh "tribunal_legal_caseworker_reg7@justice.gov.uk" "${ADMIN_PWD}" "PUBLIC" "tribunal-caseworker" '{"jurisdiction":"CIVIL","primaryLocation":"234850","workTypes":"decision_making_work"}' "LEGAL_OPERATIONS"
