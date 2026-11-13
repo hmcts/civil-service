@@ -70,6 +70,7 @@ public enum CamundaProcessIdentifier {
     GenerateSpecDJFormNotifier,
     NotifyDecisionOnReconsiderationRequestNotifier,
     SettleClaimPaidInFullNotificationNotifier,
+    UnspecClaimSettledNotifier,
     ClaimantResponsePartAdmitPayImmediatelyNotifier,
     InformAgreedExtensionDateNotifier,
     InformAgreedExtensionDateSpecNotifier,
