@@ -55,7 +55,8 @@ public class GAResponseDeadlineTaskHandler extends BaseExternalTaskHandler {
         List<Long> ids = cases.stream().map(CaseDetails::getId).toList();
         log.info("GAResponseDeadlineTaskHandler Job '{}' found {} case(s) with ids {}", externalTask.getTopicName(), cases.size(), ids);
 
-        cases.forEach(this::deleteDashboardNotifications);
+        filterCasesPastDueDate(caseSearchService.getUncheckedResponseDeadlineApplications(AWAITING_RESPONDENT_RESPONSE))
+            .forEach(this::deleteDashboardNotifications);
         cases.forEach(this::fireEventForStateChange);
 
         Set<CaseDetails> caseList = getUrgentApplicationCasesThatArePastDueDate();
@@ -96,6 +97,10 @@ public class GAResponseDeadlineTaskHandler extends BaseExternalTaskHandler {
         Set<CaseDetails> awaitingResponseCases = caseSearchService
             .getGeneralApplications(AWAITING_RESPONDENT_RESPONSE);
 
+        return filterCasesPastDueDate(awaitingResponseCases);
+    }
+
+    private Set<CaseDetails> filterCasesPastDueDate(Set<CaseDetails> awaitingResponseCases) {
         return awaitingResponseCases.stream()
             .filter(a -> {
                 try {
@@ -112,20 +117,9 @@ public class GAResponseDeadlineTaskHandler extends BaseExternalTaskHandler {
 
     protected Set<CaseDetails> getUrgentApplicationCasesThatArePastDueDate() {
         Set<CaseDetails> awaitingResponseCases = caseSearchService
-            .getGeneralApplications(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION);
+            .getUncheckedResponseDeadlineApplications(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION);
 
-        return awaitingResponseCases.stream()
-            .filter(a -> {
-                try {
-                    return caseDetailsConverter.toGeneralApplicationCaseData(a).getGeneralAppNotificationDeadlineDate() != null
-                        && now().isAfter(
-                        caseDetailsConverter.toGeneralApplicationCaseData(a).getGeneralAppNotificationDeadlineDate());
-                } catch (Exception e) {
-                    log.error("GAResponseDeadlineTaskHandler failed: " + e);
-                }
-                return false;
-            })
-            .collect(toSet());
+        return filterCasesPastDueDate(awaitingResponseCases);
     }
 
     @Override
