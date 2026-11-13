@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -102,7 +103,7 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
                         ? new ArrayList<>()
                         : new ArrayList<>(builder.getMiscellaneous());
         updatedMiscellaneousEvents3.add(
-                buildMiscEvent(builder, sequenceGenerator, text, getDateOfDjCreated(caseData)));
+                buildMiscEvent(builder, sequenceGenerator, text, getDateOfJudgment(caseData)));
         builder.setMiscellaneous(updatedMiscellaneousEvents3);
     }
 
@@ -120,7 +121,7 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
 
         DJPaymentTypeSelection paymentType = caseData.getPaymentTypeSelection();
         boolean immediate = DJPaymentTypeSelection.IMMEDIATELY.equals(paymentType);
-        LocalDateTime dateOfDjCreated = getDateOfDjCreated(caseData);
+        LocalDateTime dateOfJudgment = getDateOfJudgment(caseData);
         LocalDateTime paymentInFullDate = computePaymentInFullDate(caseData);
 
         BigDecimal amountOfCosts =
@@ -148,14 +149,14 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
                         .setInstallmentAmount(installmentAmount)
                         .setInstallmentPeriod(getInstallmentPeriod(caseData))
                         .setFirstInstallmentDate(caseData.getRepaymentDate())
-                        .setDateOfJudgment(dateOfDjCreated)
+                        .setDateOfJudgment(dateOfJudgment)
                         .setJointJudgment(jointJudgment)
                         .setJudgmentToBeRegistered(false);
 
         return createEvent(
                 sequenceGenerator.nextSequence(builder),
                 DEFAULT_JUDGMENT_GRANTED.getCode(),
-                dateOfDjCreated,
+                dateOfJudgment,
                 litigiousPartyId,
                 "",
                 details);
@@ -228,5 +229,16 @@ public class DefaultJudgmentEventStrategy implements EventHistoryStrategy {
                         && Objects.nonNull(caseData.getJoDJCreatedDate())
                 ? caseData.getJoDJCreatedDate()
                 : LocalDateTime.now();
+    }
+
+    private LocalDateTime getDateOfJudgment(CaseData caseData) {
+        if (!featureToggleService.isJudgmentBufferEnabled()) {
+            return getDateOfDjCreated(caseData);
+        }
+
+        return Optional.ofNullable(caseData.getActiveJudgment())
+            .map(JudgmentDetails::getIssueDate)
+            .map(LocalDate::atStartOfDay)
+            .orElseGet(() -> getDateOfDjCreated(caseData));
     }
 }
