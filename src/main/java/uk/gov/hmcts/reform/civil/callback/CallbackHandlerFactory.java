@@ -62,7 +62,7 @@ public class CallbackHandlerFactory {
             .map(businessProcess -> handler.isEventAlreadyProcessed(callbackParams, businessProcess))
             .filter(isProcessed -> isProcessed)
             .map(isProcessed -> eventAlreadyProcessedResponse(eventId))
-            .orElse(handler.handle(callbackParams));
+            .orElseGet(() -> handler.handle(callbackParams));
     }
 
     private CallbackResponse eventAlreadyProcessedResponse(String eventId) {
