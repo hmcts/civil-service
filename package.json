@@ -15,15 +15,15 @@
     "chai": "6.3.0",
     "lodash": "4.18.1",
     "mocha": "12.0.3",
-    "puppeteer": "25.16.0"
+    "puppeteer": "25.17.0"
   },
   "overrides": {
     "puppeteer": "$puppeteer",
-    "basic-ftp": "6.2.3",
+    "basic-ftp": "6.2.6",
     "js-yaml": "5.5.0",
-    "ip-address": "10.7.5",
-    "ws": "8.22.0",
-    "glob": "14.0.5",
+    "ip-address": "10.7.6",
+    "ws": "8.23.0",
+    "glob": "14.0.6",
     "minimatch": "11.0.8"
   }
 }
