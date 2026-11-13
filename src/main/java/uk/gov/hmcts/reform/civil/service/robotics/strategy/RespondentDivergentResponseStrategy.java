@@ -171,6 +171,12 @@ public class RespondentDivergentResponseStrategy implements EventHistoryStrategy
             LocalDateTime responseDate,
             String respondentId,
             boolean isRespondent1) {
+
+        if (responseType == null) {
+            log.info("Skipping spec response events for respondent {} because response type is missing", respondentId);
+            return;
+        }
+
         switch (responseType) {
             case FULL_DEFENCE:
                 addFullDefenceEvent(builder, caseData, responseDate, respondentId, isRespondent1);
@@ -193,6 +199,11 @@ public class RespondentDivergentResponseStrategy implements EventHistoryStrategy
             LocalDateTime responseDate,
             String respondentId,
             boolean isRespondent1) {
+        if (responseType == null) {
+            log.info("Skipping unspec response events for respondent {} because response type is missing", respondentId);
+            return;
+        }
+
         switch (responseType) {
             case FULL_DEFENCE:
                 addFullDefenceEvent(builder, caseData, responseDate, respondentId, isRespondent1);
