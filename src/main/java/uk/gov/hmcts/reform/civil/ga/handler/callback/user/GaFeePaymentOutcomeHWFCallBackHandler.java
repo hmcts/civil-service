@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -15,11 +16,12 @@ import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.HelpWithFeesDetails;
+import uk.gov.hmcts.reform.civil.ga.service.GaNotificationHistoryService;
 import uk.gov.hmcts.reform.civil.ga.service.GaPaymentRequestUpdateCallbackService;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.ga.service.HwfNotificationService;
 import uk.gov.hmcts.reform.civil.ga.utils.HwFFeeTypeUtil;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -49,6 +51,7 @@ public class GaFeePaymentOutcomeHWFCallBackHandler extends CallbackHandler imple
     private final ObjectMapper objectMapper;
     private final GaPaymentRequestUpdateCallbackService paymentRequestUpdateCallbackService;
     private final HwfNotificationService hwfNotificationService;
+    private final GaNotificationHistoryService notificationHistoryService;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -61,8 +64,16 @@ public class GaFeePaymentOutcomeHWFCallBackHandler extends CallbackHandler imple
             callbackKey(ABOUT_TO_START), this::setData,
             callbackKey(ABOUT_TO_SUBMIT), this::submitFeePaymentOutcome,
             callbackKey(MID, "remission-type"), this::validateSelectedRemissionType,
-            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+            callbackKey(SUBMITTED), this::recordNotifications
         );
+    }
+
+    private CallbackResponse recordNotifications(CallbackParams callbackParams) {
+        var caseData = callbackParams.getGeneralApplicationCaseData();
+        if (caseData.isHWFTypeAdditional() && caseData.getNotificationSummary() != null) {
+            notificationHistoryService.recordNotifications(caseData.getCcdCaseReference().toString(), caseData.getNotificationSummary());
+        }
+        return SubmittedCallbackResponse.builder().build();
     }
 
     private CallbackResponse setData(CallbackParams callbackParams) {

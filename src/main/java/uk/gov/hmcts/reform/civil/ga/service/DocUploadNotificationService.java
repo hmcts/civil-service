@@ -2,16 +2,18 @@ package uk.gov.hmcts.reform.civil.ga.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
-import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -46,13 +48,37 @@ public class DocUploadNotificationService implements NotificationDataGA {
     private final NotificationsSignatureConfiguration configuration;
     private final OrganisationService organisationService;
 
+    public String notifyEvidenceUploadAndGetSummary(GeneralApplicationCaseData caseData) {
+        var summary = new GaNotificationSummary(notificationService);
+        try {
+            notifyApplicantEvidenceUpload(caseData, summary);
+        } catch (Exception exception) {
+            summary.recordFailure("applicant", exception);
+        }
+        if (JudicialDecisionNotificationUtil.isWithNotice(caseData)) {
+            try {
+                notifyRespondentEvidenceUpload(caseData, summary);
+            } catch (Exception exception) {
+                summary.recordFailure("respondent", exception);
+            }
+        }
+        return summary.build();
+    }
+
     public void notifyApplicantEvidenceUpload(GeneralApplicationCaseData caseData) throws NotificationException {
+        notifyApplicantEvidenceUpload(caseData, null);
+    }
+
+    private void notifyApplicantEvidenceUpload(GeneralApplicationCaseData caseData, GaNotificationSummary summary) {
         log.info("Starting applicant evidence upload notification for Case ID: {}", caseData.getCcdCaseReference());
         String email = caseData.getGeneralAppApplnSolicitor().getEmail();
+        if (summary != null && StringUtils.isBlank(email)) {
+            return;
+        }
         GeneralApplicationCaseData civilCaseData = caseDetailsConverter.toGeneralApplicationCaseData(coreCaseDataService
                                                                      .getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference())));
         if (null != email) {
-            notificationService.sendMail(
+            sendNotification(summary,
                     email,
                     gaForLipService.isLipApp(caseData) ? getLiPApplicantTemplate(caseData)
                         : notificationProperties.getEvidenceUploadTemplate(),
@@ -64,11 +90,17 @@ public class DocUploadNotificationService implements NotificationDataGA {
                             caseData.getCcdCaseReference()
                     )
             );
-            log.info("Applicant evidence upload notification sent for Case ID: {}", caseData.getCcdCaseReference());
+            if (summary == null) {
+                log.info("Applicant evidence upload notification sent for Case ID: {}", caseData.getCcdCaseReference());
+            }
         }
     }
 
     public void notifyRespondentEvidenceUpload(GeneralApplicationCaseData caseData) throws NotificationException {
+        notifyRespondentEvidenceUpload(caseData, null);
+    }
+
+    private void notifyRespondentEvidenceUpload(GeneralApplicationCaseData caseData, GaNotificationSummary summary) {
 
         log.info("Starting respondent evidence upload notification for Case ID: {}", caseData.getCcdCaseReference());
         GeneralApplicationCaseData civilCaseData = caseDetailsConverter.toGeneralApplicationCaseData(coreCaseDataService
@@ -76,7 +108,10 @@ public class DocUploadNotificationService implements NotificationDataGA {
 
         caseData.getGeneralAppRespondentSolicitors().forEach(
                 respondentSolicitor -> {
-                    notificationService.sendMail(
+                    if (summary != null && StringUtils.isBlank(respondentSolicitor.getValue().getEmail())) {
+                        return;
+                    }
+                    sendNotification(summary,
                             respondentSolicitor.getValue().getEmail(),
                             gaForLipService.isLipResp(caseData)
                                 ? getLiPRespondentTemplate(caseData)
@@ -90,6 +125,15 @@ public class DocUploadNotificationService implements NotificationDataGA {
                             )
                     );
                 });
+    }
+
+    private void sendNotification(GaNotificationSummary summary, String email, String template,
+                                  Map<String, String> properties, String reference) {
+        if (summary == null) {
+            notificationService.sendMail(email, template, properties, reference);
+        } else {
+            summary.send(email, template, properties, reference);
+        }
     }
 
     private String getLiPRespondentTemplate(GeneralApplicationCaseData caseData) {

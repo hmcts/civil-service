@@ -4,12 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME_GA;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_COSC_APPLICATION_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT;
@@ -21,6 +23,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -40,6 +44,7 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDe
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.ga.service.GaPaymentRequestUpdateCallbackService;
 import uk.gov.hmcts.reform.civil.ga.service.HwfNotificationService;
+import uk.gov.hmcts.reform.civil.ga.service.GaNotificationHistoryService;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
@@ -60,11 +65,27 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest
 
     @Mock private GaPaymentRequestUpdateCallbackService service;
     @Mock private HwfNotificationService hwfNotificationService;
+    @Mock private GaNotificationHistoryService notificationHistoryService;
     @Mock private FeatureToggleService featureToggleService;
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(FEE_PAYMENT_OUTCOME_GA);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"ADDITIONAL, true", "ADDITIONAL, false", "APPLICATION, true", "APPLICATION, false"})
+    void shouldRecordAdditionalFeeHistoryOnlyAfterSubmission(FeeType feeType, boolean hasSummary) {
+        String summary = "Attempted: r@example.com : ref : template || Errors: ";
+        var data = new GeneralApplicationCaseData().ccdCaseReference(2000L).hwfFeeType(feeType)
+            .notificationSummary(hasSummary ? summary : null).build();
+        handler.handle(callbackParamsOf(data, SUBMITTED));
+        if (feeType == FeeType.ADDITIONAL && hasSummary) {
+            verify(notificationHistoryService).recordNotifications("2000", summary);
+        } else {
+            verifyNoInteractions(notificationHistoryService);
+        }
+        verifyNoInteractions(service, hwfNotificationService);
     }
 
     @Nested
