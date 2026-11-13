@@ -61,11 +61,11 @@ public class BundleRequestExecutor {
             } else {
                 log.warn("The call to the endpoint with URL {} returned a non positive outcome (HTTP-{}). This may "
                              + "cause problems down the line.", endpoint, response1.getStatusCode().value());
-                HttpStatus derivedStatus = HttpStatus.resolve(response1.getStatusCodeValue());
+                HttpStatus derivedStatus = HttpStatus.resolve(response1.getStatusCode().value());
                 String reason = derivedStatus == null ? "Unknown" : derivedStatus.getReasonPhrase();
                 log.info(
                     "Stitching endpoint returned {} with reason {}",
-                    response1.getStatusCodeValue(),
+                    response1.getStatusCode().value(),
                     reason
                 );
                 throw new RetryableStitchingException();
@@ -104,7 +104,7 @@ public class BundleRequestExecutor {
     @SuppressWarnings("unchecked")
     private void logRelevantInfoQuietly(RestClientResponseException e) {
         try {
-            log.error("  ^  HTTP Error: {}", e.getRawStatusCode());
+            log.error("  ^  HTTP Error: {}", e.getStatusCode().value());
             Map<String, Object> response = objectMapper.readValue(e.getResponseBodyAsString(), Map.class);
 
             List<String> errors = (List<String>) response.get("errors");

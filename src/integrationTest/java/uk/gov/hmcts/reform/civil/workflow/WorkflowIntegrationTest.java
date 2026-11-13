@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.workflow;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -39,10 +39,10 @@ public abstract class WorkflowIntegrationTest extends BaseIntegrationTest {
     protected static final String CALLBACK_URL = "/cases/callbacks/{callback-type}";
     protected static final String CALLBACK_PAGE_ID_URL = "/cases/callbacks/{callback-type}/{page-id}";
 
-    @MockBean
+    @MockitoBean
     protected SystemUpdateUserConfiguration systemUpdateUserConfiguration;
 
-    @MockBean
+    @MockitoBean
     protected EventEmitterService eventEmitterService;
 
     @BeforeEach

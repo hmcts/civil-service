@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.provider;
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
 import au.com.dius.pact.provider.junitsupport.State;
-import au.com.dius.pact.provider.spring.junit5.MockMvcTestTarget;
+import au.com.dius.pact.provider.spring.spring7.Spring7MockMvcTestTarget;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -216,7 +216,7 @@ abstract class CivilCitizenUiProviderSupport {
             .setControllerAdvice(new ControllerExceptionHandler(), new ResourceExceptionHandler(mapper),
                                  new UncaughtExceptionHandler())
             .build();
-        MockMvcTestTarget target = new MockMvcTestTarget();
+        Spring7MockMvcTestTarget target = new Spring7MockMvcTestTarget();
         target.setMockMvc(mockMvc);
         if (context != null) {
             context.setTarget(target);

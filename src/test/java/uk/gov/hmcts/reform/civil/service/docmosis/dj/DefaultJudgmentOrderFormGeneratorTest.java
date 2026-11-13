@@ -4,8 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
@@ -40,7 +40,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SD
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     DefaultJudgmentOrderFormGenerator.class,
-    JacksonAutoConfiguration.class
+    Jackson2AutoConfiguration.class
 })
 class DefaultJudgmentOrderFormGeneratorTest {
 
@@ -57,19 +57,19 @@ class DefaultJudgmentOrderFormGeneratorTest {
         .documentName(fileNameTrial)
         .documentType(DEFAULT_JUDGMENT_SDO_ORDER)
         .build();
-    @MockBean
+    @MockitoBean
     private SecuredDocumentManagementService documentManagementService;
 
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
 
-    @MockBean
+    @MockitoBean
     private DjDisposalTemplateService djDisposalTemplateService;
 
-    @MockBean
+    @MockitoBean
     private UserService userService;
 
-    @MockBean
+    @MockitoBean
     private DjTrialTemplateService djTrialTemplateService;
 
     @Autowired

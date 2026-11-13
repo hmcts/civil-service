@@ -15,7 +15,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -77,16 +77,16 @@ class GaFeesPaymentServiceTest {
     @Autowired
     private GaFeesPaymentService feesPaymentService;
 
-    @MockBean
+    @MockitoBean
     private PaymentsClient paymentsClient;
 
-    @MockBean
+    @MockitoBean
     private GaCoreCaseDataService coreCaseDataService;
 
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @MockitoBean
     private UpdatePaymentStatusService updatePaymentStatusService;
 
     private GeneralApplicationCaseData caseData;

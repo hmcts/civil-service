@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -58,7 +58,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
     private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     @Spy
-    private JacksonAutoConfiguration jacksonAutoConfiguration;
+    private Jackson2AutoConfiguration jacksonAutoConfiguration;
 
     @Mock
     private UserService userService;
