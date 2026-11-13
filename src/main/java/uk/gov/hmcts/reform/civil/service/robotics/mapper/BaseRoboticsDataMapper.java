@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.Address;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
+import uk.gov.hmcts.reform.civil.model.robotics.RPABreathingSpace;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
 import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
 import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
@@ -70,5 +72,24 @@ public abstract class BaseRoboticsDataMapper {
                                .map(addressMapper::toRoboticsAddresses)
                                .orElse(null)
                 );
+    }
+
+    protected RPABreathingSpace buildBreathingSpace(CaseData caseData) {
+        var breathingSpaceEnterInfo = caseData.getBreathing().getEnter();
+        RPABreathingSpace breathingSpace = new RPABreathingSpace();
+        breathingSpace.setReference(breathingSpaceEnterInfo.getReference());
+        breathingSpace.setStartDate(breathingSpaceEnterInfo.getStart());
+        breathingSpace.setType(breathingSpaceEnterInfo.getType());
+        var breathingSpaceLiftInfo = caseData.getBreathing().getLift();
+        if (breathingSpaceLiftInfo != null) {
+            breathingSpace.setEndDate(breathingSpaceLiftInfo.getExpectedEnd());
+            breathingSpace.setReasonForLifting(breathingSpaceLiftInfo.getReasonToLift());
+        }
+        log.info("RoboticsCaseDataSpec RPABreathingSpace ={}", breathingSpace.toString());
+        return breathingSpace;
+    }
+
+    protected boolean hasBreathingSpaceData(CaseData caseData) {
+        return caseData.getBreathing() != null && caseData.getBreathing().getEnter() != null;
     }
 }

@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -46,6 +47,8 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -133,6 +136,25 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
             // Then
             verify(roboticsNotificationService).notifyRobotics(caseData, false,
                 params.getParams().get(BEARER_TOKEN).toString()
+            );
+        }
+
+        @Test
+        void shouldOmitBreathingSpace_whenCaseHasBreathingSpace() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateProceedsOfflineAdmissionOrCounterClaim()
+                .build()
+                .toBuilder()
+                .breathing(new BreathingSpaceInfo())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verify(roboticsNotificationService).notifyRobotics(
+                argThat(data -> data.getBreathing() == null),
+                eq(false),
+                eq(params.getParams().get(BEARER_TOKEN).toString())
             );
         }
 
