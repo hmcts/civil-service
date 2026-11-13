@@ -56,7 +56,7 @@ class JudgmentVariedDeterminationOfMeansDefendantEmailDTOGeneratorTest {
                                 .setRespondent1ResponseLanguage(Language.BOTH.toString())))
                 .build();
 
-        when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(BILINGUAL_TEMPLATE_ID);
+        when(notificationsProperties.getNotifyLipJudgmentVariedDeterminationOfMeansBilingualTemplate()).thenReturn(BILINGUAL_TEMPLATE_ID);
 
         String templateId = generator.getEmailTemplateId(caseData);
 
@@ -81,7 +81,7 @@ class JudgmentVariedDeterminationOfMeansDefendantEmailDTOGeneratorTest {
                 .respondent1(new Party().setPartyEmail(RESPONDENT_EMAIL).setCompanyName(RESPONDENT_NAME).setType(Party.Type.COMPANY))
                 .legacyCaseReference(LEGACY_REF)
                 .build();
-        when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
+        when(notificationsProperties.getNotifyLipJudgmentVariedDeterminationOfMeansTemplate()).thenReturn(TEMPLATE_ID);
 
         assertThat(generator.getEmailTemplateId(caseData)).isEqualTo(TEMPLATE_ID);
 

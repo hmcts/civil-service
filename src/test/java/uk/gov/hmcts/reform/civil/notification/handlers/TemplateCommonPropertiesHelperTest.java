@@ -7,17 +7,25 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_16_DIGIT_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
 
 class TemplateCommonPropertiesHelperTest {
@@ -65,6 +73,42 @@ class TemplateCommonPropertiesHelperTest {
         when(configuration.getRaiseQueryLr()).thenReturn(TEST_RAISE_QUERY_LR);
         when(configuration.getRaiseQueryLip()).thenReturn(TEST_RAISE_QUERY_LIP);
         when(configuration.getRaiseQueryLipWelsh()).thenReturn(TEST_RAISE_QUERY_LIP_WELSH);
+    }
+
+    @Test
+    void shouldAddBaseProperties() {
+        CaseData realCaseData = buildCaseData();
+
+        Map<String, String> properties = helper.addBaseProperties(realCaseData, new HashMap<>());
+
+        assertThat(properties)
+            .containsEntry(CLAIM_REFERENCE_NUMBER, "1594901956117591")
+            .containsEntry(CLAIM_16_DIGIT_NUMBER, "1594901956117591")
+            .containsEntry(CASEMAN_REF, "000DC001")
+            .containsEntry(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
+    }
+
+    @Test
+    void shouldAddClaimantVDefendantForLip() {
+        CaseData realCaseData = buildCaseData();
+        Map<String, String> properties = helper.addBaseProperties(realCaseData, new HashMap<>());
+
+        helper.addLipClaimantVDefendant(realCaseData, properties);
+
+        assertThat(properties)
+            .containsEntry(CLAIMANT_V_DEFENDANT, "Claimant Ltd V Defendant Ltd")
+            .containsEntry(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
+    }
+
+    private CaseData buildCaseData() {
+        return CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .ccdCaseReference(1594901956117591L)
+            .legacyCaseReference("000DC001")
+            .applicant1(new Party().setCompanyName("Claimant Ltd").setType(Party.Type.COMPANY))
+            .respondent1(new Party().setCompanyName("Defendant Ltd").setType(Party.Type.COMPANY))
+            .build();
     }
 
     @Test

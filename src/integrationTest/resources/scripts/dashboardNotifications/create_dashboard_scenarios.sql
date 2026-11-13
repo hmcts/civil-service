@@ -1,3 +1,7 @@
+DELETE FROM dbs.task_list WHERE task_item_template_id = 9999;
+DELETE FROM dbs.task_item_template WHERE id = 9999;
+DELETE FROM dbs.scenario WHERE id IN (9999, 9997);
+
 INSERT INTO dbs.scenario (id, name, notifications_to_delete, notifications_to_create, created_at)
 VALUES (9999, 'scenario.hearing.fee.payment.required', '{"notification.claim.hearing.readiness.requested"}',
         '{"notification.hearing.fee.payment.required" : ["hearingFeePayByTime", "hearingFeePayByDate"]}',

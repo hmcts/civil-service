@@ -21,6 +21,7 @@ import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipSubjectProperties;
 
 @Service
 @RequiredArgsConstructor
@@ -57,6 +58,7 @@ public class TranslatedOrderNoticeUploadedDefendantNotificationHandler extends C
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             PARTY_NAME, caseData.getRespondent1().getPartyName()
         ));
+        addLipSubjectProperties(caseData, properties);
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isPublicQueryManagementEnabled(caseData));
 

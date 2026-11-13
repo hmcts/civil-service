@@ -52,7 +52,7 @@ public class TranslatedDocumentUploadedDefendantEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder().build();
         String expectedTemplateId = "template-id-english";
 
-        when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(expectedTemplateId);
+        when(notificationsProperties.getNotifyLiPDefendantTranslatedDocumentUploadedTemplate()).thenReturn(expectedTemplateId);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 
