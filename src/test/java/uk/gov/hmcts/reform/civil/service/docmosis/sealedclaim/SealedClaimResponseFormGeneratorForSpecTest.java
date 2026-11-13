@@ -8,6 +8,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -95,6 +96,12 @@ class SealedClaimResponseFormGeneratorForSpecTest {
             .respondent1DQ(respondent1DQ)
             .respondent1ResponseDate(LocalDateTime.now())
             .build();
+        RespondToClaim respondToClaim = new RespondToClaim();
+        respondToClaim.setHowMuchWasPaid(new BigDecimal("100050"));
+        respondToClaim.setWhenWasThisAmountPaid(LocalDate.parse("2023-03-29"));
+        respondToClaim.setHowWasThisAmountPaid(PaymentMethod.OTHER);
+        respondToClaim.setHowWasThisAmountPaidOther("OTHER");
+        base1v1.setRespondToClaim(respondToClaim);
         base1v1.setDetailsOfWhyDoesYouDisputeTheClaim("why-1v1");
 
         Party applicantOne1v2 = new Party();
@@ -157,6 +164,7 @@ class SealedClaimResponseFormGeneratorForSpecTest {
         base1v2LatestIsResp2.setSpecResponseTimelineOfEvents(List.of(timeline1));
         base1v2LatestIsResp2.setSpecResponseTimelineOfEvents2(List.of(timeline2));
         base1v2LatestIsResp2.setRespondToAdmittedClaim(respondToAdmittedClaim);
+        base1v2LatestIsResp2.setRespondToAdmittedClaim2(respondToClaim);
 
         // Minimal stubs for the two "populator" collaborators to keep this unit test atomic
         lenient().doAnswer(inv -> {
@@ -198,6 +206,8 @@ class SealedClaimResponseFormGeneratorForSpecTest {
 
     @Test
     void getTemplateData_1v2_latestIsRespondent2_usesResp2_fields_timeline2_and_resp2_def_doc() {
+        //Respondent 2 responds first
+        base1v2LatestIsResp2.setIsRespondent2(YesOrNo.YES);
         SealedClaimResponseFormForSpec dto = generator.getTemplateData(base1v2LatestIsResp2, AUTH);
 
         // populated by our stub
@@ -214,11 +224,22 @@ class SealedClaimResponseFormGeneratorForSpecTest {
         assertThat(dto.getTimeline()).hasSize(1);
         assertThat(dto.getTimeline().get(0).getTimelineDescription()).isEqualTo("r2-timeline");
 
-        // payments mapping (respondToAdmittedClaim present)
-        assertThat(dto.getPoundsPaid()).isEqualTo("10.00"); // 1000 pennies -> £10.00
-        assertThat(dto.getPaymentDate()).isEqualTo(base1v2LatestIsResp2.getRespondToAdmittedClaim().getWhenWasThisAmountPaid());
+        // payments mapping (respondToAdmittedClaim2 present)
+        assertThat(dto.getPoundsPaid()).isEqualTo("1000.50"); // 100050 pennies -> £1000.50
+        assertThat(dto.getPaymentDate()).isEqualTo(base1v2LatestIsResp2.getRespondToAdmittedClaim2().getWhenWasThisAmountPaid());
         // human-friendly for credit card comes from enum; we only assert it's non-empty
         assertThat(dto.getPaymentMethod()).isNotBlank();
+
+        //Respondent 1 responds second
+        base1v2LatestIsResp2.setIsRespondent1(YesOrNo.YES);
+        base1v2LatestIsResp2.setIsRespondent2(null);
+        SealedClaimResponseFormForSpec dto1 = generator.getTemplateData(base1v2LatestIsResp2, AUTH);
+
+        // payments mapping (respondToAdmittedClaim present)
+        assertThat(dto1.getPoundsPaid()).isEqualTo("10.00"); // 1000 pennies -> £10
+        assertThat(dto1.getPaymentDate()).isEqualTo(base1v2LatestIsResp2.getRespondToAdmittedClaim().getWhenWasThisAmountPaid());
+        // human-friendly for credit card comes from enum; we only assert it's non-empty
+        assertThat(dto1.getPaymentMethod()).isEqualTo("Credit card");;
     }
 
     @Test
@@ -259,6 +280,7 @@ class SealedClaimResponseFormGeneratorForSpecTest {
         respondToClaim.setWhenWasThisAmountPaid(LocalDate.now().minusDays(3));
         CaseData withOther = base1v1;
         withOther.setRespondToClaim(respondToClaim);
+        withOther.setIsRespondent1(YesOrNo.YES);
 
         SealedClaimResponseFormForSpec dto = generator.getTemplateData(withOther, AUTH);
 
@@ -313,5 +335,50 @@ class SealedClaimResponseFormGeneratorForSpecTest {
         );
         assertThat(templateEnumCaptor.getValue())
             .isEqualTo(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V2_LR_ADMISSION_BULK);
+    }
+
+    @Test
+    void generate_1v2DifferentSolicitors_respondent1_usesDistinctFileName() {
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.COMPANY);
+        respondent2.setCompanyName("Resp2 Ltd");
+        CaseData multiparty = base1v1;
+        multiparty.setRespondent2(respondent2);
+        multiparty.setRespondent2SameLegalRepresentative(YesOrNo.NO);
+        multiparty.setRespondent1ResponseDate(LocalDateTime.now());
+
+        when(documentGeneratorService.generateDocmosisDocument(any(), any()))
+            .thenReturn(new DocmosisDocument().setBytes(new byte[]{1}));
+        when(documentManagementService.uploadDocument(anyString(), any(PDF.class)))
+            .thenReturn(new CaseDocument().setDocumentType(DocumentType.SEALED_CLAIM));
+
+        generator.generate(multiparty, AUTH);
+
+        verify(documentManagementService).uploadDocument(eq(AUTH), pdfCaptor.capture());
+        assertThat(pdfCaptor.getValue().getFileBaseName())
+            .isEqualTo("LEG-123_defendant_response_sealed_form.pdf");
+    }
+
+    @Test
+    void generate_1v2DifferentSolicitors_respondent2_usesDistinctFileName() {
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.COMPANY);
+        respondent2.setCompanyName("Resp2 Ltd");
+        CaseData multiparty = base1v1;
+        multiparty.setRespondent2(respondent2);
+        multiparty.setRespondent2SameLegalRepresentative(YesOrNo.NO);
+        multiparty.setRespondent1ResponseDate(LocalDateTime.now().minusDays(1));
+        multiparty.setRespondent2ResponseDate(LocalDateTime.now());
+
+        when(documentGeneratorService.generateDocmosisDocument(any(), any()))
+            .thenReturn(new DocmosisDocument().setBytes(new byte[]{1}));
+        when(documentManagementService.uploadDocument(anyString(), any(PDF.class)))
+            .thenReturn(new CaseDocument().setDocumentType(DocumentType.SEALED_CLAIM));
+
+        generator.generate(multiparty, AUTH);
+
+        verify(documentManagementService).uploadDocument(eq(AUTH), pdfCaptor.capture());
+        assertThat(pdfCaptor.getValue().getFileBaseName())
+            .isEqualTo("LEG-123_defendant2_response_sealed_form.pdf");
     }
 }

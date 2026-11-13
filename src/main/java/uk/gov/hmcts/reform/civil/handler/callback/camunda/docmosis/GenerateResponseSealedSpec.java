@@ -149,14 +149,23 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             "Sealed Claim form",
             LocalDate.now().toString()
         ));
-        if (caseData.getSpecResponseTimelineDocumentFiles() != null) {
+        // Shared uploaded timeline belongs to respondent 1 only; R2 uses event timeline on the form.
+        if (!isRespondent2Document(caseData) && caseData.getSpecResponseTimelineDocumentFiles() != null) {
             documents.add(new DocumentMetaData(
                 caseData.getSpecResponseTimelineDocumentFiles(),
                 "Claim timeline",
                 LocalDate.now().toString()
             ));
         }
-        if (caseData.getRespondent1SpecDefenceResponseDocument() != null) {
+        if (isRespondent2Document(caseData)) {
+            if (caseData.getRespondent2SpecDefenceResponseDocument() != null) {
+                documents.add(new DocumentMetaData(
+                    caseData.getRespondent2SpecDefenceResponseDocument().getFile(),
+                    "Supported docs",
+                    LocalDate.now().toString()
+                ));
+            }
+        } else if (caseData.getRespondent1SpecDefenceResponseDocument() != null) {
             documents.add(new DocumentMetaData(
                 caseData.getRespondent1SpecDefenceResponseDocument().getFile(),
                 "Supported docs",
@@ -177,6 +186,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
         } else {
             ElementUtils.unwrapElements(caseData.getSystemGeneratedCaseDocuments()).stream()
                 .filter(cd -> DocumentType.DIRECTIONS_QUESTIONNAIRE.equals(cd.getDocumentType()))
+                .filter(cd -> isCurrentDefendantDq(caseData, cd))
                 .map(cd ->
                          new DocumentMetaData(
                              cd.getDocumentLink(),
@@ -186,5 +196,24 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 ).forEach(documents::add);
         }
         return documents;
+    }
+
+    private boolean isCurrentDefendantDq(CaseData caseData, CaseDocument directionsQuestionnaire) {
+        String documentUrl = directionsQuestionnaire.getDocumentLink() != null
+            ? directionsQuestionnaire.getDocumentLink().getDocumentUrl()
+            : null;
+        if (isRespondent2Document(caseData)) {
+            return caseData.getRespondent2DocumentURL() != null
+                && caseData.getRespondent2DocumentURL().equals(documentUrl);
+        }
+        if (caseData.getRespondent1DocumentURL() != null) {
+            return caseData.getRespondent1DocumentURL().equals(documentUrl);
+        }
+        // 1v1 / single DQ: include when not generating for respondent 2
+        return true;
+    }
+
+    private boolean isRespondent2Document(CaseData caseData) {
+        return "userRespondent2".equals(caseData.getRespondent2DocumentGeneration());
     }
 }

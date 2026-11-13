@@ -25,10 +25,12 @@ public class ValidateRespondentPaymentDate implements CaseTask {
         log.info("Executing respondent payment date validation for caseId: {}", callbackParams.getCaseData().getCcdCaseReference());
 
         CaseData caseData = callbackParams.getCaseData();
+        RespondToClaimAdmitPartLRspec admitPart = caseData.isCurrentDefendantRespondent2()
+            ? caseData.getRespondToClaimAdmitPartLRspec2()
+            : caseData.getRespondToClaimAdmitPartLRspec();
 
         List<String> errors = paymentDateValidator
-                .validate(Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
-                        .orElseGet(() -> new RespondToClaimAdmitPartLRspec()));
+                .validate(Optional.ofNullable(admitPart).orElseGet(RespondToClaimAdmitPartLRspec::new));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
