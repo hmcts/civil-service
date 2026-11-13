@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.GeneralApplicationCaseNameService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -30,6 +31,7 @@ import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,6 +41,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -52,6 +56,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @SpringBootTest(classes = {
     AddDefendantLitigationFriendCallbackHandler.class,
+    GeneralApplicationCaseNameService.class,
     JacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class,
     ExitSurveyConfiguration.class,
@@ -232,7 +237,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
         }
 
         @Test
-        void shouldSetRespondent1LF_WhenRespondentOneSelected_WithMultiParty_1v2_SameSolicitor_Also_Update_GaCaseName() {
+        void shouldSetRespondent1LF_WhenRespondentOneSelected_WithMultiParty_1v2_SameSolicitor_WithoutUpdatingGaCaseName() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateAddRespondent1LitigationFriend_1v2_SameSolicitor()
                 .selectLitigationFriend("Defendant One: Mr. Def One")
@@ -257,7 +262,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
                 .isEqualTo("John Rambo v Sole Trader T/A Sole Trader co represented by Litigation Friend (litigation friend), John Rambo");
             assertThat(response.getData()).extracting("caseNamePublic")
                 .isEqualTo("John Rambo v Sole Trader T/A Sole Trader co represented by Litigation Friend (litigation friend), John Rambo");
-            verify(coreCaseDataService).triggerGeneralApplicationEvent(eq(1234L), eq(UPDATE_GA_CASE_DATA), anyMap());
+            verify(coreCaseDataService, never()).triggerGeneralApplicationEvent(anyLong(), any(), anyMap());
         }
 
         @Test
@@ -474,6 +479,24 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
                     .confirmationHeader("# You have added litigation friend details")
                     .confirmationBody(exitSurveyContentService.respondentSurvey())
                     .build());
+        }
+
+        @Test
+        void shouldUpdateGeneralApplicationCaseName_whenLitigationFriendChangedSavedCaseName() {
+            CaseData caseDataBefore = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseData(CaseDataBuilder.builder().atStateClaimDetailsNotified().build());
+            caseDataBefore.setCaseNameHmctsInternal("John Rambo v Sole Trader");
+            CaseData savedCaseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseData(CaseDataBuilder.builder().atStateClaimDetailsNotified().build());
+            savedCaseData.setCaseNameHmctsInternal("John Rambo v Sole Trader represented by Litigation Friend (litigation friend)");
+
+            handler.handle(callbackParamsOf(savedCaseData, caseDataBefore, SUBMITTED));
+
+            verify(coreCaseDataService).triggerGeneralApplicationEvent(
+                1234L,
+                UPDATE_GA_CASE_DATA,
+                Map.of("caseNameGaInternal", "John Rambo v Sole Trader represented by Litigation Friend (litigation friend)")
+            );
         }
     }
 }
