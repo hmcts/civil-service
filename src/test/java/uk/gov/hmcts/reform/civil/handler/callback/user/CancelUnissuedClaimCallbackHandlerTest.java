@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -17,10 +18,13 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -33,11 +37,15 @@ class CancelUnissuedClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     private CancelUnissuedClaimCallbackHandler handler;
     private ObjectMapper objectMapper;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @BeforeEach
     void setup() {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        handler = new CancelUnissuedClaimCallbackHandler(objectMapper);
+        lenient().when(featureToggleService.isEarlyClaimTerminationEnabled()).thenReturn(true);
+        handler = new CancelUnissuedClaimCallbackHandler(objectMapper, featureToggleService);
     }
 
     private CaseData eligibleCaseData() {
@@ -66,6 +74,16 @@ class CancelUnissuedClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnError_whenEarlyClaimTerminationFlagIsOff() {
+            when(featureToggleService.isEarlyClaimTerminationEnabled()).thenReturn(false);
+            CallbackParams params = callbackParamsOf(eligibleCaseData(), ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(CancelUnissuedClaimCallbackHandler.EVENT_NOT_ALLOWED);
         }
 
         @Test
