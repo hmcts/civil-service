@@ -57,10 +57,7 @@ public class SettleUnspecClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse submitChanges(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        boolean isFlagEnabled = featureToggleService.isEarlyClaimTerminationEnabled();
-        log.info("SETTLE_CLAIM_UNSPEC about-to-submit: early-claim-termination flag is {} for caseId {}",
-                 isFlagEnabled ? "ON" : "OFF", caseData.getCcdCaseReference());
-        if (!isFlagEnabled) {
+        if (!featureToggleService.isEarlyClaimTerminationEnabled()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(EVENT_NOT_ALLOWED))
                 .build();
