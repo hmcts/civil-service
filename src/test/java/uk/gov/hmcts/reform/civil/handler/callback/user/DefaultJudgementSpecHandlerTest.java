@@ -195,8 +195,10 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-            assertThat(response.getErrors()).doesNotContain("Default judgment cannot be applied for while claim is "
-                                                          + "in breathing space");
+            assertThat(response.getErrors())
+                .isNotEmpty()
+                .doesNotContain("Default judgment cannot be applied for while claim is "
+                                    + "in breathing space");
         }
 
         @Test
