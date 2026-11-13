@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapp
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RECORD_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,6 +43,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -102,15 +104,21 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
+import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
+import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.AcknowledgementOfServiceStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.BreathingSpaceEventStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.CaseNotesStrategy;
@@ -149,12 +157,15 @@ import uk.gov.hmcts.reform.civil.service.robotics.strategy.TakenOfflineSpecDefen
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnregisteredDefendantStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnrepresentedAndUnregisteredDefendantStrategy;
 import uk.gov.hmcts.reform.civil.service.robotics.strategy.UnrepresentedDefendantStrategy;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsManualOfflineSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
@@ -272,6 +283,29 @@ class EventHistoryMapperTest {
         EventHistory eventHistory = new EventHistory();
         judgmentByAdmissionStrategy.contribute(eventHistory, caseData, BEARER_TOKEN);
         return eventHistory.getJudgmentByAdmission().getFirst().getEventDetails().getAmountOfJudgment();
+    }
+
+    private RoboticsCaseData mapUnspecPayload(CaseData caseData) {
+        return mapUnspecPayload(caseData, mapper);
+    }
+
+    private RoboticsCaseData mapUnspecPayload(CaseData caseData, EventHistoryMapper eventHistoryMapper) {
+        ContactInformation contactInformation = new ContactInformation()
+                .setAddressLine1("1 Example Street")
+                .setPostCode("AB1 2XY");
+        Organisation organisation = new Organisation()
+                .setName("Example Solicitors")
+                .setContactInformation(List.of(contactInformation));
+        OrganisationService organisationService = mock(OrganisationService.class);
+        when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(organisation));
+        RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
+        RoboticsDataMapperForUnspec dataMapper = new RoboticsDataMapperForUnspec(
+                addressMapper,
+                eventHistoryMapper,
+                organisationService,
+                locationRefDataUtil,
+                new RoboticsCaseDataSupport(addressMapper, new RoboticsPartyLookup()));
+        return dataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
     }
 
     @Nested
@@ -4160,6 +4194,56 @@ class EventHistoryMapperTest {
     class RespondentDivergentResponse {
 
         @Test
+        void shouldBuildValidPayloadFromControlledHistoryWhenRespondent2TypeMissing()
+                throws JsonProcessingException {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .atState1v2DivergentResponse(FULL_ADMISSION, PART_ADMISSION)
+                    .build();
+            caseData.setRespondent2Represented(YES);
+            caseData.setRespondent2ClaimResponseType(null);
+
+            // Retain both response dates to exercise the missing-type branch. This malformed data
+            // permits ambiguous transitions, so this test isolates payload mapping from routing.
+            StateFlow stateFlow = mock(StateFlow.class);
+            when(stateFlow.getStateHistory()).thenReturn(List.of(
+                    State.from(FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE.fullName()),
+                    State.from(FlowState.Main.CLAIM_DETAILS_NOTIFIED.fullName()),
+                    State.from(FlowState.Main.CLAIM_NOTIFIED.fullName()),
+                    State.from(FlowState.Main.CLAIM_ISSUED.fullName())));
+            IStateFlowEngine stateFlowEngine = mock(IStateFlowEngine.class);
+            when(stateFlowEngine.evaluate(caseData)).thenReturn(stateFlow);
+            RoboticsSequenceGenerator sequenceGenerator = new RoboticsSequenceGenerator();
+            RoboticsRespondentResponseSupport responseSupport = new RoboticsRespondentResponseSupport(
+                    formatter, new RoboticsTimelineHelper(time));
+            EventHistoryMapper controlledMapper = new EventHistoryMapper(
+                    new EventHistorySequencer(),
+                    responseSupport,
+                    List.of(
+                            new ClaimIssuedEventStrategy(sequenceGenerator, stateFlowEngine),
+                            new ClaimNotifiedEventStrategy(sequenceGenerator, stateFlowEngine),
+                            new ClaimDetailsNotifiedEventStrategy(sequenceGenerator, stateFlowEngine),
+                            new RespondentDivergentResponseStrategy(
+                                    sequenceGenerator, responseSupport, stateFlowEngine)),
+                    stateFlowEngine);
+
+            RoboticsCaseData payload = mapUnspecPayload(caseData, controlledMapper);
+            EventHistory eventHistory = payload.getEvents();
+
+            assertThat(eventHistory.getReceiptOfAdmission())
+                    .extracting(Event::getLitigiousPartyID).containsExactly("002");
+            assertThat(eventHistory.getReceiptOfPartAdmission()).containsExactly(EMPTY_EVENT);
+            assertThat(eventHistory.getDirectionsQuestionnaireFiled()).containsExactly(EMPTY_EVENT);
+            assertThat(eventHistory.getMiscellaneous())
+                    .extracting(Event::getEventSequence).containsExactly(1, 2, 3, 5);
+            assertThat(eventHistory.getMiscellaneous().getFirst().getEventDetailsText())
+                    .isEqualTo("Claim issued in CCD.");
+            assertThat(eventHistory.getMiscellaneous().getLast().getEventDetailsText())
+                    .contains(caseData.getRespondent1().getPartyName(), "FULL_ADMISSION");
+            assertThat(new JsonSchemaValidationService().validate(payload.toJsonString())).isEmpty();
+        }
+
+        @Test
         void
                 shouldPrepareExpectedEvents_whenClaimWith1v2DiffSolicitorResp1FullAdmitsResp2PartAdmitsNoOptionalEvents() {
             CaseData caseData =
@@ -7305,6 +7389,24 @@ class EventHistoryMapperTest {
 
     @Nested
     class TakenOfflineByStaff {
+
+        @Test
+        void shouldBuildValidPayloadWithFallbackWhenUnspecOfflineDetailsMissing() throws JsonProcessingException {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff().build();
+            caseData.setClaimProceedsInCaseman(null);
+
+            RoboticsCaseData payload = mapUnspecPayload(caseData);
+            EventHistory eventHistory = payload.getEvents();
+
+            assertThat(eventHistory.getMiscellaneous()).extracting(Event::getEventDetailsText)
+                    .containsExactly("Claim issued in CCD.", "RPA Reason: Case taken offline by staff.");
+            assertThat(eventHistory.getMiscellaneous()).extracting(Event::getEventSequence).containsExactly(1, 2);
+            Event offlineEvent = eventHistory.getMiscellaneous().getLast();
+            assertThat(offlineEvent.getEventCode()).isEqualTo("999");
+            assertThat(offlineEvent.getDateReceived()).isEqualTo(caseData.getTakenOfflineByStaffDate());
+            assertThat(offlineEvent.getEventDetails().getMiscText()).isEqualTo(offlineEvent.getEventDetailsText());
+            assertThat(new JsonSchemaValidationService().validate(payload.toJsonString())).isEmpty();
+        }
 
         @Test
         void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterClaimIssued() {
