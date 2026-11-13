@@ -3,7 +3,8 @@ package uk.gov.hmcts.reform.civil.bpmn;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Map;
 
@@ -15,30 +16,13 @@ public class StayLiftedTest extends BpmnBaseTest {
     public static final String MESSAGE_NAME = "STAY_LIFTED";
     public static final String PROCESS_ID = "STAY_LIFTED";
 
-    //CCD CASE EVENT
-    public static final String NOTIFY_CLAIMANT_STAY_LIFTED
-        = "NOTIFY_CLAIMANT_STAY_LIFTED";
-    public static final String NOTIFY_DEFENDANT_STAY_LIFTED
-        = "NOTIFY_DEFENDANT_STAY_LIFTED";
-    public static final String NOTIFY_DEFENDANT2_STAY_LIFTED
-        = "NOTIFY_DEFENDANT2_STAY_LIFTED";
-    public static final String GENERATE_DASHBOARD_NOTIFICATION_STAY_LIFTED
-        = "GenerateDashboardNotificationStayLifted";
-
-    //ACTIVITY IDs
-    private static final String NOTIFY_CLAIMANT_STAY_LIFTED_ACTIVITY_ID
-        = "NotifyClaimantStayLifted";
-    private static final String NOTIFY_DEFENDANT_STAY_LIFTED_ACTIVITY_ID
-        = "NotifyDefendantStayLifted";
-    private static final String NOTIFY_DEFENDANT2_STAY_LIFTED_ACTIVITY_ID
-        = "NotifyDefendant2StayLifted";
-
     public StayLiftedTest() {
         super("stay_lifted.bpmn", PROCESS_ID);
     }
 
-    @Test
-    void shouldSuccessfullyCompleteAmendRestitchBundle() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCompleteStayLiftedWithOneNotificationTask(boolean twoRepresentatives) {
         //assert process has started
         assertFalse(processInstance.isEnded());
 
@@ -47,7 +31,8 @@ public class StayLiftedTest extends BpmnBaseTest {
 
         VariableMap variables = Variables.createVariables();
         variables.put("flowFlags", Map.of(
-            TWO_RESPONDENT_REPRESENTATIVES, true
+            ONE_RESPONDENT_REPRESENTATIVE, !twoRepresentatives,
+            TWO_RESPONDENT_REPRESENTATIVES, twoRepresentatives
         ));
 
         //complete the start business process
@@ -58,36 +43,17 @@ public class StayLiftedTest extends BpmnBaseTest {
 
         ExternalTask notificationTask;
 
-        //complete the claimant notification
+        // One framework task selects all recipients, regardless of the former gateway branch.
         notificationTask = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(notificationTask, PROCESS_CASE_EVENT,
-                                   NOTIFY_CLAIMANT_STAY_LIFTED,
-                                   NOTIFY_CLAIMANT_STAY_LIFTED_ACTIVITY_ID,
-                                   variables
-        );
-
-        //complete the defendant 2 notification
-        notificationTask = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(notificationTask, PROCESS_CASE_EVENT,
-                                   NOTIFY_DEFENDANT2_STAY_LIFTED,
-                                   NOTIFY_DEFENDANT2_STAY_LIFTED_ACTIVITY_ID,
-                                   variables
-        );
-
-        //complete the defendant notification
-        notificationTask = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(notificationTask, PROCESS_CASE_EVENT,
-                                   NOTIFY_DEFENDANT_STAY_LIFTED,
-                                   NOTIFY_DEFENDANT_STAY_LIFTED_ACTIVITY_ID,
-                                   variables
-        );
+                                   "NOTIFY_EVENT", "StayLiftedNotifyParties", variables);
 
         //Generate the Dashboard notifications
         ExternalTask dashboardTask = assertNextExternalTask(PROCESS_CASE_EVENT);
         assertCompleteExternalTask(dashboardTask,
                                    PROCESS_CASE_EVENT,
                                    DASHBOARD_NOTIFICATION_EVENT,
-                                   GENERATE_DASHBOARD_NOTIFICATION_STAY_LIFTED,
+                                   "GenerateDashboardNotificationStayLifted",
                                    variables
         );
 
