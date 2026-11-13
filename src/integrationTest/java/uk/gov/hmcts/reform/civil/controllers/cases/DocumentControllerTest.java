@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
@@ -57,6 +57,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -79,13 +82,13 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     @Autowired
     private DocumentController documentController;
 
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
 
-    @MockBean
+    @MockitoBean
     private CaseDocumentClientApi caseDocumentClientApi;
 
-    @MockBean
+    @MockitoBean
     private CaseDocumentBinaryApiClient caseDocumentBinaryApiClient;
 
     @Autowired
@@ -106,6 +109,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     private static final String GENERATE_ANY_DOC_URL = BASE_URL + "/generateAnyDoc";
     private static final LocalDate DATE = LocalDate.of(2023, 5, 1);
     private static final String DOWNLOAD_FILE_URL = BASE_URL + "/downloadDocument/{documentId}";
+    private static final String DELETE_FILE_URL = BASE_URL + "/{documentId}";
     private static final String DOCUMENT_URL = "http://dm-store:8080/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
 
     private Document document;
@@ -113,10 +117,10 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     @InjectMocks
     private SealedClaimFormGeneratorForSpec sealedClaimFormGenerator;
 
-    @MockBean
+    @MockitoBean
     private RepresentativeService representativeService;
 
-    @MockBean
+    @MockitoBean
     private DocmosisApiClient docmosisApiClient;
 
     private final UserInfo userInfo = UserInfo.builder()
@@ -340,6 +344,41 @@ public class DocumentControllerTest extends BaseIntegrationTest {
             DocumentUploadException.class,
             () -> documentController.uploadAnyDocument(BEARER_TOKEN, file)
         );
+    }
+
+    @Test
+    void shouldDeleteDocument_whenUploadedByCallingUser() throws Exception {
+        UUID documentId = UUID.fromString("85d97996-22a5-40d7-882e-3a382c8ae1b7");
+        Document ownDocument = document();
+        ownDocument.createdBy = userInfo.getUid();
+        ownDocument.ttl = new Date();
+        when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), eq(documentId)))
+            .thenReturn(ownDocument);
+
+        doDelete(BEARER_TOKEN, null, DELETE_FILE_URL, documentId)
+            .andExpect(status().isNoContent());
+
+        verify(caseDocumentClientApi).deleteDocument(anyString(), anyString(), eq(documentId), eq(true));
+    }
+
+    @Test
+    void shouldReturnForbidden_whenDeletingDocumentUploadedBySomeoneElse() throws Exception {
+        UUID documentId = UUID.fromString("85d97996-22a5-40d7-882e-3a382c8ae1b7");
+        when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), eq(documentId)))
+            .thenReturn(document());
+
+        doDelete(BEARER_TOKEN, null, DELETE_FILE_URL, documentId)
+            .andExpect(status().isForbidden());
+
+        verify(caseDocumentClientApi, never()).deleteDocument(anyString(), anyString(), any(UUID.class), anyBoolean());
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenDeletingWithInvalidDocumentId() throws Exception {
+        doDelete(BEARER_TOKEN, null, DELETE_FILE_URL, "undefined")
+            .andExpect(status().isBadRequest());
+
+        verify(caseDocumentClientApi, never()).deleteDocument(anyString(), anyString(), any(UUID.class), anyBoolean());
     }
 
     private UUID getDocumentIdFromSelfHref(String selfHref) {
