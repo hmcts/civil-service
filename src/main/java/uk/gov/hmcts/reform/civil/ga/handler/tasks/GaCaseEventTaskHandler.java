@@ -121,4 +121,9 @@ public class GaCaseEventTaskHandler extends BaseExternalTaskHandler {
 
         return null;
     }
+
+    @Override
+    protected boolean isRetryGuarded() {
+        return true;
+    }
 }
