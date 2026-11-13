@@ -346,6 +346,20 @@ class GaPaymentRequestUpdateCallbackServiceTest {
         verify(coreCaseDataService, never()).startGaUpdate(any(), any());
     }
 
+    @Test
+    void shouldProcessHwf_whenGeneralAppHelpWithFeesIsNull() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(Long.valueOf(CASE_ID));
+        caseData.setCcdState(AWAITING_APPLICATION_PAYMENT);
+        caseData.setGeneralAppHelpWithFees(null);
+        caseData.setGeneralAppPBADetails(new GeneralApplicationPbaDetails());
+
+        GeneralApplicationCaseData result = paymentRequestUpdateCallbackService.processHwf(caseData);
+
+        assertThat(result).isNotNull();
+        verify(coreCaseDataService, never()).startGaUpdate(any(), any());
+    }
+
     private CaseDetails buildCaseDetails(GeneralApplicationCaseData caseData) {
         return CaseDetails.builder()
             .data(objectMapper.convertValue(caseData,
