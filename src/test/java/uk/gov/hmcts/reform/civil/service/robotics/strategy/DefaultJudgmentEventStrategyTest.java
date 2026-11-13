@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -135,6 +136,49 @@ class DefaultJudgmentEventStrategyTest {
         assertThat(builder.getMiscellaneous()).hasSize(1);
         assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo("Judgment recorded.");
+    }
+
+    @Test
+    void usesActiveJudgmentIssueDateWhenJudgmentBufferIsEnabled() {
+        LocalDate issueDate = LocalDate.of(2025, 2, 14);
+        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+        when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
+        lenient().when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(1, 2);
+        when(partyLookup.respondentId(0)).thenReturn("002");
+
+        CaseData caseData = StrategyTestDataFactory.defaultJudgment1v1Builder()
+            .activeJudgment(new JudgmentDetails().setIssueDate(issueDate))
+            .build();
+
+        EventHistory builder = new EventHistory();
+        strategy.contribute(builder, caseData, null);
+
+        assertThat(builder.getDefaultJudgment().getFirst().getDateReceived())
+            .isEqualTo(issueDate.atStartOfDay());
+        assertThat(builder.getDefaultJudgment().getFirst().getEventDetails().getDateOfJudgment())
+            .isEqualTo(issueDate.atStartOfDay());
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived())
+            .isEqualTo(issueDate.atStartOfDay());
+    }
+
+    @Test
+    void fallsBackToJoDjCreatedDateWhenJudgmentIssueDateIsMissing() {
+        LocalDateTime joCreatedDate = LocalDateTime.of(2025, 3, 20, 15, 30);
+        when(featureToggleService.isJudgmentBufferEnabled()).thenReturn(true);
+        when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
+        lenient().when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(1, 2);
+        when(partyLookup.respondentId(0)).thenReturn("002");
+
+        CaseData caseData = StrategyTestDataFactory.defaultJudgment1v1Builder()
+            .activeJudgment(new JudgmentDetails())
+            .joDJCreatedDate(joCreatedDate)
+            .build();
+
+        EventHistory builder = new EventHistory();
+        strategy.contribute(builder, caseData, null);
+
+        assertThat(builder.getDefaultJudgment().getFirst().getDateReceived()).isEqualTo(joCreatedDate);
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived()).isEqualTo(joCreatedDate);
     }
 
     @Test
