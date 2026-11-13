@@ -19,6 +19,12 @@ ROLE_ATTRIBUTES="${5:-'{"jurisdiction":"CIVIL"}'}"
 ROLE_CATEGORY="${6:-"LEGAL_OPERATIONS"}"
 AUTHORISATIONS=${7:-'[]'}
 
+# hmcts-* roles (such as hmcts-admin) are BASIC grants: the role assignment service rejects them as STANDARD
+GRANT_TYPE="STANDARD"
+if [[ "${ROLE_NAME}" == hmcts-* ]]; then
+  GRANT_TYPE="BASIC"
+fi
+
 BASEDIR=$(dirname "$0")
 
 USER_TOKEN=$($BASEDIR/idam-user-token.sh $USERNAME $PASSWORD)
@@ -47,7 +53,7 @@ curl --silent --show-error -X POST "${ROLE_ASSIGNMENT_URL}/am/role-assignments" 
             "roleType": "ORGANISATION",
             "roleName": "'"${ROLE_NAME}"'",
             "classification": "'"${ROLE_CLASSIFICATION}"'",
-            "grantType": "STANDARD",
+            "grantType": "'"${GRANT_TYPE}"'",
             "roleCategory": "'"${ROLE_CATEGORY}"'",
             "readOnly": false,
             "attributes": '${ROLE_ATTRIBUTES}',
