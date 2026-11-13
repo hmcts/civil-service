@@ -11,6 +11,9 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/ccd-definition-mirror.yml'
+      - 'bin/build-civil-xlsx-definitions.sh'
+      - 'bin/compare-ccd-definition-builds.sh'
+      - 'bin/shared/process-definition.sh'
   push:
     branches:
       - master
@@ -19,6 +22,9 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/ccd-definition-mirror.yml'
+      - 'bin/build-civil-xlsx-definitions.sh'
+      - 'bin/compare-ccd-definition-builds.sh'
+      - 'bin/shared/process-definition.sh'
   workflow_dispatch:
 
 permissions:
@@ -104,3 +110,15 @@ jobs:
 
       - name: Run the definition specs
         run: npm run test:definitions
+
+  same-build:
+    name: Build matches civil-ccd-definition
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Builds every environment's spreadsheets with civil-ccd-definition's build-release-ccd-definition.sh
+      # and with bin/build-civil-xlsx-definitions.sh, from the same definitions, and fails if any differ.
+      # Until the cutover, change exclusion rules in civil-ccd-definition first, then here.
+      - name: Compare the spreadsheets
+        run: ./bin/compare-ccd-definition-builds.sh
