@@ -43,7 +43,7 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
             .onlyWhen(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.beforeClaimIssue), transitions)
 
             .moveTo(CLAIM_ISSUED_PAYMENT_FAILED, transitions)
-            .onlyWhen(PaymentPredicate.failed, transitions)
+            .onlyWhen(PaymentPredicate.failed.and(not(TakenOfflinePredicate.byStaff)), transitions)
 
             .moveTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, transitions)
             .onlyWhen(LipPredicate.isLiPvLiPCase

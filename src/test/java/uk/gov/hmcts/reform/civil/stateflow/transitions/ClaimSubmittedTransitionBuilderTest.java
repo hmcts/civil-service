@@ -207,6 +207,35 @@ class ClaimSubmittedTransitionBuilderTest {
         Assertions.assertTrue(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.beforeClaimIssue).test(caseData));
     }
 
+    @Test
+    void shouldOnlyMoveToTakenOfflineByStaff_whenPaymentFailedAndTakenOfflineByStaffBeforeIssue() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedPaymentFailed()
+            .takenOfflineByStaff()
+            .build();
+
+        assertTrue(PaymentPredicate.failed.test(caseData));
+        assertTrue(result.get(1).getCondition().test(caseData));
+        assertFalse(result.get(2).getCondition().test(caseData));
+    }
+
+    @Test
+    void shouldNotMoveToPaymentFailed_whenPaymentFailedAndTakenOfflineByStaff() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentFailed()
+            .takenOfflineByStaff()
+            .build();
+
+        assertTrue(PaymentPredicate.failed.test(caseData));
+        assertFalse(result.get(2).getCondition().test(caseData));
+    }
+
+    @Test
+    void shouldMoveToPaymentFailed_whenPaymentFailedAndNotTakenOffline() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedPaymentFailed().build();
+
+        assertFalse(result.get(1).getCondition().test(caseData));
+        assertTrue(result.get(2).getCondition().test(caseData));
+    }
+
     private CaseData buildCaseDataWithHelpWithFees(YesOrNo helpWithFee) {
         HelpWithFees helpWithFees = new HelpWithFees()
             .setHelpWithFee(helpWithFee);
