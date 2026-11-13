@@ -78,7 +78,13 @@ jobs:
           distribution: 'temurin'
           java-version: 21.0.13+9.0.LTS
       - name: Run checks
-        run: ./gradlew check
+        run: |
+          # Jenkins owns PR unit execution and Sonar coverage. Keep every other check here.
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            ./gradlew check -x test
+          else
+            ./gradlew check
+          fi
       - name: Run integration tests
         env:
           SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
