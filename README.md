@@ -12,6 +12,7 @@ Civil CCD Callback Service.
 - [Pact or contract testing](#pact-or-contract-testing)
 - [Adding Git Conventions](#adding-git-conventions)
 - [Scheduler Framework](docs/scheduler-framework.md)
+- [Handler Decomposition](docs/handler-decomposition.md)
 
 ## StateFlow diagrams
 
@@ -406,6 +407,10 @@ role-assignment, etc.). Add this label when you need to test against live AAT se
 ## [Scheduler Framework](docs/scheduler-framework.md)
 
 Detailed documentation on core components, safety mechanisms, and instructions for creating new schedulers can be found in [docs/scheduler-framework.md](docs/scheduler-framework.md).
+
+## [Handler Decomposition](docs/handler-decomposition.md)
+
+The convention for breaking business logic out of CCD callback handlers into task classes, including package layout, the testing rule and when the pattern does not apply, is in [docs/handler-decomposition.md](docs/handler-decomposition.md). Read it before picking up a [DTSCCI-365](https://hmcts.atlassian.net/browse/DTSCCI-365) subtask.
 
 ## Null-safety baseline
 
