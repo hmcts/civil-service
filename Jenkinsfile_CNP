@@ -177,7 +177,11 @@ withPipeline(type, product, component) {
             cp -R charts/civil-service "$chart_check_dir/civil-service"
             helm dependency build "$chart_check_dir/civil-service"
             helm package "$chart_check_dir/civil-service" --destination "$chart_check_dir/package"
-            python3 .github/scripts/check-chart-size.py "$chart_check_dir"/package/civil-service-*.tgz
+            chart_size_script="$PWD/.github/scripts/check-chart-size.py"
+            (
+              cd "$chart_check_dir/package"
+              python3 "$chart_size_script"
+            )
           '''
         }
       }
