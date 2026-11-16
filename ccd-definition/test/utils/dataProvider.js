@@ -54,15 +54,26 @@ const loadFilesFromDefinitions = filePrefix => {
   return results;
 };
 
-// Please update this map whenever exclusions are updated in build-release-ccd-definition.sh
-// without the *
-const exclusions = new Map([
-  ['preview', ['-prod.json']],
-  ['demo', ['UserProfile.json', '-prod.json']],
-  ['aat', ['UserProfile.json', '-prod.json']],
-  ['prod', ['UserProfile.json', '-nonprod.json', '-testing.json']],
-  ['staging', ['UserProfile.json', '-nonprod.json', '-testing.json']],
-]);
+// The files each environment leaves out, as passed to json2xlsx -e by bin/build-civil-xlsx-definitions.sh.
+// The specs run once per environment against exactly the files that environment imports. The build always
+// leaves out one of the two AuthorisationCaseType shutter files; this checks the unshuttered build, which
+// is what every environment runs outside a shutter.
+const exclusions = new Map(
+  Object.entries(load(path.join(definitionsRoot, 'exclusions.json')))
+    .map(([env, patterns]) => [env, [...patterns, 'AuthorisationCaseType-shuttered.json']])
+);
+
+// json2xlsx (ccd-definition-processor) leaves out a file when any segment of its path matches a pattern
+// with matcher's isMatch: '*' matches any run of characters and the match ignores case.
+const toRegExp = pattern => new RegExp(
+  `^${pattern.split('*').map(part => part.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*')}$`, 'i'
+);
+const isExcluded = (name, env) => {
+  if (!exclusions.has(env)) {
+    throw new Error(`No exclusions for environment '${env}' in exclusions.json`);
+  }
+  return exclusions.get(env).some(pattern => toRegExp(pattern).test(name));
+};
 
 const ccdData = {
     Banner: loadFileFromDefinitions('Banner'),
@@ -112,37 +123,24 @@ getFileData = (filePath, env) => {
   return fieldsArray;
 };
 
-processDir = (filePath, withConfig) => {
-  const fileNames = fs.readdirSync(path.resolve(__dirname, filePath));
-  if (!Object.prototype.toString.call(fileNames) === '[object Array]') {
-    const currentObject = path.resolve(__dirname, `${filePath}/${fileNames}`);
+processDir = (filePath, env) => {
+  fs.readdirSync(path.resolve(__dirname, filePath)).forEach(filename => {
+    if (isExcluded(filename, env)) {
+      return;
+    }
+    const currentObject = path.resolve(__dirname, `${filePath}/${filename}`);
     const stat = fs.statSync(currentObject);
     if (stat.isFile()) {
-      if (!(exclusions.get(withConfig).filter(ext => fileNames.includes(ext)).length > 0)) {
-        const content = Object.assign(load(currentObject), []);
+      const content = Object.assign(load(currentObject), []);
+      if (Object.prototype.toString.call(content) === '[object Array]') {
         fieldsArray = [...fieldsArray, ...content];
+      } else {
+        fieldsArray.push(content);
       }
     } else if (stat.isDirectory()) {
-      processDir(currentObject, withConfig);
+      processDir(currentObject, env);
     }
-  } else {
-    fileNames.forEach(filename => {
-      const currentObject = path.resolve(__dirname, `${filePath}/${filename}`);
-      const stat = fs.statSync(currentObject);
-      if (stat.isFile()) {
-        if (!(exclusions.get(withConfig).filter(ext => filename.includes(ext)).length > 0)) {
-          const content = Object.assign(load(currentObject), []);
-          if (Object.prototype.toString.call(content) === '[object Array]') {
-            fieldsArray = [...fieldsArray, ...content];
-          } else {
-            fieldsArray.push(content);
-          }
-        }
-      } else if (stat.isDirectory()) {
-        processDir(currentObject, withConfig);
-      }
-    });
-  }
+  });
 };
 
 module.exports = {
