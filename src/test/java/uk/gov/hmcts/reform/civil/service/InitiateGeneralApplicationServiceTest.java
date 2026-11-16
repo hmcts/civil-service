@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.DebtPaymentOptions;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypesLR;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -35,6 +36,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationTypeLR;
 import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
@@ -426,6 +428,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     void shouldReturnCaseDataPopulated_whenValidApplicationIsBeingInitiated() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build());
+        GAApplicationTypeLR applicationTypeLR = new GAApplicationTypeLR();
+        applicationTypeLR.setTypes(List.of(GeneralApplicationTypesLR.EXTEND_TIME));
+        caseData.setGeneralAppTypeLR(applicationTypeLR);
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
         CaseData result = service.buildCaseData(caseData, UserDetails.builder()
@@ -1378,6 +1383,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     private void assertCaseDateEntries(CaseData caseData) {
         assertThat(caseData.getGeneralAppType().getTypes()).isNull();
+        assertThat(caseData.getGeneralAppTypeLR().getTypes()).isNull();
         assertThat(caseData.getGeneralAppRespondentAgreement().getHasAgreed()).isNull();
         assertThat(caseData.getGeneralAppDetailsOfOrder()).isEmpty();
         assertThat(caseData.getGeneralAppReasonsOfOrder()).isEmpty();
