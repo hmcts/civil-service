@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "ApplicationDetailsOption",
+    "ListElementCode": "DEFENDANT",
+    "ListElement": "Defendant",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ApplicationDetailsOption",
+    "ListElementCode": "CLAIMANT",
+    "ListElement": "Claimant",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "ApplicationDetailsOption",
+    "ListElementCode": "CLAIMANT_AND_DEFENDANT",
+    "ListElement": "Claimant and Defendant",
+    "DisplayOrder": 3
+  }
+]

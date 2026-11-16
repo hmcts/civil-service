@@ -1,0 +1,92 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "PENDING_CASE_ISSUED",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "AWAITING_RESPONDENT_ACKNOWLEDGEMENT",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "AWAITING_APPLICANT_INTENTION",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "PROCEEDS_IN_HERITAGE_SYSTEM",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "CASE_ISSUED",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "AWAITING_CASE_DETAILS_NOTIFICATION",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "CASE_DISMISSED",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "JUDICIAL_REFERRAL",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "CASE_PROGRESSION",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "HEARING_READINESS",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "PREPARE_FOR_HEARING_CONDUCT_HEARING",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "DECISION_OUTCOME",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "IN_MEDIATION",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "All_FINAL_ORDERS_ISSUED",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "CLOSED",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRUD"
+  }
+]

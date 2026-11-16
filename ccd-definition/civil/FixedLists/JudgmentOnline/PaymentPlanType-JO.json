@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "JoPaymentPlanTypeList",
+    "ListElementCode": "PAY_IN_INSTALMENTS",
+    "ListElement": "Paid in instalments",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "JoPaymentPlanTypeList",
+    "ListElementCode": "PAY_BY_DATE",
+    "ListElement": "Paid by date",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "JoPaymentPlanTypeList",
+    "ListElementCode": "PAY_IMMEDIATELY",
+    "ListElement": "Paid immediately",
+    "DisplayOrder": 3
+  }
+]

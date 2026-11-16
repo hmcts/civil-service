@@ -1,0 +1,98 @@
+[
+  {
+    "ID": "DisposalHearingWitnessOfFact",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFact",
+    "ListElementCode": "input1",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFact",
+    "ListElementCode": "date1",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFact",
+    "ListElementCode": "input2",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFact",
+    "ListElementCode": "date2Label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFact",
+    "ListElementCode": "date2",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFact",
+    "ListElementCode": "input3",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFact",
+    "ListElementCode": "input4",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFact",
+    "ListElementCode": "date3Label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFact",
+    "ListElementCode": "date3",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFact",
+    "ListElementCode": "input5",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingWitnessOfFact",
+    "ListElementCode": "input6",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

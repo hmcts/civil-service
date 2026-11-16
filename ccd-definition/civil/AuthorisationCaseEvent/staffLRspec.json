@@ -1,0 +1,86 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "INFORM_AGREED_EXTENSION_DATE_SPEC",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "ACKNOWLEDGEMENT_OF_SERVICE",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "DEFENDANT_RESPONSE_SPEC",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "PROCESS_FULL_DEFENCE_SPEC",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "PROCESS_PART_ADMISSION_DEFENCE_SPEC",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "NOTIFY_APPLICANT_SOLICITOR1_FOR_RESPONDENT_LITIGANT_IN_PERSON_SPEC",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "CLAIMANT_RESPONSE_SPEC",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "ENTER_BREATHING_SPACE_SPEC",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "LIFT_BREATHING_SPACE_SPEC",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_ENTER",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "NOTIFY_RESPONDENT_SOLICITOR2_BREATHING_SPACE_ENTER",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_ENTER",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  }
+]

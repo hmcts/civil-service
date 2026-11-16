@@ -107,8 +107,6 @@
       <option value='partial_remission_hwf_granted'>Part remission HwF - granted (PARTIAL_REMISSION_HWF_GRANTED)</option>
       <option value='process_cosc_application'>Process COSC Application (PROCESS_COSC_APPLICATION)</option>
       <option value='querymanagementraisequery'>Raise a new query (queryManagementRaiseQuery)</option>
-      <option value='record_judgment'>Record Judgment (RECORD_JUDGMENT)</option>
-      <option value='record_judgment_notification'>Record judgment notification (RECORD_JUDGMENT_NOTIFICATION)</option>
       <option value='hearing_scheduled_retrigger'>Request a listing (HEARING_SCHEDULED_RETRIGGER)</option>
       <option value='default_judgement'>Request Default Judgment (DEFAULT_JUDGEMENT)</option>
       <option value='default_judgement_spec'>Request Default Judgment (DEFAULT_JUDGEMENT_SPEC)</option>
@@ -127,6 +125,8 @@
       <option value='respondent1_trial_ready_notify_others'>Respondent1 trial ready notify others (RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS)</option>
       <option value='respondent2_trial_ready_notify_others'>Respondent2 trial ready notify others (RESPONDENT2_TRIAL_READY_NOTIFY_OTHERS)</option>
       <option value='hearing_scheduled_ga'>Schedule hearing (HEARING_SCHEDULED_GA)</option>
+      <option value='send_translated_order_to_lip_claimant'>Send translated order (SEND_TRANSLATED_ORDER_TO_LIP_CLAIMANT)</option>
+      <option value='send_translated_order_to_lip_defendant'>Send translated order (SEND_TRANSLATED_ORDER_TO_LIP_DEFENDANT)</option>
       <option value='set_aside_judgment'>Set aside judgment (SET_ASIDE_JUDGMENT)</option>
       <option value='settle_claim_marked_paid_in_full'>Settle Claim Marked As Paid In Full notification (SETTLE_CLAIM_MARKED_PAID_IN_FULL)</option>
       <option value='settle_claim_mark_paid_full'>Settle this claim (SETTLE_CLAIM_MARK_PAID_FULL)</option>
@@ -150,7 +150,6 @@
       <option value='upload_translated_document_hearing_notice'>Upload Translated document Hearing Notice (UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE)</option>
       <option value='upload_translated_document_claim_issue'>Upload translated document lip (UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE)</option>
       <option value='upload_translated_document_order'>Upload translated document order (UPLOAD_TRANSLATED_DOCUMENT_ORDER)</option>
-      <option value='upload_translated_document_order_notice'>Upload translated document order notice (UPLOAD_TRANSLATED_DOCUMENT_ORDER_NOTICE)</option>
       <option value='upload_translated_document_sdo'>Upload translated document SDO process (UPLOAD_TRANSLATED_DOCUMENT_SDO)</option>
       <option value='upload_translated_document_hearing_scheduled'>Upload Translated GA hearing scheduled process (UPLOAD_TRANSLATED_DOCUMENT_HEARING_SCHEDULED)</option>
       <option value='upload_translated_document_settlement_agreement'>Upload translated settlement agreement process (UPLOAD_TRANSLATED_DOCUMENT_SETTLEMENT_AGREEMENT)</option>
@@ -1489,10 +1488,10 @@
       </tr>
       <tr data-ccd-events='initiate_cosc_application_after_payment' data-channel='email'>
         <td>Cosc Application After Payment (INITIATE_COSC_APPLICATION_AFTER_PAYMENT)</td>
-        <td><code>NotifyApplicantSolicitorCoscApplication</code></td>
+        <td><code>CoscApplicationAfterPaymentNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/initiate_cosc_application_after_payment.png'>initiate_cosc_application_after_payment.bpmn</a></td>
         <td>Email</td>
-        <td>Applicant</td>
+        <td>Custom (extends CivilEmailDTOGenerator)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0ef9cda6-1ad4-4191-857b-c298ec71cf4c'>notifyClaimantLRCoscApplied (0ef9cda6-1ad4-4191-857b-c298ec71cf4c)</a></td>
       </tr>
       <tr data-ccd-events='initiate_cosc_application_after_payment judgment_paid_in_full process_cosc_application' data-channel='docmosis'>
@@ -3319,94 +3318,6 @@
         <td>—</td>
         <td><a class='template-link' href='https://github.com/hmcts/rdo-docmosis/blob/HEAD/Templates/Base/CV-SPC-ACK-ENG-00001-v01.docx?raw=1'><code>N10 (CV-SPC-ACK-ENG-00001-v01.docx) - acknowledgement_of_service_form_spec.pdf</code></a></td>
       </tr>
-      <tr data-ccd-events='record_judgment_notification record_judgment' data-channel='email'>
-        <td>Record judgment notification (RECORD_JUDGMENT_NOTIFICATION)<br>Record Judgment (RECORD_JUDGMENT)</td>
-        <td><code>RecordJudgmentApplicantSolicitor1</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/record_judgment_notification.png'>record_judgment_notification.bpmn</a></td>
-        <td>Email</td>
-        <td>Applicant</td>
-        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf'>notifyLipUpdateTemplate (edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf)</a></td>
-      </tr>
-      <tr data-ccd-events='record_judgment_notification record_judgment' data-channel='email'>
-        <td>Record judgment notification (RECORD_JUDGMENT_NOTIFICATION)<br>Record Judgment (RECORD_JUDGMENT)</td>
-        <td><code>RecordJudgmentApplicantSolicitor1</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/record_judgment_notification.png'>record_judgment_notification.bpmn</a></td>
-        <td>Email</td>
-        <td>Applicant</td>
-        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/730f4e11-3cb0-43a7-aeeb-8373a28fbc1d'>notifyLipUpdateTemplateBilingual (730f4e11-3cb0-43a7-aeeb-8373a28fbc1d)</a></td>
-      </tr>
-      <tr data-ccd-events='record_judgment_notification record_judgment' data-channel='email'>
-        <td>Record judgment notification (RECORD_JUDGMENT_NOTIFICATION)<br>Record Judgment (RECORD_JUDGMENT)</td>
-        <td><code>RecordJudgmentApplicantSolicitor1</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/record_judgment_notification.png'>record_judgment_notification.bpmn</a></td>
-        <td>Email</td>
-        <td>Applicant</td>
-        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/176148d0-379f-449e-b686-3ff417b0e357'>notifyLrRecordJudgmentDeterminationMeansTemplate (176148d0-379f-449e-b686-3ff417b0e357)</a></td>
-      </tr>
-      <tr data-ccd-events='record_judgment_notification record_judgment' data-channel='email'>
-        <td>Record judgment notification (RECORD_JUDGMENT_NOTIFICATION)<br>Record Judgment (RECORD_JUDGMENT)</td>
-        <td><code>RecordJudgmentNotifyRespondent1</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/record_judgment_notification.png'>record_judgment_notification.bpmn</a></td>
-        <td>Email</td>
-        <td>Respondent</td>
-        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf'>notifyLipUpdateTemplate (edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf)</a></td>
-      </tr>
-      <tr data-ccd-events='record_judgment_notification record_judgment' data-channel='email'>
-        <td>Record judgment notification (RECORD_JUDGMENT_NOTIFICATION)<br>Record Judgment (RECORD_JUDGMENT)</td>
-        <td><code>RecordJudgmentNotifyRespondent1</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/record_judgment_notification.png'>record_judgment_notification.bpmn</a></td>
-        <td>Email</td>
-        <td>Respondent</td>
-        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/730f4e11-3cb0-43a7-aeeb-8373a28fbc1d'>notifyLipUpdateTemplateBilingual (730f4e11-3cb0-43a7-aeeb-8373a28fbc1d)</a></td>
-      </tr>
-      <tr data-ccd-events='record_judgment_notification record_judgment' data-channel='email'>
-        <td>Record judgment notification (RECORD_JUDGMENT_NOTIFICATION)<br>Record Judgment (RECORD_JUDGMENT)</td>
-        <td><code>RecordJudgmentNotifyRespondent1</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/record_judgment_notification.png'>record_judgment_notification.bpmn</a></td>
-        <td>Email</td>
-        <td>Respondent</td>
-        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/176148d0-379f-449e-b686-3ff417b0e357'>notifyLrRecordJudgmentDeterminationMeansTemplate (176148d0-379f-449e-b686-3ff417b0e357)</a></td>
-      </tr>
-      <tr data-ccd-events='record_judgment_notification record_judgment' data-channel='email'>
-        <td>Record judgment notification (RECORD_JUDGMENT_NOTIFICATION)<br>Record Judgment (RECORD_JUDGMENT)</td>
-        <td><code>RecordJudgmentNotifyRespondent2</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/record_judgment_notification.png'>record_judgment_notification.bpmn</a></td>
-        <td>Email</td>
-        <td>Respondent</td>
-        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf'>notifyLipUpdateTemplate (edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf)</a></td>
-      </tr>
-      <tr data-ccd-events='record_judgment_notification record_judgment' data-channel='email'>
-        <td>Record judgment notification (RECORD_JUDGMENT_NOTIFICATION)<br>Record Judgment (RECORD_JUDGMENT)</td>
-        <td><code>RecordJudgmentNotifyRespondent2</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/record_judgment_notification.png'>record_judgment_notification.bpmn</a></td>
-        <td>Email</td>
-        <td>Respondent</td>
-        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/730f4e11-3cb0-43a7-aeeb-8373a28fbc1d'>notifyLipUpdateTemplateBilingual (730f4e11-3cb0-43a7-aeeb-8373a28fbc1d)</a></td>
-      </tr>
-      <tr data-ccd-events='record_judgment_notification record_judgment' data-channel='email'>
-        <td>Record judgment notification (RECORD_JUDGMENT_NOTIFICATION)<br>Record Judgment (RECORD_JUDGMENT)</td>
-        <td><code>RecordJudgmentNotifyRespondent2</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/record_judgment_notification.png'>record_judgment_notification.bpmn</a></td>
-        <td>Email</td>
-        <td>Respondent</td>
-        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/176148d0-379f-449e-b686-3ff417b0e357'>notifyLrRecordJudgmentDeterminationMeansTemplate (176148d0-379f-449e-b686-3ff417b0e357)</a></td>
-      </tr>
-      <tr data-ccd-events='record_judgment_notification record_judgment' data-channel='dashboard'>
-        <td>Record judgment notification (RECORD_JUDGMENT_NOTIFICATION)<br>Record Judgment (RECORD_JUDGMENT)</td>
-        <td><code>GenerateDashboardNotificationRecordJudgmentDefendant</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/record_judgment_notification.png'>record_judgment_notification.bpmn</a></td>
-        <td>Dashboard</td>
-        <td>Defendant</td>
-        <td><a class='template-link' href='dashboard-template.html?path=src/main/resources/notification-templates/Notice.AAA6.JudgmentsOnline.JudgmentDeterminationIssued.Defendant.json'><code>Notice.AAA6.JudgmentsOnline.JudgmentDeterminationIssued.Defendant</code></a></td>
-      </tr>
-      <tr data-ccd-events='record_judgment_notification record_judgment' data-channel='docmosis'>
-        <td>Record judgment notification (RECORD_JUDGMENT_NOTIFICATION)<br>Record Judgment (RECORD_JUDGMENT)</td>
-        <td><code>SendRecordJudgmentDeterminationOfMeansLiPLetterDef1</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/record_judgment_notification.png'>record_judgment_notification.bpmn</a></td>
-        <td>Docmosis (Camunda callback)</td>
-        <td>Defendant</td>
-        <td><a class='template-link' href='https://github.com/hmcts/rdo-docmosis/blob/HEAD/Templates/Base/CV-CMC-LET-ENG-LIP-JO0003.docx?raw=1'><code>RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LIP_DEFENDANT_LETTER (CV-CMC-LET-ENG-LIP-JO0003.docx) - record_judgment_determination_of_means_letter.pdf</code></a></td>
-      </tr>
       <tr data-ccd-events='default_judgement_non_divergent_spec judgment_requested_spec default_judgement_granted_spec default_judgement_spec' data-channel='email'>
         <td>DJ non divergent spec (DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC)<br>Judgment Requested Spec (JUDGMENT_REQUESTED_SPEC)<br>Issue Default Judgment (DEFAULT_JUDGEMENT_GRANTED_SPEC)<br>Request Default Judgment (DEFAULT_JUDGEMENT_SPEC)</td>
         <td><code>DJ_NON_DIVERGENT_NOTIFIER</code></td>
@@ -3751,18 +3662,18 @@
         <td>Defendant 1 (LiP)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/8e5c35fc-b9b3-4172-9509-e5f1838a218a'>orderBeingTranslatedTemplateWelsh (8e5c35fc-b9b3-4172-9509-e5f1838a218a)</a></td>
       </tr>
-      <tr data-ccd-events='generate_order_notification upload_translated_document_order upload_translated_document_order_notice generate_directions_order' data-channel='docmosis'>
-        <td>Generate order notification (GENERATE_ORDER_NOTIFICATION)<br>Upload translated document order (UPLOAD_TRANSLATED_DOCUMENT_ORDER)<br>Upload translated document order notice (UPLOAD_TRANSLATED_DOCUMENT_ORDER_NOTICE)<br>Make an order (GENERATE_DIRECTIONS_ORDER)</td>
+      <tr data-ccd-events='generate_order_notification upload_translated_document_order send_translated_order_to_lip_defendant send_translated_order_to_lip_claimant generate_directions_order' data-channel='docmosis'>
+        <td>Generate order notification (GENERATE_ORDER_NOTIFICATION)<br>Upload translated document order (UPLOAD_TRANSLATED_DOCUMENT_ORDER)<br>Send translated order (SEND_TRANSLATED_ORDER_TO_LIP_DEFENDANT)<br>Send translated order (SEND_TRANSLATED_ORDER_TO_LIP_CLAIMANT)</td>
         <td><code>SendFinalOrderToClaimantLIP</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/generate_order_notification.png'>generate_order_notification.bpmn</a><br><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_order.png'>upload_translated_document_order.bpmn</a><br><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_order_notice.png'>upload_translated_document_order_notice.bpmn</a></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/generate_order_notification.png'>generate_order_notification.bpmn</a><br><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_order.png'>upload_translated_document_order.bpmn</a></td>
         <td>Docmosis (Camunda callback)</td>
         <td>—</td>
         <td><a class='template-link' href='https://github.com/hmcts/rdo-docmosis/blob/HEAD/Templates/Base/CV-SPC-LET-ENG-COVER-LETTER.docx?raw=1'><code>COVER_LETTER (CV-SPC-LET-ENG-COVER-LETTER.docx) - cover_letter.pdf</code></a></td>
       </tr>
-      <tr data-ccd-events='generate_order_notification upload_translated_document_order upload_translated_document_order_notice generate_directions_order' data-channel='docmosis'>
-        <td>Generate order notification (GENERATE_ORDER_NOTIFICATION)<br>Upload translated document order (UPLOAD_TRANSLATED_DOCUMENT_ORDER)<br>Upload translated document order notice (UPLOAD_TRANSLATED_DOCUMENT_ORDER_NOTICE)<br>Make an order (GENERATE_DIRECTIONS_ORDER)</td>
+      <tr data-ccd-events='generate_order_notification upload_translated_document_order send_translated_order_to_lip_defendant send_translated_order_to_lip_claimant generate_directions_order' data-channel='docmosis'>
+        <td>Generate order notification (GENERATE_ORDER_NOTIFICATION)<br>Upload translated document order (UPLOAD_TRANSLATED_DOCUMENT_ORDER)<br>Send translated order (SEND_TRANSLATED_ORDER_TO_LIP_DEFENDANT)<br>Send translated order (SEND_TRANSLATED_ORDER_TO_LIP_CLAIMANT)</td>
         <td><code>SendFinalOrderToDefendantLIP</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/generate_order_notification.png'>generate_order_notification.bpmn</a><br><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_order.png'>upload_translated_document_order.bpmn</a><br><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_order_notice.png'>upload_translated_document_order_notice.bpmn</a></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/generate_order_notification.png'>generate_order_notification.bpmn</a><br><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_order.png'>upload_translated_document_order.bpmn</a></td>
         <td>Docmosis (Camunda callback)</td>
         <td>—</td>
         <td><a class='template-link' href='https://github.com/hmcts/rdo-docmosis/blob/HEAD/Templates/Base/CV-SPC-LET-ENG-COVER-LETTER.docx?raw=1'><code>COVER_LETTER (CV-SPC-LET-ENG-COVER-LETTER.docx) - cover_letter.pdf</code></a></td>
@@ -4919,18 +4830,18 @@
         <td>Defendant 1 (LiP)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/730f4e11-3cb0-43a7-aeeb-8373a28fbc1d'>notifyLipUpdateTemplateBilingual (730f4e11-3cb0-43a7-aeeb-8373a28fbc1d)</a></td>
       </tr>
-      <tr data-ccd-events='notify_judgment_varied_determination_of_means record_judgment_notification edit_judgment record_judgment' data-channel='docmosis'>
-        <td>Notify Judgement Varied (NOTIFY_JUDGMENT_VARIED_DETERMINATION_OF_MEANS)<br>Record judgment notification (RECORD_JUDGMENT_NOTIFICATION)<br>Edit Judgment (EDIT_JUDGMENT)<br>Record Judgment (RECORD_JUDGMENT)</td>
+      <tr data-ccd-events='notify_judgment_varied_determination_of_means edit_judgment' data-channel='docmosis'>
+        <td>Notify Judgement Varied (NOTIFY_JUDGMENT_VARIED_DETERMINATION_OF_MEANS)<br>Edit Judgment (EDIT_JUDGMENT)</td>
         <td><code>GenerateClaimantJudgmentByDeterminationDoc</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/notify_judgment_varied_determination_of_means.png'>notify_judgment_varied_determination_of_means.bpmn</a><br><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/record_judgment_notification.png'>record_judgment_notification.bpmn</a></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/notify_judgment_varied_determination_of_means.png'>notify_judgment_varied_determination_of_means.bpmn</a></td>
         <td>Docmosis (Camunda callback)</td>
         <td>—</td>
         <td><a class='template-link' href='https://github.com/hmcts/rdo-docmosis/blob/HEAD/Templates/Base/CV-SPC-DEC-ENG-00982.docx?raw=1'><code>JUDGMENT_BY_DETERMINATION_CLAIMANT (CV-SPC-DEC-ENG-00982.docx) - Judgment_by_determination_claimant.pdf</code></a><br><a class='template-link' href='https://github.com/hmcts/rdo-docmosis/blob/HEAD/Templates/Base/CV-SPC-DEC-ENG-00981.docx?raw=1'><code>JUDGMENT_BY_DETERMINATION_DEFENDANT (CV-SPC-DEC-ENG-00981.docx) - Judgment_by_determination_defendant.pdf</code></a></td>
       </tr>
-      <tr data-ccd-events='notify_judgment_varied_determination_of_means record_judgment_notification edit_judgment record_judgment' data-channel='docmosis'>
-        <td>Notify Judgement Varied (NOTIFY_JUDGMENT_VARIED_DETERMINATION_OF_MEANS)<br>Record judgment notification (RECORD_JUDGMENT_NOTIFICATION)<br>Edit Judgment (EDIT_JUDGMENT)<br>Record Judgment (RECORD_JUDGMENT)</td>
+      <tr data-ccd-events='notify_judgment_varied_determination_of_means edit_judgment' data-channel='docmosis'>
+        <td>Notify Judgement Varied (NOTIFY_JUDGMENT_VARIED_DETERMINATION_OF_MEANS)<br>Edit Judgment (EDIT_JUDGMENT)</td>
         <td><code>GenerateDefendantJudgmentByDeterminationDoc</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/notify_judgment_varied_determination_of_means.png'>notify_judgment_varied_determination_of_means.bpmn</a><br><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/record_judgment_notification.png'>record_judgment_notification.bpmn</a></td>
+        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/notify_judgment_varied_determination_of_means.png'>notify_judgment_varied_determination_of_means.bpmn</a></td>
         <td>Docmosis (Camunda callback)</td>
         <td>—</td>
         <td><a class='template-link' href='https://github.com/hmcts/rdo-docmosis/blob/HEAD/Templates/Base/CV-SPC-DEC-ENG-00982.docx?raw=1'><code>JUDGMENT_BY_DETERMINATION_CLAIMANT (CV-SPC-DEC-ENG-00982.docx) - Judgment_by_determination_claimant.pdf</code></a><br><a class='template-link' href='https://github.com/hmcts/rdo-docmosis/blob/HEAD/Templates/Base/CV-SPC-DEC-ENG-00981.docx?raw=1'><code>JUDGMENT_BY_DETERMINATION_DEFENDANT (CV-SPC-DEC-ENG-00981.docx) - Judgment_by_determination_defendant.pdf</code></a></td>
@@ -5673,74 +5584,74 @@
       </tr>
       <tr data-ccd-events='stay_case' data-channel='email'>
         <td>Stay case (STAY_CASE)</td>
-        <td><code>NotifyClaimantStayCase</code></td>
+        <td><code>StayCaseNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_case.png'>stay_case.bpmn</a></td>
         <td>Email</td>
-        <td>Claimant</td>
+        <td>Custom (extends StayCaseEmailDTOGenerator)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/d79fa784-f6de-4bd4-a924-334a2765c7fd'>notifyLRCaseStayed (d79fa784-f6de-4bd4-a924-334a2765c7fd)</a></td>
       </tr>
       <tr data-ccd-events='stay_case' data-channel='email'>
         <td>Stay case (STAY_CASE)</td>
-        <td><code>NotifyClaimantStayCase</code></td>
+        <td><code>StayCaseNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_case.png'>stay_case.bpmn</a></td>
         <td>Email</td>
-        <td>Claimant</td>
+        <td>Custom (extends StayCaseEmailDTOGenerator)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf'>notifyLipUpdateTemplate (edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf)</a></td>
       </tr>
       <tr data-ccd-events='stay_case' data-channel='email'>
         <td>Stay case (STAY_CASE)</td>
-        <td><code>NotifyClaimantStayCase</code></td>
+        <td><code>StayCaseNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_case.png'>stay_case.bpmn</a></td>
         <td>Email</td>
-        <td>Claimant</td>
+        <td>Custom (extends StayCaseEmailDTOGenerator)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/730f4e11-3cb0-43a7-aeeb-8373a28fbc1d'>notifyLipUpdateTemplateBilingual (730f4e11-3cb0-43a7-aeeb-8373a28fbc1d)</a></td>
       </tr>
       <tr data-ccd-events='stay_case' data-channel='email'>
         <td>Stay case (STAY_CASE)</td>
-        <td><code>NotifyDefendant2StayCase</code></td>
+        <td><code>StayCaseNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_case.png'>stay_case.bpmn</a></td>
         <td>Email</td>
-        <td>Defendant</td>
+        <td>Custom (extends StayCaseEmailDTOGenerator)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/d79fa784-f6de-4bd4-a924-334a2765c7fd'>notifyLRCaseStayed (d79fa784-f6de-4bd4-a924-334a2765c7fd)</a></td>
       </tr>
       <tr data-ccd-events='stay_case' data-channel='email'>
         <td>Stay case (STAY_CASE)</td>
-        <td><code>NotifyDefendant2StayCase</code></td>
+        <td><code>StayCaseNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_case.png'>stay_case.bpmn</a></td>
         <td>Email</td>
-        <td>Defendant</td>
+        <td>Custom (extends StayCaseEmailDTOGenerator)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf'>notifyLipUpdateTemplate (edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf)</a></td>
       </tr>
       <tr data-ccd-events='stay_case' data-channel='email'>
         <td>Stay case (STAY_CASE)</td>
-        <td><code>NotifyDefendant2StayCase</code></td>
+        <td><code>StayCaseNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_case.png'>stay_case.bpmn</a></td>
         <td>Email</td>
-        <td>Defendant</td>
+        <td>Custom (extends StayCaseEmailDTOGenerator)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/730f4e11-3cb0-43a7-aeeb-8373a28fbc1d'>notifyLipUpdateTemplateBilingual (730f4e11-3cb0-43a7-aeeb-8373a28fbc1d)</a></td>
       </tr>
       <tr data-ccd-events='stay_case' data-channel='email'>
         <td>Stay case (STAY_CASE)</td>
-        <td><code>NotifyDefendantStayCase</code></td>
+        <td><code>StayCaseNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_case.png'>stay_case.bpmn</a></td>
         <td>Email</td>
-        <td>Defendant</td>
+        <td>Custom (extends StayCaseEmailDTOGenerator)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/d79fa784-f6de-4bd4-a924-334a2765c7fd'>notifyLRCaseStayed (d79fa784-f6de-4bd4-a924-334a2765c7fd)</a></td>
       </tr>
       <tr data-ccd-events='stay_case' data-channel='email'>
         <td>Stay case (STAY_CASE)</td>
-        <td><code>NotifyDefendantStayCase</code></td>
+        <td><code>StayCaseNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_case.png'>stay_case.bpmn</a></td>
         <td>Email</td>
-        <td>Defendant</td>
+        <td>Custom (extends StayCaseEmailDTOGenerator)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf'>notifyLipUpdateTemplate (edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf)</a></td>
       </tr>
       <tr data-ccd-events='stay_case' data-channel='email'>
         <td>Stay case (STAY_CASE)</td>
-        <td><code>NotifyDefendantStayCase</code></td>
+        <td><code>StayCaseNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_case.png'>stay_case.bpmn</a></td>
         <td>Email</td>
-        <td>Defendant</td>
+        <td>Custom (extends StayCaseEmailDTOGenerator)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/730f4e11-3cb0-43a7-aeeb-8373a28fbc1d'>notifyLipUpdateTemplateBilingual (730f4e11-3cb0-43a7-aeeb-8373a28fbc1d)</a></td>
       </tr>
       <tr data-ccd-events='stay_case' data-channel='dashboard'>
@@ -5761,74 +5672,74 @@
       </tr>
       <tr data-ccd-events='stay_lifted manage_stay' data-channel='email'>
         <td>Stay Lifted (STAY_LIFTED)<br>Manage stay (MANAGE_STAY)</td>
-        <td><code>NotifyClaimantStayLifted</code></td>
+        <td><code>StayLiftedNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_lifted.png'>stay_lifted.bpmn</a></td>
         <td>Email</td>
-        <td>Claimant</td>
+        <td>Custom (extends StayLiftedEmailDTOGenerator)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/bd2c8d45-2050-4e98-8779-985105a9eb7b'>notifyLRStayLifted (bd2c8d45-2050-4e98-8779-985105a9eb7b)</a></td>
       </tr>
       <tr data-ccd-events='stay_lifted manage_stay' data-channel='email'>
         <td>Stay Lifted (STAY_LIFTED)<br>Manage stay (MANAGE_STAY)</td>
-        <td><code>NotifyClaimantStayLifted</code></td>
+        <td><code>StayLiftedNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_lifted.png'>stay_lifted.bpmn</a></td>
         <td>Email</td>
-        <td>Claimant</td>
+        <td>Custom (extends StayLiftedEmailDTOGenerator)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf'>notifyLipUpdateTemplate (edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf)</a></td>
       </tr>
       <tr data-ccd-events='stay_lifted manage_stay' data-channel='email'>
         <td>Stay Lifted (STAY_LIFTED)<br>Manage stay (MANAGE_STAY)</td>
-        <td><code>NotifyClaimantStayLifted</code></td>
+        <td><code>StayLiftedNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_lifted.png'>stay_lifted.bpmn</a></td>
         <td>Email</td>
-        <td>Claimant</td>
+        <td>Custom (extends StayLiftedEmailDTOGenerator)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/730f4e11-3cb0-43a7-aeeb-8373a28fbc1d'>notifyLipUpdateTemplateBilingual (730f4e11-3cb0-43a7-aeeb-8373a28fbc1d)</a></td>
       </tr>
       <tr data-ccd-events='stay_lifted manage_stay' data-channel='email'>
         <td>Stay Lifted (STAY_LIFTED)<br>Manage stay (MANAGE_STAY)</td>
-        <td><code>NotifyDefendant2StayLifted</code></td>
+        <td><code>StayLiftedNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_lifted.png'>stay_lifted.bpmn</a></td>
         <td>Email</td>
-        <td>Defendant</td>
+        <td>Custom (extends StayLiftedEmailDTOGenerator)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/bd2c8d45-2050-4e98-8779-985105a9eb7b'>notifyLRStayLifted (bd2c8d45-2050-4e98-8779-985105a9eb7b)</a></td>
       </tr>
       <tr data-ccd-events='stay_lifted manage_stay' data-channel='email'>
         <td>Stay Lifted (STAY_LIFTED)<br>Manage stay (MANAGE_STAY)</td>
-        <td><code>NotifyDefendant2StayLifted</code></td>
+        <td><code>StayLiftedNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_lifted.png'>stay_lifted.bpmn</a></td>
         <td>Email</td>
-        <td>Defendant</td>
+        <td>Custom (extends StayLiftedEmailDTOGenerator)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf'>notifyLipUpdateTemplate (edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf)</a></td>
       </tr>
       <tr data-ccd-events='stay_lifted manage_stay' data-channel='email'>
         <td>Stay Lifted (STAY_LIFTED)<br>Manage stay (MANAGE_STAY)</td>
-        <td><code>NotifyDefendant2StayLifted</code></td>
+        <td><code>StayLiftedNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_lifted.png'>stay_lifted.bpmn</a></td>
         <td>Email</td>
-        <td>Defendant</td>
+        <td>Custom (extends StayLiftedEmailDTOGenerator)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/730f4e11-3cb0-43a7-aeeb-8373a28fbc1d'>notifyLipUpdateTemplateBilingual (730f4e11-3cb0-43a7-aeeb-8373a28fbc1d)</a></td>
       </tr>
       <tr data-ccd-events='stay_lifted manage_stay' data-channel='email'>
         <td>Stay Lifted (STAY_LIFTED)<br>Manage stay (MANAGE_STAY)</td>
-        <td><code>NotifyDefendantStayLifted</code></td>
+        <td><code>StayLiftedNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_lifted.png'>stay_lifted.bpmn</a></td>
         <td>Email</td>
-        <td>Defendant</td>
+        <td>Custom (extends StayLiftedEmailDTOGenerator)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/bd2c8d45-2050-4e98-8779-985105a9eb7b'>notifyLRStayLifted (bd2c8d45-2050-4e98-8779-985105a9eb7b)</a></td>
       </tr>
       <tr data-ccd-events='stay_lifted manage_stay' data-channel='email'>
         <td>Stay Lifted (STAY_LIFTED)<br>Manage stay (MANAGE_STAY)</td>
-        <td><code>NotifyDefendantStayLifted</code></td>
+        <td><code>StayLiftedNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_lifted.png'>stay_lifted.bpmn</a></td>
         <td>Email</td>
-        <td>Defendant</td>
+        <td>Custom (extends StayLiftedEmailDTOGenerator)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf'>notifyLipUpdateTemplate (edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf)</a></td>
       </tr>
       <tr data-ccd-events='stay_lifted manage_stay' data-channel='email'>
         <td>Stay Lifted (STAY_LIFTED)<br>Manage stay (MANAGE_STAY)</td>
-        <td><code>NotifyDefendantStayLifted</code></td>
+        <td><code>StayLiftedNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_lifted.png'>stay_lifted.bpmn</a></td>
         <td>Email</td>
-        <td>Defendant</td>
+        <td>Custom (extends StayLiftedEmailDTOGenerator)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/730f4e11-3cb0-43a7-aeeb-8373a28fbc1d'>notifyLipUpdateTemplateBilingual (730f4e11-3cb0-43a7-aeeb-8373a28fbc1d)</a></td>
       </tr>
       <tr data-ccd-events='stay_lifted manage_stay' data-channel='dashboard'>
@@ -5865,74 +5776,74 @@
       </tr>
       <tr data-ccd-events='stay_update_requested manage_stay' data-channel='email'>
         <td>Stay Update Requested (STAY_UPDATE_REQUESTED)<br>Manage stay (MANAGE_STAY)</td>
-        <td><code>NotifyClaimantStayUpdateRequested</code></td>
+        <td><code>StayUpdateRequestedNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_update_requested.png'>stay_update_requested.bpmn</a></td>
         <td>Email</td>
-        <td>Claimant</td>
+        <td>Claimant (LiP)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/d164bdcc-e7e4-4868-a5b2-78c9e2bb6334'>notifyLRStayUpdateRequested (d164bdcc-e7e4-4868-a5b2-78c9e2bb6334)</a></td>
       </tr>
       <tr data-ccd-events='stay_update_requested manage_stay' data-channel='email'>
         <td>Stay Update Requested (STAY_UPDATE_REQUESTED)<br>Manage stay (MANAGE_STAY)</td>
-        <td><code>NotifyClaimantStayUpdateRequested</code></td>
+        <td><code>StayUpdateRequestedNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_update_requested.png'>stay_update_requested.bpmn</a></td>
         <td>Email</td>
-        <td>Claimant</td>
+        <td>Claimant (LiP)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/2f57d5f1-bc41-49a8-94e8-51df8afc5eff'>notifyLipBilingualStayUpdateRequested (2f57d5f1-bc41-49a8-94e8-51df8afc5eff)</a></td>
       </tr>
       <tr data-ccd-events='stay_update_requested manage_stay' data-channel='email'>
         <td>Stay Update Requested (STAY_UPDATE_REQUESTED)<br>Manage stay (MANAGE_STAY)</td>
-        <td><code>NotifyClaimantStayUpdateRequested</code></td>
+        <td><code>StayUpdateRequestedNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_update_requested.png'>stay_update_requested.bpmn</a></td>
         <td>Email</td>
-        <td>Claimant</td>
+        <td>Claimant (LiP)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/3c1cde59-b856-459c-ae58-2411314bb1f2'>notifyLipStayUpdateRequested (3c1cde59-b856-459c-ae58-2411314bb1f2)</a></td>
       </tr>
       <tr data-ccd-events='stay_update_requested manage_stay' data-channel='email'>
         <td>Stay Update Requested (STAY_UPDATE_REQUESTED)<br>Manage stay (MANAGE_STAY)</td>
-        <td><code>NotifyDefendant2StayUpdateRequested</code></td>
+        <td><code>StayUpdateRequestedNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_update_requested.png'>stay_update_requested.bpmn</a></td>
         <td>Email</td>
-        <td>Defendant</td>
+        <td>Defendant 1 (LiP)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/d164bdcc-e7e4-4868-a5b2-78c9e2bb6334'>notifyLRStayUpdateRequested (d164bdcc-e7e4-4868-a5b2-78c9e2bb6334)</a></td>
       </tr>
       <tr data-ccd-events='stay_update_requested manage_stay' data-channel='email'>
         <td>Stay Update Requested (STAY_UPDATE_REQUESTED)<br>Manage stay (MANAGE_STAY)</td>
-        <td><code>NotifyDefendant2StayUpdateRequested</code></td>
+        <td><code>StayUpdateRequestedNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_update_requested.png'>stay_update_requested.bpmn</a></td>
         <td>Email</td>
-        <td>Defendant</td>
+        <td>Defendant 1 (LiP)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/2f57d5f1-bc41-49a8-94e8-51df8afc5eff'>notifyLipBilingualStayUpdateRequested (2f57d5f1-bc41-49a8-94e8-51df8afc5eff)</a></td>
       </tr>
       <tr data-ccd-events='stay_update_requested manage_stay' data-channel='email'>
         <td>Stay Update Requested (STAY_UPDATE_REQUESTED)<br>Manage stay (MANAGE_STAY)</td>
-        <td><code>NotifyDefendant2StayUpdateRequested</code></td>
+        <td><code>StayUpdateRequestedNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_update_requested.png'>stay_update_requested.bpmn</a></td>
         <td>Email</td>
-        <td>Defendant</td>
+        <td>Defendant 1 (LiP)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/3c1cde59-b856-459c-ae58-2411314bb1f2'>notifyLipStayUpdateRequested (3c1cde59-b856-459c-ae58-2411314bb1f2)</a></td>
       </tr>
       <tr data-ccd-events='stay_update_requested manage_stay' data-channel='email'>
         <td>Stay Update Requested (STAY_UPDATE_REQUESTED)<br>Manage stay (MANAGE_STAY)</td>
-        <td><code>NotifyDefendantStayUpdateRequested</code></td>
+        <td><code>StayUpdateRequestedNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_update_requested.png'>stay_update_requested.bpmn</a></td>
         <td>Email</td>
-        <td>Defendant</td>
+        <td>Defendant 2 (LiP)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/d164bdcc-e7e4-4868-a5b2-78c9e2bb6334'>notifyLRStayUpdateRequested (d164bdcc-e7e4-4868-a5b2-78c9e2bb6334)</a></td>
       </tr>
       <tr data-ccd-events='stay_update_requested manage_stay' data-channel='email'>
         <td>Stay Update Requested (STAY_UPDATE_REQUESTED)<br>Manage stay (MANAGE_STAY)</td>
-        <td><code>NotifyDefendantStayUpdateRequested</code></td>
+        <td><code>StayUpdateRequestedNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_update_requested.png'>stay_update_requested.bpmn</a></td>
         <td>Email</td>
-        <td>Defendant</td>
+        <td>Defendant 2 (LiP)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/2f57d5f1-bc41-49a8-94e8-51df8afc5eff'>notifyLipBilingualStayUpdateRequested (2f57d5f1-bc41-49a8-94e8-51df8afc5eff)</a></td>
       </tr>
       <tr data-ccd-events='stay_update_requested manage_stay' data-channel='email'>
         <td>Stay Update Requested (STAY_UPDATE_REQUESTED)<br>Manage stay (MANAGE_STAY)</td>
-        <td><code>NotifyDefendantStayUpdateRequested</code></td>
+        <td><code>StayUpdateRequestedNotifyParties</code></td>
         <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/stay_update_requested.png'>stay_update_requested.bpmn</a></td>
         <td>Email</td>
-        <td>Defendant</td>
+        <td>Defendant 2 (LiP)</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/3c1cde59-b856-459c-ae58-2411314bb1f2'>notifyLipStayUpdateRequested (3c1cde59-b856-459c-ae58-2411314bb1f2)</a></td>
       </tr>
       <tr data-ccd-events='take_case_offline' data-channel='email'>
@@ -6334,22 +6245,6 @@
         <td>Dashboard</td>
         <td>Defendant</td>
         <td><a class='template-link' href='dashboard-template.html?path=src/main/resources/notification-templates/Notice.AAA6.ClaimIssue.Response.Required.json'><code>Notice.AAA6.ClaimIssue.Response.Required</code></a></td>
-      </tr>
-      <tr data-ccd-events='upload_translated_document_order_notice' data-channel='email'>
-        <td>Upload translated document order notice (UPLOAD_TRANSLATED_DOCUMENT_ORDER_NOTICE)</td>
-        <td><code>NotifyClaimantOfUploadedOrderNotice</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_order_notice.png'>upload_translated_document_order_notice.bpmn</a></td>
-        <td>Email</td>
-        <td>Claimant</td>
-        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/d1eb5d79-6d1f-4b05-bbdf-a18fda06cf01'>notifyLiPOrderTranslatedTemplate (d1eb5d79-6d1f-4b05-bbdf-a18fda06cf01)</a></td>
-      </tr>
-      <tr data-ccd-events='upload_translated_document_order_notice' data-channel='email'>
-        <td>Upload translated document order notice (UPLOAD_TRANSLATED_DOCUMENT_ORDER_NOTICE)</td>
-        <td><code>NotifyDefendantOfUploadedOrderNotice</code></td>
-        <td><a href='https://raw.githubusercontent.com/hmcts/civil-service/master/docs/bpmn-diagrams/upload_translated_document_order_notice.png'>upload_translated_document_order_notice.bpmn</a></td>
-        <td>Email</td>
-        <td>Defendant</td>
-        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/d1eb5d79-6d1f-4b05-bbdf-a18fda06cf01'>notifyLiPOrderTranslatedTemplate (d1eb5d79-6d1f-4b05-bbdf-a18fda06cf01)</a></td>
       </tr>
       <tr data-ccd-events='' data-channel='email'>
         <td>—</td>
@@ -7369,6 +7264,14 @@
       </tr>
       <tr data-ccd-events='' data-channel='email'>
         <td>—</td>
+        <td><code>NotifyApplicantSolicitorCoscApplication</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Applicant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/0ef9cda6-1ad4-4191-857b-c298ec71cf4c'>notifyClaimantLRCoscApplied (0ef9cda6-1ad4-4191-857b-c298ec71cf4c)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
         <td><code>NotifyApplicantSolicitorDJReceived</code></td>
         <td>—</td>
         <td>Email</td>
@@ -7537,6 +7440,78 @@
       </tr>
       <tr data-ccd-events='' data-channel='email'>
         <td>—</td>
+        <td><code>NotifyClaimantStayCase</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Claimant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/d79fa784-f6de-4bd4-a924-334a2765c7fd'>notifyLRCaseStayed (d79fa784-f6de-4bd4-a924-334a2765c7fd)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyClaimantStayCase</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Claimant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf'>notifyLipUpdateTemplate (edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyClaimantStayCase</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Claimant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/730f4e11-3cb0-43a7-aeeb-8373a28fbc1d'>notifyLipUpdateTemplateBilingual (730f4e11-3cb0-43a7-aeeb-8373a28fbc1d)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyClaimantStayLifted</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Claimant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/bd2c8d45-2050-4e98-8779-985105a9eb7b'>notifyLRStayLifted (bd2c8d45-2050-4e98-8779-985105a9eb7b)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyClaimantStayLifted</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Claimant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf'>notifyLipUpdateTemplate (edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyClaimantStayLifted</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Claimant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/730f4e11-3cb0-43a7-aeeb-8373a28fbc1d'>notifyLipUpdateTemplateBilingual (730f4e11-3cb0-43a7-aeeb-8373a28fbc1d)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyClaimantStayUpdateRequested</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Claimant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/d164bdcc-e7e4-4868-a5b2-78c9e2bb6334'>notifyLRStayUpdateRequested (d164bdcc-e7e4-4868-a5b2-78c9e2bb6334)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyClaimantStayUpdateRequested</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Claimant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/2f57d5f1-bc41-49a8-94e8-51df8afc5eff'>notifyLipBilingualStayUpdateRequested (2f57d5f1-bc41-49a8-94e8-51df8afc5eff)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyClaimantStayUpdateRequested</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Claimant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/3c1cde59-b856-459c-ae58-2411314bb1f2'>notifyLipStayUpdateRequested (3c1cde59-b856-459c-ae58-2411314bb1f2)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
         <td><code>NotifyDJNonDivergentClaimant</code></td>
         <td>—</td>
         <td>Email</td>
@@ -7670,6 +7645,78 @@
         <td>Email</td>
         <td>Defendant</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/af2f664a-dcc6-4239-94e0-a0956132182c'>hearingNotificationLipDefendantTemplateWelsh (af2f664a-dcc6-4239-94e0-a0956132182c)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyDefendant2StayCase</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Defendant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/d79fa784-f6de-4bd4-a924-334a2765c7fd'>notifyLRCaseStayed (d79fa784-f6de-4bd4-a924-334a2765c7fd)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyDefendant2StayCase</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Defendant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf'>notifyLipUpdateTemplate (edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyDefendant2StayCase</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Defendant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/730f4e11-3cb0-43a7-aeeb-8373a28fbc1d'>notifyLipUpdateTemplateBilingual (730f4e11-3cb0-43a7-aeeb-8373a28fbc1d)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyDefendant2StayLifted</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Defendant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/bd2c8d45-2050-4e98-8779-985105a9eb7b'>notifyLRStayLifted (bd2c8d45-2050-4e98-8779-985105a9eb7b)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyDefendant2StayLifted</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Defendant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf'>notifyLipUpdateTemplate (edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyDefendant2StayLifted</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Defendant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/730f4e11-3cb0-43a7-aeeb-8373a28fbc1d'>notifyLipUpdateTemplateBilingual (730f4e11-3cb0-43a7-aeeb-8373a28fbc1d)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyDefendant2StayUpdateRequested</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Defendant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/d164bdcc-e7e4-4868-a5b2-78c9e2bb6334'>notifyLRStayUpdateRequested (d164bdcc-e7e4-4868-a5b2-78c9e2bb6334)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyDefendant2StayUpdateRequested</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Defendant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/2f57d5f1-bc41-49a8-94e8-51df8afc5eff'>notifyLipBilingualStayUpdateRequested (2f57d5f1-bc41-49a8-94e8-51df8afc5eff)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyDefendant2StayUpdateRequested</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Defendant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/3c1cde59-b856-459c-ae58-2411314bb1f2'>notifyLipStayUpdateRequested (3c1cde59-b856-459c-ae58-2411314bb1f2)</a></td>
       </tr>
       <tr data-ccd-events='' data-channel='email'>
         <td>—</td>
@@ -7830,6 +7877,78 @@
         <td>Email</td>
         <td>Defendant</td>
         <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/af2f664a-dcc6-4239-94e0-a0956132182c'>hearingNotificationLipDefendantTemplateWelsh (af2f664a-dcc6-4239-94e0-a0956132182c)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyDefendantStayCase</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Defendant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/d79fa784-f6de-4bd4-a924-334a2765c7fd'>notifyLRCaseStayed (d79fa784-f6de-4bd4-a924-334a2765c7fd)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyDefendantStayCase</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Defendant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf'>notifyLipUpdateTemplate (edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyDefendantStayCase</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Defendant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/730f4e11-3cb0-43a7-aeeb-8373a28fbc1d'>notifyLipUpdateTemplateBilingual (730f4e11-3cb0-43a7-aeeb-8373a28fbc1d)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyDefendantStayLifted</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Defendant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/bd2c8d45-2050-4e98-8779-985105a9eb7b'>notifyLRStayLifted (bd2c8d45-2050-4e98-8779-985105a9eb7b)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyDefendantStayLifted</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Defendant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf'>notifyLipUpdateTemplate (edf3ac20-fb30-43ac-a0fd-dc72f9f37aaf)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyDefendantStayLifted</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Defendant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/730f4e11-3cb0-43a7-aeeb-8373a28fbc1d'>notifyLipUpdateTemplateBilingual (730f4e11-3cb0-43a7-aeeb-8373a28fbc1d)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyDefendantStayUpdateRequested</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Defendant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/d164bdcc-e7e4-4868-a5b2-78c9e2bb6334'>notifyLRStayUpdateRequested (d164bdcc-e7e4-4868-a5b2-78c9e2bb6334)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyDefendantStayUpdateRequested</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Defendant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/2f57d5f1-bc41-49a8-94e8-51df8afc5eff'>notifyLipBilingualStayUpdateRequested (2f57d5f1-bc41-49a8-94e8-51df8afc5eff)</a></td>
+      </tr>
+      <tr data-ccd-events='' data-channel='email'>
+        <td>—</td>
+        <td><code>NotifyDefendantStayUpdateRequested</code></td>
+        <td>—</td>
+        <td>Email</td>
+        <td>Defendant</td>
+        <td><a class='template-link' href='https://www.notifications.service.gov.uk/services/a8b1617c-8e15-49aa-a8d3-a27a243f3c45/templates/3c1cde59-b856-459c-ae58-2411314bb1f2'>notifyLipStayUpdateRequested (3c1cde59-b856-459c-ae58-2411314bb1f2)</a></td>
       </tr>
       <tr data-ccd-events='' data-channel='email'>
         <td>—</td>

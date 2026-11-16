@@ -1,0 +1,50 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "UserRoles": [
+      "caseworker-civil-solicitor",
+      "caseworker-civil-admin",
+      "judge-profile",
+      "legal-adviser",
+      "admin-access",
+      "full-access",
+      "hearing-schedule-access",
+      "payment-access",
+      "caseworker-civil-staff"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "UserRoles": [
+      "caseworker-approver",
+      "caseworker-caa",
+      "caseworker-civil-systemupdate",
+      "next-hearing-date-admin",
+      "caseworker-wa-task-configuration",
+      "caseworker-civil-rparobot",
+      "wlu-admin"
+    ],
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "UserRoles": [
+      "GS_profile",
+      "caseworker-ras-validation",
+      "caseworker-civil-citizen-ui-pcqextractor"
+    ],
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "UserRoles": [
+      "CITIZEN-CLAIMANT-PROFILE",
+      "CITIZEN-DEFENDANT-PROFILE",
+      "cui-admin-profile",
+      "cui-nbc-profile",
+      "citizen-profile"
+    ],
+    "CRUD": "CRU"
+  }
+]

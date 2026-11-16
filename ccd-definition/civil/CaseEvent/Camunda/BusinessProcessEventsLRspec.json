@@ -1,0 +1,14 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "VALIDATE_FEE_SPEC",
+    "Name": "Validate fee",
+    "Description": "Validate fee for Spec",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N"
+  }
+]

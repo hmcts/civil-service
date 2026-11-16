@@ -1,0 +1,10 @@
+[
+  {
+    "LiveFrom": "05/07/2024",
+    "CaseTypeID": "CIVIL",
+    "CategoryID": "discontinueNotices",
+    "CategoryLabel": "Notice of Discontinuance",
+    "DisplayOrder": "5",
+    "ParentCategoryID": "orders"
+  }
+]

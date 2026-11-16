@@ -1,0 +1,1751 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaDetailsMasterCollection",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppType",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplicationType",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppParentCaseLink",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "caseLink",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "businessProcess",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplicantAddlSolicitors",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppEvidenceDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "RU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentAgreement",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "RU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppUrgencyRequirement",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "RU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppInformOtherParty",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "RU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "isApplicationUrgent",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "RU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppDetailsOfOrder",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "RU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppReasonsOfOrder",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "RU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppUploadEvidenceLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "RU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppWrittenRepUploadLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "RU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "CaseAccessCategory",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppWrittenRepUpload",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaWrittenRepDocList",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppDirOrderUpload",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaDirectionDocList",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppAddlnInfoUpload",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaAddlnInfoList",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "RU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeAnOrderForWrittenRepresentations",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "writtenRepresentationsDrawGeneralOrder",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "sequentialWrittenRepresentationUploadyBy",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "sequentialWrittenRepresentationRespondWithin",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "concurrentWrittenRepresentationUploadyBy",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judgeRecitalText",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "directionInRelationToHearingText",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialGeneralHearingOrderRecital",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialHearingGeneralOrderHearingType",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialHearingGeneralOrderHearingText",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialHearingGOHearingReqText",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialGeneralOrderHearingEstimationTimeText",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialSequentialDateText",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialApplicanSequentialDateText",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialConcurrentDateText",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialGeneralOrderHearingEstimationTime",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialGeneralOrderHearingRequirement",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialGOHearingDirections",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "isMultiParty",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "applicantPartyName",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimant1PartyName",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimant2PartyName",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "defendant1PartyName",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "defendant2PartyName",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "caseManagementLocation",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "isCcmccLocation",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "caseManagementCategory",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "parentClaimantIsApplicant",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "applicationIsCloaked",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "applicationIsUncloakedOnce",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "applicationIsCloakedLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicidalDecisionMakeAnOrderForWrittenRepresentationsLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialGeneralOrderHeading",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "makeAppVisibleToRespondents",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppSubmittedDateGAspec",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondent1Representative",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecision",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppDateDeadline",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppNotificationDeadlineDate",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "hearingDetailsResp",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentsResponses",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppSuperClaimType",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "locationName",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaDraftDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalOrderDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "consentOrderDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "dismissalOrderDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "directionOrderDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "requestForInformationDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "hearingOrderDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "applicationClosedDate",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "applicationTakenOfflineDate",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppVaryJudgementType",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaUploadN245FormUploadLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppHearingDate",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppN245FormUpload",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "hearingNoticeDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderCourtOwnInitiativeListForHearing",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNoticeListForHearing",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderCourtOwnInitiativeForWrittenRep",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNoticeForWrittenRep",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderMadeCourtsInitiativeLabelForHearing",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderMadeCourtsInitiativeLabelForWrittenRep",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaRespondentDebtorOffer",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppResponseStatementOfTruth",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppConsentOrder",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaRespondentConsent",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaApplicantDisplayName",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaRespDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondReason",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaRespondDoc",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondConsentReason",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondConsentDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondDebtorDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondDebtorUploadLabel",
+    "UserRoles": [
+      "wlu-admin"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondUploadLabel",
+    "UserRoles": [
+      "wlu-admin"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondConsentUploadLabel",
+    "UserRoles": [
+      "wlu-admin"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaAddlDoc",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "addnDocumentLabel",
+    "UserRoles": [
+      "wlu-admin"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "caseDocumentUploadDate",
+    "UserRoles": [
+      "wlu-admin"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "caseDocumentUploadDateRes",
+    "UserRoles": [
+      "wlu-admin"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "uploadDocument",
+    "UserRoles": [
+      "wlu-admin"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "isDocumentVisible",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "applicant1OrganisationPolicy",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondent1OrganisationPolicy",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondent2OrganisationPolicy",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "applicationTypes",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "parentCaseReference",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaAddlDocBundle",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppAskForCosts",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "RU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "applicationFeeAmountInPence",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "RU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaAddlDocRespondentSol",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaAddlDocClaimant",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "writtenRepSequentialDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppWrittenRepText",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "writtenRepConcurrentDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "caseNameGaInternal",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "caseTitleTranslatedDoc",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "translatedDocuments",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "translatedDocumentsBulkPrint",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimantBilingualLanguagePreference",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondent1LiPResponse",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "applicantBilingualLanguagePreference",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentBilingualLanguagePreference",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppDetailsOfOrderColl",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "RU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppReasonsOfOrderColl",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "RU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "preTranslationGaDocuments",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-admin"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "wlu-admin",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "preTranslationGaDocumentType",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-admin"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "wlu-admin",
+          "CITIZEN-CLAIMANT-PROFILE",
+          "CITIZEN-DEFENDANT-PROFILE",
+          "citizen-profile",
+          "judge-profile",
+          "legal-adviser",
+          "cui-admin-profile",
+          "APP-SOL-SPEC-PROFILE",
+          "RES-SOL-ONE-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "originalDocumentsBulkPrint",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaDetailsTranslationCollection",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRUD"
+      },
+      {
+        "UserRoles": [
+          "cui-admin-profile",
+          "wlu-admin",
+          "caseworker-civil-staff",
+          "civil-administrator-standard"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "preTranslationGaDocsApplicant",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "APPLICANT-PROFILE-SPEC",
+          "CITIZEN-CLAIMANT-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRUD"
+      },
+      {
+        "UserRoles": [
+          "wlu-admin",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "preTranslationGaDocsRespondent",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "RESPONDENT-ONE-PROFILE-SPEC",
+          "CITIZEN-DEFENDANT-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRUD"
+      },
+      {
+        "UserRoles": [
+          "wlu-admin",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  }
+]

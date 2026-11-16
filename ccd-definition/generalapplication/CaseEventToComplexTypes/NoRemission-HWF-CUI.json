@@ -1,0 +1,43 @@
+[
+  {
+    "ID": "HelpWithFeesDetails",
+    "CaseEventID": "NO_REMISSION_HWF_GA",
+    "CaseFieldID": "gaHwfDetails",
+    "ListElementCode": "noRemissionDetails",
+    "EventElementLabel": "Details",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "hwfFeeType = \"APPLICATION\""
+  },
+  {
+    "ID": "HelpWithFeesDetails",
+    "CaseEventID": "NO_REMISSION_HWF_GA",
+    "CaseFieldID": "gaHwfDetails",
+    "ListElementCode": "noRemissionDetailsSummary",
+    "EventElementLabel": "Summary",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "hwfFeeType = \"APPLICATION\""
+  },
+  {
+    "ID": "HelpWithFeesDetails",
+    "CaseEventID": "NO_REMISSION_HWF_GA",
+    "CaseFieldID": "additionalHwfDetails",
+    "ListElementCode": "noRemissionDetails",
+    "EventElementLabel": "Details",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "hwfFeeType = \"ADDITIONAL\""
+  },
+  {
+    "ID": "HelpWithFeesDetails",
+    "CaseEventID": "NO_REMISSION_HWF_GA",
+    "CaseFieldID": "additionalHwfDetails",
+    "ListElementCode": "noRemissionDetailsSummary",
+    "EventElementLabel": "Summary",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "hwfFeeType = \"ADDITIONAL\""
+  }
+
+]

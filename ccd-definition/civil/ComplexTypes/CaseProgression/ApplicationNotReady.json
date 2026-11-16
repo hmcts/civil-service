@@ -1,0 +1,27 @@
+[
+  {
+    "ID": "ApplicationNotReady",
+    "ListElementCode": "applicationNotReadyLabel",
+    "ElementLabel": "## You will need to make an application to the court if this case is not ready for the trial or hearing. \nThe trial or hearing will go ahead as planned on the specified date unless a judge makes an order changing the date of hearing. If you want the date of hearing to be changed (or any other order to make the case ready for trial) you will need to make an application to the court. \n\nYou will still need to provide the following information on trial arrangements. \n****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ApplicationNotReady",
+    "ListElementCode": "applicationNotReadyLine",
+    "ElementLabel": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "ApplicationNotReady",
+    "ListElementCode": "applicationNotReadyConditional",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "applicationNotReadyLine=\"DO_NOT_SHOW_IN_UI\""
+  }
+]

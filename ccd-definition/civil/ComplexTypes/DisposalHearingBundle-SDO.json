@@ -1,0 +1,35 @@
+[
+  {
+    "ID": "DisposalHearingBundle",
+    "ListElementCode": "label1",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingBundle",
+    "ListElementCode": "input",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingBundle",
+    "ListElementCode": "label2",
+    "FieldType": "Label",
+    "ElementLabel": "#### Select bundle type",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingBundle",
+    "ListElementCode": "type",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "DisposalHearingBundleType",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

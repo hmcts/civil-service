@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "FastTrackJudgesRecital",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackJudgesRecital",
+    "ListElementCode": "input",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]
