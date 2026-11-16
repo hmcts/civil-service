@@ -27,14 +27,14 @@ import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 
 /**
- * Loads the civil-ccd-definition JSON the build packages, through the decentralised runtime and this service's
+ * Loads the CCD definition JSON the build packages, through the decentralised runtime and this service's
  * callback dispatcher, as an environment would.
  */
 class CivilJsonCcdConfigTest {
 
     @Test
     void loadsTheNonProdDefinitions() {
-        context("*-prod.json").run(context -> {
+        context("local").run(context -> {
             assertThat(context).hasNotFailed();
             var configs = resolved(context.getBeansOfType(CCDConfig.class).values());
 
@@ -47,7 +47,7 @@ class CivilJsonCcdConfigTest {
 
     @Test
     void loadsTheProdDefinitions() {
-        context("*-nonprod.json,*-testing*.json").run(context -> {
+        context("prod").run(context -> {
             assertThat(context).hasNotFailed();
             var configs = resolved(context.getBeansOfType(CCDConfig.class).values());
 
@@ -58,7 +58,13 @@ class CivilJsonCcdConfigTest {
         });
     }
 
-    private static ApplicationContextRunner context(String excludedFiles) {
+    @Test
+    void refusesAnEnvironmentExclusionsJsonDoesNotName() {
+        context("nowhere").run(context -> assertThat(context).hasFailed()
+            .getFailure().hasStackTraceContaining("exclusions.json has no environment 'nowhere'"));
+    }
+
+    private static ApplicationContextRunner context(String environment) {
         return new ApplicationContextRunner()
             .withUserConfiguration(CivilJsonCcdConfig.class, JsonCCDConfigSupport.class, JsonCallbackBridge.class)
             .withBean(DecentralisedCallbackHandler.class, () -> new DecentralisedCallbackHandler(
@@ -72,7 +78,7 @@ class CivilJsonCcdConfigTest {
             .withPropertyValues(
                 "civil.decentralised.enabled=true",
                 "civil.decentralised.definitions-root=classpath:ccd-definitions",
-                "civil.decentralised.excluded-files=" + excludedFiles,
+                "civil.decentralised.definitions-environment=" + environment,
                 "decentralisation.local-callback-placeholder=CCD_DEF_CASE_SERVICE_BASE_URL"
             );
     }
