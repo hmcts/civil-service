@@ -1,0 +1,12 @@
+{
+  "CaseTypeID": "CIVIL",
+  "CaseEventID": "REMOVE_DOCUMENT",
+  "AccessControl": [
+    {
+      "UserRoles": [
+        "caseworker-civil-doc-removal"
+      ],
+      "CRUD": "CRUD"
+    }
+  ]
+}

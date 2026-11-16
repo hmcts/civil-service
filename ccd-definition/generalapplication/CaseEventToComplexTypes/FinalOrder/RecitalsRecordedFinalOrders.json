@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "assistedOrderRecitalsRecorded",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRecitalsRecorded",
+    "ListElementCode": "label",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "assistedOrderRecitalsRecorded",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRecitalsRecorded",
+    "ListElementCode": "text",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  }
+]

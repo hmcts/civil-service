@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "PaymentStatus",
+    "ListElementCode": "SUCCESS",
+    "ListElement": "Success",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "PaymentStatus",
+    "ListElementCode": "FAILED",
+    "ListElement": "Failed",
+    "DisplayOrder": 2
+  }
+]

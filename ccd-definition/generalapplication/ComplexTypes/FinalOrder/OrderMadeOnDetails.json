@@ -1,0 +1,66 @@
+[
+  {
+    "ID": "OrderMadeOnOwnInitiative",
+    "ListElementCode": "ownInitiativeLabel",
+    "ElementLabel": "### Order on court's own initiative",
+    "HintText": " ",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "OrderMadeOnOwnInitiative",
+    "ListElementCode": "detailText",
+    "ElementLabel": " ",
+    "HintText": "",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "OrderMadeOnOwnInitiative",
+    "ListElementCode": "ownInitiativeDateLabel",
+    "ElementLabel": "### Please enter date",
+    "HintText": " ",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "OrderMadeOnOwnInitiative",
+    "ListElementCode": "date",
+    "ElementLabel": " ",
+    "HintText": "For example, 16 4 2021",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "OrderMadeOnWithOutNotice",
+    "ListElementCode": "withOutNoticeLabel",
+    "ElementLabel": "### Order without notice",
+    "HintText": " ",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "OrderMadeOnWithOutNotice",
+    "ListElementCode": "detailText",
+    "ElementLabel": " ",
+    "HintText": "",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "OrderMadeOnWithOutNotice",
+    "ListElementCode": "withOutNoticeDateLabel",
+    "ElementLabel": "### Please enter date",
+    "HintText": " ",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "OrderMadeOnWithOutNotice",
+    "ListElementCode": "date",
+    "ElementLabel": " ",
+    "HintText": "For example, 16 4 2021",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
+  }
+]

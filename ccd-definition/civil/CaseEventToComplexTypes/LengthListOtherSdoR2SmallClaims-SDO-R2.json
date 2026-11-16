@@ -1,0 +1,34 @@
+[
+  {
+    "ID": "SdoR2SmallClaimsHearingLengthOther",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2SmallClaimsHearing",
+    "ListElementCode": "lengthListOther.title",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearingLengthOther",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2SmallClaimsHearing",
+    "ListElementCode": "lengthListOther.trialLengthDays",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "COMPLEX"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearingLengthOther",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2SmallClaimsHearing",
+    "ListElementCode": "lengthListOther.trialLengthHours",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "COMPLEX"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearingLengthOther",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2SmallClaimsHearing",
+    "ListElementCode": "lengthListOther.trialLengthMinutes",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "COMPLEX"
+  }
+]

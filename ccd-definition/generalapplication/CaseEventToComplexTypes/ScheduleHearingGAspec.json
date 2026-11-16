@@ -1,0 +1,83 @@
+[
+  {
+    "ID": "GAHearingNoticeApplication",
+    "CaseEventID": "HEARING_SCHEDULED_GA",
+    "CaseFieldID": "gaHearingNoticeApplication",
+    "ListElementCode": "hearingNoticeApplicationDetail",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "GAHearingNoticeApplication",
+    "CaseEventID": "HEARING_SCHEDULED_GA",
+    "CaseFieldID": "gaHearingNoticeApplication",
+    "ListElementCode": "hearingNoticeApplicationType",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "GAHearingNoticeApplication",
+    "CaseEventID": "HEARING_SCHEDULED_GA",
+    "CaseFieldID": "gaHearingNoticeApplication",
+    "ListElementCode": "hearingNoticeApplicationDate",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "GAHearingNoticeDetail",
+    "CaseEventID": "HEARING_SCHEDULED_GA",
+    "CaseFieldID": "gaHearingNoticeDetail",
+    "ListElementCode": "hearingLocation",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "GAHearingNoticeDetail",
+    "CaseEventID": "HEARING_SCHEDULED_GA",
+    "CaseFieldID": "gaHearingNoticeDetail",
+    "ListElementCode": "channel",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "GAHearingNoticeDetail",
+    "CaseEventID": "HEARING_SCHEDULED_GA",
+    "ListElementCode": "gaHearingNoticeDetail",
+    "CaseFieldID": "hearingNoticeDetail",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "GAHearingNoticeDetail",
+    "CaseEventID": "HEARING_SCHEDULED_GA",
+    "CaseFieldID": "gaHearingNoticeDetail",
+    "ListElementCode": "hearingDate",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "GAHearingNoticeDetail",
+    "CaseEventID": "HEARING_SCHEDULED_GA",
+    "CaseFieldID": "gaHearingNoticeDetail",
+    "ListElementCode": "hearingTimeHourMinute",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "GAHearingNoticeDetail",
+    "CaseEventID": "HEARING_SCHEDULED_GA",
+    "CaseFieldID": "gaHearingNoticeDetail",
+    "ListElementCode": "hearingDuration",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "GAHearingNoticeDetail",
+    "CaseEventID": "HEARING_SCHEDULED_GA",
+    "CaseFieldID": "gaHearingNoticeDetail",
+    "ListElementCode": "hearingDurationOther",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "hearingDuration = \"OTHER\""
+  }
+]

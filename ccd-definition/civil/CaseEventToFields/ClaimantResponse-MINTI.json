@@ -1,0 +1,37 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "CLAIMANT_RESPONSE",
+    "CaseFieldID": "applicantDQFixedRecoverableCostsIntermediateLabel",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "FixedRecoverableCosts",
+    "FieldShowCondition": "allocatedTrack=\"INTERMEDIATE_CLAIM\"",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "CLAIMANT_RESPONSE",
+    "CaseFieldID": "applicant1DQFixedRecoverableCostsIntermediate",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "COMPLEX",
+    "CaseEventFieldLabel": "Fixed Recoverable Costs",
+    "PageID": "FixedRecoverableCosts",
+    "FieldShowCondition": "allocatedTrack=\"INTERMEDIATE_CLAIM\" AND (applicant1ProceedWithClaim = \"Yes\" OR applicant1ProceedWithClaimMultiParty2v1 = \"Yes\" OR applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2 = \"Yes\" OR applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2 = \"Yes\")",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "CLAIMANT_RESPONSE",
+    "CaseFieldID": "applicant2DQFixedRecoverableCostsIntermediate",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "COMPLEX",
+    "CaseEventFieldLabel": "Fixed Recoverable Costs",
+    "PageID": "FixedRecoverableCosts",
+    "FieldShowCondition": "allocatedTrack=\"INTERMEDIATE_CLAIM\" AND (applicant1ProceedWithClaimMultiParty2v1 = \"No\" AND applicant2ProceedWithClaimMultiParty2v1 = \"Yes\")",
+    "ShowSummaryChangeOption": "Y"
+  }
+]

@@ -1,0 +1,13 @@
+[{
+  "CaseTypeID": "GENERALAPPLICATION",
+  "ID": "ADD_APPLICATION_TO_TRANSLATION_COLLECTION",
+  "Name": "Add Application to collection",
+  "Description": "Add Application to collection",
+  "PreConditionState(s)": "*",
+  "PostConditionState": "*",
+  "SecurityClassification": "Public",
+  "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+  "ShowSummary": "N",
+  "ShowEventNotes": "N",
+  "RetriesTimeoutURLAboutToSubmitEvent": 0
+}]

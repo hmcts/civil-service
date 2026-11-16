@@ -1,0 +1,47 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "isGaApplicantLip",
+    "TabFieldDisplayOrder": 24,
+    "FieldShowCondition": "judicialDecision.decision = \"DONT_SHOW_UI\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "isGaRespondentOneLip",
+    "TabFieldDisplayOrder": 24,
+    "FieldShowCondition": "judicialDecision.decision = \"DONT_SHOW_UI\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 3,
+    "CaseFieldID": "caseTitleWithHwFDetails",
+    "TabFieldDisplayOrder": 24,
+    "FieldShowCondition": "isGaApplicantLip = \"Yes\" OR isGaRespondentOneLip=\"Yes\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "gaHwfDetails",
+    "TabFieldDisplayOrder": 24,
+    "FieldShowCondition": "isGaApplicantLip = \"Yes\" OR isGaRespondentOneLip=\"Yes\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 5,
+    "CaseFieldID": "additionalHwfDetails",
+    "TabFieldDisplayOrder": 24,
+    "FieldShowCondition": "isGaApplicantLip = \"Yes\" OR isGaRespondentOneLip=\"Yes\""
+  }
+]
