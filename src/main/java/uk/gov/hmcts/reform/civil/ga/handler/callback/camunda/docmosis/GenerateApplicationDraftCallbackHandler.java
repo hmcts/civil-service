@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -35,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DRAFT_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption.REQUEST_MORE_INFO;
 import static uk.gov.hmcts.reform.civil.ga.utils.RespondentsResponsesUtil.isRespondentsResponseSatisfied;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -198,7 +198,12 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
             || isApplicationUrgentAndFeePaid(caseData)
             || isRespondentsResponseSatisfied(caseData, caseData)
             || isLRConsentApplication(caseData))
-            && Objects.isNull(caseData.getJudicialDecision());
+            && isJDDraftAllowed(caseData);
+    }
+
+    private boolean isJDDraftAllowed(GeneralApplicationCaseData caseData) {
+        return caseData.getJudicialDecision() == null
+            || REQUEST_MORE_INFO.equals(caseData.getJudicialDecision().getDecision());
     }
 
     private CaseDocument generateDraftDocument(CallbackParams callbackParams, GeneralApplicationCaseData caseData) {

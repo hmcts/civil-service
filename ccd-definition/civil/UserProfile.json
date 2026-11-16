@@ -1,0 +1,20 @@
+[
+  {
+    "UserIDAMId": "solicitor@example.com",
+    "WorkBasketDefaultJurisdiction": "CIVIL",
+    "WorkBasketDefaultCaseType": "CIVIL",
+    "WorkBasketDefaultState": "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"
+  },
+  {
+    "UserIDAMId": "hmcts.civil+organisation.1.solicitor.1@gmail.com",
+    "WorkBasketDefaultJurisdiction": "CIVIL",
+    "WorkBasketDefaultCaseType": "CIVIL",
+    "WorkBasketDefaultState": "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"
+  },
+  {
+    "UserIDAMId": "hmcts.civil+organisation.2.solicitor.1@gmail.com",
+    "WorkBasketDefaultJurisdiction": "CIVIL",
+    "WorkBasketDefaultCaseType": "CIVIL",
+    "WorkBasketDefaultState": "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"
+  }
+]

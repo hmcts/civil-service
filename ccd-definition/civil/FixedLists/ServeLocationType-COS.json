@@ -1,0 +1,74 @@
+[
+  {
+    "ID": "ServeLocationTypeCoS",
+    "ListElementCode": "USUAL_RESIDENCE",
+    "ListElement": "Usual Residence",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ServeLocationTypeCoS",
+    "ListElementCode": "LAST_KNOWN_RESIDENCE",
+    "ListElement": "Last known residence",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "ServeLocationTypeCoS",
+    "ListElementCode": "PLACE_OF_BUSINESS_WITH_CONNECTION",
+    "ListElement": "Place of business of the partnership/company/corporation within the jurisdiction with a connection to the claim",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "ServeLocationTypeCoS",
+    "ListElementCode": "PRINCIPAL_OFFICE_COMPANY",
+    "ListElement": "Principal office of the company",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "ServeLocationTypeCoS",
+    "ListElementCode": "PRINCIPAL_OFFICE_CORPORATION",
+    "ListElement": "Principal office of the corporation",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "ServeLocationTypeCoS",
+    "ListElementCode": "PRINCIPAL_OFFICE_PARTNERSHIP",
+    "ListElement": "Principal office of the partnership",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "ServeLocationTypeCoS",
+    "ListElementCode": "LAST_KNOWN_PRINCIPAL_PLACE_BUSINESS",
+    "ListElement": "Last known principal place of business",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "ServeLocationTypeCoS",
+    "ListElementCode": "LAST_KNOWN_PLACE_BUSINESS",
+    "ListElement": "Last known place of business",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "ServeLocationTypeCoS",
+    "ListElementCode": "PRINCIPAL_PLACE_OF_BUSINESS",
+    "ListElement": "Principal place of business",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "ServeLocationTypeCoS",
+    "ListElementCode": "PLACE_OF_BUSINESS",
+    "ListElement": "Place of business",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "ServeLocationTypeCoS",
+    "ListElementCode": "EMAIL",
+    "ListElement": "Email",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "ServeLocationTypeCoS",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 12
+  }
+]

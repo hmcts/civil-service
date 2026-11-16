@@ -1,0 +1,30 @@
+[
+  {
+    "ID": "FinalOrderIntermediateTrackAllocation",
+    "ListElementCode": "assignComplexityBand",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Do you assign a complexity band to the case?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FinalOrderIntermediateTrackAllocation",
+    "ListElementCode": "band",
+    "ElementLabel": "and the court assigns the claim to complexity",
+    "FieldType": "FixedRadioList",
+    "FieldShowCondition": "assignComplexityBand = \"Yes\"",
+    "FieldTypeParameter": "FinalOrdersIntermediateComplexityBand",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FinalOrderIntermediateTrackAllocation",
+    "ListElementCode": "reasons",
+    "ElementLabel": "because",
+    "FieldType": "TextArea",
+    "FieldShowCondition": "assignComplexityBand = \"Yes\" OR assignComplexityBand = \"No\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "_comment": "Field will not show when assignComplexityBand is not selected"
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "END_SCHEDULER_CHECK_STAY_ORDER_DEADLINE",
+    "CaseFieldID": "isCcmccLocation",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "isMultiPartyPage",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "END_SCHEDULER_CHECK_STAY_ORDER_DEADLINE",
+    "CaseFieldID": "generalAppSuperClaimType",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "isMultiPartyPage",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 2,
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  }
+]

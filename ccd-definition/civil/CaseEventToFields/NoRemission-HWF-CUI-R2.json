@@ -1,0 +1,55 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "NO_REMISSION_HWF",
+    "CaseFieldID": "helpWithFees",
+    "DisplayContext": "READONLY",
+    "PageID": "NoRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "FieldShowCondition": "caseTitleWithHWFClaimFeeNumber=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "NO_REMISSION_HWF",
+    "CaseFieldID": "caseTitleWithHWFClaimFeeNumber",
+    "DisplayContext": "READONLY",
+    "PageID": "NoRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 3,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "hwfFeeType = \"CLAIMISSUED\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "NO_REMISSION_HWF",
+    "CaseFieldID": "claimIssuedHwfDetails",
+    "DisplayContext": "COMPLEX",
+    "PageID": "NoRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 5,
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "NO_REMISSION_HWF",
+    "CaseFieldID": "claimFeeLabel",
+    "DisplayContext": "READONLY",
+    "PageID": "NoRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 4,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "hwfFeeType=\"CLAIMISSUED\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "NO_REMISSION_HWF",
+    "CaseFieldID": "hwfFeeType",
+    "DisplayContext": "READONLY",
+    "PageID": "NoRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 6,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "caseTitleWithHWFClaimFeeNumber=\"DO_NOT_SHOW_IN_UI\""
+  }
+]

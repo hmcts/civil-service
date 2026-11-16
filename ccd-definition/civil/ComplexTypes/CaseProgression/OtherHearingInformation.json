@@ -1,0 +1,19 @@
+[
+  {
+    "ID": "HearingOtherComments",
+    "ListElementCode": "startLabel",
+    "ElementLabel": "### Other information",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HearingOtherComments",
+    "ListElementCode": "hearingOtherComments",
+    "ElementLabel": "Is there anything else the court needs to know?",
+    "HintText": "For example, a witness needs to leave the court by 3pm due to caring responsibilities.",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

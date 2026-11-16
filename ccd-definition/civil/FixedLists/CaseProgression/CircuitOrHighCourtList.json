@@ -1,0 +1,12 @@
+[
+  {
+    "ID": "CircuitOrHighCourtList",
+    "ListElementCode": "CIRCUIT_COURT",
+    "ListElement": "a Circuit Judge of the County Court"
+  },
+  {
+    "ID": "CircuitOrHighCourtList",
+    "ListElementCode": "HIGH_COURT",
+    "ListElement": "a High Court Judge of the King's Bench Division"
+  }
+]

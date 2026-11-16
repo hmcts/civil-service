@@ -1,0 +1,47 @@
+[
+  {
+    "ID": "Language",
+    "ListElementCode": "helpText",
+    "FieldType": "Label",
+    "ElementLabel": "Welsh is an official language of Wales. You can use Welsh in court hearings. Asking to speak in Welsh in your hearing will not delay the hearing or have any effect on proceedings or the outcome of a case.",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Language",
+    "ListElementCode": "helpTextCarm",
+    "FieldType": "Label",
+    "ElementLabel": "You can also use Welsh at mediation. Asking to speak in Welsh will not delay the hearing or mediation appointment or have any effect on proceedings or the outcome of a case.",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Language",
+    "ListElementCode": "evidence",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "Language",
+    "ElementLabel": "Which language have you been advised of your right to give evidence in?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Language",
+    "ListElementCode": "court",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "Language",
+    "ElementLabel": "What language will you, your experts or witnesses speak at the hearing?",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Publish": "Y"
+  },
+  {
+    "ID": "Language",
+    "ListElementCode": "documents",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "Language",
+    "ElementLabel": "What language will documents be provided in?",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Publish": "Y"
+  }
+]

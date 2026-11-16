@@ -1,0 +1,14 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "WITHDRAW_CLAIM",
+    "CaseFieldID": "withdrawClaim",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "COMPLEX",
+    "PageID": "WithdrawalReason",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N",
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/withdrawal-reason",
+    "RetriesTimeoutURLMidEvent": 0
+  }
+]

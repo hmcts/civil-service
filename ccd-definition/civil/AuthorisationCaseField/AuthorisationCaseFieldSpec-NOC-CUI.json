@@ -1,0 +1,12 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "respondentSolicitorDetails",
+    "UserRoles": [
+      "CITIZEN-CLAIMANT-PROFILE",
+      "CITIZEN-DEFENDANT-PROFILE",
+      "caseworker-civil-systemupdate"
+    ],
+    "CRUD": "CRUD"
+  }
+]

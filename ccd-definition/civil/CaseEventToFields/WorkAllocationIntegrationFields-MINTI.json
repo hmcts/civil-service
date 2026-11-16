@@ -1,0 +1,54 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "CONFIRM_LISTING_COMPLETED",
+    "CaseFieldID": "allocatedTrack",
+    "PageFieldDisplayOrder": 10,
+    "DisplayContext": "READONLY",
+    "PageID": "WorkAllocationIntegrationFields",
+    "PageDisplayOrder": 99,
+    "PageShowCondition": "confirmListingTickBox=\"DONOTSHOW\"",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "CONFIRM_LISTING_COMPLETED",
+    "CaseFieldID": "responseClaimTrack",
+    "PageFieldDisplayOrder": 10,
+    "DisplayContext": "READONLY",
+    "PageID": "WorkAllocationIntegrationFields",
+    "PageDisplayOrder": 99,
+    "Publish": "Y"
+  },
+    {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "HEARING_SCHEDULED_RETRIGGER",
+    "CaseFieldID": "taskManagementLocations",
+    "PageFieldDisplayOrder": 10,
+    "DisplayContext": "READONLY",
+    "PageID": "WorkAllocationIntegrationMintiField",
+    "PageDisplayOrder": 99,
+    "PageShowCondition": "relistHearingNotice=\"DONOTSHOW\"",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "allocatedTrack",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "WorkAllocationIntegrationFields",
+    "PageDisplayOrder": 99,
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "responseClaimTrack",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "WorkAllocationIntegrationFields",
+    "PageDisplayOrder": 99,
+    "Publish": "Y"
+  }
+]
