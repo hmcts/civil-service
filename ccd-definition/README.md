@@ -11,6 +11,24 @@ The [CCD definition mirror](../.github/workflows/ccd-definition-mirror.yml) work
 which `civil/` or `generalapplication/` stop matching civil-ccd-definition at `.source-sha`, or in which
 `.source-sha` is not a commit on civil-ccd-definition master. This changes at the cutover to this repo.
 
+## The source-of-truth toggle
+
+The cutover is a file: `SOURCE_OF_TRUTH` in this folder. It is not there yet.
+
+- **Absent:** civil-ccd-definition is the source of truth, and everything below applies.
+- **Present:** this repo is. `bin/pull-latest-civil-ccd-files.sh` and
+  `bin/dev-setup/start-devuser-preview-environment.sh` use this folder as it is, and only copy the test
+  code from civil-ccd-definition.
+
+Other repos decide the same way with
+[`bin/shared/pull-ccd-definitions.sh`](../bin/shared/pull-ccd-definitions.sh)
+`<civil-service ref> [civil-ccd-definition ref] [target dir]`. It checks for the file at the civil-service
+ref they would pull from (master, or `pr-N`), then copies `civil/` and `generalapplication/` from
+civil-service if it is there, or from civil-ccd-definition if not, and prints which. It fails on any
+fetch error instead of falling back to the other repo. A civil-service PR that adds the file therefore
+rehearses the switch: its own preview, and any consumer build pointed at `pr-N`, take the new path while
+nothing else changes.
+
 To re-sync, copy civil-ccd-definition's `ccd-definition/civil` and `ccd-definition/generalapplication`
 at a newer master commit over these folders, and put that commit's full SHA in `.source-sha`.
 

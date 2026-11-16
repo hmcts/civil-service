@@ -15,6 +15,18 @@ find_first_existing_dir() {
   return 1
 }
 
+# ccd-definition/SOURCE_OF_TRUTH in this checkout means this repo is the source of truth for the CCD
+# definitions (see ccd-definition/README.md). The build then uses the in-repo ccd-definition/ as it is,
+# and only the test code still comes from civil-ccd-definition.
+toggleFile="ccd-definition/SOURCE_OF_TRUTH"
+if [ -f "${toggleFile}" ]; then
+  definitionsFromThisRepo=true
+  echo "CCD definitions: source of truth is civil-service (${toggleFile} is present). Using the in-repo ccd-definition/."
+else
+  definitionsFromThisRepo=false
+  echo "CCD definitions: source of truth is civil-ccd-definition (no ${toggleFile}). Copying them from ${ccdRepoName}@${branchName}."
+fi
+
 # Checkout specific branch of CCD definitions.
 git clone https://github.com/hmcts/${ccdRepoName}.git
 cd "${ccdRepoName}"
@@ -27,7 +39,7 @@ mergedDefinitionsDir=$(find_first_existing_dir \
   "./${ccdRepoName}/ccd-definition" \
   "./${ccdRepoName}/civil-ccd-definition/ccd-definition" || true)
 
-if [ -z "${mergedDefinitionsDir:-}" ]; then
+if [ "${definitionsFromThisRepo}" = "false" ] && [ -z "${mergedDefinitionsDir:-}" ]; then
   echo "Unable to locate merged CCD definition directory in ${ccdRepoName}."
   exit 1
 fi
@@ -36,19 +48,21 @@ fi
 # ccd-definition/test (see ccd-definition/README.md). The build uses the branch copied here, so replace
 # only the folders that branch provides (civil/ and generalapplication/). Deleting all of ccd-definition/
 # would also delete test/ and any uncommitted work in it.
-mkdir -p ./ccd-definition
 replacedPaths=""
 trackedPaths=""
-for source in "${mergedDefinitionsDir}"/* "${mergedDefinitionsDir}"/.[!.]*; do
-  [ -e "${source}" ] || continue
-  target="ccd-definition/$(basename "${source}")"
-  if [ -n "$(git ls-files -- "${target}" 2>/dev/null | head -1)" ]; then
-    trackedPaths="${trackedPaths} ${target}"
-  fi
-  replacedPaths="${replacedPaths} ${target}"
-  rm -rf "./${target}"
-  cp -r "${source}" "./${target}"
-done
+if [ "${definitionsFromThisRepo}" = "false" ]; then
+  mkdir -p ./ccd-definition
+  for source in "${mergedDefinitionsDir}"/* "${mergedDefinitionsDir}"/.[!.]*; do
+    [ -e "${source}" ] || continue
+    target="ccd-definition/$(basename "${source}")"
+    if [ -n "$(git ls-files -- "${target}" 2>/dev/null | head -1)" ]; then
+      trackedPaths="${trackedPaths} ${target}"
+    fi
+    replacedPaths="${replacedPaths} ${target}"
+    rm -rf "./${target}"
+    cp -r "${source}" "./${target}"
+  done
+fi
 
 cp -r "./${ccdRepoName}/e2e" .
 cp -r "./${ccdRepoName}/playwright-e2e" .
