@@ -23,8 +23,8 @@ class InitiateCoSCApplicationAfterPaymentTest extends BpmnBaseGAAfterPaymentTest
     private static final String APPLICATION_PROCESS_CASE_EVENT_GASPEC = "applicationProcessCaseEventGASpec";
     private static final String GENERATE_COSC_DOCUMENT = "GENERATE_COSC_DOCUMENT";
     private static final String GENERATE_COSC_DOCUMENT_ACTIVITY_ID = "GenerateCoscDocument";
-    private static final String NOTIFY_APPLICANT_SOLICITOR1_FOR_PAID_IN_FULL_COSC = "NOTIFY_APPLICANT_SOLICITOR1_FOR_PAID_IN_FULL_COSC";
-    private static final String NOTIFY_APPLICANT_SOLICITOR1_FOR_PAID_IN_FULL_COSC_ACTIVITY_ID = "NotifyApplicantSolicitorCoscApplication";
+    private static final String NOTIFY_EVENT = "NOTIFY_EVENT";
+    private static final String NOTIFY_PARTIES_ACTIVITY_ID = "CoscApplicationAfterPaymentNotifyParties";
     private static final String NOTIFY_RPA = "NOTIFY_RPA_ON_CONTINUOUS_FEED";
     private static final String NOTIFY_RPA_ACTIVITY_ID = "NotifyRPA";
     private static final String GENERATE_DASHBOARD_NOTIFICATIONS_INITIATE_COSC = "GenerateDashboardNotificationsInitiateCOSC";
@@ -81,8 +81,8 @@ class InitiateCoSCApplicationAfterPaymentTest extends BpmnBaseGAAfterPaymentTest
                 assertCompleteExternalTask(
                     claimantNotificationTask,
                     APPLICATION_PROCESS_EVENT_GASPEC,
-                    NOTIFY_APPLICANT_SOLICITOR1_FOR_PAID_IN_FULL_COSC,
-                    NOTIFY_APPLICANT_SOLICITOR1_FOR_PAID_IN_FULL_COSC_ACTIVITY_ID,
+                    NOTIFY_EVENT,
+                    NOTIFY_PARTIES_ACTIVITY_ID,
                     variables
                 );
             }
