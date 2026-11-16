@@ -1,0 +1,28 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "bundleLabel",
+    "Label": "## Bundles",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "bundleSelectionEvidence",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "BundleUpload",
+    "Label": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "bundleEvidence",
+    "Label": "Bundle",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "UploadEvidenceBundle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

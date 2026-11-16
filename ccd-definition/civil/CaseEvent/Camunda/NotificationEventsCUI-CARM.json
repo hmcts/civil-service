@@ -1,0 +1,54 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR",
+    "Name": "Unsuccessful mediation",
+    "Description": "Notify defendant 1 LR for unsuccessful mediation",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR",
+    "Name": "Unsuccessful mediation",
+    "Description": "Notify defendant 2 LR for unsuccessful mediation",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_2_LR",
+    "Name": "Email: Mediation successful",
+    "Description": "Notify defendant 2 LR for mediation successful",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_LIP",
+    "Name": "Email: Mediation successful",
+    "Description": "Notify defendant Lip for mediation successful",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  }
+]

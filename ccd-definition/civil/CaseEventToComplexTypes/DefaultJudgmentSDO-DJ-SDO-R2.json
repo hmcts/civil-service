@@ -1,0 +1,90 @@
+[
+  {
+    "ID": "sdoR2DisposalHearingWelshLanguageDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "sdoR2DisposalHearingWelshLanguageDJ",
+    "ListElementCode": "description",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "SdoR2TrialWelshLanguageDJ",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "sdoR2TrialWelshLanguageDJ",
+    "ListElementCode": "description",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHire",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "sdoDJR2TrialCreditHire",
+    "ListElementCode": "label",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHire",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "sdoDJR2TrialCreditHire",
+    "ListElementCode": "input1",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHire",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "sdoDJR2TrialCreditHire",
+    "ListElementCode": "detailsShowToggle",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHire",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "sdoDJR2TrialCreditHire",
+    "ListElementCode": "sdoDJR2TrialCreditHireDetails",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHire",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "sdoDJR2TrialCreditHire",
+    "ListElementCode": "input6",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHire",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "sdoDJR2TrialCreditHire",
+    "ListElementCode": "date3",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHire",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "sdoDJR2TrialCreditHire",
+    "ListElementCode": "input7",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHire",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "sdoDJR2TrialCreditHire",
+    "ListElementCode": "date4",
+    "FieldDisplayOrder": 8,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "SdoDJR2TrialCreditHire",
+    "CaseEventID": "STANDARD_DIRECTION_ORDER_DJ",
+    "CaseFieldID": "sdoDJR2TrialCreditHire",
+    "ListElementCode": "input8",
+    "FieldDisplayOrder": 9,
+    "DisplayContext": "MANDATORY"
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "ID": "HelpWithFeesDetails",
+    "CaseEventID": "PARTIAL_REMISSION_HWF_GA",
+    "CaseFieldID": "gaHwfDetails",
+    "ListElementCode": "remissionAmount",
+    "EventElementLabel": "Remission Amount",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "hwfFeeType = \"APPLICATION\""
+  },
+  {
+    "ID": "HelpWithFeesDetails",
+    "CaseEventID": "PARTIAL_REMISSION_HWF_GA",
+    "CaseFieldID": "additionalHwfDetails",
+    "ListElementCode": "remissionAmount",
+    "EventElementLabel": "Remission Amount",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "hwfFeeType = \"ADDITIONAL\""
+  }
+]

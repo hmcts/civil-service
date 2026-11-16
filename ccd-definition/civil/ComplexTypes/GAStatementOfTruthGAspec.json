@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "GAStatementOfTruthGAspec",
+    "ListElementCode": "name",
+    "FieldType": "Text",
+    "ElementLabel": "Name",
+    "Max": 70,
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "GAStatementOfTruthGAspec",
+    "ListElementCode": "role",
+    "FieldType": "Text",
+    "ElementLabel": "Role",
+    "Max": 40,
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

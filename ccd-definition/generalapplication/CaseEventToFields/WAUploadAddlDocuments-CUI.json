@@ -1,0 +1,50 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "UPLOAD_ADDL_DOCUMENTS",
+    "CaseFieldID": "isGaApplicantLip",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "WAFieldsCUI1",
+    "PageDisplayOrder": 1,
+    "PageShowCondition": "uploadDocument = \"DO_NOT_SHOW_IN_UI\"",
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "UPLOAD_ADDL_DOCUMENTS",
+    "CaseFieldID": "isGaRespondentOneLip",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "WAFieldsCUI2",
+    "PageDisplayOrder": 2,
+    "PageShowCondition": "uploadDocument = \"DO_NOT_SHOW_IN_UI\"",
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "UPLOAD_ADDL_DOCUMENTS",
+    "CaseFieldID": "applicantBilingualLanguagePreference",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "WAFieldsCUI3",
+    "PageDisplayOrder": 3,
+    "PageShowCondition": "uploadDocument = \"DO_NOT_SHOW_IN_UI\"",
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "UPLOAD_ADDL_DOCUMENTS",
+    "CaseFieldID": "respondentBilingualLanguagePreference",
+    "PageFieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "WAFieldsCUI4",
+    "PageDisplayOrder": 4,
+    "PageShowCondition": "uploadDocument = \"DO_NOT_SHOW_IN_UI\"",
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  }
+]

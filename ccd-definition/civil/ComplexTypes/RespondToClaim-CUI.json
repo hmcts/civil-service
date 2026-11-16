@@ -1,0 +1,82 @@
+[
+  {
+    "ID": "RespondentLiPResponse",
+    "ListElementCode": "timelineComment",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RespondentLiPResponse",
+    "ListElementCode": "evidenceComment",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RespondentLiPResponse",
+    "ListElementCode": "respondent1LiPFinancialDetails",
+    "ElementLabel": " ",
+    "FieldType": "FinancialDetailsLiP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RespondentLiPResponse",
+    "ListElementCode": "respondent1MediationLiPResponse",
+    "ElementLabel": " ",
+    "FieldType": "MediationLiP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RespondentLiPResponse",
+    "ListElementCode": "respondent1DQExtraDetails",
+    "ElementLabel": " ",
+    "FieldType": "DQExtraDetailsLip",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RespondentLiPResponse",
+    "ListElementCode": "respondent1DQHearingSupportLip",
+    "ElementLabel": " ",
+    "FieldType": "HearingSupportLip",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RespondentLiPResponse",
+    "ListElementCode": "respondent1LiPContactPerson",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RespondentLiPResponse",
+    "ListElementCode": "respondent1LiPCorrespondenceAddress",
+    "ElementLabel": " ",
+    "FieldType": "AddressUK",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RespondentLiPResponse",
+    "ListElementCode": "respondent1ResponseLanguage",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RespondentLiPResponse",
+    "ListElementCode": "respondent1DQEvidenceConfirmDetails",
+    "ElementLabel": " ",
+    "FieldType": "EvidenceConfirmYourDetails",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

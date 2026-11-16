@@ -1,0 +1,17 @@
+[
+    {
+      "CaseTypeID": "GENERALAPPLICATION",
+      "ID": "CHANGE_STATE_TO_AWAITING_JUDICIAL_DECISION",
+      "Name": "Change application state",
+      "Description": "Change state to APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION",
+      "PreConditionState(s)": "*",
+      "PostConditionState": "APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION",
+      "SecurityClassification": "Public",
+      "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+      "CallBackURLSubmittedEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/submitted",
+      "ShowSummary": "N",
+      "ShowEventNotes": "N",
+      "RetriesTimeoutURLAboutToSubmitEvent": 0,
+      "Publish": "Y"
+    }
+  ]

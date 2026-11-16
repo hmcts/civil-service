@@ -1,0 +1,24 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "CaseAccessCategory",
+    "Label": "Claim Type",
+    "DisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "[CASE_REFERENCE]",
+    "Label": "CCD Case Number",
+    "DisplayOrder": 2
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "legacyCaseReference",
+    "Label": "CaseMan reference number",
+    "DisplayOrder": 3
+  }
+]
+
+
+
+

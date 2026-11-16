@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.DraftClaimReference;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -46,6 +47,36 @@ public class AsyncCaseMigrationService {
         this.objectMapper = objectMapper;
         this.migrationBatchSize = migrationBatchSize;
         this.migrationWaitTime = migrationWaitTime;
+    }
+
+    @Async("asyncHandlerExecutor")
+    public <T extends DraftClaimReference> void migrateUserDrafts(
+        MigrationTask<T> task,
+        List<T> draftReferences
+    ) {
+        int count = 0;
+        int batchCount = 1;
+        for (T drafts : draftReferences) {
+            count++;
+            try {
+                RequestContextHolder.setRequestAttributes(new CustomRequestScopeAttr());
+                if (count == migrationBatchSize) {
+                    log.info("Batch {} limit reached {}, pausing for {} minutes", batchCount, migrationBatchSize, migrationWaitTime);
+                    TimeUnit.MINUTES.sleep(migrationWaitTime);
+                    count = 0;
+                    batchCount++;
+                }
+                task.migrateUserDrafts(drafts);
+            } catch (RuntimeException e) {
+                log.error("Error executing migration operation for drafts with userId {}: caseReference: {} {}",
+                          drafts.getUserId(), drafts.getCaseReference(), e.getMessage(), e);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException(e);
+            } finally {
+                RequestContextHolder.resetRequestAttributes();
+            }
+        }
     }
 
     @Async("asyncHandlerExecutor")

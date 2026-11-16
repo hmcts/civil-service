@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.bpmn;
 
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskIds;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -10,11 +11,6 @@ public class EvidenceUploadedTest extends BpmnBaseTest {
 
     private static final String MESSAGE_NAME = "EVIDENCE_UPLOADED";
     private static final String PROCESS_ID = "EVIDENCE_UPLOADED_PROCESS_ID";
-
-    private static final String CREATE_DASHBOARD_NOTIFICATION_EVIDENCE_UPLOADED_CLAIMANT = "CREATE_DASHBOARD_NOTIFICATION_EVIDENCE_UPLOADED_CLAIMANT";
-    private static final String CREATE_DASHBOARD_NOTIFICATION_EVIDENCE_UPLOADED_CLAIMANT_ACTIVITY_ID = "GenerateDashboardNotificationEvidenceUploadedClaimant";
-    private static final String CREATE_DASHBOARD_NOTIFICATION_EVIDENCE_UPLOADED_DEFENDANT = "CREATE_DASHBOARD_NOTIFICATION_EVIDENCE_UPLOADED_DEFENDANT";
-    private static final String CREATE_DASHBOARD_NOTIFICATION_EVIDENCE_UPLOADED_DEFENDANT_ACTIVITY_ID = "GenerateDashboardNotificationEvidenceUploadedDefendant";
 
     public EvidenceUploadedTest() {
         super("evidence_uploaded.bpmn", "EVIDENCE_UPLOADED_PROCESS_ID");
@@ -35,19 +31,9 @@ public class EvidenceUploadedTest extends BpmnBaseTest {
                                    START_BUSINESS_EVENT,
                                    START_BUSINESS_ACTIVITY);
 
-        //complete the notification to applicant
-        ExternalTask documentGeneration = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(documentGeneration,
-                                   PROCESS_CASE_EVENT,
-                                   CREATE_DASHBOARD_NOTIFICATION_EVIDENCE_UPLOADED_CLAIMANT,
-                                   CREATE_DASHBOARD_NOTIFICATION_EVIDENCE_UPLOADED_CLAIMANT_ACTIVITY_ID);
-
-        //complete the notification to defendant
-        ExternalTask notification = assertNextExternalTask(PROCESS_CASE_EVENT);
-        assertCompleteExternalTask(notification,
-                                   PROCESS_CASE_EVENT,
-                                   CREATE_DASHBOARD_NOTIFICATION_EVIDENCE_UPLOADED_DEFENDANT,
-                                   CREATE_DASHBOARD_NOTIFICATION_EVIDENCE_UPLOADED_DEFENDANT_ACTIVITY_ID);
+        ExternalTask notification = assertNextExternalTask(DASHBOARD_NOTIFICATION_TOPIC);
+        assertCompleteExternalTask(notification, DASHBOARD_NOTIFICATION_TOPIC,
+            DASHBOARD_NOTIFICATION_EVENT, DashboardTaskIds.EVIDENCE_UPLOADED);
 
         //end business process
         ExternalTask endBusinessProcess = assertNextExternalTask(END_BUSINESS_PROCESS);

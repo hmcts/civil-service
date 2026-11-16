@@ -11,11 +11,11 @@ dependencies:
     version: 6.1.1
     repository: 'oci://hmctsprod.azurecr.io/helm'
   - name: ccd
-    version: 9.3.0
+    version: 9.3.1
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: ccd.enabled
   - name: xui-webapp
-    version: 1.0.56
+    version: 1.0.57
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: xui-webapp.enabled
   - name: camunda-bpm

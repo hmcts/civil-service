@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "ChangeLanguagePreferenceUserType",
+    "ListElementCode": "CLAIMANT",
+    "ListElement": "Claimant",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ChangeLanguagePreferenceUserType",
+    "ListElementCode": "DEFENDANT",
+    "ListElement": "Defendant",
+    "DisplayOrder": 2
+  }
+]

@@ -1,0 +1,4154 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimantGaAppDetails",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaDetailsMasterCollection",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolGaAppDetails",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolTwoGaAppDetails",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppType",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplicationType",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppParentCaseLink",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "caseLink",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "businessProcess",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "nextState",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplicantAddlSolicitors",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppEvidenceDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "RU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentAgreement",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "RU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppStatementOfTruthConsent",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppStatementOfTruth",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppStatementOfTruthLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppUrgencyRequirement",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "RU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppInformOtherParty",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "RU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "isApplicationUrgent",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "RU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppDetailsOfOrder",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "RU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppReasonsOfOrder",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "RU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppUploadEvidenceLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "RU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppWrittenRepUploadLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "RU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "CaseAccessCategory",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppWrittenRepUpload",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaWrittenRepDocList",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppDirOrderUpload",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaDirectionDocList",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppAddlnInfoUpload",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaAddlnInfoList",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppHearingDetails",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "RU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeAnOrderForWrittenRepresentations",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "writtenRepresentationsDrawGeneralOrder",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "sequentialWrittenRepresentationUploadyBy",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "sequentialWrittenRepresentationRespondWithin",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "concurrentWrittenRepresentationUploadyBy",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judgeRecitalText",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "directionInRelationToHearingText",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialGeneralHearingOrderRecital",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialHearingGeneralOrderHearingType",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialHearingGeneralOrderHearingText",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialHearingGOHearingReqText",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialGeneralOrderHearingEstimationTimeText",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialSequentialDateText",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialApplicanSequentialDateText",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialConcurrentDateText",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialGeneralOrderHearingEstimationTime",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialGeneralOrderHearingRequirement",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialGOHearingDirections",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "isMultiParty",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "applicantPartyName",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "litigiousPartyID",
+    "UserRoles": [
+      "caseworker-civil-systemupdate"
+    ],
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimant1PartyName",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimant2PartyName",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "defendant1PartyName",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "defendant2PartyName",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "caseManagementLocation",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "isCcmccLocation",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "caseManagementCategory",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "parentClaimantIsApplicant",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "applicationIsCloaked",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "applicationIsUncloakedOnce",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "applicationIsCloakedLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicidalDecisionMakeAnOrderForWrittenRepresentationsLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialGeneralOrderHeading",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "makeAppVisibleToRespondents",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppSubmittedDateGAspec",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondent1Representative",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecision",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppDateDeadline",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppNotificationDeadlineDate",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "hearingDetailsResp",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentsResponses",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppSuperClaimType",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "locationName",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "civilServiceUserRoles",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "applicantSolicitors",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "defendantSolicitors",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaDraftDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalOrderDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "consentOrderDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "dismissalOrderDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "directionOrderDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "requestForInformationDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "hearingOrderDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "writtenRepSequentialDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "writtenRepConcurrentDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "ServiceRequest",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "payment-access"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "approveConsentOrder",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "consentOrderDocPreview",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "referToJudge",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "caseworker-civil-systemupdate",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "referToLegalAdvisor",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "applicationClosedDate",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-judge",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "applicationTakenOfflineDate",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-judge",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppVaryJudgementType",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-judge",
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-admin",
+          "judge-profile",
+          "legal-adviser",
+          "ga-basic-access"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaUploadN245FormUploadLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-judge",
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-admin",
+          "judge-profile",
+          "legal-adviser",
+          "ga-basic-access"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppHearingDate",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-judge",
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-admin",
+          "judge-profile",
+          "legal-adviser",
+          "ga-basic-access"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppN245FormUpload",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-judge",
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-admin",
+          "judge-profile",
+          "legal-adviser",
+          "ga-basic-access"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialMakeOrderDocPreview",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser",
+          "ga-basic-access"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListHearingDocPreview",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser",
+          "ga-basic-access"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialWrittenRepDocPreview",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser",
+          "ga-basic-access"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialRequestMoreInfoDocPreview",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser",
+          "ga-basic-access"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialByCourtsInitiativeListForHearing",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser",
+          "ga-basic-access"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialByCourtsInitiativeForWrittenRep",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser",
+          "ga-basic-access"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "showRequestInfoPreviewDoc",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser",
+          "ga-basic-access"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "migrationId",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaHearingNoticeApplication",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "hearing-schedule-access"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaHearingNoticeDetail",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "hearing-schedule-access"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaHearingNoticeInformation",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "hearing-schedule-access"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "hearingNoticeDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "finalOrderSelection",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "judge-profile",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "caseNameLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "judge-profile",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "caseNameHmctsInternal",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "caseParticipantsFreeForm",
+    "UserRoles": [
+      "judge-profile",
+      "legal-adviser"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "freeFormRecitalAndOrderLabel",
+    "UserRoles": [
+      "judge-profile",
+      "legal-adviser",
+      "caseworker-civil-systemupdate"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "freeFormRecitalText",
+    "UserRoles": [
+      "judge-profile",
+      "legal-adviser"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "freeFormOrderedLabel",
+    "UserRoles": [
+      "judge-profile",
+      "legal-adviser"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "freeFormOrderedText",
+    "UserRoles": [
+      "judge-profile",
+      "legal-adviser"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderOnCourtsListLabel",
+    "UserRoles": [
+      "judge-profile",
+      "legal-adviser"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderOnCourtsList",
+    "UserRoles": [
+      "judge-profile",
+      "legal-adviser"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderOnCourtInitiative",
+    "UserRoles": [
+      "judge-profile",
+      "legal-adviser"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNotice",
+    "UserRoles": [
+      "judge-profile",
+      "legal-adviser"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderCourtOwnInitiativeListForHearing",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNoticeListForHearing",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderCourtOwnInitiativeForWrittenRep",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNoticeForWrittenRep",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderMadeCourtsInitiativeLabelForHearing",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser",
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderMadeCourtsInitiativeLabelForWrittenRep",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser",
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaFinalOrderDocPreview",
+    "UserRoles": [
+      "judge-profile",
+      "legal-adviser"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaRespondentDebtorOffer",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppConsentOrder",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-judge",
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-admin",
+          "judge-profile",
+          "legal-adviser",
+          "ga-basic-access"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaRespondentConsent",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaApplicantDisplayName",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "judge-profile",
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "ga-basic-access",
+          "caseworker-civil-solicitor"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaRespDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "APP-SOL-UNSPEC-PROFILE",
+          "APP-SOL-SPEC-PROFILE",
+          "RES-SOL-ONE-UNSPEC-PROFILE",
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-UNSPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondReason",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaRespondDoc",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondConsentReason",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondConsentDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondDebtorDocument",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondDebtorUploadLabel",
+    "UserRoles": [
+      "caseworker-civil-solicitor",
+      "caseworker-civil-systemupdate",
+      "judge-profile",
+      "legal-adviser",
+      "civil-administrator-standard",
+      "civil-administrator-basic",
+      "caseworker-ras-validation",
+      "ga-basic-access"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondUploadLabel",
+    "UserRoles": [
+      "caseworker-civil-solicitor",
+      "caseworker-civil-systemupdate",
+      "judge-profile",
+      "legal-adviser",
+      "civil-administrator-standard",
+      "civil-administrator-basic",
+      "caseworker-ras-validation",
+      "ga-basic-access"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondConsentUploadLabel",
+    "UserRoles": [
+      "caseworker-civil-solicitor",
+      "caseworker-civil-systemupdate",
+      "judge-profile",
+      "legal-adviser",
+      "civil-administrator-standard",
+      "civil-administrator-basic",
+      "caseworker-ras-validation",
+      "ga-basic-access"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaAddlDoc",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "addnDocumentLabel",
+    "UserRoles": [
+      "caseworker-civil-solicitor",
+      "caseworker-civil-systemupdate",
+      "caseworker-ras-validation",
+      "ga-basic-access"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "caseDocumentUploadDate",
+    "UserRoles": [
+      "caseworker-civil-solicitor",
+      "caseworker-civil-systemupdate",
+      "caseworker-ras-validation",
+      "ga-basic-access"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "caseDocumentUploadDateRes",
+    "UserRoles": [
+      "caseworker-civil-solicitor",
+      "caseworker-civil-systemupdate",
+      "caseworker-ras-validation",
+      "ga-basic-access"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "uploadDocument",
+    "UserRoles": [
+      "caseworker-civil-solicitor",
+      "caseworker-civil-systemupdate",
+      "caseworker-ras-validation",
+      "ga-basic-access"
+    ],
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "isDocumentVisible",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-solicitor"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaAddlDocStaff",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "judge-profile",
+          "caseworker-civil-admin",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaAddlDocClaimant",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "APP-SOL-UNSPEC-PROFILE",
+          "APP-SOL-SPEC-PROFILE",
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-civil-admin",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaAddlDocRespondentSol",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "RES-SOL-ONE-UNSPEC-PROFILE",
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-civil-admin",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaAddlDocRespondentSolTwo",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "RES-SOL-TWO-UNSPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE",
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser",
+          "caseworker-civil-admin",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "applicant1OrganisationPolicy",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondent1OrganisationPolicy",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondent2OrganisationPolicy",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "applicationTypes",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "parentCaseReference",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judgeTitle",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaAddlDocBundle",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "isGaApplicantLip",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser",
+          "citizen-profile"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "isGaRespondentOneLip",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser",
+          "citizen-profile"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "isGaRespondentTwoLip",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser",
+          "citizen-profile"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "caseNameGaInternal",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic",
+          "caseworker-ras-validation",
+          "ga-basic-access",
+          "caseworker-civil-admin"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaWaTrackLabel",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "RU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "emailPartyReference",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "RU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "casePaymentHistoryViewer",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-staff",
+          "caseworker-civil-admin"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "caseHistory",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-staff",
+          "caseworker-civil-admin",
+          "judge-profile",
+          "legal-adviser",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "unfinishedBackEndProcess",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "judge-profile",
+          "legal-adviser",
+          "payment-access",
+          "caseworker-civil-admin"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "mainCaseSubmittedDate",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil-solicitor",
+          "judge-profile",
+          "legal-adviser"
+        ],
+        "CRUD": "RU"
+      },
+      {
+        "UserRoles": [
+          "civil-administrator-standard",
+          "civil-administrator-basic"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "UserRoles": [
+          "caseworker-ras-validation",
+          "ga-basic-access"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  }
+]

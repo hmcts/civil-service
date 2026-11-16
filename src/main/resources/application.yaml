@@ -618,7 +618,6 @@ notifications:
   notifyLrDefendantSuccessfulMediation: "4a941565-10a8-4da5-b498-08ded5501f4e"
   notifyLrDefendantSuccessfulMediationForLipVLrClaim: "565caf87-d0e6-44d4-aadb-08110653344d"
 
-  notifyLrRecordJudgmentDeterminationMeansTemplate: "176148d0-379f-449e-b686-3ff417b0e357"
   notifyClaimantLipForDefendantRepresentedTemplate: "6b4d2b15-c537-4603-9542-f0c7c89d7024"
   notifyDefendantLipForNoLongerAccessTemplate: "187436dd-b5e2-495b-a96e-54a0937a33d1"
   notifyDefendantLrAfterNoticeOfChangeTemplate: "633b2b9f-14e0-4b22-80a5-4db95401045c"

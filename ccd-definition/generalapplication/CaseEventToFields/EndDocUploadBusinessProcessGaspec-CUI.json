@@ -1,0 +1,57 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "END_DOC_UPLOAD_BUSINESS_PROCESS_GASPEC",
+    "CaseFieldID": "isGaApplicantLip",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "WAFieldsCUI1",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "END_DOC_UPLOAD_BUSINESS_PROCESS_GASPEC",
+    "CaseFieldID": "isGaRespondentOneLip",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "WAFieldsCUI2",
+    "PageDisplayOrder": 2,
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "END_DOC_UPLOAD_BUSINESS_PROCESS_GASPEC",
+    "CaseFieldID": "applicantBilingualLanguagePreference",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "WAFieldsCUI3",
+    "PageDisplayOrder": 3,
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "END_DOC_UPLOAD_BUSINESS_PROCESS_GASPEC",
+    "CaseFieldID": "respondentBilingualLanguagePreference",
+    "PageFieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "WAFieldsCUI4",
+    "PageDisplayOrder": 4,
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "END_DOC_UPLOAD_BUSINESS_PROCESS_GASPEC",
+    "CaseFieldID": "gaWaTrackLabel",
+    "PageFieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "WAFieldsCUI4",
+    "PageDisplayOrder": 4,
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  }
+]

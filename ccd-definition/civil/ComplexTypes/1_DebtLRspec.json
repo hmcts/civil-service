@@ -1,0 +1,29 @@
+[
+  {
+    "ID": "Debt",
+    "ListElementCode": "debtType",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "DebtType",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Debt",
+    "ListElementCode": "paymentAmount",
+    "FieldType": "MoneyGBP",
+    "ElementLabel": "Repayment amount",
+    "HintText": "Only include the amount paid to clear previously missed regular payments",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Debt",
+    "ListElementCode": "paymentFrequency",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "PaymentFrequency",
+    "ElementLabel": "Select one option.",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

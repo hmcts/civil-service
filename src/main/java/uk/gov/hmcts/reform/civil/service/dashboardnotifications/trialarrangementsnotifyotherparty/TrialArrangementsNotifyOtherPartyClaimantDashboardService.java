@@ -7,6 +7,9 @@ import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotific
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICANT_TRIAL_READY_NOTIFY_OTHERS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_TRIAL_READY_DOCUMENT_APPLICANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_LR_CLAIMANT;
 
@@ -31,6 +34,15 @@ public class TrialArrangementsNotifyOtherPartyClaimantDashboardService extends D
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
+        if (caseData.getBusinessProcess() != null
+            && RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS.name().equals(caseData.getBusinessProcess().getCamundaEvent())) {
+            return true;
+        }
+        if (caseData.getBusinessProcess() != null
+            && (APPLICANT_TRIAL_READY_NOTIFY_OTHERS.name().equals(caseData.getBusinessProcess().getCamundaEvent())
+            || GENERATE_TRIAL_READY_DOCUMENT_APPLICANT.name().equals(caseData.getBusinessProcess().getCamundaEvent()))) {
+            return false;
+        }
         // This service is called via the registry when the claimant confirms trial arrangements
         // (APPLICANT_TRIAL_READY_NOTIFY_OTHERS BPMN). The claimant should NOT receive
         // a "the other party confirmed" notification about their own confirmation.
