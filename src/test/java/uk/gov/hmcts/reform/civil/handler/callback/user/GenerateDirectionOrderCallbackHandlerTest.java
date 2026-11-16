@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -369,8 +370,9 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData().get("orderOnCourtsList")).isNull();
         }
 
-        @Test
-        void shouldNullPreviousSubmittedEventSelections_whenInvokedAssisted() {
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldNullPreviousSubmittedEventSelections_whenInvokedAssisted(boolean otherRemedyEnabled) {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderMadeSelection(YES).finalOrderDateHeardComplex(new OrderMade())
@@ -387,6 +389,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderGiveReasonsComplex(new AssistedOrderReasons().setReasonsText("text"))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            when(featureToggleService.isOtherRemedyEnabled()).thenReturn(otherRemedyEnabled);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("finalOrderSelection")).isNull();
             assertThat(response.getData().get("finalOrderMadeSelection")).isNull();
@@ -403,6 +406,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData().get("assistedOrderCostsReserved")).isNull();
             assertThat(response.getData().get("assistedOrderMakeAnOrderForCosts")).isNull();
             assertThat(response.getData().get("assistedOrderCostsBespoke")).isNull();
+            assertThat(response.getData().get("assistedOrderPenalNoticeToggle")).isNull();
             assertThat(response.getData().get("finalOrderAppealToggle")).isNull();
             assertThat(response.getData().get("finalOrderAppealComplex")).isNull();
             assertThat(response.getData().get("orderMadeOnDetailsList")).isNull();
