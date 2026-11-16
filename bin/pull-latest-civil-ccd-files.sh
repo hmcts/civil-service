@@ -18,10 +18,16 @@ find_first_existing_dir() {
 # ccd-definition/SOURCE_OF_TRUTH in this checkout means this repo is the source of truth for the CCD
 # definitions (see ccd-definition/README.md). The build then uses the in-repo ccd-definition/ as it is,
 # and only the test code still comes from civil-ccd-definition.
+# The same path is checked in bin/dev-setup/start-devuser-preview-environment.sh and
+# bin/shared/pull-ccd-definitions.sh. Change all three together.
 toggleFile="ccd-definition/SOURCE_OF_TRUTH"
 if [ -f "${toggleFile}" ]; then
   definitionsFromThisRepo=true
   echo "CCD definitions: source of truth is civil-service (${toggleFile} is present). Using the in-repo ccd-definition/."
+  echo "CCD definitions: only the test code comes from ${ccdRepoName}@${branchName}."
+  if [ "${branchName}" != "master" ]; then
+    echo "WARNING: ${ccdRepoName} branch ${branchName} is not used for the definitions, only for the test code. Make definition changes in this repo's ccd-definition/."
+  fi
 else
   definitionsFromThisRepo=false
   echo "CCD definitions: source of truth is civil-ccd-definition (no ${toggleFile}). Copying them from ${ccdRepoName}@${branchName}."

@@ -8,7 +8,8 @@
 #   - absent:  civil-ccd-definition is, and the definitions come from its branch, as before the move.
 #
 # Usage: pull-ccd-definitions.sh <civil-service ref> [civil-ccd-definition ref] [target dir]
-#   civil-service ref:         branch, tag, full commit SHA, or pr-N for pull request N. Default master.
+#   civil-service ref:         branch, tag, full commit SHA, or pr-N (or prN) for the head of pull
+#                              request N. Default master.
 #   civil-ccd-definition ref:  same forms. Default master. Pass - to leave the target as it is when
 #                              civil-ccd-definition is the source (for civil-ccd-definition's own pipeline,
 #                              whose checkout already holds the definitions it is building).
@@ -27,6 +28,8 @@ civilServiceRef=${1:-master}
 ccdDefinitionRef=${2:-master}
 targetDir=${3:-./ccd-definition}
 
+# The same path is checked in bin/pull-latest-civil-ccd-files.sh and
+# bin/dev-setup/start-devuser-preview-environment.sh. Change all three together.
 toggleFile="ccd-definition/SOURCE_OF_TRUTH"
 definitionDirs=(civil generalapplication)
 
@@ -34,10 +37,11 @@ workDir=$(mktemp -d)
 trap 'rm -rf "${workDir}"' EXIT
 
 # Fetches one commit of a GitHub repo into a new, blob-less repository at $3, so that checking the
-# toggle downloads no file contents. Accepts pr-N for pull request N.
+# toggle downloads no file contents. Accepts pr-N or prN for the head of pull request N, as the
+# camunda and shared-script pulls in civil-ccd-definition and civil-citizen-ui do.
 fetch_ref() {
   local repo=$1 ref=$2 dir=$3 refspec
-  if [[ "${ref}" =~ ^pr-([0-9]+)$ ]]; then
+  if [[ "${ref}" =~ ^pr-?([0-9]+)$ ]]; then
     refspec="refs/pull/${BASH_REMATCH[1]}/head"
   else
     refspec="${ref}"

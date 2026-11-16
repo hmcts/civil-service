@@ -84,12 +84,10 @@ cp -r src/main/resources/camunda .
 echo "Importing CCD definitions"
 # With ccd-definition/SOURCE_OF_TRUTH present, this repo is the source of truth: the pull script leaves
 # ccd-definition/ alone and the in-repo copy, including uncommitted edits, is imported. Restoring it
-# afterwards would throw those edits away, so only restore when the pull replaced it.
-if [ -f "ccd-definition/SOURCE_OF_TRUTH" ]; then
-  if [ "${ccd_branch}" != "master" ]; then
-    echo "Ignoring CCD definition branch ${ccd_branch}: ccd-definition/SOURCE_OF_TRUTH is present, so the in-repo definitions are imported."
-  fi
-else
+# afterwards would throw those edits away, so only restore when the pull replaced it. The pull script
+# warns if ${ccd_branch} is then used only for the test code. The same path is checked in
+# bin/pull-latest-civil-ccd-files.sh and bin/shared/pull-ccd-definitions.sh. Change all three together.
+if [ ! -f "ccd-definition/SOURCE_OF_TRUTH" ]; then
   ccd_definition_replaced=true
 fi
 CCD_DEFINITION_MIRROR_RESTORED_BY_CALLER=true ./bin/pull-latest-civil-ccd-files.sh "${ccd_branch}"
