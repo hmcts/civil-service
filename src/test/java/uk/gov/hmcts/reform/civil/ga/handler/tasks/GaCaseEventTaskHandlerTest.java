@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -232,5 +233,10 @@ class GaCaseEventTaskHandlerTest {
             verify(coreCaseDataService, never()).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).complete(mockTask, variables);
         }
+    }
+
+    @Test
+    void shouldBeRetryGuarded() {
+        assertThat(caseEventTaskHandler.isRetryGuarded()).isTrue();
     }
 }
