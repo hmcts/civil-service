@@ -95,6 +95,39 @@ Where the net is thin, add characterisation tests covering current behaviour **b
 
 New task classes need their own unit tests. Per the repository guidelines, keep per-file coverage at or above the Sonar new-code target and watch duplication on near-identical task classes.
 
+### Wire the real tasks into the handler test
+
+**Do not mock the tasks you have just extracted.** A handler test that mocks them proves only that the handler calls them, which is the one part of the refactor that obviously works. The risk is that a task behaves differently from the code it replaced, and a mocked test cannot see that.
+
+Instead, let the handler test run the real tasks. It stays a `@SpringBootTest` with a sliced context, so it is not slow, but it exercises the composition rather than the wiring. In effect the existing unit test becomes a small integration test for that handler, which is the assurance this refactor actually needs.
+
+The mechanism is a three line test configuration that component scans the task package:
+
+```java
+@Configuration
+@ComponentScan(basePackages = "uk.gov.hmcts.reform.civil.handler.callback.user.respondtoclaimspeccallbackhandlertasks")
+public class RespondToClaimSpecCallbackHandlerTestConfig {
+}
+```
+
+Add it to the context alongside the handler:
+
+```java
+@SpringBootTest(classes = {
+    RespondToClaimSpecCallbackHandler.class,
+    ...
+    RespondToClaimSpecCallbackHandlerTestConfig.class
+})
+```
+
+Every task in that package is then a real bean. Keep `@MockBean` for the outer boundary only: clock and `Time`, `FeatureToggleService`, reference data and location services, CCD and document clients, anything that calls out of the process. Do not mock anything inside the package you are extracting into.
+
+This is not theoretical. `RespondToClaimSpecCallbackHandlerTest` already works this way, with no mocks and no manual instantiation in its config, and it passes against the real tasks.
+
+It is also not yet the norm. Three other decomposed handlers mock their collaborators instead, with 19, 6 and 11 `@MockBean` declarations respectively. Prefer the scanned configuration for anything you decompose under DTSCCI-365, and when you touch one of the others, consider converting it while you are there.
+
+**Why this matters more than the usual coverage argument.** The decomposition subtasks require the existing handler test to pass unedited. That rule is only worth having if the test can actually detect a behaviour change. If the tasks are mocked out, the test passes unedited whether or not the extracted logic is correct, and the safety net is an illusion.
+
 ## Known trade-off
 
 This pattern moves coupling from logic into wiring. The reference handler is 229 lines but injects 21 dependencies, one per task.
