@@ -82,5 +82,8 @@ public enum CamundaProcessIdentifier {
     StayCaseNotifyParties,
     StayLiftedNotifyParties,
     CoscApplicationAfterPaymentNotifyParties,
-    StayUpdateRequestedNotifyParties;
+    StayUpdateRequestedNotifyParties,
+    RequestJudgementByAdmissionNotifyParties,
+    BreathingSpaceEnterNotifyParties,
+    BreathingSpaceLiftedNotifyParties;
 }
