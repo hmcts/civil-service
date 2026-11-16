@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -49,20 +48,16 @@ public class ContactInformationUpdatedTaskHandler extends BaseExternalTaskHandle
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        try {
-            ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
-            String caseId = ofNullable(variables.getCaseId())
-                .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
-            CaseEvent caseEvent = ofNullable(variables.getCaseEvent())
-                .orElseThrow(() -> new InvalidCaseDataException("The case event was not provided"));
+        ExternalTaskInput variables = toExternalTaskInput(externalTask, mapper);
+        String caseId = ofNullable(variables.getCaseId())
+            .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
+        CaseEvent caseEvent = ofNullable(variables.getCaseEvent())
+            .orElseThrow(() -> new InvalidCaseDataException("The case event was not provided"));
 
-            StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, caseEvent);
+        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, caseEvent);
 
-            coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, externalTask));
-            return new ExternalTaskData();
-        } catch (ValueMapperException | IllegalArgumentException e) {
-            throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
-        }
+        coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, externalTask));
+        return new ExternalTaskData();
     }
 
     @Override

@@ -1,0 +1,12 @@
+  [{
+  "CaseTypeID": "CIVIL",
+  "CaseEventID": "CREATE_NOC_ONLINE_DASHBOARD_NOTIFICATION_FOR_CLAIMANT",
+  "UserRole": "caseworker-civil-systemupdate",
+  "CRUD": "CRU"
+},
+  {
+  "CaseTypeID": "CIVIL",
+  "CaseEventID": "NOTIFY_NEW_DEFENDANT_SOLICITOR",
+  "UserRole": "caseworker-civil-systemupdate",
+  "CRUD": "CRU"
+}]

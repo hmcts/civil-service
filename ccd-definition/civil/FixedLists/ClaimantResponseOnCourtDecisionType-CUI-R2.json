@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "ClaimantResponseOnCourtDecisionType",
+    "ListElementCode": "ACCEPT_REPAYMENT_DATE",
+    "ListElement": "ACCEPT_REPAYMENT_DATE",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ClaimantResponseOnCourtDecisionType",
+    "ListElementCode": "JUDGE_REPAYMENT_DATE",
+    "ListElement": "JUDGE_REPAYMENT_DATE",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "ClaimantResponseOnCourtDecisionType",
+    "ListElementCode": "JUDGE_REPAYMENT_PLAN",
+    "ListElement": "JUDGE_REPAYMENT_PLAN",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "ClaimantResponseOnCourtDecisionType",
+    "ListElementCode": "ACCEPT_REPAYMENT_PLAN",
+    "ListElement": "ACCEPT_REPAYMENT_PLAN",
+    "DisplayOrder": 4
+  }
+]

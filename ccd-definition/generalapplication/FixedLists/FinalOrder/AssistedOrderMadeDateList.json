@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "AssistedOrderMadeDateList",
+    "ListElementCode": "SINGLE_DATE",
+    "ListElement": "Single date",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "AssistedOrderMadeDateList",
+    "ListElementCode": "DATE_RANGE",
+    "ListElement": "Date range",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "AssistedOrderMadeDateList",
+    "ListElementCode": "BESPOKE_RANGE",
+    "ListElement": "Bespoke range",
+    "DisplayOrder": 3
+  }
+]

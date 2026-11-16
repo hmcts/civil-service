@@ -1,0 +1,60 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "AMEND_PARTY_DETAILS",
+    "CaseFieldID": "respondent1Represented",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "Email",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "applicant1Represented = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "AMEND_PARTY_DETAILS",
+    "CaseFieldID": "applicant1Represented",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "Email",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "respondent1Represented = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "AMEND_PARTY_DETAILS",
+    "CaseFieldID": "amendPartyDetailsLabel",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "Email",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "respondent1Represented = \"Yes\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "AMEND_PARTY_DETAILS",
+    "CaseFieldID": "respondentSolicitor1EmailAddress",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "CaseEventFieldLabel": "Defendant's legal representative's details",
+    "PageID": "Email",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "respondent1Represented = \"Yes\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "AMEND_PARTY_DETAILS",
+    "CaseFieldID": "applicantSolicitor1UserDetails",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "COMPLEX",
+    "CaseEventFieldLabel": " ",
+    "Comment": "Need to overwrite field label to stop header appearing in UI",
+    "PageID": "Email",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "applicant1Represented != \"No\""
+  }
+]

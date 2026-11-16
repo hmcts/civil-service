@@ -1,0 +1,56 @@
+[
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "DRAFT_CLAIM_FORM",
+    "ListElement": "Draft claim form",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "SETTLEMENT_AGREEMENT",
+    "ListElement": "Defendant settlement agreement form",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "LIP_MANUAL_DETERMINATION",
+    "ListElement": "Claimant Lip Manual Determination",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "INTERLOCUTORY_JUDGEMENT",
+    "ListElement": "Interlocutory Judgment",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "CLAIMANT_CLAIM_FORM",
+    "ListElement": "claimant claim form",
+    "DisplayOrder": 19
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": " CCJ_REQUEST_ADMISSION",
+    "ListElement": "CCJ Request Admission",
+    "DisplayOrder": 20
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": " CCJ_REQUEST_DETERMINATION",
+    "ListElement": "CCJ Request Determination",
+    "DisplayOrder": 21
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "CLAIM_ISSUE_TRANSLATED_DOCUMENT",
+    "ListElement": "Claim Issue Translated Document",
+    "DisplayOrder": 22
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "CLAIMANT_INTENTION_TRANSLATED_DOCUMENT",
+    "ListElement": "Claimant Intention Translated Document",
+    "DisplayOrder": 23
+  }
+]

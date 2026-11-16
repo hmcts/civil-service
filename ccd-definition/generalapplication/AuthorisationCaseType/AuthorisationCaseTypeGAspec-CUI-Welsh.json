@@ -1,0 +1,9 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "UserRoles": [
+      "wlu-admin"
+    ],
+    "CRUD": "RU"
+  }
+]

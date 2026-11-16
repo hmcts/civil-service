@@ -1,0 +1,13 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "ApplicationsSpec",
+    "TabLabel": "Applications",
+    "TabDisplayOrder": 8,
+    "UserRoles": [
+      "APP-SOL-SPEC-PROFILE"
+    ],
+    "CaseFieldID": "claimantGaAppDetails",
+    "TabFieldDisplayOrder": 1
+  }
+]

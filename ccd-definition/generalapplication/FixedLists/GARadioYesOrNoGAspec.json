@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "GARadioYesOrNo",
+    "ListElementCode": "Yes",
+    "ListElement": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "GARadioYesOrNo",
+    "ListElementCode": "No",
+    "ListElement": "No",
+    "DisplayOrder": 2
+  }
+]

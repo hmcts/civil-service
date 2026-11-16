@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.ONE_RESPONDENT_REPRESENTATIVE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_CASE_KEY;
+import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_ERROR_KEY;
 import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_FLAGS_KEY;
 import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_HISTORY_KEY;
 
@@ -129,6 +130,24 @@ class StateFlowTest {
             String actualMessage = exception.getMessage();
 
             assertEquals(expectedMessage, actualMessage);
+        }
+
+        @Test
+        void shouldAppendErrorMessage_whenStateMachineHasErrors() {
+            when(mockedStateMachine.hasStateMachineError()).thenReturn(true);
+            ExtendedState mockedExtendedState = createMockedExtendedState();
+            when(mockedStateMachine.getExtendedState()).thenReturn(mockedExtendedState);
+            when(mockedExtendedState.get(EXTENDED_STATE_CASE_KEY, CaseData.class))
+                .thenReturn(CaseData.builder().ccdCaseReference(1234567890L).build());
+            String errorMessage = "Ambiguous transitions permitting state [STATE] to move to more than "
+                + "one next states [A,B].";
+            when(mockedExtendedState.get(EXTENDED_STATE_ERROR_KEY, String.class)).thenReturn(errorMessage);
+            StateFlow stateFlow = new StateFlow(mockedStateMachine);
+
+            Exception exception = assertThrows(StateFlowException.class, stateFlow::getState);
+
+            assertEquals("The state machine is at error state. Case ID: 1234567890 " + errorMessage,
+                         exception.getMessage());
         }
     }
 

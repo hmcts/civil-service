@@ -1,0 +1,58 @@
+[
+  {
+    "ID": "RespondToClaim",
+    "ListElementCode": "howMuchWasPaidLabel",
+    "ElementLabel": "The total amount claimed is £${totalClaimAmount}. This includes the claim fee and any interest. \n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RespondToClaim",
+    "ListElementCode": "howMuchWasPaidWithInterestLabel",
+    "ElementLabel": "The total amount claimed is £${totalClaimAmountPlusInterestAdmitPartString}.\n\nThis amount includes any interest claimed but not the claim fee and any fixed costs claimed.\n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RespondToClaim",
+    "ListElementCode": "howMuchWasPaid",
+    "FieldType": "MoneyGBP",
+    "ElementLabel": "How much was paid?",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Label": "How much was paid?"
+  },
+  {
+    "ID": "RespondToClaim",
+    "ListElementCode": "whenWasThisAmountPaid",
+    "FieldType": "Date",
+    "ElementLabel": "When was this amount paid?",
+    "HintText": "For example, 12 11 2007",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Label": "When was this amount paid?"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "howWasThisAmountPaid",
+    "ID": "RespondToClaim",
+    "Label": " ",
+    "ElementLabel": "How was this amount paid?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "HowWasThisAmountPaid",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "howWasThisAmountPaidOther",
+    "ID": "RespondToClaim",
+    "Label": " ",
+    "ElementLabel": "Tell us how",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

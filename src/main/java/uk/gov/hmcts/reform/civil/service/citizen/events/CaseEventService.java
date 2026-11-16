@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.services.DraftStoreService;
@@ -26,6 +27,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
@@ -42,8 +45,11 @@ public class CaseEventService {
     private final CaseDetailsConverter caseDetailsConverter;
     private final DraftStoreService draftStoreService;
     private final CoreCaseDataService coreCaseDataService;
+    private final FeatureToggleService featureToggleService;
     @Value("${case-flags.logging.enabled:false}")
     private boolean caseFlagsLoggingEnabled;
+    @Value("${draft-store.submission-claim-stale-after-minutes:5}")
+    private long submissionClaimStaleAfterMinutes;
 
     private StartEventResponse startEvent(String authorisation, String userId, String caseId, CaseEvent event) {
         return coreCaseDataApi.startEventForCitizen(
@@ -111,8 +117,8 @@ public class CaseEventService {
     }
 
     public CaseDetails submitEventForNewClaim(EventSubmissionParams params) {
-        if (!params.hasSubmissionId()) {
-            return createNewClaim(params);
+        if (!params.hasSubmissionId() || !featureToggleService.isDraftClaimDatabaseEnabled()) {
+            return createNewClaim(params, null);
         }
 
         Optional<DraftStoreEntity> bySubmission = draftStoreService.getDraftBySubmissionId(
@@ -171,7 +177,7 @@ public class CaseEventService {
     private CaseDetails createAndLink(UUID draftId, EventSubmissionParams params) {
         CaseDetails created;
         try {
-            created = createNewClaim(params);
+            created = createNewClaim(params, draftId);
         } catch (RuntimeException ex) {
             if (isDefinitiveCcdClientFailure(ex)) {
                 log.warn(
@@ -222,6 +228,23 @@ public class CaseEventService {
             return existingCase(draft, params);
         }
 
+        Optional<CaseDetails> recoveredCase = findCaseCreatedBySubmission(params);
+        if (recoveredCase.isPresent()) {
+            draftStoreService.linkCaseId(
+                draftId, params.getUserId(), recoveredCase.get().getId().toString(), DraftType.DRAFT_CLAIM
+            );
+            return recoveredCase.get();
+        }
+
+        if (isStale(draft)) {
+            draftStoreService.releaseFailedSubmissionClaim(draftId, params.getUserId(), DraftType.DRAFT_CLAIM);
+            if (draftStoreService.claimSubmission(
+                draftId, params.getUserId(), params.getSubmissionId(), DraftType.DRAFT_CLAIM
+            )) {
+                return createAndLink(draftId, params);
+            }
+        }
+
         log.warn(
             "Submission already claimed for draftId={} submissionId={} existingSubmissionId={}",
             draftId,
@@ -243,6 +266,14 @@ public class CaseEventService {
             return existingCase(draft, params);
         }
 
+        Optional<CaseDetails> recoveredCase = findCaseCreatedBySubmission(params);
+        if (recoveredCase.isPresent()) {
+            draftStoreService.linkCaseId(
+                draft.getId(), params.getUserId(), recoveredCase.get().getId().toString(), DraftType.DRAFT_CLAIM
+            );
+            return recoveredCase.get();
+        }
+
         log.warn(
             "Submission already claimed for submissionId={} draftId={}",
             params.getSubmissionId(),
@@ -254,8 +285,23 @@ public class CaseEventService {
         );
     }
 
-    private CaseDetails createNewClaim(EventSubmissionParams params) {
-        StartEventResponse eventResponse = startEvent(params.getAuthorisation(), params.getUserId(), params.getEvent());
+    private CaseDetails createNewClaim(EventSubmissionParams params, UUID draftId) {
+        StartEventResponse eventResponse;
+        try {
+            eventResponse = startEvent(params.getAuthorisation(), params.getUserId(), params.getEvent());
+        } catch (RuntimeException ex) {
+            // No CCD case exists when start-event fails, so the draft claim is
+            // safe to release and retry. Keep the claim for failures after the
+            // start event because CCD may have created a case already.
+            if (draftId != null) {
+                draftStoreService.releaseFailedSubmissionClaim(
+                    draftId,
+                    params.getUserId(),
+                    DraftType.DRAFT_CLAIM
+                );
+            }
+            throw ex;
+        }
         Map<String, Object> updates = new HashMap<>();
         if (params.getUpdates() != null) {
             updates.putAll(params.getUpdates());
@@ -271,6 +317,22 @@ public class CaseEventService {
                                                 CASE_TYPE,
                                                 true, caseDataContent
         );
+    }
+
+    private Optional<CaseDetails> findCaseCreatedBySubmission(EventSubmissionParams params) {
+        if (!params.hasSubmissionId()) {
+            return Optional.empty();
+        }
+        return coreCaseDataService.findCaseByLipClaimSubmissionId(
+            params.getSubmissionId(), params.getAuthorisation()
+        );
+    }
+
+    private boolean isStale(DraftStoreEntity draft) {
+        return draft.getUpdatedAt() != null
+            && draft.getUpdatedAt().isBefore(
+                OffsetDateTime.now(ZoneOffset.UTC).minusMinutes(submissionClaimStaleAfterMinutes)
+            );
     }
 
     public CaseDetails submitEvent(EventSubmissionParams params) {

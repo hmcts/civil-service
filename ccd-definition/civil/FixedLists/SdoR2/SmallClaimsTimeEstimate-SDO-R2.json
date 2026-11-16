@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "SmallClaimsSdoR2TimeEstimate",
+    "ListElementCode": "FIFTEEN_MINUTES",
+    "ListElement": "15 minutes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "SmallClaimsSdoR2TimeEstimate",
+    "ListElementCode": "THIRTY_MINUTES",
+    "ListElement": "30 minutes",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "SmallClaimsSdoR2TimeEstimate",
+    "ListElementCode": "ONE_HOUR",
+    "ListElement": "1 hour",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "SmallClaimsSdoR2TimeEstimate",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 4
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "ORDER_REVIEW_OBLIGATION_CHECK",
+    "CaseFieldID": "obligationWAFlag",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "COMPLEX",
+    "PageID": "obligationWAFlag",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N"
+  }
+]

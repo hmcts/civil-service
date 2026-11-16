@@ -16,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.unit.DataSize;
+import uk.gov.hmcts.reform.auth.checker.core.user.User;
 import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
@@ -47,6 +48,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static java.lang.String.format;
@@ -305,7 +307,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
             .thenReturn(bytes);
         when(caseDocumentClientApi.uploadDocuments(anyString(), anyString(), any()))
             .thenReturn(new UploadResponse(List.of(document)));
-        when(userRequestAuthorizerMock.authorise(any())).thenReturn(null);
+        when(userRequestAuthorizerMock.authorise(any())).thenReturn(new User("1", Set.of("role")));
 
         //then
         doFilePost(BEARER_TOKEN, file, GENERATE_ANY_DOC_URL)

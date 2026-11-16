@@ -1,0 +1,17 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "LINK_DEFENDANT_TO_CLAIM",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-systemupdate",
+          "caseworker-civil-admin",
+          "caseworker-civil-solicitor",
+          "caseworker-civil-staff"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  }
+]

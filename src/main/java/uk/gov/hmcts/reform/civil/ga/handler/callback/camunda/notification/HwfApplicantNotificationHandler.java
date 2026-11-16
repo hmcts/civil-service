@@ -20,6 +20,30 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_LIP_HWF;
 
+/**
+ * Superseded by {@code GaHwfApplicantNotifier} on the Notifier framework, and deliberately kept.
+ *
+ * <p>Camunda versions process definitions, and an instance keeps running the version it started
+ * on. When the migrated {@code notify_ga_applicant_hwf_outcome.bpmn} deploys, every
+ * {@code GA_NOTIFY_HWF} instance already in flight continues on the previous version and still
+ * reaches the old activity, which raises {@code NOTIFY_APPLICANT_LIP_HWF}. Deleting this handler
+ * would leave those callbacks unhandled, so they would fail into Camunda incidents and the cases
+ * would need unsticking by hand.
+ *
+ * <p>New instances use {@code NOTIFY_EVENT} and never reach this. Remove it once no running
+ * instance remains on a pre migration version of the definition, which can be confirmed from the
+ * engine rather than assumed from elapsed time.</p>
+ *
+ * <p>The removal takes this class and the {@code NOTIFY_APPLICANT_LIP_HWF} entry in
+ * civil-ccd-definition, but not the {@link uk.gov.hmcts.reform.civil.callback.CaseEvent} value
+ * itself. That name has a second, unrelated role: the five HWF user callbacks set it as the
+ * business process event, and {@code GaEventEmitterService} correlates it as the Camunda start
+ * message that launches {@code GA_NOTIFY_HWF}. Deleting the enum value or the
+ * {@code bpmn:message} would stop the process starting at all.</p>
+ *
+ * @deprecated retained only to drain in flight process instances. See DTSCCI-6726.
+ */
+@Deprecated(forRemoval = true)
 @Slf4j
 @Service
 @RequiredArgsConstructor
