@@ -1,0 +1,413 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "gaApplicantDisplayName",
+    "TabFieldDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "judicialDecision",
+    "FieldShowCondition": "judicialDecision.decision = \"DO_NOT_SHOW_IN_UI\"",
+    "TabFieldDisplayOrder": 2
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "finalOrderSelection",
+    "TabFieldDisplayOrder": 3
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "assistedOrderRecitals",
+    "TabFieldDisplayOrder": 4,
+    "FieldShowCondition": "finalOrderSelection = \"DONT_SHOW_UI\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "preTranslationGaDocumentType",
+    "TabFieldDisplayOrder": 5,
+    "FieldShowCondition": "finalOrderSelection = \"DONT_SHOW_UI\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "assistedOrderRecitalsRecorded",
+    "TabFieldDisplayOrder": 4,
+    "FieldShowCondition": "finalOrderSelection = \"ASSISTED_ORDER\" AND assistedOrderRecitals=\"SHOW\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 3,
+    "CaseFieldID": "assistedOrderOrderedThat",
+    "TabFieldDisplayOrder": 4,
+    "FieldShowCondition": "finalOrderSelection = \"ASSISTED_ORDER\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "assistedOrderOrderedThatText",
+    "TabFieldDisplayOrder": 4,
+    "FieldShowCondition": "finalOrderSelection = \"ASSISTED_ORDER\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 5,
+    "CaseFieldID": "gaFinalOrderDocPreview",
+    "TabFieldDisplayOrder": 4,
+    "FieldShowCondition": "finalOrderSelection = \"ASSISTED_ORDER\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "freeFormRecitalAndOrderLabel",
+    "TabFieldDisplayOrder": 5,
+    "FieldShowCondition": "preTranslationGaDocumentType != \"*\" AND judicialDecision.decision = \"FREE_FORM_ORDER\" OR finalOrderSelection = \"FREE_FORM_ORDER\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "freeFormRecitalText",
+    "TabFieldDisplayOrder": 5,
+    "FieldShowCondition": "preTranslationGaDocumentType != \"*\" AND judicialDecision.decision = \"FREE_FORM_ORDER\" OR finalOrderSelection = \"FREE_FORM_ORDER\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 3,
+    "CaseFieldID": "freeFormOrderedLabel",
+    "TabFieldDisplayOrder": 5,
+    "FieldShowCondition": "preTranslationGaDocumentType != \"*\" AND judicialDecision.decision = \"FREE_FORM_ORDER\" OR finalOrderSelection = \"FREE_FORM_ORDER\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "freeFormOrderedText",
+    "TabFieldDisplayOrder": 5,
+    "FieldShowCondition": "preTranslationGaDocumentType != \"*\" AND judicialDecision.decision = \"FREE_FORM_ORDER\" OR finalOrderSelection = \"FREE_FORM_ORDER\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 5,
+    "CaseFieldID": "orderOnCourtsListLabel",
+    "TabFieldDisplayOrder": 5,
+    "FieldShowCondition": "preTranslationGaDocumentType != \"*\" AND judicialDecision.decision = \"FREE_FORM_ORDER\" OR finalOrderSelection = \"FREE_FORM_ORDER\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 6,
+    "CaseFieldID": "orderOnCourtsList",
+    "TabFieldDisplayOrder": 5,
+    "FieldShowCondition": "preTranslationGaDocumentType != \"*\" AND judicialDecision.decision = \"FREE_FORM_ORDER\" OR finalOrderSelection = \"FREE_FORM_ORDER\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 7,
+    "CaseFieldID": "orderOnCourtInitiative",
+    "TabFieldDisplayOrder": 5,
+    "FieldShowCondition": "preTranslationGaDocumentType != \"*\" AND judicialDecision.decision = \"FREE_FORM_ORDER\" OR finalOrderSelection = \"FREE_FORM_ORDER\" AND orderOnCourtsList = \"ORDER_ON_COURT_INITIATIVE\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 8,
+    "CaseFieldID": "orderWithoutNotice",
+    "TabFieldDisplayOrder": 5,
+    "FieldShowCondition": "preTranslationGaDocumentType != \"*\" AND judicialDecision.decision = \"FREE_FORM_ORDER\" OR finalOrderSelection = \"FREE_FORM_ORDER\" AND orderOnCourtsList = \"ORDER_WITHOUT_NOTICE\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "TabFieldDisplayOrder": 6,
+    "FieldShowCondition": "preTranslationGaDocumentType = \"MORE_INFO_RESPONSE_DOC\" OR preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "TabFieldDisplayOrder": 7
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "judicialDecisionMakeAnOrderForWrittenRepresentations",
+    "TabFieldDisplayOrder": 8,
+    "FieldShowCondition": "preTranslationGaDocumentType = \"WRITTEN_REPS_RESPONSE_DOC\" OR preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "judgeRecitalText",
+    "TabFieldDisplayOrder": 8,
+    "FieldShowCondition": "judicialDecision.decision = \"MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS\" AND preTranslationGaDocumentType = \"WRITTEN_REPS_RESPONSE_DOC\" OR preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 3,
+    "CaseFieldID": "directionInRelationToHearingText",
+    "TabFieldDisplayOrder": 8,
+    "FieldShowCondition": "judicialDecision.decision = \"MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS\" AND preTranslationGaDocumentType = \"WRITTEN_REPS_RESPONSE_DOC\" OR preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "judicialByCourtsInitiativeForWrittenRep",
+    "TabFieldDisplayOrder": 8,
+    "FieldShowCondition": "judicialDecision.decision = \"MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS\" AND preTranslationGaDocumentType = \"WRITTEN_REPS_RESPONSE_DOC\" OR preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 5,
+    "CaseFieldID": "orderCourtOwnInitiativeForWrittenRep",
+    "TabFieldDisplayOrder": 8,
+    "FieldShowCondition": "judicialDecision.decision = \"MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS\" AND judicialByCourtsInitiativeForWrittenRep=\"OPTION_1\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 6,
+    "CaseFieldID": "orderWithoutNoticeForWrittenRep",
+    "TabFieldDisplayOrder": 8,
+    "FieldShowCondition": "judicialDecision.decision = \"MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS\" AND judicialByCourtsInitiativeForWrittenRep=\"OPTION_2\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "judicialListForHearing",
+    "TabFieldDisplayOrder": 9,
+    "FieldShowCondition": "judicialDecision.decision = \"LIST_FOR_A_HEARING\" AND preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "judicialGeneralHearingOrderRecital",
+    "TabFieldDisplayOrder": 9,
+    "FieldShowCondition": "judicialDecision.decision = \"LIST_FOR_A_HEARING\" AND preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 3,
+    "CaseFieldID": "judicialGOHearingDirections",
+    "TabFieldDisplayOrder": 9,
+    "FieldShowCondition": "judicialDecision.decision = \"LIST_FOR_A_HEARING\" AND preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "orderMadeCourtsInitiativeLabelForHearing",
+    "TabFieldDisplayOrder": 9,
+    "FieldShowCondition": "judicialDecision.decision = \"LIST_FOR_A_HEARING\" AND preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 5,
+    "CaseFieldID": "judicialByCourtsInitiativeListForHearing",
+    "TabFieldDisplayOrder": 9,
+    "FieldShowCondition": "judicialDecision.decision = \"LIST_FOR_A_HEARING\" AND preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 6,
+    "CaseFieldID": "orderCourtOwnInitiativeListForHearing",
+    "TabFieldDisplayOrder": 9,
+    "FieldShowCondition": "judicialDecision.decision = \"LIST_FOR_A_HEARING\" AND judicialByCourtsInitiativeListForHearing=\"OPTION_1\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 7,
+    "CaseFieldID": "orderWithoutNoticeListForHearing",
+    "TabFieldDisplayOrder": 9,
+    "FieldShowCondition": "judicialDecision.decision = \"LIST_FOR_A_HEARING\" AND judicialByCourtsInitiativeListForHearing=\"OPTION_2\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "generalAppRespondentAgreement",
+    "TabFieldDisplayOrder": 10
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "generalAppConsentOrder",
+    "TabFieldDisplayOrder": 11,
+    "FieldShowCondition": "generalAppConsentOrder = \"No\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "generalAppUrgencyRequirement",
+    "TabFieldDisplayOrder": 12
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "generalAppInformOtherParty",
+    "FieldShowCondition": "generalAppRespondentAgreement.hasAgreed = \"No\"",
+    "TabFieldDisplayOrder": 13
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "generalAppType",
+    "TabFieldDisplayOrder": 14
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "generalAppN245FormUpload",
+    "TabFieldDisplayOrder": 15
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "generalAppDetailsOfOrder",
+    "TabFieldDisplayOrder": 16,
+    "FieldShowCondition": "preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "generalAppReasonsOfOrder",
+    "TabFieldDisplayOrder": 17,
+    "FieldShowCondition": "preTranslationGaDocumentType != \"*\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "generalAppEvidenceDocument",
+    "TabFieldDisplayOrder": 18
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "generalAppHearingDetails",
+    "TabFieldDisplayOrder": 19
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "generalAppParentCaseLink",
+    "TabFieldDisplayOrder": 20
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "ElementLabel": "Respondend response",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "respondentsResponses",
+    "TabFieldDisplayOrder": 21
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "referToJudge",
+    "TabFieldDisplayOrder": 22
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "referToLegalAdvisor",
+    "TabFieldDisplayOrder": 23
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "TabID": "Application",
+    "TabLabel": "Application",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "caseNameGaInternal",
+    "FieldShowCondition": "judicialDecision.decision = \"DO_NOT_SHOW_IN_UI\"",
+    "TabFieldDisplayOrder": 24
+  }
+]

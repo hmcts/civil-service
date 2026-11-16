@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "SmallClaimsSdoR2PhysicalTrialBundleOptions",
+    "ListElementCode": "NO",
+    "ListElement": "No",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "SmallClaimsSdoR2PhysicalTrialBundleOptions",
+    "ListElementCode": "PARTY",
+    "ListElement": "Party",
+    "DisplayOrder": 2
+  }
+]

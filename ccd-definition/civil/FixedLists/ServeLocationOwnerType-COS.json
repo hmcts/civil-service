@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "ServeLocationOwnerTypeCoS",
+    "ListElementCode": "FRIEND",
+    "ListElement": "litigation friend's",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ServeLocationOwnerTypeCoS",
+    "ListElementCode": "SOLICITOR",
+    "ListElement": "solicitor's",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "ServeLocationOwnerTypeCoS",
+    "ListElementCode": "DEFENDANT",
+    "ListElement": "defendant's",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "ServeLocationOwnerTypeCoS",
+    "ListElementCode": "CLAIMANT",
+    "ListElement": "claimant's",
+    "DisplayOrder": 4
+  }
+]

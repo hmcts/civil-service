@@ -1,0 +1,11 @@
+[
+  {
+    "ID": "GATypeGAspec",
+    "ListElementCode": "types",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "GeneralApplicationTypesGAspec",
+    "HintText": "  ",
+    "ElementLabel": " Application type",
+    "SecurityClassification": "Public"
+  }
+]

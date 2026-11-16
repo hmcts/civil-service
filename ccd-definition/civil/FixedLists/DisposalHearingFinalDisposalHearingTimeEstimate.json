@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "DisposalHearingFinalDisposalHearingTimeEstimate",
+    "ListElementCode": "THIRTY_MINUTES",
+    "ListElement": "30 minutes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "DisposalHearingFinalDisposalHearingTimeEstimate",
+    "ListElementCode": "FIFTEEN_MINUTES",
+    "ListElement": "15 minutes",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "DisposalHearingFinalDisposalHearingTimeEstimate",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 3
+  }
+]

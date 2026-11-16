@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "RegistrationTypeInformation",
+    "ListElementCode": "registrationType ",
+    "FieldType": "Text",
+    "ElementLabel": "registration type",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RegistrationTypeInformation",
+    "ListElementCode": "judgmentDateTime",
+    "FieldType": "DateTime",
+    "ElementLabel": "Judgment created on",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

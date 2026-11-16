@@ -1,0 +1,15 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "END_SCHEDULER_CHECK_STAY_ORDER_DEADLINE",
+    "Name": "Order Made End Date Scheduler",
+    "Description": "Trigger Order Made End Date Scheduler",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "ORDER_MADE",
+    "SecurityClassification": "Public",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0,
+    "Publish": "Y"
+  }
+]

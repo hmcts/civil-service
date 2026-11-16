@@ -1,0 +1,37 @@
+[
+  {
+    "ID": "GAJudicialWrittenRepresentationsGAspec",
+    "ListElementCode": "makeAnOrderForWrittenRepresentations",
+    "ElementLabel": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "GAJudgeWrittenRepresentationsOptionsGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAJudicialWrittenRepresentationsGAspec",
+    "ListElementCode": "writtenSequentailRepresentationsBy",
+    "ElementLabel": "The defendant should upload any written responses or evidence by 4pm on",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "DisplayContextParameter": "#DATETIMEDISPLAY(d LLLL yyyy)",
+    "FieldShowCondition": "makeAnOrderForWrittenRepresentations=\"SEQUENTIAL_REPRESENTATIONS\""
+  },
+  {
+    "ID": "GAJudicialWrittenRepresentationsGAspec",
+    "ListElementCode": "sequentialApplicantMustRespondWithin",
+    "ElementLabel": "The claimant should upload any written responses or evidence in reply by 4pm on",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "DisplayContextParameter": "#DATETIMEDISPLAY(d LLLL yyyy)",
+    "FieldShowCondition": "makeAnOrderForWrittenRepresentations=\"SEQUENTIAL_REPRESENTATIONS\""
+  },
+  {
+    "ID": "GAJudicialWrittenRepresentationsGAspec",
+    "ListElementCode": "writtenConcurrentRepresentationsBy",
+    "ElementLabel": "The claimant and defendant should upload any written submissions and evidence by 4pm on",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "DisplayContextParameter": "#DATETIMEDISPLAY(d LLLL yyyy)",
+    "FieldShowCondition": "makeAnOrderForWrittenRepresentations = \"CONCURRENT_REPRESENTATIONS\""
+  }
+]

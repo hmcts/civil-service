@@ -1,0 +1,38 @@
+[
+  {
+    "ID": "CaseRoleType",
+    "ListElementCode": "CREATOR",
+    "ListElement": "CREATOR",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "CaseRoleType",
+    "ListElementCode": "APPLICANTSOLICITORONE",
+    "ListElement": "APPLICANTSOLICITORONE",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "CaseRoleType",
+    "ListElementCode": "RESPONDENTSOLICITORONE",
+    "ListElement": "RESPONDENTSOLICITORONE",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "CaseRoleType",
+    "ListElementCode": "RESPONDENTSOLICITORTWO",
+    "ListElement": "RESPONDENTSOLICITORTWO",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "CaseRoleType",
+    "ListElementCode": "CLAIMANT",
+    "ListElement": "CLAIMANT",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "CaseRoleType",
+    "ListElementCode": "DEFENDANT",
+    "ListElement": "DEFENDANT",
+    "DisplayOrder": 6
+  }
+]
