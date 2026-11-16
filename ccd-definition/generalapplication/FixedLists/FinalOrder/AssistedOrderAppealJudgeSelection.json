@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "AssistedOrderAppealJudgeSelection",
+    "ListElementCode": "CIRCUIT_COURT_JUDGE",
+    "ListElement": "a Circuit Judge of the County Court",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "AssistedOrderAppealJudgeSelection",
+    "ListElementCode": "HIGH_COURT_JUDGE",
+    "ListElement": "a High Court Judge of the King's Bench Division",
+    "DisplayOrder": 2
+  }
+]

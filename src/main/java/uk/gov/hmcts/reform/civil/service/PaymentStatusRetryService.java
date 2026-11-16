@@ -45,7 +45,7 @@ public class PaymentStatusRetryService {
         } catch (IllegalArgumentException ex) {
             throw ex;
         } catch (Exception ex) {
-            log.error("Payment status update failed for case {} and fee type {}", caseReference, feeType, ex);
+            log.warn("Payment status update failed for case {} and fee type {}; will retry if attempts remain.", caseReference, feeType, ex);
             throw new CaseDataUpdateException(ex.getMessage(), ex);
         }
     }
@@ -61,8 +61,8 @@ public class PaymentStatusRetryService {
         } catch (IllegalArgumentException ex) {
             throw ex;
         } catch (Exception ex) {
-            log.error(
-                "Payment status update failed for case {} and fee type {}. Status: {}, ErrorCode: {}",
+            log.warn(
+                "Payment status update failed for case {} and fee type {}. Status: {}, ErrorCode: {}; will retry if attempts remain.",
                 caseReference,
                 feeType,
                 getStatus(response),

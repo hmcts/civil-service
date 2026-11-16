@@ -1,13 +1,14 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.RequestForReconsiderationRequestedByOtherPartyClaimantNotificationHandler;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.requestforreconsideration.RequestForReconsiderationClaimantDashboardTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -24,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class RequestForReconsiderationRecipientClaimantScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
-    private RequestForReconsiderationRequestedByOtherPartyClaimantNotificationHandler handler;
+    private RequestForReconsiderationClaimantDashboardTask handler;
 
     @Test
     void should_create_request_for_reconsideration_claimant_scenario() throws Exception {
@@ -42,7 +43,7 @@ public class RequestForReconsiderationRecipientClaimantScenarioTest extends Dash
                 new CaseDocument().setDocumentLink(new Document().setDocumentBinaryUrl("url")))))
             .requestForReconsiderationDeadline(LocalDateTime.of(2024, 6, 14, 16, 0)).build();
 
-        handler.handle(callbackParams(caseData));
+        handler.execute(DashboardTaskContext.civil(caseData, BEARER_TOKEN));
 
         String requestForReconsiderationDeadlineEn = DateUtils.formatDate(LocalDate.of(2024, 6, 14));
         String requestForReconsiderationDeadlineCy = DateUtils.formatDateInWelsh(LocalDate.of(2024, 6, 14), false);

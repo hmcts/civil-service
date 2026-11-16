@@ -71,10 +71,18 @@ public class NoOngoingBusinessProcessAspect {
     ) {
         if (generalApplicationCaseType) {
             GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
+            BusinessProcess bp = caseData.getBusinessProcess();
             log.info(
-                "{} is not allowed on the case {} due to ongoing business process",
+                "{} is not allowed on the case {} due to ongoing business process "
+                    + "[camundaEvent={}, processInstanceId={}, activityId={}, status={}, readyOn={}], "
+                    + "caseType=GENERALAPPLICATION",
                 caseEvent.name(),
-                caseData.getCcdCaseReference()
+                caseData.getCcdCaseReference(),
+                bp.getCamundaEvent(),
+                bp.getProcessInstanceId(),
+                bp.getActivityId(),
+                bp.getStatus(),
+                bp.getReadyOn()
             );
             return;
         }

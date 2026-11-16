@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "SdoR2AddendumReport",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": "### Addendum report upload",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2AddendumReport",
+    "ListElementCode": "sdoAddendumReportTxt",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2AddendumReport",
+    "ListElementCode": "sdoAddendumReportDate",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

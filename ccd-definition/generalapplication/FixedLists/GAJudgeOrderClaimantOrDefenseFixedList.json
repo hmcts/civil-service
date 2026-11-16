@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "GAJudgeOrderClaimantOrDefenseFixedList",
+    "ListElementCode": "CLAIM_FORM",
+    "ListElement": "Claim Form",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "GAJudgeOrderClaimantOrDefenseFixedList",
+    "ListElementCode": "DEFENCE_FORM",
+    "ListElement": "Defence Form",
+    "DisplayOrder": 2
+  }
+]

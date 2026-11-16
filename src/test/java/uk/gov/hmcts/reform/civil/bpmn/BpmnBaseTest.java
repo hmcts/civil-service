@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.bpmn;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.springframework.scheduling.support.CronExpression;
@@ -10,7 +9,6 @@ import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +17,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.engine.ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -79,9 +76,7 @@ public abstract class BpmnBaseTest {
 
     @BeforeAll
     static void startEngine() {
-        ProcessEngineConfiguration configuration = createStandaloneInMemProcessEngineConfiguration();
-
-        engine = configuration.buildProcessEngine();
+        engine = SharedProcessEngine.reset();
     }
 
     @BeforeEach
@@ -107,11 +102,6 @@ public abstract class BpmnBaseTest {
         engine.getRepositoryService().deleteDeployment(startBusinessProcessDeployment.getId());
         engine.getRepositoryService().deleteDeployment(endBusinessProcessDeployment.getId());
         engine.getRepositoryService().deleteDeployment(deployment.getId());
-    }
-
-    @AfterAll
-    static void shutDown() {
-        engine.close();
     }
 
     void deployDiagram(String bpmnFileName) {

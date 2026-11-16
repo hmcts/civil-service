@@ -5,23 +5,13 @@ import lombok.Value;
 @Value
 public class ScheduledTaskEventConfiguration {
 
-    String schedulerName;
-    String jobStartedEvent;
-    String caseProcessedEvent;
-    String caseFailedEvent;
-    String caseAbortedEvent;
-    String jobCompletedEvent;
-    String jobAbortedEvent;
-    String backPressureUpdatedEvent;
+    public static final String SCHEDULER_JOB_STARTED = "SchedulerJobStarted";
+    public static final String SCHEDULER_CASE_PROCESSED = "SchedulerCaseProcessed";
+    public static final String SCHEDULER_CASE_FAILED = "SchedulerCaseFailed";
+    public static final String SCHEDULER_CASE_ABORTED = "SchedulerCaseAborted";
+    public static final String SCHEDULER_JOB_COMPLETED = "SchedulerJobCompleted";
+    public static final String SCHEDULER_JOB_ABORTED = "SchedulerJobAborted";
+    public static final String SCHEDULER_BACK_PRESSURE_UPDATED = "SchedulerBackPressureUpdated";
 
-    public ScheduledTaskEventConfiguration(String schedulerName) {
-        this.schedulerName = schedulerName;
-        this.jobStartedEvent = schedulerName + "JobStarted";
-        this.caseProcessedEvent = schedulerName + "CaseProcessed";
-        this.caseFailedEvent = schedulerName + "CaseFailed";
-        this.caseAbortedEvent = schedulerName + "CaseAborted";
-        this.jobCompletedEvent = schedulerName + "JobCompleted";
-        this.jobAbortedEvent = schedulerName + "JobAborted";
-        this.backPressureUpdatedEvent = schedulerName + "BackPressureUpdated";
-    }
+    String schedulerName;
 }

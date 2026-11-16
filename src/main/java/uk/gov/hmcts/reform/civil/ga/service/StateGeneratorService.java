@@ -67,7 +67,8 @@ public class StateGeneratorService {
 
     private CaseState getMakeAnOrderState(GeneralApplicationCaseData data) {
         if (isDirectionsWithoutHearing(data)) {
-            return AWAITING_DIRECTIONS_ORDER_DOCS;
+            return data.getJudicialDecisionMakeOrder().getDirectionsResponseByDate() == null
+                ? ORDER_MADE : AWAITING_DIRECTIONS_ORDER_DOCS;
         }
         if (isApproveOrEditOrder(data)) {
             return shouldProceedInHeritage(data) ? PROCEEDS_IN_HERITAGE : ORDER_MADE;

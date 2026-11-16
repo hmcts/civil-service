@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.NoHearingFeeDueEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.AbortCategory;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.TaskAbortedException;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -44,7 +45,7 @@ public class HearingFeePublisherService {
         } else if (isHearingFeeUnpaid(paymentDetails, caseData)) {
             publishEvent(prefix, HEARING_FEE_UNPAID_EVENT, caseData, new HearingFeeUnpaidEvent(caseId));
         } else {
-            throw new TaskAbortedException("No condition matched (e.g. hearing due date not yet reached)");
+            throw new TaskAbortedException(AbortCategory.BUSINESS_RULE_NOT_MET, "No condition matched (e.g. hearing due date not yet reached)");
         }
     }
 

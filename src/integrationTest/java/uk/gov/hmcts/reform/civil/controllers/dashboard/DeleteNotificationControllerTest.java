@@ -50,7 +50,7 @@ public class DeleteNotificationControllerTest extends BaseIntegrationTest {
         when(userRequestAuthorizerMock.authorise(any())).thenThrow(BearerTokenMissingException.class);
 
         doDelete("", null, END_POINT_URL, NOTIFICATION_IDENTIFIER.toString())
-            .andExpect(status().isForbidden());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test

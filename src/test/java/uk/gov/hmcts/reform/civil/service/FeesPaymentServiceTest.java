@@ -16,6 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -58,6 +59,7 @@ import static uk.gov.hmcts.reform.civil.enums.FeeType.HEARING;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {FeesPaymentService.class, CoreCaseDataService.class, PaymentStatusService.class,
     PaymentsClient.class, CaseDetailsConverter.class, PinInPostConfiguration.class, ObjectMapper.class})
+@TestPropertySource(properties = "payments.retry.delay-ms=0")
 @EnableRetry
 class FeesPaymentServiceTest {
 

@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 public class HearingsService {
 
     private static final int MAX_ATTEMPTS = 3;
-    private static final int BACKOFF_DELAY_MS = 500;
+    private static final String BACKOFF_DELAY_EXPRESSION = "${hmc.hearings.retry.delay-ms:500}";
 
     private final HearingsApi hearingNoticeApi;
     private final AuthTokenGenerator authTokenGenerator;
@@ -39,7 +39,7 @@ public class HearingsService {
         retryFor = {FeignException.class, RetryableException.class},
         noRetryFor = FeignException.FeignClientException.class,
         maxAttempts = MAX_ATTEMPTS,
-        backoff = @Backoff(delay = BACKOFF_DELAY_MS)
+        backoff = @Backoff(delayExpression = BACKOFF_DELAY_EXPRESSION)
     )
     public HearingGetResponse getHearingResponse(String authToken, String hearingId) throws HmcException {
         log.debug("Sending Get Hearings with Hearing ID {}", hearingId);
@@ -73,7 +73,7 @@ public class HearingsService {
         retryFor = {FeignException.class, RetryableException.class},
         noRetryFor = FeignException.FeignClientException.class,
         maxAttempts = MAX_ATTEMPTS,
-        backoff = @Backoff(delay = BACKOFF_DELAY_MS)
+        backoff = @Backoff(delayExpression = BACKOFF_DELAY_EXPRESSION)
     )
     public PartiesNotifiedResponses getPartiesNotifiedResponses(String authToken, String hearingId) {
         log.debug("Requesting Get Parties Notified with Hearing ID {}", hearingId);
@@ -111,7 +111,7 @@ public class HearingsService {
         retryFor = {FeignException.class, RetryableException.class},
         noRetryFor = FeignException.FeignClientException.class,
         maxAttempts = MAX_ATTEMPTS,
-        backoff = @Backoff(delay = BACKOFF_DELAY_MS)
+        backoff = @Backoff(delayExpression = BACKOFF_DELAY_EXPRESSION)
     )
     public ResponseEntity updatePartiesNotifiedResponse(String authToken, String hearingId,
                                                         int requestVersion, LocalDateTime receivedDateTime,
@@ -154,7 +154,7 @@ public class HearingsService {
         retryFor = {FeignException.class, RetryableException.class},
         noRetryFor = FeignException.FeignClientException.class,
         maxAttempts = MAX_ATTEMPTS,
-        backoff = @Backoff(delay = BACKOFF_DELAY_MS)
+        backoff = @Backoff(delayExpression = BACKOFF_DELAY_EXPRESSION)
     )
     public UnNotifiedHearingResponse getUnNotifiedHearingResponses(String authToken, String hmctsServiceCode,
                                                                    LocalDateTime hearingStartDateFrom,
@@ -185,7 +185,7 @@ public class HearingsService {
         retryFor = {FeignException.class, RetryableException.class},
         noRetryFor = FeignException.FeignClientException.class,
         maxAttempts = MAX_ATTEMPTS,
-        backoff = @Backoff(delay = BACKOFF_DELAY_MS)
+        backoff = @Backoff(delayExpression = BACKOFF_DELAY_EXPRESSION)
     )
     public HearingsResponse getHearings(String authToken, Long caseId, String status) {
         log.debug("Requesting Hearings for case: {}", caseId);

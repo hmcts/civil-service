@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "MarkJudgmentPaid",
+    "CaseEventID": "JUDGMENT_PAID_IN_FULL",
+    "CaseFieldID": "joJudgmentPaidInFull",
+    "ListElementCode": "dateOfFullPaymentMade",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "MarkJudgmentPaid",
+    "CaseEventID": "JUDGMENT_PAID_IN_FULL",
+    "CaseFieldID": "joJudgmentPaidInFull",
+    "ListElementCode": "confirmFullPaymentMade",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  }
+]

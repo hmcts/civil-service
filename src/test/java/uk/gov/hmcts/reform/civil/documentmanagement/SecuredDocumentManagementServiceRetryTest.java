@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.documentmanagement;
 
 import feign.FeignException;
 import feign.Request;
+import feign.Response;
 import org.apache.tika.Tika;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,21 +13,23 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.util.unit.DataSize;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
+import uk.gov.hmcts.reform.civil.client.CaseDocumentBinaryApiClient;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -34,7 +37,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -49,14 +51,17 @@ import static org.mockito.Mockito.when;
  * applied, so the sibling test can only assert at the method level and cannot prove the
  * {@code noRetryFor} classification actually short-circuits the three attempts.
  */
-@SpringBootTest(classes = {
-    SecuredDocumentManagementService.class,
-    SecuredDocumentManagementServiceRetryTest.TestRetryConfig.class,
-    JacksonAutoConfiguration.class,
-    DocumentManagementConfiguration.class, Tika.class})
+@SpringBootTest(
+    properties = "document-management.retry.delay-ms=0",
+    classes = {
+        SecuredDocumentManagementService.class,
+        SecuredDocumentManagementServiceRetryTest.TestRetryConfig.class,
+        JacksonAutoConfiguration.class,
+        DocumentManagementConfiguration.class, Tika.class})
 class SecuredDocumentManagementServiceRetryTest {
 
     public static final String BEARER_TOKEN = "Bearer Token";
+    private static final String DOCUMENT_PATH = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
 
     // proxyTargetClass = true so the retry proxy is a CGLIB subclass of the concrete service,
     // letting the test autowire SecuredDocumentManagementService directly (a JDK interface
@@ -68,6 +73,8 @@ class SecuredDocumentManagementServiceRetryTest {
 
     @MockBean
     private CaseDocumentClientApi caseDocumentClientApi;
+    @MockBean
+    private CaseDocumentBinaryApiClient caseDocumentBinaryApiClient;
     @MockBean
     private DocumentDownloadClientApi documentDownloadClient;
     @MockBean
@@ -97,11 +104,35 @@ class SecuredDocumentManagementServiceRetryTest {
             InvalidDocumentLinkException.class,
             () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, shortSelfHref));
 
-        // getUserInfo runs once at the top of every attempt, so it is a reliable per-attempt counter:
-        // exactly one invocation proves the bad-input error short-circuited the retry (not the full retry budget).
-        verify(userService, times(1)).getUserInfo(BEARER_TOKEN);
-        // the guard trips before any CDAM call, so neither document client is ever touched.
-        verifyNoInteractions(caseDocumentClientApi, documentDownloadClient);
+        // the guard trips before any CDAM call, so no document client is ever touched.
+        verifyNoInteractions(caseDocumentClientApi, caseDocumentBinaryApiClient, documentDownloadClient);
+    }
+
+    @Test
+    void downloadDocumentWithMetaData_streamedBinary500_isRetriedThreeTimes() {
+        when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), any(UUID.class)))
+            .thenReturn(document(1024));
+        when(caseDocumentBinaryApiClient.getDocumentBinary(anyString(), anyString(), any(UUID.class)))
+            .thenAnswer(invocation -> binaryResponse(500));
+
+        assertThrows(
+            DocumentDownloadException.class,
+            () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, DOCUMENT_PATH));
+
+        verify(caseDocumentBinaryApiClient, times(3)).getDocumentBinary(anyString(), anyString(), any(UUID.class));
+    }
+
+    @Test
+    void downloadDocumentWithMetaData_tooLarge_isNotRetried() {
+        when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), any(UUID.class)))
+            .thenReturn(document(DataSize.ofMegabytes(1024).toBytes() + 1));
+
+        assertThrows(
+            DocumentTooLargeException.class,
+            () -> documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, DOCUMENT_PATH));
+
+        verify(caseDocumentClientApi, times(1)).getMetadataForDocument(anyString(), anyString(), any(UUID.class));
+        verifyNoInteractions(caseDocumentBinaryApiClient);
     }
 
     @Test
@@ -141,8 +172,6 @@ class SecuredDocumentManagementServiceRetryTest {
     void downloadDocumentWithMetaData_emptyResponse_isRetriedThreeTimes(EmptyResponse failure) {
         String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
         NullPointerException decoderFailure = new NullPointerException("Feign response body is null");
-        Document metadata = mock(Document.class);
-        metadata.originalDocumentName = "test.pdf";
 
         switch (failure) {
             case NULL_METADATA -> when(caseDocumentClientApi.getMetadataForDocument(
@@ -151,13 +180,13 @@ class SecuredDocumentManagementServiceRetryTest {
                 anyString(), anyString(), any(UUID.class))).thenThrow(decoderFailure);
             case BINARY_DECODER_NPE, NULL_BINARY_BODY -> {
                 when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), any(UUID.class)))
-                    .thenReturn(metadata);
+                    .thenReturn(document(1024));
                 if (failure == EmptyResponse.BINARY_DECODER_NPE) {
-                    when(caseDocumentClientApi.getDocumentBinary(anyString(), anyString(), any(UUID.class)))
+                    when(caseDocumentBinaryApiClient.getDocumentBinary(anyString(), anyString(), any(UUID.class)))
                         .thenThrow(decoderFailure);
                 } else {
-                    when(caseDocumentClientApi.getDocumentBinary(anyString(), anyString(), any(UUID.class)))
-                        .thenReturn(ResponseEntity.ok().build());
+                    when(caseDocumentBinaryApiClient.getDocumentBinary(anyString(), anyString(), any(UUID.class)))
+                        .thenAnswer(invocation -> binaryResponse(200, null));
                 }
             }
             default -> throw new IllegalArgumentException("Unexpected failure: " + failure);
@@ -173,28 +202,40 @@ class SecuredDocumentManagementServiceRetryTest {
         verify(caseDocumentClientApi, times(3))
             .getMetadataForDocument(anyString(), anyString(), any(UUID.class));
         boolean binaryCalled = failure == EmptyResponse.BINARY_DECODER_NPE || failure == EmptyResponse.NULL_BINARY_BODY;
-        verify(caseDocumentClientApi, binaryCalled ? times(3) : never())
+        verify(caseDocumentBinaryApiClient, binaryCalled ? times(3) : never())
             .getDocumentBinary(anyString(), anyString(), any(UUID.class));
         verifyNoInteractions(documentDownloadClient);
     }
 
     @Test
-    void downloadDocumentWithMetaData_emptyMetadataThenSuccess_returnsDocument() {
-        Document metadata = mock(Document.class);
-        metadata.originalDocumentName = "test.pdf";
-        ByteArrayResource resource = new ByteArrayResource(new byte[]{1, 2, 3});
+    void downloadDocumentWithMetaData_emptyMetadataThenSuccess_returnsDocument() throws IOException {
+        byte[] content = {1, 2, 3};
         when(caseDocumentClientApi.getMetadataForDocument(anyString(), anyString(), any(UUID.class)))
-            .thenReturn(null, metadata);
-        when(caseDocumentClientApi.getDocumentBinary(anyString(), anyString(), any(UUID.class)))
-            .thenReturn(ResponseEntity.ok(resource));
+            .thenReturn(null, document(content.length));
+        when(caseDocumentBinaryApiClient.getDocumentBinary(anyString(), anyString(), any(UUID.class)))
+            .thenAnswer(invocation -> binaryResponse(200, content));
 
         String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
         var response = documentManagementService.downloadDocumentWithMetaData(BEARER_TOKEN, documentPath);
 
-        assertSame(resource, response.file());
+        assertArrayEquals(content, response.file().getContentAsByteArray());
         verify(caseDocumentClientApi, times(2))
             .getMetadataForDocument(anyString(), anyString(), any(UUID.class));
-        verify(caseDocumentClientApi).getDocumentBinary(anyString(), anyString(), any(UUID.class));
+        verify(caseDocumentBinaryApiClient).getDocumentBinary(anyString(), anyString(), any(UUID.class));
+    }
+
+    private static Document document(long size) {
+        return Document.builder().size(size).originalDocumentName("TEST_DOCUMENT_1.pdf").build();
+    }
+
+    private static Response binaryResponse(int status) {
+        return binaryResponse(status, new byte[]{});
+    }
+
+    private static Response binaryResponse(int status, byte[] body) {
+        Request request = Request.create(
+            Request.HttpMethod.GET, "/cases/documents/x/binary", Map.of(), new byte[]{}, StandardCharsets.UTF_8, null);
+        return Response.builder().status(status).request(request).headers(Map.of()).body(body).build();
     }
 
     private static FeignException buildFeignException(int status) {

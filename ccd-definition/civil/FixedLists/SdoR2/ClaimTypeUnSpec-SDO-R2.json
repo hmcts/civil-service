@@ -1,0 +1,56 @@
+[
+  {
+    "ID": "ClaimTypeUnSpec",
+    "ListElementCode": "PERSONAL_INJURY",
+    "ListElement": "Personal injury",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ClaimTypeUnSpec",
+    "ListElementCode": "CLINICAL_NEGLIGENCE",
+    "ListElement": "Clinical negligence",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "ClaimTypeUnSpec",
+    "ListElementCode": "PROFESSIONAL_NEGLIGENCE",
+    "ListElement": "Professional negligence",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "ClaimTypeUnSpec",
+    "ListElementCode": "BREACH_OF_CONTRACT",
+    "ListElement": "Breach of contract",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "ClaimTypeUnSpec",
+    "ListElementCode": "CONSUMER",
+    "ListElement": "Consumer",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "ClaimTypeUnSpec",
+    "ListElementCode": "CONSUMER_CREDIT",
+    "ListElement": "Consumer credit",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "ClaimTypeUnSpec",
+    "ListElementCode": "HOUSING_DISREPAIR",
+    "ListElement": "Housing disrepair",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "ClaimTypeUnSpec",
+    "ListElementCode": "DAMAGES_AND_OTHER_REMEDY",
+    "ListElement": "Damages and an ‘other’ remedy e.g. Payment Protection Insurance (PPI), Motor finance",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "ClaimTypeUnSpec",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 9
+  }
+]

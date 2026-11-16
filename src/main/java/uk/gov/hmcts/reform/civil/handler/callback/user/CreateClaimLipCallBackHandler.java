@@ -161,6 +161,10 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     }
 
     private CallbackResponse linkDraftBySubmissionIdOnSubmitted(CallbackParams callbackParams) {
+        if (!featureToggleService.isDraftClaimDatabaseEnabled()) {
+            return SubmittedCallbackResponse.builder().build();
+        }
+
         CaseData caseData = callbackParams.getCaseData();
         String userId = Optional.ofNullable(caseData.getClaimantUserDetails())
             .map(IdamUserDetails::getId)

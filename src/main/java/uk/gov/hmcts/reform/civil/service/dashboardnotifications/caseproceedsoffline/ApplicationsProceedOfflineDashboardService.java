@@ -75,7 +75,7 @@ abstract class ApplicationsProceedOfflineDashboardService {
         if (states == null || states.isEmpty()) {
             return false;
         }
-        return states.stream().anyMatch(state -> !NON_LIVE_STATES.contains(state));
+        return states.stream().anyMatch(state -> state != null && !NON_LIVE_STATES.contains(state));
     }
 
     protected abstract boolean isLip(CaseData caseData);

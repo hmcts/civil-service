@@ -1,0 +1,70 @@
+[
+  {
+    "ID": "StoredObligationData",
+    "ListElementCode": "createdBy",
+    "FieldType": "Text",
+    "ElementLabel": "Created by",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "StoredObligationData",
+    "ListElementCode": "createdOn",
+    "FieldType": "DateTime",
+    "ElementLabel": "Created on",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "StoredObligationData",
+    "ListElementCode": "obligationDate",
+    "FieldType": "Date",
+    "ElementLabel": "Review date",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "ID": "StoredObligationData",
+    "ListElementCode": "obligationReason",
+    "ElementLabel": "Reason",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "ObligationReason",
+    "FieldShowCondition": "reasonText = \" \"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "StoredObligationData",
+    "ListElementCode": "otherObligationReason",
+    "FieldType": "Text",
+    "ElementLabel": "Info for other",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "reasonText = \" \"",
+    "Searchable": "N"
+  },
+  {
+    "ID": "StoredObligationData",
+    "ListElementCode": "reasonText",
+    "FieldType": "Text",
+    "ElementLabel": "Review type",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "StoredObligationData",
+    "ListElementCode": "obligationAction",
+    "FieldType": "TextArea",
+    "ElementLabel": "Description of review",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "StoredObligationData",
+    "ListElementCode": "obligationWATaskRaised",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "Y",
+    "FieldShowCondition": "obligationWATaskRaised = \"DO_NOT_SHOW_IN_UI\""
+  }
+]

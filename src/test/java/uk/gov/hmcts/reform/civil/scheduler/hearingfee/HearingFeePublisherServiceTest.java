@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.event.NoHearingFeeDueEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.AbortCategory;
 import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.TaskAbortedException;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -167,7 +168,8 @@ class HearingFeePublisherServiceTest {
 
         assertThatThrownBy(() -> publisherService.publishHearingFeeEvent(caseData))
             .isInstanceOf(TaskAbortedException.class)
-            .hasFieldOrPropertyWithValue("reason", "No condition matched (e.g. hearing due date not yet reached)");
+            .hasFieldOrPropertyWithValue("reason", "No condition matched (e.g. hearing due date not yet reached)")
+            .hasFieldOrPropertyWithValue("category", AbortCategory.BUSINESS_RULE_NOT_MET);
 
         verifyNoInteractions(applicationEventPublisher);
     }
@@ -183,7 +185,8 @@ class HearingFeePublisherServiceTest {
 
         assertThatThrownBy(() -> publisherService.publishHearingFeeEvent(caseData))
             .isInstanceOf(TaskAbortedException.class)
-            .hasFieldOrPropertyWithValue("reason", "No condition matched (e.g. hearing due date not yet reached)");
+            .hasFieldOrPropertyWithValue("reason", "No condition matched (e.g. hearing due date not yet reached)")
+            .hasFieldOrPropertyWithValue("category", AbortCategory.BUSINESS_RULE_NOT_MET);
 
         verifyNoInteractions(applicationEventPublisher);
     }
@@ -199,7 +202,8 @@ class HearingFeePublisherServiceTest {
 
         assertThatThrownBy(() -> publisherService.publishHearingFeeEvent(caseData))
             .isInstanceOf(TaskAbortedException.class)
-            .hasFieldOrPropertyWithValue("reason", "No condition matched (e.g. hearing due date not yet reached)");
+            .hasFieldOrPropertyWithValue("reason", "No condition matched (e.g. hearing due date not yet reached)")
+            .hasFieldOrPropertyWithValue("category", AbortCategory.BUSINESS_RULE_NOT_MET);
 
         verifyNoInteractions(applicationEventPublisher);
     }

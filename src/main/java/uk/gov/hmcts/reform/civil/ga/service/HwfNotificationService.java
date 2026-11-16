@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
@@ -57,6 +58,24 @@ public class HwfNotificationService implements NotificationDataGA {
     }
 
     public void sendNotification(GeneralApplicationCaseData caseData, CaseEvent event) throws NotificationException {
+        EmailDTO email = buildEmail(caseData, event);
+        notificationService.sendMail(
+                email.getTargetEmail(),
+                email.getEmailTemplate(),
+                email.getParameters(),
+                email.getReference()
+        );
+    }
+
+    /**
+     * Works out who to email, with which template and properties, without sending anything.
+     *
+     * <p>Split out of {@link #sendNotification(GeneralApplicationCaseData, CaseEvent)} so the
+     * Notifier framework can reuse the same decision. The framework owns the sending, so a
+     * generator needs the choice without the side effect. Both paths go through this method, which
+     * is why migrating a BPMN onto the framework cannot change which email goes out.</p>
+     */
+    public EmailDTO buildEmail(GeneralApplicationCaseData caseData, CaseEvent event) {
         GeneralApplicationCaseData civilCaseData = caseDetailsConverter
                 .toGeneralApplicationCaseData(coreCaseDataService
                         .getCase(Long.parseLong(caseData.getGeneralAppParentCaseLink().getCaseReference())));
@@ -67,13 +86,12 @@ public class HwfNotificationService implements NotificationDataGA {
         }
         log.info("Sending help with fees notification for Case ID: {}", caseData.getCcdCaseReference());
 
-        notificationService.sendMail(
-                caseData.getGeneralAppApplnSolicitor().getEmail(),
-                caseData.isApplicantBilingual() ? getTemplateBilingual(event) :
-                    getTemplate(event),
-                addAllProperties(caseData, civilCaseData, event),
-                caseData.getGeneralAppParentCaseLink().getCaseReference()
-        );
+        EmailDTO email = new EmailDTO();
+        email.setTargetEmail(caseData.getGeneralAppApplnSolicitor().getEmail());
+        email.setEmailTemplate(caseData.isApplicantBilingual() ? getTemplateBilingual(event) : getTemplate(event));
+        email.setParameters(addAllProperties(caseData, civilCaseData, event));
+        email.setReference(caseData.getGeneralAppParentCaseLink().getCaseReference());
+        return email;
     }
 
     @Override

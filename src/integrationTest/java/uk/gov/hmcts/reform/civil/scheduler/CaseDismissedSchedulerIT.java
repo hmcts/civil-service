@@ -24,7 +24,7 @@ import uk.gov.hmcts.test.helper.CoreCaseDataApiMockHelper;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -64,8 +64,8 @@ public class CaseDismissedSchedulerIT {
     @Test
     void shouldExecuteCaseDismissedScheduler() {
         CaseDetails searchCase = CaseDetailsBuilder.builder()
+            .atStateAwaitingRespondentAcknowledgement()
             .id(CASE_ID)
-            .data(new HashMap<>())
             .build();
         SearchResult searchResult = SearchResult.builder()
             .total(1)
@@ -85,9 +85,9 @@ public class CaseDismissedSchedulerIT {
         scheduler.runScheduledTask();
 
         coreCaseDataApiMockHelper.verifySubmitEvent(1);
-        verify(telemetryService).trackEvent(eq("CaseDismissedJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("CaseDismissedCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("CaseDismissedJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
     }
 
     @Test
@@ -114,8 +114,27 @@ public class CaseDismissedSchedulerIT {
         scheduler.runScheduledTask();
 
         coreCaseDataApiMockHelper.verifySubmitEvent(0);
-        verify(telemetryService).trackEvent(eq("CaseDismissedJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("CaseDismissedCaseAborted"), anyMap());
-        verify(telemetryService).trackEvent(eq("CaseDismissedJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerCaseAborted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+    }
+
+    @Test
+    void shouldAbortCaseDismissedScheduler_whenDismissClaimEventNotAllowed() {
+        CaseDetails searchCase = CaseDetailsBuilder.builder().atStatePendingClaimIssued().id(CASE_ID).build();
+        SearchResult searchResult = SearchResult.builder()
+            .total(1)
+            .cases(List.of(searchCase))
+            .build();
+
+        coreCaseDataApiMockHelper.mockElasticSearchResult(searchResult);
+        coreCaseDataApiMockHelper.mockGetCaseAnyCase(searchCase);
+
+        scheduler.runScheduledTask();
+
+        coreCaseDataApiMockHelper.verifySubmitEvent(0);
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerCaseAborted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
     }
 }

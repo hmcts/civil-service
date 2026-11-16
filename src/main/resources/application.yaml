@@ -7,6 +7,9 @@ management:
       show-details: "always"
       probes:
         enabled: true
+      group:
+        s2s:
+          include: s2sSecretReadiness
   endpoints:
     web:
       base-path: /
@@ -42,6 +45,11 @@ spring:
     username: ${CMC_DB_USERNAME:-}
     password: ${CMC_DB_PASSWORD:-}
     url: jdbc:postgresql://${CMC_DB_HOST:}:${CMC_DB_PORT:}/${CMC_DB_NAME:cmc}${CMC_DB_CONNECTION_OPTIONS:}
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 3000
+      idle-timeout: 600000
+      max-lifetime: 1800000
 
   servlet:
     multipart:
@@ -81,7 +89,7 @@ spring:
             readTimeout: ${CORE_CASE_EVENT_API_READ_TIMEOUT:25000}
 
 scheduler:
-  active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:JudgementBuffer, ExpiredDraftStore}
+  active-schedulers: ${SCHEDULER_ACTIVE_SCHEDULERS:}
   circuitBreakerThreshold: ${CIRCUIT_BREAKER_THRESHOLD:5}
   lockAtLeastFor: ${LOCK_AT_LEAST_FOR:PT1M}
   lockAtMostFor: ${LOCK_AT_MOST_FOR:PT30M}
@@ -295,6 +303,8 @@ auth:
 
 document_management:
   userRoles: "caseworker-civil,caseworker-civil-solicitor"
+  # Upper bound on a single document download. Matches dm-store's non-media upload limit (MAX_NON_MEDIA_FILE_SIZE).
+  maxDownloadSize: ${DOCUMENT_MANAGEMENT_MAX_DOWNLOAD_SIZE:1024MB}
 
 bankHolidays:
   api:
@@ -621,7 +631,6 @@ notifications:
   notifyLrDefendantSuccessfulMediation: "4a941565-10a8-4da5-b498-08ded5501f4e"
   notifyLrDefendantSuccessfulMediationForLipVLrClaim: "565caf87-d0e6-44d4-aadb-08110653344d"
 
-  notifyLrRecordJudgmentDeterminationMeansTemplate: "176148d0-379f-449e-b686-3ff417b0e357"
   notifyClaimantLipForDefendantRepresentedTemplate: "6b4d2b15-c537-4603-9542-f0c7c89d7024"
   notifyDefendantLipForNoLongerAccessTemplate: "187436dd-b5e2-495b-a96e-54a0937a33d1"
   notifyDefendantLrAfterNoticeOfChangeTemplate: "633b2b9f-14e0-4b22-80a5-4db95401045c"
@@ -948,10 +957,10 @@ spring:
     url: jdbc:tc:postgresql:15://localhost/cmc
     jdbcUrl: jdbc:tc:postgresql:15://localhost/cmc
     hikari:
-      minimum-idle: 1
-      connectionTimeout: 10000
-      idleTimeout: 30000
-      maxLifetime: 60000
+      maximum-pool-size: 3
+      connection-timeout: 10000
+      idle-timeout: 600000
+      max-lifetime: 1800000
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
