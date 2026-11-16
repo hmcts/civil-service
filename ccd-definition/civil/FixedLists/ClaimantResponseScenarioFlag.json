@@ -1,0 +1,32 @@
+[
+  {
+    "ID": "ClaimantResponseScenarioFlag",
+    "ListElementCode": "TWO_V_ONE",
+    "ListElement": "TWO_V_ONE",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ClaimantResponseScenarioFlag",
+    "ListElementCode": "ONE_V_TWO_ONE_LEGAL_REP",
+    "ListElement": "ONE_V_TWO_ONE_LEGAL_REP",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "ClaimantResponseScenarioFlag",
+    "ListElementCode": "ONE_V_TWO_TWO_LEGAL_REP",
+    "ListElement": "ONE_V_TWO_TWO_LEGAL_REP",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "ClaimantResponseScenarioFlag",
+    "ListElementCode": "ONE_V_ONE",
+    "ListElement": "ONE_V_ONE",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "ClaimantResponseScenarioFlag",
+    "ListElementCode": "UNSPECIFIED_SCENARIO",
+    "ListElement": "UNSPECIFIED_SCENARIO",
+    "DisplayOrder": 5
+  }
+]

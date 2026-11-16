@@ -1,0 +1,37 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "CaseBundles",
+    "TabLabel": "Bundles",
+    "TabDisplayOrder": 12,
+    "CaseFieldID": "TrialBundles",
+    "TabFieldDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "CaseBundles",
+    "TabLabel": "Bundles",
+    "TabDisplayOrder": 12,
+    "CaseFieldID": "caseBundles",
+    "TabFieldDisplayOrder": 2,
+    "DisplayContextParameter": "#TABLE(title,createdOn,bundleHearingDate,stitchedDocument)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "CaseBundles",
+    "TabLabel": "Bundles",
+    "TabDisplayOrder": 12,
+    "CaseFieldID": "applicantDocsUploadedAfterBundle",
+    "TabFieldDisplayOrder": 3,
+    "DisplayContextParameter": "#TABLE(typeOfDocument,createdDatetime,documentUpload)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "CaseBundles",
+    "TabLabel": "Bundles",
+    "TabDisplayOrder": 12,
+    "CaseFieldID": "respondentDocsUploadedAfterBundle",
+    "TabFieldDisplayOrder": 4,
+    "DisplayContextParameter": "#TABLE(typeOfDocument,createdDatetime,documentUpload)"
+  }
+]

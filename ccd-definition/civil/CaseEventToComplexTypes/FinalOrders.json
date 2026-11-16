@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "FinalOrderPreview",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "finalOrderDocument",
+    "ListElementCode": "documentLink",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "EventElementLabel": "Order"
+  },
+  {
+    "ID": "FinalOrderPreview",
+    "CaseEventID": "COURT_OFFICER_ORDER",
+    "CaseFieldID": "previewCourtOfficerOrder",
+    "ListElementCode": "documentLink",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "EventElementLabel": "Order"
+  }
+]

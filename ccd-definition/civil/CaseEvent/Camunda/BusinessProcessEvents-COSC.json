@@ -1,0 +1,30 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "PROCESS_COSC_APPLICATION",
+    "Name": "Process COSC Application",
+    "Description": " ",
+    "PreConditionState(s)": "*",
+    "PostConditionState":  "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/submitted",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 3,
+    "RetriesTimeoutURLSubmittedEvent": 3
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "CHECK_AND_MARK_PAID_IN_FULL",
+    "Name": "Check and mark claimant paid",
+    "Description": " ",
+    "PreConditionState(s)": "*",
+    "PostConditionState":  "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 3
+  }
+]

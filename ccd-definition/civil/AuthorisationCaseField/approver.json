@@ -1,0 +1,33 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "applicant1OrganisationPolicy",
+    "UserRole": "caseworker-approver",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "applicant2OrganisationPolicy",
+    "UserRole": "caseworker-approver",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "respondent1OrganisationPolicy",
+    "UserRole": "caseworker-approver",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "respondent2OrganisationPolicy",
+    "UserRole": "caseworker-approver",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "changeOrganisationRequestField",
+    "UserRole": "caseworker-approver",
+    "CRUD": "CRUD"
+  }
+]
+

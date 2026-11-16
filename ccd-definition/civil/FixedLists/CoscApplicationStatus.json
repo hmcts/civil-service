@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "CoscApplicationStatus",
+    "ListElementCode": "ACTIVE",
+    "ListElement": "Active",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "CoscApplicationStatus",
+    "ListElementCode": "PROCESSED",
+    "ListElement": "Processed",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "CoscApplicationStatus",
+    "ListElementCode": "INACTIVE",
+    "ListElement": "Inactive",
+    "DisplayOrder": 3
+  }
+]

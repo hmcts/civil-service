@@ -1,0 +1,17 @@
+[
+  {
+    "ID": "GAReferToJudgeGAspec",
+    "ListElementCode": "judgeReferEventDescription",
+    "ElementLabel": "Event Description",
+    "HintText": "A few words describing the purpose of the event.",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAReferToJudgeGAspec",
+    "ListElementCode": "judgeReferAdditionalInfo",
+    "ElementLabel": "Additional Information",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  }
+]

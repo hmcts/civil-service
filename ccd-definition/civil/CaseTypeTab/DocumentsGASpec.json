@@ -1,0 +1,335 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "generalOrderDocument",
+    "TabFieldDisplayOrder": 5,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "dismissalOrderDocument",
+    "TabFieldDisplayOrder": 6,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "directionOrderDocument",
+    "TabFieldDisplayOrder": 7,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "generalOrderDocStaff",
+    "TabFieldDisplayOrder": 8,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "generalOrderDocClaimant",
+    "TabFieldDisplayOrder": 9,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "generalOrderDocRespondentSol",
+    "TabFieldDisplayOrder": 10,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "generalOrderDocRespondentSolTwo",
+    "TabFieldDisplayOrder": 11,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "dismissalOrderDocStaff",
+    "TabFieldDisplayOrder": 12,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "dismissalOrderDocClaimant",
+    "TabFieldDisplayOrder": 13,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "dismissalOrderDocRespondentSol",
+    "TabFieldDisplayOrder": 14,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "dismissalOrderDocRespondentSolTwo",
+    "TabFieldDisplayOrder": 15,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "directionOrderDocStaff",
+    "TabFieldDisplayOrder": 16,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "directionOrderDocClaimant",
+    "TabFieldDisplayOrder": 17,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "directionOrderDocRespondentSol",
+    "TabFieldDisplayOrder": 18,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "directionOrderDocRespondentSolTwo",
+    "TabFieldDisplayOrder": 19,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "hearingNoticeDocStaff",
+    "TabFieldDisplayOrder": 20,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "hearingNoticeDocClaimant",
+    "TabFieldDisplayOrder": 21,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "hearingNoticeDocRespondentSol",
+    "TabFieldDisplayOrder": 22,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "hearingNoticeDocRespondentSolTwo",
+    "TabFieldDisplayOrder": 23,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "consentOrderDocStaff",
+    "TabFieldDisplayOrder": 24,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "consentOrderDocClaimant",
+    "TabFieldDisplayOrder": 25,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "consentOrderDocRespondentSol",
+    "TabFieldDisplayOrder": 26,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "consentOrderDocRespondentSolTwo",
+    "TabFieldDisplayOrder": 27,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "consentOrderDocument",
+    "TabFieldDisplayOrder": 28,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "gaDraftDocument",
+    "TabFieldDisplayOrder": 29,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "gaDraftDocStaff",
+    "TabFieldDisplayOrder": 30,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "gaDraftDocClaimant",
+    "TabFieldDisplayOrder": 31,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "gaDraftDocRespondentSol",
+    "TabFieldDisplayOrder": 32,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "gaDraftDocRespondentSolTwo",
+    "TabFieldDisplayOrder": 33,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "hearingOrderDocStaff",
+    "TabFieldDisplayOrder": 34,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "hearingOrderDocClaimant",
+    "TabFieldDisplayOrder": 35,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "hearingOrderDocRespondentSol",
+    "TabFieldDisplayOrder": 36,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "hearingOrderDocRespondentSolTwo",
+    "TabFieldDisplayOrder": 37,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "requestForInfoDocStaff",
+    "TabFieldDisplayOrder": 38,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "requestForInfoDocClaimant",
+    "TabFieldDisplayOrder": 39,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "requestForInfoDocRespondentSol",
+    "TabFieldDisplayOrder": 40,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Documents",
+    "TabLabel": "Claim documents",
+    "TabDisplayOrder": 4,
+    "CaseFieldID": "requestForInfoDocRespondentSolTwo",
+    "TabFieldDisplayOrder": 41,
+    "DisplayContextParameter": "#TABLE(documentType, createdDatetime, documentLink, createdBy)"
+  }
+]

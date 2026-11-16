@@ -1,0 +1,33 @@
+[
+  {
+    "ID": "GAApproveConsentOrderGAspec",
+    "ListElementCode": "consentOrderDescription",
+    "ElementLabel": "Order",
+    "HintText": "This is for the claim form",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAApproveConsentOrderGAspec",
+    "ListElementCode": "consentOrderDateToEnd",
+    "ElementLabel": "Date for Order to end",
+    "FieldType":  "Date",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAApproveConsentOrderGAspec",
+    "ListElementCode": "showConsentOrderDate",
+    "ElementLabel": " ",
+    "FieldType":  "YesOrNo",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "consentOrderDescription = \"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "GAApproveConsentOrderGAspec",
+    "ListElementCode": "isOrderProcessedByStayScheduler",
+    "ElementLabel": " ",
+    "FieldType":  "YesOrNo",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "consentOrderDescription = \"DO_NOT_SHOW_IN_UI\""
+  }
+]

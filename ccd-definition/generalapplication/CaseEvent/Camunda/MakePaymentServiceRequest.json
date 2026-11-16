@@ -1,0 +1,15 @@
+[
+    {
+      "CaseTypeID": "GENERALAPPLICATION",
+      "ID": "MAKE_PAYMENT_SERVICE_REQ_GASPEC",
+      "Name": "Make Payment Service Request",
+      "Description": "Make Payment Service Request",
+      "PreConditionState(s)": "*",
+      "PostConditionState": "*",
+      "SecurityClassification": "Public",
+      "ShowSummary": "N",
+      "ShowEventNotes": "N",
+      "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+      "RetriesTimeoutURLAboutToSubmitEvent": 0
+    }
+  ]

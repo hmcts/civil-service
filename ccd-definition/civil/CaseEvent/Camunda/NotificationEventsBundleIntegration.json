@@ -1,0 +1,41 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED",
+    "Name": "Email DF 1: Bundle created",
+    "Description": "Notify DF 1 of bundle creation",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "NOTIFY_RESPONDENT_SOLICITOR2_FOR_BUNDLE_CREATED",
+    "Name": "Email DF 2: Bundle created",
+    "Description": "Notify DF 2 of bundle creation",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "NOTIFY_APPLICANT_SOLICITOR1_FOR_BUNDLE_CREATED",
+    "Name": "Email CL: Bundle created",
+    "Description": "Notify CL of bundle creation",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  }
+]

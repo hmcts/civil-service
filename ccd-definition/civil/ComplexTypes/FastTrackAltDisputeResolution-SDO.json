@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "FastTrackAltDisputeResolution",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackAltDisputeResolution",
+    "ListElementCode": "text",
+    "FieldType": "Label",
+    "ElementLabel": "At all stages, the parties must consider settling this litigation by any means of Alternative Dispute Resolution. This includes round table conferences, early neutral evaluation, mediation and arbitration. Any party not engaging in any such means proposed by another must uploaded to the Digital Portal a witness statement giving reasons within 21 days of receipt of that proposal. That witness statement must not be shown to the trial judge until questions of costs arise.",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

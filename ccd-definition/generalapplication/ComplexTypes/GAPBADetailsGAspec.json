@@ -1,0 +1,76 @@
+[
+  {
+    "ID": "GAPBADetailsGAspec",
+    "ListElementCode": "fee",
+    "ElementLabel": "General Application fee",
+    "FieldType": "Fee",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAPBADetailsGAspec",
+    "ListElementCode": "generalAppFeeToPayLabel119",
+    "ElementLabel": "<p class=\"govuk-body govuk-!-margin-bottom-1 govuk-!-font-weight-bold\">Application fee to pay </p> £119 <p class=\"govuk-body\">   </p>",
+    "HintText": "  ",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "fee = \"DONT_SHOW_UI\""
+  },
+  {
+    "ID": "GAPBADetailsGAspec",
+    "ListElementCode": "generalAppFeeToPayLabel303",
+    "ElementLabel": "<p class=\"govuk-body govuk-!-margin-bottom-1 govuk-!-font-weight-bold\">Application fee to pay </p> £303 <p class=\"govuk-body\">   </p>",
+    "HintText": "  ",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "fee = \"DONT_SHOW_UI\""
+  },
+  {
+    "ID": "GAPBADetailsGAspec",
+    "ListElementCode": "generalAppFeeToPayLabel",
+    "ElementLabel": "<p class=\"govuk-body govuk-!-margin-bottom-1 govuk-!-font-weight-bold\">Application fee to pay </p> <£119 without notice> or <£303 with notice><p class=\"govuk-body\">   </p>",
+    "HintText": "  ",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "fee = \"DONT_SHOW_UI\""
+  },
+  {
+    "ID": "GAPBADetailsGAspec",
+    "ListElementCode": "paymentDetails",
+    "ElementLabel": "Details of PBA payment",
+    "FieldType": "GAPaymentDetails",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "fee = \"DONT_SHOW_UI\""
+  },
+  {
+    "ID": "GAPBADetailsGAspec",
+    "ListElementCode": "additionalPaymentDetails",
+    "ElementLabel": "Additional payment details",
+    "FieldType": "GAPaymentDetails",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "fee = \"DONT_SHOW_UI\""
+  },
+  {
+    "ID": "GAPBADetailsGAspec",
+    "ListElementCode": "paymentSuccessfulDate",
+    "ElementLabel": "Payment successful date",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "fee = \"DONT_SHOW_UI\""
+  },
+  {
+    "ID": "GAPBADetailsGAspec",
+    "ListElementCode": "serviceRequestReference",
+    "ElementLabel": "Service Request Reference",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "fee = \"DONT_SHOW_UI\""
+  },
+  {
+    "ID": "GAPBADetailsGAspec",
+    "ListElementCode": "additionalPaymentServiceRef",
+    "ElementLabel": "Additional payment ref number",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "fee = \"DONT_SHOW_UI\""
+ }
+]
