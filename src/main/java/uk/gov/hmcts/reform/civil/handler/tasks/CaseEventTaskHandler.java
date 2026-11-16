@@ -46,6 +46,9 @@ import static uk.gov.hmcts.reform.civil.utils.WaTaskUtil.cancelApplicantWaDocume
 @Component
 public class CaseEventTaskHandler extends BaseExternalTaskHandler {
 
+    // TEMPORARY - see handleTask
+    private static final Map<String, Integer> TEMP_FORCED_ATTEMPTS = new java.util.concurrent.ConcurrentHashMap<>();
+
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
@@ -78,6 +81,16 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
         CaseEvent caseEvent = ofNullable(variables.getCaseEvent())
             .orElseThrow(() -> new InvalidCaseDataException("The caseEvent was not provided"));
         log.info("Start Event {} for caseId {} activityId {}", caseEvent, caseId, externalTask.getActivityId());
+
+        // TEMPORARY - remove after testing the hourly incident retry in preview. Active only when env var
+        // FORCE_FAILURE_ENABLED=true; applies to every case, failing the first 3 attempts per process
+        // instance and activity (enough to raise an incident). Later attempts, such as the hourly retry,
+        // run normally. Counter is per pod; a restart resets it.
+        if ("true".equals(System.getenv("FORCE_FAILURE_ENABLED"))
+            && TEMP_FORCED_ATTEMPTS.merge(
+                externalTask.getProcessInstanceId() + "|" + externalTask.getActivityId(), 1, Integer::sum) <= 3) {
+            throw new IllegalStateException("TEST: forced failure for hourly retry check, caseId " + caseId);
+        }
 
         CaseData data = processCaseEvent(externalTask, caseId, caseEvent);
 
