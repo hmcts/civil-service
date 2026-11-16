@@ -336,8 +336,33 @@ static def isPreviewEnvironment() {
   System.getenv('ENVIRONMENT') == 'preview'
 }
 
-static def isHighLevelDataSetupEnvironment() {
-  System.getenv('ENVIRONMENT') in ['preview', 'aat']
+// The environment highLevelDataSetup imports into. CNP runs `highLevelDataSetup --args=<environment>` in
+// every High Level Data Setup stage. ENVIRONMENT can't tell those stages apart: master sets it to aat for the
+// whole build, prod stage included. Without --args (one of these tasks run on its own), ENVIRONMENT.
+static def dataSetupEnvironment(List<String> requestedArgs) {
+  def index = requestedArgs.findIndexOf { it == '--args' || it.startsWith('--args=') }
+  if (index < 0) {
+    return System.getenv('ENVIRONMENT')
+  }
+  def value = requestedArgs[index] == '--args' ? requestedArgs[index + 1] : requestedArgs[index] - '--args='
+  value?.trim()?.tokenize()?.find()
+}
+
+// The CCD definition stores this repo shares with civil-ccd-definition. Exactly one of the two imports into
+// each, picked by the toggle file: civil-service while ccd-definition/SOURCE_OF_TRUTH is in its checkout,
+// civil-ccd-definition while it isn't (see ccd-definition/README.md).
+static def isSharedCcdEnvironment(String environment) {
+  environment in ['aat', 'demo', 'perftest', 'ithc', 'prod']
+}
+
+static def isHighLevelDataSetupEnvironment(String environment) {
+  environment == 'preview' || isSharedCcdEnvironment(environment)
+}
+
+// runStagingHighLevelDataSetup in Jenkinsfile_CNP imports into this repo's own AAT staging stack. It passes
+// --args=aat to get the aat exclusion rules, so it sets this to say it isn't the shared AAT import.
+static def isStagingImport() {
+  System.getenv('STAGING_HIGH_LEVEL_DATA_SETUP') == 'true'
 }
 
 static def isCamundaImportEnabled() {
@@ -345,17 +370,26 @@ static def isCamundaImportEnabled() {
   camundaBaseUrl != null && !camundaBaseUrl.trim().isEmpty()
 }
 
-static def isCommonAatCcdSetupSkipped() {
-  System.getenv('ENVIRONMENT') == 'aat' && Boolean.parseBoolean(System.getenv('SKIP_COMMON_AAT_CCD_SETUP'))
-}
-
 static def isNightlyRun() {
   System.getenv('NIGHTLY_RUN') == 'true'
 }
 
+// Decided while the build is configured, so that a stage with nothing to import doesn't compile the app:
+// highLevelDataSetup's classpath would pull in compileJava even with the task skipped. That matters on prod,
+// whose stage runs on a separate agent without this build's output.
+// The same path is checked in bin/shared/pull-ccd-definitions.sh, bin/pull-latest-civil-ccd-files.sh and
+// bin/dev-setup/start-devuser-preview-environment.sh. Change them together.
+def ccdDataSetupEnvironment = dataSetupEnvironment(gradle.startParameter.taskRequests.collectMany { it.args })
+def importsIntoOwnStack = ccdDataSetupEnvironment == 'preview' ||
+  (ccdDataSetupEnvironment == 'aat' && isStagingImport())
+def civilServiceIsSourceOfTruth = file('ccd-definition/SOURCE_OF_TRUTH').exists()
+def importsCcdDefinitions = importsIntoOwnStack ||
+  (isSharedCcdEnvironment(ccdDataSetupEnvironment) && civilServiceIsSourceOfTruth)
+
 def pullLatestCivilCcdDefinitions = tasks.register('pullLatestCivilCcdDefinitions', Exec) {
   description = 'Pulls the civil CCD definition repository branch needed for data setup.'
-  onlyIf { isHighLevelDataSetupEnvironment() && !isCommonAatCcdSetupSkipped() }
+  // A shared environment is only ever imported into from this checkout's own ccd-definition/.
+  onlyIf('the import is into a preview or staging stack') { importsIntoOwnStack }
   doFirst {
     commandLine './bin/pull-latest-civil-ccd-files.sh', dataSetupBranch('CCD_DEFINITION_BRANCH')
   }
@@ -363,14 +397,14 @@ def pullLatestCivilCcdDefinitions = tasks.register('pullLatestCivilCcdDefinition
 
 def pullLatestCivilCamundaDefinitions = tasks.register('pullLatestCivilCamundaDefinitions', Copy) {
   description = 'Stages the in-repo Camunda BPMN definitions for data setup.'
-  onlyIf { isHighLevelDataSetupEnvironment() && isCamundaImportEnabled() }
+  onlyIf { importsIntoOwnStack && isCamundaImportEnabled() }
   from 'src/main/resources/camunda'
   into 'camunda'
 }
 
 def pullLatestCivilWaDmnDefinitions = tasks.register('pullLatestCivilWaDmnDefinitions', Exec) {
   description = 'Pulls the civil WA DMN definition repository branch needed for data setup.'
-  onlyIf { isHighLevelDataSetupEnvironment() && isCamundaImportEnabled() }
+  onlyIf { importsIntoOwnStack && isCamundaImportEnabled() }
   doFirst {
     commandLine './bin/pull-latest-dmn-files.sh', dataSetupBranch('DMN_DEFINITION_BRANCH')
   }
@@ -386,36 +420,41 @@ def pullLatestCivilWiremockMappings = tasks.register('pullLatestCivilWiremockMap
 
 def buildCcdDefinitionsXls = tasks.register('buildCcdDefinitionsXls', Exec) {
   description = 'Builds CCD XLS definitions.'
-  onlyIf { isHighLevelDataSetupEnvironment() && !isCommonAatCcdSetupSkipped() }
+  onlyIf('this build imports CCD definitions') { importsCcdDefinitions }
   dependsOn pullLatestCivilCcdDefinitions
   doFirst {
-    def dataSetupEnvironment = System.getenv('ENVIRONMENT')
-    if (!(dataSetupEnvironment in ['preview', 'aat'])) {
-      throw new GradleException("ENVIRONMENT must be one of: preview, aat")
+    if (!isHighLevelDataSetupEnvironment(ccdDataSetupEnvironment)) {
+      throw new GradleException("The data setup environment must be one of: preview, aat, demo, perftest, ithc, prod")
     }
 
-    if (isPreviewEnvironment()) {
+    def civilServiceUrl
+    if (ccdDataSetupEnvironment == 'preview') {
       def changeId = System.getenv('CHANGE_ID')
       if (!changeId) {
         throw new GradleException("CHANGE_ID must be set when ENVIRONMENT=preview")
       }
-      environment 'CCD_DEF_CASE_SERVICE_BASE_URL', "http://civil-service-pr-${changeId}-java"
-      environment 'CCD_DEF_GEN_APP_SERVICE_BASE_URL', "http://civil-service-pr-${changeId}-java"
+      civilServiceUrl = "http://civil-service-pr-${changeId}-java"
+    } else if (importsIntoOwnStack) {
+      civilServiceUrl = System.getenv('CCD_DEF_CASE_SERVICE_BASE_URL') ?:
+        'http://civil-service-aat.service.core-compute-aat.internal'
     } else {
-      def aatCivilServiceUrl = 'http://civil-service-aat.service.core-compute-aat.internal'
-      environment 'CCD_DEF_CASE_SERVICE_BASE_URL',
-        System.getenv('CCD_DEF_CASE_SERVICE_BASE_URL') ?: aatCivilServiceUrl
-      environment 'CCD_DEF_GEN_APP_SERVICE_BASE_URL',
-        System.getenv('CCD_DEF_GEN_APP_SERVICE_BASE_URL') ?: aatCivilServiceUrl
+      // The callback URLs civil-ccd-definition's bin/variables/load-<environment>-environment-variables.sh set.
+      civilServiceUrl =
+        "http://civil-service-${ccdDataSetupEnvironment}.service.core-compute-${ccdDataSetupEnvironment}.internal"
     }
+    environment 'CCD_DEF_CASE_SERVICE_BASE_URL', civilServiceUrl
+    environment 'CCD_DEF_GEN_APP_SERVICE_BASE_URL',
+      (importsIntoOwnStack ? System.getenv('CCD_DEF_GEN_APP_SERVICE_BASE_URL') : null) ?: civilServiceUrl
 
-    commandLine './bin/build-civil-xlsx-definitions.sh', dataSetupEnvironment
+    commandLine './bin/build-civil-xlsx-definitions.sh', ccdDataSetupEnvironment
   }
 }
 
 def camundaHighLevelDataSetup = tasks.register('camundaHighLevelDataSetup', JavaExec) {
   description = 'Imports civil Camunda BPMN and WA DMN definitions using the high-level data setup flow.'
-  onlyIf { isHighLevelDataSetupEnvironment() && isCamundaImportEnabled() }
+  // Shared environments get their BPMNs from uploadBpmnDiagrams in Jenkinsfile_CNP. CAMUNDA_BASE_URL can't
+  // be trusted there either: on master it still points at the AAT staging stack when the prod stage runs.
+  onlyIf { importsIntoOwnStack && isCamundaImportEnabled() }
   dependsOn pullLatestCivilCamundaDefinitions, pullLatestCivilWaDmnDefinitions
   mainClass.set("uk.gov.hmcts.reform.civil.setup.CamundaHighLevelDataSetupApp")
   classpath += sourceSets.main.runtimeClasspath
@@ -431,10 +470,18 @@ def loadCivilWiremockMappings = tasks.register('loadCivilWiremockMappings', Exec
 
 tasks.register('highLevelDataSetup', JavaExec) {
   description = 'Loads roles, CCD definitions, Camunda BPMNs, WA DMNs and preview WireMock mappings using the high-level data setup flow.'
-  onlyIf { isHighLevelDataSetupEnvironment() && !isCommonAatCcdSetupSkipped() }
-  dependsOn buildCcdDefinitionsXls, camundaHighLevelDataSetup, loadCivilWiremockMappings
+  onlyIf('this build imports CCD definitions') {
+    if (!importsCcdDefinitions && isSharedCcdEnvironment(ccdDataSetupEnvironment)) {
+      logger.lifecycle("Not importing into ${ccdDataSetupEnvironment}: civil-ccd-definition is the source of " +
+        'truth for the CCD definitions and imports them, until ccd-definition/SOURCE_OF_TRUTH is added here.')
+    }
+    importsCcdDefinitions
+  }
+  if (importsCcdDefinitions) {
+    dependsOn buildCcdDefinitionsXls, camundaHighLevelDataSetup, loadCivilWiremockMappings
+    classpath += sourceSets.main.runtimeClasspath
+  }
   mainClass.set("uk.gov.hmcts.reform.civil.setup.HighLevelDataSetupApp")
-  classpath += sourceSets.main.runtimeClasspath
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 

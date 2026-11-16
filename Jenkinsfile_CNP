@@ -168,10 +168,11 @@ withPipeline(type, product, component) {
 
   onMaster {
     env.PACT_BRANCH_NAME = "master"
-    enableHighLevelDataSetup("", true)
+    // No prod skip: the prod import, like aat, runs only once ccd-definition/SOURCE_OF_TRUTH is in this repo
+    // (the highLevelDataSetup onlyIf in build.gradle). Until then civil-ccd-definition imports into both.
+    enableHighLevelDataSetup()
     env.ENVIRONMENT = "aat"
     env.CCD_DEFINITION_BRANCH = "master"
-    env.SKIP_COMMON_AAT_CCD_SETUP = "true"
     env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR = 'civil-service-master'
     env.STASH_DIAGNOSTICS = 'false'
 
@@ -183,16 +184,19 @@ withPipeline(type, product, component) {
   }
 
   onDemo {
+    enableHighLevelDataSetup()
     env.ENVIRONMENT = "demo"
     loadVaultSecrets(secretsOtherenv)
   }
 
   onPerftest {
+    enableHighLevelDataSetup()
     env.ENVIRONMENT = "perftest"
     loadVaultSecrets(secretsOtherenv)
   }
 
   onIthc {
+    enableHighLevelDataSetup()
     env.ENVIRONMENT = "ithc"
     loadVaultSecrets(secretsOtherenv)
   }
@@ -519,7 +523,7 @@ def runStagingHighLevelDataSetup() {
   withEnv([
     'ENVIRONMENT=aat',
     'TEST_DATA_LOAD_SKIP_PERIOD=0',
-    'SKIP_COMMON_AAT_CCD_SETUP=false',
+    'STAGING_HIGH_LEVEL_DATA_SETUP=true',
     'IDAM_API_URL_BASE=https://idam-api.aat.platform.hmcts.net',
     'S2S_URL_BASE=http://rpe-service-auth-provider-aat.service.core-compute-aat.internal',
     'CCD_API_GATEWAY_S2S_ID=ccd_gw',
