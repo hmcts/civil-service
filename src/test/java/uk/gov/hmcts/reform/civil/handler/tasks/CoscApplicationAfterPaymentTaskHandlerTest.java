@@ -11,6 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -39,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
@@ -241,6 +246,63 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, CHECK_PAID_IN_FULL_SCHED_DEADLINE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
         verify(externalTaskService).complete(mockExternalTask, variables);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldPassNotificationActivityToParentCivilCase(boolean hasBusinessProcess) {
+        BusinessProcess existingProcess = new BusinessProcess()
+            .setActivityId("stale-civil-activity")
+            .setProcessInstanceId("civil-process-id")
+            .setStatus(BusinessProcessStatus.FINISHED)
+            .setCamundaEvent("STAY_CASE");
+        CaseData data = CaseDataBuilder.builder().build().toBuilder()
+            .businessProcess(hasBusinessProcess ? existingProcess : null).build();
+        CaseDetails details = new CaseDetailsBuilder().data(data).build();
+        when(mockExternalTask.getAllVariables()).thenReturn(Map.of(
+            "caseId", GENERAL_APP_CASE_ID,
+            "generalAppParentCaseLink", CIVIL_CASE_ID,
+            "caseEvent", CaseEvent.NOTIFY_EVENT));
+        when(mockExternalTask.getActivityId()).thenReturn("CoscApplicationAfterPaymentNotifyParties");
+        when(coreCaseDataService.startUpdate(CIVIL_CASE_ID, CaseEvent.NOTIFY_EVENT))
+            .thenReturn(StartEventResponse.builder().caseDetails(details).eventId("NOTIFY_EVENT").build());
+        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class))).thenReturn(data);
+
+        handler.handleTask(mockExternalTask);
+
+        ArgumentCaptor<CaseDataContent> content = ArgumentCaptor.forClass(CaseDataContent.class);
+        verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), content.capture());
+        CaseData submitted = mapper.convertValue(content.getValue().getData(), CaseData.class);
+        assertThat(content.getValue().getEvent().getId()).isEqualTo("NOTIFY_EVENT");
+        assertThat(submitted.getBusinessProcess().getActivityId()).isEqualTo("CoscApplicationAfterPaymentNotifyParties");
+        if (hasBusinessProcess) {
+            assertThat(submitted.getBusinessProcess().getProcessInstanceId()).isEqualTo("civil-process-id");
+            assertThat(submitted.getBusinessProcess().getStatus()).isEqualTo(BusinessProcessStatus.FINISHED);
+            assertThat(submitted.getBusinessProcess().getCamundaEvent()).isEqualTo("STAY_CASE");
+        }
+        assertThat(submitted.getLegacyCaseReference()).isEqualTo(data.getLegacyCaseReference());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CaseEvent.class, names = {"CHECK_PAID_IN_FULL_SCHED_DEADLINE", "GENERATE_COSC_DOCUMENT",
+        "NOTIFY_RPA_ON_CONTINUOUS_FEED", "NOTIFY_APPLICANT_SOLICITOR1_FOR_PAID_IN_FULL_COSC"})
+    void shouldPreserveParentDataForExistingCoscTasks(CaseEvent event) {
+        CaseData data = CaseDataBuilder.builder().build().toBuilder()
+            .businessProcess(new BusinessProcess().setActivityId("existing-civil-activity")).build();
+        CaseDetails details = new CaseDetailsBuilder().data(data).build();
+        when(mockExternalTask.getAllVariables()).thenReturn(Map.of(
+            "caseId", GENERAL_APP_CASE_ID,
+            "generalAppParentCaseLink", CIVIL_CASE_ID,
+            "caseEvent", event));
+        when(coreCaseDataService.startUpdate(CIVIL_CASE_ID, event))
+            .thenReturn(StartEventResponse.builder().caseDetails(details).eventId(event.name()).build());
+        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class))).thenReturn(data);
+
+        handler.handleTask(mockExternalTask);
+
+        ArgumentCaptor<CaseDataContent> content = ArgumentCaptor.forClass(CaseDataContent.class);
+        verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), content.capture());
+        assertThat(content.getValue().getData()).isEqualTo(details.getData());
     }
 
     @Test
