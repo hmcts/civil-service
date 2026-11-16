@@ -5,7 +5,7 @@ import sys
 import tarfile
 
 
-MAX_BYTES = 90 * 1024 * 1024
+MAX_BYTES = 70 * 1024 * 1024
 
 
 def main():
