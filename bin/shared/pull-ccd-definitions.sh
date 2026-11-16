@@ -8,6 +8,7 @@
 #   - absent:  civil-ccd-definition is, and the definitions come from its branch, as before the move.
 #
 # Usage: pull-ccd-definitions.sh <civil-service ref> [civil-ccd-definition ref] [target dir]
+#        pull-ccd-definitions.sh --check [civil-service ref]
 #   civil-service ref:         branch, tag, full commit SHA, or pr-N (or prN) for the head of pull
 #                              request N. Default master.
 #   civil-ccd-definition ref:  same forms. Default master. Pass - to leave the target as it is when
@@ -15,6 +16,10 @@
 #                              whose checkout already holds the definitions it is building).
 #   target dir:                default ./ccd-definition. Only its civil/ and generalapplication/ folders are
 #                              replaced; anything else in it is left alone.
+#   --check:                   copy nothing. Print only the source of truth at the civil-service ref,
+#                              civil-service or civil-ccd-definition, on stdout. civil-ccd-definition's
+#                              highLevelDataSetup uses it to decide whether to import, so the import and
+#                              the copy can't disagree.
 #
 # Prints the source it used. Any clone or fetch failure is an error. It never falls back to the other
 # repo, so a network failure can't quietly select the wrong source.
@@ -23,6 +28,12 @@
 # anything else in this repo.
 
 set -euo pipefail
+
+checkOnly=false
+if [ "${1:-}" = "--check" ]; then
+  checkOnly=true
+  shift
+fi
 
 civilServiceRef=${1:-master}
 ccdDefinitionRef=${2:-master}
@@ -77,6 +88,14 @@ copy_definitions() {
 fetch_ref civil-service "${civilServiceRef}" "${workDir}/civil-service"
 
 if [ -n "$(git -C "${workDir}/civil-service" ls-tree --name-only FETCH_HEAD "${toggleFile}")" ]; then
+  sourceOfTruth=civil-service
+else
+  sourceOfTruth=civil-ccd-definition
+fi
+
+if [ "${checkOnly}" = true ]; then
+  echo "${sourceOfTruth}"
+elif [ "${sourceOfTruth}" = civil-service ]; then
   echo "CCD definitions: source of truth is civil-service (${toggleFile} is present at ${civilServiceRef})."
   copy_definitions "${workDir}/civil-service" "civil-service@${civilServiceRef}"
   echo "CCD definitions: copied from civil-service@${civilServiceRef} into ${targetDir}."
