@@ -1,0 +1,27 @@
+
+[
+  {
+    "ID": "FastTrackOrderAndHearingDetails",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackOrderAndHearingDetails",
+    "ListElementCode": "text",
+    "FieldType": "Label",
+    "ElementLabel": "# Order details \nWarning: You must comply with the terms imposed upon you by this order otherwise your claim or the defence of it is liable to be struck out or some other sanction imposed. If you cannot comply, you are expected to make formal application to the court before any deadline imposed upon you expires.",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "FastTrackOrderAndHearingDetails",
+    "ListElementCode": "line",
+    "FieldType": "Label",
+    "ElementLabel": "****",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

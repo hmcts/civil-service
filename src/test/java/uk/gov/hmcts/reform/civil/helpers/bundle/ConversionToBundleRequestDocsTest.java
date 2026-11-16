@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.bundle.BundlingRequestDocument;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
+import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
@@ -69,6 +70,9 @@ class ConversionToBundleRequestDocsTest {
         String displayName = "%s %s %s";
         String documentType = "documentType";
 
+        Element<UploadEvidenceWitness> witnessWithoutDocument = new Element<UploadEvidenceWitness>().setValue(
+            new UploadEvidenceWitness().setWitnessOptionName("Witness Without Document")
+        );
         Element<UploadEvidenceWitness> unbundledWitness = new Element<UploadEvidenceWitness>().setValue(
             new UploadEvidenceWitness()
                 .setWitnessOptionName("Witness One")
@@ -91,13 +95,13 @@ class ConversionToBundleRequestDocsTest {
         );
 
         Map<String, List<Element<UploadEvidenceWitness>>> witnessStatementsMap = new HashMap<>();
-        witnessStatementsMap.put("Witness1", List.of(unbundledWitness, bundledWitness));
+        witnessStatementsMap.put("Witness1", List.of(witnessWithoutDocument, unbundledWitness, bundledWitness));
 
         List<BundlingRequestDocument> result = conversionToBundleRequestDocs.covertOtherWitnessEvidenceToBundleRequestDocs(
             witnessStatementsMap, displayName, documentType, null);
 
         assertEquals(1, result.size());
-        assertEquals("Witness Two 2 06/02/2023", result.getFirst().getDocumentFileName());
+        assertEquals("Witness Two 3 06/02/2023", result.getFirst().getDocumentFileName());
     }
 
     @Test
@@ -126,6 +130,18 @@ class ConversionToBundleRequestDocsTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
+    }
+
+    @Test
+    void shouldSkipWitnessEvidenceWithoutDocument() {
+        List<Element<UploadEvidenceWitness>> witnessEvidence = List.of(
+            new Element<UploadEvidenceWitness>().setValue(new UploadEvidenceWitness())
+        );
+
+        List<BundlingRequestDocument> result = conversionToBundleRequestDocs.covertWitnessEvidenceToBundleRequestDocs(
+            witnessEvidence, "fileNamePrefix", "documentType", PartyType.CLAIMANT1, true);
+
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -161,6 +177,37 @@ class ConversionToBundleRequestDocsTest {
 
         assertNotNull(result);
         assertEquals(2, result.size());
+    }
+
+    @Test
+    void shouldSkipEvidenceUploadWithoutDocumentAndKeepBundledDocument() {
+        UploadEvidenceDocumentType missingDocument = new UploadEvidenceDocumentType();
+        UploadEvidenceDocumentType bundledDocument = new UploadEvidenceDocumentType()
+            .setDocumentUpload(new Document()
+                                   .setDocumentFileName("document.pdf")
+                                   .setCategoryID("SomeCategoryID"));
+        List<Element<UploadEvidenceDocumentType>> uploads = List.of(
+            new Element<UploadEvidenceDocumentType>().setValue(missingDocument),
+            new Element<UploadEvidenceDocumentType>().setValue(bundledDocument)
+        );
+
+        List<BundlingRequestDocument> result = conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(
+            uploads, "DOC_FILE_NAME", EvidenceUploadType.COSTS.name(), PartyType.CLAIMANT1);
+
+        assertEquals(1, result.size());
+        assertEquals("document", result.getFirst().getDocumentFileName());
+    }
+
+    @Test
+    void shouldSkipExpertEvidenceWithoutDocument() {
+        List<Element<UploadEvidenceExpert>> expertEvidence = List.of(
+            new Element<UploadEvidenceExpert>().setValue(new UploadEvidenceExpert())
+        );
+
+        List<BundlingRequestDocument> result = conversionToBundleRequestDocs.covertExpertEvidenceTypeToBundleRequestDocs(
+            expertEvidence, "fileNamePrefix", EvidenceUploadType.EXPERT_REPORT.name());
+
+        assertTrue(result.isEmpty());
     }
 
     @Test

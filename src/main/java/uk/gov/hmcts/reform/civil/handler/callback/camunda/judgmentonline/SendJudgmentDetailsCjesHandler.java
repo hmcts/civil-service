@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.judgmentonline;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -12,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import uk.gov.hmcts.reform.civil.service.judgments.CjesService;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +29,7 @@ public class SendJudgmentDetailsCjesHandler extends CallbackHandler {
                                                           SEND_JUDGMENT_DETAILS_CJES_SA);
     public static final String TASK_ID = "SendJudgmentDetailsToCJES";
     private final ObjectMapper objectMapper;
-    private final RuntimeService runTimeService;
+    private final CamundaRuntimeClient camundaRuntimeClient;
     private final CjesService cjesService;
 
     @Override
@@ -79,7 +79,7 @@ public class SendJudgmentDetailsCjesHandler extends CallbackHandler {
 
     private void updateCamundaVars(CaseData caseData) {
         if (caseData.getJoJudgmentRecordReason() != null) {
-            runTimeService.setVariable(
+            camundaRuntimeClient.setProcessVariable(
                 caseData.getBusinessProcess().getProcessInstanceId(),
                 "judgmentRecordedReason", caseData.getJoJudgmentRecordReason().toString());
         }
@@ -87,7 +87,7 @@ public class SendJudgmentDetailsCjesHandler extends CallbackHandler {
 
     private void updateCamundaVarsSetAside(CaseData caseData) {
         if (caseData.getJoSetAsideReason() != null) {
-            runTimeService.setVariable(
+            camundaRuntimeClient.setProcessVariable(
                 caseData.getBusinessProcess().getProcessInstanceId(),
                 "JUDGMENT_SET_ASIDE_ERROR",
                 caseData.getJoSetAsideReason().equals(JudgmentSetAsideReason.JUDGMENT_ERROR));

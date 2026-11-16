@@ -4,8 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.config.TestIdamConfiguration;
@@ -15,18 +15,20 @@ import uk.gov.hmcts.reform.civil.scheduler.gadocumentuploadnotify.GADocumentUplo
 import uk.gov.hmcts.reform.civil.scheduler.gadocumentuploadnotify.GADocumentUploadNotifyScheduler;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
+import uk.gov.hmcts.test.config.CoreCaseDataApiMockHelperConfiguration;
+import uk.gov.hmcts.test.helper.CoreCaseDataApiMockHelper;
 
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
-@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class}, properties = {
+@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class, CoreCaseDataApiMockHelperConfiguration.class}, properties = {
     "test.id=GADocumentUploadNotifySchedulerIT",
     "scheduler.lockAtLeastFor=PT0S"
 })
@@ -38,21 +40,26 @@ public class GADocumentUploadNotifySchedulerIT {
     @Autowired
     private GADocumentUploadNotifyScheduler scheduler;
 
-    @MockBean
+    @MockitoBean
     private TelemetryService telemetryService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private GaEvidenceUploadNotificationSearchService searchService;
 
-    @MockBean
+    @MockitoBean
     private GADocumentUploadNotifyScheduledTask gaDocumentUploadNotifyScheduledTask;
+
+    @Autowired
+    private CoreCaseDataApiMockHelper coreCaseDataApiMockHelper;
 
     @BeforeEach
     void setUp() {
         reset(telemetryService, featureToggleService, searchService, gaDocumentUploadNotifyScheduledTask);
+        coreCaseDataApiMockHelper.resetMocks();
+        coreCaseDataApiMockHelper.setupIdamClient();
         when(featureToggleService.isSpringSchedulerEnabled(SCHEDULER_NAME)).thenReturn(true);
         when(gaDocumentUploadNotifyScheduledTask.maxCasesPerRun()).thenReturn(Long.MAX_VALUE);
         when(gaDocumentUploadNotifyScheduledTask.getItemId(any(CaseDetails.class))).thenAnswer(invocation ->
@@ -67,8 +74,8 @@ public class GADocumentUploadNotifySchedulerIT {
         scheduler.runScheduledTask();
 
         verify(gaDocumentUploadNotifyScheduledTask).accept(searchCase);
-        verify(telemetryService).trackEvent(eq("GADocUploadNotifySchedulerJobStarted"), anyMap());
-        verify(telemetryService).trackEvent(eq("GADocUploadNotifySchedulerCaseProcessed"), anyMap());
-        verify(telemetryService).trackEvent(eq("GADocUploadNotifySchedulerJobCompleted"), anyMap());
+        verify(telemetryService).trackEvent(eq("SchedulerJobStarted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerCaseProcessed"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
+        verify(telemetryService).trackEvent(eq("SchedulerJobCompleted"), argThat(props -> SCHEDULER_NAME.equals(props.get("schedulerName"))));
     }
 }

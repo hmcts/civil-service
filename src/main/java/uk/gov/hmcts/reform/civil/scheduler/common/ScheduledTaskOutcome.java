@@ -6,7 +6,9 @@ import java.util.List;
 public record ScheduledTaskOutcome<I>(
     List<I> succeededCases,
     List<I> failedCases,
+    List<I> abortedCases,
     boolean abortedEarly,
-    String abortReason,
-    Duration cumulativeDelay
+    String jobAbortReason,
+    Duration cumulativeDelay,
+    Duration processingDuration
 ) {}

@@ -220,9 +220,9 @@ class PaymentStatusRetryServiceTest {
             .hasCause(cause);
 
         assertThat(listAppender.list).hasSize(1);
-        assertThat(listAppender.list.getFirst().getLevel()).isEqualTo(Level.ERROR);
+        assertThat(listAppender.list.getFirst().getLevel()).isEqualTo(Level.WARN);
         assertThat(listAppender.list.getFirst().getFormattedMessage())
-            .contains("Payment status update failed for case 123 and fee type CLAIMISSUED");
+            .contains("Payment status update failed for case 123 and fee type CLAIMISSUED; will retry if attempts remain.");
     }
 
     @Test

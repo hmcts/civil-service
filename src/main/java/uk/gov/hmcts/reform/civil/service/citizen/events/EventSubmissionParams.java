@@ -21,8 +21,13 @@ public class EventSubmissionParams {
     private String caseId;
     private CaseEvent event;
     private Map<String, Object> updates;
+    private String submissionId;
 
     public boolean isDraftClaim() {
         return caseId.equals(DRAFT_CLAIM_ID);
+    }
+
+    public boolean hasSubmissionId() {
+        return submissionId != null && !submissionId.isBlank();
     }
 }

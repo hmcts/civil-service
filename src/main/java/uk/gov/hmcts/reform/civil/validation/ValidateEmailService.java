@@ -112,10 +112,6 @@ public class ValidateEmailService {
             log.warn("Email contains ..");
             return true;
         }
-        if (emailAddress.contains("'")) {
-            log.warn("Email contains apostrophe");
-            return true;
-        }
         return false;
     }
 

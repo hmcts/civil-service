@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.ga.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaDashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.ga.service.dashboardnotifications.GaDashboardScenarioService;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 
 import java.util.Objects;
 
@@ -40,7 +41,8 @@ public class FinalOrderRespondentDashboardService extends GaDashboardScenarioSer
     }
 
     private boolean isWithNoticeOrConsent(GeneralApplicationCaseData caseData) {
-        return YES.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice())
+        GAInformOtherParty informOtherParty = caseData.getGeneralAppInformOtherParty();
+        return (informOtherParty != null && YES.equals(informOtherParty.getIsWithNotice()))
             || YES.equals(caseData.getGeneralAppConsentOrder());
     }
 }

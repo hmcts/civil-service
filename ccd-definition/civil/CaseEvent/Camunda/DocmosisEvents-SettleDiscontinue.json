@@ -1,0 +1,15 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "SEND_SETTLE_CLAIM_PAID_IN_FULL_LETTER_TO_LIP_DEFENDANT1",
+    "Name": "Settle claim paid full letter",
+    "Description": "Send Settle claim mark paid in full Letter to LiP Defendant 1",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  }
+]

@@ -11,12 +11,16 @@ import org.apache.http.HttpStatus;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.civil.config.FeesConfiguration;
+import uk.gov.hmcts.reform.civil.config.LaunchDarklyConfiguration;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 import uk.gov.hmcts.reform.civil.model.Fee2Dto;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesClientService;
 
 import java.math.BigDecimal;
@@ -31,6 +35,13 @@ import static uk.gov.hmcts.reform.civil.consumer.FeesLookupApiConsumerTest.JURIS
 import static uk.gov.hmcts.reform.civil.consumer.FeesLookupApiConsumerTest.JURISDICTION_CIVIL;
 import static uk.gov.hmcts.reform.civil.service.FeesClientService.EVENT_ISSUE;
 
+@Import({
+    LaunchDarklyConfiguration.class,
+    FeatureToggleApi.class,
+    FeatureToggleService.class,
+    FeesClientService.class,
+    FeesConfiguration.class
+})
 @PactTestFor(providerName = "feeRegister_rangeGroup")
 @MockServerConfig(hostInterface = "localhost", port = "6661")
 @TestPropertySource(properties = "fees.api.url=http://localhost:6661")

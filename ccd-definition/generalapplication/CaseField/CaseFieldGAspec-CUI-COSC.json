@@ -1,0 +1,10 @@
+[
+ {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "certOfSC",
+    "Label": " ",
+    "FieldType": "CertOfSC",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

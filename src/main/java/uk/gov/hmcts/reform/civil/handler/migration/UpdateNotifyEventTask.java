@@ -33,7 +33,7 @@ public class UpdateNotifyEventTask extends MigrationTask<NotificationCaseReferen
         }
 
         final String camundaProcessIdentifier = caseReference.getCamundaProcessIdentifier();
-        final Notifier notifier = notifierFactory.getNotifier(camundaProcessIdentifier);
+        final Notifier<CaseData> notifier = notifierFactory.getNotifier(camundaProcessIdentifier);
 
         if (notifier == null) {
             throw new IllegalStateException(

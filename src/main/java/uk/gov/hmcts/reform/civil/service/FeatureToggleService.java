@@ -154,4 +154,8 @@ public class FeatureToggleService {
     public boolean isHmctsAccessMigrationEnabled() {
         return featureToggleApi.isFeatureEnabled("hmcts-access-migration");
     }
+
+    public boolean isDraftClaimDatabaseEnabled() {
+        return featureToggleApi.isFeatureEnabled("cui-draft-claim-database");
+    }
 }

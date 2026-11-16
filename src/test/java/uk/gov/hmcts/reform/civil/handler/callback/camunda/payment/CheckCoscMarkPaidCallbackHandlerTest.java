@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.engine.RuntimeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -46,7 +46,7 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private RuntimeService runTimeService;
+    private CamundaRuntimeClient camundaRuntimeClient;
 
     private final LocalDateTime nowMock = LocalDateTime.of(2024, 10, 8, 0, 0, 0);
     private final LocalDate expectedlocalDate = LocalDate.of(2024, 10, 8).plusDays(30);

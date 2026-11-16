@@ -42,6 +42,7 @@ jobs:
           MAX_AGE_DAYS: ${{ inputs.max_age_days || '3' }}
           THRESHOLD: ${{ inputs.threshold || '1' }}
         with:
+          retries: 3
           script: |
             const maxAgeDays = Number(process.env.MAX_AGE_DAYS || process.env.DEFAULT_MAX_AGE_DAYS);
             const threshold = Number(process.env.THRESHOLD || process.env.DEFAULT_THRESHOLD);

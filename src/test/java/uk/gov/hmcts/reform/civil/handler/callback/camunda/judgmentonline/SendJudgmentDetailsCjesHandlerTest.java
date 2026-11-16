@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.judgmentonline;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.engine.RuntimeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -13,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import uk.gov.hmcts.reform.civil.service.judgments.CjesService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,7 +35,7 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
     private ObjectMapper objectMapper;
 
     @Mock
-    private RuntimeService runtimeService;
+    private CamundaRuntimeClient camundaRuntimeClient;
 
     @Mock
     private CjesService cjesService;
@@ -66,7 +66,7 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
 
         // Assert
         verify(cjesService).sendJudgment(eq(caseData), eq(true));
-        verify(runtimeService).setVariable(processId, "judgmentRecordedReason", DETERMINATION_OF_MEANS.toString());
+        verify(camundaRuntimeClient).setProcessVariable(processId, "judgmentRecordedReason", DETERMINATION_OF_MEANS.toString());
     }
 
     @Test
@@ -86,7 +86,7 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
 
         // Assert
         verify(cjesService).sendJudgment(eq(caseData), eq(true));
-        verifyNoInteractions(runtimeService);
+        verifyNoInteractions(camundaRuntimeClient);
     }
 
     @Test
@@ -107,7 +107,7 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
 
         // Assert
         verify(cjesService, never()).sendJudgment(any(), any());
-        verify(runtimeService).setVariable(processId, "judgmentRecordedReason", DETERMINATION_OF_MEANS.toString());
+        verify(camundaRuntimeClient).setProcessVariable(processId, "judgmentRecordedReason", DETERMINATION_OF_MEANS.toString());
     }
 
     @Test
@@ -128,7 +128,7 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
 
         // Assert
         verify(cjesService).sendJudgment(eq(caseData), eq(false));
-        verify(runtimeService).setVariable(processId, "JUDGMENT_SET_ASIDE_ERROR", false);
+        verify(camundaRuntimeClient).setProcessVariable(processId, "JUDGMENT_SET_ASIDE_ERROR", false);
     }
 
     @Test
@@ -149,7 +149,7 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
 
         // Assert
         verify(cjesService, never()).sendJudgment(any(), any());
-        verify(runtimeService).setVariable(processId, "JUDGMENT_SET_ASIDE_ERROR", true);
+        verify(camundaRuntimeClient).setProcessVariable(processId, "JUDGMENT_SET_ASIDE_ERROR", true);
     }
 
     @Test

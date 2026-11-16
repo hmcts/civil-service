@@ -17,26 +17,35 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARENT_CLAIM_SETTLED;
 
 @ExtendWith(MockitoExtension.class)
 public class LIPClaimSettledCallBackHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     protected FeatureToggleService featureToggleService;
+    @Mock
+    private GenAppStateHelperService genAppStateHelperService;
     private LIPClaimSettledCallbackHandler handler;
 
     @BeforeEach
     void setup() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        handler = new LIPClaimSettledCallbackHandler(objectMapper, featureToggleService);
+        handler = new LIPClaimSettledCallbackHandler(
+            objectMapper,
+            featureToggleService,
+            genAppStateHelperService
+        );
     }
 
     @Nested
@@ -88,6 +97,7 @@ public class LIPClaimSettledCallBackHandlerTest extends BaseCallbackHandlerTest 
                 .extracting("businessProcess")
                 .extracting("status")
                 .isEqualTo("READY");
+            verify(genAppStateHelperService).triggerEvent(caseData, PARENT_CLAIM_SETTLED);
         }
 
         @Test

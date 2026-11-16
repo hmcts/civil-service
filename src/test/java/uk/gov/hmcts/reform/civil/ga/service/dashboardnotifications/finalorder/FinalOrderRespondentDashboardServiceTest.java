@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaDashboardNotificationsParamsMapper;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
@@ -58,16 +57,14 @@ class FinalOrderRespondentDashboardServiceTest {
     }
 
     @Test
-    void shouldRecordRespondentFinalOrderScenarioWhenConsentOrder() {
-        GeneralApplicationCaseData caseData =
-            GeneralApplicationCaseDataBuilder.builder()
-                .isGaRespondentOneLip(YesOrNo.YES)
-                .isMultiParty(YesOrNo.NO)
-                .atStateClaimDraft()
-                .withNoticeCaseData()
-                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.NO))
-                .generalAppConsentOrder(YesOrNo.YES)
-                .build();
+    void shouldRecordRespondentFinalOrderScenarioWhenConsentOrderAndInformOtherPartyIsNull() {
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .ccdCaseReference(1644495739087775L)
+            .isGaRespondentOneLip(YesOrNo.YES)
+            .isMultiParty(YesOrNo.NO)
+            .generalAppInformOtherParty(null)
+            .generalAppConsentOrder(YesOrNo.YES)
+            .build();
 
         HashMap<String, Object> params = new HashMap<>();
         when(mapper.mapCaseDataToParams(caseData)).thenReturn(params);

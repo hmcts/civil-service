@@ -64,4 +64,15 @@ class Respondent2WitnessesCaseDataUpdaterTest {
         assertThat(updatedRespondent2DQ).isNotNull();
         assertThat(updatedRespondent2DQ.getRespondent2DQWitnesses()).isNull();
     }
+
+    @Test
+    void shouldNotThrowWhenRespondent2DqIsNullAndSmallClaimWitnessesPresent() {
+        caseData.setRespondent2DQ(null);
+        caseData.setRespondent2DQWitnessesSmallClaim(
+            new Witnesses().setWitnessesToAppear(YES).setDetails(wrapElements(new Witness().setFirstName("A"))));
+
+        updater.update(caseData);
+
+        assertThat(caseData.getRespondent2DQ()).isNull();
+    }
 }

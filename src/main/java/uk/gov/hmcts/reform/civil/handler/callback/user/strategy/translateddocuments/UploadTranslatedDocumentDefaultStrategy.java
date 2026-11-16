@@ -54,7 +54,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
 
     private static final String TRANSLATED = "Translated_%s.%s";
     private static final Map<TranslatedDocumentType, CaseEvent> DOCUMENT_SPECIFIC_BUSINESS_PROCESS_EVENTS = Map.of(
-        ORDER_NOTICE, CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_ORDER_NOTICE,
         STANDARD_DIRECTION_ORDER, CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SDO,
         INTERLOCUTORY_JUDGMENT, CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN,
         MANUAL_DETERMINATION, CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN,
@@ -65,7 +64,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         HEARING_NOTICE, CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE
     );
     private static final Set<TranslatedDocumentType> FIRST_DOCUMENT_PRIORITY_TYPES = Set.of(
-        ORDER_NOTICE,
         STANDARD_DIRECTION_ORDER,
         INTERLOCUTORY_JUDGMENT,
         MANUAL_DETERMINATION,

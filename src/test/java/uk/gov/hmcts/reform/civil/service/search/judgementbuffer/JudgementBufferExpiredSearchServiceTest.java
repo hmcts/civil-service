@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchPaginatedStreamProvider;
 import uk.gov.hmcts.reform.civil.service.search.common.ElasticSearchResult;
 
@@ -27,7 +28,7 @@ class JudgementBufferExpiredSearchServiceTest {
     @BeforeEach
     void setup() {
         searchService = new JudgementBufferExpiredSearchService(elasticSearchPaginatedStreamProvider, judgementBufferExpiredQueryProvider);
-        org.springframework.test.util.ReflectionTestUtils.setField(searchService, "pageSize", 50);
+        ReflectionTestUtils.setField(searchService, "pageSize", 50);
     }
 
     @Test

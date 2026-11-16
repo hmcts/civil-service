@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypesLR;
@@ -50,7 +49,6 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataServ
 import uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidator;
 import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -159,7 +157,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         objectMapper.registerModule(new JavaTimeModule());
         handler = new InitiateGeneralApplicationHandler(initiateGeneralAppService, generalApplicationValidator, objectMapper, theUserService,
                                                         feesService, locationRefDataService,
-                                                        coreCaseUserService, generalAppFeesService);
+                                                        generalAppFeesService);
     }
 
     @Test
@@ -402,6 +400,45 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldValidatePopulatedLRTypesWithoutLookingUpCaseRoles() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .generalAppTypeLR(createGAApplicationTypeLR(List.of(GeneralApplicationTypesLR.STRIKE_OUT)))
+            .build();
+        caseData.setGeneralAppType(null);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+            callbackParamsOf(caseData, MID, "ga-validate-type"));
+
+        assertThat(response.getErrors()).isEmpty();
+        verify(coreCaseUserService, never()).getUserCaseRoles(anyString(), anyString());
+    }
+
+    @Test
+    void shouldFallBackToCitizenTypesWhenLRTypesAreEmpty() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .generalAppTypeLR(createGAApplicationTypeLR(List.of()))
+            .build();
+        caseData.setGeneralAppType(createGAApplicationType(List.of(STRIKE_OUT)));
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+            callbackParamsOf(caseData, MID, "ga-validate-type"));
+
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldReturnValidationErrorWhenBothApplicationTypesAreMissing() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setGeneralAppType(null);
+        caseData.setGeneralAppTypeLR(null);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+            callbackParamsOf(caseData, MID, "ga-validate-type"));
+
+        assertThat(response.getErrors()).containsExactly("Select an application type");
     }
 
     @Nested
@@ -708,10 +745,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotCauseAnyErrors_whenGaTypeIsNotSettleOrDiscontinueConsentCoscEnabled() {
 
-            when(theUserService.getUserInfo(anyString())).thenReturn(createUserInfo("uid"));
-
-            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
-                .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
             List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.STRIKE_OUT, GeneralApplicationTypesLR.SUMMARY_JUDGEMENT);
             CaseData caseData = CaseDataBuilder
                 .builder()
@@ -732,10 +765,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotCauseAnyErrors_whenGaTypeIsNotSettleOrDiscontinueConsentYesCoscEnabled() {
 
             List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.SETTLE_BY_CONSENT);
-            when(theUserService.getUserInfo(anyString())).thenReturn(createUserInfo("uid"));
 
-            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
-                .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
             CaseData caseData = CaseDataBuilder
                 .builder()
                 .ccdCaseReference(1234L)
@@ -754,10 +784,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCauseError_whenGaTypeIsNotSettleOrDiscontinueConsentNoCoscEnabled() {
 
-            when(theUserService.getUserInfo(anyString())).thenReturn(createUserInfo("uid"));
-
-            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
-                .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
             List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.SETTLE_BY_CONSENT);
             CaseData caseData = CaseDataBuilder
                 .builder()
@@ -1095,10 +1121,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                 .setCode(FEE_CODE)
                                 .setCalculatedAmountInPence(fee275)
                                 .setVersion(FEE_VERSION));
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
-            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
-                .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
             List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.VARY_PAYMENT_TERMS_OF_JUDGMENT);
             GAApplicationTypeLR gaApplicationTypeLR = new GAApplicationTypeLR();
             gaApplicationTypeLR.setTypes(typesLR);
@@ -1145,10 +1168,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                 .setCode(FEE_CODE)
                                 .setCalculatedAmountInPence(fee14));
 
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-
-            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
-                .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
             List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.VARY_ORDER);
             GAApplicationTypeLR gaApplicationTypeLR = new GAApplicationTypeLR();
             gaApplicationTypeLR.setTypes(typesLR);
@@ -1193,9 +1212,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                 .setCode(FEE_CODE)
                                 .setCalculatedAmountInPence(fee14));
 
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
-                .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
             List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.VARY_ORDER, GeneralApplicationTypesLR.STAY_THE_CLAIM);
             GAApplicationTypeLR gaApplicationTypeLR = new GAApplicationTypeLR();
             gaApplicationTypeLR.setTypes(typesLR);
@@ -1385,6 +1401,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder
                 .builder().generalAppTypeLR(gaApplicationTypeLR)
                 .build();
+            caseData.setGeneralAppType(null);
             caseData.setCcdCaseReference(1234L);
             caseData.setGeneralAppPBADetails(generalAppPBADetails);
             caseData.setGeneralAppHearingDetails(new GAHearingDetails());
@@ -1392,7 +1409,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                                                                             .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                             .build());
-            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(initiateGeneralAppService.buildCaseData(
                 any(CaseData.class), any(UserDetails.class), anyString())).thenAnswer((Answer) invocation -> invocation.getArguments()[0]
             );
@@ -1401,6 +1417,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(data.getGeneralAppType().getTypes()).containsExactly(VARY_PAYMENT_TERMS_OF_JUDGMENT);
+            verify(coreCaseUserService, never()).getUserCaseRoles(anyString(), anyString());
             assertThat(response.getErrors()).isNull();
             assertThat(data.getGeneralAppInformOtherParty().getIsWithNotice()).isEqualTo(YES);
         }
@@ -1577,12 +1595,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         gaUnavailabilityDates.setUnavailableTrialDateFrom(from);
         gaUnavailabilityDates.setUnavailableTrialDateTo(to);
         return gaUnavailabilityDates;
-    }
-
-    private static UserInfo createUserInfo(String uid) {
-        return UserInfo.builder()
-            .uid(uid)
-            .build();
     }
 
     private static Fee createFee(String code, BigDecimal calculatedAmountInPence, String version) {

@@ -7,10 +7,19 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 
 public class LaunchDarklyConfigurationTest {
 
     private LaunchDarklyConfiguration configuration = new LaunchDarklyConfiguration();
+
+    /**
+     * Without flag files the client streams from LaunchDarkly, and the fake key can never connect, so
+     * these don't wait for initialisation: the default startWait is 5s per client, all spent on network.
+     */
+    private LDClient streamingClient(String key, boolean offline, String[] flagFiles) {
+        return new LDClient(key, configuration.configBuilder(offline, flagFiles).startWait(Duration.ZERO).build());
+    }
 
     /**
      * LDClient build test without flag files.
@@ -19,11 +28,11 @@ public class LaunchDarklyConfigurationTest {
     public void streamingLD() throws Exception {
         String key = "sdkkey";
         boolean offline = false;
-        try (LDClient client = configuration.ldClient(key, offline, null)) {
+        try (LDClient client = streamingClient(key, offline, null)) {
             Assertions.assertEquals(client.isOffline(), offline);
         }
 
-        try (LDClient client = configuration.ldClient(key, offline, new String[0])) {
+        try (LDClient client = streamingClient(key, offline, new String[0])) {
             Assertions.assertEquals(client.isOffline(), offline);
         }
     }
@@ -32,7 +41,7 @@ public class LaunchDarklyConfigurationTest {
     public void unexistentFiles() throws Exception {
         String key = "sdkkey";
         boolean offline = false;
-        try (LDClient client = configuration.ldClient(key, offline, new String[]{
+        try (LDClient client = streamingClient(key, offline, new String[]{
             "AFileThatDoesNotExist"
         })) {
             Assertions.assertEquals(client.isOffline(), offline);

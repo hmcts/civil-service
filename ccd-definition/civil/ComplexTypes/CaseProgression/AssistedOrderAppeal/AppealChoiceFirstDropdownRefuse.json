@@ -1,0 +1,42 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "appealChoiceListLabel",
+    "ID": "AppealChoiceFirstDropdownRefuse",
+    "ElementLabel": "### An appeal lies from this order to",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "circuitOrHighCourtListRefuse",
+    "ID": "AppealChoiceFirstDropdownRefuse",
+    "ElementLabel": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "CircuitOrHighCourtList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "appealChoiceSecondDropdownA",
+    "ID": "AppealChoiceFirstDropdownRefuse",
+    "ElementLabel": " ",
+    "FieldType": "AppealChoiceSecondDropdownARefuse",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "circuitOrHighCourtListRefuse = \"CIRCUIT_COURT\""
+  },
+
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "appealChoiceSecondDropdownB",
+    "ID": "AppealChoiceFirstDropdownRefuse",
+    "ElementLabel": " ",
+    "FieldType": "AppealChoiceSecondDropdownBRefuse",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "circuitOrHighCourtListRefuse = \"HIGH_COURT\""
+  }
+]

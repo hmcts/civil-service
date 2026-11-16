@@ -30,15 +30,12 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidator;
-import uk.gov.hmcts.reform.civil.utils.UserRoleUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -101,7 +98,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private final UserService userService;
     private final GeneralAppFeesService feesService;
     private final LocationReferenceDataService locationRefDataService;
-    private final CoreCaseUserService coreCaseUserService;
     private final GeneralAppFeesService generalAppFeesService;
 
     @Override
@@ -162,7 +158,13 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse gaValidateConsent(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        List<GeneralApplicationTypes> generalAppTypes = getGeneralApplicationTypes(callbackParams, caseData);
+        List<GeneralApplicationTypes> generalAppTypes = getGeneralApplicationTypes(caseData);
+        if (generalAppTypes.isEmpty()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseData.toMap(objectMapper))
+                .errors(List.of(MISSING_APPLICATION_TYPE_ERROR))
+                .build();
+        }
 
         var consent = Objects.nonNull(caseData.getGeneralAppRespondentAgreement())
                                 && YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed());
@@ -178,23 +180,11 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .build();
     }
 
-    private List<GeneralApplicationTypes> getGeneralApplicationTypes(CallbackParams callbackParams, CaseData caseData) {
-        List<GeneralApplicationTypes> generalAppTypes;
-        if (caseData.getGeneralAppTypeLR() != null && isCoscEnabledAndUserNotLip(callbackParams)) {
-            generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
-        } else {
-            generalAppTypes = caseData.getGeneralAppType().getTypes();
+    private List<GeneralApplicationTypes> getGeneralApplicationTypes(CaseData caseData) {
+        if (hasGeneralAppTypeLRTypes(caseData)) {
+            return GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
         }
-        return generalAppTypes;
-    }
-
-    private boolean isCoscEnabledAndUserNotLip(CallbackParams callbackParams) {
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        List<String> roles = coreCaseUserService.getUserCaseRoles(
-                callbackParams.getCaseData().getCcdCaseReference().toString(),
-                userInfo.getUid()
-        );
-        return !(UserRoleUtils.isLIPDefendant(roles) || UserRoleUtils.isLIPClaimant(roles));
+        return hasGeneralAppTypes(caseData) ? caseData.getGeneralAppType().getTypes() : List.of();
     }
 
     private CallbackResponse gaValidateType(CallbackParams callbackParams) {
@@ -202,7 +192,13 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
-        List<GeneralApplicationTypes> generalAppTypes = getGeneralApplicationTypes(callbackParams, caseData);
+        List<GeneralApplicationTypes> generalAppTypes = getGeneralApplicationTypes(caseData);
+        if (generalAppTypes.isEmpty()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseData.toMap(objectMapper))
+                .errors(List.of(MISSING_APPLICATION_TYPE_ERROR))
+                .build();
+        }
 
         if (generalAppTypes.size() > 1
             && generalAppTypes.contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
@@ -280,7 +276,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse setFeesAndPBA(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        setGeneralAppTypeFromLRIfRequired(callbackParams, caseData);
+        setGeneralAppTypeFromLRIfRequired(caseData);
         caseData = setWithNoticeByType(caseData);
         Fee feeForGA = feesService.getFeeForGA(caseData);
         GAPbaDetails generalAppPBADetails = new GAPbaDetails();
@@ -295,7 +291,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private CallbackResponse submitApplication(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        setGeneralAppTypeFromLRIfRequired(callbackParams, caseData);
+        setGeneralAppTypeFromLRIfRequired(caseData);
         if (!hasGeneralAppTypes(caseData)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(MISSING_APPLICATION_TYPE_ERROR))
@@ -340,8 +336,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .data(data).build();
     }
 
-    private void setGeneralAppTypeFromLRIfRequired(CallbackParams callbackParams, CaseData caseData) {
-        if (hasGeneralAppTypeLRTypes(caseData) && isCoscEnabledAndUserNotLip(callbackParams)) {
+    private void setGeneralAppTypeFromLRIfRequired(CaseData caseData) {
+        if (hasGeneralAppTypeLRTypes(caseData)) {
             var generalAppTypes = GATypeHelper.getGATypes(caseData.getGeneralAppTypeLR().getTypes());
             GAApplicationType gaApplicationType = new GAApplicationType();
             gaApplicationType.setTypes(generalAppTypes);

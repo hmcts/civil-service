@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW_DASHBOARD_UPDATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.CourtStaffNextSteps.STILL_TASKS;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -122,11 +123,15 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
 
     private CallbackResponse confirmOrderReview(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        boolean isReturningFromDecisionOutcome = CaseState.DECISION_OUTCOME.toString()
+            .equals(callbackParams.getRequest().getCaseDetails().getState());
 
         if (YesOrNo.YES.equals(caseData.getObligationDatePresent())) {
             caseData.setBusinessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW));
         } else if (YesOrNo.YES.equals(caseData.getIsFinalOrder())) {
             caseData.setBusinessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW_FINAL_ORDER));
+        } else if (isReturningFromDecisionOutcome) {
+            caseData.setBusinessProcess(BusinessProcess.ready(CONFIRM_ORDER_REVIEW_DASHBOARD_UPDATE));
         }
 
         if (nonNull(caseData.getObligationData())) {
@@ -166,7 +171,7 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
                 .build();
         }
 
-        if (CaseState.DECISION_OUTCOME.toString().equals(callbackParams.getRequest().getCaseDetails().getState())) {
+        if (isReturningFromDecisionOutcome) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toMap(objectMapper))
                 .state(CaseState.CASE_PROGRESSION.toString())

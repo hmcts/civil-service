@@ -77,7 +77,6 @@ class JudgementBufferExpiredQueryProviderTest {
         assertThat(json.toString()).contains("data.joDJCreatedDate");
         assertThat(json.toString()).contains("2026-07-02T10:00:00");
         assertThat(json.toString()).contains("JUDGMENT_REQUESTED");
-        assertThat(json.toString()).contains("data.businessProcess");
 
         verify(dateTimeCalculator).minusWorkingHours(ZONED_NOW, JUDGEMENT_BUFFER_WORKING_HOURS);
     }

@@ -475,7 +475,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     }
 
     @Test
-    void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentTypeIsOrderNotice_ToggleEnabledCP() {
+    void shouldUseGenericBusinessProcessForLegacyOrderNoticeTranslation() {
         //Given
         Document orderDoc = new Document();
         orderDoc.setDocumentFileName(FILE_NAME_1);
@@ -509,7 +509,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         assertThat(response.getData())
             .extracting("businessProcess")
             .extracting("camundaEvent")
-            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_ORDER_NOTICE.name());
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT.name());
     }
 
     @Test

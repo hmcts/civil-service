@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.engine.RuntimeService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -39,6 +38,7 @@ import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentT
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import uk.gov.hmcts.reform.civil.service.docmosis.settlediscontinue.NoticeOfDiscontinuanceFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
@@ -72,7 +72,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
     @MockBean
     private NoticeOfDiscontinuanceFormGenerator formGenerator;
     @MockBean
-    private RuntimeService runTimeService;
+    private CamundaRuntimeClient camundaRuntimeClient;
     @MockBean
     private OrganisationService organisationService;
     public static final String PROCESS_INSTANCE_ID = "processInstanceId";
@@ -100,7 +100,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             //When
             handler.handle(params);
             //Then
-            verify(runTimeService).setVariable(PROCESS_INSTANCE_ID, "JUDGE_ORDER_VERIFICATION_REQUIRED", toggleState);
+            verify(camundaRuntimeClient).setProcessVariable(PROCESS_INSTANCE_ID, "JUDGE_ORDER_VERIFICATION_REQUIRED", toggleState);
         }
 
         @Test
@@ -527,7 +527,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
         handler.handle(params);
 
-        verify(runTimeService).setVariable(PROCESS_INSTANCE_ID, "WELSH_ENABLED", true);
+        verify(camundaRuntimeClient).setProcessVariable(PROCESS_INSTANCE_ID, "WELSH_ENABLED", true);
     }
 
     @Test

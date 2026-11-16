@@ -1,0 +1,65 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "DISPATCH_BUSINESS_PROCESS_GASPEC",
+    "Name": "Dispatch ga business process",
+    "Description": "Set READY ga business process status to DISPATCHED",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToStartEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-start",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutAboutToStartEvent": 0,
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "START_BUSINESS_PROCESS_GASPEC",
+    "Name": "Start ga business process",
+    "Description": "Start ga business process",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "END_BUSINESS_PROCESS_GASPEC",
+    "Name": "End business process",
+    "Description": "End business process",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "CREATE_GENERAL_APPLICATION_CASE",
+    "Name": "Create general application",
+    "Description": "Create general application",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "UPDATE_CASE_WITH_GA_STATE",
+    "Name": "Update general-app state",
+    "Description": "Update Case with state of general application",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  }
+]

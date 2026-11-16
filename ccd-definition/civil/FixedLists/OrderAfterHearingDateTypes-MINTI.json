@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "OrderAfterHearingDateType",
+    "ListElementCode": "SINGLE_DATE",
+    "ListElement": "Single date",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "OrderAfterHearingDateType",
+    "ListElementCode": "DATE_RANGE",
+    "ListElement": "Date range",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "OrderAfterHearingDateType",
+    "ListElementCode": "BESPOKE_RANGE",
+    "ListElement": "Bespoke range",
+    "DisplayOrder": 3
+  }
+]

@@ -12,18 +12,25 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.civil.config.HearingFeeConfiguration;
+import uk.gov.hmcts.reform.civil.config.LaunchDarklyConfiguration;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
+import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
+import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.io.IOException;
@@ -38,6 +45,15 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+@Import({
+    LaunchDarklyConfiguration.class,
+    FeatureToggleApi.class,
+    FeatureToggleService.class,
+    HearingFeeConfiguration.class,
+    HearingFeesService.class,
+    PaymentsClient.class,
+    PaymentsService.class
+})
 @PactTestFor(providerName = "payment_creditAccountPayment")
 @MockServerConfig(hostInterface = "localhost", port = "6670")
 @TestPropertySource(properties = "payments.api.url=http://localhost:6670")

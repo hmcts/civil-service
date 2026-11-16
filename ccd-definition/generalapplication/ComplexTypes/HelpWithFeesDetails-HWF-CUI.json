@@ -1,0 +1,69 @@
+[
+  {
+    "ID": "HelpWithFeesDetails",
+    "ListElementCode": "hwfFeeType",
+    "ElementLabel": "Type",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HelpWithFeesDetails",
+    "ListElementCode": "hwfReferenceNumber",
+    "ElementLabel": "HwF reference number",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HelpWithFeesDetails",
+    "ListElementCode": "fee",
+    "ElementLabel": " ",
+    "FieldType": "Fee",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "HelpWithFeesDetails",
+    "ListElementCode": "remissionAmount",
+    "ElementLabel": "Remission Amount",
+    "FieldType": "MoneyGBP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HelpWithFeesDetails",
+    "ListElementCode": "outstandingFee",
+    "ElementLabel": "Applicant must pay",
+    "FieldType": "MoneyGBP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HelpWithFeesDetails",
+    "ListElementCode": "noRemissionDetails",
+    "ElementLabel": "Details",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "outstandingFee = \"DONT_SHOW_UI\""
+  },
+  {
+    "ID": "HelpWithFeesDetails",
+    "ListElementCode": "noRemissionDetailsSummary",
+    "ElementLabel": "Summary",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "HWFFeesSummaryType",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "outstandingFee = \"DONT_SHOW_UI\""
+  },
+  {
+    "ID": "HelpWithFeesDetails",
+    "ListElementCode": "hwfCaseEvent",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "outstandingFee = \"DONT_SHOW_UI\""
+  }
+]

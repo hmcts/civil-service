@@ -11,11 +11,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.civil.referencedata.JRDConfiguration;
 import uk.gov.hmcts.reform.civil.referencedata.JudicialRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.JudgeRefData;
 
@@ -27,6 +29,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
+@Import({JRDConfiguration.class, JudicialRefDataService.class})
 @PactTestFor(providerName = "referenceData_judicialv2")
 @MockServerConfig(hostInterface = "localhost", port = "6683")
 @TestPropertySource(properties = {

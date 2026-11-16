@@ -11,10 +11,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.scheduler.common.DefaultBackPressureConfiguration;
 import uk.gov.hmcts.reform.civil.scheduler.common.ScheduledTaskBackPressureConfiguration;
-import uk.gov.hmcts.reform.civil.scheduler.hearingfee.publisher.HearingFeePublisherProvider;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-
-import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -38,10 +35,7 @@ class HearingFeeSchedulerTaskTest {
     private CaseDetailsConverter caseDetailsConverter;
 
     @Mock
-    private HearingFeePublisherProvider hearingFeePublisherProvider;
-
-    @Mock
-    private Consumer<Long> publisher;
+    private HearingFeePublisherService hearingFeePublisherService;
 
     @InjectMocks
     private HearingFeeSchedulerTask task;
@@ -60,16 +54,15 @@ class HearingFeeSchedulerTaskTest {
     }
 
     @Test
-    void shouldInvokePublisher_whenCaseFound() {
+    void shouldInvokePublisherService_whenCaseFound() {
         CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(CASE_ID).build();
         CaseDetails caseDetails = CaseDetails.builder().id(CASE_ID).build();
 
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-        when(hearingFeePublisherProvider.provide(caseData)).thenReturn(publisher);
 
         task.accept(caseDetails);
 
-        verify(publisher).accept(CASE_ID);
+        verify(hearingFeePublisherService).publishHearingFeeEvent(caseData);
     }
 }

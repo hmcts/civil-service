@@ -1,0 +1,14 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "transferCourtLocationList",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "reasonForTransfer",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRU"
+  }
+]

@@ -11,10 +11,15 @@ import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
+import uk.gov.hmcts.reform.civil.config.FeesConfiguration;
+import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
+import uk.gov.hmcts.reform.civil.config.HearingFeeConfiguration;
+import uk.gov.hmcts.reform.civil.config.OtherRemedyFeesConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -23,6 +28,7 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.FeesClientService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
@@ -37,6 +43,16 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.FeesClientService.EVENT_ISSUE;
 import static uk.gov.hmcts.reform.civil.service.FeesClientService.MONEY_CLAIM;
 
+@Import({
+    FeesClientService.class,
+    FeesConfiguration.class,
+    FeesService.class,
+    GeneralAppFeesConfiguration.class,
+    GeneralAppFeesService.class,
+    HearingFeeConfiguration.class,
+    HearingFeesService.class,
+    OtherRemedyFeesConfiguration.class
+})
 @PactTestFor(providerName = "feeRegister_lookUp")
 @MockServerConfig(hostInterface = "localhost", port = "6662")
 @TestPropertySource(properties = "fees.api.url=http://localhost:6662")

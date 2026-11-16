@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.ga.service;
 
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
+import feign.FeignException;
+import feign.Request;
+import feign.RetryableException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,15 +14,17 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.util.Lists.newArrayList;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,22 +34,16 @@ class GaEventEmitterServiceTest {
     private ApplicationEventPublisher applicationEventPublisher;
 
     @Mock
-    private RemoteProcessEngineException mockedRemoteProcessEngineException;
+    private FeignException.BadRequest mockedFeignException;
 
     @Mock
-    private RuntimeService runtimeService;
-
-    @Mock
-    private MessageCorrelationBuilder messageCorrelationBuilder;
+    private CamundaRuntimeClient camundaRuntimeClient;
 
     private GaEventEmitterService eventEmitterService;
 
     @BeforeEach
     void setup() {
-        eventEmitterService = new GaEventEmitterService(applicationEventPublisher, runtimeService);
-        when(runtimeService.createMessageCorrelation(any())).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.setVariable(any(), any())).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.tenantId(any())).thenReturn(messageCorrelationBuilder);
+        eventEmitterService = new GaEventEmitterService(applicationEventPublisher, camundaRuntimeClient);
     }
 
     @Test
@@ -65,18 +61,14 @@ class GaEventEmitterServiceTest {
 
         eventEmitterService.emitBusinessProcessCamundaEvent(caseId, generalApplication, true);
 
-        verify(runtimeService).createMessageCorrelation("TEST_EVENT");
-        verify(messageCorrelationBuilder).tenantId("civil");
-        verify(messageCorrelationBuilder).setVariable("caseId", 1L);
-        verify(messageCorrelationBuilder).correlateStartMessage();
+        verify(camundaRuntimeClient).correlateStartMessage("TEST_EVENT", "civil", Map.of("caseId", 1L));
         verify(applicationEventPublisher).publishEvent(new DispatchBusinessProcessEvent(1L, businessProcess));
     }
 
     @Test
     void shouldSendMessageAndTriggerEvent_whenInvoked_withoutTenantId() {
-        when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException)
-            .thenReturn(null);
+        doThrow(mockedFeignException).when(camundaRuntimeClient)
+            .correlateStartMessage(any(), any(), any());
 
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
         GeneralApplication generalApplication = new GeneralApplication()
@@ -91,11 +83,44 @@ class GaEventEmitterServiceTest {
 
         eventEmitterService.emitBusinessProcessCamundaEvent(caseId, generalApplication, true);
 
-        verify(runtimeService, times(2)).createMessageCorrelation("TEST_EVENT");
-        verify(messageCorrelationBuilder, times(2)).setVariable("caseId", 1L);
-        verify(messageCorrelationBuilder).withoutTenantId();
-        verify(messageCorrelationBuilder, times(2)).correlateStartMessage();
+        verify(camundaRuntimeClient).correlateStartMessage("TEST_EVENT", "civil", Map.of("caseId", 1L));
+        verify(camundaRuntimeClient).correlateStartMessageWithoutTenant("TEST_EVENT", Map.of("caseId", 1L));
         verify(applicationEventPublisher).publishEvent(new DispatchBusinessProcessEvent(1L, businessProcess));
+    }
+
+    @Test
+    void shouldNotCorrelateAgainWithoutTenant_whenTenantAttemptTimesOut() {
+        var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
+        GeneralApplication generalApplication = new GeneralApplication()
+            .setBusinessProcess(businessProcess);
+        doThrow(new RetryableException(
+            -1, "Read timed out", Request.HttpMethod.POST, (Long) null,
+            Request.create(Request.HttpMethod.POST, "url", Map.of(), null, null, null)
+        )).when(camundaRuntimeClient).correlateStartMessage(any(), any(), any());
+
+        eventEmitterService.emitBusinessProcessCamundaEvent(1L, generalApplication, true);
+
+        verify(camundaRuntimeClient).correlateStartMessage("TEST_EVENT", "civil", Map.of("caseId", 1L));
+        verify(camundaRuntimeClient, never()).correlateStartMessageWithoutTenant(any(), any());
+        verifyNoInteractions(applicationEventPublisher);
+    }
+
+    @Test
+    void shouldNotCorrelateGAEventAgainWithoutTenant_whenTenantAttemptTimesOut() {
+        var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .businessProcess(businessProcess)
+            .ccdCaseReference(1L)
+            .build();
+        doThrow(new RetryableException(
+            -1, "Read timed out", Request.HttpMethod.POST, (Long) null,
+            Request.create(Request.HttpMethod.POST, "url", Map.of(), null, null, null)
+        )).when(camundaRuntimeClient).correlateStartMessage(any(), any(), any());
+
+        eventEmitterService.emitBusinessProcessCamundaGAEvent(caseData, true);
+
+        verify(camundaRuntimeClient, never()).correlateStartMessageWithoutTenant(any(), any());
+        verifyNoInteractions(applicationEventPublisher);
     }
 
     @Test
@@ -108,18 +133,14 @@ class GaEventEmitterServiceTest {
 
         eventEmitterService.emitBusinessProcessCamundaGAEvent(caseData, true);
 
-        verify(runtimeService).createMessageCorrelation("TEST_EVENT");
-        verify(messageCorrelationBuilder).tenantId("civil");
-        verify(messageCorrelationBuilder).setVariable("caseId", 1L);
-        verify(messageCorrelationBuilder).correlateStartMessage();
+        verify(camundaRuntimeClient).correlateStartMessage("TEST_EVENT", "civil", Map.of("caseId", 1L));
         verify(applicationEventPublisher).publishEvent(new DispatchBusinessProcessEvent(1L, businessProcess));
     }
 
     @Test
     void shouldSendMessageAndTriggerGAEvent_whenInvoked_withoutTenantId() {
-        when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException)
-            .thenReturn(null);
+        doThrow(mockedFeignException).when(camundaRuntimeClient)
+            .correlateStartMessage(any(), any(), any());
 
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
@@ -129,16 +150,15 @@ class GaEventEmitterServiceTest {
 
         eventEmitterService.emitBusinessProcessCamundaGAEvent(caseData, true);
 
-        verify(runtimeService, times(2)).createMessageCorrelation("TEST_EVENT");
-        verify(messageCorrelationBuilder, times(2)).setVariable("caseId", 1L);
-        verify(messageCorrelationBuilder).withoutTenantId();
-        verify(messageCorrelationBuilder, times(2)).correlateStartMessage();
+        verify(camundaRuntimeClient).correlateStartMessage("TEST_EVENT", "civil", Map.of("caseId", 1L));
+        verify(camundaRuntimeClient).correlateStartMessageWithoutTenant("TEST_EVENT", Map.of("caseId", 1L));
         verify(applicationEventPublisher).publishEvent(new DispatchBusinessProcessEvent(1L, businessProcess));
     }
 
     @Test
     void shouldSendMessageAndNotTriggerEvent_whenNotTrue() {
-        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(new RuntimeException());
+        doThrow(new RuntimeException()).when(camundaRuntimeClient)
+            .correlateStartMessage(any(), any(), any());
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
         GeneralApplication generalApplication = new GeneralApplication()
             .setBusinessProcess(businessProcess);
@@ -152,15 +172,15 @@ class GaEventEmitterServiceTest {
 
         eventEmitterService.emitBusinessProcessCamundaEvent(caseId, generalApplication, false);
 
-        verify(runtimeService).createMessageCorrelation("TEST_EVENT");
-        verify(messageCorrelationBuilder).setVariable("caseId", 1L);
-        verify(messageCorrelationBuilder).correlateStartMessage();
+        verify(camundaRuntimeClient).correlateStartMessage("TEST_EVENT", "civil", Map.of("caseId", 1L));
+        verify(camundaRuntimeClient, never()).correlateStartMessageWithoutTenant(any(), any());
         verifyNoInteractions(applicationEventPublisher);
     }
 
     @Test
     void shouldSendMessageAndNotTriggerGAEvent_whenNotTrue() {
-        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(new RuntimeException());
+        doThrow(new RuntimeException()).when(camundaRuntimeClient)
+            .correlateStartMessage(any(), any(), any());
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .businessProcess(businessProcess)
@@ -169,16 +189,17 @@ class GaEventEmitterServiceTest {
 
         eventEmitterService.emitBusinessProcessCamundaGAEvent(caseData, false);
 
-        verify(runtimeService).createMessageCorrelation("TEST_EVENT");
-        verify(messageCorrelationBuilder).setVariable("caseId", 1L);
-        verify(messageCorrelationBuilder).correlateStartMessage();
+        verify(camundaRuntimeClient).correlateStartMessage("TEST_EVENT", "civil", Map.of("caseId", 1L));
+        verify(camundaRuntimeClient, never()).correlateStartMessageWithoutTenant(any(), any());
         verifyNoInteractions(applicationEventPublisher);
     }
 
     @Test
     void shouldHandleException_whenInvoked() {
-        when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException);
+        doThrow(mockedFeignException).when(camundaRuntimeClient)
+            .correlateStartMessage(any(), any(), any());
+        doThrow(mockedFeignException).when(camundaRuntimeClient)
+            .correlateStartMessageWithoutTenant(any(), any());
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
         GeneralApplication generalApplication = new GeneralApplication()
             .setBusinessProcess(businessProcess);
@@ -192,15 +213,17 @@ class GaEventEmitterServiceTest {
 
         eventEmitterService.emitBusinessProcessCamundaEvent(caseId, generalApplication, true);
 
-        verify(runtimeService, times(2)).createMessageCorrelation("TEST_EVENT");
-        verify(messageCorrelationBuilder, times(2)).correlateStartMessage();
+        verify(camundaRuntimeClient).correlateStartMessage("TEST_EVENT", "civil", Map.of("caseId", 1L));
+        verify(camundaRuntimeClient).correlateStartMessageWithoutTenant("TEST_EVENT", Map.of("caseId", 1L));
         verifyNoInteractions(applicationEventPublisher);
     }
 
     @Test
     void shouldHandleException_whenInvokedGA() {
-        when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException);
+        doThrow(mockedFeignException).when(camundaRuntimeClient)
+            .correlateStartMessage(any(), any(), any());
+        doThrow(mockedFeignException).when(camundaRuntimeClient)
+            .correlateStartMessageWithoutTenant(any(), any());
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
 
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
@@ -210,8 +233,8 @@ class GaEventEmitterServiceTest {
 
         eventEmitterService.emitBusinessProcessCamundaGAEvent(caseData, true);
 
-        verify(runtimeService, times(2)).createMessageCorrelation("TEST_EVENT");
-        verify(messageCorrelationBuilder, times(2)).correlateStartMessage();
+        verify(camundaRuntimeClient).correlateStartMessage("TEST_EVENT", "civil", Map.of("caseId", 1L));
+        verify(camundaRuntimeClient).correlateStartMessageWithoutTenant("TEST_EVENT", Map.of("caseId", 1L));
         verifyNoInteractions(applicationEventPublisher);
     }
 }

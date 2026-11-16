@@ -1,0 +1,29 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "representationType",
+    "ID": "assistedOrderRepresentation",
+    "ElementLabel": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "FinalOrdersRepresentationList",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "claimantDefendantRepresentation",
+    "ID": "assistedOrderRepresentation",
+    "ElementLabel": " ",
+    "FieldType": "ClaimantAndDefendantHeard",
+    "FieldShowCondition": "representationType=\"CLAIMANT_AND_DEFENDANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "otherRepresentation",
+    "ID": "assistedOrderRepresentation",
+    "ElementLabel": " ",
+    "FieldType": "ClaimantAndDefendantHeard",
+    "FieldShowCondition": "representationType=\"OTHER_REPRESENTATION\"",
+    "SecurityClassification": "Public"
+  }
+]

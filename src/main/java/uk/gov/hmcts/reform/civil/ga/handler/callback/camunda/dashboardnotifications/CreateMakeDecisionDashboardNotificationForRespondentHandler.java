@@ -21,6 +21,13 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_REQUEST_MORE_INFO_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_WRITTEN_REPRESENTATION_REQUIRED_RESPONDENT;
 
+/**
+ * Retained for running Camunda instances using pre-migration process definitions.
+ * Remove after no instance can reach the legacy dashboard task (DTSCCI-6703).
+ *
+ * @deprecated Replaced by dashboard framework tasks for new process instances.
+ */
+@Deprecated(forRemoval = true)
 @Service
 public class CreateMakeDecisionDashboardNotificationForRespondentHandler extends GaDashboardCallbackHandler {
 
@@ -78,7 +85,8 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandler extends
     }
 
     private boolean isWithoutNotice(GeneralApplicationCaseData caseData) {
-        return NO.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice());
+        return caseData.getGeneralAppInformOtherParty() != null
+            && NO.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice());
     }
 
 }

@@ -1,0 +1,8 @@
+# The image only needs the files the Dockerfile COPYs. az acr build uploads
+# the whole workspace otherwise, including .gradle-user-home, whose temp files
+# the parallel unit test branch creates and deletes mid-upload.
+# If you add a COPY to the Dockerfile, add its source here.
+*
+!lib/applicationinsights.json
+!lib/appinsights-connection-string
+!build/libs/civil-service.jar

@@ -1,0 +1,50 @@
+[
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "DEFAULT_JUDGMENT_CLAIMANT1",
+    "ListElement": "Default Judgment claimant",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "DEFAULT_JUDGMENT_CLAIMANT2",
+    "ListElement": "Default Judgment claimant",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "DEFAULT_JUDGMENT_DEFENDANT1",
+    "ListElement": "Default Judgment defendant",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "DEFAULT_JUDGMENT_DEFENDANT2",
+    "ListElement": "Default Judgment defendant",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "JUDGMENT_BY_ADMISSION_CLAIMANT",
+    "ListElement": "Judgment by admission claimant",
+    "DisplayOrder": 19
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "JUDGMENT_BY_ADMISSION_DEFENDANT",
+    "ListElement": "Judgment by admission defendant",
+    "DisplayOrder": 20
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "JUDGMENT_BY_DETERMINATION_CLAIMANT",
+    "ListElement": "Judgment by determination claimant",
+    "DisplayOrder": 21
+  },
+  {
+    "ID": "DocumentType",
+    "ListElementCode": "JUDGMENT_BY_DETERMINATION_DEFENDANT",
+    "ListElement": "Judgment by determination defendant",
+    "DisplayOrder": 22
+  }
+]

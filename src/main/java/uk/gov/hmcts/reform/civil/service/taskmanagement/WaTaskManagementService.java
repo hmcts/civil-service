@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.service.taskmanagement;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -54,7 +54,7 @@ public class WaTaskManagementService {
                 userAuth,
                 request
             );
-        } catch (RemoteProcessEngineException e) {
+        } catch (FeignException e) {
             log.error("There was an issue retrieving tasks from task management api: {}", e.getMessage());
             throw new InternalServerErrorException(e.getMessage());
         }
@@ -80,7 +80,7 @@ public class WaTaskManagementService {
         if (taskManagementEnabled) {
             try {
                 taskManagementClient.claimTask(authTokenGenerator.generate(), authorization, taskId);
-            } catch (RemoteProcessEngineException e) {
+            } catch (FeignException e) {
                 log.error("There was an issue claiming the task [{}] from task management api: {}", taskId, e.getMessage());
                 throw new InternalServerErrorException(e.getMessage());
             }

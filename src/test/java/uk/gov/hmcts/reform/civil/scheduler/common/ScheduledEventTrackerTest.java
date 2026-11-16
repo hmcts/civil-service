@@ -6,12 +6,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.scheduler.common.interceptor.AbortCategory;
 import uk.gov.hmcts.reform.civil.service.TelemetryService;
 
 import java.time.Duration;
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,13 +38,13 @@ class ScheduledEventTrackerTest {
         scheduledEventTracker.jobStartedEvent(eventConfig, 10);
 
         verify(telemetryService).trackEvent(
-            eq("TestSchedulerJobStarted"),
-            eq(Map.of(
+            ScheduledTaskEventConfiguration.SCHEDULER_JOB_STARTED,
+            Map.of(
                 "schedulerName", "TestScheduler",
                 "totalCases", "10",
                 "succeededCases", "0",
                 "failedCases", "0"
-            ))
+            )
         );
     }
 
@@ -53,12 +53,46 @@ class ScheduledEventTrackerTest {
         scheduledEventTracker.caseProcessedEvent(eventConfig, 123L);
 
         verify(telemetryService).trackEvent(
-            eq("TestSchedulerCaseProcessed"),
-            eq(Map.of(
+            ScheduledTaskEventConfiguration.SCHEDULER_CASE_PROCESSED,
+            Map.of(
                 "schedulerName", "TestScheduler",
                 "caseId", "123",
                 "status", "SUCCESS"
-            ))
+            )
+        );
+    }
+
+    @Test
+    void shouldTrackCaseProcessedEventWithMetrics() {
+        Map<String, Long> metrics = Map.of("Interceptor1", 10L);
+        scheduledEventTracker.caseProcessedEvent(eventConfig, "123", metrics);
+
+        verify(telemetryService).trackEvent(
+            ScheduledTaskEventConfiguration.SCHEDULER_CASE_PROCESSED,
+            Map.of(
+                "schedulerName", "TestScheduler",
+                "caseId", "123",
+                "status", "SUCCESS",
+                "metric_Interceptor1", "10"
+            )
+        );
+    }
+
+    @Test
+    void shouldTrackCaseProcessedEventWithMetricsAndProperties() {
+        Map<String, Long> metrics = Map.of("Interceptor1", 10L);
+        Map<String, String> properties = Map.of("flowState", "MAIN.DRAFT");
+        scheduledEventTracker.caseProcessedEvent(eventConfig, "123", metrics, properties);
+
+        verify(telemetryService).trackEvent(
+            ScheduledTaskEventConfiguration.SCHEDULER_CASE_PROCESSED,
+            Map.of(
+                "schedulerName", "TestScheduler",
+                "caseId", "123",
+                "status", "SUCCESS",
+                "metric_Interceptor1", "10",
+                "flowState", "MAIN.DRAFT"
+            )
         );
     }
 
@@ -70,114 +104,324 @@ class ScheduledEventTrackerTest {
         scheduledEventTracker.caseFailedEvent(eventConfig, 456L, exception);
 
         verify(telemetryService).trackEvent(
-            eq("TestSchedulerCaseFailed"),
-            eq(Map.of(
+            ScheduledTaskEventConfiguration.SCHEDULER_CASE_FAILED,
+            Map.of(
                 "schedulerName", "TestScheduler",
                 "caseId", "456",
                 "status", "FAILURE",
                 "error", "Test error",
                 "errorCategory", "TestCategory"
-            ))
+            )
+        );
+    }
+
+    @Test
+    void shouldTrackCaseFailedEventWithMetrics() {
+        Exception exception = new RuntimeException("Test error");
+        when(errorCategorizer.categorizeError(exception)).thenReturn("TestCategory");
+        Map<String, Long> metrics = Map.of("Interceptor1", 10L);
+
+        scheduledEventTracker.caseFailedEvent(eventConfig, "456", exception, metrics);
+
+        verify(telemetryService).trackEvent(
+            ScheduledTaskEventConfiguration.SCHEDULER_CASE_FAILED,
+            Map.of(
+                "schedulerName", "TestScheduler",
+                "caseId", "456",
+                "status", "FAILURE",
+                "error", "Test error",
+                "errorCategory", "TestCategory",
+                "metric_Interceptor1", "10"
+            )
+        );
+    }
+
+    @Test
+    void shouldTrackCaseFailedEventWithMetricsAndProperties() {
+        Exception exception = new RuntimeException("Test error");
+        when(errorCategorizer.categorizeError(exception)).thenReturn("TestCategory");
+        Map<String, Long> metrics = Map.of("Interceptor1", 10L);
+        Map<String, String> properties = Map.of("flowState", "MAIN.DRAFT");
+
+        scheduledEventTracker.caseFailedEvent(eventConfig, "456", exception, metrics, properties);
+
+        verify(telemetryService).trackEvent(
+            ScheduledTaskEventConfiguration.SCHEDULER_CASE_FAILED,
+            Map.of(
+                "schedulerName", "TestScheduler",
+                "caseId", "456",
+                "status", "FAILURE",
+                "error", "Test error",
+                "errorCategory", "TestCategory",
+                "metric_Interceptor1", "10",
+                "flowState", "MAIN.DRAFT"
+            )
         );
     }
 
     @Test
     void shouldTrackJobCompletedEvent() {
-        scheduledEventTracker.jobCompletedEvent(eventConfig, 3, 2, 1, Duration.ofMillis(500));
+        scheduledEventTracker.jobCompletedEvent(
+            eventConfig,
+            ScheduledJobReport.builder()
+                .totalCases(3)
+                .succeededCases(2)
+                .failedCases(1)
+                .abortedCases(0)
+                .cumulativeDelay(Duration.ofMillis(500))
+                .searchDuration(Duration.ofMillis(100))
+                .processingDuration(Duration.ofMillis(400))
+                .totalDuration(Duration.ofMillis(500))
+                .build()
+        );
 
         verify(telemetryService).trackEvent(
-            eq("TestSchedulerJobCompleted"),
-            eq(Map.of(
+            ScheduledTaskEventConfiguration.SCHEDULER_JOB_COMPLETED,
+            Map.of(
                 "schedulerName", "TestScheduler",
                 "totalCases", "3",
                 "succeededCases", "2",
                 "failedCases", "1",
-                "cumulativeDelay", "500"
-            ))
+                "abortedCases", "0",
+                "cumulativeDelay", "500",
+                "searchDuration", "100",
+                "processingDuration", "400",
+                "totalDuration", "500"
+            )
         );
     }
 
     @Test
     void shouldTrackJobAbortedEvent() {
-        scheduledEventTracker.jobAbortedEvent(eventConfig, 2, 0, 2, "Aborted due to too many errors", Duration.ofMillis(100));
+        scheduledEventTracker.jobAbortedEvent(
+            eventConfig,
+            ScheduledJobReport.builder()
+                .totalCases(2)
+                .succeededCases(0)
+                .failedCases(2)
+                .abortedCases(0)
+                .jobAbortReason("Aborted due to too many errors")
+                .cumulativeDelay(Duration.ofMillis(100))
+                .searchDuration(Duration.ofMillis(50))
+                .processingDuration(Duration.ofMillis(150))
+                .totalDuration(Duration.ofMillis(200))
+                .build()
+        );
 
         verify(telemetryService).trackEvent(
-            eq("TestSchedulerJobAborted"),
-            eq(Map.of(
+            ScheduledTaskEventConfiguration.SCHEDULER_JOB_ABORTED,
+            Map.of(
                 "schedulerName", "TestScheduler",
                 "totalCases", "2",
                 "succeededCases", "0",
                 "failedCases", "2",
-                "abortReason", "Aborted due to too many errors",
-                "cumulativeDelay", "100"
-            ))
+                "abortedCases", "0",
+                "jobAbortReason", "Aborted due to too many errors",
+                "cumulativeDelay", "100",
+                "searchDuration", "50",
+                "processingDuration", "150",
+                "totalDuration", "200"
+            )
         );
     }
 
     @Test
     void shouldTrackJobAbortedEventWithUnknownReason_whenReasonIsNull() {
-        scheduledEventTracker.jobAbortedEvent(eventConfig, 0, 0, 0, null, Duration.ZERO);
+        scheduledEventTracker.jobAbortedEvent(
+            eventConfig,
+            ScheduledJobReport.builder()
+                .totalCases(0)
+                .succeededCases(0)
+                .failedCases(0)
+                .abortedCases(0)
+                .jobAbortReason(null)
+                .cumulativeDelay(Duration.ZERO)
+                .searchDuration(Duration.ZERO)
+                .processingDuration(Duration.ZERO)
+                .totalDuration(Duration.ZERO)
+                .build()
+        );
 
         verify(telemetryService).trackEvent(
-            eq("TestSchedulerJobAborted"),
-            eq(Map.of(
+            ScheduledTaskEventConfiguration.SCHEDULER_JOB_ABORTED,
+            Map.of(
                 "schedulerName", "TestScheduler",
                 "totalCases", "0",
                 "succeededCases", "0",
                 "failedCases", "0",
-                "abortReason", "Unknown",
-                "cumulativeDelay", "0"
-            ))
+                "abortedCases", "0",
+                "jobAbortReason", "Unknown",
+                "cumulativeDelay", "0",
+                "searchDuration", "0",
+                "processingDuration", "0",
+                "totalDuration", "0"
+            )
         );
     }
 
     @Test
     void shouldTrackJobCompletedNoCasesEvent() {
-        scheduledEventTracker.jobCompletedNoCasesEvent(eventConfig);
+        scheduledEventTracker.jobCompletedNoCasesEvent(eventConfig, Duration.ofMillis(100));
 
         verify(telemetryService).trackEvent(
-            eq("TestSchedulerJobCompleted"),
-            eq(Map.of(
+            ScheduledTaskEventConfiguration.SCHEDULER_JOB_COMPLETED,
+            Map.of(
                 "schedulerName", "TestScheduler",
                 "totalCases", "0",
                 "succeededCases", "0",
                 "failedCases", "0",
-                "cumulativeDelay", "0"
-            ))
+                "abortedCases", "0",
+                "cumulativeDelay", "0",
+                "searchDuration", "100",
+                "processingDuration", "0",
+                "totalDuration", "100"
+            )
+        );
+    }
+
+    @Test
+    void shouldTrackCaseAbortedEvent() {
+        scheduledEventTracker.caseAbortedEvent(eventConfig, "789", AbortCategory.ONGOING_BUSINESS_PROCESS, "Ongoing business process");
+
+        verify(telemetryService).trackEvent(
+            ScheduledTaskEventConfiguration.SCHEDULER_CASE_ABORTED,
+            Map.of(
+                "schedulerName", "TestScheduler",
+                "caseId", "789",
+                "abortReason", "Ongoing business process",
+                "abortCategory", "ONGOING_BUSINESS_PROCESS",
+                "status", "ABORTED"
+            )
+        );
+    }
+
+    @Test
+    void shouldTrackCaseAbortedEventWithMetrics() {
+        Map<String, Long> metrics = Map.of("Interceptor1", 10L);
+        scheduledEventTracker.caseAbortedEvent(eventConfig, "789", AbortCategory.ONGOING_BUSINESS_PROCESS, "Ongoing business process", metrics);
+
+        verify(telemetryService).trackEvent(
+            ScheduledTaskEventConfiguration.SCHEDULER_CASE_ABORTED,
+            Map.of(
+                "schedulerName", "TestScheduler",
+                "caseId", "789",
+                "abortReason", "Ongoing business process",
+                "abortCategory", "ONGOING_BUSINESS_PROCESS",
+                "status", "ABORTED",
+                "metric_Interceptor1", "10"
+            )
+        );
+    }
+
+    @Test
+    void shouldTrackCaseAbortedEventWithMetricsAndProperties() {
+        Map<String, Long> metrics = Map.of("Interceptor1", 10L);
+        Map<String, String> properties = Map.of("flowState", "MAIN.DRAFT");
+        scheduledEventTracker.caseAbortedEvent(eventConfig, "789", AbortCategory.FLOW_STATE_DISALLOWED, "Disallowed", metrics, properties);
+
+        verify(telemetryService).trackEvent(
+            ScheduledTaskEventConfiguration.SCHEDULER_CASE_ABORTED,
+            Map.of(
+                "schedulerName", "TestScheduler",
+                "caseId", "789",
+                "abortReason", "Disallowed",
+                "abortCategory", "FLOW_STATE_DISALLOWED",
+                "status", "ABORTED",
+                "metric_Interceptor1", "10",
+                "flowState", "MAIN.DRAFT"
+            )
+        );
+    }
+
+    @Test
+    void shouldTrackCaseAbortedEventDefaultingToOtherCategory_whenNoCategoryProvided() {
+        scheduledEventTracker.caseAbortedEvent(eventConfig, "789", "Custom reason");
+
+        verify(telemetryService).trackEvent(
+            ScheduledTaskEventConfiguration.SCHEDULER_CASE_ABORTED,
+            Map.of(
+                "schedulerName", "TestScheduler",
+                "caseId", "789",
+                "abortReason", "Custom reason",
+                "abortCategory", "OTHER",
+                "status", "ABORTED"
+            )
+        );
+    }
+
+    @Test
+    void shouldTrackCaseAbortedEventWithNullCategoryDefaultingToOther() {
+        scheduledEventTracker.caseAbortedEvent(eventConfig, "789", null, "Custom reason");
+
+        verify(telemetryService).trackEvent(
+            ScheduledTaskEventConfiguration.SCHEDULER_CASE_ABORTED,
+            Map.of(
+                "schedulerName", "TestScheduler",
+                "caseId", "789",
+                "abortReason", "Custom reason",
+                "abortCategory", "OTHER",
+                "status", "ABORTED"
+            )
         );
     }
 
     @Test
     void shouldTrackSimpleJobAbortedEvent() {
-        scheduledEventTracker.jobAbortedEvent(eventConfig, "Error reason");
+        scheduledEventTracker.jobAbortedEvent(eventConfig, "Error reason", Duration.ofMillis(100));
 
         verify(telemetryService).trackEvent(
-            eq("TestSchedulerJobAborted"),
-            eq(Map.of(
+            ScheduledTaskEventConfiguration.SCHEDULER_JOB_ABORTED,
+            Map.of(
                 "schedulerName", "TestScheduler",
                 "totalCases", "0",
                 "succeededCases", "0",
                 "failedCases", "0",
-                "abortReason", "Error reason",
-                "cumulativeDelay", "0"
-            ))
+                "abortedCases", "0",
+                "jobAbortReason", "Error reason",
+                "cumulativeDelay", "0",
+                "searchDuration", "100",
+                "processingDuration", "0",
+                "totalDuration", "100"
+            )
         );
     }
 
     @Test
     void shouldTrackSimpleJobAbortedEventWithUnknownReason_whenReasonIsNull() {
-        scheduledEventTracker.jobAbortedEvent(eventConfig, null);
+        scheduledEventTracker.jobAbortedEvent(eventConfig, null, Duration.ZERO);
 
         verify(telemetryService).trackEvent(
-            eq("TestSchedulerJobAborted"),
-            eq(Map.of(
+            ScheduledTaskEventConfiguration.SCHEDULER_JOB_ABORTED,
+            Map.of(
                 "schedulerName", "TestScheduler",
                 "totalCases", "0",
                 "succeededCases", "0",
                 "failedCases", "0",
-                "abortReason", "Unknown",
-                "cumulativeDelay", "0"
-            ))
+                "abortedCases", "0",
+                "jobAbortReason", "Unknown",
+                "cumulativeDelay", "0",
+                "searchDuration", "0",
+                "processingDuration", "0",
+                "totalDuration", "0"
+            )
+        );
+    }
+
+    @Test
+    void shouldTrackBackPressureUpdatedEvent() {
+        scheduledEventTracker.backPressureUpdatedEvent(
+            eventConfig,
+            Duration.ofMillis(100),
+            Duration.ofMillis(200)
+        );
+
+        verify(telemetryService).trackEvent(
+            ScheduledTaskEventConfiguration.SCHEDULER_BACK_PRESSURE_UPDATED,
+            Map.of(
+                "schedulerName", "TestScheduler",
+                "previousDelay", "100",
+                "currentDelay", "200"
+            )
         );
     }
 }

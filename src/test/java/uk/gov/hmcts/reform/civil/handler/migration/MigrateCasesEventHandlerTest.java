@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReferenceCsvLoader;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardNotificationTaskCaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardScenarioCaseReference;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.DraftClaimReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.ExcelCaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.ExcelMappable;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.NotificationCaseReference;
@@ -102,6 +103,54 @@ class MigrateCasesEventHandlerTest {
 
         assertNotNull(result);
         verify(asyncCaseMigrationService, times(1)).migrateCasesAsync(migrationTask, mockReferences, null, false);
+    }
+
+    @Test
+    void shouldDelegateDraftReferencesToUserDraftMigration() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("taskName")).thenReturn("draftTask");
+        when(externalTask.getVariable("caseIds")).thenReturn("");
+        when(externalTask.getVariable("csvFileName")).thenReturn("drafts.csv");
+        when(externalTask.getVariable("isDraftCase")).thenReturn("true");
+
+        @SuppressWarnings("unchecked")
+        MigrationTask<DraftClaimReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.getType()).thenReturn(DraftClaimReference.class);
+        doReturn(Optional.of(migrationTask)).when(migrationTaskFactory).getMigrationTask("draftTask");
+
+        DraftClaimReference reference = new DraftClaimReference();
+        reference.setCaseReference("draft-1");
+        reference.setUserId("user-1");
+        when(caseReferenceCsvLoader.loadCaseReferenceList(
+            DraftClaimReference.class, "drafts.csv"
+        )).thenReturn(List.of(reference));
+
+        handler.handleTask(externalTask);
+
+        verify(asyncCaseMigrationService).migrateUserDrafts(migrationTask, List.of(reference));
+        verify(asyncCaseMigrationService, never()).migrateCasesAsync(any(), anyList(), any(), anyBoolean());
+    }
+
+    @Test
+    void shouldRejectDraftReferenceWithoutUserId() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("taskName")).thenReturn("draftTask");
+        when(externalTask.getVariable("caseIds")).thenReturn("");
+        when(externalTask.getVariable("csvFileName")).thenReturn("drafts.csv");
+        when(externalTask.getVariable("isDraftCase")).thenReturn("true");
+
+        @SuppressWarnings("unchecked")
+        MigrationTask<DraftClaimReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.getType()).thenReturn(DraftClaimReference.class);
+        doReturn(Optional.of(migrationTask)).when(migrationTaskFactory).getMigrationTask("draftTask");
+
+        DraftClaimReference reference = new DraftClaimReference();
+        reference.setCaseReference("draft-1");
+        when(caseReferenceCsvLoader.loadCaseReferenceList(DraftClaimReference.class, "drafts.csv"))
+            .thenReturn(List.of(reference));
+
+        assertThrows(IllegalArgumentException.class, () -> handler.handleTask(externalTask));
+        verify(asyncCaseMigrationService, never()).migrateUserDrafts(any(), anyList());
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

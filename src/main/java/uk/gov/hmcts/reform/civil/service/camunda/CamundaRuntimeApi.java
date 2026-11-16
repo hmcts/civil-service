@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.camunda;
 
-import org.camunda.community.rest.client.model.IncidentDto;
-import org.camunda.community.rest.client.model.ProcessInstanceDto;
-import org.camunda.community.rest.client.model.VariableValueDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,6 +8,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
+import uk.gov.hmcts.reform.civil.model.camunda.CamundaIncident;
+import uk.gov.hmcts.reform.civil.model.camunda.CamundaMessageCorrelation;
+import uk.gov.hmcts.reform.civil.model.camunda.CamundaProcessInstance;
+import uk.gov.hmcts.reform.civil.model.camunda.CamundaVariableValue;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.Map;
 public interface CamundaRuntimeApi {
 
     @GetMapping("process-instance/{processInstanceId}/variables")
-    HashMap<String, VariableValueDto> getProcessVariables(
+    HashMap<String, CamundaVariableValue> getProcessVariables(
         @PathVariable("processInstanceId") String processInstanceId,
         @RequestHeader("ServiceAuthorization") String serviceAuthorization
     );
@@ -33,7 +34,7 @@ public interface CamundaRuntimeApi {
     );
 
     @GetMapping("/process-instance")
-    List<ProcessInstanceDto> getUnfinishedProcessInstancesWithIncidents(
+    List<CamundaProcessInstance> getUnfinishedProcessInstancesWithIncidents(
         @RequestHeader("ServiceAuthorization") String serviceAuthorization,
         @RequestParam("unfinished") boolean unfinished,
         @RequestParam("withIncident") boolean withIncident,
@@ -47,7 +48,7 @@ public interface CamundaRuntimeApi {
     );
 
     @PostMapping("/history/process-instance")
-    List<ProcessInstanceDto> queryProcessInstances(
+    List<CamundaProcessInstance> queryProcessInstances(
         @RequestHeader("ServiceAuthorization") String serviceAuthorization,
         @RequestParam(value = "firstResult", required = false) Integer firstResult,
         @RequestParam(value = "maxResults", required = false) Integer maxResults,
@@ -63,7 +64,7 @@ public interface CamundaRuntimeApi {
     );
 
     @GetMapping("/incident")
-    List<IncidentDto> getLatestOpenIncidentForProcessInstance(
+    List<CamundaIncident> getLatestOpenIncidentForProcessInstance(
         @RequestHeader("ServiceAuthorization") String serviceAuthorization,
         @RequestParam("open") boolean open,
         @RequestParam("processInstanceId") String processInstanceId, // single process instance ID
@@ -84,5 +85,38 @@ public interface CamundaRuntimeApi {
         @RequestHeader("ServiceAuthorization") String serviceAuthorization,
         @PathVariable("processInstanceId") String processInstanceId,
         @RequestBody Map<String, Object> modificationRequest
+    );
+
+    /**
+     * REST equivalent of {@code runtimeService.setVariables(processInstanceId, variables)}.
+     *
+     * <p>The body takes the Camunda "modify variables" shape, i.e.
+     * {@code {"modifications": {"name": {"value": ..., "type": ...}}}}.</p>
+     */
+    @PostMapping("/process-instance/{processInstanceId}/variables")
+    void setProcessVariables(
+        @RequestHeader("ServiceAuthorization") String serviceAuthorization,
+        @PathVariable("processInstanceId") String processInstanceId,
+        @RequestBody Map<String, Object> modifications
+    );
+
+    /**
+     * REST equivalent of {@code runtimeService.setVariable(processInstanceId, name, value)}.
+     */
+    @PutMapping("/process-instance/{processInstanceId}/variables/{variableName}")
+    void setProcessVariable(
+        @RequestHeader("ServiceAuthorization") String serviceAuthorization,
+        @PathVariable("processInstanceId") String processInstanceId,
+        @PathVariable("variableName") String variableName,
+        @RequestBody CamundaVariableValue variableValue
+    );
+
+    /**
+     * REST equivalent of {@code runtimeService.createMessageCorrelation(...).correlateStartMessage()}.
+     */
+    @PostMapping("/message")
+    void correlateMessage(
+        @RequestHeader("ServiceAuthorization") String serviceAuthorization,
+        @RequestBody CamundaMessageCorrelation correlation
     );
 }

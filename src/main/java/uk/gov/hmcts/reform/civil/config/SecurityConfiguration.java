@@ -2,12 +2,14 @@ package uk.gov.hmcts.reform.civil.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
@@ -76,6 +78,9 @@ public class SecurityConfiguration {
             .csrf(csrf -> csrf.disable())
             .formLogin(form -> form.disable())
             .logout(logout -> logout.disable())
+            // Unauthenticated requests (e.g. IDAM rejected the token) get 401 so callers such as CUI can re-authenticate;
+            // the default Http403ForbiddenEntryPoint made them indistinguishable from a missing role
+            .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
             // Add the filter for all requests, but health endpoints will be excluded by the permitAll() rule
             .addFilterBefore(authCheckerUserOnlyFilter, AbstractPreAuthenticatedProcessingFilter.class)
             .authorizeHttpRequests(auth -> auth

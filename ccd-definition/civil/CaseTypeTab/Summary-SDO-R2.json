@@ -1,0 +1,26 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "reasonForReconsiderationApplicant",
+    "TabFieldDisplayOrder": 16
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "reasonForReconsiderationRespondent1",
+    "TabFieldDisplayOrder": 17
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Summary",
+    "TabLabel": "Summary",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "reasonForReconsiderationRespondent2",
+    "TabFieldDisplayOrder": 18
+  }
+]
