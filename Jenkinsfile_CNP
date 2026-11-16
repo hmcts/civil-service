@@ -5,6 +5,7 @@
 import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
+import uk.gov.hmcts.contino.Helm
 
 // properties() replaces the job's whole property list, so both branches must carry every property.
 // On a PR, a new push aborts the running build: otherwise the new build queues on the per-PR preview
@@ -160,6 +161,21 @@ withPipeline(type, product, component) {
 
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
     before('build') {
+      stage('Check chart size') {
+        // Reuse Jenkins registry access; GitHub-hosted runners cannot pull these private charts.
+        withAcrClient('nonprod') {
+          new Helm(this, 'civil-service').authenticateAcr()
+          sh '''
+            set -eu
+            chart_check_dir=$(mktemp -d)
+            trap 'rm -rf "$chart_check_dir"' EXIT
+            cp -R charts/civil-service "$chart_check_dir/civil-service"
+            helm dependency build "$chart_check_dir/civil-service"
+            helm package "$chart_check_dir/civil-service" --destination "$chart_check_dir/package"
+            python3 .github/scripts/check-chart-size.py "$chart_check_dir"/package/civil-service-*.tgz
+          '''
+        }
+      }
       sh """
       ./bin/validate-migration-files.sh ${env.CHANGE_BRANCH} ${env.CHANGE_TARGET} --jenkins
        """

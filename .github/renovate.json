@@ -120,6 +120,16 @@
       "automergeType": "pr"
     },
     {
+      "description": "DTSCCI-7065: Hold CCD chart updates until the chart size regression is resolved and the packaged civil-service chart is safely below the size limit",
+      "matchManagers": [
+        "helmv3"
+      ],
+      "matchPackageNames": [
+        "ccd"
+      ],
+      "enabled": false
+    },
+    {
       "groupName": "Spring Boot and related updates",
       "groupSlug": "spring-boot-related",
       "automerge": true,
