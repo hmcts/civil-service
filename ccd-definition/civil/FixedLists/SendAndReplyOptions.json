@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "SendAndReplyOptionsList",
+    "ListElementCode": "SEND",
+    "ListElement": "Send a message",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "SendAndReplyOptionsList",
+    "ListElementCode": "REPLY",
+    "ListElement": "Reply to a message",
+    "DisplayOrder": 2
+  }
+]

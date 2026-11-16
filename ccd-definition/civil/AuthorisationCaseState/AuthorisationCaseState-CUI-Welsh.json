@@ -1,0 +1,130 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "AWAITING_RESPONDENT_ACKNOWLEDGEMENT",
+    "UserRoles": [
+      "wlu-admin"
+    ],
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "AWAITING_APPLICANT_INTENTION",
+    "UserRoles": [
+      "wlu-admin"
+    ],
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "PENDING_CASE_ISSUED",
+    "UserRoles": [
+      "wlu-admin"
+    ],
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "JUDICIAL_REFERRAL",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "IN_MEDIATION",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "CASE_SETTLED",
+    "UserRoles": [
+      "wlu-admin"
+    ],
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "CASE_STAYED",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "PROCEEDS_IN_HERITAGE_SYSTEM",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "All_FINAL_ORDERS_ISSUED",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "CASE_PROGRESSION",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "PREPARE_FOR_HEARING_CONDUCT_HEARING",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "HEARING_READINESS",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  }
+]

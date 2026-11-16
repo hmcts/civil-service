@@ -1,0 +1,20 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "eaCourtLocation",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "orderType",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseFieldID": "caseManagementOrderSelection",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "R"
+  }
+]

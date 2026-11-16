@@ -1,0 +1,11 @@
+[
+  {
+    "ID": "GAmakeAppVisibleToRespondents",
+    "ListElementCode": "makeAppAvailableCheck",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "MakeAppAvailableCheckGAspec",
+    "HintText": "  ",
+    "ElementLabel": "Do you wish to make the application visible to all parties?",
+    "SecurityClassification": "Public"
+  }
+]

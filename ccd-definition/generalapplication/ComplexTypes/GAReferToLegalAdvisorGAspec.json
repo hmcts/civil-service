@@ -1,0 +1,17 @@
+[
+  {
+    "ID": "GAReferToLegalAdvisorGAspec",
+    "ListElementCode": "legalAdvisorEventDescription",
+    "ElementLabel": "Event Descirpiton",
+    "HintText": "A few words describing the purpose of the event.",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAReferToLegalAdvisorGAspec",
+    "ListElementCode": "legalAdvisorAdditionalInfo",
+    "ElementLabel": "Additional Information",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "PROCESS_COSC_APPLICATION",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "CHECK_AND_MARK_PAID_IN_FULL",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRU"
+  }
+]

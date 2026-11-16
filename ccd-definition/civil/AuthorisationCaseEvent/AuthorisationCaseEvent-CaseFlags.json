@@ -1,0 +1,26 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "CREATE_CASE_FLAGS",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseflags-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "MANAGE_CASE_FLAGS",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseflags-admin"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "GAApplicationsRespTwo",
+    "TabLabel": "Applications",
+    "TabDisplayOrder": 8,
+    "CaseFieldID": "respondentSolTwoGaAppDetails",
+    "UserRoles": [
+      "RES-SOL-TWO-UNSPEC-PROFILE"
+    ],
+    "TabFieldDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "GAApplicationsRespTwoSpec",
+    "TabLabel": "Applications",
+    "TabDisplayOrder": 8,
+    "CaseFieldID": "respondentSolTwoGaAppDetails",
+    "UserRoles": [
+      "RES-SOL-TWO-SPEC-PROFILE"
+    ],
+    "TabFieldDisplayOrder": 1
+  }
+]

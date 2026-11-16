@@ -1,0 +1,30 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "datesToAvoidDatesTopText",
+    "ID": "FinalOrderFurtherHearingDatesAvoid",
+    "ElementLabel": "The parties must, by 4pm on",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "datesToAvoidDates",
+    "ID": "FinalOrderFurtherHearingDatesAvoid",
+    "ElementLabel": " ",
+    "HintText": "For example, 16 4 2021",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "datesToAvoidDatesBottomText",
+    "ID": "FinalOrderFurtherHearingDatesAvoid",
+    "ElementLabel": "upload the dates on which they are unavailable for a hearing",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

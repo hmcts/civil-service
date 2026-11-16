@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "EvidenceUploadWitnessSmallClaim",
+    "ListElementCode": "WITNESS_STATEMENT",
+    "ListElement": "Witness statement",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "EvidenceUploadWitnessSmallClaim",
+    "ListElementCode": "WITNESS_SUMMARY",
+    "ListElement": "Witness summary",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "EvidenceUploadWitnessSmallClaim",
+    "ListElementCode": "DOCUMENTS_REFERRED",
+    "ListElement": "Documentary evidence",
+    "DisplayOrder": 3
+  }
+]

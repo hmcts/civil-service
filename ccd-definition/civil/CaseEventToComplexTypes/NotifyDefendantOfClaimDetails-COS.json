@@ -1,0 +1,244 @@
+[
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails1",
+    "ListElementCode": "cosDocSaved",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails1",
+    "ListElementCode": "cosDateOfServiceForDefendant",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails1",
+    "ListElementCode": "cosDateDeemedServedForDefendant",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails1",
+    "ListElementCode": "cosServedDocumentFiles",
+    "EventElementLabel": "What documents did you serve?",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails1",
+    "ListElementCode": "cosEvidenceDocument",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "COMPLEX"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails1",
+    "ListElementCode": "cosRecipient",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails1",
+    "ListElementCode": "cosRecipientServeType",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails1",
+    "ListElementCode": "cosRecipientServeLocation",
+    "FieldDisplayOrder": 8,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails1",
+    "ListElementCode": "cosRecipientServeLocationOwnerType",
+    "FieldDisplayOrder": 9,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails1",
+    "ListElementCode": "cosRecipientServeLocationType",
+    "FieldDisplayOrder": 10,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails1",
+    "ListElementCode": "cosRecipientServeLocationTypeOther",
+    "FieldDisplayOrder": 11,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails1",
+    "ListElementCode": "cosStatementOfTruthLabel",
+    "FieldDisplayOrder": 12,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails1",
+    "ListElementCode": "cosSender",
+    "FieldDisplayOrder": 13,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails1",
+    "ListElementCode": "cosSenderFirm",
+    "FieldDisplayOrder": 14,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails1",
+    "ListElementCode": "cosUISenderStatementOfTruthLabel",
+    "FieldDisplayOrder": 15,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails2",
+    "ListElementCode": "cosDocSaved",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "Claimant",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails2",
+    "ListElementCode": "cosDateOfServiceForDefendant",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "Claimant",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails2",
+    "ListElementCode": "cosDateDeemedServedForDefendant",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "Claimant",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails2",
+    "ListElementCode": "cosServedDocumentFiles",
+    "EventElementLabel": "What documents did you serve?",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails2",
+    "ListElementCode": "cosEvidenceDocument",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "COMPLEX"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails2",
+    "ListElementCode": "cosRecipient",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails2",
+    "ListElementCode": "cosRecipientServeType",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails2",
+    "ListElementCode": "cosRecipientServeLocation",
+    "FieldDisplayOrder": 8,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails2",
+    "ListElementCode": "cosRecipientServeLocationOwnerType",
+    "FieldDisplayOrder": 9,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails2",
+    "ListElementCode": "cosRecipientServeLocationType",
+    "FieldDisplayOrder": 10,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails2",
+    "ListElementCode": "cosRecipientServeLocationTypeOther",
+    "FieldDisplayOrder": 11,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails2",
+    "ListElementCode": "cosStatementOfTruthLabel",
+    "FieldDisplayOrder": 12,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails2",
+    "ListElementCode": "cosSender",
+    "FieldDisplayOrder": 13,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails2",
+    "ListElementCode": "cosSenderFirm",
+    "FieldDisplayOrder": 14,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "NotifyClaimDetailsCoS",
+    "CaseEventID": "NOTIFY_DEFENDANT_OF_CLAIM_DETAILS",
+    "CaseFieldID": "cosNotifyClaimDetails2",
+    "ListElementCode": "cosUISenderStatementOfTruthLabel",
+    "FieldDisplayOrder": 15,
+    "DisplayContext": "MANDATORY"
+  }
+]

@@ -1,0 +1,105 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "FULL_REMISSION_HWF_GA",
+    "CaseFieldID": "hwfFeeType",
+    "DisplayContext": "READONLY",
+    "PageID": "FullRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "caseTitleWithHWFGaFeeNumber=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "FULL_REMISSION_HWF_GA",
+    "CaseFieldID": "generalAppHelpWithFees",
+    "DisplayContext": "READONLY",
+    "PageID": "FullRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "caseTitleWithHWFGaFeeNumber=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "FULL_REMISSION_HWF_GA",
+    "CaseFieldID": "claimant1PartyName",
+    "DisplayContext": "READONLY",
+    "PageID": "FullRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "caseTitleWithHWFGaFeeNumber=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "FULL_REMISSION_HWF_GA",
+    "CaseFieldID": "defendant1PartyName",
+    "DisplayContext": "READONLY",
+    "PageID": "FullRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 3,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "caseTitleWithHWFGaFeeNumber=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "FULL_REMISSION_HWF_GA",
+    "CaseFieldID": "gaHwfDetails",
+    "DisplayContext": "READONLY",
+    "PageID": "FullRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 6,
+    "FieldShowCondition": "caseTitleWithHWFGaFeeNumber=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "FULL_REMISSION_HWF_GA",
+    "CaseFieldID": "caseTitleWithHWFGaFeeNumber",
+    "DisplayContext": "READONLY",
+    "PageID": "FullRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 4,
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "FULL_REMISSION_HWF_GA",
+    "CaseFieldID": "subTitleHwfDetails",
+    "DisplayContext": "READONLY",
+    "PageID": "FullRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 5
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "FULL_REMISSION_HWF_GA",
+    "CaseFieldID": "gaFeeLabel",
+    "DisplayContext": "READONLY",
+    "PageID": "FullRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 6,
+    "FieldShowCondition": "hwfFeeType=\"APPLICATION\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "FULL_REMISSION_HWF_GA",
+    "CaseFieldID": "additionalHwfDetails",
+    "DisplayContext": "READONLY",
+    "PageID": "FullRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 7,
+    "FieldShowCondition": "caseTitleWithHWFGaFeeNumber=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "FULL_REMISSION_HWF_GA",
+    "CaseFieldID": "additionalFeeLabel",
+    "DisplayContext": "READONLY",
+    "PageID": "FullRemissionHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 6,
+    "FieldShowCondition": "hwfFeeType=\"ADDITIONAL\""
+  }
+]

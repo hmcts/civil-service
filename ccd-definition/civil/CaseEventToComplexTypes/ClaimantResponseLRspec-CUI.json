@@ -1,0 +1,19 @@
+[
+  {
+    "ID": "CaseDocument",
+    "CaseEventID": "CLAIMANT_RESPONSE_SPEC",
+    "CaseFieldID": "respondent1ClaimResponseDocumentSpec",
+    "ListElementCode": "documentLink",
+    "EventElementLabel": "Defendant response form",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "RequestedCourtLocationLRspec",
+    "CaseEventID": "CLAIMANT_RESPONSE_SPEC",
+    "CaseFieldID": "applicant1DQRequestedCourt",
+    "ListElementCode": "responseCourtLocations",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  }
+]

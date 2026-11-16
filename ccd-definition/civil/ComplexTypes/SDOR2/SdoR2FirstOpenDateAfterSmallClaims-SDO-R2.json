@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "SdoR2SmallClaimsFirstOpenDateAfter",
+    "ListElementCode": "titleLbl",
+    "FieldType": "Label",
+    "ElementLabel": "**First open date after**",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsFirstOpenDateAfter",
+    "ListElementCode": "listFromLbl",
+    "FieldType": "Label",
+    "ElementLabel": "**List from**",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsFirstOpenDateAfter",
+    "ListElementCode": "listFrom",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

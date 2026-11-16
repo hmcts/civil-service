@@ -1,0 +1,22 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "REQUEST_JUDGEMENT_ADMISSION_SPEC",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "APP-SOL-SPEC-PROFILE"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "RES-SOL-ONE-SPEC-PROFILE",
+          "RES-SOL-TWO-SPEC-PROFILE",
+          "CITIZEN-DEFENDANT-PROFILE"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  }
+]

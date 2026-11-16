@@ -1,0 +1,61 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "NotSuitable_SDO",
+    "CaseFieldID": "lblTransferCaseDetails",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "NotSuitableSDO",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "NotSuitable_SDO",
+    "CaseFieldID": "lblReasonNotSuitableSDO",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "READONLY",
+    "PageID": "NotSuitableSDO",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "NotSuitable_SDO",
+    "CaseFieldID": "notSuitableSdoOptions",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY",
+    "PageID": "NotSuitableSDO",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N",
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/not-suitable-reason",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "NotSuitable_SDO",
+    "CaseFieldID": "tocTransferCaseReason",
+    "PageFieldDisplayOrder": 4,
+    "DisplayContext": "COMPLEX",
+    "PageID": "NotSuitableSDO",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "notSuitableSdoOptions = \"CHANGE_LOCATION\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "NotSuitable_SDO",
+    "CaseFieldID": "reasonNotSuitableSDO",
+    "PageFieldDisplayOrder": 5,
+    "DisplayContext": "COMPLEX",
+    "PageID": "NotSuitableSDO",
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y",
+    "FieldShowCondition": "notSuitableSdoOptions = \"OTHER_REASONS\""
+  }
+]

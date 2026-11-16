@@ -1,0 +1,13 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "UPDATE_GA_CASE_DATA",
+    "Name": "Update case data",
+    "Description": "Update parent case data ",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N"
+  }
+]
