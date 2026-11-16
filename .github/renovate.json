@@ -130,6 +130,18 @@
       "enabled": false
     },
     {
+      "description": "Require manual review of AAC chart updates because the chart also bundles CCD",
+      "matchManagers": [
+        "helmv3"
+      ],
+      "matchPackageNames": [
+        "aac-manage-case-assignment"
+      ],
+      "groupName": "AAC chart updates",
+      "groupSlug": "aac-chart",
+      "automerge": false
+    },
+    {
       "groupName": "Spring Boot and related updates",
       "groupSlug": "spring-boot-related",
       "automerge": true,
