@@ -78,5 +78,9 @@ public enum CamundaProcessIdentifier {
     TranslatedDocumentUploadedNotifyParties,
     STANDARD_DIRECTION_ORDER_DJ_NOTIFY_PARTIES,
     DJ_NON_DIVERGENT_NOTIFIER,
-    RequestJudgementByAdmissionNotifyParties;
+    RequestJudgementByAdmissionNotifyParties,
+    StayCaseNotifyParties,
+    StayLiftedNotifyParties,
+    CoscApplicationAfterPaymentNotifyParties,
+    StayUpdateRequestedNotifyParties;
 }
