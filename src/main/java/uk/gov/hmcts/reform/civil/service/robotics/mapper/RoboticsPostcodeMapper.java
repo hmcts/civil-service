@@ -42,7 +42,8 @@ public class RoboticsPostcodeMapper {
             return;
         }
         String lookupPostcode = postcode.replaceAll("\\s", "").toUpperCase(Locale.UK);
-        if (!englandOrWales.computeIfAbsent(lookupPostcode, postcodeLookupService::validatePostCodeForDefendant)) {
+        if (Boolean.FALSE.equals(
+            englandOrWales.computeIfAbsent(lookupPostcode, postcodeLookupService::validatePostCodeForDefendant))) {
             String line3 = address.getAddressLine3();
             address.setAddressLine3(isBlank(line3) ? postcode : line3 + " - " + postcode);
             address.setPostCode(null);
