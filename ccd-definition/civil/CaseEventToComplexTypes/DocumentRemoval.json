@@ -1,0 +1,30 @@
+[
+  {
+    "ID": "documentToKeep",
+    "CaseEventID": "REMOVE_DOCUMENT",
+    "CaseFieldID": "documentToKeepCollection",
+    "ListElementCode": "documentId",
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "documentToKeep",
+    "CaseEventID": "REMOVE_DOCUMENT",
+    "CaseFieldID": "documentToKeepCollection",
+    "ListElementCode": "caseDocumentToKeep",
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "documentToKeep",
+    "CaseEventID": "REMOVE_DOCUMENT",
+    "CaseFieldID": "documentToKeepCollection",
+    "ListElementCode": "uploadedDate",
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "documentToKeep",
+    "CaseEventID": "REMOVE_DOCUMENT",
+    "CaseFieldID": "documentToKeepCollection",
+    "ListElementCode": "systemGenerated",
+    "DisplayContext": "READONLY"
+  }
+]

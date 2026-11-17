@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
@@ -84,17 +85,19 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
             variables.getGeneralApplicationProcessInstanceId(), externalTask.getProcessInstanceId());
         var matchingApplications = ofNullable(generalApplications).orElse(List.of()).stream()
             .filter(Objects::nonNull)
-            .map(Element::getValue)
-            .filter(Objects::nonNull)
-            .filter(application -> application.getBusinessProcess() != null
+            .filter(application -> application.getValue() != null
+                && application.getValue().getBusinessProcess() != null
                 && applicationProcessInstanceId != null
-                && applicationProcessInstanceId.equals(application.getBusinessProcess().getProcessInstanceId()))
+                && applicationProcessInstanceId.equals(application.getValue().getBusinessProcess().getProcessInstanceId()))
             .toList();
         if (matchingApplications.size() != 1) {
             throw new NotRetryableException("Expected one general application for parent case " + caseId
                 + ", process instance " + externalTask.getProcessInstanceId() + "; found " + matchingApplications.size());
         }
-        GeneralApplication generalApplication = matchingApplications.get(0);
+        var selectedApplication = matchingApplications.get(0);
+        log.info("Selected general application element ID: {} for case ID: {}, process instance ID: {}",
+                 selectedApplication.getId(), caseId, externalTask.getProcessInstanceId());
+        GeneralApplication generalApplication = selectedApplication.getValue();
         GeneralApplicationCaseData generalAppCaseData;
         if (generalApplication.getBusinessProcess().getStatus() == BusinessProcessStatus.FINISHED
             && generalApplication.getCaseLink() != null
@@ -323,11 +326,17 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
     }
 
     private YesOrNo checkVisibility(GeneralApplication generalApplication) {
+        YesOrNo hasAgreed = ofNullable(generalApplication.getGeneralAppRespondentAgreement())
+            .map(GARespondentOrderAgreement::getHasAgreed).orElse(null);
+        if (hasAgreed == null) {
+            return NO;
+        }
+
         /*
          * Respondent Agreement is No and without notice application.
          * Application should be visible to solicitor who initiates the ga
          * */
-        if ((generalApplication.getGeneralAppRespondentAgreement().getHasAgreed().equals(NO)
+        if ((NO.equals(hasAgreed)
             && ofNullable(generalApplication.getGeneralAppInformOtherParty()).isPresent()
             && NO.equals(generalApplication.getGeneralAppInformOtherParty().getIsWithNotice()))) {
             return NO;
@@ -337,10 +346,10 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
          * Application should be visible to all solicitors
          * Consent order should be visible to all solicitors
          * */
-        if ((generalApplication.getGeneralAppRespondentAgreement().getHasAgreed().equals(NO)
+        if ((NO.equals(hasAgreed)
             && ofNullable(generalApplication.getGeneralAppInformOtherParty()).isPresent()
             && YES.equals(generalApplication.getGeneralAppInformOtherParty().getIsWithNotice()))
-            || generalApplication.getGeneralAppRespondentAgreement().getHasAgreed().equals(YES)) {
+            || YES.equals(hasAgreed)) {
             return YES;
         }
 

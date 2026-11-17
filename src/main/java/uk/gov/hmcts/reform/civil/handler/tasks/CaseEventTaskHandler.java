@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -72,21 +71,17 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        try {
-            log.info(externalTask.getActivityId());
-            ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
-            String caseId = ofNullable(variables.getCaseId())
-                .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
-            CaseEvent caseEvent = ofNullable(variables.getCaseEvent())
-                .orElseThrow(() -> new InvalidCaseDataException("The caseEvent was not provided"));
-            log.info("Start Event {} for caseId {} activityId {}", caseEvent, caseId, externalTask.getActivityId());
+        log.info(externalTask.getActivityId());
+        ExternalTaskInput variables = toExternalTaskInput(externalTask, mapper);
+        String caseId = ofNullable(variables.getCaseId())
+            .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
+        CaseEvent caseEvent = ofNullable(variables.getCaseEvent())
+            .orElseThrow(() -> new InvalidCaseDataException("The caseEvent was not provided"));
+        log.info("Start Event {} for caseId {} activityId {}", caseEvent, caseId, externalTask.getActivityId());
 
-            CaseData data = processCaseEvent(externalTask, caseId, caseEvent);
+        CaseData data = processCaseEvent(externalTask, caseId, caseEvent);
 
-            return new ExternalTaskData().setCaseData(data);
-        } catch (ValueMapperException | IllegalArgumentException e) {
-            throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
-        }
+        return new ExternalTaskData().setCaseData(data);
     }
 
     private CaseData processCaseEvent(ExternalTask externalTask, String caseId, CaseEvent caseEvent) {

@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "DocumentsToBeConsidered",
+    "ListElementCode": "hasDocumentsToBeConsidered",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Are there any documents the claimants have that you want the court to consider?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DocumentsToBeConsidered",
+    "ListElementCode": "details",
+    "FieldType": "Text",
+    "ElementLabel": "What are the documents the claimants have that you want the court to consider?",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

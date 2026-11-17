@@ -1,0 +1,199 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "defendantDetailsSpec",
+    "Label": "Defendant Details",
+    "FieldType": "DynamicRadioList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "bothDefendantsSpec",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "CPRCertifySpec",
+    "Label": "* The time for responding to the claim has expired. \n* The Defendant has not responded to the claim. \n* There is no outstanding application by the Defendant to strike out the claim for summary judgment. \n* The Defendant has not satisfied the whole claim, including costs. \n* The Defendant has not filed an admission together with request for time to pay.\n\n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "CPRCertifySpecTwoDefendant",
+    "Label": "* The time for responding to the claim has expired. \n* The Defendant has not responded to the claim. \n* There is no outstanding application by the Defendant to strike out the claim for summary judgment. \n* The Defendant has not satisfied the whole claim, including costs. \n* The Defendant has not filed an admission together with request for time to pay.\n\n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "currentDefendant",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "_comment": "Used to populate title for partial payment, depending on whether both defendants were selected"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "partialPaymentLabel",
+    "Label": "## ${currentDefendant}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "partialPayment",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "partialPaymentInsetHelpText",
+    "Label": "<div class=\"govuk-inset-text\">The system only allows interest to be calculated on the full claim amount. If you have received any part payment and you are requesting a CCJ, please use form <a target=\"_blank\" href=\"https://www.gov.uk/government/publications/form-n225-request-for-judgment-and-reply-to-admission-specified-amount\">N225</a>. If you have received any part payment and you are requesting a Judgment on a Part Admission response, please use form <a target=\"_blank\" href=\"https://assets.publishing.service.gov.uk/media/63f49b03e90e077bb3d7af45/n225a-eng-04-13_save.pdf\">N225a</a>. You can calculate the correct interest, and send to <a target=\"_blank\" href=\"mailto:contactocmc@justice.gov.uk\">contactocmc@justice.gov.uk</a></div>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "partialPaymentAmount",
+    "Label": "Amount already paid",
+    "FieldType": "MoneyGBP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "paymentConfirmationTitleSpec",
+    "Label": "## Would you like to claim for fixed costs?",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "paymentConfirmationDecisionSpec",
+    "Label": "This will include fixed costs for judgment and commencement.",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "repaymentSummaryLabel",
+    "Label": "${repaymentSummaryObject}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "repaymentSummaryObject",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "currentDefendantName",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "paymentTypeLabel",
+    "Label": "## How do you want ${currentDefendantName} to pay?",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "paymentTypeSelection",
+    "Label": "Payment type",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "PaymentTypeList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "paymentSetDateLabel",
+    "Label": "## When do you want ${currentDefendantName} to pay?",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "paymentSetDate",
+    "Label": " ",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "repaymentDue",
+    "Label": "Total",
+    "FieldType": "Number",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "repaymentDetailsLabel",
+    "Label": "## Suggest instalments for ${currentDefendantName} \n Total claim amount is £${repaymentDue}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "repaymentSuggestion",
+    "Label": "Regular payments of",
+    "HintText": "For example, £10",
+    "FieldType": "MoneyGBP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "repaymentFrequency",
+    "Label": "How often do you want to receive payments?",
+    "FieldTypeParameter": "RepaymentFrequencyDJ",
+    "FieldType": "FixedRadioList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "currentDatebox",
+    "Label": "date2",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "repaymentDate",
+    "Label": "Date for first instalment",
+    "HintText": "This must be after ${currentDatebox}",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

@@ -14,6 +14,12 @@ import java.util.List;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT2_STAY_UPDATE_REQUESTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_STAY_UPDATE_REQUESTED;
 
+/**
+ * Retained for pre-migration STAY_UPDATE_REQUESTED versions until production confirms they have drained.
+ *
+ * @deprecated Replaced by StayUpdateRequestedNotifier for new process instances.
+ */
+@Deprecated(forRemoval = true)
 @Service
 public class NotifyDefendantStayUpdateRequestedHandler extends AbstractNotifyManageStayDefendantHandler {
 

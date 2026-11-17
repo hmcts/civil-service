@@ -1,0 +1,35 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingDurationInMinutesAHN",
+    "Label": "Duration AHN",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "claimantTrialReadyDocumentCreated",
+    "Label": "trial doc date",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "defendantTrialReadyDocumentCreated",
+    "Label": "trial doc date",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingDocumentsWelsh",
+    "Label": "System generated Case Documents",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

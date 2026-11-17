@@ -1,0 +1,74 @@
+[
+  {
+    "ID": "ShowResponseOneVOneFlag",
+    "ListElementCode": "ONE_V_ONE_FULL_ADMIT",
+    "ListElement": "ONE_V_ONE_FULL_ADMIT",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ShowResponseOneVOneFlag",
+    "ListElementCode": "ONE_V_ONE_FULL_ADMIT_HAS_PAID",
+    "ListElement": "ONE_V_ONE_FULL_ADMIT_HAS_PAID",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "ShowResponseOneVOneFlag",
+    "ListElementCode": "ONE_V_ONE_FULL_ADMIT_PAY_IMMEDIATELY",
+    "ListElement": "ONE_V_ONE_FULL_ADMIT_PAY_IMMEDIATELY",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "ShowResponseOneVOneFlag",
+    "ListElementCode": "ONE_V_ONE_FULL_ADMIT_PAY_BY_SET_DATE",
+    "ListElement": "ONE_V_ONE_FULL_ADMIT_PAY_BY_SET_DATE",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "ShowResponseOneVOneFlag",
+    "ListElementCode": "ONE_V_ONE_FULL_ADMIT_PAY_INSTALMENT",
+    "ListElement": "ONE_V_ONE_FULL_ADMIT_PAY_INSTALMENT",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "ShowResponseOneVOneFlag",
+    "ListElementCode": "ONE_V_ONE_FULL_DEFENCE",
+    "ListElement": "ONE_V_ONE_FULL_DEFENCE",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "ShowResponseOneVOneFlag",
+    "ListElementCode": "ONE_V_ONE_PART_ADMIT",
+    "ListElement": "ONE_V_ONE_PART_ADMIT",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "ShowResponseOneVOneFlag",
+    "ListElementCode": "ONE_V_ONE_PART_ADMIT_HAS_PAID",
+    "ListElement": "ONE_V_ONE_PART_ADMIT_HAS_PAID",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "ShowResponseOneVOneFlag",
+    "ListElementCode": "ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY",
+    "ListElement": "ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "ShowResponseOneVOneFlag",
+    "ListElementCode": "ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE",
+    "ListElement": "ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "ShowResponseOneVOneFlag",
+    "ListElementCode": "ONE_V_ONE_PART_ADMIT_PAY_INSTALMENT",
+    "ListElement": "ONE_V_ONE_PART_ADMIT_PAY_INSTALMENT",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "ShowResponseOneVOneFlag",
+    "ListElementCode": "ONE_V_ONE_COUNTER_CLAIM",
+    "ListElement": "ONE_V_ONE_COUNTER_CLAIM",
+    "DisplayOrder": 12
+  }
+]

@@ -1,0 +1,104 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "changeLanguagePreferenceLabel",
+    "Label": "Update a citizen’s language preference by selecting the user, and their preferred language in which to receive correspondence",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "changeLanguagePreference",
+    "Label": " ",
+    "FieldType": "ChangeLanguagePreference",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "claimantLanguagePreferenceDisplay",
+    "Label": "Claimant language preference",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "PreferredLanguage",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "defendantLanguagePreferenceDisplay",
+    "Label": "Defendant language preference",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "PreferredLanguage",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "preTranslationDocuments",
+    "Label": "Documents to be translated",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "preTranslationDocumentType",
+    "Label": "Type of document to be translated",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "PreTranslationDocumentType",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Publish": "Y"
+  },
+  {
+  "CaseTypeID": "CIVIL",
+    "ID": "documentTranslationInProgressLabel",
+    "Label": "<strong class=\"text-16\">Translation of system generated document in progress.</strong>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondent1NoticeOfDiscontinueAllPartyTranslatedDoc",
+    "Label": " ",
+    "FieldType": "CaseDocument",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "bilingualHint",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "bilingualHintTextNotification",
+    "Label": "<h2>A party in this case has expressed a Welsh language preference. Delays to visibility of documents could be caused during translation processes</h2>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondent1OriginalDqDoc",
+    "Label": " ",
+    "FieldType": "CaseDocument",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "courtOfficersOrders",
+    "Label": "Court Officer Orders",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

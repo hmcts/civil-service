@@ -1,0 +1,70 @@
+[
+  {
+    "ID": "GAHearingNoticeApplication",
+    "ListElementCode": "hearingNoticeApplicationDetail",
+    "ElementLabel": "Application details",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "ApplicationDetailsOption",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAHearingNoticeApplication",
+    "ListElementCode": "hearingNoticeApplicationType",
+    "FieldType": "Text",
+    "ElementLabel": "Type of application",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAHearingNoticeApplication",
+    "ListElementCode": "hearingNoticeApplicationDate",
+    "ElementLabel": "Date of application",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAHearingNoticeDetail",
+    "ListElementCode": "hearingLocation",
+    "ElementLabel": "Location",
+    "FieldType": "DynamicList",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAHearingNoticeDetail",
+    "ListElementCode": "channel",
+    "ElementLabel": "Channel",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "GAJudicialHearingListOptionsGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAHearingNoticeDetail",
+    "ListElementCode": "hearingDate",
+    "ElementLabel": "Hearing Date",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAHearingNoticeDetail",
+    "ListElementCode": "hearingTimeHourMinute",
+    "ElementLabel": "Start time",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "HearingTimeHourMinute",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAHearingNoticeDetail",
+    "ListElementCode": "hearingDuration",
+    "ElementLabel": "Duration",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "GAHearingDurationGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAHearingNoticeDetail",
+    "ListElementCode": "hearingDurationOther",
+    "ElementLabel": "Other duration",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "hearingDuration = \"OTHER\""
+  }
+]

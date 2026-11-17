@@ -1,0 +1,32 @@
+[
+  {
+    "ID": "GAJudicialHearingSupportRequirementGAspec",
+    "ListElementCode": "DISABLED_ACCESS",
+    "ListElement": "Disabled access",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "GAJudicialHearingSupportRequirementGAspec",
+    "ListElementCode": "HEARING_LOOPS",
+    "ListElement": "Hearing loop",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "GAJudicialHearingSupportRequirementGAspec",
+    "ListElementCode": "SIGN_INTERPRETER",
+    "ListElement": "Sign language interpreter",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "GAJudicialHearingSupportRequirementGAspec",
+    "ListElementCode": "LANGUAGE_INTERPRETER",
+    "ListElement": "Language interpreter",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "GAJudicialHearingSupportRequirementGAspec",
+    "ListElementCode": "OTHER_SUPPORT",
+    "ListElement": "Other support",
+    "DisplayOrder": 5
+  }
+]

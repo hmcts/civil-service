@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "CloseClaim",
+    "ListElementCode": "date",
+    "FieldType": "Date",
+    "ElementLabel": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Comment": "This label should be set in caseEventToComplexTypes"
+  },
+  {
+    "ID": "CloseClaim",
+    "ListElementCode": "reason",
+    "FieldType": "TextArea",
+    "ElementLabel": "Reason",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Comment": "This label should be set in caseEventToComplexTypes"
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "HearingNoticeSelection",
+    "ListElementCode": "SMALL_CLAIMS",
+    "ListElement": "Small claims hearing",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "HearingNoticeSelection",
+    "ListElementCode": "FAST_TRACK_TRIAL",
+    "ListElement": "Trial (Fast, Intermediate and Multi track)",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "HearingNoticeSelection",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 3
+  }
+]

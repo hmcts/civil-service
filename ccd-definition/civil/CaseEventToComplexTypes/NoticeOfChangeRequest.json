@@ -1,0 +1,67 @@
+[
+  {
+    "ID": "ChangeOrganisationRequest",
+    "CaseEventID": "NOC_REQUEST",
+    "CaseFieldID": "changeOrganisationRequestField",
+    "ListElementCode": "OrganisationToAdd.OrganisationID",
+    "FieldDisplayOrder": "1",
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "ChangeOrganisationRequest",
+    "CaseEventID": "NOC_REQUEST",
+    "CaseFieldID": "changeOrganisationRequestField",
+    "ListElementCode": "OrganisationToAdd.OrganisationName",
+    "FieldDisplayOrder": "2",
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "ChangeOrganisationRequest",
+    "CaseEventID": "NOC_REQUEST",
+    "CaseFieldID": "changeOrganisationRequestField",
+    "ListElementCode": "OrganisationToRemove.OrganisationID",
+    "FieldDisplayOrder": "3",
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "ChangeOrganisationRequest",
+    "CaseEventID": "NOC_REQUEST",
+    "CaseFieldID": "changeOrganisationRequestField",
+    "ListElementCode": "OrganisationToRemove.OrganisationName",
+    "FieldDisplayOrder": "4",
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "ChangeOrganisationRequest",
+    "CaseEventID": "NOC_REQUEST",
+    "CaseFieldID": "changeOrganisationRequestField",
+    "ListElementCode": "CaseRoleId",
+    "FieldDisplayOrder": "5",
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "ChangeOrganisationRequest",
+    "CaseEventID": "NOC_REQUEST",
+    "CaseFieldID": "changeOrganisationRequestField",
+    "ListElementCode": "RequestTimestamp",
+    "FieldDisplayOrder": "6",
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "ChangeOrganisationRequest",
+    "CaseEventID": "NOC_REQUEST",
+    "CaseFieldID": "changeOrganisationRequestField",
+    "ListElementCode": "ApprovalStatus",
+    "DefaultValue": "1",
+    "FieldDisplayOrder": "7",
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "ChangeOrganisationRequest",
+    "CaseEventID": "NOC_REQUEST",
+    "CaseFieldID": "changeOrganisationRequestField",
+    "ListElementCode": "CreatedBy",
+    "FieldDisplayOrder": "8",
+    "DisplayContext": "OPTIONAL"
+  }
+]

@@ -1,0 +1,30 @@
+[
+  {
+    "ID": "LengthOfUnemploymentComplexTypeLRspec",
+    "ListElementCode": "lengthOfUnemploymentLabel",
+    "ElementLabel": "How long has your client been unemployed? \n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "numberOfYearsInUnemployment",
+    "ID": "LengthOfUnemploymentComplexTypeLRspec",
+    "Label": " ",
+    "ElementLabel": "Years",
+    "FieldType": "Number",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ListElementCode": "numberOfMonthsInUnemployment",
+    "ID": "LengthOfUnemploymentComplexTypeLRspec",
+    "Label": " ",
+    "ElementLabel": "Months",
+    "FieldType": "Number",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

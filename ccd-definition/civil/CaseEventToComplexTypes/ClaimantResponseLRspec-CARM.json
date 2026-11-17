@@ -1,0 +1,82 @@
+[
+  {
+    "ID": "MediationContactInformation",
+    "CaseEventID": "CLAIMANT_RESPONSE_SPEC",
+    "CaseFieldID": "app1MediationContactInfo",
+    "ListElementCode": "firstName",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "MediationContactInformation",
+    "CaseEventID": "CLAIMANT_RESPONSE_SPEC",
+    "CaseFieldID": "app1MediationContactInfo",
+    "ListElementCode": "lastName",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "MediationContactInformation",
+    "CaseEventID": "CLAIMANT_RESPONSE_SPEC",
+    "CaseFieldID": "app1MediationContactInfo",
+    "ListElementCode": "emailAddress",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "MediationContactInformation",
+    "CaseEventID": "CLAIMANT_RESPONSE_SPEC",
+    "CaseFieldID": "app1MediationContactInfo",
+    "ListElementCode": "telephoneNumber",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "MediationAvailability",
+    "CaseEventID": "CLAIMANT_RESPONSE_SPEC",
+    "CaseFieldID": "app1MediationAvailability",
+    "ListElementCode": "isMediationUnavailablityExists",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+  "ID": "MediationAvailability",
+  "CaseEventID": "CLAIMANT_RESPONSE_SPEC",
+  "CaseFieldID": "app1MediationAvailability",
+  "ListElementCode": "unavailableDatesForMediation",
+  "FieldDisplayOrder": 2,
+  "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "MediationAvailability",
+    "CaseEventID": "CLAIMANT_RESPONSE_SPEC",
+    "CaseFieldID": "app1MediationAvailability",
+    "ListElementCode": "unavailableDatesForMediation.unavailableDateType",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "MediationAvailability",
+    "CaseEventID": "CLAIMANT_RESPONSE_SPEC",
+    "CaseFieldID": "app1MediationAvailability",
+    "ListElementCode": "unavailableDatesForMediation.date",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "MediationAvailability",
+    "CaseEventID": "CLAIMANT_RESPONSE_SPEC",
+    "CaseFieldID": "app1MediationAvailability",
+    "ListElementCode": "unavailableDatesForMediation.fromDate",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "MediationAvailability",
+    "CaseEventID": "CLAIMANT_RESPONSE_SPEC",
+    "CaseFieldID": "app1MediationAvailability",
+    "ListElementCode": "unavailableDatesForMediation.toDate",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "MANDATORY"
+  }
+]

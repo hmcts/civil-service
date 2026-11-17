@@ -1,0 +1,155 @@
+[
+  {
+    "ID": "SdoR2SmallClaimsHearing",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": "**A hearing will take place on**",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearing",
+    "ListElementCode": "trialOnOptions",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "HearingOnRadioOptions",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearing",
+    "ListElementCode": "sdoR2SmallClaimsHearingFirstOpenDateAfter",
+    "FieldType": "SdoR2SmallClaimsFirstOpenDateAfter",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "trialOnOptions = \"OPEN_DATE\""
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearing",
+    "ListElementCode": "sdoR2SmallClaimsHearingWindow",
+    "FieldType": "SdoR2SmallClaimsHearingFromTo",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "trialOnOptions = \"HEARING_WINDOW\""
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearing",
+    "ListElementCode": "lengthHearingLbl",
+    "FieldType": "Label",
+    "ElementLabel": "**Length of hearing**",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearing",
+    "ListElementCode": "lengthList",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "SmallClaimsSdoR2TimeEstimate",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearing",
+    "ListElementCode": "lengthListOther",
+    "FieldType": "SdoR2SmallClaimsHearingLengthOther",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "lengthList = \"OTHER\""
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearing",
+    "ListElementCode": "eitherPartyLabel",
+    "FieldType": "Label",
+    "ElementLabel": "If either party considers that the time estimate is insufficient, they must inform the court within 7 days of the date of this order.",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearing",
+    "ListElementCode": "hearingLocationLbl",
+    "FieldType": "Label",
+    "ElementLabel": "**Hearing location**",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearing",
+    "ListElementCode": "hearingCourtLocationList",
+    "FieldType": "DynamicRadioList",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearing",
+    "ListElementCode": "altHearingCourtLocationList",
+    "FieldType": "DynamicList",
+    "ElementLabel": "Alternative hearing location",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "hearingCourtLocationList=\"OTHER_LOCATION\""
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearing",
+    "ListElementCode": "methodOfHearingLbl",
+    "FieldType": "Label",
+    "ElementLabel": "**Method of hearing**",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearing",
+    "ListElementCode": "methodOfHearing",
+    "FieldType": "DynamicRadioList",
+    "ElementLabel": " ",
+    "HintText": "If you want to include any extra information or want to request a certain hearing platform, please include this in the 'Hearing notes' section below",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearing",
+    "ListElementCode": "physicalBundleOptionsLbl",
+    "FieldType": "Label",
+    "ElementLabel": "**Physical hearing bundle**",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearing",
+    "ListElementCode": "physicalBundleOptions",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "SmallClaimsSdoR2PhysicalTrialBundleOptions",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearing",
+    "ListElementCode": "sdoR2SmallClaimsBundleOfDocs",
+    "FieldType": "SdoR2SmallClaimsBundleOfDocs",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "ElementLabel": " ",
+    "FieldShowCondition": "physicalBundleOptions = \"PARTY\""
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearing",
+    "ListElementCode": "hearingNotesLbl",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "ElementLabel": "**Hearing notes**"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearing",
+    "ListElementCode": "hearingNotesTxt",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "ElementLabel": "This is only seen by the Listing Officer"
+  }
+]

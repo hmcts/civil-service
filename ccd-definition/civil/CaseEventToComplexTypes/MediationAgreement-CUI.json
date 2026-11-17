@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "MediationAgreement",
+    "CaseEventID": "MEDIATION_SUCCESSFUL",
+    "CaseFieldID": "mediationAgreement",
+    "ListElementCode": "name",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "MediationAgreement",
+    "CaseEventID": "MEDIATION_SUCCESSFUL",
+    "CaseFieldID": "mediationAgreement",
+    "ListElementCode": "documentType",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "MediationAgreement",
+    "CaseEventID": "MEDIATION_SUCCESSFUL",
+    "CaseFieldID": "mediationAgreement",
+    "ListElementCode": "document",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  }
+]

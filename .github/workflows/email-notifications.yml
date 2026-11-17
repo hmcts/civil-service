@@ -1,40 +1,68 @@
 name: Verify email notification documentation
 
 on:
+  pull_request:
+    branches: [master]
   push:
-    branches:
-      - master
-    paths:
-      - 'src/main/java/**'
-      - 'src/main/resources/application.yaml'
-      - 'src/main/resources/camunda/**'
-      - 'scripts/generate_email_notifications_table.py'
-      - 'docs/email-notifications.md'
-      - 'docs/email-notifications.html'
-      - '.github/workflows/email-notifications.yml'
+    branches: [master]
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   email-docs:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout civil-service
+      - name: Check out civil-service
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - name: Checkout civil-ccd-definition
-        uses: actions/checkout@v7
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v7
         with:
-          repository: hmcts/civil-ccd-definition
-          path: civil-ccd-definition
-          fetch-depth: 0
-      - name: Checkout civil-general-apps-ccd-definition
-        uses: actions/checkout@v7
+          python-version: '3.12'
+      - name: Determine verification policy
+        id: policy
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          if [[ "$EVENT_NAME" == 'workflow_dispatch' ]]; then
+            echo 'mode=sync' >> "$GITHUB_OUTPUT"
+          else
+            python3 -B scripts/email_docs.py classify --base "$BASE_SHA" --head "$HEAD_SHA" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Validate generated documentation
+        if: steps.policy.outputs.mode != 'skip'
+        uses: ./.github/actions/email-docs
         with:
-          repository: hmcts/civil-general-apps-ccd-definition
-          path: civil-general-apps-ccd-definition
-          fetch-depth: 0
-      - name: Generate email notifications table
-        run: scripts/generate_email_notifications_table.py --ccd-definition-root ../civil-ccd-definition/ccd-definition --ga-ccd-definition-root ../civil-general-apps-ccd-definition/ga-ccd-definition
-      - name: Verify docs are in sync
-        run: git diff --exit-code docs/email-notifications.md docs/email-notifications.html
+          mode: ${{ steps.policy.outputs.mode }}
+      - name: Set up Node.js
+        if: steps.policy.outputs.mode != 'skip'
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+      - name: Test documentation PR lifecycle
+        if: steps.policy.outputs.mode != 'skip'
+        run: node --test .github/scripts/*email-docs*.test.cjs
+      - name: Package strictly verified documentation
+        id: package
+        if: github.ref == 'refs/heads/master' && steps.policy.outputs.mode == 'sync'
+        run: |
+          tar -C docs -cf "$RUNNER_TEMP/email-docs.tar" .
+          echo "tree=$(git rev-parse HEAD:docs)" >> "$GITHUB_OUTPUT"
+      - name: Retain verified documentation for publication and recovery
+        if: github.ref == 'refs/heads/master' && steps.policy.outputs.mode == 'sync'
+        uses: actions/upload-artifact@v7
+        with:
+          name: verified-email-docs-${{ steps.package.outputs.tree }}
+          path: ${{ runner.temp }}/email-docs.tar
+          retention-days: 90
+          overwrite: true
+          if-no-files-found: error
+      - name: No documentation inputs changed
+        if: steps.policy.outputs.mode == 'skip'
+        run: echo 'No documentation inputs changed; verification is complete.' >> "$GITHUB_STEP_SUMMARY"
