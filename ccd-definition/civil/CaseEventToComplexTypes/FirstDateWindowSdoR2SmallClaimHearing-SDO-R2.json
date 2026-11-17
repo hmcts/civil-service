@@ -1,0 +1,42 @@
+[
+  {
+    "ID": "SdoR2SmallClaimsHearingFromTo",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2SmallClaimsHearing",
+    "ListElementCode": "sdoR2SmallClaimsHearingWindow.hearingWindowTitle",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearingFromTo",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2SmallClaimsHearing",
+    "ListElementCode": "sdoR2SmallClaimsHearingWindow.hearingWindowFromLbl",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearingFromTo",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2SmallClaimsHearing",
+    "ListElementCode": "sdoR2SmallClaimsHearingWindow.listFrom",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearingFromTo",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2SmallClaimsHearing",
+    "ListElementCode": "sdoR2SmallClaimsHearingWindow.hearingWindowToLbl",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "SdoR2SmallClaimsHearingFromTo",
+    "CaseEventID": "CREATE_SDO",
+    "CaseFieldID": "sdoR2SmallClaimsHearing",
+    "ListElementCode": "sdoR2SmallClaimsHearingWindow.dateTo",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  }
+]

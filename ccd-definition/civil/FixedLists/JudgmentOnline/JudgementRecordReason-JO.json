@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "JoJudgmentRecordReasonList",
+    "ListElementCode": "DETERMINATION_OF_MEANS",
+    "ListElement": "A determination of means has been made",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "JoJudgmentRecordReasonList",
+    "ListElementCode": "JUDGE_ORDER",
+    "ListElement": "A judge has made an order",
+    "DisplayOrder": 2
+  }
+]

@@ -1,0 +1,1274 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppType",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppType.types",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppRespondentAgreement",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppRespondentAgreement.hasAgreed",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppUrgencyRequirement",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppInformOtherParty",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppUrgencyRequirement.urgentAppConsiderationDate",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppUrgencyRequirement.generalAppUrgency",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppUrgencyRequirement.reasonsForUrgency",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppUrgencyRequirement.ConsentAgreementCheckBox",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "ListElementCode": "id",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "ListElementCode": "email",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "ListElementCode": "forename",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "ListElementCode": "surname",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "ListElementCode": "organisationIdentifier",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "ListElementCode": "id",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "ListElementCode": "email",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "ListElementCode": "forename",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "ListElementCode": "surname",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "ListElementCode": "organisationIdentifier",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplicantAddlSolicitors",
+    "ListElementCode": "id",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplicantAddlSolicitors",
+    "ListElementCode": "email",
+    "UserRole":"judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplicantAddlSolicitors",
+    "ListElementCode": "surname",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplicantAddlSolicitors",
+    "ListElementCode": "forename",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplicantAddlSolicitors",
+    "ListElementCode": "organisationIdentifier",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "generalAppFeeToPayLabel119",
+    "UserRole": "judge-profile",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "generalAppFeeToPayLabel303",
+    "UserRole": "judge-profile",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "fee",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "paymentDetails",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "paymentSuccessfulDate",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppStatementOfTruth",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppStatementOfTruth.name",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppStatementOfTruth.role",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppDetailsOfOrder",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppReasonsOfOrder",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.hearingYesorNo",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.hearingDate",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.judgeRequiredYesOrNo",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.judgeName",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.trialRequiredYesOrNo",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.trialDateFrom",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.trialDateTo",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.HearingPreferencesPreferredType",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.TelephoneHearingPreferredType",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.ReasonForPreferredHearingType",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.HearingPreferredLocation",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.HearingDetailsTelephoneNumber",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.HearingDetailsEmailID",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.HearingDuration",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppHearingDays",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppHearingHours",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppHearingMinutes",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.unavailableTrialRequiredYesOrNo",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppUnavailableDates",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppUnavailableDates.unavailableTrialDateFrom",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppUnavailableDates.unavailableTrialDateTo",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.SupportRequirement",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.SupportRequirementSignLanguage",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.SupportRequirementLanguageInterpreter",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.SupportRequirementOther",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppEvidenceDocument",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "isMultiParty",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "applicantPartyName",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "claimant1PartyName",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "claimant2PartyName",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "defendant1PartyName",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "defendant2PartyName",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "parentClaimantIsApplicant",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppParentCaseLink",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppSubmittedDateGAspec",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimantGaAppDetails",
+    "ListElementCode": "generalAppSubmittedDateGAspec",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimantGaAppDetails",
+    "ListElementCode": "caseLink",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimantGaAppDetails",
+    "ListElementCode": "caseState",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimantGaAppDetails",
+    "ListElementCode": "generalApplicationType",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaDetailsMasterCollection",
+    "ListElementCode": "generalAppSubmittedDateGAspec",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaDetailsMasterCollection",
+    "ListElementCode": "caseLink",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaDetailsMasterCollection",
+    "ListElementCode": "caseState",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaDetailsMasterCollection",
+    "ListElementCode": "generalApplicationType",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolGaAppDetails",
+    "ListElementCode": "generalAppSubmittedDateGAspec",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolGaAppDetails",
+    "ListElementCode": "caseLink",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolGaAppDetails",
+    "ListElementCode": "caseState",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolGaAppDetails",
+    "ListElementCode": "generalApplicationType",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolTwoGaAppDetails",
+    "ListElementCode": "generalAppSubmittedDateGAspec",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolTwoGaAppDetails",
+    "ListElementCode": "caseLink",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolTwoGaAppDetails",
+    "ListElementCode": "caseState",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolTwoGaAppDetails",
+    "ListElementCode": "generalApplicationType",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppDateDeadline",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "civilServiceUserRoles",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "applicantSolicitors",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "defendantSolicitors",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "respondentsResponses",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentsResponses",
+    "ListElementCode": "gaHearingDetails",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentsResponses",
+    "ListElementCode": "generalAppRespondent1Representative",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentsResponses",
+    "ListElementCode": "gaRespondentDetails",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentsResponses",
+    "ListElementCode": "gaRespondentResponseReason",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "judgeRecitalLabel",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "judgeOrderLabel",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "showJudgeRecitalText",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "judgeRecitalText",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "makeAnOrder",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "orderText",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "judgeApproveEditOptionDate",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "judgeApproveEditOptionDateForUnlessOrder",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "judgeApproveEditOptionDoc",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "displayjudgeApproveEditOptionDate",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "displayjudgeApproveEditOptionDateForUnlessOrder",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "displayjudgeApproveEditOptionDoc",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "dismissalOrderText",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "directionsText",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "directionsResponseByDate",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "reasonForDecisionLabel",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "showReasonForDecision",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "reasonForDecisionText",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "judicialByCourtsInitiative",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeAnOrderForWrittenRepresentations",
+    "ListElementCode": "makeAnOrderForWrittenRepresentations",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeAnOrderForWrittenRepresentations",
+    "ListElementCode": "writtenSequentailRepresentationsBy",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeAnOrderForWrittenRepresentations",
+    "ListElementCode": "sequentialApplicantMustRespondWithin",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeAnOrderForWrittenRepresentations",
+    "ListElementCode": "writtenConcurrentRepresentationsBy",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "writtenRepresentationsDrawGeneralOrder",
+    "ListElementCode": "judgeRecitalText",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "writtenRepresentationsDrawGeneralOrder",
+    "ListElementCode": "directionInRelationToHearingText",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "requestMoreInfoOption",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "deadlineForMoreInfoSubmission",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "isWithNotice",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "judgeRequestMoreInfoText",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "judgeRequestMoreInfoByDate",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.vulnerabilityQuestionsYesOrNo",
+    "UserRole": "judge-profile",
+    "CRUD": "CRR"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.vulnerabilityQuestion",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "caseManagementLocation",
+    "UserRole": "judge-profile",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "caseManagementLocation.region",
+    "UserRole": "judge-profile",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "caseManagementLocation.baseLocation",
+    "UserRole": "judge-profile",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "caseManagementLocation.siteName",
+    "UserRole": "judge-profile",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "caseManagementLocation.address",
+    "UserRole": "judge-profile",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "caseManagementLocation.postcode",
+    "UserRole": "judge-profile",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "isCcmccLocation",
+    "UserRole": "judge-profile",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppSuperClaimType",
+    "UserRole": "judge-profile",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "caseManagementCategory",
+    "UserRole": "judge-profile",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppVaryJudgementType",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppN245FormUpload",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDate",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "judicialMakeOrderDocPreview",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "judicialListHearingDocPreview",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "judicialWrittenRepDocPreview",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "judicialRequestMoreInfoDocPreview",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "judicialByCourtsInitiativeListForHearing",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "judicialByCourtsInitiativeForWrittenRep",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "orderCourtOwnInitiative",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "orderCourtOwnInitiativeDate",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "orderWithoutNotice",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "orderWithoutNoticeDate",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderCourtOwnInitiativeListForHearing",
+    "ListElementCode": "orderCourtOwnInitiative",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderCourtOwnInitiativeListForHearing",
+    "ListElementCode": "orderCourtOwnInitiativeDate",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNoticeListForHearing",
+    "ListElementCode": "orderWithoutNotice",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNoticeListForHearing",
+    "ListElementCode": "orderWithoutNoticeDate",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderCourtOwnInitiativeForWrittenRep",
+    "ListElementCode": "orderCourtOwnInitiative",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderCourtOwnInitiativeForWrittenRep",
+    "ListElementCode": "orderCourtOwnInitiativeDate",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNoticeForWrittenRep",
+    "ListElementCode": "orderWithoutNotice",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNoticeForWrittenRep",
+    "ListElementCode": "orderWithoutNoticeDate",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "gaFinalOrderDocPreview",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "hearingPreferencesPreferredType",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "hearingPreferredLocation",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judicialTimeEstimate",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judicialTimeEstimateDays",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judicialTimeEstimateHours",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judicialTimeEstimateMinutes",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judicialSupportRequirement",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judgeSignLanguage",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judgeLanguageInterpreter",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judgeOtherSupport",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "addlnInfoCourtStaff",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judgeHearingCourtLocationText1",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judgeHearingTimeEstimateText1",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judgeHearingSupportReqText1",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judicialVulnerabilityText",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "isGaApplicantLip",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "isGaRespondentOneLip",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "isGaRespondentTwoLip",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "caseNameGaInternal",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "gaWaTrackLabel",
+    "UserRole": "judge-profile",
+    "CRUD": "CRU"
+  }
+]

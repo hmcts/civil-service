@@ -1,0 +1,41 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "lengthListOtherLabel",
+    "ID": "CaseHearingLengthElement",
+    "ElementLabel": "### Length of hearing",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "lengthListOtherDays",
+    "ID": "CaseHearingLengthElement",
+    "ElementLabel": "Days",
+    "HintText": "For example, 2",
+    "FieldType": "Number",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "lengthListOtherHours",
+    "ID": "CaseHearingLengthElement",
+    "ElementLabel": "Hours",
+    "HintText": "For example, 4",
+    "FieldType": "Number",
+    "SecurityClassification": "Public",
+    "Min": 0,
+    "Max": 23
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "lengthListOtherMinutes",
+    "ID": "CaseHearingLengthElement",
+    "ElementLabel": "Minutes",
+    "HintText": "For example, 0",
+    "FieldType": "Number",
+    "SecurityClassification": "Public",
+    "Min": 0,
+    "Max": 59
+  }
+]

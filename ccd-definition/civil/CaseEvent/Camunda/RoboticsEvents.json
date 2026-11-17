@@ -1,0 +1,56 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "NOTIFY_RPA_ON_CASE_HANDED_OFFLINE",
+    "Name": "Notify RPA on case offline",
+    "Description": "Notify by email with attached RPA JSON to robotics on case handed offline",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "NOTIFY_RPA_ON_CONTINUOUS_FEED",
+    "Name": "Notify RPA on continuous feed",
+    "Description": "Notify by email with attached RPA JSON to robotics on continuous feed",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "RETRY_NOTIFY_RPA_ON_CASE_HANDED_OFFLINE",
+    "Name": "Retry RPA notification",
+    "Description": "Retry notification by email with attached RPA JSON to robotics on case handed offline",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "RESET_RPA_NOTIFICATION_BUSINESS_PROCESS",
+    "Name": "Reset RPA notification",
+    "Description": "Reset business process for RPA Notification",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/submitted",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "RetriesTimeoutURLAboutToSubmitEvent": 0,
+    "RetriesTimeoutURLSubmittedEvent": 0
+  }
+]

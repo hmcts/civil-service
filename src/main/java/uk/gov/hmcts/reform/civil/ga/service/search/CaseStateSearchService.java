@@ -4,12 +4,16 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 
+import java.util.Set;
+
 import static java.util.Collections.emptyList;
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.UNLESS_ORDER;
 
@@ -18,6 +22,16 @@ public class CaseStateSearchService extends GaElasticSearchService {
 
     public CaseStateSearchService(GaCoreCaseDataService coreCaseDataService) {
         super(coreCaseDataService);
+    }
+
+    public Set<CaseDetails> getUncheckedResponseDeadlineApplications(CaseState caseState) {
+        return searchGeneralApplications(startIndex -> new Query(
+            boolQuery()
+                .must(matchQuery("state", caseState.toString()))
+                .mustNot(matchQuery("data.respondentResponseDeadlineChecked", "Yes")),
+            emptyList(),
+            startIndex
+        ));
     }
 
     @Override
