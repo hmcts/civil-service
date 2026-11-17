@@ -68,6 +68,8 @@ java:
     MANAGEMENT_HEALTH_FEES_ENABLED: false
     # DO NOT MERGE: CIVIL and GENERALAPPLICATION cases are kept by this service's decentralised runtime.
     CIVIL_DECENTRALISED_ENABLED: true
+    # The ccd-definition/exclusions.json entry this environment loads.
+    CIVIL_DECENTRALISED_DEFINITIONS_ENVIRONMENT: preview
   keyVaults:
     civil:
       resourceGroup: civil
