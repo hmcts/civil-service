@@ -1,0 +1,15 @@
+[
+    {
+      "ID": "GAJudgeRequestMoreInfoOptionGAspec",
+      "ListElementCode": "REQUEST_MORE_INFORMATION",
+      "ListElement": "Request more information",
+      "DisplayOrder": 1
+    },
+    {
+      "ID": "GAJudgeRequestMoreInfoOptionGAspec",
+      "ListElementCode": "SEND_APP_TO_OTHER_PARTY",
+      "ListElement": "Send application to other party and request hearing details",
+      "DisplayOrder": 2
+    }
+]
+  

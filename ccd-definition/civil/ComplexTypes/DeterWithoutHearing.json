@@ -1,0 +1,29 @@
+[
+  {
+    "ID": "DeterWithoutHearing",
+    "ListElementCode": "deterWithoutHearingLabel",
+    "FieldType": "Label",
+    "ElementLabel": "**Do you consider that this claim is suitable for determination without a hearing** i.e. by a Judge reading and considering the case papers, witness statements and other documents filed by the parties, making a decision, and giving a note of reasons for that decision? ",
+    "ShowSummaryChangeOption": "N",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DeterWithoutHearing",
+    "ListElementCode": "deterWithoutHearingYesNo",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Determination without hearing?",
+    "ShowSummaryChangeOption": "Y",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DeterWithoutHearing",
+    "ListElementCode": "deterWithoutHearingWhyNot",
+    "FieldType": "TextArea",
+    "ElementLabel": "Tell us why",
+    "ShowSummaryChangeOption": "y",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

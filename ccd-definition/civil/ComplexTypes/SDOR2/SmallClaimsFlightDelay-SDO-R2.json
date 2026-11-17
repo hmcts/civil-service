@@ -1,0 +1,51 @@
+[
+  {
+    "ID": "SmallClaimsFlightDelay",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimsFlightDelay",
+    "ListElementCode": "smallClaimsFlightDelayToggle",
+    "FieldType": "MultiSelectList",
+    "ElementLabel": " ",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimsFlightDelay",
+    "ListElementCode": "relatedClaimsTitle",
+    "FieldType": "Label",
+    "ElementLabel": "## Related claims",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimsFlightDelay",
+    "ListElementCode": "relatedClaimsInput",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimsFlightDelay",
+    "ListElementCode": "legalDocumentsTitle",
+    "FieldType": "Label",
+    "ElementLabel": "## Legal arguments",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SmallClaimsFlightDelay",
+    "ListElementCode": "legalDocumentsInput",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

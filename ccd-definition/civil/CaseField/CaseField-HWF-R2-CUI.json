@@ -1,0 +1,152 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "helpWithFeesReferenceNumber",
+    "Label": " ",
+    "FieldType": "HelpWithFees",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "caseLabelClaimIssueReference",
+    "Label": "${helpWithFees.helpWithFeesReferenceNumber}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "caseTitleWithHWFClaimFeeNumber",
+    "Label": "<h2 class=\"govuk-heading-1\">  ${helpWithFees.helpWithFeesReferenceNumber} ${applicant1.partyName} Vs ${respondent1.partyName}</h2>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "subTitleHwfDetails",
+    "Label": "<h4 class=\"govuk-heading-1\"> HwF Details</h4>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "caseTitleWithHwFDetails",
+    "Label": "## Hwf Details",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hwfFeeType",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "claimFeeLabel",
+    "FieldType": "Label",
+    "Label": "Help with Fees type: HwF Claim fee",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "claimIssuedHwfDetails",
+    "FieldType": "HelpWithFeesDetails",
+    "Label": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "helpWithFeesMoreInformationClaimIssue",
+    "Label": " ",
+    "FieldType": "HelpWithFeesMoreInformation",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "remissionFeeAmountWarningMessage",
+    "Label": "<h4 class=\"govuk-heading-1\"> Warning: Please check you are entering the correct amount, as you will not be able to amend after submission.</h4>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hwfNumberAvailable",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "caseTitle2",
+    "Label": "### ${applicant1.partyName} Vs ${respondent1.partyName}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hwfNumberForFeePaymentOutcome",
+    "Label": "Enter the reference number",
+    "FieldType": "Text",
+    "HintText": "For example, HWF-A1B-23C, PA12-123456",
+    "RegularExpression": "HWF-[0-9A-Za-z]{3}-[0-9A-Za-z]{3}|PA[0-9]{2}-[0-9]{6}",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hwfFullRemissionGrantedForClaimIssue",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hwfOutstandingFeePaymentDoneForClaimIssue",
+    "Label": "Confirm payment of £${claimIssuedHwfDetails.outstandingFeeInPounds} has been taken.",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "ConfirmPaymentMade",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "headingHelpWithFeesDetails",
+    "Label": "## HwF Details",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "claimIssuedHwfForTab",
+    "Label": " ",
+    "FieldType": "HelpWithFeesForTab",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingHwfForTab",
+    "Label": " ",
+    "FieldType": "HelpWithFeesForTab",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

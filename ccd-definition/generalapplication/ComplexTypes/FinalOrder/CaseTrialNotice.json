@@ -1,0 +1,137 @@
+[
+  {
+  "CaseTypeID": "GENERALAPPLICATION",
+  "ListElementCode": "listClaim",
+  "ID": "TrialNoticeProcedure",
+  "ElementLabel": " ",
+  "FieldType": "FixedList",
+  "FieldTypeParameter": "FinalOrdersClaimantNotAttending",
+  "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "label1",
+    "ID": "TrialNoticeProcedure",
+    "ElementLabel": "${claimantPartyName}, the claimant, did not attend the hearing, but the Judge was satisfied that they had received notice of the trial and it was reasonable to proceed in their absence.",
+    "FieldType": "Label",
+    "FieldShowCondition": "listClaim=\"SATISFIED_REASONABLE_TO_PROCEED_CLAIMANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "label2",
+    "ID": "TrialNoticeProcedure",
+    "ElementLabel": "${claimantPartyName}, the claimant, did not attend the hearing and, whilst the Judge was satisfied that they had received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.",
+    "FieldType": "Label",
+    "FieldShowCondition": "listClaim=\"SATISFIED_NOTICE_OF_TRIAL_CLAIMANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "label3",
+    "ID": "TrialNoticeProcedure",
+    "ElementLabel": "${claimantPartyName}, the claimant, did not attend the hearing. The Judge was not satisfied that they had received notice of the hearing and determined that it was not reasonable to proceed in their absence.",
+    "FieldType": "Label",
+    "FieldShowCondition": "listClaim=\"NOT_SATISFIED_NOTICE_OF_TRIAL_CLAIMANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "label4",
+    "ID": "TrialNoticeProcedure",
+    "ElementLabel": "${claimantPartyName}, the claimant, did not attend the hearing as they were not given notice of the application.",
+    "FieldType": "Label",
+    "FieldShowCondition": "listClaim=\"NOT_GIVEN_NOTICE_OF_APPLICATION_CLAIMANT\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "listDef",
+    "ID": "TrialNoticeProcedure",
+    "ElementLabel": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "FinalOrdersDefendantNotAttending",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "label1Def",
+    "ID": "TrialNoticeProcedure",
+    "ElementLabel": "${defendantOnePartyName}, the defendant, did not attend the hearing, but the Judge was satisfied that they had received notice of the trial and it was reasonable to proceed in their absence.",
+    "FieldType": "Label",
+    "FieldShowCondition": "listDef=\"SATISFIED_REASONABLE_TO_PROCEED\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "label2Def",
+    "ID": "TrialNoticeProcedure",
+    "ElementLabel": "${defendantOnePartyName}, the defendant, did not attend the hearing and, whilst the Judge was satisfied that they had received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.",
+    "FieldType": "Label",
+    "FieldShowCondition": "listDef=\"SATISFIED_NOTICE_OF_TRIAL\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "label3Def",
+    "ID": "TrialNoticeProcedure",
+    "ElementLabel": "${defendantOnePartyName}, the defendant, did not attend the hearing. The Judge was not satisfied that they had received notice of the hearing and determined that it was not reasonable to proceed in their absence.",
+    "FieldType": "Label",
+    "FieldShowCondition": "listDef=\"NOT_SATISFIED_NOTICE_OF_TRIAL\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "label4Def",
+    "ID": "TrialNoticeProcedure",
+    "ElementLabel": "${defendantOnePartyName}, the defendant, did not attend the hearing as they were not given notice of the application.",
+    "FieldType": "Label",
+    "FieldShowCondition": "listDef=\"NOT_GIVEN_NOTICE_OF_APPLICATION\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "listDefTwo",
+    "ID": "TrialNoticeProcedure",
+    "ElementLabel": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "FinalOrdersDefendantNotAttending",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "label1DefTwo",
+    "ID": "TrialNoticeProcedure",
+    "ElementLabel": "${defendantTwoPartyName}, the defendant, did not attend the hearing, but the Judge was satisfied that they had received notice of the trial and it was reasonable to proceed in their absence.",
+    "FieldType": "Label",
+    "FieldShowCondition": "listDefTwo=\"SATISFIED_REASONABLE_TO_PROCEED\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "label2DefTwo",
+    "ID": "TrialNoticeProcedure",
+    "ElementLabel": "${defendantTwoPartyName}, the defendant, did not attend the hearing and, whilst the Judge was satisfied that they had received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.",
+    "FieldType": "Label",
+    "FieldShowCondition": "listDefTwo=\"SATISFIED_NOTICE_OF_TRIAL\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "label3DefTwo",
+    "ID": "TrialNoticeProcedure",
+    "ElementLabel": "${defendantTwoPartyName}, the defendant, did not attend the hearing. The Judge was not satisfied that they had received notice of the hearing and determined that it was not reasonable to proceed in their absence.",
+    "FieldType": "Label",
+    "FieldShowCondition": "listDefTwo=\"NOT_SATISFIED_NOTICE_OF_TRIAL\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "label4DefTwo",
+    "ID": "TrialNoticeProcedure",
+    "ElementLabel": "${defendantTwoPartyName}, the defendant, did not attend the hearing as they were not given notice of the application.",
+    "FieldType": "Label",
+    "FieldShowCondition": "listDefTwo=\"NOT_GIVEN_NOTICE_OF_APPLICATION\"",
+    "SecurityClassification": "Public"
+  }
+]

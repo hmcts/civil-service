@@ -1,0 +1,19 @@
+[
+  {
+    "ID": "AdmitPartEmployer",
+    "ListElementCode": "employerDetailsLabel",
+    "FieldType": "Label",
+    "ElementLabel": "## Name of employer (if employed by someone else) \n",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "AdmitPartEmployer",
+    "ListElementCode": "employerDetails",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "EmployerDetail",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

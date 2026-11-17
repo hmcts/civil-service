@@ -1,0 +1,728 @@
+[
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0800",
+    "ListElement": "08:00",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0805",
+    "ListElement": "08:05",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0810",
+    "ListElement": "08:10",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0815",
+    "ListElement": "08:15",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0820",
+    "ListElement": "08:20",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0825",
+    "ListElement": "08:25",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0830",
+    "ListElement": "08:30",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0835",
+    "ListElement": "08:35",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0840",
+    "ListElement": "08:40",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0845",
+    "ListElement": "08:45",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0850",
+    "ListElement": "08:50",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0855",
+    "ListElement": "08:55",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0900",
+    "ListElement": "09:00",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0905",
+    "ListElement": "09:05",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0910",
+    "ListElement": "09:10",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0915",
+    "ListElement": "09:15",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0920",
+    "ListElement": "09:20",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0925",
+    "ListElement": "09:25",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0930",
+    "ListElement": "09:30",
+    "DisplayOrder": 19
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0935",
+    "ListElement": "09:35",
+    "DisplayOrder": 20
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0940",
+    "ListElement": "09:40",
+    "DisplayOrder": 21
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0945",
+    "ListElement": "09:45",
+    "DisplayOrder": 22
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0950",
+    "ListElement": "09:50",
+    "DisplayOrder": 23
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "0955",
+    "ListElement": "09:55",
+    "DisplayOrder": 24
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1000",
+    "ListElement": "10:00",
+    "DisplayOrder": 25
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1005",
+    "ListElement": "10:05",
+    "DisplayOrder": 26
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1010",
+    "ListElement": "10:10",
+    "DisplayOrder": 27
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1015",
+    "ListElement": "10:15",
+    "DisplayOrder": 28
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1020",
+    "ListElement": "10:20",
+    "DisplayOrder": 29
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1025",
+    "ListElement": "10:25",
+    "DisplayOrder": 30
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1030",
+    "ListElement": "10:30",
+    "DisplayOrder": 31
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1035",
+    "ListElement": "10:35",
+    "DisplayOrder": 32
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1040",
+    "ListElement": "10:40",
+    "DisplayOrder": 33
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1045",
+    "ListElement": "10:45",
+    "DisplayOrder": 34
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1050",
+    "ListElement": "10:50",
+    "DisplayOrder": 35
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1055",
+    "ListElement": "10:55",
+    "DisplayOrder": 36
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1100",
+    "ListElement": "11:00",
+    "DisplayOrder": 37
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1105",
+    "ListElement": "11:05",
+    "DisplayOrder": 38
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1110",
+    "ListElement": "11:10",
+    "DisplayOrder": 39
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1115",
+    "ListElement": "11:15",
+    "DisplayOrder": 40
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1120",
+    "ListElement": "11:20",
+    "DisplayOrder": 41
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1125",
+    "ListElement": "11:25",
+    "DisplayOrder": 42
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1130",
+    "ListElement": "11:30",
+    "DisplayOrder": 43
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1135",
+    "ListElement": "11:35",
+    "DisplayOrder": 44
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1140",
+    "ListElement": "11:40",
+    "DisplayOrder": 45
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1145",
+    "ListElement": "11:45",
+    "DisplayOrder": 46
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1150",
+    "ListElement": "11:50",
+    "DisplayOrder": 47
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1155",
+    "ListElement": "11:55",
+    "DisplayOrder": 48
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1200",
+    "ListElement": "12:00",
+    "DisplayOrder": 49
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1205",
+    "ListElement": "12:05",
+    "DisplayOrder": 50
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1210",
+    "ListElement": "12:10",
+    "DisplayOrder": 51
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1215",
+    "ListElement": "12:15",
+    "DisplayOrder": 52
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1220",
+    "ListElement": "12:20",
+    "DisplayOrder": 53
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1225",
+    "ListElement": "12:25",
+    "DisplayOrder": 54
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1230",
+    "ListElement": "12:30",
+    "DisplayOrder": 55
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1235",
+    "ListElement": "12:35",
+    "DisplayOrder": 56
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1240",
+    "ListElement": "12:40",
+    "DisplayOrder": 57
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1245",
+    "ListElement": "12:45",
+    "DisplayOrder": 58
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1250",
+    "ListElement": "12:50",
+    "DisplayOrder": 59
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1255",
+    "ListElement": "12:55",
+    "DisplayOrder": 60
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1300",
+    "ListElement": "13:00",
+    "DisplayOrder": 61
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1305",
+    "ListElement": "13:05",
+    "DisplayOrder": 62
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1310",
+    "ListElement": "13:10",
+    "DisplayOrder": 63
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1315",
+    "ListElement": "13:15",
+    "DisplayOrder": 64
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1320",
+    "ListElement": "13:20",
+    "DisplayOrder": 65
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1325",
+    "ListElement": "13:25",
+    "DisplayOrder": 66
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1330",
+    "ListElement": "13:30",
+    "DisplayOrder": 67
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1335",
+    "ListElement": "13:35",
+    "DisplayOrder": 68
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1340",
+    "ListElement": "13:40",
+    "DisplayOrder": 69
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1345",
+    "ListElement": "13:45",
+    "DisplayOrder": 70
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1350",
+    "ListElement": "13:50",
+    "DisplayOrder": 71
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1355",
+    "ListElement": "13:55",
+    "DisplayOrder": 72
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1400",
+    "ListElement": "14:00",
+    "DisplayOrder": 73
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1405",
+    "ListElement": "14:05",
+    "DisplayOrder": 74
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1410",
+    "ListElement": "14:10",
+    "DisplayOrder": 75
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1415",
+    "ListElement": "14:15",
+    "DisplayOrder": 76
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1420",
+    "ListElement": "14:20",
+    "DisplayOrder": 77
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1425",
+    "ListElement": "14:25",
+    "DisplayOrder": 78
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1430",
+    "ListElement": "14:30",
+    "DisplayOrder": 79
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1435",
+    "ListElement": "14:35",
+    "DisplayOrder": 80
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1440",
+    "ListElement": "14:40",
+    "DisplayOrder": 81
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1445",
+    "ListElement": "14:45",
+    "DisplayOrder": 82
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1450",
+    "ListElement": "14:50",
+    "DisplayOrder": 83
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1455",
+    "ListElement": "14:55",
+    "DisplayOrder": 84
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1500",
+    "ListElement": "15:00",
+    "DisplayOrder": 85
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1505",
+    "ListElement": "15:05",
+    "DisplayOrder": 86
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1510",
+    "ListElement": "15:10",
+    "DisplayOrder": 87
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1515",
+    "ListElement": "15:15",
+    "DisplayOrder": 88
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1520",
+    "ListElement": "15:20",
+    "DisplayOrder": 89
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1525",
+    "ListElement": "15:25",
+    "DisplayOrder": 90
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1530",
+    "ListElement": "15:30",
+    "DisplayOrder": 91
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1535",
+    "ListElement": "15:35",
+    "DisplayOrder": 92
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1540",
+    "ListElement": "15:40",
+    "DisplayOrder": 93
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1545",
+    "ListElement": "15:45",
+    "DisplayOrder": 94
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1550",
+    "ListElement": "15:50",
+    "DisplayOrder": 95
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1555",
+    "ListElement": "15:55",
+    "DisplayOrder": 96
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1600",
+    "ListElement": "16:00",
+    "DisplayOrder": 97
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1605",
+    "ListElement": "16:05",
+    "DisplayOrder": 98
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1610",
+    "ListElement": "16:10",
+    "DisplayOrder": 99
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1615",
+    "ListElement": "16:15",
+    "DisplayOrder": 100
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1620",
+    "ListElement": "16:20",
+    "DisplayOrder": 101
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1625",
+    "ListElement": "16:25",
+    "DisplayOrder": 102
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1630",
+    "ListElement": "16:30",
+    "DisplayOrder": 103
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1635",
+    "ListElement": "16:35",
+    "DisplayOrder": 104
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1640",
+    "ListElement": "16:40",
+    "DisplayOrder": 105
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1645",
+    "ListElement": "16:45",
+    "DisplayOrder": 106
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1650",
+    "ListElement": "16:50",
+    "DisplayOrder": 107
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1655",
+    "ListElement": "16:55",
+    "DisplayOrder": 108
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1700",
+    "ListElement": "17:00",
+    "DisplayOrder": 109
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1705",
+    "ListElement": "17:05",
+    "DisplayOrder": 110
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1710",
+    "ListElement": "17:10",
+    "DisplayOrder": 111
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1715",
+    "ListElement": "17:15",
+    "DisplayOrder": 112
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1720",
+    "ListElement": "17:20",
+    "DisplayOrder": 113
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1725",
+    "ListElement": "17:25",
+    "DisplayOrder": 114
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1730",
+    "ListElement": "17:30",
+    "DisplayOrder": 115
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1735",
+    "ListElement": "17:35",
+    "DisplayOrder": 116
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1740",
+    "ListElement": "17:40",
+    "DisplayOrder": 117
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1745",
+    "ListElement": "17:45",
+    "DisplayOrder": 118
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1750",
+    "ListElement": "17:50",
+    "DisplayOrder": 119
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1755",
+    "ListElement": "17:55",
+    "DisplayOrder": 120
+  },
+  {
+    "ID": "HearingTimeHourMinute",
+    "ListElementCode": "1800",
+    "ListElement": "18:00",
+    "DisplayOrder": 121
+  }
+]

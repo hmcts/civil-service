@@ -1,0 +1,213 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppHelpWithFees",
+    "Label": " ",
+    "FieldType": "HelpWithFees",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "helpWithFeesReferenceNumber",
+    "Label": " ",
+    "FieldType": "HelpWithFees",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "caseLabelGaReference",
+    "Label": "${generalAppHelpWithFees.helpWithFeesReferenceNumber}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "caseTitleWithHWFGaFeeNumber",
+    "Label": "<h2 class=\"govuk-heading-1\">  ${generalAppHelpWithFees.helpWithFeesReferenceNumber} ${claimant1PartyName} Vs ${defendant1PartyName}</h2>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "subTitleHwfDetails",
+    "Label": "<h4 class=\"govuk-heading-1\"> HwF Details</h4>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "caseTitleWithHwFDetails",
+    "Label": "## Hwf Details",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "hwfFeeType",
+    "Label": "Type",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaFeeLabel",
+    "FieldType": "Label",
+    "Label": "Help with Fees type: HwF Application fee",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "additionalFeeLabel",
+    "FieldType": "Label",
+    "Label": "Help with Fees type: HwF Additional fee",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaHwfDetails",
+    "FieldType": "HelpWithFeesDetails",
+    "Label": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "additionalHwfDetails",
+    "FieldType": "HelpWithFeesDetails",
+    "Label": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "helpWithFeesMoreInformationGa",
+    "Label": " ",
+    "FieldType": "HelpWithFeesMoreInformation",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "helpWithFeesMoreInformationAdditional",
+    "Label": " ",
+    "FieldType": "HelpWithFeesMoreInformation",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "remissionFeeAmountWarningMessage",
+    "Label": "<h4 class=\"govuk-heading-1\"> Warning: Please check you are entering the correct amount, as you will not be able to amend after submission.</h4>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "hwfNumberAvailable",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "caseTitle",
+    "Label": "### ${claimant1PartyName} Vs ${defendant1PartyName}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "caseTitle2",
+    "Label": "### ${claimant1PartyName} Vs ${defendant1PartyName}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "hwfNumberForFeePaymentOutcome",
+    "Label": "Enter the reference number",
+    "FieldType": "Text",
+    "HintText": "For example, HWF-A1B-23C",
+    "RegularExpression": "HWF-[0-9A-Za-z]{3}-[0-9A-Za-z]{3}",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "hwfFullRemissionGrantedForGa",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "hwfFullRemissionGrantedForAdditionalFee",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "hwfOutstandingFeePaymentDoneForGa",
+    "Label": "Confirm payment of ${gaHwfDetails.outstandingFee} has been taken.",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "ConfirmPaymentMade",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "hwfOutstandingFeePaymentDoneForAdditionalFee",
+    "Label": "Confirm payment of ${additionalHwfDetails.outstandingFee} has been taken.",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "ConfirmPaymentMade",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "headingHelpWithFeesDetails",
+    "Label": "## HwF Details",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "claimantBilingualLanguagePreference",
+    "Label": "Claimant Language Preference",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "respondent1LiPResponse",
+    "Label": " ",
+    "FieldType": "RespondentLiPResponse",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Publish": "Y"
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "ID": "AssistedOrderReasons",
+    "ListElementCode": "reasonsLabel",
+    "ElementLabel": "### Brief reasons",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "AssistedOrderReasons",
+    "ListElementCode": "reasonsText",
+    "ElementLabel": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]
