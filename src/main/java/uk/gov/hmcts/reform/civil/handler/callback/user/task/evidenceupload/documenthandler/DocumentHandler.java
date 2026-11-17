@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -34,6 +35,7 @@ public abstract class DocumentHandler<T> {
     protected static final String END = ".";
     protected static final String DATE_FORMAT = "dd-MM-yyyy";
     protected final DocumentCategory documentCategory;
+    @Getter
     protected final EvidenceUploadType evidenceUploadType;
     private final UploadDocumentRetriever<T> uploadDocumentRetriever;
 

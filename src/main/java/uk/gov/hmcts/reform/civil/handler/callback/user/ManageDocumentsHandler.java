@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.List;
@@ -34,6 +35,7 @@ public class ManageDocumentsHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(MANAGE_DOCUMENTS);
     private final ObjectMapper objectMapper;
     private final TaskListService taskListService;
+    private final FeatureToggleService featureToggleService;
 
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT),
@@ -80,10 +82,17 @@ public class ManageDocumentsHandler extends CallbackHandler {
         if (previousDocumentLink != null) {
             documentWithCategory = copyDocumentWithCategory(documentLink, previousDocumentLink.getCategoryID());
         }
+        return applyPart36Category(manageDocument, documentWithCategory);
+    }
+
+    private Document applyPart36Category(ManageDocument manageDocument, Document documentWithCategory) {
+        if (!featureToggleService.isPart36Enabled()) {
+            return documentWithCategory;
+        }
 
         if (manageDocument.getDocumentType() != WITHOUT_PREJUDICE_PART_36_OFFER_OR_REJECTIONS
             && WITHOUT_PREJUDICE_CATEGORY_ID.equals(documentWithCategory.getCategoryID())) {
-            documentWithCategory = copyDocumentWithCategory(documentWithCategory, null);
+            return copyDocumentWithCategory(documentWithCategory, null);
         }
 
         if (manageDocument.getDocumentType() == WITHOUT_PREJUDICE_PART_36_OFFER_OR_REJECTIONS
