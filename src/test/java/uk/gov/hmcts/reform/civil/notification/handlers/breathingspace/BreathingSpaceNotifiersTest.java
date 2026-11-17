@@ -133,7 +133,6 @@ class BreathingSpaceNotifiersTest {
     private void assertParity(CaseData data, boolean enter, boolean twoRepresentatives) {
         Notifier<CaseData> notifier;
         String taskId;
-        List<String> expectedEmails = getExpectedEmails(data, twoRepresentatives);
         if (enter) {
             when(engine.evaluate(data)).thenReturn(flow);
             when(flow.isFlagSet(ONE_RESPONDENT_REPRESENTATIVE)).thenReturn(!twoRepresentatives);
@@ -158,6 +157,7 @@ class BreathingSpaceNotifiersTest {
         assertThat(factory.getNotifier(taskId)).isSameAs(notifier);
         new NotificationHandler(factory, mock(CoreCaseDataService.class), new ObjectMapper().registerModule(new JavaTimeModule()))
             .handle(params(data, CaseEvent.NOTIFY_EVENT));
+        List<String> expectedEmails = getExpectedEmails(data, twoRepresentatives);
         assertThat(emails(notificationService)).hasSize(twoRepresentatives ? 3 : 2);
         assertThat(emails(notificationService).stream()
                        .map(entry -> Objects.toString(entry.getFirst(), null))
