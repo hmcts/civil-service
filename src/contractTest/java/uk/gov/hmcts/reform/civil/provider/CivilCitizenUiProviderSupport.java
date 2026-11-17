@@ -815,10 +815,9 @@ abstract class CivilCitizenUiProviderSupport {
             .build());
     }
 
-    @State("Citizen event submission returns callback errors and warnings")
-    void callbackErrorsAndWarnings() throws IOException {
-        rejectedEvent(Map.of("callbackErrors", List.of("Claim cannot be submitted"),
-                             "callbackWarnings", List.of("Check the claim details")));
+    @State("Citizen event submission returns callback errors")
+    void callbackErrors() throws IOException {
+        rejectedEvent(Map.of("callbackErrors", List.of("Claim cannot be submitted")));
     }
 
     @State("Citizen event submission returns field validation errors")
