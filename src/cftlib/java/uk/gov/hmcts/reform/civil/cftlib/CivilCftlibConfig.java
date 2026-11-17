@@ -140,6 +140,9 @@ public class CivilCftlibConfig implements CFTLibConfigurer {
             lib.importJsonDefinition(new File(definitions, caseType), template, substitutions,
                 "*-prod.json", "AuthorisationCaseType-shuttered.json");
         }
+        // The decentralised runtime reads these to find which of a case type's events it publishes for work
+        // allocation. Without them it publishes none.
+        lib.dumpDefinitionSnapshots();
 
         deployBusinessProcesses();
         deployWorkAllocation(lib);

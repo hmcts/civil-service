@@ -47,6 +47,9 @@ class CivilIntegrationsCftlibTest extends CftlibTest {
     private static final String SERVICE_CODE = "AAA7";
     private static final Duration WAIT = Duration.ofMinutes(2);
     private static final LocalDateTime LISTED_START = LocalDate.now().plusDays(14).atTime(10, 0);
+    // With CIVIL_DECENTRALISED_ENABLED, CIVIL cases live in this service's own ccd schema, and CCD keeps only a
+    // pointer to each, as in preview.
+    private static final boolean DECENTRALISED = "true".equals(System.getenv("CIVIL_DECENTRALISED_ENABLED"));
 
     @Autowired
     private UserService userService;
@@ -159,6 +162,33 @@ class CivilIntegrationsCftlibTest extends CftlibTest {
             }
             """;
         String reference = caseReference();
+        if (DECENTRALISED) {
+            // CCD's pointer, as data store writes it: no data or state, only what routes requests to this service.
+            long id;
+            try (var connection = cftlib().getConnection(Database.Datastore)) {
+                var insert = connection.prepareStatement(
+                    "insert into case_data (reference, jurisdiction, case_type_id, state, data, data_classification,"
+                        + " security_classification, created_date, resolved_ttl)"
+                        + " values (?, 'CIVIL', 'CIVIL', '', '{}'::jsonb, '{}'::jsonb, 'RESTRICTED', now(),"
+                        + " current_date + 365) returning id");
+                insert.setLong(1, Long.parseLong(reference));
+                var ids = insert.executeQuery();
+                ids.next();
+                id = ids.getLong(1);
+            }
+            try (var connection = civilDatabase()) {
+                var insert = connection.prepareStatement(
+                    "insert into ccd.case_data (id, reference, jurisdiction, case_type_id, state, data,"
+                        + " security_classification, created_date, last_modified, last_state_modified_date)"
+                        + " values (?, ?, 'CIVIL', 'CIVIL', ?, ?::jsonb, 'PUBLIC', now(), now(), now())");
+                insert.setLong(1, id);
+                insert.setLong(2, Long.parseLong(reference));
+                insert.setString(3, state);
+                insert.setString(4, data);
+                insert.execute();
+            }
+            return reference;
+        }
         try (var connection = cftlib().getConnection(Database.Datastore)) {
             var insert = connection.prepareStatement(
                 "insert into case_data (reference, jurisdiction, case_type_id, state, data, data_classification,"
@@ -171,6 +201,12 @@ class CivilIntegrationsCftlibTest extends CftlibTest {
             insert.execute();
         }
         return reference;
+    }
+
+    // This service's database, which holds its decentralised cases in the ccd schema.
+    @SneakyThrows
+    private static java.sql.Connection civilDatabase() {
+        return DriverManager.getConnection("jdbc:postgresql://localhost:6432/cmc", "postgres", "postgres");
     }
 
     // CCD's case references are 16 digits with a Luhn check digit.
@@ -288,28 +324,34 @@ class CivilIntegrationsCftlibTest extends CftlibTest {
     }
 
     private List<String> caseEvents(String caseReference) {
-        return query(Database.Datastore,
-                     "select e.event_id from case_event e join case_data c on c.id = e.case_data_id"
-                         + " where c.reference = ? order by e.id", Long.parseLong(caseReference));
+        return caseQuery("select e.event_id from %1$scase_event e join %1$scase_data c on c.id = e.case_data_id"
+                             + " where c.reference = ? order by e.id", caseReference);
     }
 
     private String caseState(String caseReference) {
-        return query(Database.Datastore, "select state from case_data where reference = ?",
-                     Long.parseLong(caseReference)).get(0);
+        return caseQuery("select state from %scase_data where reference = ?", caseReference).get(0);
     }
 
     private String businessProcess(String caseReference) {
-        return query(Database.Datastore,
-                     "select concat(data->'businessProcess'->>'camundaEvent', ' ', data->'businessProcess'->>'status')"
-                         + " from case_data where reference = ?", Long.parseLong(caseReference)).get(0);
+        return caseQuery("select concat(data->'businessProcess'->>'camundaEvent', ' ',"
+                             + " data->'businessProcess'->>'status') from %scase_data where reference = ?",
+                         caseReference).get(0);
     }
 
     // The next hearing's id and date, as this service records them.
     private String nextHearing(String caseReference) {
-        return query(Database.Datastore,
-                     "select concat(data->'nextHearingDetails'->>'hearingID', ' ',"
-                         + " left(data->'nextHearingDetails'->>'hearingDateTime', 10)) from case_data where reference = ?",
-                     Long.parseLong(caseReference)).get(0);
+        return caseQuery("select concat(data->'nextHearingDetails'->>'hearingID', ' ',"
+                             + " left(data->'nextHearingDetails'->>'hearingDateTime', 10)) from %scase_data"
+                             + " where reference = ?", caseReference).get(0);
+    }
+
+    // A query of the tables that hold CIVIL cases: data store's, or this service's own ccd schema when decentralised.
+    @SneakyThrows
+    private List<String> caseQuery(String sql, String caseReference) {
+        try (var connection = DECENTRALISED ? civilDatabase() : cftlib().getConnection(Database.Datastore)) {
+            return rows(connection.prepareStatement(sql.formatted(DECENTRALISED ? "ccd." : "")),
+                        Long.parseLong(caseReference));
+        }
     }
 
     // Each of the case's tasks in task management, as its type, state and termination reason.
@@ -328,13 +370,6 @@ class CivilIntegrationsCftlibTest extends CftlibTest {
         try (var connection = DriverManager.getConnection("jdbc:postgresql://localhost:6432/cft_task_db",
                                                           "postgres", "postgres")) {
             return rows(connection.prepareStatement(sql), caseReference);
-        }
-    }
-
-    @SneakyThrows
-    private List<String> query(Database database, String sql, Object parameter) {
-        try (var connection = cftlib().getConnection(database)) {
-            return rows(connection.prepareStatement(sql), parameter);
         }
     }
 
