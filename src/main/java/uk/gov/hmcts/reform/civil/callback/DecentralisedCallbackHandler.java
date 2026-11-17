@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.callback;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -15,6 +17,8 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.http.HttpResponseHeadersService;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -28,6 +32,10 @@ import static uk.gov.hmcts.reform.civil.helpers.CaseTypeIdentifier.isGeneralAppl
  * <p>The decentralised runtime calls this in place of CCD calling {@code CallbackController}. It builds the same
  * {@link CallbackParams} the controller builds from the callback URL in the definition, and dispatches them through
  * {@link CallbackHandlerFactory}, so the factory's aspects and duplicate-event check apply as they do over HTTP.
+ *
+ * <p>It returns the response as the JSON the controller would send. This service's ObjectMapper leaves out empty
+ * values, and the runtime's would keep them: a case would then hold values that this service drops whenever it submits
+ * the case's data back, which CCD reads as an update, and refuses to a user who cannot update the field.
  */
 @Slf4j
 @Component
@@ -46,6 +54,7 @@ public class DecentralisedCallbackHandler implements JsonCallbackHandler {
     private final CallbackHandlerFactory callbackHandlerFactory;
     private final CaseDetailsConverter caseDetailsConverter;
     private final HttpResponseHeadersService responseHeadersService;
+    private final ObjectMapper objectMapper;
 
     @Override
     public boolean handles(String callbackPath) {
@@ -77,12 +86,21 @@ public class DecentralisedCallbackHandler implements JsonCallbackHandler {
             .isCivilCaseType(!generalApplicationCaseType);
 
         CallbackResponse response = callbackHandlerFactory.dispatch(callbackParams);
+        JsonNode body = asSentOverHttp(response);
         // As CallbackController does, ask ExUI to complete the WA task a submitted callback names.
         return responseHeadersService.clientContextHeader(response)
             .<Object>map(clientContext -> ResponseEntity.ok()
                 .header(HttpResponseHeadersService.CLIENT_CONTEXT, clientContext)
-                .body(response))
-            .orElse(response);
+                .body(body))
+            .orElse(body);
+    }
+
+    private JsonNode asSentOverHttp(CallbackResponse response) {
+        try {
+            return objectMapper.readTree(objectMapper.writeValueAsBytes(response));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     private Optional<PathPattern.PathMatchInfo> match(String callbackPath) {

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.callback;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.taskmanagement.Task;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.UserTask;
 import uk.gov.hmcts.reform.civil.service.http.HttpResponseHeadersService;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,6 +49,10 @@ class DecentralisedCallbackHandlerTest {
     private CallbackHandlerFactory callbackHandlerFactory;
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
+    // Configured as CaseDetailsConverter configures this service's ObjectMapper.
+    private final ObjectMapper objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
     private final HttpResponseHeadersService responseHeadersService =
         new HttpResponseHeadersService(new ObjectMapper().registerModule(new JavaTimeModule()));
 
@@ -53,7 +60,9 @@ class DecentralisedCallbackHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new DecentralisedCallbackHandler(callbackHandlerFactory, caseDetailsConverter, responseHeadersService);
+        handler = new DecentralisedCallbackHandler(
+            callbackHandlerFactory, caseDetailsConverter, responseHeadersService, objectMapper
+        );
     }
 
     @ParameterizedTest
@@ -83,7 +92,7 @@ class DecentralisedCallbackHandlerTest {
         );
 
         CallbackParams params = dispatchedParams();
-        assertThat(response).isSameAs(expected);
+        assertThat(response).isEqualTo(json(expected));
         assertThat(params.getType()).isEqualTo(ABOUT_TO_SUBMIT);
         assertThat(params.getVersion()).isEqualTo(V_1);
         assertThat(params.getPageId()).isNull();
@@ -117,7 +126,7 @@ class DecentralisedCallbackHandlerTest {
         assertThat(dispatchedParams().getType()).isEqualTo(SUBMITTED);
         assertThat(response).isInstanceOf(ResponseEntity.class);
         ResponseEntity<?> entity = (ResponseEntity<?>) response;
-        assertThat(entity.getBody()).isSameAs(submitted);
+        assertThat(entity.getBody()).isEqualTo(json(submitted));
         assertThat(entity.getHeaders().getFirst("client-context"))
             .isEqualTo(responseHeadersService.clientContextHeader(submitted).orElseThrow());
     }
@@ -129,7 +138,36 @@ class DecentralisedCallbackHandlerTest {
 
         Object response = handler.handle("/cases/callbacks/submitted", request(CASE_TYPE, "SEND_AND_REPLY"), headers());
 
-        assertThat(response).isSameAs(submitted);
+        assertThat(response).isEqualTo(json(submitted));
+    }
+
+    @Test
+    void leavesOutTheEmptyValuesCallbackControllerWouldLeaveOut() {
+        // A DynamicList whose element has no code or label, as this service's toMap leaves it.
+        Map<String, Object> courts = Map.of(
+            "value", Map.of(),
+            "list_items", List.of(Map.of("code", "c1", "label", "Court One"))
+        );
+        when(callbackHandlerFactory.dispatch(any())).thenReturn(AboutToStartOrSubmitCallbackResponse.builder()
+            .data(Map.of("sdoR2Trial", Map.of("altHearingCourtLocationList", courts), "notes", List.of()))
+            .build());
+
+        JsonNode response = (JsonNode) handler.handle(
+            "/cases/callbacks/about-to-submit", request(CASE_TYPE, "CREATE_SDO"), headers()
+        );
+
+        JsonNode data = response.get("data");
+        assertThat(data.has("notes")).isFalse();
+        assertThat(data.at("/sdoR2Trial/altHearingCourtLocationList").has("value")).isFalse();
+        assertThat(data.at("/sdoR2Trial/altHearingCourtLocationList/list_items/0/code").asText()).isEqualTo("c1");
+    }
+
+    private JsonNode json(Object value) {
+        try {
+            return objectMapper.readTree(objectMapper.writeValueAsString(value));
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     private CallbackParams dispatchedParams() {

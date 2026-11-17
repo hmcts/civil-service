@@ -70,7 +70,8 @@ class CivilJsonCcdConfigTest {
             .withBean(DecentralisedCallbackHandler.class, () -> new DecentralisedCallbackHandler(
                 mock(CallbackHandlerFactory.class),
                 mock(CaseDetailsConverter.class),
-                new HttpResponseHeadersService(new ObjectMapper())
+                new HttpResponseHeadersService(new ObjectMapper()),
+                new ObjectMapper()
             ))
             .withBean(CcdCaseDataMapperConfiguration.CCD_CASE_DATA_OBJECT_MAPPER, ObjectMapper.class, ObjectMapper::new)
             .withBean("requestMappingHandlerMapping", RequestMappingHandlerMapping.class,
