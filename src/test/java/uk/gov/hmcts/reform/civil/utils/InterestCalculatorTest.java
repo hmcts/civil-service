@@ -377,6 +377,27 @@ class InterestCalculatorTest {
     }
 
     @Test
+    void shouldPauseInterestAcrossAllStoredBreathingSpaceCyclesAndMergeOverlapDates() {
+        CaseData caseData = sameRateInterestUntilJudgement(LocalDate.now().minusDays(10), BigDecimal.valueOf(5000));
+        // overlapped breathing space days so these should merge into a single range
+        caseData = caseData.toBuilder()
+            .breathing(new BreathingSpaceInfo()
+                           .setStoredBreathingSpace(wrapElements(
+                               new StoredBreathingSpace()
+                                   .setEnter(new BreathingSpaceEnterInfo().setStart(LocalDate.now().minusDays(9)))
+                                   .setLift(new BreathingSpaceLiftInfo().setExpectedEnd(LocalDate.now().minusDays(4))),
+                               new StoredBreathingSpace()
+                                   .setEnter(new BreathingSpaceEnterInfo().setStart(LocalDate.now().minusDays(9)))
+                                   .setLift(new BreathingSpaceLiftInfo().setExpectedEnd(LocalDate.now().minusDays(4)))
+                           )))
+            .build();
+
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
+
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(4.40).setScale(2, RoundingMode.UNNECESSARY));
+    }
+
+    @Test
     void shouldPauseInterestWhenOnlyCurrentBreathingSpaceIsPresent() {
         CaseData caseData = sameRateInterestUntilJudgement(LocalDate.now().minusDays(6), BigDecimal.valueOf(5000));
         caseData = caseData.toBuilder()

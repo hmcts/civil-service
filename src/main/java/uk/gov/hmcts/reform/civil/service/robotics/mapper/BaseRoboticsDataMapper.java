@@ -81,11 +81,13 @@ public abstract class BaseRoboticsDataMapper {
         breathingSpace.setStartDate(breathingSpaceEnterInfo.getStart());
         breathingSpace.setType(breathingSpaceEnterInfo.getType());
         var breathingSpaceLiftInfo = caseData.getBreathing().getLift();
-        if (breathingSpaceLiftInfo != null) {
+        boolean hasLiftInfo = breathingSpaceLiftInfo != null;
+        if (hasLiftInfo) {
             breathingSpace.setEndDate(breathingSpaceLiftInfo.getExpectedEnd());
             breathingSpace.setReasonForLifting(breathingSpaceLiftInfo.getReasonToLift());
         }
-        log.info("RoboticsCaseDataSpec RPABreathingSpace ={}", breathingSpace.toString());
+        log.info("Built RPABreathingSpace for caseId={}, hasLiftInfo={}",
+                 caseData.getLegacyCaseReference(), hasLiftInfo);
         return breathingSpace;
     }
 

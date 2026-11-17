@@ -31,7 +31,7 @@ public class BreathingSpaceEnterRespSolTwoEmailDTOGenerator extends RespSolTwoEm
     @Override
     public Boolean getShouldNotify(CaseData caseData) {
         var flow = stateFlowEngine.evaluate(caseData);
-        return !caseData.isRespondent1NotRepresented()
+        return !caseData.isRespondent2NotRepresented()
             && !flow.isFlagSet(ONE_RESPONDENT_REPRESENTATIVE) && flow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES);
     }
 

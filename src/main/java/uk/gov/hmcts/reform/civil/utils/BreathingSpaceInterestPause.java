@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public final class BreathingSpaceInterestPause {
@@ -16,16 +17,39 @@ public final class BreathingSpaceInterestPause {
     }
 
     public static long countPausedDays(CaseData caseData, LocalDate interestFromDate, LocalDate interestToDate) {
-        long pausedDays = 0;
-        for (BreathingSpaceDateRange dateRange : getBreathingSpaceDateRanges(caseData)) {
-            pausedDays += countDaysBreathingSpaceOverlapsInterestPeriod(
-                dateRange.start(),
-                dateRange.end(),
+        return mergeOverlappingRanges(getBreathingSpaceDateRanges(caseData)).stream()
+            .mapToLong(range -> countDaysBreathingSpaceOverlapsInterestPeriod(
+                range.start(),
+                range.end(),
                 interestFromDate,
                 interestToDate
-            );
+            ))
+            .sum();
+    }
+
+    private static List<BreathingSpaceDateRange> mergeOverlappingRanges(List<BreathingSpaceDateRange> ranges) {
+        if (ranges == null || ranges.isEmpty()) {
+            return List.of();
         }
-        return pausedDays;
+
+        List<BreathingSpaceDateRange> sorted = ranges.stream()
+            .sorted(Comparator.comparing(BreathingSpaceDateRange::start))
+            .toList();
+
+        List<BreathingSpaceDateRange> merged = new ArrayList<>();
+        BreathingSpaceDateRange current = sorted.getFirst();
+
+        for (BreathingSpaceDateRange next : sorted.subList(1, sorted.size())) {
+            if (current.canMergeWith(next)) {
+                current = current.mergeWith(next);
+            } else {
+                merged.add(current);
+                current = next;
+            }
+        }
+        merged.add(current);
+
+        return merged;
     }
 
     private static List<BreathingSpaceDateRange> getBreathingSpaceDateRanges(CaseData caseData) {
@@ -82,6 +106,15 @@ public final class BreathingSpaceInterestPause {
     }
 
     private record BreathingSpaceDateRange(LocalDate start, LocalDate end) {
+        public boolean canMergeWith(BreathingSpaceDateRange other) {
+            // Overlapping or contiguous (e.g., Jan 1-5/Jan 4-10 and Jan 1-5/Jan 6-10)
+            return !other.start.isAfter(this.end.plusDays(1));
+        }
+
+        public BreathingSpaceDateRange mergeWith(BreathingSpaceDateRange other) {
+            LocalDate latestEnd = other.end.isAfter(this.end) ? other.end : this.end;
+            return new BreathingSpaceDateRange(this.start, latestEnd);
+        }
     }
 
     private static long countDaysBreathingSpaceOverlapsInterestPeriod(LocalDate breathingSpaceStart,

@@ -128,9 +128,8 @@ class CamundaProcessIdentifierTest {
             .satisfies(v -> assertThat(v[75]).isEqualTo(CamundaProcessIdentifier.StayCaseNotifyParties))
             .satisfies(v -> assertThat(v[76]).isEqualTo(CamundaProcessIdentifier.StayLiftedNotifyParties))
             .satisfies(v -> assertThat(v[77]).isEqualTo(CamundaProcessIdentifier.CoscApplicationAfterPaymentNotifyParties))
-            .satisfies(v -> assertThat(v[78]).isEqualTo(CamundaProcessIdentifier.StayUpdateRequestedNotifyParties));
-            .satisfies(v -> assertThat(v[79]).isEqualTo(CamundaProcessIdentifier.RequestJudgementByAdmissionNotifyParties))
-            .satisfies(v -> assertThat(v[80]).isEqualTo(CamundaProcessIdentifier.BreathingSpaceEnterNotifyParties))
-            .satisfies(v -> assertThat(v[81]).isEqualTo(CamundaProcessIdentifier.BreathingSpaceLiftedNotifyParties));
+            .satisfies(v -> assertThat(v[78]).isEqualTo(CamundaProcessIdentifier.StayUpdateRequestedNotifyParties))
+            .satisfies(v -> assertThat(v[79]).isEqualTo(CamundaProcessIdentifier.BreathingSpaceEnterNotifyParties))
+            .satisfies(v -> assertThat(v[80]).isEqualTo(CamundaProcessIdentifier.BreathingSpaceLiftedNotifyParties));
     }
 }

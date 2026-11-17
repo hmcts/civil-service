@@ -109,9 +109,8 @@ public class RoboticsNotificationService {
             RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData, authToken);
             if (roboticsCaseData.getBreathingSpace() != null) {
                 log.info(
-                    "RPA breathing space payload for unspec case {}: {}",
-                    caseData.getLegacyCaseReference(),
-                    roboticsCaseData.getBreathingSpace()
+                    "RPA breathing space payload for unspec case {}",
+                    caseData.getLegacyCaseReference()
                 );
             }
             roboticsCaseDataDTO = new RoboticsCaseDataDTO(roboticsCaseData.toJsonString().getBytes(), roboticsCaseData.getEvents());

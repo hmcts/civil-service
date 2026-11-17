@@ -110,13 +110,16 @@ class BreathingSpaceNotifiersTest {
         when(flow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(true);
         assertThat(new BreathingSpaceEnterRespSolTwoEmailDTOGenerator(organisations, helper, templates, engine)
                        .getShouldNotify(data)).isFalse();
+        assertThat(new BreathingSpaceLiftedRespSolTwoEmailDTOGenerator(organisations, helper, templates, engine)
+                       .getShouldNotify(data)).isFalse();
     }
 
     @ParameterizedTest
     @CsvSource({"YES,YES", "YES,NO", "NO,YES", "NO,NO"})
     void shouldOnlyNotifyRepresentedParties(YesOrNo applicantRepresented, YesOrNo respondentRepresented) {
         CaseData data = caseData().toBuilder().applicant1Represented(applicantRepresented)
-            .respondent1Represented(respondentRepresented).build();
+            .respondent1Represented(respondentRepresented)
+            .respondent2Represented(respondentRepresented).build();
         boolean applicant = applicantRepresented == YesOrNo.YES;
         boolean respondent = respondentRepresented == YesOrNo.YES;
         assertThat(new BreathingSpaceEnterAppSolOneEmailDTOGenerator(organisations, helper, templates)
@@ -130,6 +133,8 @@ class BreathingSpaceNotifiersTest {
         when(engine.evaluate(data)).thenReturn(flow);
         when(flow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(true);
         assertThat(new BreathingSpaceEnterRespSolTwoEmailDTOGenerator(organisations, helper, templates, engine)
+                       .getShouldNotify(data)).isEqualTo(respondent);
+        assertThat(new BreathingSpaceLiftedRespSolTwoEmailDTOGenerator(organisations, helper, templates, engine)
                        .getShouldNotify(data)).isEqualTo(respondent);
     }
 
@@ -152,9 +157,13 @@ class BreathingSpaceNotifiersTest {
                 legacy.handle(params(data, CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_BREATHING_SPACE_ENTER));
             }
         } else {
+            when(engine.evaluate(data)).thenReturn(flow);
+            when(flow.isFlagSet(ONE_RESPONDENT_REPRESENTATIVE)).thenReturn(!twoRepresentatives);
+            when(flow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(twoRepresentatives);
             notifier = new BreathingSpaceLiftedNotifier(notificationService, tracking, new BreathingSpaceLiftedAllPartiesEmailGenerator(
                 new BreathingSpaceLiftedAppSolOneEmailDTOGenerator(organisations, helper, templates),
-                new BreathingSpaceLiftedRespSolOneEmailDTOGenerator(organisations, helper, templates)));
+                new BreathingSpaceLiftedRespSolOneEmailDTOGenerator(organisations, helper, templates),
+                new BreathingSpaceLiftedRespSolTwoEmailDTOGenerator(organisations, helper, templates, engine)));
             taskId = "BreathingSpaceLiftedNotifyParties";
             var legacy = new BreathingSpaceLiftedNotificationHandler(legacyService, templates, organisations, signatures, toggles);
             legacy.handle(params(data, CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED));
