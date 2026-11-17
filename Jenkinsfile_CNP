@@ -160,6 +160,31 @@ withPipeline(type, product, component) {
 
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
     before('build') {
+      stage('Check chart size') {
+        // Reuse Jenkins registry access; GitHub-hosted runners cannot pull these private charts.
+        withAcrClient('nonprod') {
+          sh '''
+            set -eu
+            # Match the Azure CLI profile used by withAcrClient's subscription login.
+            # Avoid importing Helm here: its Acr/DockerImage dependency cycle fails Jenkinsfile compilation.
+            if [ -n "${EXTERNAL_ACR_SUBSCRIPTION_HMCTSPROD:-}" ]; then
+              AZURE_CONFIG_DIR=/opt/jenkins/.azure-nonprod az acr login --name hmctsprod --subscription "$EXTERNAL_ACR_SUBSCRIPTION_HMCTSPROD"
+            else
+              AZURE_CONFIG_DIR=/opt/jenkins/.azure-nonprod az acr login --name hmctsprod
+            fi
+            chart_check_dir=$(mktemp -d)
+            trap 'rm -rf "$chart_check_dir"' EXIT
+            cp -R charts/civil-service "$chart_check_dir/civil-service"
+            helm dependency build "$chart_check_dir/civil-service"
+            helm package "$chart_check_dir/civil-service" --destination "$chart_check_dir/package"
+            chart_size_script="$PWD/.github/scripts/check-chart-size.py"
+            (
+              cd "$chart_check_dir/package"
+              python3 "$chart_size_script"
+            )
+          '''
+        }
+      }
       sh """
       ./bin/validate-migration-files.sh ${env.CHANGE_BRANCH} ${env.CHANGE_TARGET} --jenkins
        """
