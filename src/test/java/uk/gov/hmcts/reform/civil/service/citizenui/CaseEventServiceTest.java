@@ -40,6 +40,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.helpers.CaseDataDateNormaliser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -77,6 +81,10 @@ public class CaseEventServiceTest {
 
     @Mock
     private FeatureToggleService featureToggleService;
+
+    @Spy
+    private CaseDataDateNormaliser dateNormaliser =
+        new CaseDataDateNormaliser(new ObjectMapper().registerModule(new JavaTimeModule()));
 
     @InjectMocks
     private CaseEventService caseEventService;

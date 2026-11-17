@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.helpers.CaseDataDateNormaliser;
 import uk.gov.hmcts.reform.draftstore.DraftType;
 import uk.gov.hmcts.reform.draftstore.entities.DraftStoreEntity;
 import uk.gov.hmcts.reform.draftstore.services.DraftStoreService;
@@ -46,6 +47,7 @@ public class CaseEventService {
     private final DraftStoreService draftStoreService;
     private final CoreCaseDataService coreCaseDataService;
     private final FeatureToggleService featureToggleService;
+    private final CaseDataDateNormaliser dateNormaliser;
     @Value("${case-flags.logging.enabled:false}")
     private boolean caseFlagsLoggingEnabled;
     @Value("${draft-store.submission-claim-stale-after-minutes:5}")
@@ -86,7 +88,9 @@ public class CaseEventService {
             Flags respondentFlags = caseData.getRespondent1().getFlags();
             log.info("caseid: {}, respondent flags before civil commons call: {}", params.getCaseId(), respondentFlags);
         }
-        CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(eventResponse, params.getUpdates());
+        CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(
+            eventResponse, dateNormaliser.normalise(params.getUpdates(), CaseData.class)
+        );
         if (caseFlagsLoggingEnabled) {
             Map<String, Object> payload = new HashMap<>((Map<String, Object>) caseDataContent.getData());
             Map<String, Object> respondent1 = new HashMap<>((Map<String, Object>) payload.get("respondent1"));
@@ -304,7 +308,7 @@ public class CaseEventService {
         }
         Map<String, Object> updates = new HashMap<>();
         if (params.getUpdates() != null) {
-            updates.putAll(params.getUpdates());
+            updates.putAll(dateNormaliser.normalise(params.getUpdates(), CaseData.class));
         }
         if (params.getSubmissionId() != null) {
             updates.put("lipClaimSubmissionId", params.getSubmissionId());

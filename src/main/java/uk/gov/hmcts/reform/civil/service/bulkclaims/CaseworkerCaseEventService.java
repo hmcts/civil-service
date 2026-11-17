@@ -9,6 +9,8 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.helpers.CaseDataDateNormaliser;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
@@ -21,6 +23,7 @@ public class CaseworkerCaseEventService {
 
     private final CoreCaseDataApi coreCaseDataApi;
     private final AuthTokenGenerator authTokenGenerator;
+    private final CaseDataDateNormaliser dateNormaliser;
 
     private StartEventResponse startEventCaseworker(String authorisation, String userId, CaseEvent event) {
         return coreCaseDataApi.startForCaseworker(
@@ -35,7 +38,9 @@ public class CaseworkerCaseEventService {
 
     public CaseDetails submitEventForNewClaimCaseWorker(CaseworkerEventSubmissionParams params) {
         StartEventResponse eventResponse = startEventCaseworker(params.getAuthorisation(), params.getUserId(), params.getEvent());
-        CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(eventResponse, params.getUpdates());
+        CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(
+            eventResponse, dateNormaliser.normalise(params.getUpdates(), CaseData.class)
+        );
         return coreCaseDataApi.submitForCaseworker(params.getAuthorisation(),
                                                    authTokenGenerator.generate(),
                                                    params.getUserId(),

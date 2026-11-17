@@ -14,6 +14,10 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 
 import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.mockito.Spy;
+import uk.gov.hmcts.reform.civil.helpers.CaseDataDateNormaliser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,6 +36,10 @@ public class CaseworkerCaseEventServiceTest {
 
     @Mock
     private AuthTokenGenerator authTokenGenerator;
+
+    @Spy
+    private CaseDataDateNormaliser dateNormaliser =
+        new CaseDataDateNormaliser(new ObjectMapper().registerModule(new JavaTimeModule()));
 
     @InjectMocks
     private CaseworkerCaseEventService caseworkerCaseEventService;
