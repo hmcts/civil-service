@@ -120,8 +120,9 @@ withPipeline(type, product, component) {
   env.PACT_BROKER_PORT = "443"
   env.PACT_BROKER_SCHEME = "https"
   env.ENABLE_SECURE_URL = true
-  // Caps unit test forks too: maxParallelForks cannot exceed the worker count. Each fork peaks at ~2.2G RSS.
-  env.GRADLE_OPTS = "-Dorg.gradle.workers.max=5"
+  // Caps unit test forks too: maxParallelForks cannot exceed the worker count. Each fork peaks at ~2.2G RSS,
+  // so 7 forks need ~15.4G on the 8 CPU, 32G agents; only the short OWASP branch runs alongside the tests.
+  env.GRADLE_OPTS = "-Dorg.gradle.workers.max=7"
   env.CHECKSTYLE_SKIP = (env.CHANGE_ID != null) ? "false" : "true"
   env.BEFTA_S2S_CLIENT_ID = "ccd_data"
   env.DMN_DEFINITION_BRANCH = dmnBranch
