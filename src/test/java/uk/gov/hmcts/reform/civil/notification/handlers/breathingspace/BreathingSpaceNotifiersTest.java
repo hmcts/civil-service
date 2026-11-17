@@ -10,8 +10,6 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.BreathingSpaceEnterNotificationHandler;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.BreathingSpaceLiftedNotificationHandler;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationHandler;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -31,8 +29,10 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,10 +46,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.ONE_RESPONDENT_REPRESENTATIVE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 
-@SuppressWarnings("removal")
 class BreathingSpaceNotifiersTest {
 
-    private final NotificationService legacyService = mock(NotificationService.class);
     private final NotificationService notificationService = mock(NotificationService.class);
     private final CaseTaskTrackingService tracking = mock(CaseTaskTrackingService.class);
     private final NotificationsProperties templates = mock(NotificationsProperties.class, invocation ->
@@ -65,28 +63,21 @@ class BreathingSpaceNotifiersTest {
     private final BreathingSpaceEmailHelper helper = new BreathingSpaceEmailHelper(organisations, signatures, toggles);
 
     @ParameterizedTest
-    @CsvSource({
-        "true,false,false,false", "true,true,false,true", "true,true,true,false", "true,true,true,true",
-        "false,false,false,false", "false,false,false,true", "false,false,true,false", "false,false,true,true"
-    })
-    void shouldDispatchUnchangedLegacyEmails(boolean enter, boolean twoRepresentatives,
-                                            boolean applicantOrganisationMissing, boolean queryManagement) {
-        CaseData data = caseData();
-        when(organisations.findOrganisationById("applicant"))
-            .thenReturn(applicantOrganisationMissing ? Optional.empty() : Optional.of(new Organisation().setName("Claimant firm")));
-        when(organisations.findOrganisationById("respondent1")).thenReturn(Optional.of(new Organisation().setName("Defendant firm")));
-        when(organisations.findOrganisationById("respondent2")).thenReturn(Optional.of(new Organisation().setName("Second firm")));
-        when(toggles.isPublicQueryManagementEnabled(data)).thenReturn(queryManagement);
-        assertParity(data, enter, twoRepresentatives);
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {"NULL,YES", "NULL,NO", "'',YES"}, nullValues = "NULL")
-    void shouldPreserveRespondentTwoAddressFallback(String email, YesOrNo sameRepresentative) {
+    @CsvSource(value = {"NULL,YES", "NULL,NO", "'',YES", "'',NO"}, nullValues = "NULL")
+    void shouldPreserveRespondentTwoAddressFallbackBSEnter(String email, YesOrNo sameRepresentative) {
         when(organisations.findOrganisationById(any())).thenReturn(Optional.of(new Organisation().setName("Firm")));
         CaseData data = caseData().toBuilder().respondentSolicitor2EmailAddress(email)
             .respondent2SameLegalRepresentative(sameRepresentative).build();
         assertParity(data, true, true);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"NULL,YES", "NULL,NO", "'',YES", "'',NO"}, nullValues = "NULL")
+    void shouldPreserveRespondentTwoAddressFallbackBSLift(String email, YesOrNo sameRepresentative) {
+        when(organisations.findOrganisationById(any())).thenReturn(Optional.of(new Organisation().setName("Firm")));
+        CaseData data = caseData().toBuilder().respondentSolicitor2EmailAddress(email)
+            .respondent2SameLegalRepresentative(sameRepresentative).build();
+        assertParity(data, false, true);
     }
 
     @Test
@@ -115,13 +106,14 @@ class BreathingSpaceNotifiersTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"YES,YES", "YES,NO", "NO,YES", "NO,NO"})
-    void shouldOnlyNotifyRepresentedParties(YesOrNo applicantRepresented, YesOrNo respondentRepresented) {
+    @CsvSource({"YES,YES,YES", "YES,YES,NO", "YES,NO,YES", "YES,NO,NO", "NO,YES,YES", "NO,YES,NO", "NO,NO,YES", "NO,NO,NO"})
+    void shouldOnlyNotifyRepresentedParties(YesOrNo applicantRepresented, YesOrNo respondentRepresented, YesOrNo respondent2Represented) {
         CaseData data = caseData().toBuilder().applicant1Represented(applicantRepresented)
             .respondent1Represented(respondentRepresented)
-            .respondent2Represented(respondentRepresented).build();
+            .respondent2Represented(respondent2Represented).build();
         boolean applicant = applicantRepresented == YesOrNo.YES;
         boolean respondent = respondentRepresented == YesOrNo.YES;
+        boolean respondent2 = respondent2Represented == YesOrNo.YES;
         assertThat(new BreathingSpaceEnterAppSolOneEmailDTOGenerator(organisations, helper, templates)
                        .getShouldNotify(data)).isEqualTo(applicant);
         assertThat(new BreathingSpaceLiftedAppSolOneEmailDTOGenerator(organisations, helper, templates)
@@ -133,14 +125,15 @@ class BreathingSpaceNotifiersTest {
         when(engine.evaluate(data)).thenReturn(flow);
         when(flow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(true);
         assertThat(new BreathingSpaceEnterRespSolTwoEmailDTOGenerator(organisations, helper, templates, engine)
-                       .getShouldNotify(data)).isEqualTo(respondent);
+                       .getShouldNotify(data)).isEqualTo(respondent2);
         assertThat(new BreathingSpaceLiftedRespSolTwoEmailDTOGenerator(organisations, helper, templates, engine)
-                       .getShouldNotify(data)).isEqualTo(respondent);
+                       .getShouldNotify(data)).isEqualTo(respondent2);
     }
 
     private void assertParity(CaseData data, boolean enter, boolean twoRepresentatives) {
         Notifier<CaseData> notifier;
         String taskId;
+        List<String> expectedEmails = getExpectedEmails(data, twoRepresentatives);
         if (enter) {
             when(engine.evaluate(data)).thenReturn(flow);
             when(flow.isFlagSet(ONE_RESPONDENT_REPRESENTATIVE)).thenReturn(!twoRepresentatives);
@@ -150,12 +143,6 @@ class BreathingSpaceNotifiersTest {
                 new BreathingSpaceEnterRespSolOneEmailDTOGenerator(organisations, helper, templates),
                 new BreathingSpaceEnterRespSolTwoEmailDTOGenerator(organisations, helper, templates, engine)));
             taskId = "BreathingSpaceEnterNotifyParties";
-            var legacy = new BreathingSpaceEnterNotificationHandler(legacyService, templates, organisations, signatures, toggles);
-            legacy.handle(params(data, CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_ENTER));
-            legacy.handle(params(data, CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_ENTER));
-            if (twoRepresentatives) {
-                legacy.handle(params(data, CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_BREATHING_SPACE_ENTER));
-            }
         } else {
             when(engine.evaluate(data)).thenReturn(flow);
             when(flow.isFlagSet(ONE_RESPONDENT_REPRESENTATIVE)).thenReturn(!twoRepresentatives);
@@ -165,18 +152,35 @@ class BreathingSpaceNotifiersTest {
                 new BreathingSpaceLiftedRespSolOneEmailDTOGenerator(organisations, helper, templates),
                 new BreathingSpaceLiftedRespSolTwoEmailDTOGenerator(organisations, helper, templates, engine)));
             taskId = "BreathingSpaceLiftedNotifyParties";
-            var legacy = new BreathingSpaceLiftedNotificationHandler(legacyService, templates, organisations, signatures, toggles);
-            legacy.handle(params(data, CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_LIFTED));
-            legacy.handle(params(data, CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_LIFTED));
         }
         data.setBusinessProcess(new BusinessProcess().setActivityId(taskId));
         var factory = new NotifierFactory(notifier);
         assertThat(factory.getNotifier(taskId)).isSameAs(notifier);
         new NotificationHandler(factory, mock(CoreCaseDataService.class), new ObjectMapper().registerModule(new JavaTimeModule()))
             .handle(params(data, CaseEvent.NOTIFY_EVENT));
-        assertThat(emails(legacyService)).hasSize(enter && twoRepresentatives ? 3 : 2);
-        assertThat(emails(notificationService)).containsExactlyInAnyOrderElementsOf(emails(legacyService));
+        assertThat(emails(notificationService)).hasSize(twoRepresentatives ? 3 : 2);
+        assertThat(emails(notificationService).stream()
+                       .map(entry -> Objects.toString(entry.getFirst(), null))
+                       .toList())
+            .containsExactlyInAnyOrderElementsOf(expectedEmails);
         verifyNoInteractions(tracking);
+    }
+
+    private static List<String> getExpectedEmails(CaseData data, boolean twoRepresentatives) {
+        List<String> expectedEmails = new ArrayList<>(List.of(
+            data.getRespondentSolicitor1EmailAddress(),
+            data.getApplicantSolicitor1UserDetailsEmail()
+        ));
+
+        if (twoRepresentatives) {
+            boolean fallbackToSolicitor1 = data.getRespondent2SameLegalRepresentative() == YesOrNo.YES
+                && data.getRespondentSolicitor2EmailAddress() == null;
+
+            expectedEmails.add(fallbackToSolicitor1
+                                   ? data.getRespondentSolicitor1EmailAddress()
+                                   : data.getRespondentSolicitor2EmailAddress());
+        }
+        return expectedEmails;
     }
 
     private CallbackParams params(CaseData data, CaseEvent event) {

@@ -2,19 +2,20 @@ package uk.gov.hmcts.reform.civil.notification.handlers.breathingspace;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.RespSolTwoEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.ONE_RESPONDENT_REPRESENTATIVE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
-public class BreathingSpaceLiftedRespSolTwoEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
+public class BreathingSpaceLiftedRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
 
     private final BreathingSpaceEmailHelper helper;
     private final NotificationsProperties notificationsProperties;
@@ -34,6 +35,13 @@ public class BreathingSpaceLiftedRespSolTwoEmailDTOGenerator extends RespSolOneE
         var flow = stateFlowEngine.evaluate(caseData);
         return !caseData.isRespondent2NotRepresented()
             && !flow.isFlagSet(ONE_RESPONDENT_REPRESENTATIVE) && flow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES);
+    }
+
+    @Override
+    public String getEmailAddress(CaseData caseData) {
+        String email = caseData.getRespondentSolicitor2EmailAddress();
+        return email == null && caseData.getRespondent2SameLegalRepresentative() == YES
+            ? caseData.getRespondentSolicitor1EmailAddress() : email;
     }
 
     @Override
