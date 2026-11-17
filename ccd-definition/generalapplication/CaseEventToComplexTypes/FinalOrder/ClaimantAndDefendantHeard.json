@@ -1,0 +1,234 @@
+[
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.claimantPartyName",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.defendantOnePartyName",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.defendantTwoPartyName",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.claimantRepresentationLabel",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.claimantRepresentation",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.counselForClaimant",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.solicitorForClaimant",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.costDraftsman",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.claimantInPerson",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.layRepresentativeforClaimant",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.heardFromClaimantNotAttend",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "MANDATORY"
+    },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.defendantRepresentationLabel",
+    "FieldDisplayOrder": 8,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.defendantRepresentation",
+    "FieldDisplayOrder": 9,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.CounselForDefendant",
+    "FieldDisplayOrder": 10,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.solicitorForDefendant",
+    "FieldDisplayOrder": 10,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.costDraftsmanDef",
+    "FieldDisplayOrder": 10,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.defendantInPerson",
+    "FieldDisplayOrder": 10,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.layRepresentativeDef",
+    "FieldDisplayOrder": 10,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.heardFromDefendantNotAttend",
+    "FieldDisplayOrder": 11,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.defendantTwoRepresentationLabel",
+    "FieldDisplayOrder": 12,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.defendantTwoRepresentation",
+    "FieldDisplayOrder": 13,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.CounselForDefendantTwo",
+    "FieldDisplayOrder": 14,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.solicitorForDefendantTwo",
+    "FieldDisplayOrder": 14,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.costDraftsmanDefTwo",
+    "FieldDisplayOrder": 14,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.defendantTwoInPerson",
+    "FieldDisplayOrder": 14,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.layRepresentativeDefTwo",
+    "FieldDisplayOrder": 14,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "claimantDefendantRepresentation.heardFromDefTwoNotAttend",
+    "FieldDisplayOrder": 15,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "otherRepresentation.detailsRepresentationLabel",
+    "FieldDisplayOrder": 16,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "ID": "ClaimantAndDefendantHeard",
+    "CaseEventID": "GENERATE_DIRECTIONS_ORDER",
+    "CaseFieldID": "assistedOrderRepresentation",
+    "ListElementCode": "otherRepresentation.detailsRepresentationText",
+    "FieldDisplayOrder": 17,
+    "DisplayContext": "OPTIONAL"
+  }
+]

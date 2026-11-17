@@ -1,0 +1,42 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "INFORM_AGREED_EXTENSION_DATE",
+    "CaseFieldID": "isRespondent1",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "ExtensionDate",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "respondentSolicitor1AgreedDeadlineExtension=\"DO_NOT_SHOW_IN_UI\"",
+    "RetainHiddenValue": "Y"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "INFORM_AGREED_EXTENSION_DATE",
+    "CaseFieldID": "respondentSolicitor1AgreedDeadlineExtension",
+    "CaseEventFieldLabel": "The damages claims portal allows the parties to agree a 28 day extension to the time limit for responding to the claim. If the parties have agreed an extension, please click the submit button. The extended date for the response is shown below.",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "READONLY",
+    "PageID": "ExtensionDate",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N",
+    "RetriesTimeoutURLMidEvent": 0,
+    "RetainHiddenValue": "Yes",
+    "FieldShowCondition": "isRespondent1=\"Yes\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "INFORM_AGREED_EXTENSION_DATE",
+    "CaseFieldID": "respondentSolicitor2AgreedDeadlineExtension",
+    "CaseEventFieldLabel": "The damages claims portal allows the parties to agree a 28 day extension to the time limit for responding to the claim. If the parties have agreed an extension, please click the submit button. The extended date for the response is shown below.",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "READONLY",
+    "PageID": "ExtensionDate",
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N",
+    "RetriesTimeoutURLMidEvent": 0,
+    "RetainHiddenValue": "Yes",
+    "FieldShowCondition": "isRespondent1=\"No\""
+  }
+]

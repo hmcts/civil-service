@@ -1,0 +1,21 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "TRANSFER_ONLINE_CASE",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-civil-admin",
+          "caseworker-civil-staff"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-civil"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  }
+]

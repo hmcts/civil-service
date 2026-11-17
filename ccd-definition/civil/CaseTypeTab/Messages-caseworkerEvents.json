@@ -1,0 +1,11 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "Messages",
+    "TabLabel": "Messages",
+    "TabDisplayOrder": 99,
+    "CaseFieldID": "messages",
+    "TabFieldDisplayOrder": 1,
+    "DisplayContextParameter": "#TABLE(senderRoleType, recipientRoleType, isUrgent, sentTime, updatedTime, subject)"
+  }
+]

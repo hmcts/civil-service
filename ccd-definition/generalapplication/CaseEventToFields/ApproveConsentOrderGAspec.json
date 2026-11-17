@@ -1,0 +1,91 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "APPROVE_CONSENT_ORDER",
+    "CaseFieldID": "approveConsentOrder",
+    "DisplayContext": "COMPLEX",
+    "PageID": "GAApproveConsentOrderScreen",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y",
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/populate-consent-order-doc"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "APPROVE_CONSENT_ORDER",
+    "CaseFieldID": "consentOrderDocPreview",
+    "DisplayContext": "READONLY",
+    "PageID": "GAConsentOrderDocPreviewScreen",
+    "PageLabel": "Preview Order Document",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+  "CaseTypeID": "GENERALAPPLICATION",
+  "CaseEventID": "APPROVE_CONSENT_ORDER",
+  "CaseFieldID": "generalAppUrgencyRequirement",
+  "PageFieldDisplayOrder":1,
+  "DisplayContext": "OPTIONAL",
+  "PageID": "GAUrgencyRecordPage",
+  "PageDisplayOrder": 3,
+  "PageColumnNumber": 1,
+  "PageShowCondition": "approveConsentOrder = \"DO_NOT_SHOW_IN_UI\"",
+  "ShowSummaryChangeOption": "N",
+  "Publish": "Y"
+},
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "APPROVE_CONSENT_ORDER",
+    "CaseFieldID": "generalAppType",
+    "DisplayContext": "OPTIONAL",
+    "PageID": "GATypePage",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "PageShowCondition": "approveConsentOrder = \"DO_NOT_SHOW_IN_UI\"",
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "APPROVE_CONSENT_ORDER",
+    "CaseFieldID": "judicialDecision",
+    "PageID": "GAJudicialDecision",
+    "PageFieldDisplayOrder": 1,
+    "PageDisplayOrder": 5,
+    "PageColumnNumber": 1,
+    "PageShowCondition": "approveConsentOrder = \"DO_NOT_SHOW_IN_UI\"",
+    "DisplayContext": "OPTIONAL",
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "APPROVE_CONSENT_ORDER",
+    "CaseFieldID": "isCcmccLocation",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "isMultiPartyPage",
+    "PageDisplayOrder": 6,
+    "PageColumnNumber": 1,
+    "PageShowCondition": "approveConsentOrder = \"DO_NOT_SHOW_IN_UI\"",
+    "ShowSummaryChangeOption": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "APPROVE_CONSENT_ORDER",
+    "CaseFieldID": "generalAppSuperClaimType",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "isMultiPartyPage2",
+    "PageDisplayOrder": 7,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "N",
+    "PageShowCondition": "generalAppUrgencyRequirement = \"DO_NOT_SHOW_IN_UI\"",
+    "Publish": "Y"
+  }
+]

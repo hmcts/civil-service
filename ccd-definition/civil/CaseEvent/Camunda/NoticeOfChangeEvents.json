@@ -1,0 +1,26 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "UPDATE_CASE_DETAILS_AFTER_NOC",
+    "Name": "Update casedetails after NoC",
+    "Description": "Update case details after Notice of Change",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "CLEAR_FORMER_SOLICITOR_INFO_AFTER_NOTIFY_NOC",
+    "Name": "Clear former solicitor info",
+    "Description": "Clear former solicitor info after Notifying Notice of Change",
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N"
+  }
+]

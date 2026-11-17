@@ -1,0 +1,83 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "caseNoteType",
+    "Label": "This case note is only visible to you and other judges",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "CaseNoteType",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "documentAndNameToAdd",
+    "Label": "Upload a document",
+    "HintText": "Each document must be less than 100MB. You can upload the following file types: Word, Excel, PowerPoint, PDF, RTF, TXT, CSV, JPG, PNG, BMP, TIF, TIFF",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "DocumentAndName",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "documentAndName",
+    "Label": "Upload a document",
+    "HintText": "Each document must be less than 100MB. You can upload the following file types: Word, Excel, PowerPoint, PDF, RTF, TXT, CSV, JPG, PNG, BMP, TIF, TIFF",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "DocumentAndName",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "caseNoteTypeNoteLabel",
+    "Label": "## Write a Note \n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "caseNoteTA",
+    "Label": "Write a note about this case",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "caseNotesTA",
+    "Label": "Write a note about this case",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseNote",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Comment": "The note fields to be displayed in the tab"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "noteAdditionDateTime",
+    "Label": "Note was added on",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "documentAndNoteToAdd",
+    "Label": "Upload a document",
+    "HintText": "Each document must be less than 100MB, You can upload the following file types: Word, Excel, PowerPoint, PDF, RTF, TXT, CSV, JPG, PNG, BMP, TIF, TIFF",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "DocumentAndNote",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "documentAndNote",
+    "Label": "Upload a document and case note",
+    "HintText": "Each document must be less than 100MB, You can upload the following file types: Word, Excel, PowerPoint, PDF, RTF, TXT, CSV, JPG, PNG, BMP, TIF, TIFF",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "DocumentAndNote",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

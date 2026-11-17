@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "SendMessageSubjectOptionsList",
+    "ListElementCode": "APPLICATION",
+    "ListElement": "An application",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "SendMessageSubjectOptionsList",
+    "ListElementCode": "HEARING",
+    "ListElement": "A hearing",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "SendMessageSubjectOptionsList",
+    "ListElementCode": "REVIEW_DOCUMENTS",
+    "ListElement": "Review submitted documents",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "SendMessageSubjectOptionsList",
+    "ListElementCode": "OTHER",
+    "ListElement": "Other",
+    "DisplayOrder": 4
+  }
+]
