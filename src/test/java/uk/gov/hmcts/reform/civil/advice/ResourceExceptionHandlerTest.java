@@ -78,6 +78,46 @@ public class ResourceExceptionHandlerTest {
     }
 
     @Test
+    void shouldReturnUnauthorized_whenRoleAssignmentBadRequestBodySays401() {
+        String body = "{\"exception\":\"uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException\","
+            + "\"status\":400,\"message\":\"Client error when getting Role Assignments from Role Assignment "
+            + "Service because of 401 Unauthorized on GET request for "
+            + "\\\"http://am-role-assignment-service-prod.service.core-compute-prod.internal"
+            + "/am/role-assignments/actors/uid\\\": [no body]\"}";
+        String truncatedMessage = "[400 Bad Request] during [POST] to [http://ccd-data-store-api/searchCases] "
+            + "[CoreCaseDataApi#searchCases]: [{...because of... (518 bytes)";
+
+        testTemplate(
+            truncatedMessage,
+            handler.badRequestFeign(new FeignException.BadRequest(
+                truncatedMessage,
+                Mockito.mock(feign.Request.class),
+                body.getBytes(StandardCharsets.UTF_8),
+                Collections.emptyMap()
+            ), contentCachingRequestWrapper),
+            HttpStatus.UNAUTHORIZED
+        );
+    }
+
+    @Test
+    void shouldReturnInternalServerError_whenFeignBadRequestIsNotRoleAssignment401() {
+        String body = """
+            {"exception":"uk.gov.hmcts.ccd.endpoint.exceptions.BadRequestException","status":400,"message":"Case data validation failed"}""";
+        String message = "expected validation error from ccd";
+
+        testTemplate(
+            message,
+            handler.badRequestFeign(new FeignException.BadRequest(
+                message,
+                Mockito.mock(feign.Request.class),
+                body.getBytes(StandardCharsets.UTF_8),
+                Collections.emptyMap()
+            ), contentCachingRequestWrapper),
+            HttpStatus.INTERNAL_SERVER_ERROR
+        );
+    }
+
+    @Test
     void shouldReturnUnauthorized_whenFeignExceptionUnauthorizedExceptionThrown() {
         testTemplate(
             "expected exception for feing unauthorized",
