@@ -141,6 +141,13 @@ allprojects {
       dependency 'io.projectreactor:reactor-core:3.8.7'
       dependency 'io.micrometer:micrometer-core:1.16.7'
       dependency 'ch.qos.logback:logback-core:1.6.5'
+
+      // The decentralised runtime's Spring Boot BOM would hold elasticsearch-java's OpenTelemetry at 1.49.0.
+      // GHSA-ccrj-gw8r-854m, GHSA-rcgg-9c38-7xpx
+      dependencySet(group: 'io.opentelemetry', version: '1.67.0') {
+        entry 'opentelemetry-api'
+        entry 'opentelemetry-context'
+      }
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.0.3'
