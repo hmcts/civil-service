@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DJ_NON_DIVERGE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DJ_NON_DIVERGENT_SPEC_DEFENDANT1_LR;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DJ_NON_DIVERGENT_SPEC_DEFENDANT2_LR;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipSubjectProperties;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getDefendantNameBasedOnCaseType;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
@@ -98,7 +99,7 @@ public class ClaimDJNonDivergentDefendantNotificationHandler extends CallbackHan
         if (recipientEmail != null) {
             notificationService.sendMail(
                 recipientEmail,
-                getTemplate(isRespondentLip),
+                getTemplate(caseData, isRespondentLip),
                 getEmailProperties(callbackParams, caseData),
                 getReferenceTemplate(caseData, isRespondentLip)
             );
@@ -122,9 +123,13 @@ public class ClaimDJNonDivergentDefendantNotificationHandler extends CallbackHan
         }
     }
 
-    private String getTemplate(boolean isRespondentLip) {
-        return isRespondentLip ? notificationsProperties.getNotifyUpdateTemplate()
-            : notificationsProperties.getNotifyDJNonDivergentSpecDefendantTemplate();
+    private String getTemplate(CaseData caseData, boolean isRespondentLip) {
+        if (!isRespondentLip) {
+            return notificationsProperties.getNotifyDJNonDivergentSpecDefendantTemplate();
+        }
+        return caseData.isRespondentResponseBilingual()
+            ? notificationsProperties.getNotifyLipUpdateTemplateBilingual()
+            : notificationsProperties.getNotifyLipDjNonDivergentDefendantTemplate();
     }
 
     private String getRecipientEmail(CallbackParams callbackParams) {
@@ -160,6 +165,7 @@ public class ClaimDJNonDivergentDefendantNotificationHandler extends CallbackHan
             CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
             PARTY_NAME, caseData.getRespondent1().getPartyName()
         ));
+        addLipSubjectProperties(caseData, properties);
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;

@@ -43,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Cl
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimSetAsideJudgmentDefendantNotificationHandler.TASK_ID_RESPONDENT1_LIP;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_16_DIGIT_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_INTERIM;
@@ -175,6 +176,7 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandlerTest extends BaseC
                                  .setType(Party.Type.INDIVIDUAL).setPartyEmail("respondentLip@example.com"))
                 .applicant1Represented(YesOrNo.NO)
                 .legacyCaseReference("000DC001")
+                .ccdCaseReference(CaseDataBuilder.CASE_ID)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
                 .build();
@@ -213,6 +215,8 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandlerTest extends BaseC
     private Map<String, String> getNotificationDataMapLip(CaseData caseData) {
         Map<String, String> expectedProperties = new HashMap<>(addCommonProperties(true));
         expectedProperties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
+        expectedProperties.put(CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString());
+        expectedProperties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
         expectedProperties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
         expectedProperties.put(PARTY_NAME, caseData.getRespondent1().getPartyName());
         return expectedProperties;

@@ -22,6 +22,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT1_GENERIC_TEMPLATE;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipSubjectProperties;
 
 @Service
 @RequiredArgsConstructor
@@ -72,6 +73,7 @@ public class NotifyApplicant1GenericTemplateHandler extends CallbackHandler impl
             PARTY_NAME, caseData.getApplicant1().getPartyName(),
             CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
         ));
+        addLipSubjectProperties(caseData, properties);
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
