@@ -64,9 +64,9 @@ public class DraftClaimController {
     public ResponseEntity<DraftClaimResponse> getActiveDraftClaim(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
-        DraftStoreEntity draftClaim = draftClaimService.getActiveDraftClaimForUser(getUserId(authorisation))
-            .orElseThrow(DraftClaimNotFoundException::new);
-        return ResponseEntity.ok(DraftClaimResponse.from(draftClaim));
+        return draftClaimService.getActiveDraftClaimForUser(getUserId(authorisation))
+            .map(draftClaim -> ResponseEntity.ok(DraftClaimResponse.from(draftClaim)))
+            .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     @GetMapping("/case/{case-id}")
@@ -74,9 +74,9 @@ public class DraftClaimController {
         @PathVariable("case-id") String caseId,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
-        DraftStoreEntity draftClaim = draftClaimService.getDraftClaimForCase(getUserId(authorisation), caseId)
-            .orElseThrow(() -> new DraftClaimNotFoundException(caseId));
-        return ResponseEntity.ok(DraftClaimResponse.from(draftClaim));
+        return draftClaimService.getDraftClaimForCase(getUserId(authorisation), caseId)
+            .map(draftClaim -> ResponseEntity.ok(DraftClaimResponse.from(draftClaim)))
+            .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     @GetMapping("/{draft-id}")
