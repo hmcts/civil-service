@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "RespondentResponseTypeSpecPaidStatus",
+    "ListElementCode": "PAID_LESS_THAN_CLAIMED_AMOUNT",
+    "ListElement": "This should be an empty string or Hidden. CCD requires a string to be displayed. So we cannot use this variable as a logic workaround",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "RespondentResponseTypeSpecPaidStatus",
+    "ListElementCode": "PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT",
+    "ListElement": "This should be an empty string or Hidden. CCD requires a string to be displayed. So we cannot use this variable as a logic workaround",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "RespondentResponseTypeSpecPaidStatus",
+    "ListElementCode": "DID_NOT_PAY",
+    "ListElement": "This should be an empty string or Hidden. CCD requires a string to be displayed. So we cannot use this variable as a logic workaround",
+    "DisplayOrder": 3
+  }
+]

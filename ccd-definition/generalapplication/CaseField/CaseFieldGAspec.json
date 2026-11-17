@@ -1,0 +1,1369 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalApplications",
+    "Label": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "GeneralApplicationGAspec",
+    "SecurityClassification": "Public",
+    "_Definition":  "The details of the child application on the case",
+    "_Category":  "COMMON"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "applicant1OrganisationPolicy",
+    "Label": "Claimant's legal representative",
+    "FieldType": "OrganisationPolicy",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "respondent1OrganisationPolicy",
+    "Label": "Defendant's legal representative",
+    "FieldType": "OrganisationPolicy",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "caseHistory",
+    "Label": " ",
+    "FieldType": "CaseHistoryViewer",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "respondent2OrganisationPolicy",
+    "Label": "Defendant 2's legal representative",
+    "FieldType": "OrganisationPolicy",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalApplicationCaseListLabel",
+    "Label": "Application Type",
+    "HintText": "  ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppParentCaseLink",
+    "Label": "Parent Case ID",
+    "HintText": "  ",
+    "FieldType": "CaseLink",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "caseLink",
+    "Label": "caseLink",
+    "HintText": "  ",
+    "FieldType": "CaseLink",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppType",
+    "Label": " ",
+    "HintText": "  ",
+    "FieldType": "GATypeGAspec",
+    "SecurityClassification": "Public",
+    "_Definition":  "Type of the child application on the case",
+    "_Category":  "COMMON"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalApplicationType",
+    "Label": "What type of application(s) do you want to make?",
+    "HintText": "  ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "_Definition":  "Type of the child application on the case",
+    "_Category":  "COMMON"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppRespondentAgreement",
+    "Label": " ",
+    "FieldType": "GARespondentAgreementGAspec",
+    "SecurityClassification": "Public",
+    "_Definition":  "The details of the child application on the case related to respondent agreement",
+    "_Category":  "COMMON"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppConsentOrder",
+    "Label": "With notice",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppStatementOfTruthLabel",
+    "Label": "## Statement of truth\n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppStatementOfTruth",
+    "Label": " ",
+    "FieldType": "GAStatementOfTruthGAspec",
+    "SecurityClassification": "Public",
+    "Comment": "This field is used to capture information and is then cleared immediately. Required to reset SoT when user changes answer in CYA"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppStatementOfTruthConsent",
+    "Label": " ",
+    "ListElementCode": "ConsentAgreementCheckBox",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "StatementOfTruthConsentGAspec",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppUrgencyRequirement",
+    "Label": " ",
+    "FieldType": "GAUrgencyRecordGAspec",
+    "SecurityClassification": "Public",
+    "_Definition":  "This fields holds whether or not the application is urgent, and if it is then the further details and reasons",
+    "_Category":  "COMMON"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "isApplicationUrgent",
+    "Label": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "GAIsUrgentGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppInformOtherParty",
+    "Label": " ",
+    "FieldType": "GAWithOrWithoutNotice",
+    "SecurityClassification": "Public",
+    "_Definition":  "This fields holds whether or not the other party should be notified of this application. If no, then reasons behind not notifying.",
+    "_Category":  "COMMON"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppDetailsOfOrder",
+    "Label": "Draft order",
+    "HintText": "This is the draft order that you are requesting from the court",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppReasonsOfOrder",
+    "Label": "Reason",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppUploadEvidenceLabel",
+    "Label": "## How to upload your evidence \n If a document has multiple pages, upload them as one file rather than multiple files.\n\n Before you upload the document, give it a name that tells the court what it is, for example \"Witness statement by Jane Smith dated DD/MM/YYYY\" \n\n Each document must be less than 100MB. You can upload the following file types: Word, Excel, PowerPoint, PDF, RTF, TXT, CSV, JPG, JPEG, PNG, BMP, TIF, TIFF.\n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppWrittenRepUploadLabel",
+    "Label": "## How to upload your evidence \n If a document has multiple pages, upload them as one file rather than multiple files.\n\n Before you upload the document, give it a name that tells the court what it is, for example \"Witness statement by Jane Smith dated DD/MM/YYYY\" \n\n Each document must be less than 100MB. You can upload the following file types: Word, Excel, PowerPoint, PDF, RTF, TXT, CSV, JPG, JPEG, PNG, BMP, TIF, TIFF.\n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppHearingDetails",
+    "Label": "Hearing details",
+    "FieldType": "GAHearingDetailsGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppPBADetails",
+    "Label": "Pay for application with PBA\n",
+    "FieldType": "GAPBADetailsGAspec",
+    "SecurityClassification": "Public",
+    "_Definition":  "This fields holds applicant's PBA details.",
+    "_Category":  "COMMON"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppApplnSolicitor",
+    "Label": "Applicant Solicitor Details",
+    "FieldType": "GASolicitorDetailsGAspec",
+    "SecurityClassification": "Public",
+    "_Definition":  "This fields holds applicant's Solicitor details.",
+    "_Category":  "COMMON"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppRespondentSolicitors",
+    "Label": "Respondent Solicitor Details",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "GASolicitorDetailsGAspec",
+    "SecurityClassification": "Public",
+    "_Definition":  "This fields holds respondent's Solicitor details.",
+    "_Category":  "COMMON"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppApplicantAddlSolicitors",
+    "Label": "Applicant Addl Solicitor Details",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "GASolicitorDetailsGAspec",
+    "SecurityClassification": "Public",
+    "_Definition":  "This fields holds applicant's Solicitor details.",
+    "_Category":  "COMMON"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppEvidenceDocument",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "Label": "Supporting evidence",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppWrittenRepUpload",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "Label": "Response file",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaWrittenRepDocList",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "Label": "Written Representation Documents",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppDirOrderUpload",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "Label": "Response file",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaDirectionDocList",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "Label": "Directions Order Documents",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppAddlnInfoUpload",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "Label": "Response file",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaAddlnInfoList",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "Label": "Additional Information Documents",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "businessProcess",
+    "Label": " ",
+    "FieldType": "BusinessProcess",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "isMultiParty",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "applicantPartyName",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "litigiousPartyID",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "claimant1PartyName",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "claimant2PartyName",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "defendant1PartyName",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "defendant2PartyName",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "caseManagementLocation",
+    "Label": " ",
+    "FieldType": "GACaseLocationGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "isCcmccLocation",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "caseManagementCategory",
+    "Label": " ",
+    "FieldType": "GACaseManagementCategory",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "parentClaimantIsApplicant",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public"
+  },
+   {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppSubmittedDateGAspec",
+    "Label": "General Application Submitted on",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "claimantGaAppDetails",
+    "Label": " ",
+    "ElementLabel": "Application Type",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "GeneralApplicationDetailsGAspec",
+    "SecurityClassification": "Public",
+    "_Definition":  "The details of the child application on the case for Claimant solicitor",
+    "_Category":  "COMMON"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaDetailsMasterCollection",
+    "Label": " ",
+    "ElementLabel": "Application Type",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "GeneralApplicationDetailsGAspec",
+    "SecurityClassification": "Public",
+    "_Definition":  "The details of the child application on the case for Judge",
+    "_Category":  "COMMON"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "respondentSolGaAppDetails",
+    "Label": " ",
+    "ElementLabel": "Application Type",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "GeneralApplicationDetailsGAspec",
+    "SecurityClassification": "Public",
+    "_Definition":  "The details of the child application on the case for respondent solicitor",
+    "_Category":  "COMMON"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "respondentSolTwoGaAppDetails",
+    "Label": " ",
+    "ElementLabel": "Application Type",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "GeneralApplicationDetailsGAspec",
+    "SecurityClassification": "Public",
+    "_Definition":  "The details of the child application on the case for respondent2 solicitor",
+    "_Category":  "COMMON"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppRespondent1Representative",
+    "Label": "Do you agree that the court should make the order that the applicant has requested?",
+    "FieldType": "GARespondentRepresentativeGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaRespondentDetails",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppDateDeadline",
+    "Label": " ",
+    "FieldType": "GeneralApplicationGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppNotificationDeadlineDate",
+    "Label": " ",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "hearingDetailsResp",
+    "Label": "Scheduled hearings and trials",
+    "FieldType": "GAHearingDetailsRespGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "civilServiceUserRoles",
+    "Label": " ",
+    "FieldType": "GAUserDetailsGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "applicantSolicitors",
+    "Label": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "GASolicitorsDetailsGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "defendantSolicitors",
+    "Label": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "GASolicitorsDetailsGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialDecision",
+    "Label": "What do you wish to do in relation to this application?",
+    "FieldType": "GAJudicialDecisionGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "respondentsResponses",
+    "Label": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "GAResondentResponseGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppSuperClaimType",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "locationName",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialDecisionMakeOrder",
+    "Label": " ",
+    "FieldType": "GAJudicialMakeAnOrderGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "applicationIsCloaked",
+    "Label": "Hide applicationIsCloakedLabel",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Comment": "workaround field to show applicationIsCloakedLabel when applicationIsCloaked is Yes. Also hides ConsentAgreementCheckBox"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialListForHearing",
+    "Label": "List for a hearing",
+    "FieldType": "GAJudgesHearingListGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialHearingGeneralOrderHearingType",
+    "Label": "${judicialHearingGeneralOrderHearingText}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialGeneralOrderHearingEstimationTime",
+    "Label": "${judicialGeneralOrderHearingEstimationTimeText}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialGeneralOrderHearingRequirement",
+    "Label": "${judicialHearingGOHearingReqText}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialGOHearingDirections",
+    "Label": "Directions in relation to hearing",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialGeneralHearingOrderRecital",
+    "Label": "Judge’s recital",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "applicationIsCloakedLabel",
+    "Label": "## This application is cloaked",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "makeAppVisibleToRespondents",
+    "Label": " ",
+    "ListElementCode": "ConsentAgreementCheckBox",
+    "FieldType": "GAmakeAppVisibleToRespondents",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialDecisionRequestMoreInfo",
+    "Label": "Request for information",
+    "FieldType": "GAJudicialRequestMoreInfoGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicidalDecisionMakeAnOrderForWrittenRepresentationsLabel",
+    "Label": "## Draw a General Order",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialDecisionMakeAnOrderForWrittenRepresentations",
+    "Label": "Make an order for written representations",
+    "FieldType": "GAJudicialWrittenRepresentationsGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "writtenRepresentationsDrawGeneralOrder",
+    "Label": "Draw a General Order",
+    "FieldType": "GAJudicialWrittenRepDrawGeneralOrderGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "migrationId",
+    "Label": "Migration Id",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "sequentialWrittenRepresentationUploadyBy",
+    "Label": "${judicialSequentialDateText}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "sequentialWrittenRepresentationRespondWithin",
+    "Label": "${judicialApplicanSequentialDateText}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "concurrentWrittenRepresentationUploadyBy",
+    "Label": "${judicialConcurrentDateText}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judgeRecitalText",
+    "Label": "Judge’s recital",
+    "ElementLabel": "Judge’s recital",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "directionInRelationToHearingText",
+    "Label": "Order in relation to written representations",
+    "ElementLabel": "Order in relation to written representations",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialGeneralOrderHeading",
+    "Label": "## Draw a General Order",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialHearingGeneralOrderHearingText",
+    "Label": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialHearingGOHearingReqText",
+    "Label": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialGeneralOrderHearingEstimationTimeText",
+    "Label": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialSequentialDateText",
+    "Label": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialApplicanSequentialDateText",
+    "Label": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialConcurrentDateText",
+    "Label": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaDraftDocument",
+    "Label": "Draft Application document",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalOrderDocument",
+    "Label": "General order document",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "consentOrderDocument",
+    "Label": "Consent order document",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "dismissalOrderDocument",
+    "Label": "Dismissal order document",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "directionOrderDocument",
+    "Label": "Directions order document",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "requestForInformationDocument",
+    "Label": "Request for information document",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "hearingOrderDocument",
+    "Label": "Hearing order document",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "writtenRepSequentialDocument",
+    "Label": "Written representation sequential document",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "writtenRepConcurrentDocument",
+    "Label": "Written representation concurrent document",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "ServiceRequest",
+    "Label": "Service Request",
+    "FieldType": "WaysToPay",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "referToJudge",
+    "Label": "Refer to Judge",
+    "FieldType": "GAReferToJudgeGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "referToLegalAdvisor",
+    "Label": "Refer to Legal Advisor",
+    "FieldType": "GAReferToLegalAdvisorGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "approveConsentOrder",
+    "Label": "Approve consent order",
+    "FieldType": "GAApproveConsentOrderGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "applicationClosedDate",
+    "Label": "Application Closed date",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "applicationTakenOfflineDate",
+    "Label": "Application Proceeds in Heritage state change date",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "CaseAccessCategory",
+    "Label": "Case Access Category",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "_Definition":  "Case Access Category",
+    "_Category":  "GENERALAPPLICATION"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppVaryJudgementType",
+    "Label": "Vary payment terms of judgment GA Type",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaUploadN245FormUploadLabel",
+    "Label": "Upload your completed N245 form",
+    "FieldType": "GAN245FormUpload",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppN245FormUpload",
+    "Label": "N245 Form",
+    "FieldType": "Document",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppHearingDate",
+    "Label": " ",
+    "FieldType": "GAHearingDateGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialMakeOrderDocPreview",
+    "Label": "Draft Order",
+    "FieldType": "Document",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialListHearingDocPreview",
+    "Label": "Draft Order",
+    "FieldType": "Document",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialWrittenRepDocPreview",
+    "Label": "Draft Order",
+    "FieldType": "Document",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialRequestMoreInfoDocPreview",
+    "Label": "Draft Order",
+    "FieldType": "Document",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "consentOrderDocPreview",
+    "Label": "Draft Order",
+    "FieldType": "Document",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialByCourtsInitiativeListForHearing",
+    "Label": "Select as appropriate",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "GAByCourtsInitiativeGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judicialByCourtsInitiativeForWrittenRep",
+    "Label": "Select as appropriate",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "GAByCourtsInitiativeGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "showRequestInfoPreviewDoc",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Comment": " "
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "applicationIsUncloakedOnce",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Comment": " "
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaHearingNoticeApplication",
+    "Label": " ",
+    "FieldType": "GAHearingNoticeApplication",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaHearingNoticeDetail",
+    "FieldType": "GAHearingNoticeDetail",
+    "Label": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaHearingNoticeInformation",
+    "Label": "Is there more information you need to add to the Hearing Notification letter?",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "hearingNoticeDocument",
+    "Label": "Hearing Notice",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "caseNameHmctsInternal",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "_comment": "Used to populate title"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "caseNameLabel",
+    "Label": "## ${caseNameHmctsInternal}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "caseParticipantsFreeForm",
+    "Label": "## ${caseNameHmctsInternal}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "freeFormRecitalAndOrderLabel",
+    "Label": "**** \n ## Recitals and order \n ### The court records that:",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "freeFormRecitalText",
+    "Label": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "freeFormOrderedLabel",
+    "Label": "**** \n ## Order \n ### The court orders that:",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "freeFormOrderedText",
+    "Label": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "orderOnCourtsListLabel",
+    "Label": "**** \n ## Order made on court's own initiative/without notice \n ### Select as appropriate",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "orderOnCourtsList",
+    "Label": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "OrderOnCourtsList",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "orderOnCourtInitiative",
+    "Label": " ",
+    "FieldType": "OrderOnCourtInitiative",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "orderWithoutNotice",
+    "Label": " ",
+    "FieldType": "OrderWithoutNotice",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "orderCourtOwnInitiativeListForHearing",
+    "Label": " ",
+    "FieldType": "GAOrderCourtOwnInitiativeGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "orderWithoutNoticeListForHearing",
+    "Label": " ",
+    "FieldType": "GAOrderWithoutNoticeGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "orderCourtOwnInitiativeForWrittenRep",
+    "Label": " ",
+    "FieldType": "GAOrderCourtOwnInitiativeGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "orderWithoutNoticeForWrittenRep",
+    "Label": " ",
+    "FieldType": "GAOrderWithoutNoticeGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "orderMadeCourtsInitiativeLabelForHearing",
+    "Label": "### Order made on court's own initiative/without notice",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "orderMadeCourtsInitiativeLabelForWrittenRep",
+    "Label": "### Order made on court's own initiative/without notice",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaRespondentDebtorOffer",
+    "Label": " ",
+    "FieldType": "GARespondentDebtorOfferGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaApplicantDisplayName",
+    "Label": "Applicant",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaRespondentConsent",
+    "Label": "The applicant has confirmed that you have agreed to the order that the applicant has requested the court to make. Is this correct?",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaRespDocument",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "Label": "Respondent Evidence",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppRespondReason",
+    "Label": "Reasons why",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppRespondUploadLabel",
+    "Label": "## How to upload your evidence \n If a document has multiple pages, upload them as one file rather than multiple files.\n\n Before you upload the document, give it a name that tells the court what it is, for example \"Witness statement by Jane Smith dated DD/MM/YYYY\" \n\n Each document must be less than 100MB. You can upload the following file types: Word, Excel, PowerPoint, PDF, RTF, TXT, CSV, JPG, JPEG, PNG, BMP, TIF, TIFF.\n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppRespondDocument",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "Label": "Upload evidence",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaRespondDoc",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "Label": "Respond upload evidence",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppRespondConsentReason",
+    "Label": "Reasons why",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppRespondConsentUploadLabel",
+    "Label": "## How to upload your evidence \n If a document has multiple pages, upload them as one file rather than multiple files.\n\n Before you upload the document, give it a name that tells the court what it is, for example \"Witness statement by Jane Smith dated DD/MM/YYYY\" \n\n Each document must be less than 100MB. You can upload the following file types: Word, Excel, PowerPoint, PDF, RTF, TXT, CSV, JPG, JPEG, PNG, BMP, TIF, TIFF.\n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppRespondConsentDocument",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "Label": "Upload evidence",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppRespondDebtorUploadLabel",
+    "Label": "## How to upload your evidence \n If a document has multiple pages, upload them as one file rather than multiple files.\n\n Before you upload the document, give it a name that tells the court what it is, for example \"Witness statement by Jane Smith dated DD/MM/YYYY\" \n\n Each document must be less than 100MB. You can upload the following file types: Word, Excel, PowerPoint, PDF, RTF, TXT, CSV, JPG, JPEG, PNG, BMP, TIF, TIFF.\n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "generalAppRespondDebtorDocument",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "Document",
+    "Label": "Upload evidence",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "addnDocumentLabel",
+    "Label": "### Uploading additional documents \n This screen is to enable you to upload documents relevant to the application including court ordered bundle and any schedule of costs.\n\rIf the court has ordered written representations, please use \"Respond to judges written rep\" from the next steps menu on the top right of the application screen.\n\rIf the court has requested additional information, please use \"Respond to judges addn info\" from the next steps menu on the top right of the application screen.\n\n ### How to upload your documents \n If a document has multiple pages, upload them as one file rather than multiple files. \n\n Before you upload the document, give it a name that tells the court what it is, for example \"Witness statement by Jane Smith dated DD/MM/YYYY\". \n\n Each document must be less than 100MB. You can upload the following file types: Word, Excel, PowerPoint, PDF, RTF, TXT, CSV, JPG, JPEG, PNG, BMP. TIF, TIFF.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "uploadDocument",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "uploadDocumentByType",
+    "Label": "Add document",
+    "HintText": "Upload a document to the system",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaAddlDoc",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "Label": "upload additional Document",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaAddlDocStaff",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "Label": "Uploaded additional documents",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaAddlDocClaimant",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "Label": "Applicant uploaded documents",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaAddlDocRespondentSol",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "Label": "Respondent uploaded documents",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaAddlDocRespondentSolTwo",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "Label": "Respondent Two uploaded documents",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "isDocumentVisible",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "caseDocumentUploadDate",
+    "Label": "upload date",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "caseDocumentUploadDateRes",
+    "Label": "upload date",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "applicationTypes",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "parentCaseReference",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "judgeTitle",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaAddlDocBundle",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "Label": "Application bundle",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png,.csv",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "isGaApplicantLip",
+    "FieldType": "YesOrNo",
+    "Label": "Is GA for LIP",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "isGaRespondentOneLip",
+    "FieldType": "YesOrNo",
+    "Label": "Is GA for LIP",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "isGaRespondentTwoLip",
+    "FieldType": "YesOrNo",
+    "Label": "Is GA for LIP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "caseNameGaInternal",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "gaWaTrackLabel",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "casePaymentHistoryViewer",
+    "Label": "Custom Payment History Viewer",
+    "FieldType": "CasePaymentHistoryViewer",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "emailPartyReference",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "unfinishedBackEndProcess",
+    "Label": "The case processing has not completed, please refresh this page in one minute. If the problem persists please contact the helpdesk 0300 123 7050",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "mainCaseSubmittedDate",
+    "Label": " ",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "nextState",
+    "Label": "Enter next state",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]
+

@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "TranslatedDocumentType",
+    "ListElementCode": "CLAIM_ISSUE",
+    "ListElement": "Claim Issue",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "TranslatedDocumentType",
+    "ListElementCode": "CLAIMANT_INTENTION",
+    "ListElement": "Claimant Intention",
+    "DisplayOrder": 3
+  }
+]

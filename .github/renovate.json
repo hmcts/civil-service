@@ -9,13 +9,13 @@
   ],
   "timezone": "Europe/London",
   "automergeSchedule": [
-    "after 7am and before 8am every weekday",
-    "after 6pm and before 8pm every weekday"
+    "after 7am and before 9am every weekday",
+    "after 5pm and before 8pm every weekday"
   ],
   "platformAutomerge": false,
   "schedule": [
-    "after 7am and before 8am every weekday",
-    "after 6pm and before 8pm every weekday"
+    "after 7am and before 9am every weekday",
+    "after 5pm and before 8pm every weekday"
   ],
   "rebaseWhen": "behind-base-branch",
   "automergeStrategy": "squash",
@@ -118,6 +118,28 @@
       "groupSlug": "helm-charts",
       "automerge": true,
       "automergeType": "pr"
+    },
+    {
+      "description": "DTSCCI-7065: Hold CCD chart updates until the chart size regression is resolved and the packaged civil-service chart is safely below the size limit",
+      "matchManagers": [
+        "helmv3"
+      ],
+      "matchPackageNames": [
+        "ccd"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Require manual review of AAC chart updates because the chart also bundles CCD",
+      "matchManagers": [
+        "helmv3"
+      ],
+      "matchPackageNames": [
+        "aac-manage-case-assignment"
+      ],
+      "groupName": "AAC chart updates",
+      "groupSlug": "aac-chart",
+      "automerge": false
     },
     {
       "groupName": "Spring Boot and related updates",

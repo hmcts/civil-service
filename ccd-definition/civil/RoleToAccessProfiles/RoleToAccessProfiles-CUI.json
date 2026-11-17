@@ -1,0 +1,29 @@
+[
+  {
+    "RoleName" : "[CLAIMANT]",
+    "Authorisation": "",
+    "CaseTypeID": "CIVIL",
+    "AccessProfiles": "CITIZEN-CLAIMANT-PROFILE",
+    "ReadOnly": "N",
+    "Disabled": "F",
+    "CaseAccessCategories": "SPEC_CLAIM"
+  },
+  {
+    "RoleName" : "[DEFENDANT]",
+    "Authorisation": "",
+    "CaseTypeID": "CIVIL",
+    "AccessProfiles": "CITIZEN-DEFENDANT-PROFILE",
+    "ReadOnly": "N",
+    "Disabled": "F",
+    "CaseAccessCategories": "SPEC_CLAIM"
+  },
+  {
+    "RoleName" : "idam:citizen",
+    "Authorisation": "",
+    "CaseTypeID": "CIVIL",
+    "AccessProfiles": "citizen-profile",
+    "ReadOnly": "N",
+    "Disabled": "F",
+    "CaseAccessCategories": "SPEC_CLAIM"
+  }
+]

@@ -1,0 +1,11 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "CaseBundles",
+    "TabLabel": "Bundles",
+    "TabDisplayOrder": 12,
+    "CaseFieldID": "bundleEvidence",
+    "TabFieldDisplayOrder": 5,
+    "DisplayContextParameter": "#TABLE(bundleName,createdDatetime,documentIssuedDate,documentUpload)"
+  }
+]

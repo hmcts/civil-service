@@ -1,18 +1,15 @@
 name: Publish email notification docs
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - 'docs/email-notifications.md'
-      - 'docs/email-notifications.html'
-      - '.github/workflows/deploy-email-docs.yml'
-      - 'scripts/generate_email_notifications_table.py'
+  workflow_run:
+    workflows: [Verify email notification documentation]
+    types: [completed]
+    branches: [master]
   workflow_dispatch:
 
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 
@@ -22,17 +19,150 @@ concurrency:
 
 jobs:
   deploy:
+    if: >-
+      github.repository == 'hmcts/civil-service' &&
+      github.ref == 'refs/heads/master' &&
+      (github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name == 'hmcts/civil-service' &&
+      github.event.workflow_run.head_branch == 'master' &&
+      (github.event.workflow_run.event == 'push' || github.event.workflow_run.event == 'workflow_dispatch')))
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-      - name: Upload docs artifact
+      - name: Select and download strictly verified documentation
+        id: verified
+        uses: actions/github-script@v9
+        with:
+          script: |
+            // This privileged workflow never checks out or executes repository code.
+            const repo = { owner: 'hmcts', repo: 'civil-service' };
+            const repository = `${repo.owner}/${repo.repo}`;
+            if (`${context.repo.owner}/${context.repo.repo}` !== repository || context.ref !== 'refs/heads/master') {
+              throw new Error('Email documentation can only be published from hmcts/civil-service master.');
+            }
+            const workflow = 'email-notifications.yml';
+            const trusted = run => run.conclusion === 'success' && run.head_branch === 'master'
+              && run.head_repository?.full_name === repository
+              && ['push', 'workflow_dispatch'].includes(run.event);
+
+            async function verificationRuns() {
+              if (context.eventName === 'workflow_run') {
+                return [context.payload.workflow_run].filter(trusted);
+              }
+              if (context.eventName !== 'workflow_dispatch') throw new Error('Unsupported publication event.');
+              return github.paginate(github.rest.actions.listWorkflowRuns, {
+                ...repo, workflow_id: workflow, branch: 'master', status: 'success', per_page: 100,
+                created: `>=${new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString()}`,
+              });
+            }
+
+            async function masterDocsTree() {
+              const branch = await github.rest.repos.getBranch({ ...repo, branch: 'master' });
+              const commit = await github.rest.git.getCommit({ ...repo, commit_sha: branch.data.commit.sha });
+              const root = await github.rest.git.getTree({ ...repo, tree_sha: commit.data.tree.sha });
+              if (root.data.truncated) throw new Error('The master tree response is incomplete.');
+              const docs = root.data.tree.find(entry => entry.path === 'docs' && entry.type === 'tree');
+              if (!docs) throw new Error('Master has no docs directory.');
+              return docs.sha;
+            }
+
+            async function findArtefact(runs, docsTree) {
+              for (const run of runs.filter(trusted)) {
+                const definition = await github.rest.actions.getWorkflow({ ...repo, workflow_id: run.workflow_id });
+                if (definition.data.path !== `.github/workflows/${workflow}`) continue;
+                const artefacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+                  ...repo, run_id: run.id, per_page: 100,
+                });
+                const artefact = artefacts.find(item => !item.expired && item.name === `verified-email-docs-${docsTree}`);
+                if (artefact) return { artefactId: artefact.id, runId: run.id, sha: run.head_sha };
+              }
+              if (context.eventName === 'workflow_dispatch') {
+                throw new Error('No retained, strictly verified artefact matches the complete docs directory on master. '
+                  + 'Run Verify email notification documentation on master successfully, then retry publication.');
+              }
+              core.info('This run has no verified artefact matching master; nothing to publish.');
+              return null;
+            }
+
+            const runs = await verificationRuns();
+            if (context.eventName === 'workflow_run' && runs.length === 0) return null;
+            const docsTree = await masterDocsTree();
+            const result = await findArtefact(runs, docsTree);
+            if (!result) return null;
+            const expected = await github.rest.git.getTree({ ...repo, tree_sha: docsTree, recursive: 'true' });
+            if (expected.data.truncated) throw new Error('The docs tree response is incomplete.');
+            const archive = await github.rest.actions.downloadArtifact({
+              ...repo, artifact_id: result.artefactId, archive_format: 'zip',
+            });
+            const fs = require('node:fs');
+            fs.writeFileSync(`${process.env.RUNNER_TEMP}/email-docs-tree.json`, JSON.stringify(expected.data.tree));
+            fs.writeFileSync(`${process.env.RUNNER_TEMP}/email-docs.zip`, Buffer.from(archive.data));
+            core.setOutput('found', 'true');
+            await core.summary.addRaw(`Publishing documentation verified at ${result.sha} in Actions run ${result.runId}.\n`).write();
+            return result;
+      - name: Validate and unpack documentation as data
+        if: steps.verified.outputs.found == 'true'
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path, PurePosixPath
+          import subprocess
+          import tarfile
+          import zipfile
+
+          temporary = Path(os.environ['RUNNER_TEMP'])
+          entries = json.loads((temporary / 'email-docs-tree.json').read_text())
+          expected = {}
+          for entry in entries:
+              if entry['type'] == 'tree':
+                  continue
+              if entry['type'] != 'blob' or entry['mode'] not in ('100644', '100755'):
+                  raise SystemExit('Documentation must contain only regular files and directories.')
+              expected[entry['path']] = entry
+          destination = temporary / 'verified-email-docs'
+          destination.mkdir()
+          seen = set()
+          with zipfile.ZipFile(temporary / 'email-docs.zip') as archive:
+              if archive.namelist() != ['email-docs.tar']:
+                  raise SystemExit('Unexpected documentation archive contents.')
+              with archive.open('email-docs.tar') as packed, tarfile.open(fileobj=packed, mode='r|') as bundle:
+                  for member in bundle:
+                      path = PurePosixPath(member.name)
+                      if path.is_absolute() or '..' in path.parts:
+                          raise SystemExit('Unsafe documentation archive path.')
+                      if member.isdir():
+                          continue
+                      name = path.as_posix()
+                      if not member.isfile() or name not in expected or name in seen:
+                          raise SystemExit('Unexpected or duplicate documentation archive entry.')
+                      entry = expected[name]
+                      mode = '100755' if member.mode & 0o100 else '100644'
+                      if member.size != entry['size'] or mode != entry['mode']:
+                          raise SystemExit(f'Documentation metadata mismatch: {name}')
+                      content = bundle.extractfile(member).read()
+                      # Compare Git object identities without writing objects or executing extracted files.
+                      object_id = subprocess.check_output(['git', 'hash-object', '--stdin'], input=content).decode().strip()
+                      if object_id != entry['sha']:
+                          raise SystemExit(f'Documentation content mismatch: {name}')
+                      target = destination / name
+                      target.parent.mkdir(parents=True, exist_ok=True)
+                      target.write_bytes(content)
+                      target.chmod(int(entry['mode'][-3:], 8))
+                      seen.add(name)
+          if seen != expected.keys():
+              raise SystemExit('The documentation archive is incomplete.')
+          PY
+      - name: Upload documentation artefact
+        if: steps.verified.outputs.found == 'true'
         uses: actions/upload-pages-artifact@v5
         with:
-          path: docs
+          path: ${{ runner.temp }}/verified-email-docs
       - name: Deploy to GitHub Pages
+        if: steps.verified.outputs.found == 'true'
         id: deployment
         uses: actions/deploy-pages@v5

@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.GeneralApplicationCaseNameService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 
 import java.util.Collections;
@@ -71,6 +72,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private final PrepareEventTask prepareEventTask;
     private final ShowWarningTask showWarningTask;
     private final SubmitChangesTask submitChangesTask;
+    private final GeneralApplicationCaseNameService generalApplicationCaseNameService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -179,6 +181,9 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        generalApplicationCaseNameService.updateGeneralApplicationsIfCaseNameChanged(
+            callbackParams.getCaseData(), callbackParams.getCaseDataBefore());
+
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Contact information changed")
             .confirmationBody("### What happens next\nAny changes made to contact details have been updated.")
