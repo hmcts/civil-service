@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.robotics;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,9 +30,13 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
+import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
+import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.postcode.PostcodeLookupService;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -48,6 +53,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsPostcodeMapper;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
@@ -59,6 +65,7 @@ import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -83,6 +90,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
         RoboticsDataMapperForUnspec.class,
         RoboticsAddressMapper.class,
         AddressLinesMapper.class,
+        RoboticsPostcodeMapper.class,
         OrganisationService.class,
         RoboticsNotificationServiceTest.RoboticsStrategyTestConfiguration.class
     },
@@ -114,6 +122,8 @@ class RoboticsNotificationServiceTest {
     RoboticsDataMapperForUnspec roboticsDataMapper;
     @MockBean
     FeatureToggleService featureToggleService;
+    @MockBean
+    PostcodeLookupService postcodeLookupService;
 
     @Captor
     private ArgumentCaptor<EmailData> emailDataArgumentCaptor;
@@ -141,6 +151,7 @@ class RoboticsNotificationServiceTest {
 
     @BeforeEach
     void setup() {
+        when(postcodeLookupService.validatePostCodeForDefendant(anyString())).thenReturn(true);
         localDateTime = LocalDateTime.of(2020, 8, 1, 12, 0, 0);
         when(time.now()).thenReturn(localDateTime);
     }
@@ -196,6 +207,13 @@ class RoboticsNotificationServiceTest {
                     .build())
                 .build())
             .build();
+        var overseasAddress = new RoboticsAddress()
+            .setAddressLine1("10 High Street").setAddressLine2("Edinburgh")
+            .setAddressLine3("Midlothian").setPostCode("EH1 1AA");
+        build.setLitigiousParties(List.of(new LitigiousParty()
+            .setAddresses(new RoboticsAddresses()
+                .setContactAddress(overseasAddress))));
+        when(postcodeLookupService.validatePostCodeForDefendant("EH11AA")).thenReturn(false);
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
 
         // When
@@ -204,6 +222,12 @@ class RoboticsNotificationServiceTest {
         verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
 
         EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
+        try (var input = capturedEmailData.getAttachments().get(0).getData().getInputStream()) {
+            var payload = new ObjectMapper().readTree(input);
+            assertThat(payload.at("/litigiousParties/0/addresses/contactAddress/postCode").isNull()).isTrue();
+            assertThat(payload.at("/litigiousParties/0/addresses/contactAddress/addressLine3").asText())
+                .isEqualTo("Midlothian - EH1 1AA");
+        }
         String reference = caseData.getLegacyCaseReference();
         String fileName = format("CaseData_%s.json", reference);
         String message = format("Robotics case data JSON is attached for %s", reference);
