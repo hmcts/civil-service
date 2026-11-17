@@ -266,7 +266,9 @@ ccd:
         DEFINITION_STORE_DB_PASSWORD: ${POSTGRES_PASSWORD}
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
-        DEFINITION_STORE_TX_TIMEOUT_DEFAULT: 60
+        # Seconds. The civil import normally takes 31 to 47s here, but reached 62s on a freshly
+        # restarted pod (PR-8643 build 3) and failed High Level Data Setup. The shared CCD base is 120.
+        DEFINITION_STORE_TX_TIMEOUT_DEFAULT: 120
         WELSH_TRANSLATION_ENABLED: false
       secrets:
         DEFINITION_STORE_DB_PASSWORD:
