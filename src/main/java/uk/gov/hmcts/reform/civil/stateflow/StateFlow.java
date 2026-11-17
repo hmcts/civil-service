@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.stateflow;
 
+import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateMachine;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StateFlowDTO;
@@ -15,6 +16,7 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_CASE_KEY;
+import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_ERROR_KEY;
 import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_FLAGS_KEY;
 import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_HISTORY_KEY;
 
@@ -40,10 +42,13 @@ public class StateFlow {
 
     public State getState() {
         if (stateMachine.hasStateMachineError()) {
-            CaseData caseData = stateMachine.getExtendedState().get(EXTENDED_STATE_CASE_KEY, CaseData.class);
+            ExtendedState extendedState = stateMachine.getExtendedState();
+            CaseData caseData = extendedState.get(EXTENDED_STATE_CASE_KEY, CaseData.class);
+            String errorMessage = extendedState.get(EXTENDED_STATE_ERROR_KEY, String.class);
+            String message = format("The state machine is at error state. Case ID: %s",
+                                    caseData != null ? caseData.getCcdCaseReference() : "unknown");
             throw new StateFlowException(
-                format("The state machine is at error state. Case ID: %s",
-                              caseData != null ? caseData.getCcdCaseReference() : "unknown")
+                errorMessage == null ? message : format("%s %s", message, errorMessage)
             );
         }
         return State.from(stateMachine.getState().getId());

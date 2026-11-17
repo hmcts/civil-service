@@ -1,0 +1,38 @@
+[
+  {
+    "ID": "DocumentsReferred",
+    "ListElementCode": "documentType",
+    "FieldType": "Text",
+    "ElementLabel": "Document type",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DocumentsReferred",
+    "ListElementCode": "documentDate",
+    "FieldType": "Date",
+    "ElementLabel": "Date document was produced",
+    "HintText": "For example, 27 3 2007",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DocumentsReferred",
+    "ListElementCode": "document",
+    "ElementLabel": "Upload a file",
+    "HintText": "Each document must be less than 100MB. You can upload the following file types: Word, Excel, PowerPoint, PDF, RTF, TXT, CSV, JPG, JPEG, PNG, BMG, TIF, TIFF",
+    "FieldType": "Document",
+    "RegularExpression": ".pdf,.txt,.doc,.dot,.docx,.rtf,.xls,.xlt,.xla,.xlsx,.xltx,.xlsb,.ppt,.pot,.pps,.ppa,.pptx,.potx,.ppsx,.jpg,.jpeg,.bmp,.tif,.tiff,.png",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DocumentsReferred",
+    "ListElementCode": "documentUploadedDatetime",
+    "ElementLabel": "Document Uploaded DateTime",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "document = \"DO NOT SHOW IN UI\""
+  }
+]

@@ -1,0 +1,68 @@
+[
+  {
+    "ID": "UnavailableDate",
+    "ListElementCode": "unavailableDateType",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "UnavailableDateChoice",
+    "ElementLabel": "Add a single date or a date range",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "UnavailableDate",
+    "ListElementCode": "date",
+    "FieldType": "Date",
+    "ElementLabel": "Unavailable date",
+    "HintText": "This date cannot be in the past and must not be more than one year in the future",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "unavailableDateType = \"SINGLE_DATE\"",
+    "Searchable": "N"
+  },
+  {
+    "ID": "UnavailableDate",
+    "ListElementCode": "fromDate",
+    "FieldType": "Date",
+    "ElementLabel": "Date from",
+    "HintText": "This date cannot be in the past and must not be more than one year in the future",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "unavailableDateType = \"DATE_RANGE\"",
+    "Searchable": "N"
+  },
+  {
+    "ID": "UnavailableDate",
+    "ListElementCode": "toDate",
+    "FieldType": "Date",
+    "ElementLabel": "Date to",
+    "HintText": "This date cannot be in the past and must not be more than one year in the future",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "unavailableDateType = \"DATE_RANGE\"",
+    "Searchable": "N"
+  },
+  {
+    "ID": "UnavailableDate",
+    "ListElementCode": "who",
+    "FieldType": "Text",
+    "ElementLabel": "Name of unavailable person",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "unavailableDateType = \"DO NOT SHOW IN UI\"",
+    "DisplayContext": "OPTIONAL",
+    "Comment": "FIELDS REQUIRED FOR PRODUCTION - PART OF LEGAL REP UPLIFTS - QUERY PROD BEFORE DELETING",
+    "Searchable": "N"
+  },
+  {
+    "ID": "UnavailableDate",
+    "ListElementCode": "eventAdded",
+    "FieldType": "Text",
+    "ElementLabel": "Event added",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "UnavailableDate",
+    "ListElementCode": "dateAdded",
+    "FieldType": "Date",
+    "ElementLabel": "Date added",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

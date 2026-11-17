@@ -1,0 +1,187 @@
+[
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "listForHearingLabel",
+    "ElementLabel": "### How do you want to list for a hearing?",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "hearingPreferencesPreferredType",
+    "ElementLabel": " ",
+    "HintText": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "GAJudicialHearingListOptionsGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "judgeHearingCourtLocationLabel",
+    "ElementLabel": "### Where do you want to list for a hearing?",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "hearingPreferencesPreferredType = \"IN_PERSON\""
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "hearingPreferredLocationLabel",
+    "ElementLabel": "### Select a location",
+    "FieldType": "Label",
+    "FieldShowCondition": "hearingPreferencesPreferredType = \"IN_PERSON\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "hearingPreferredLocation",
+    "ElementLabel": " ",
+    "HintText": " ",
+    "FieldType": "DynamicList",
+    "FieldShowCondition": "hearingPreferencesPreferredType = \"IN_PERSON\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "judicialTimeEstimateLabel",
+    "ElementLabel": "### How long do you think the hearing will last?",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "judicialTimeEstimate",
+    "ElementLabel": " ",
+    "HintText": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "GAJudicialHearingTimeEstimateGAspec",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "judicialTimeEstimateDays",
+    "ElementLabel": "Day(s)",
+    "FieldType": "Number",
+    "Max": 9,
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "judicialTimeEstimate = \"OTHER\""
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "judicialTimeEstimateHours",
+    "ElementLabel": "Hour(s)",
+    "FieldType": "Number",
+    "Max": 99,
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "judicialTimeEstimate = \"OTHER\""
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "judicialTimeEstimateMinutes",
+    "ElementLabel": "Minute(s)",
+    "FieldType": "Number",
+    "Max": 99,
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "judicialTimeEstimate = \"OTHER\""
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "judicialSupportRequirementLabel",
+    "ElementLabel": "### Support requirements (optional)",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "judicialSupportRequirement",
+    "HintText": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "GAJudicialHearingSupportRequirementGAspec",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "judgeSignLanguage",
+    "ElementLabel": "What type of sign language?",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "judicialSupportRequirementCONTAINS\"SIGN_INTERPRETER\""
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "judgeLanguageInterpreter",
+    "ElementLabel": "What spoken or written language?",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "judicialSupportRequirementCONTAINS\"LANGUAGE_INTERPRETER\""
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "judgeOtherSupport",
+    "ElementLabel": "What other support is needed?",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "judicialSupportRequirementCONTAINS\"OTHER_SUPPORT\""
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "addlnInfoCourtStaffLabel",
+    "ElementLabel": "### Additional information for court staff (optional)",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "addlnInfoCourtStaff",
+    "ElementLabel": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "hearingPreferencesPreferredTypeLabel1",
+    "ElementLabel": " ",
+    "HintText": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "judgeHearingCourtLocationText1",
+    "ElementLabel": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "hearingPreferencesPreferredType = \"IN_PERSON\""
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "judgeHearingTimeEstimateText1",
+    "ElementLabel": " ",
+    "HintText": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "judgeHearingSupportReqText1",
+    "ElementLabel": " ",
+    "HintText": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "judicialVulnerabilityLabel",
+    "ElementLabel": "### Vulnerability questions",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAJudgesHearingListGAspec",
+    "ListElementCode": "judicialVulnerabilityText",
+    "ElementLabel": " ",
+    "HintText": " ",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  }
+]

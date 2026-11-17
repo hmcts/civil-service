@@ -1,0 +1,1523 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "drawDirectionsOrderRequired",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "drawDirectionsOrder",
+    "Label": " ",
+    "FieldType": "JudgementSum",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "claimsTrack",
+    "Label": "What track are you allocating the claim to?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "ClaimsTrack",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaims",
+    "Label": "Select additional directions for Small Claims Track, if any ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "SmallTrack",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastClaims",
+    "Label": "Select additional directions for Fast Track, if any ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "FastTrack",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "trialAdditionalDirectionsForFastTrack",
+    "Label": "Select additional directions for Fast Track, if any ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "FastTrack",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "drawDirectionsOrderSmallClaims",
+    "Label": "Do you want to allocate this claim to the small claims track?",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "drawDirectionsOrderSmallClaimsAdditionalDirections",
+    "Label": "Select additional directions for Small Claims Track, if any ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "SmallTrack",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "orderType",
+    "Label": "What order would you like to make?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "OrderType",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "orderTypeTrialAdditionalDirections",
+    "Label": "Select additional directions, if any ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderTypeTrialAdditionalDirections",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingOrderAndHearingDetails",
+    "Label": "Order and hearing details",
+    "FieldType": "DisposalHearingOrderAndHearingDetails",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingJudgesRecital",
+    "Label": "Judge's recital",
+    "FieldType": "DisposalHearingJudgesRecital",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingJudgementDeductionStatement",
+    "Label": " ",
+    "FieldType": "DisposalHearingJudgementDeductionStatement",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingJudgementDeductionValue",
+    "Label": " ",
+    "FieldType": "DisposalHearingJudgementDeductionValue",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingDisclosureOfDocumentsStartLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingDisclosureOfDocumentsTitle",
+    "Label": "## Disclosure of documents",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingDisclosureOfDocumentsToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingDisclosureOfDocuments",
+    "Label": " ",
+    "FieldType": "DisposalHearingDisclosureOfDocuments",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingDisclosureOfDocumentsEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingWitnessOfFactTitle",
+    "Label": "## Witnesses of Fact",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingWitnessOfFactToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingWitnessOfFact",
+    "Label": " ",
+    "FieldType": "DisposalHearingWitnessOfFact",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingWitnessOfFactEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingMedicalEvidenceTitle",
+    "Label": "## Expert evidence",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingMedicalEvidenceToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingMedicalEvidence",
+    "Label": " ",
+    "FieldType": "DisposalHearingMedicalEvidence",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingMedicalEvidenceEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingQuestionsToExpertsTitle",
+    "Label": "## Questions to experts",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingQuestionsToExpertsToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingQuestionsToExperts",
+    "Label": " ",
+    "FieldType": "DisposalHearingQuestionsToExperts",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingQuestionsToExpertsEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingSchedulesOfLossTitle",
+    "Label": "## Schedules or counter-schedules of loss",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingSchedulesOfLossToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingSchedulesOfLoss",
+    "Label": " ",
+    "FieldType": "DisposalHearingSchedulesOfLoss",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingSchedulesOfLossEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingFinalDisposalHearingTitle",
+    "Label": "## Hearing time",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingFinalDisposalHearingToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingFinalDisposalHearing",
+    "Label": " ",
+    "FieldType": "DisposalHearingFinalDisposalHearing",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingHearingTime",
+    "Label": " ",
+    "FieldType": "DisposalHearingHearingTime",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingFinalDisposalHearingEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingMethodTitle",
+    "Label": "## Hearing Method",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingMethodToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingMethod",
+    "Label": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "DisposalHearingMethod",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingMethodInPerson",
+    "Label": "Select hearing location ",
+    "FieldType": "DynamicList",
+    "FieldTypeParameter": "DisposalHearingMethodInPerson",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingMethodVideoConferenceHearing",
+    "Label": "Who will arrange the video conference? ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "DisposalHearingMethodVideoConferenceHearing",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingMethodVideoConferenceHearingCourtStatement",
+    "Label": "Parties must file at court details of their respective relevant email addresses by 4.00pm\n 7 days before the disposal hearing so that the court may send out invitations for them to join the disposal hearing",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingMethodTelephoneHearing",
+    "Label": "Who will arrange the telephone hearing? ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "DisposalHearingMethodTelephoneHearing",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingMethodTelephoneHearingCourtStatement",
+    "Label": "Parties must file at court details of their respective relevant telephone numbers by 4.00pm\n 7 days before the disposal hearing so that the court may telephone them to join them to the disposal hearing",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingHearingNotesStartLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingHearingNotesTitle",
+    "Label": "## Hearing notes",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingHearingNotes",
+    "Label": "This is only seen by the listing officer",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalOrderWithoutHearing",
+    "Label": " ",
+    "FieldType": "DisposalOrderWithoutHearing",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingBundleStartLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingBundleTitle",
+    "Label": "## Disposal hearing bundle",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingBundleToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingBundle",
+    "Label": " ",
+    "FieldType": "DisposalHearingBundle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingBundleEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingClaimSettlingTitle",
+    "Label": "## Claim Settling",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingClaimSettlingToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingClaimSettling",
+    "Label": " ",
+    "FieldType": "DisposalHearingClaimSettling",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingClaimSettlingEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingCostsTitle",
+    "Label": "## Costs",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingCostsToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingCosts",
+    "Label": " ",
+    "FieldType": "DisposalHearingCosts",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingCostsEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingAddNewDirections",
+    "Label": "Add a new direction",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "DisposalHearingAddNewDirections",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingAddNewDirectionsEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "disposalHearingNotes",
+    "Label": "Notes",
+    "FieldType": "DisposalHearingNotes",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "setSmallClaimsFlag",
+    "Label": "small claims flag",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsOrderAndHearingDetails",
+    "Label": " ",
+    "FieldType": "SmallClaimsOrderAndHearingDetails",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsJudgesRecital",
+    "Label": "Judge's recital",
+    "FieldType": "SmallClaimsJudgesRecital",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsJudgementDeductionStatement",
+    "Label": " ",
+    "FieldType": "SmallClaimsJudgementDeductionStatement",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsJudgementDeductionValue",
+    "Label": " ",
+    "FieldType": "SmallClaimsJudgementDeductionValue",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsAllocation",
+    "Label": " ",
+    "FieldType": "SmallClaimsAllocation",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsHearingStartLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsHearingTitle",
+    "Label": "## Hearing time",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsHearingToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsHearing",
+    "Label": " ",
+    "FieldType": "SmallClaimsHearing",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsHearingEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsDocumentsStartLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsDocumentsTitle",
+    "Label": "## Documents",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsDocumentsToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsDocuments",
+    "Label": " ",
+    "FieldType": "SmallClaimsDocuments",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsDocumentsEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsWitnessStatementTitle",
+    "Label": "## Witness Statement",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsWitnessStatementToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsWitnessStatement",
+    "Label": " ",
+    "FieldType": "SmallClaimsWitnessStatement",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsWitnessStatementEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsMethodTitle",
+    "Label": "## Hearing Method",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsMethodToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsMethod",
+    "Label": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "SmallClaimsMethod",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsMethodInPerson",
+    "Label": "This hearing will take place at:",
+    "FieldType": "DynamicList",
+    "FieldTypeParameter": "SmallClaimsMethodInPerson",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsMethodVideoConferenceHearing",
+    "Label": "Who will arrange the video conference? ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "SmallClaimsMethodVideoConferenceHearing",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsMethodTelephoneHearing",
+    "Label": "Who will arrange the telephone hearing? ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "SmallClaimsMethodTelephoneHearing",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsNotes",
+    "Label": "Important notes",
+    "FieldType": "SmallClaimsNotes",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "sdoHearingNotes",
+    "Label": "Hearing notes",
+    "FieldType": "SDOHearingNotes",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsCreditHire",
+    "Label": "Credit hire",
+    "FieldType": "SmallClaimsCreditHire",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsRoadTrafficAccident",
+    "Label": "Road traffic accident ",
+    "FieldType": "SmallClaimsRoadTrafficAccident",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsAddNewDirections",
+    "Label": "Add a new direction",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "SmallClaimsAddNewDirections",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsAddNewDirectionsEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "setFastTrackFlag",
+    "Label": "fast track flag",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackOrderAndHearingDetails",
+    "Label": " ",
+    "FieldType": "FastTrackOrderAndHearingDetails",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackJudgesRecital",
+    "Label": "Judge's recital",
+    "FieldType": "FastTrackJudgesRecital",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackJudgementDeductionStatement",
+    "Label": " ",
+    "FieldType": "FastTrackJudgementDeductionStatement",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackJudgementDeductionValue",
+    "Label": " ",
+    "FieldType": "FastTrackJudgementDeductionValue",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackAllocation",
+    "Label": " ",
+    "FieldType": "FastTrackAllocation",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackAltDisputeResolutionStartLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackAltDisputeResolutionTitle",
+    "Label": "## Alternative dispute resolution",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackAltDisputeResolutionToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackAltDisputeResolution",
+    "Label": " ",
+    "FieldType": "FastTrackAltDisputeResolution",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackAltDisputeResolutionEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackVariationOfDirectionsTitle",
+    "Label": "## Variation of directions",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackVariationOfDirectionsToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackVariationOfDirections",
+    "Label": " ",
+    "FieldType": "FastTrackVariationOfDirections",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackVariationOfDirectionsEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackSettlementTitle",
+    "Label": "## Settlement",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackSettlementToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackSettlement",
+    "Label": " ",
+    "FieldType": "FastTrackSettlement",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackSettlementEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackDisclosureOfDocumentsTitle",
+    "Label": "## Disclosure of documents",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackDisclosureOfDocumentsToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackDisclosureOfDocuments",
+    "Label": " ",
+    "FieldType": "FastTrackDisclosureOfDocuments",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackDisclosureOfDocumentsEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackWitnessOfFactTitle",
+    "Label": "## Witnesses of Fact",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackWitnessOfFactToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackWitnessOfFact",
+    "Label": " ",
+    "FieldType": "FastTrackWitnessOfFact",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackWitnessOfFactEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackSchedulesOfLossTitle",
+    "Label": "## Schedules of loss",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackSchedulesOfLossToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackSchedulesOfLoss",
+    "Label": " ",
+    "FieldType": "FastTrackSchedulesOfLoss",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackSchedulesOfLossEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackCostsTitle",
+    "Label": "## Costs",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackCostsToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackCosts",
+    "Label": " ",
+    "FieldType": "FastTrackCosts",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackCostsEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackTrialTitle",
+    "Label": "## Hearing time",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackTrialToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackTrial",
+    "Label": " ",
+    "FieldType": "FastTrackTrial",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackHearingTime",
+    "Label": " ",
+    "FieldType": "FastTrackHearingTime",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackTrialEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackTrialBundleTitle",
+    "Label": "## Trial bundles",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackTrialBundleToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackTrialBundleText",
+    "Label": "If by a date no later than 14 days before the Trial the claim is proceeding in the Digital Portal, then the following directions in this section will apply on the basis the bundle (\"bundle\") will be automatically generated in the Digital Portal for use by the parties and the Judge at the hearing.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackTrialBundleEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackMethodTitle",
+    "Label": "## Hearing Method",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackMethod",
+    "Label": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "FastTrackMethod",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackMethodToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackMethodInPerson",
+    "Label": "This hearing will take place at:",
+    "FieldType": "DynamicList",
+    "FieldTypeParameter": "FastTrackMethodInPerson",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackMethodVideoConferenceHearing",
+    "Label": "Who will arrange the video conference? ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "FastTrackMethodVideoConferenceHearing",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackMethodTelephoneHearing",
+    "Label": "Who will arrange the telephone hearing? ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "FastTrackMethodTelephoneHearing",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackMethodEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackNotes",
+    "Label": " ",
+    "FieldType": "FastTrackNotes",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackHearingNotes",
+    "Label": "Hearing notes",
+    "FieldType": "FastTrackHearingNotes",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackOrderWithoutJudgement",
+    "Label": "Important notes",
+    "FieldType": "FastTrackOrderWithoutJudgement",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackBuildingDispute",
+    "Label": "Building dispute",
+    "FieldType": "FastTrackBuildingDispute",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackClinicalNegligence",
+    "Label": "Clinical negligence",
+    "FieldType": "FastTrackClinicalNegligence",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackCreditHire",
+    "Label": "Credit hire",
+    "FieldType": "FastTrackCreditHire",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackEmployersLiability",
+    "Label": "Employer's liability",
+    "FieldType": "FastTrackEmployersLiability",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackPersonalInjury",
+    "Label": "Expert Evidence",
+    "FieldType": "FastTrackPersonalInjury",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackRoadTrafficAccident",
+    "Label": "Road traffic accident",
+    "FieldType": "FastTrackRoadTrafficAccident",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackAddNewDirections",
+    "Label": "Add a new direction",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "FastTrackAddNewDirections",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackAddNewDirectionsEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "unsuitableSDODate",
+    "Label": "SDO unsuitable date",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "sdoOrderDocument",
+    "Label": "View directions order",
+    "FieldType": "CaseDocument",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "claimantResponseDocumentsContainsDefenceAndDirectionsDocuments",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "defendantResponseDocumentsContainsDefenceAndDirectionsDocuments",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "otherDetails",
+    "Label": "Other Details",
+    "FieldType": "OtherDetails",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingMethodValuesDisposalHearing",
+    "Label": " ",
+    "FieldType": "DynamicRadioList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingMethodValuesSmallClaims",
+    "Label": " ",
+    "FieldType": "DynamicRadioList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingMethodValuesFastTrack",
+    "Label": " ",
+    "FieldType": "DynamicRadioList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsMediationSectionTitle",
+    "Label": "## Mediation representation",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsMediationSectionToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsMediationSectionStatement",
+    "Label": " ",
+    "FieldType": "SmallClaimsMediation",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsMediationSectionEndLine",
+    "Label": "****",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsPenalNoticeTitle",
+    "Label": "## Penal notice (optional)",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsPenalNoticeToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsPenalNotice",
+    "Label": "Note: Paragraph numbers and the parties' name to which the penal notice applies must be entered in the box below.",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackPenalNoticeTitle",
+    "Label": "## Penal notice (optional)",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackPenalNoticeToggle",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "OrderDetailsPagesSectionsToggle",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackPenalNotice",
+    "Label": "Note: Paragraph numbers and the parties' name to which the penal notice applies must be entered in the box below.",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsPPI",
+    "Label": "Payment Protection Insurance (PPI)",
+    "FieldType": "PPI",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackPPI",
+    "Label": "Payment Protection Insurance (PPI)",
+    "FieldType": "PPI",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "smallClaimsHousingDisrepair",
+    "Label": "Housing Disrepair",
+    "FieldType": "HousingDisrepair",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fastTrackHousingDisrepair",
+    "Label": "Housing Disrepair",
+    "FieldType": "HousingDisrepair",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

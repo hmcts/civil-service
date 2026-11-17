@@ -1,0 +1,82 @@
+[
+  {
+    "ID": "DisposalHearingSchedulesOfLoss",
+    "ListElementCode": "label",
+    "FieldType": "Label",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingSchedulesOfLoss",
+    "ListElementCode": "input1",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingSchedulesOfLoss",
+    "ListElementCode": "date1",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingSchedulesOfLoss",
+    "ListElementCode": "input2",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingSchedulesOfLoss",
+    "ListElementCode": "date2",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingSchedulesOfLoss",
+    "ListElementCode": "input3",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingSchedulesOfLoss",
+    "ListElementCode": "date3",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingSchedulesOfLoss",
+    "ListElementCode": "input4",
+    "FieldType": "TextArea",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingSchedulesOfLoss",
+    "ListElementCode": "date4",
+    "FieldType": "Date",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DisposalHearingSchedulesOfLoss",
+    "ListElementCode": "text",
+    "FieldType": "Label",
+    "ElementLabel": "If there is a claim for future pecuniary loss and the parties have not already set out their case on periodical payments, then they must do so in the respective schedule and counter-schedule.",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

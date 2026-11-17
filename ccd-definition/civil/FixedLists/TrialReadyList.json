@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "TrialReadyList",
+    "ListElementCode": "Yes",
+    "ListElement": "Yes, the case is ready for trial or hearing.",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "TrialReadyList",
+    "ListElementCode": "No",
+    "ListElement": "No, the case is not ready for trial or hearing.",
+    "DisplayOrder": 2
+  }
+]

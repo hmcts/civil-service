@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.camunda.bpm.client.task.ExternalTaskService;
@@ -8,11 +10,13 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
+import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 import uk.gov.hmcts.reform.civil.helpers.ExternalTaskExceptionHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.ExternalTaskCompletionService;
+import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 
 import java.util.Objects;
 
@@ -125,6 +129,14 @@ public abstract class BaseExternalTaskHandler implements ExternalTaskHandler {
 
     protected int getMaxAttempts() {
         return eventProperties.getRetryCount();
+    }
+
+    protected ExternalTaskInput toExternalTaskInput(ExternalTask externalTask, ObjectMapper mapper) {
+        try {
+            return mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
+        } catch (ValueMapperException | IllegalArgumentException e) {
+            throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types: " + e.getMessage(), e);
+        }
     }
 
     /**

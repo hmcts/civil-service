@@ -4,7 +4,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -49,22 +48,17 @@ public class PaymentTaskHandler extends BaseExternalTaskHandler {
     }
 
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        try {
-            Map<String, Object> allVariables = externalTask.getAllVariables();
-            ExternalTaskInput externalTaskInput = objectMapper.convertValue(allVariables, ExternalTaskInput.class);
-            String caseId = ofNullable(externalTaskInput.getCaseId())
-                .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
-            StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
-                caseId,
-                externalTaskInput.getCaseEvent()
-            );
-            BusinessProcess businessProcess = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())
-                .getBusinessProcess().updateActivityId(externalTask.getActivityId());
-            var data = coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
-            return new ExternalTaskData().setCaseData(data);
-        } catch (ValueMapperException | IllegalArgumentException e) {
-            throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
-        }
+        ExternalTaskInput externalTaskInput = toExternalTaskInput(externalTask, objectMapper);
+        String caseId = ofNullable(externalTaskInput.getCaseId())
+            .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
+        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
+            caseId,
+            externalTaskInput.getCaseEvent()
+        );
+        BusinessProcess businessProcess = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())
+            .getBusinessProcess().updateActivityId(externalTask.getActivityId());
+        var data = coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
+        return new ExternalTaskData().setCaseData(data);
     }
 
     @Override

@@ -1,0 +1,68 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "PENDING_CASE_ISSUED",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "AWAITING_RESPONDENT_ACKNOWLEDGEMENT",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "AWAITING_APPLICANT_INTENTION",
+    "CRUD": "R",
+    "UserRole": "caseworker-civil-staff"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "CASE_DISMISSED",
+    "CRUD": "R",
+    "UserRole": "caseworker-civil-staff"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "PROCEEDS_IN_HERITAGE_SYSTEM",
+    "CRUD": "R",
+    "UserRole": "caseworker-civil-staff"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "CASE_ISSUED",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "AWAITING_CASE_DETAILS_NOTIFICATION",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "JUDICIAL_REFERRAL",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "CASE_PROGRESSION",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "HEARING_READINESS",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseStateID": "PREPARE_FOR_HEARING_CONDUCT_HEARING",
+    "UserRole": "caseworker-civil-staff",
+    "CRUD": "R"
+  }
+]

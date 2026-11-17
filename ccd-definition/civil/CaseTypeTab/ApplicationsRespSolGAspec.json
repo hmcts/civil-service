@@ -1,0 +1,24 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "GAApplicationsRespOne",
+    "TabLabel": "Applications",
+    "TabDisplayOrder": 8,
+    "CaseFieldID": "respondentSolGaAppDetails",
+    "UserRoles": [
+      "RES-SOL-ONE-UNSPEC-PROFILE"
+    ],
+    "TabFieldDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "TabID": "GAApplicationsRespOneSpec",
+    "TabLabel": "Applications",
+    "TabDisplayOrder": 8,
+    "CaseFieldID": "respondentSolGaAppDetails",
+    "UserRoles": [
+      "RES-SOL-ONE-SPEC-PROFILE"
+    ],
+    "TabFieldDisplayOrder": 1
+  }
+]

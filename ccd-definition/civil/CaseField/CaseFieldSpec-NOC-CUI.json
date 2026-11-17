@@ -1,0 +1,10 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "respondentSolicitorDetails",
+    "Label": " ",
+    "FieldType": "RespondentSolicitorDetails",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

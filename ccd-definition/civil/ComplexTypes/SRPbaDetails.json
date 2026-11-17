@@ -1,0 +1,50 @@
+[
+  {
+    "ID": "SRPbaDetails",
+    "ListElementCode": "fee",
+    "ElementLabel": "Hearing Notice fee",
+    "FieldType": "Fee",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SRPbaDetails",
+    "ListElementCode": "paymentDetails",
+    "ElementLabel": "Details of PBA payment",
+    "FieldType": "PaymentDetails",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SRPbaDetails",
+    "ListElementCode": "paymentSuccessfulDate",
+    "ElementLabel": "Payment successful date",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SRPbaDetails",
+    "ListElementCode": "serviceRequestReference",
+    "ElementLabel": "Service Request Reference",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SRPbaDetails",
+    "ListElementCode": "applicantsPbaAccounts",
+    "ElementLabel": "Claimant solicitor PBA accounts",
+    "FieldType": "DynamicList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "SRPbaDetails",
+    "ListElementCode": "pbaReference",
+    "ElementLabel": "PBA Reference",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

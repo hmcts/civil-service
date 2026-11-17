@@ -1,0 +1,2154 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppType",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppType.types",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppRespondentAgreement",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppRespondentAgreement.hasAgreed",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppVaryJudgementType",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppN245FormUpload",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDate",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDate.hearingScheduledPreferenceYesNoLabel",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDate.hearingScheduledPreferenceYesNo",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDate.hearingScheduledDateLabel",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDate.hearingScheduledDate",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppUrgencyRequirement",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppInformOtherParty",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppUrgencyRequirement.urgentAppConsiderationDate",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppUrgencyRequirement.generalAppUrgency",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppUrgencyRequirement.reasonsForUrgency",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppUrgencyRequirement.ConsentAgreementCheckBox",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "ListElementCode": "id",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "ListElementCode": "email",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "ListElementCode": "forename",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "ListElementCode": "surname",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "ListElementCode": "organisationIdentifier",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "ListElementCode": "id",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "ListElementCode": "email",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "ListElementCode": "forename",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "ListElementCode": "surname",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "ListElementCode": "organisationIdentifier",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "generalAppFeeToPayLabel119",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "generalAppFeeToPayLabel303",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "fee",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "paymentDetails",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "paymentSuccessfulDate",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppStatementOfTruth",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppStatementOfTruth.name",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppStatementOfTruth.role",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppDetailsOfOrder",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppReasonsOfOrder",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.hearingYesorNo",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.hearingDate",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.judgeRequiredYesOrNo",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.judgeName",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.trialRequiredYesOrNo",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.trialDateFrom",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.trialDateTo",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.HearingPreferencesPreferredType",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.TelephoneHearingPreferredType",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.ReasonForPreferredHearingType",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.HearingPreferredLocation",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.HearingDetailsTelephoneNumber",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.HearingDetailsEmailID",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.HearingDuration",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppHearingDays",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppHearingHours",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppHearingMinutes",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.unavailableTrialRequiredYesOrNo",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppUnavailableDates",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppUnavailableDates.unavailableTrialDateFrom",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppUnavailableDates.unavailableTrialDateTo",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.SupportRequirement",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.SupportRequirementSignLanguage",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.SupportRequirementLanguageInterpreter",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.SupportRequirementOther",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppEvidenceDocument",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "isMultiParty",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "applicantPartyName",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "claimant1PartyName",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "claimant2PartyName",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "defendant1PartyName",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "defendant2PartyName",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "parentClaimantIsApplicant",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppParentCaseLink",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppSubmittedDateGAspec",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimantGaAppDetails",
+    "ListElementCode": "generalAppSubmittedDateGAspec",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimantGaAppDetails",
+    "ListElementCode": "caseLink",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimantGaAppDetails",
+    "ListElementCode": "caseState",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimantGaAppDetails",
+    "ListElementCode": "generalApplicationType",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaDetailsMasterCollection",
+    "ListElementCode": "generalAppSubmittedDateGAspec",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaDetailsMasterCollection",
+    "ListElementCode": "caseLink",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaDetailsMasterCollection",
+    "ListElementCode": "caseState",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaDetailsMasterCollection",
+    "ListElementCode": "generalApplicationType",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolGaAppDetails",
+    "ListElementCode": "generalAppSubmittedDateGAspec",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolGaAppDetails",
+    "ListElementCode": "caseLink",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolGaAppDetails",
+    "ListElementCode": "caseState",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolGaAppDetails",
+    "ListElementCode": "generalApplicationType",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolTwoGaAppDetails",
+    "ListElementCode": "generalAppSubmittedDateGAspec",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolTwoGaAppDetails",
+    "ListElementCode": "caseLink",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolTwoGaAppDetails",
+    "ListElementCode": "caseState",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolTwoGaAppDetails",
+    "ListElementCode": "generalApplicationType",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppDateDeadline",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "civilServiceUserRoles",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "applicantSolicitors",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "defendantSolicitors",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "respondentsResponses",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentsResponses",
+    "ListElementCode": "gaHearingDetails",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentsResponses",
+    "ListElementCode": "generalAppRespondent1Representative",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentsResponses",
+    "ListElementCode": "gaRespondentDetails",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentsResponses",
+    "ListElementCode": "gaRespondentResponseReason",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "judgeRecitalText",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "makeAnOrder",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "orderText",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "judgeApproveEditOptionDate",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "judgeApproveEditOptionDoc",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "displayjudgeApproveEditOptionDate",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "displayjudgeApproveEditOptionDateForUnlessOrder",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "judgeApproveEditOptionDateForUnlessOrder",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "isOrderProcessedByStayScheduler",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "isOrderProcessedByUnlessScheduler",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "displayjudgeApproveEditOptionDoc",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "dismissalOrderText",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "directionsText",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "directionsResponseByDate",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "reasonForDecisionText",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "showReasonForDecision",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeAnOrderForWrittenRepresentations",
+    "ListElementCode": "makeAnOrderForWrittenRepresentations",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeAnOrderForWrittenRepresentations",
+    "ListElementCode": "writtenSequentailRepresentationsBy",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeAnOrderForWrittenRepresentations",
+    "ListElementCode": "sequentialApplicantMustRespondWithin",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeAnOrderForWrittenRepresentations",
+    "ListElementCode": "writtenConcurrentRepresentationsBy",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "writtenRepresentationsDrawGeneralOrder",
+    "ListElementCode": "judgeRecitalText",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "writtenRepresentationsDrawGeneralOrder",
+    "ListElementCode": "directionInRelationToHearingText",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "requestMoreInfoOption",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "deadlineForMoreInfoSubmission",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "isWithNotice",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "judgeRequestMoreInfoText",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "judgeRequestMoreInfoByDate",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.vulnerabilityQuestionsYesOrNo",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.vulnerabilityQuestion",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "orderCourtOwnInitiative",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "orderCourtOwnInitiativeDate",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "orderWithoutNotice",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "orderWithoutNoticeDate",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderCourtOwnInitiativeListForHearing",
+    "ListElementCode": "orderCourtOwnInitiative",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderCourtOwnInitiativeListForHearing",
+    "ListElementCode": "orderCourtOwnInitiativeDate",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNoticeListForHearing",
+    "ListElementCode": "orderWithoutNotice",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNoticeListForHearing",
+    "ListElementCode": "orderWithoutNoticeDate",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderCourtOwnInitiativeForWrittenRep",
+    "ListElementCode": "orderCourtOwnInitiative",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderCourtOwnInitiativeForWrittenRep",
+    "ListElementCode": "orderCourtOwnInitiativeDate",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNoticeForWrittenRep",
+    "ListElementCode": "orderWithoutNotice",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNoticeForWrittenRep",
+    "ListElementCode": "orderWithoutNoticeDate",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppType",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppType.types",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppRespondentAgreement",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppRespondentAgreement.hasAgreed",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppVaryJudgementType",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppN245FormUpload",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppUrgencyRequirement",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppInformOtherParty",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppUrgencyRequirement.urgentAppConsiderationDate",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppUrgencyRequirement.generalAppUrgency",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppUrgencyRequirement.reasonsForUrgency",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppUrgencyRequirement.ConsentAgreementCheckBox",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "ListElementCode": "id",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "ListElementCode": "email",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "ListElementCode": "forename",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "ListElementCode": "surname",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplnSolicitor",
+    "ListElementCode": "organisationIdentifier",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "ListElementCode": "id",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "ListElementCode": "email",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "ListElementCode": "forename",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "ListElementCode": "surname",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppRespondentSolicitors",
+    "ListElementCode": "organisationIdentifier",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplicantAddlSolicitors",
+    "ListElementCode": "id",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplicantAddlSolicitors",
+    "ListElementCode": "email",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplicantAddlSolicitors",
+    "ListElementCode": "surname",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplicantAddlSolicitors",
+    "ListElementCode": "forename",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppApplicantAddlSolicitors",
+    "ListElementCode": "organisationIdentifier",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "generalAppFeeToPayLabel119",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "generalAppFeeToPayLabel303",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "fee",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "paymentDetails",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalAppPBADetails",
+    "ListElementCode": "paymentSuccessfulDate",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppStatementOfTruth",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppStatementOfTruth.name",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppStatementOfTruth.role",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppDetailsOfOrder",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppReasonsOfOrder",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.hearingYesorNo",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.hearingDate",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.judgeRequiredYesOrNo",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.judgeName",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.trialRequiredYesOrNo",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.trialDateFrom",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.trialDateTo",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.HearingPreferencesPreferredType",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.TelephoneHearingPreferredType",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.ReasonForPreferredHearingType",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.HearingPreferredLocation",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.HearingDetailsTelephoneNumber",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.HearingDetailsEmailID",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.HearingDuration",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppHearingDays",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppHearingHours",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppHearingMinutes",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.unavailableTrialRequiredYesOrNo",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppUnavailableDates",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppUnavailableDates.unavailableTrialDateFrom",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.generalAppUnavailableDates.unavailableTrialDateTo",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.SupportRequirement",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.SupportRequirementSignLanguage",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.SupportRequirementLanguageInterpreter",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.SupportRequirementOther",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppEvidenceDocument",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "isMultiParty",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "applicantPartyName",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "claimant1PartyName",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "claimant2PartyName",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "defendant1PartyName",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "defendant2PartyName",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "parentClaimantIsApplicant",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppParentCaseLink",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppSubmittedDateGAspec",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimantGaAppDetails",
+    "ListElementCode": "generalAppSubmittedDateGAspec",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimantGaAppDetails",
+    "ListElementCode": "caseLink",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimantGaAppDetails",
+    "ListElementCode": "caseState",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "claimantGaAppDetails",
+    "ListElementCode": "generalApplicationType",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaDetailsMasterCollection",
+    "ListElementCode": "generalAppSubmittedDateGAspec",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaDetailsMasterCollection",
+    "ListElementCode": "caseLink",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaDetailsMasterCollection",
+    "ListElementCode": "caseState",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "gaDetailsMasterCollection",
+    "ListElementCode": "generalApplicationType",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolGaAppDetails",
+    "ListElementCode": "generalAppSubmittedDateGAspec",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolGaAppDetails",
+    "ListElementCode": "caseLink",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolGaAppDetails",
+    "ListElementCode": "caseState",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolGaAppDetails",
+    "ListElementCode": "generalApplicationType",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolTwoGaAppDetails",
+    "ListElementCode": "generalAppSubmittedDateGAspec",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolTwoGaAppDetails",
+    "ListElementCode": "caseLink",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolTwoGaAppDetails",
+    "ListElementCode": "caseState",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentSolTwoGaAppDetails",
+    "ListElementCode": "generalApplicationType",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppDateDeadline",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "civilServiceUserRoles",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "applicantSolicitors",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "defendantSolicitors",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "respondentsResponses",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentsResponses",
+    "ListElementCode": "gaHearingDetails",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentsResponses",
+    "ListElementCode": "generalAppRespondent1Representative",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentsResponses",
+    "ListElementCode": "gaRespondentDetails",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "respondentsResponses",
+    "ListElementCode": "gaRespondentResponseReason",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "judgeRecitalText",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "makeAnOrder",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "orderText",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "judgeApproveEditOptionDate",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "judgeApproveEditOptionDoc",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "displayjudgeApproveEditOptionDate",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "isOrderProcessedByStayScheduler",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "isOrderProcessedByUnlessScheduler",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "displayjudgeApproveEditOptionDoc",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "dismissalOrderText",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "directionsText",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "directionsResponseByDate",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "reasonForDecisionText",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "showReasonForDecision",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeAnOrderForWrittenRepresentations",
+    "ListElementCode": "makeAnOrderForWrittenRepresentations",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeAnOrderForWrittenRepresentations",
+    "ListElementCode": "writtenSequentailRepresentationsBy",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeAnOrderForWrittenRepresentations",
+    "ListElementCode": "sequentialApplicantMustRespondWithin",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeAnOrderForWrittenRepresentations",
+    "ListElementCode": "writtenConcurrentRepresentationsBy",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "writtenRepresentationsDrawGeneralOrder",
+    "ListElementCode": "judgeRecitalText",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "writtenRepresentationsDrawGeneralOrder",
+    "ListElementCode": "directionInRelationToHearingText",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "requestMoreInfoOption",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "deadlineForMoreInfoSubmission",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "isWithNotice",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "judgeRequestMoreInfoText",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionRequestMoreInfo",
+    "ListElementCode": "judgeRequestMoreInfoByDate",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.vulnerabilityQuestionsYesOrNo",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDetails.vulnerabilityQuestion",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDate",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDate.hearingScheduledPreferenceYesNoLabel",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDate.hearingScheduledPreferenceYesNo",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDate.hearingScheduledDateLabel",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "generalAppHearingDate.hearingScheduledDate",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "orderCourtOwnInitiative",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "orderCourtOwnInitiativeDate",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "orderWithoutNotice",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialDecisionMakeOrder",
+    "ListElementCode": "orderWithoutNoticeDate",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderCourtOwnInitiativeListForHearing",
+    "ListElementCode": "orderCourtOwnInitiative",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderCourtOwnInitiativeListForHearing",
+    "ListElementCode": "orderCourtOwnInitiativeDate",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNoticeListForHearing",
+    "ListElementCode": "orderWithoutNotice",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNoticeListForHearing",
+    "ListElementCode": "orderWithoutNoticeDate",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderCourtOwnInitiativeForWrittenRep",
+    "ListElementCode": "orderCourtOwnInitiative",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderCourtOwnInitiativeForWrittenRep",
+    "ListElementCode": "orderCourtOwnInitiativeDate",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNoticeForWrittenRep",
+    "ListElementCode": "orderWithoutNotice",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "orderWithoutNoticeForWrittenRep",
+    "ListElementCode": "orderWithoutNoticeDate",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "hearingPreferencesPreferredType",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "hearingPreferredLocation",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judicialTimeEstimate",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judicialTimeEstimateDays",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judicialTimeEstimateHours",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judicialTimeEstimateMinutes",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judicialSupportRequirement",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judgeSignLanguage",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judgeLanguageInterpreter",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judgeOtherSupport",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "addlnInfoCourtStaff",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judgeHearingCourtLocationText1",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judgeHearingTimeEstimateText1",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judgeHearingSupportReqText1",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "judicialListForHearing",
+    "ListElementCode": "judicialVulnerabilityText",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "isGaApplicantLip",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "isGaRespondentOneLip",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "isGaRespondentTwoLip",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "caseNameGaInternal",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "caseNameGaInternal",
+    "UserRole": "civil-administrator-basic",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseFieldID": "generalApplications",
+    "ListElementCode": "gaWaTrackLabel",
+    "UserRole": "civil-administrator-standard",
+    "CRUD": "R"
+  }
+]

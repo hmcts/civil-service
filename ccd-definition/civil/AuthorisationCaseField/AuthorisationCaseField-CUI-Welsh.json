@@ -1,0 +1,1098 @@
+    [
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "systemGeneratedCaseDocuments",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "RU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondentSolicitor1EmailAddress",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "totalClaimAmount",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "legacyCaseReference",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "claimValue",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "submittedDate",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "issueDate",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "detailsOfClaim",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "claimFee",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1Represented",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent1DetailsForClaimDetailsTab",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1OrganisationPolicy",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1ProceedWithClaim",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1DQVulnerabilityQuestions",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1DQHearingSupport",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicantSolicitor1UserDetails",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "specRespondent1Represented",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "timelineOfEvents",
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "R"
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "claimIssuedPaymentDetails",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "defendantDetailsSpec",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent1",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "headingClaimantDetails",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "headingDefendantDetails",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "headingClaimantDQ",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "headingDefendantDQ",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent1ClaimResponseType",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent1ClaimResponseTypeForSpec",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "claimant1ClaimResponseTypeForSpec",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "caseHistory",
+        "UserRoles": [
+          "wlu-admin"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1ClaimExpertSpecRequired",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1RespondToClaimExperts",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1ClaimWitnesses",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1DQRequestedCourt",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1DQSmallClaimHearing",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1DefenceResponseDocumentSpec",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1DQLanguage",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent1DQLanguage",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1DQWitnessesSmallClaim",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent1DQFileDirectionsQuestionnaire",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent1DQVulnerabilityQuestions",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent2DQVulnerabilityQuestions",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent1DQDisclosureReport",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent1DQExperts",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent2DQExperts",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent1DQWitnesses",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent2DQWitnesses",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent1DQHearing",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent1DQDraftDirections",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent1DQRequestedCourt",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent1DQHearingSupport",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent2DQHearingSupport",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent2DQFurtherInformation",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1DQFileDirectionsQuestionnaire",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1DQDisclosureOfElectronicDocuments",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1DQDisclosureReport",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1DQExperts",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1LiPResponse",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1DQWitnesses",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1DQHearing",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1DQDraftDirections",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1DQFurtherInformation",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "headingDefendantProposedPlan",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "translatedDocuments",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRUD"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "hearingDocuments",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRUD"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "hearingDocumentsWelsh",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRUD"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "flagLauncher",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "caseFlags",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1LitigationFriend",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant2LitigationFriend",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent1LitigationFriend",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent2LitigationFriend",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "urgentFlag",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicantWitnesses",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicantExperts",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant2",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent1Witnesses",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent1Experts",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent2",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent2Witnesses",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent2Experts",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent2LRIndividuals",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1LRIndividuals",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent1OrgIndividuals",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent2OrgIndividuals",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant1OrgIndividuals",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "respondent1LRIndividuals",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "applicant2OrgIndividuals",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "finalOrderDocumentCollection",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "CRU"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "isClaimDeclarationAdded",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "claimDeclarationDescription",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      },
+      {
+        "CaseTypeID": "CIVIL",
+        "CaseFieldID": "isHumanRightsActIssues",
+        "AccessControl": [
+          {
+            "UserRoles": [
+              "wlu-admin"
+            ],
+            "CRUD": "R"
+          }
+        ]
+      }
+    ]

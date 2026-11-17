@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -42,6 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -93,6 +95,26 @@ class SubmitClaimTaskTest {
         submitClaimTask = new SubmitClaimTask(featureToggleService, new ObjectMapper(), defendantPinToPostLRspecService, interestCalculator,
                                               toggleConfiguration, caseFlagInitialiser, feesService, userService, time, casemanReferenceNumberRepository,
                                               organisationService, airlineEpimsService, locationRefDataService);
+    }
+
+    @Test
+    void shouldRejectClaimWhenDefendantDetailsAreMissing() {
+        StatementOfTruth statementOfTruth = new StatementOfTruth().setName("Claimant solicitor");
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1(null)
+            .uiStatementOfTruth(statementOfTruth)
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) submitClaimTask.submitClaim(
+            caseData, "CREATE_CLAIM_SPEC", "authToken", NO, null);
+
+        assertThat(response.getErrors()).containsExactly("The defendant's details are missing. Start the claim again.");
+        assertThat(response.getData()).isNull();
+        assertThat(caseData.getUiStatementOfTruth()).isSameAs(statementOfTruth);
+        verifyNoInteractions(featureToggleService, defendantPinToPostLRspecService, interestCalculator,
+                             toggleConfiguration, caseFlagInitialiser, feesService, userService, time,
+                             casemanReferenceNumberRepository, organisationService, airlineEpimsService,
+                             locationRefDataService);
     }
 
     @Test

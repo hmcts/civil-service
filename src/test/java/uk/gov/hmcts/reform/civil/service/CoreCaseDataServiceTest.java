@@ -354,6 +354,45 @@ class CoreCaseDataServiceTest {
         }
 
         @Test
+        void shouldFindCaseBySubmissionId() {
+            CaseDetails caseDetails = CaseDetails.builder().id(42L).build();
+            SearchResult searchResult = SearchResult.builder().cases(List.of(caseDetails)).build();
+            Query query = new Query(QueryBuilders.matchQuery("data.lipClaimSubmissionId", "submission"), emptyList(), 0);
+            when(coreCaseDataApi.searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CASE_TYPE, query.toString()))
+                .thenReturn(searchResult);
+
+            assertThat(service.findCaseByLipClaimSubmissionId("submission", USER_AUTH_TOKEN))
+                .contains(caseDetails);
+        }
+
+        @Test
+        void shouldReturnEmptyWhenSubmissionIdCaseSearchHasNoResult() {
+            Query query = new Query(QueryBuilders.matchQuery("data.lipClaimSubmissionId", "submission"), emptyList(), 0);
+            when(coreCaseDataApi.searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CASE_TYPE, query.toString()))
+                .thenReturn(SearchResult.builder().cases(emptyList()).build());
+
+            assertThat(service.findCaseByLipClaimSubmissionId("submission", USER_AUTH_TOKEN)).isEmpty();
+        }
+
+        @Test
+        void shouldReturnEmptyWhenSubmissionIdCaseSearchReturnsNull() {
+            Query query = new Query(QueryBuilders.matchQuery("data.lipClaimSubmissionId", "submission"), emptyList(), 0);
+            when(coreCaseDataApi.searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CASE_TYPE, query.toString()))
+                .thenReturn(null);
+
+            assertThat(service.findCaseByLipClaimSubmissionId("submission", USER_AUTH_TOKEN)).isEmpty();
+        }
+
+        @Test
+        void shouldReturnEmptyWhenSubmissionIdSearchResultCasesAreNull() {
+            Query query = new Query(QueryBuilders.matchQuery("data.lipClaimSubmissionId", "submission"), emptyList(), 0);
+            when(coreCaseDataApi.searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CASE_TYPE, query.toString()))
+                .thenReturn(SearchResult.builder().build());
+
+            assertThat(service.findCaseByLipClaimSubmissionId("submission", USER_AUTH_TOKEN)).isEmpty();
+        }
+
+        @Test
         void shouldReturnClaimantCaseList_WhenCCDClaimsForLipClaimant() {
             List<CaseDetails> cases = List.of(CaseDetails.builder().id(1L).build());
             SearchResult searchResult = SearchResult.builder().cases(cases).build();
