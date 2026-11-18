@@ -200,6 +200,9 @@ withPipeline(type, product, component) {
                   python3 "$chart_size_script"
                 )
               '''
+              def previewChart = load 'bin/helm/preview-chart.groovy'
+              previewChart.prepare("${chartCheckDir}/civil-service-preview")
+              previewChart.verify("${chartCheckDir}/civil-service-preview")
             } finally {
               sh 'rm -rf "$CHART_CHECK_DIR"'
             }
@@ -220,6 +223,24 @@ withPipeline(type, product, component) {
     env.SKIP_COMMON_AAT_CCD_SETUP = "true"
     env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR = 'civil-service-master'
     env.STASH_DIAGNOSTICS = 'false'
+
+    afterSuccess('Publish Helm chart') {
+      def previewChart = load 'bin/helm/preview-chart.groovy'
+      try {
+        previewChart.prepare('charts/civil-service-preview')
+        helmPublish(
+          appPipelineConfig: pipelineConf,
+          subscription: 'nonprod',
+          environment: 'aat',
+          product: product,
+          component: 'service-preview'
+        )
+      } finally {
+        dir('charts/civil-service-preview') {
+          deleteDir()
+        }
+      }
+    }
 
     afterSuccess('akschartsinstall') {
       runStagingHighLevelDataSetup()
