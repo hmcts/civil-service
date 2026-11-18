@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ContactDetailsUpdatedEvent;
+import uk.gov.hmcts.reform.civil.model.LitigationFriend;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
@@ -23,18 +25,17 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CaseNameUtils;
 import uk.gov.hmcts.reform.civil.utils.PartyDetailsChangedUtil;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_GA_CASE_DATA;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertasks.PopulateRespondentTabDetails.updateDataForClaimDetailsTab;
@@ -77,32 +78,50 @@ public class SubmitChangesTask {
     private final UserService userService;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final PartyDetailsChangedUtil partyDetailsChangedUtil;
-    private final CoreCaseDataService coreCaseDataService;
 
     private static final List<String> ADMIN_ROLES = List.of(
         "caseworker-civil-admin", "caseworker-civil-staff");
+    static final String PARTY_NAME_CHANGE_NOT_ALLOWED =
+        "Only court staff can change a party name, after a judge has approved the change";
+    private static final List<Function<CaseData, Party>> PARTIES = List.of(
+        CaseData::getApplicant1, CaseData::getApplicant2, CaseData::getRespondent1, CaseData::getRespondent2);
+    private static final List<Function<Party, Object>> PARTY_NAME_FIELDS = List.of(
+        Party::getType, Party::getIndividualTitle, Party::getIndividualFirstName, Party::getIndividualLastName,
+        Party::getCompanyName, Party::getOrganisationName, Party::getSoleTraderTitle,
+        Party::getSoleTraderFirstName, Party::getSoleTraderLastName, Party::getSoleTraderTradingAs,
+        Party::getBulkClaimPartyName);
+    private static final List<Function<CaseData, LitigationFriend>> LITIGATION_FRIENDS = List.of(
+        CaseData::getApplicant1LitigationFriend, CaseData::getApplicant2LitigationFriend,
+        CaseData::getRespondent1LitigationFriend, CaseData::getRespondent2LitigationFriend);
+    private static final List<Function<LitigationFriend, Object>> LITIGATION_FRIEND_NAME_FIELDS = List.of(
+        LitigationFriend::getFullName, LitigationFriend::getFirstName, LitigationFriend::getLastName);
 
     public SubmitChangesTask(CaseDetailsConverter caseDetailsConverter, ObjectMapper objectMapper,
                              UserService userService, CaseFlagsInitialiser caseFlagsInitialiser,
-                             PartyDetailsChangedUtil partyDetailsChangedUtil, CoreCaseDataService coreCaseDataService) {
+                             PartyDetailsChangedUtil partyDetailsChangedUtil) {
         this.caseDetailsConverter = caseDetailsConverter;
         this.objectMapper = objectMapper;
         this.userService = userService;
         this.caseFlagsInitialiser = caseFlagsInitialiser;
         this.partyDetailsChangedUtil = partyDetailsChangedUtil;
-        this.coreCaseDataService = coreCaseDataService;
     }
 
     public CallbackResponse submitChanges(CaseData caseData, CaseDetails caseDetailsBefore, String authToken) {
         log.info("Submit changes for case ID {}", caseData.getCcdCaseReference());
 
         String partyChosenId = caseData.getUpdateDetailsForm().getPartyChosenId();
+        CaseData current = caseDetailsConverter.toCaseData(caseDetailsBefore);
+
+        if (partyNameChanged(current, caseData) && !isAdmin(authToken)) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(PARTY_NAME_CHANGE_NOT_ALLOWED))
+                .build();
+        }
 
         updateExperts(partyChosenId, caseData);
         updateWitnesses(partyChosenId, caseData);
         updateLRIndividuals(partyChosenId, caseData);
         updateOrgIndividuals(partyChosenId, caseData);
-        updateGaCaseName(caseData);
 
         if (isParty(partyChosenId) || isLitigationFriend(partyChosenId)) {
             // update case name for hmc if applicant/respondent/litigation friend was updated
@@ -121,7 +140,6 @@ public class SubmitChangesTask {
         // update claim details tab
         updateDataForClaimDetailsTab(caseData, objectMapper, false);
 
-        CaseData current = caseDetailsConverter.toCaseData(caseDetailsBefore);
         ContactDetailsUpdatedEvent changesEvent = partyDetailsChangedUtil.buildChangesEvent(current, caseData);
         //Populate individuals with partyID if they do not exist
         populatePartyIndividuals(caseData);
@@ -143,13 +161,24 @@ public class SubmitChangesTask {
             .build();
     }
 
-    private void updateGaCaseName(CaseData caseData) {
-        if (ofNullable(caseData.getGeneralApplications()).isPresent()) {
-            caseData.getGeneralApplications().forEach(app -> coreCaseDataService
-                .triggerGeneralApplicationEvent(Long.parseLong(app.getValue().getCaseLink().getCaseReference()),
-                                                UPDATE_GA_CASE_DATA,
-                                                Map.of("caseNameGaInternal", CaseNameUtils.buildCaseName(caseData))));
-        }
+    private boolean partyNameChanged(CaseData caseDataBefore, CaseData caseData) {
+        return caseDataBefore != null
+            && (namesChanged(caseDataBefore, caseData, PARTIES, PARTY_NAME_FIELDS)
+                || namesChanged(caseDataBefore, caseData, LITIGATION_FRIENDS, LITIGATION_FRIEND_NAME_FIELDS));
+    }
+
+    private static <T> boolean namesChanged(CaseData caseDataBefore, CaseData caseData,
+                                            List<Function<CaseData, T>> nameHolders,
+                                            List<Function<T, Object>> nameFields) {
+        return nameHolders.stream().anyMatch(holder -> nameFields.stream().anyMatch(
+            field -> !Objects.equals(nameValue(caseDataBefore, holder, field), nameValue(caseData, holder, field))));
+    }
+
+    private static <T> Object nameValue(CaseData caseData, Function<CaseData, T> nameHolder,
+                                        Function<T, Object> nameField) {
+        T holder = nameHolder.apply(caseData);
+        Object value = holder == null ? null : nameField.apply(holder);
+        return value instanceof String text && text.isBlank() ? null : value;
     }
 
     private boolean isAdmin(String userAuthToken) {
