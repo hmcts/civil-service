@@ -1086,7 +1086,7 @@ class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralApplication
         }
 
         @Test
-        void shouldNotReturn_Application_Submitted_Awaiting_Judicial_Decision_3Def_1Response() {
+        void shouldReturn_Application_Submitted_Awaiting_Judicial_Decision_1v2SameSolicitorFirm_1Response() {
 
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
@@ -1107,12 +1107,8 @@ class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralApplication
                     .setGeneralAppRespondent1Representative(YES)
                     .setGaRespondentDetails("id")
                     ;
-            GARespondentResponse respondent2Response = new GARespondentResponse()
-                    .setGeneralAppRespondent1Representative(YES)
-                    .setGaRespondentDetails("id2")
-                    ;
+            // Both defendants are represented by the same firm, so one response covers both of them
             respondentsResponses.add(element(respondent1Response));
-            respondentsResponses.add(element(respondent2Response));
             when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(NO, NO));
             when(coreCaseDataService.caseDataContentFromStartEventResponse(any(), anyMap())).thenCallRealMethod();
             when(caseDetailsConverter.toGeneralApplicationCaseData(getCallbackParamsMulti(NO, NO, respondentsResponses, respondentSols).getRequest().getCaseDetails()))
@@ -1122,7 +1118,7 @@ class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralApplication
 
             AboutToStartOrSubmitCallbackResponse response
                     = (AboutToStartOrSubmitCallbackResponse) handler.handle(getCallbackParamsMulti(NO, NO, respondentsResponses, respondentSols));
-            assertThat(response.getState()).isEqualTo(AWAITING_RESPONDENT_RESPONSE.name());
+            assertThat(response.getState()).isEqualTo(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.name());
         }
 
         @Test

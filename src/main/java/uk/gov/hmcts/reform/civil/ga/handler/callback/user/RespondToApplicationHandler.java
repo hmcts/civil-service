@@ -215,13 +215,14 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
         ) {
             errors.add(APPLICATION_RESPONSE_PRESENT);
         }
-        if (respondentResponse != null) {
-            Optional<Element<GARespondentResponse>> respondentResponseElement = respondentResponse.stream().findAny();
-            if (respondentResponseElement.isPresent()) {
-                String respondentResponseId = respondentResponseElement.get().getValue().getGaRespondentDetails();
-                if (respondentResponseId.equals(userInfo.getUid())) {
-                    errors.add(RESPONDENT_RESPONSE_EXISTS);
-                }
+        if (respondentResponse != null && !respondentResponse.isEmpty()) {
+            String userId = userInfo.getUid();
+            boolean userHasResponded = userId != null && respondentResponse.stream()
+                .map(Element::getValue)
+                .filter(Objects::nonNull)
+                .anyMatch(response -> userId.equals(response.getGaRespondentDetails()));
+            if (userHasResponded) {
+                errors.add(RESPONDENT_RESPONSE_EXISTS);
             }
         }
         return errors;
