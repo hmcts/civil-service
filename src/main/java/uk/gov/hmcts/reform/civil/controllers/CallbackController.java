@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandlerFactory;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
+import uk.gov.hmcts.reform.civil.callback.SystemCallbackFailureResponder;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.http.HttpResponseHeadersService;
 
@@ -45,6 +46,7 @@ public class CallbackController {
     private final CallbackHandlerFactory callbackHandlerFactory;
     private final CaseDetailsConverter caseDetailsConverter;
     private final HttpResponseHeadersService responseHeadersService;
+    private final SystemCallbackFailureResponder systemCallbackFailureResponder;
 
     @PostMapping(path = {
         "/{callback-type}",
@@ -56,6 +58,7 @@ public class CallbackController {
     public CallbackResponse callback(
         HttpServletResponse response,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
+        @RequestHeader(value = "user-roles", required = false) String userRoles,
         @PathVariable("callback-type") String callbackType,
         @NotNull @RequestBody CallbackRequest callback,
         @PathVariable("version") Optional<CallbackVersion> version,
@@ -77,18 +80,29 @@ public class CallbackController {
                  version
         );
 
-        CallbackParams callbackParams = new CallbackParams()
-            .request(callback)
-            .type(CallbackType.fromValue(callbackType))
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, authorisation))
-            .version(version.orElse(null))
-            .pageId(pageId.orElse(null))
-            .caseData(caseDetailsConverter.toBaseCaseData(caseDetails))
-            .caseDataBefore(caseDetailsBefore != null ? caseDetailsConverter.toBaseCaseData(caseDetailsBefore) : null)
-            .isGeneralApplicationCaseType(generalApplicationCaseType)
-            .isCivilCaseType(!generalApplicationCaseType);
+        final CallbackType type = CallbackType.fromValue(callbackType);
+        CallbackResponse callbackResponse;
+        try {
+            CallbackParams callbackParams = new CallbackParams()
+                .request(callback)
+                .type(type)
+                .params(Map.of(CallbackParams.Params.BEARER_TOKEN, authorisation))
+                .version(version.orElse(null))
+                .pageId(pageId.orElse(null))
+                .caseData(caseDetailsConverter.toBaseCaseData(caseDetails))
+                .caseDataBefore(caseDetailsBefore != null ? caseDetailsConverter.toBaseCaseData(caseDetailsBefore) : null)
+                .isGeneralApplicationCaseType(generalApplicationCaseType)
+                .isCivilCaseType(!generalApplicationCaseType);
 
-        CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(callbackParams);
+            callbackResponse = callbackHandlerFactory.dispatch(callbackParams);
+        } catch (RuntimeException e) {
+            // CCD reports any non-2xx callback response as a 502 and drops the body, so for system-user
+            // events the real exception is returned as a labelled callback error instead (DTSCCI-7095).
+            if (!systemCallbackFailureResponder.appliesTo(type, userRoles)) {
+                throw e;
+            }
+            callbackResponse = systemCallbackFailureResponder.toCallbackError(e, caseId, callback.getEventId(), type);
+        }
         responseHeadersService.addClientContextHeader(callbackResponse, response);
         return callbackResponse;
     }

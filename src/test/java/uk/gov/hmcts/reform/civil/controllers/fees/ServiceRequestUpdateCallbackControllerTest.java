@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import uk.gov.hmcts.reform.civil.service.PaymentRequestUpdateCallbackService;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static feign.Request.HttpMethod.GET;
@@ -92,6 +93,38 @@ class ServiceRequestUpdateCallbackControllerTest {
         assertThatThrownBy(() -> controller.serviceRequestUpdate(S2S_TOKEN, serviceRequestUpdateDto))
             .isInstanceOf(InternalServerErrorException.class)
             .hasCause(unexpectedError);
+    }
+
+    @Test
+    void shouldThrowUpstreamUnavailableException_whenCcdRejectsWithRetryableCallbackError() {
+        ServiceRequestUpdateDto serviceRequestUpdateDto = serviceRequestUpdateDto();
+        FeignException retryable = new FeignException.UnprocessableEntity(
+            "Unprocessable Entity",
+            request(),
+            "{\"callbackErrors\":[\"RETRYABLE: feign.FeignException$BadGateway: x\"]}".getBytes(StandardCharsets.UTF_8),
+            Map.of()
+        );
+        when(authorisationService.isPaymentCallbackServiceAuthorized(S2S_TOKEN)).thenReturn(true);
+        doThrow(retryable).when(requestUpdateCallbackService).processCallback(any(), any());
+
+        assertThatThrownBy(() -> controller.serviceRequestUpdate(S2S_TOKEN, serviceRequestUpdateDto))
+            .isInstanceOf(UpstreamUnavailableException.class);
+    }
+
+    @Test
+    void shouldThrowInternalServerErrorException_whenCcdRejectsWithNotRetryableCallbackError() {
+        ServiceRequestUpdateDto serviceRequestUpdateDto = serviceRequestUpdateDto();
+        FeignException notRetryable = new FeignException.UnprocessableEntity(
+            "Unprocessable Entity",
+            request(),
+            "{\"callbackErrors\":[\"NOT RETRYABLE: java.lang.NullPointerException: x\"]}".getBytes(StandardCharsets.UTF_8),
+            Map.of()
+        );
+        when(authorisationService.isPaymentCallbackServiceAuthorized(S2S_TOKEN)).thenReturn(true);
+        doThrow(notRetryable).when(requestUpdateCallbackService).processCallback(any(), any());
+
+        assertThatThrownBy(() -> controller.serviceRequestUpdate(S2S_TOKEN, serviceRequestUpdateDto))
+            .isInstanceOf(InternalServerErrorException.class);
     }
 
     private ServiceRequestUpdateDto serviceRequestUpdateDto() {

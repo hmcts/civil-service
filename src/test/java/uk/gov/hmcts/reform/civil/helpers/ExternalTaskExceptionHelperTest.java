@@ -242,4 +242,31 @@ class ExternalTaskExceptionHelperTest {
 
         assertThat(ExternalTaskExceptionHelper.isRetryable(new RuntimeException("wrapped", conflict))).isTrue();
     }
+
+    @Test
+    void shouldReturnTrueForRetryableCallbackErrorOnPostSubmit() {
+        // CCD rejected the event because a civil-service callback failed transiently (DTSCCI-7095): nothing was saved
+        Throwable exception = new FeignException.UnprocessableEntity(
+            "[422 Unprocessable Entity]",
+            Request.create(Request.HttpMethod.POST, "url", Map.of(), null, null, null),
+            "{\"callbackErrors\":[\"RETRYABLE: feign.FeignException$BadGateway: [502 Bad Gateway]\"]}"
+                .getBytes(StandardCharsets.UTF_8),
+            Map.of()
+        );
+
+        assertThat(ExternalTaskExceptionHelper.isRetryable(exception)).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalseForNotRetryableCallbackError() {
+        Throwable exception = new FeignException.UnprocessableEntity(
+            "[422 Unprocessable Entity]",
+            Request.create(Request.HttpMethod.GET, "url", Map.of(), null, null, null),
+            "{\"callbackErrors\":[\"NOT RETRYABLE: java.lang.NullPointerException: x\"]}"
+                .getBytes(StandardCharsets.UTF_8),
+            Map.of()
+        );
+
+        assertThat(ExternalTaskExceptionHelper.isRetryable(exception)).isFalse();
+    }
 }
