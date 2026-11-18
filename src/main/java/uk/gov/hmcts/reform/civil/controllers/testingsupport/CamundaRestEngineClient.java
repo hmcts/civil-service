@@ -59,7 +59,7 @@ public class CamundaRestEngineClient {
         putIfPresent(query, "processInstanceId", processInstanceId);
         putIfPresent(query, "processDefinitionKey", definitionKey);
         List<Map<String, Object>> parsed = parseVariables(variables);
-        if (nonNull(parsed)) {
+        if (!parsed.isEmpty()) {
             query.put("variables", parsed);
         }
 
@@ -78,7 +78,7 @@ public class CamundaRestEngineClient {
      */
     private List<Map<String, Object>> parseVariables(String variables) {
         if (variables == null || variables.isBlank()) {
-            return null;
+            return List.of();
         }
 
         return Arrays.stream(variables.split(","))
