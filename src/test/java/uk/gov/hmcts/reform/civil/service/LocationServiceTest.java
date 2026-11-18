@@ -4,9 +4,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
@@ -26,6 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService.CIVIL_NATIONAL_BUSINESS_CENTRE;
@@ -38,14 +41,11 @@ class LocationServiceTest {
     @Autowired
     private LocationService service;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseEventDataService coreCaseEventDataService;
 
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
-
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     private static final Respondent1DQ respondent1DQ;
     private static final Respondent2DQ respondent2DQ;
@@ -71,20 +71,9 @@ class LocationServiceTest {
     }
 
     @Test
-    void shouldThrowException_whenApplicationMadeAfterSDOMainCaseCMLNotInRefDataQMoff() {
+    void shouldThrowException_whenApplicationMadeAfterSDOMainCaseCMLNotInRefData() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getCaseDataForWorkAllocation(CaseState.JUDICIAL_REFERRAL, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
-                                          respondent2DQ
-            );
-        when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any(), any())).thenReturn(new ArrayList<>(List.of()));
-
-        assertThrows(IllegalArgumentException.class, () -> service.getWorkAllocationLocation(caseData, "authToken"));
-    }
-
-    @Test
-    void shouldThrowException_whenApplicationMadeAfterSDOMainCaseCMLNotInRefDataQMOn() {
-        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getCaseDataForWorkAllocation(CaseState.JUDICIAL_REFERRAL, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
+            .getCaseDataForWorkAllocation(CaseState.CASE_PROGRESSION, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
                                           respondent2DQ
             );
         when(locationRefDataService.getCourtLocationsByEpimmsIdWithCML(any(), any(), any())).thenReturn(new ArrayList<>(List.of()));
@@ -126,6 +115,24 @@ class LocationServiceTest {
             service.getWorkAllocationLocation(caseData, "authToken");
         assertEquals(getExpectedGACaseLocation(siteName), location.getLeft());
         assertEquals(isCcmccLocation, location.getRight());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CaseState.class, names = {"IN_MEDIATION", "JUDICIAL_REFERRAL"})
+    void shouldAllocateToCnbc_whenApplicationMadeBeforeSdo(CaseState state) {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getCaseDataForWorkAllocation(state, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ, respondent2DQ);
+        when(coreCaseEventDataService.getEventsForCase(caseData.getCcdCaseReference().toString()))
+            .thenReturn(List.of());
+        when(locationRefDataService.getCnbcLocation("authToken", "AAA6"))
+            .thenReturn(getSampleCourLocationsRefObjectPostSdoNotInRefData(CIVIL_NATIONAL_BUSINESS_CENTRE).getFirst());
+
+        Pair<uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil, Boolean> location =
+            service.getWorkAllocationLocation(caseData, "authToken");
+
+        assertEquals(getExpectedGACaseLocation(CIVIL_NATIONAL_BUSINESS_CENTRE), location.getLeft());
+        assertEquals(true, location.getRight());
+        verify(locationRefDataService, never()).getCourtLocationsByEpimmsIdWithCML(any(), any(), any());
     }
 
     protected List<LocationRefData> getSampleCourLocationsRefObjectPostSdoNotInRefData(String siteName) {
