@@ -57,14 +57,17 @@ public class RoboticsPostcodeMapper {
 
     public String prepareJson(ToJsonString payload)
         throws JsonProcessingException {
-        if (payload instanceof RoboticsCaseData data) {
-            mapPostcodes(data.getLitigiousParties(), data.getSolicitors());
-        } else if (payload instanceof RoboticsCaseDataSpec data) {
-            mapPostcodes(data.getLitigiousParties(), data.getSolicitors());
-        } else {
-            throw new IllegalArgumentException("Expected a specified or unspecified RPA payload");
-        }
-        return payload.toJsonString();
+        return switch (payload) {
+            case RoboticsCaseData data -> {
+                mapPostcodes(data.getLitigiousParties(), data.getSolicitors());
+                yield data.toJsonString();
+            }
+            case RoboticsCaseDataSpec data -> {
+                mapPostcodes(data.getLitigiousParties(), data.getSolicitors());
+                yield data.toJsonString();
+            }
+            case null, default -> throw new IllegalArgumentException("Expected a specified or unspecified RPA payload");
+        };
     }
 
     public String prepareValidatedJson(ToJsonString payload) throws JsonProcessingException {
