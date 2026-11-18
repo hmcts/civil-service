@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
@@ -118,6 +119,29 @@ class JudgmentByAdmissionOrDeterminationMapperTest {
         assertThat(repaymentPlan.getFirstRepaymentDate()).isEqualTo(firstRepaymentDate);
         assertThat(repaymentPlan.getPaymentAmount()).isEqualTo(new BigDecimal("210.00"));
         assertThat(repaymentPlan.getPaymentFrequencyDisplay()).isEqualTo("Paid every month");
+    }
+
+    @Test
+    void shouldUsePayByDate_whenClaimantAcceptsCourtProposedRepaymentDate() {
+        // Given
+        LocalDate paymentDate = LocalDate.now().plusDays(14);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
+            .applicant1RequestedPaymentDateForDefendantSpec(new PaymentBySetDate().setPaymentSetDate(paymentDate))
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                           .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
+                                                           .setClaimantResponseOnCourtDecision(ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_DATE)))
+            .respondent1RepaymentPlan(null)
+            .build();
+
+        // When
+        JudgmentByAdmissionOrDetermination form = mapper.toClaimantResponseForm(caseData, null);
+
+        // Then
+        assertThat(form.getPaymentType()).isEqualTo(ApplicantResponsePaymentPlan.SET_DATE);
+        assertThat(form.getPayBy()).isEqualTo(paymentDate);
+        assertThat(form.getRepaymentPlan()).isNull();
     }
 
     @Test
