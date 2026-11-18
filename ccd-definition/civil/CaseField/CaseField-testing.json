@@ -1,0 +1,10 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "defendantEmailAddress",
+    "Label": "Enter defendant's email address to be used for linking case",
+    "FieldType": "Email",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

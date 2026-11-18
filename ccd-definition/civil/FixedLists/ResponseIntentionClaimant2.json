@@ -1,0 +1,20 @@
+[
+  {
+    "ID": "ResponseIntentionClaimant2",
+    "ListElementCode": "FULL_DEFENCE",
+    "ListElement": "Defend all of the claim",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "ResponseIntentionClaimant2",
+    "ListElementCode": "PART_DEFENCE",
+    "ListElement": "Defend part of the claim",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "ResponseIntentionClaimant2",
+    "ListElementCode": "CONTEST_JURISDICTION",
+    "ListElement": "Contest jurisdiction",
+    "DisplayOrder": 3
+  }
+]

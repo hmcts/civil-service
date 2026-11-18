@@ -14,6 +14,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -27,8 +29,10 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Stream;
 
 @ExtendWith(MockitoExtension.class)
 class ApplicationsProceedOfflineDashboardServiceTest {
@@ -117,6 +121,47 @@ class ApplicationsProceedOfflineDashboardServiceTest {
 
         verifyNoInteractions(dashboardNotificationService);
         verifyNoInteractions(dashboardScenariosService);
+    }
+
+    @ParameterizedTest
+    @MethodSource("statesWithoutLiveApplications")
+    void shouldNotRecordActiveScenarioWhenApplicationStateIsMissing(List<String> states) {
+        dashboardService.applicationStates = states;
+        stubMapper();
+
+        dashboardService.notify(baseCaseData(), "auth");
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq("auth"),
+            eq(SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class));
+        verify(dashboardScenariosService, never()).recordScenarios(
+            eq("auth"),
+            eq(SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario()),
+            any(),
+            any());
+    }
+
+    private static Stream<List<String>> statesWithoutLiveApplications() {
+        return Stream.of(
+            Arrays.asList((String) null),
+            Arrays.asList(null, "Application Closed", "Order Made", "Application Dismissed")
+        );
+    }
+
+    @Test
+    void shouldRecordActiveScenarioWhenMissingStatePrecedesLiveApplication() {
+        dashboardService.applicationStates = Arrays.asList(null, "Awaiting Judge");
+        stubMapper();
+
+        dashboardService.notify(baseCaseData(), "auth");
+
+        verify(dashboardScenariosService).recordScenarios(
+            eq("auth"),
+            eq(SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario()),
+            eq("1234"),
+            any(ScenarioRequestParams.class));
     }
 
     @Test

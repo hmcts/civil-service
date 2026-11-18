@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReferenceCsvLoader;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardNotificationTaskCaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardScenarioCaseReference;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.DraftClaimReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.ExcelMappable;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.NotificationCaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.NotifyRpaFeedCaseReference;
@@ -46,6 +47,9 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
     private static final String STATE = "state";
     private static final String IS_GA_CASE = "isGACase";
     private static final String IS_CMC_CASE = "isCMCCase";
+    private static final String IS_DRAFT_CASE = "isDraftCase";
+    private static final String USER_ID = "userId";
+    private static final String DRAFT_TYPE = "draftType";
     private static final int EXCEL_BUFFER_SIZE = 8192;
     private final CaseReferenceCsvLoader caseReferenceCsvLoader;
     private final MigrationTaskFactory migrationTaskFactory;
@@ -90,6 +94,11 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
 
         log.info("Found {} case references to process", caseReferences.size());
 
+        String isDraftCase = externalTask.getVariable(IS_DRAFT_CASE);
+        if (isDraftCase != null) {
+            return handleDraftTask(externalTask, task, caseReferences);
+        }
+
         String state = externalTask.getVariable(STATE);
         String isGACase = externalTask.getVariable(IS_GA_CASE);
         String isCMCCase = externalTask.getVariable(IS_CMC_CASE);
@@ -100,6 +109,34 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
         }
 
         return new ExternalTaskData();
+    }
+
+    private <T extends CaseReference> ExternalTaskData handleDraftTask(
+        ExternalTask externalTask,
+        MigrationTask<T> task,
+        List<T> caseReferences
+    ) {
+        if (!DraftClaimReference.class.equals(task.getType())) {
+            throw new IllegalArgumentException(
+                "Draft tasks must use DraftClaimReference: " + task.getClass().getSimpleName()
+            );
+        }
+
+        @SuppressWarnings("unchecked")
+        MigrationTask<DraftClaimReference> draftTask =
+            (MigrationTask<DraftClaimReference>) (MigrationTask<?>) task;
+        List<DraftClaimReference> draftReferences = caseReferences.stream()
+            .map(DraftClaimReference.class::cast)
+            .toList();
+        draftReferences.forEach(this::validateDraftReference);
+        asyncCaseMigrationService.migrateUserDrafts(draftTask, draftReferences);
+        return new ExternalTaskData();
+    }
+
+    private void validateDraftReference(DraftClaimReference reference) {
+        if (reference.getUserId() == null || reference.getUserId().isBlank()) {
+            throw new IllegalArgumentException("Draft userId must not be null or blank");
+        }
     }
 
     private <T extends CaseReference> List<T> resolveCaseReferences(ExternalTask externalTask, MigrationTask<T> task) {

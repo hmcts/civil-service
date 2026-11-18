@@ -1,0 +1,8 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "TRANSFER_ONLINE_CASE",
+    "UserRole": "caseworker-civil-systemupdate",
+    "CRUD": "CRU"
+  }
+]

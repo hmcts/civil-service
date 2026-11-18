@@ -1,0 +1,10 @@
+[
+  {
+    "ID": "JudgeDecisionOnReconsiderationSelect",
+    "ListElementCode": "reasonForReconsiderationLblAmendingTxt",
+    "ElementLabel": "If you wish to do this you should select \"Make an order\" from dropdown menu on the right of the screen. This will allow you to make a bespoke order in the case.\n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

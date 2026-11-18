@@ -1,0 +1,26 @@
+[
+  {
+    "ID": "CaseNote",
+    "ListElementCode": "createdBy",
+    "FieldType": "Text",
+    "ElementLabel": "Created by",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "CaseNote",
+    "ListElementCode": "createdOn",
+    "FieldType": "DateTime",
+    "ElementLabel": "Created on",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "CaseNote",
+    "ListElementCode": "note",
+    "FieldType": "TextArea",
+    "ElementLabel": "Note",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

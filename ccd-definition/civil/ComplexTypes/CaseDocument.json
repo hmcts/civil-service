@@ -1,0 +1,61 @@
+[
+  {
+    "ID": "CaseDocument",
+    "ListElementCode": "documentName",
+    "FieldType": "Text",
+    "ElementLabel": "Name",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "CaseDocument",
+    "ListElementCode": "documentType",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "DocumentType",
+    "ElementLabel": "Type",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "CaseDocument",
+    "ListElementCode": "documentLink",
+    "FieldType": "Document",
+    "ElementLabel": "Document URL",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "CaseDocument",
+    "ListElementCode": "documentSize",
+    "FieldType": "Number",
+    "ElementLabel": "Document size",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "CaseDocument",
+    "ListElementCode": "createdDatetime",
+    "FieldType": "DateTime",
+    "ElementLabel": "Uploaded on",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "CaseDocument",
+    "ListElementCode": "createdBy",
+    "FieldType": "Text",
+    "ElementLabel": "Uploaded by",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "CaseDocument",
+    "ListElementCode": "ownedBy",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "CaseRoleType",
+    "ElementLabel": "Owned by",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "FieldShowCondition": "createdDatetime = \"DO_NOT_SHOW\""
+  }
+]

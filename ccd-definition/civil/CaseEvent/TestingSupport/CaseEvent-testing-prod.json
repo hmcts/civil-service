@@ -1,0 +1,17 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "LINK_DEFENDANT_TO_CLAIM",
+    "Name": "Link defendant to claim",
+    "Description": "Links a defendant to a claim by email address",
+    "DisplayOrder": 30,
+    "PreConditionState(s)": "AWAITING_RESPONDENT_ACKNOWLEDGEMENT;All_FINAL_ORDERS_ISSUED",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowSummary": "N",
+    "ShowEventNotes": "N",
+    "EndButtonLabel": "Link defendant",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/about-to-submit",
+    "RetriesTimeoutAboutToStartEvent": 0
+  }
+]

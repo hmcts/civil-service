@@ -30,6 +30,13 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
 
+/**
+ * Retained for running Camunda instances using pre-migration process definitions.
+ * Remove after no instance can reach the legacy dashboard task (DTSCCI-6703).
+ *
+ * @deprecated Replaced by dashboard framework tasks for new process instances.
+ */
+@Deprecated(forRemoval = true)
 @Service
 @RequiredArgsConstructor
 public class ApplicationsProceedOfflineNotificationCallbackHandler extends CallbackHandler {

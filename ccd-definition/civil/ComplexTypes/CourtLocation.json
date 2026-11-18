@@ -1,0 +1,36 @@
+[
+  {
+    "ID": "CourtLocation",
+    "ListElementCode": "applicantPreferredCourt",
+    "FieldType": "Text",
+    "ElementLabel": "Court location",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "RegularExpression": "[0-9]{3}"
+  },
+  {
+    "ID": "CourtLocation",
+    "ListElementCode": "applicantPreferredCourtLocationList",
+    "DisplayContext": "MANDATORY",
+    "ElementLabel": "Please select your preferred court hearing location",
+    "FieldType": "DynamicList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "CourtLocation",
+    "ListElementCode": "caseLocation",
+    "ElementLabel": "Case Location",
+    "FieldType": "CaseLocationCivil",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "CourtLocation",
+    "ListElementCode": "reasonForHearingAtSpecificCourt",
+    "ElementLabel": "Briefly explain your reasons",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

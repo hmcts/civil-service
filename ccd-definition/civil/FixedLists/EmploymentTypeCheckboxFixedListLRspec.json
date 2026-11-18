@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "EmploymentTypeCheckboxFixedListLRspec",
+    "ListElementCode": "EMPLOYED",
+    "ListElement": "Employed",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "EmploymentTypeCheckboxFixedListLRspec",
+    "ListElementCode": "SELF",
+    "ListElement": "Self-employed",
+    "DisplayOrder": 2
+  }
+]

@@ -25,4 +25,7 @@ public class CamundaProcessInstance {
     private Boolean ended;
     private Boolean suspended;
     private String tenantId;
+    private String superProcessInstanceId;
+    private String processDefinitionKey;
+    private String state;
 }
