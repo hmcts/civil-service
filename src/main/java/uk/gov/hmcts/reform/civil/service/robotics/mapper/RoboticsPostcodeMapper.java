@@ -91,25 +91,31 @@ public class RoboticsPostcodeMapper {
                 .map(name -> name.trim().toUpperCase(Locale.UK)).orElse("");
         }
         if (isOutsideCountry(country)) {
-            String line3 = address.getAddressLine3();
-            String combined = isBlank(line3) ? postcode : line3 + " - " + postcode;
-            if (combined.length() <= 35) {
-                address.setAddressLine3(combined);
-                address.setPostCode(null);
-            } else {
-                // Keep the postcode intact in line 3 and move existing text into the remaining lines.
-                String remaining = Stream.of(line3, address.getAddressLine4(), address.getAddressLine5())
-                    .filter(value -> !isBlank(value)).collect(Collectors.joining(", "));
-                if (postcode.length() <= 35 && remaining.length() <= 70) {
-                    int split = Math.min(35, remaining.length());
-                    address.setAddressLine3(postcode);
-                    address.setAddressLine4(remaining.substring(0, split));
-                    address.setAddressLine5(remaining.length() > split ? remaining.substring(split) : null);
-                    address.setPostCode(null);
-                } else {
-                    log.warn("RPA postcode relocation exceeds address capacity; retaining the original address");
-                }
-            }
+            relocatePostcode(address, postcode);
         }
+    }
+
+    private void relocatePostcode(RoboticsAddress address, String postcode) {
+        String line3 = address.getAddressLine3();
+        String combined = isBlank(line3) ? postcode : line3 + " - " + postcode;
+        if (combined.length() <= 35) {
+            address.setAddressLine3(combined);
+            address.setPostCode(null);
+            return;
+        }
+
+        // Keep the postcode intact in line 3 and move existing text into the remaining lines.
+        String remaining = Stream.of(line3, address.getAddressLine4(), address.getAddressLine5())
+            .filter(value -> !isBlank(value)).collect(Collectors.joining(", "));
+        if (postcode.length() > 35 || remaining.length() > 70) {
+            log.warn("RPA postcode relocation exceeds address capacity; retaining the original address");
+            return;
+        }
+
+        int split = Math.min(35, remaining.length());
+        address.setAddressLine3(postcode);
+        address.setAddressLine4(remaining.substring(0, split));
+        address.setAddressLine5(remaining.length() > split ? remaining.substring(split) : null);
+        address.setPostCode(null);
     }
 }

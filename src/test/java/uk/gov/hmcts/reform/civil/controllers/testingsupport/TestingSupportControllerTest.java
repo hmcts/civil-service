@@ -37,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TestingSupportControllerTest {
@@ -103,10 +104,10 @@ class TestingSupportControllerTest {
         var data = uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.builder().build();
         var spec = new uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec();
         var unspec = new uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData();
-        org.mockito.Mockito.when(roboticsDataMapper.toRoboticsCaseData(data, null)).thenReturn(unspec);
-        org.mockito.Mockito.when(roboticsSpecDataMapper.toRoboticsCaseData(data, null)).thenReturn(spec);
-        org.mockito.Mockito.when(roboticsPostcodeMapper.prepareJson(unspec)).thenReturn("prepared-unspec");
-        org.mockito.Mockito.when(roboticsPostcodeMapper.prepareJson(spec)).thenReturn("prepared-spec");
+        when(roboticsDataMapper.toRoboticsCaseData(data, null)).thenReturn(unspec);
+        when(roboticsSpecDataMapper.toRoboticsCaseData(data, null)).thenReturn(spec);
+        when(roboticsPostcodeMapper.prepareJson(unspec)).thenReturn("prepared-unspec");
+        when(roboticsPostcodeMapper.prepareJson(spec)).thenReturn("prepared-spec");
         assertThat(controller.getRPAJsonInformationForCaseData(data)).isEqualTo("prepared-unspec");
         assertThat(controller.getRPAJsonInformationForSpecCaseData(data)).isEqualTo("prepared-spec");
     }

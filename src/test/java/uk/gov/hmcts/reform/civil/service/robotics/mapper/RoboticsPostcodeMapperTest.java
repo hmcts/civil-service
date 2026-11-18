@@ -135,7 +135,7 @@ class RoboticsPostcodeMapperTest {
 
     @Test
     void rejectsInvalidPreparedPayload() {
-        org.mockito.Mockito.when(schema.validate(org.mockito.ArgumentMatchers.anyString())).thenReturn(
+        when(schema.validate(org.mockito.ArgumentMatchers.anyString())).thenReturn(
             java.util.Set.of(com.networknt.schema.ValidationMessage.builder().message("Invalid").build()));
         org.assertj.core.api.Assertions.assertThatThrownBy(() -> mapper.prepareJson(new RoboticsCaseData()))
             .isInstanceOf(uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException.class);

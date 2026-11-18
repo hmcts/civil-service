@@ -56,7 +56,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSp
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsPostcodeMapper;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
-import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
