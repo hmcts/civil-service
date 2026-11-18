@@ -160,6 +160,19 @@ class RoboticsNotificationServiceTest {
     }
 
     @Test
+    void invalidFinalPayloadPreventsEmail() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        when(schemaValidationService.validate(anyString())).thenReturn(java.util.Set.of(
+            com.networknt.schema.ValidationMessage.builder().message("Invalid payload").build()));
+
+        assertThrows(uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException.class,
+                     () -> service.notifyRobotics(caseData, false, BEARER_TOKEN));
+
+        verify(schemaValidationService).validate(anyString());
+        org.mockito.Mockito.verifyNoInteractions(sendGridClient);
+    }
+
+    @Test
     @SneakyThrows
     void shouldSendNotificationEmail_whenCaseDataIsProvided() {
         // Given

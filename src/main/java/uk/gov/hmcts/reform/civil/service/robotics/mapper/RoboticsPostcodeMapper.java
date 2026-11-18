@@ -20,10 +20,10 @@ import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidation
 import java.util.List;
 import java.util.Locale;
 import java.time.Duration;
-import java.util.Optional;
+import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -33,10 +33,12 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @RequiredArgsConstructor
 public class RoboticsPostcodeMapper {
 
+    private static final Pattern OUTSIDE_POSTCODE = Pattern.compile("(?:BT|JE|GY|IM|AB|EH|G|KW)[0-9]{1,2}[0-9][A-Z]{2}");
+
     private static final Set<String> OUTSIDE_COUNTRIES = Locale.getISOCountries(Locale.IsoCountryCode.PART1_ALPHA2)
         .stream().filter(code -> !"GB".equals(code))
         .map(code -> Locale.of("", code))
-        .flatMap(locale -> Stream.of(locale.getCountry(), locale.getISO3Country(), locale.getDisplayCountry(Locale.UK)))
+        .map(locale -> locale.getDisplayCountry(Locale.UK))
         .map(name -> name.toUpperCase(Locale.UK)).collect(Collectors.toUnmodifiableSet());
 
     private static boolean isOutsideCountry(String country) {
@@ -44,7 +46,7 @@ public class RoboticsPostcodeMapper {
     }
 
     private final PostcodeLookupService postcodeLookupService;
-    private final Cache<String, Optional<String>> countries =
+    private final Cache<String, String> countries =
         Caffeine.newBuilder()
             .maximumSize(1000).expireAfterWrite(Duration.ofMinutes(5)).build();
 
@@ -57,7 +59,11 @@ public class RoboticsPostcodeMapper {
         } else if (payload instanceof RoboticsCaseDataSpec data) {
             mapPostcodes(data.getLitigiousParties(), data.getSolicitors());
         }
-        String json = payload.toJsonString();
+        return payload.toJsonString();
+    }
+
+    public String prepareValidatedJson(ToJsonString payload) throws JsonProcessingException {
+        String json = prepareJson(payload);
         var errors = schemaValidationService.validate(json);
         if (errors != null && !errors.isEmpty()) {
             throw new JsonSchemaValidationException(
@@ -85,10 +91,14 @@ public class RoboticsPostcodeMapper {
             return;
         }
         String lookupPostcode = postcode.replaceAll("\\s", "").toUpperCase(Locale.UK);
-        String country = java.util.Objects.toString(address.getCountry(), "").trim().toUpperCase(Locale.UK);
+        String country = Objects.toString(address.getCountry(), "").trim().toUpperCase(Locale.UK);
         if (!isOutsideCountry(country) && !Set.of("ENGLAND", "WALES", "CYMRU").contains(country)) {
-            country = countries.get(lookupPostcode, postcodeLookupService::findCountryForPostcode)
-                .map(name -> name.trim().toUpperCase(Locale.UK)).orElse("");
+            if (OUTSIDE_POSTCODE.matcher(lookupPostcode).matches()) {
+                relocatePostcode(address, postcode);
+                return;
+            }
+            country = Objects.toString(countries.get(lookupPostcode, key -> postcodeLookupService
+                .findCountryForPostcode(key).map(name -> name.trim().toUpperCase(Locale.UK)).orElse(null)), "");
         }
         if (isOutsideCountry(country)) {
             relocatePostcode(address, postcode);
@@ -104,18 +114,18 @@ public class RoboticsPostcodeMapper {
             return;
         }
 
-        // Keep the postcode intact in line 3 and move existing text into the remaining lines.
-        String remaining = Stream.of(line3, address.getAddressLine4(), address.getAddressLine5())
-            .filter(value -> !isBlank(value)).collect(Collectors.joining(", "));
-        if (postcode.length() > 35 || remaining.length() > 70) {
+        if (postcode.length() <= 35 && isBlank(address.getAddressLine5())) {
+            if (isBlank(address.getAddressLine4())) {
+                address.setAddressLine4(postcode);
+            } else {
+                address.setAddressLine5(postcode);
+            }
+        } else if (address.getAddressLine5() != null && (address.getAddressLine5() + " - " + postcode).length() <= 35) {
+            address.setAddressLine5(address.getAddressLine5() + " - " + postcode);
+        } else {
             log.warn("RPA postcode relocation exceeds address capacity; retaining the original address");
             return;
         }
-
-        int split = Math.min(35, remaining.length());
-        address.setAddressLine3(postcode);
-        address.setAddressLine4(remaining.substring(0, split));
-        address.setAddressLine5(remaining.length() > split ? remaining.substring(split) : null);
         address.setPostCode(null);
     }
 }
