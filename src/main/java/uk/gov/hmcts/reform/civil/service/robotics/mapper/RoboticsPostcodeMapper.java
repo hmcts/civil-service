@@ -33,7 +33,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @RequiredArgsConstructor
 public class RoboticsPostcodeMapper {
 
-    private static final Pattern OUTSIDE_POSTCODE = Pattern.compile("(?:BT|JE|GY|IM|AB|EH|G|KW)[0-9]{1,2}[0-9][A-Z]{2}");
+    private static final Pattern OUTSIDE_POSTCODE = Pattern.compile("(?:BT|JE|GY|IM|AB|EH|G|KW)\\d{1,2}\\d[A-Z]{2}");
 
     private static final Set<String> OUTSIDE_COUNTRIES = Locale.getISOCountries(Locale.IsoCountryCode.PART1_ALPHA2)
         .stream().filter(code -> !"GB".equals(code))
