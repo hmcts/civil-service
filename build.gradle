@@ -1091,6 +1091,8 @@ tasks.withType(CftlibExec).configureEach {
   environment 'CIVIL_CFTLIB_CCD_DEFINITIONS_DIR', definitions
   environment 'CIVIL_CFTLIB_CCD_TEMPLATE', cftlibDir.get().file('ccd-template.xlsx').asFile.path
   environment 'CIVIL_CFTLIB_CAMUNDA_DIR', file('src/main/resources').path
+  // The organisational roles civil's test users hold in AAT and preview, which the local users are given too.
+  environment 'CIVIL_CFTLIB_ORG_ROLES_SCRIPT', file('bin/shared/add-org-roles-to-users.sh').path
   environment 'CIVIL_CFTLIB_WA_DMNS_DIR', System.getenv('CIVIL_WA_DMNS_DIR') ?: cftlibDir.get().dir('wa-dmn').asFile.path
 
   // This service
