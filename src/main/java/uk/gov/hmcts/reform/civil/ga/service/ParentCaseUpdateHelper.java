@@ -451,6 +451,8 @@ public class ParentCaseUpdateHelper {
 
         Optional<Element<GeneralApplicationsDetails>> generalApplicationsDetails = findMasterApplication(caseData, applicationId);
         if (generalApplicationsDetails.isEmpty()) {
+            log.warn("Application ID: {} not found in gaDetailsMasterCollection of Parent Case ID: {}, skipping parent case update",
+                     applicationId, parentCaseId);
             return;
         }
 
@@ -732,7 +734,7 @@ public class ParentCaseUpdateHelper {
     }
 
     private Optional<Element<GeneralApplicationsDetails>> findMasterApplication(GeneralApplicationCaseData caseData, String applicationId) {
-        return caseData.getGaDetailsMasterCollection()
+        return ofNullable(caseData.getGaDetailsMasterCollection()).orElse(newArrayList())
             .stream()
             .filter(application -> applicationFilterCriteria(application, applicationId))
             .findAny();
