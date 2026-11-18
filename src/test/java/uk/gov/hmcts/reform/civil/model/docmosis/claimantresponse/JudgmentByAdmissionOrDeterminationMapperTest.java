@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.ClaimantResponseOnCourtDecisionType;
@@ -140,6 +141,24 @@ class JudgmentByAdmissionOrDeterminationMapperTest {
 
         // Then
         assertThat(form.getPaymentType()).isEqualTo(ApplicantResponsePaymentPlan.SET_DATE);
+        assertThat(form.getPayBy()).isEqualTo(paymentDate);
+        assertThat(form.getRepaymentPlan()).isNull();
+    }
+
+    @Test
+    void shouldUseDefendantPayByDate_whenClaimantDateFieldsAreNull() {
+        // Given
+        LocalDate paymentDate = LocalDate.now().plusDays(21);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec(paymentDate))
+            .respondent1RepaymentPlan(null)
+            .build();
+
+        // When
+        JudgmentByAdmissionOrDetermination form = mapper.toClaimantResponseForm(caseData, null);
+
+        // Then
         assertThat(form.getPayBy()).isEqualTo(paymentDate);
         assertThat(form.getRepaymentPlan()).isNull();
     }

@@ -11,10 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
-import uk.gov.hmcts.reform.civil.model.Address;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
-import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
+import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.model.citizenui.AdditionalLipPartyDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.ClaimantResponseOnCourtDecisionType;
@@ -126,9 +123,14 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     }
 
     private LocalDate setPayByDate(CaseData caseData) {
-        if (caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.SET_DATE)) {
-            return caseData.getApplicant1RequestedPaymentDateForDefendantSpec().getPaymentSetDate();
-        } else if (caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.IMMEDIATELY)) {
+        if (PaymentType.SET_DATE.equals(caseData.getApplicant1RepaymentOptionForDefendantSpec())) {
+            PaymentBySetDate paymentDate = caseData.getApplicant1RequestedPaymentDateForDefendantSpec();
+            return paymentDate != null
+                ? paymentDate.getPaymentSetDate()
+                : Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
+                .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid)
+                .orElse(null);
+        } else if (PaymentType.IMMEDIATELY.equals(caseData.getApplicant1RepaymentOptionForDefendantSpec())) {
             return deadlineCalculatorService.calculateExtendedDeadline(
                 LocalDate.now(),
                 RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
@@ -430,23 +432,30 @@ public class JudgmentByAdmissionOrDeterminationMapper {
 
     private LocalDate getPaymentDateForCourtDecision(CaseData caseData) {
         if (isAcceptedRepaymentPlan(caseData)) {
-            return caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate();
+            return Optional.ofNullable(caseData.getRespondent1RepaymentPlan())
+                .map(RepaymentPlanLRspec::getFirstRepaymentDate).orElse(null);
         }
         PaymentBySetDate paymentDateForSpec = caseData.getApplicant1RequestedPaymentDateForDefendantSpec();
-        return paymentDateForSpec != null ? paymentDateForSpec.getPaymentSetDate() : null;
+        return paymentDateForSpec != null
+            ? paymentDateForSpec.getPaymentSetDate()
+            : Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
+            .map(respondToClaim -> respondToClaim.getWhenWillThisAmountBePaid())
+            .orElse(null);
     }
 
     private String getPaymentStr(CaseData caseData) {
         if (caseData.hasApplicant1CourtDecisionInFavourOfClaimant()
             || caseData.hasApplicant1AcceptedCourtDecision()) {
             if (isAcceptedRepaymentPlan(caseData)) {
-                return getRepaymentString(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency());
+                return Optional.ofNullable(caseData.getRespondent1RepaymentPlan())
+                    .map(RepaymentPlanLRspec::getRepaymentFrequency)
+                    .map(this::getRepaymentString).orElse(null);
             }
             return PaymentType.REPAYMENT_PLAN.equals(caseData.getApplicant1RepaymentOptionForDefendantSpec())
                 ? getRepaymentString(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec())
                 : null;
         } else {
-            return caseData.isPayByInstallment()
+            return caseData.isPayByInstallment() && caseData.getRespondent1RepaymentPlan() != null
                 ? getRepaymentString(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null;
         }
     }
@@ -455,13 +464,15 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         if (caseData.hasApplicant1CourtDecisionInFavourOfClaimant()
             || caseData.hasApplicant1AcceptedCourtDecision()) {
             if (isAcceptedRepaymentPlan(caseData)) {
-                return getRepaymentFrequency(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency());
+                return Optional.ofNullable(caseData.getRespondent1RepaymentPlan())
+                    .map(RepaymentPlanLRspec::getRepaymentFrequency)
+                    .map(this::getRepaymentFrequency).orElse(null);
             }
             return PaymentType.REPAYMENT_PLAN.equals(caseData.getApplicant1RepaymentOptionForDefendantSpec())
                 ? getRepaymentFrequency(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec())
                 : null;
         } else {
-            return caseData.isPayByInstallment()
+            return caseData.isPayByInstallment() && caseData.getRespondent1RepaymentPlan() != null
                 ? getRepaymentFrequency(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null;
         }
     }
@@ -470,8 +481,9 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         if (caseData.hasApplicant1CourtDecisionInFavourOfClaimant()
             || caseData.hasApplicant1AcceptedCourtDecision()) {
             if (isAcceptedRepaymentPlan(caseData)) {
-                return DateFormatHelper.formatLocalDate(
-                    caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate(), DateFormatHelper.DATE);
+                return Optional.ofNullable(caseData.getRespondent1RepaymentPlan())
+                    .map(RepaymentPlanLRspec::getFirstRepaymentDate)
+                    .map(date -> DateFormatHelper.formatLocalDate(date, DateFormatHelper.DATE)).orElse(null);
             }
             return PaymentType.REPAYMENT_PLAN.equals(caseData.getApplicant1RepaymentOptionForDefendantSpec())
                 && nonNull(caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec())
@@ -479,7 +491,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
                 caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(), DateFormatHelper.DATE)
                 : null;
         } else {
-            return caseData.isPayByInstallment()
+            return caseData.isPayByInstallment() && caseData.getRespondent1RepaymentPlan() != null
                 ? DateFormatHelper.formatLocalDate(
                     caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate(), DateFormatHelper.DATE) : null;
         }
