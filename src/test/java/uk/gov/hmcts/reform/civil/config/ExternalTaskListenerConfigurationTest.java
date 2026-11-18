@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.properties.EventProperties;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +38,23 @@ class ExternalTaskListenerConfigurationTest {
             assertThat(it).hasSingleBean(BackoffStrategy.class);
             assertThat(it.getBean(BackoffStrategy.class)).isInstanceOf(ErrorAwareBackoffStrategy.class);
         });
+    }
+
+    /**
+     * Closing the context must stop every client. A client left running with no subscriptions
+     * loops in {@code TopicSubscriptionManager.run()} without waiting, so each leaked one holds a
+     * CPU core until the JVM exits. Leaking them from this class doubled the unit test stage.
+     */
+    @Test
+    void shouldStopEveryClientWhenTheContextCloses() {
+        List<ExternalTaskClient> clients = new ArrayList<>();
+        context.run(it -> {
+            clients.addAll(it.getBean(CaseDrivenExternalTaskClients.class).clients());
+            clients.add(it.getBean("schedulerExternalTaskClient", ExternalTaskClient.class));
+            assertThat(clients).allMatch(ExternalTaskClient::isActive);
+        });
+
+        assertThat(clients).hasSize(3).noneMatch(ExternalTaskClient::isActive);
     }
 
     /**

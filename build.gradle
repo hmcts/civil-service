@@ -78,10 +78,13 @@ allprojects {
     maxWarnings = 0
     toolVersion = '14.3.0'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
-    ignoreFailures = System.getenv('CHECKSTYLE_SKIP') == 'true'
   }
 
   tasks.withType(Checkstyle).configureEach {
+    // Jenkins sets CHECKSTYLE_SKIP on non-PR builds, where checkstyle used to run in full and its
+    // result was then ignored, costing about 35s of the master Static checks stage for nothing.
+    // PR builds leave it unset, so checkstyle still gates every change.
+    enabled = System.getenv('CHECKSTYLE_SKIP') != 'true'
     reports {
       xml.required = false
       html.required = true

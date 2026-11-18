@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseEventDetail;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -25,6 +26,8 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKN
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService.CIVIL_NATIONAL_BUSINESS_CENTRE;
 import static uk.gov.hmcts.reform.civil.utils.CaseServiceUtil.getCaseServiceId;
@@ -36,14 +39,14 @@ public class LocationService {
 
     private final LocationReferenceDataService locationRefDataService;
     private final CoreCaseEventDataService coreCaseEventDataService;
-    private final FeatureToggleService featureToggleService;
 
-    public static final Set<CaseState> statesBeforeSDO = EnumSet.of(PENDING_CASE_ISSUED, CASE_ISSUED,
+    protected static final Set<CaseState> statesBeforeSDO = EnumSet.of(PENDING_CASE_ISSUED, CASE_ISSUED,
                                                                     AWAITING_CASE_DETAILS_NOTIFICATION,
                                                                     AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
-                                                                    AWAITING_APPLICANT_INTENTION);
+                                                                    AWAITING_APPLICANT_INTENTION,
+                                                                    IN_MEDIATION, JUDICIAL_REFERRAL);
 
-    public static final Set<CaseState> settleDiscontinueStates = EnumSet.of(CASE_SETTLED,
+    protected static final Set<CaseState> settleDiscontinueStates = EnumSet.of(CASE_SETTLED,
                                                                             CASE_DISCONTINUED);
 
     public Pair<CaseLocationCivil, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
@@ -135,6 +138,10 @@ public class LocationService {
             ));
         }
 
+        return getCaseLocationCivil(locationRefDataList);
+    }
+
+    private static @NonNull CaseLocationCivil getCaseLocationCivil(List<LocationRefData> locationRefDataList) {
         LocationRefData caseManagementLocationDetails = locationRefDataList.getFirst();
 
         CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
