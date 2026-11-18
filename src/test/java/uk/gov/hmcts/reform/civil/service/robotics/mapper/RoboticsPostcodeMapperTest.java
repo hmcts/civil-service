@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
@@ -15,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
 import uk.gov.hmcts.reform.civil.postcode.PostcodeLookupService;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -127,6 +130,80 @@ class RoboticsPostcodeMapperTest {
         assertThat(firstDefendant.getPostCode()).isNull();
         assertThat(secondDefendant.getAddressLine3()).isEqualTo("Milan - 20121");
         assertThat(json).doesNotContain("country");
+        verifyNoInteractions(lookup);
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @CsvSource({
+        "'AC1, AC5, AC9', BT1 1AA, DD1 2HS, IV1 1PL, , true",
+        "'AC2, AC6, AC10', BT1 1AA, DD1 2HS, IV1 1PL, District, true",
+        "'AC3, AC7, AC11', SW1A 1AA, CF10 1EP, B1 1BB, , false",
+        "'AC4, AC8, AC12', SW1A 1AA, CF10 1EP, B1 1BB, District, false"
+    })
+    void preparesSpecifiedClaimantAndBothDefendantAddresses(String criteria, String claimant, String defendant1,
+                                                           String defendant2, String line3, boolean outside)
+        throws Exception {
+        List<String> postcodes = List.of(claimant, defendant1, defendant2);
+        List<String> ids = List.of("claimant", "defendant1", "defendant2");
+        List<LitigiousParty> parties = new ArrayList<>();
+        for (int i = 0; i < ids.size(); i++) {
+            RoboticsAddress address = address(postcodes.get(i), line3).setAddressLine4(null);
+            parties.add(new LitigiousParty().setId(ids.get(i)).setAddresses(wrap(address)));
+        }
+        String json = mapper.prepareValidatedJson(new RoboticsCaseDataSpec().setLitigiousParties(parties));
+        JsonNode result = new ObjectMapper().readTree(json).required("litigiousParties");
+        assertThat(result.size()).as(criteria).isEqualTo(3);
+        for (int i = 0; i < ids.size(); i++) {
+            JsonNode party = result.get(i);
+            assertThat(party.required("ID").textValue()).isEqualTo(ids.get(i));
+            JsonNode address = party.at("/addresses/contactAddress");
+            String postCode = postcodes.get(i);
+            String expectedLine3 = outside && line3 != null ? line3 + " - " + postCode : line3;
+            if (outside && line3 == null) {
+                expectedLine3 = postCode;
+            }
+            assertThat(address.required("addressLine3").textValue()).isEqualTo(expectedLine3);
+            if (outside) {
+                assertThat(address.required("postCode").isNull()).isTrue();
+            } else {
+                assertThat(address.required("postCode").textValue()).isEqualTo(postCode);
+            }
+        }
+        verifyNoInteractions(lookup);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {25, 26})
+    void movesToFourthLineOnlyWhenCombinedTextExceeds35Characters(int length) {
+        String existing = "A".repeat(length);
+        RoboticsAddress address = address("BT1 1AA", existing).setAddressLine4(null);
+        mapper.mapPostcodes(List.of(new LitigiousParty().setAddresses(wrap(address))), null);
+        assertThat(address.getAddressLine3()).isEqualTo(length == 25 ? existing + " - BT1 1AA" : existing);
+        assertThat(address.getAddressLine4()).isEqualTo(length == 25 ? null : "BT1 1AA");
+        assertThat(address.getPostCode()).isNull();
+    }
+
+    @Test
+    void mapsInternationalClientsAndDomesticSolicitorsIndependently() throws Exception {
+        RoboticsAddressMapper addresses = new RoboticsAddressMapper(new AddressLinesMapper());
+        Address claimant = new Address("10 Example Street", "Barcelona", "Barcelona Province", null, null, "Spain", "08001");
+        Address defendant = new Address("20 Example Street", "Milan", "Lombardy", null, null, "Italy", "20121");
+        Address solicitor = new Address("30 Example Street", "Cardiff", null, null, null, "CY", "CF10 1EP");
+        RoboticsCaseDataSpec payload = new RoboticsCaseDataSpec()
+            .setLitigiousParties(List.of(new LitigiousParty().setAddresses(addresses.toRoboticsAddresses(claimant)),
+                                         new LitigiousParty().setAddresses(addresses.toRoboticsAddresses(defendant))))
+            .setSolicitors(List.of(Solicitor.builder().addresses(addresses.toRoboticsAddresses(solicitor)).build()));
+
+        JsonNode json = new ObjectMapper().readTree(mapper.prepareValidatedJson(payload));
+        JsonNode first = json.at("/litigiousParties/0/addresses/contactAddress");
+        JsonNode second = json.at("/litigiousParties/1/addresses/contactAddress");
+        assertThat(first.required("addressLine3").textValue()).isEqualTo("Barcelona Province - 08001");
+        assertThat(second.required("addressLine3").textValue()).isEqualTo("Lombardy - 20121");
+        assertThat(first.required("postCode").isNull()).isTrue();
+        assertThat(second.required("postCode").isNull()).isTrue();
+        assertThat(json.at("/solicitors/0/addresses/contactAddress/postCode").textValue()).isEqualTo("CF10 1EP");
+        assertThat(claimant.getPostCode()).isEqualTo("08001");
+        assertThat(defendant.getPostCode()).isEqualTo("20121");
         verifyNoInteractions(lookup);
     }
 
