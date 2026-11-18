@@ -75,10 +75,7 @@ class ConfirmOrderReviewTaskHandlerTest {
             caseDetailsConverter,
             objectMapper
         );
-    }
 
-    @BeforeEach
-    void init() {
         Map<String, Object> variables = Map.of(
             "caseId", CASE_ID,
             "caseEvent", UPDATE_CONFIRM_REVIEW_ORDER_EVENT.name()

@@ -40,6 +40,7 @@ public class CaseReferenceCsvLoader {
     private static final String TRANSFORMATION = "AES/GCM/NoPadding";
     private static final int IV_SIZE = 12; // GCM recommended IV size
     private static final int TAG_LENGTH_BIT = 128;
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     @SuppressWarnings({"java:S3740", "java:S1488"})
     public <T extends CaseReference> List<T> loadCaseReferenceList(Class<T> type, String fileName) {
@@ -168,7 +169,7 @@ public class CaseReferenceCsvLoader {
 
     private static byte[] generateIv() {
         byte[] iv = new byte[IV_SIZE];
-        new SecureRandom().nextBytes(iv);
+        SECURE_RANDOM.nextBytes(iv);
         return iv;
     }
 }
