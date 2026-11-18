@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.helpers;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -22,17 +22,26 @@ import java.util.concurrent.ConcurrentHashMap;
  * For a decentralised case CCD validates the event's own data instead, before the runtime runs the callback, and
  * refuses a date-time in a Date field. So each value whose field is a {@link LocalDate} in the model is read as the
  * model reads it, and written as the callback would write it. Everything else is left as it was sent.
+ *
+ * <p>Centralised, CCD validates after the callback, so with {@code civil.decentralised.enabled} off the updates are
+ * sent as they came.
  */
 @Component
-@RequiredArgsConstructor
 public class CaseDataDateNormaliser {
 
     private final ObjectMapper objectMapper;
+    private final boolean decentralised;
     private final Map<JavaType, Map<String, JavaType>> properties = new ConcurrentHashMap<>();
 
+    public CaseDataDateNormaliser(ObjectMapper objectMapper,
+                                  @Value("${civil.decentralised.enabled:false}") boolean decentralised) {
+        this.objectMapper = objectMapper;
+        this.decentralised = decentralised;
+    }
+
     public Map<String, Object> normalise(Map<String, Object> updates, Class<?> caseDataClass) {
-        if (updates == null) {
-            return null;
+        if (updates == null || !decentralised) {
+            return updates;
         }
         return normaliseFields(updates, objectMapper.constructType(caseDataClass));
     }

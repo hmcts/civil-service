@@ -42,7 +42,7 @@ public class GaCaseEventServiceTest {
 
     @Spy
     private CaseDataDateNormaliser dateNormaliser =
-        new CaseDataDateNormaliser(new ObjectMapper().registerModule(new JavaTimeModule()));
+        new CaseDataDateNormaliser(new ObjectMapper().registerModule(new JavaTimeModule()), true);
 
     @InjectMocks
     private GaCaseEventService gaCaseEventService;

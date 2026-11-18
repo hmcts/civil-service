@@ -39,7 +39,7 @@ public class CaseworkerCaseEventServiceTest {
 
     @Spy
     private CaseDataDateNormaliser dateNormaliser =
-        new CaseDataDateNormaliser(new ObjectMapper().registerModule(new JavaTimeModule()));
+        new CaseDataDateNormaliser(new ObjectMapper().registerModule(new JavaTimeModule()), true);
 
     @InjectMocks
     private CaseworkerCaseEventService caseworkerCaseEventService;

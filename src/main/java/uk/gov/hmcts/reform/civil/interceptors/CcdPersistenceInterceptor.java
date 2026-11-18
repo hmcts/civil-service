@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.interceptors;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -17,6 +18,7 @@ import java.io.IOException;
  * enough: the caller must also be data-store.
  */
 @Slf4j
+@ConditionalOnProperty(name = "civil.decentralised.enabled", havingValue = "true")
 @Component
 public class CcdPersistenceInterceptor implements HandlerInterceptor {
 

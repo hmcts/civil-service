@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CaseDataDateNormaliserTest {
 
     private final CaseDataDateNormaliser normaliser =
-        new CaseDataDateNormaliser(new ObjectMapper().registerModule(new JavaTimeModule()));
+        new CaseDataDateNormaliser(new ObjectMapper().registerModule(new JavaTimeModule()), true);
 
     @Test
     void writesADateTimeSentForADateFieldAsADate() {
@@ -46,6 +46,17 @@ class CaseDataDateNormaliserTest {
         );
 
         assertThat(normaliser.normalise(updates, CaseData.class)).isEqualTo(updates);
+    }
+
+    @Test
+    void sendsTheUpdatesAsTheyCameWhenCasesAreNotDecentralised() {
+        CaseDataDateNormaliser centralised =
+            new CaseDataDateNormaliser(new ObjectMapper().registerModule(new JavaTimeModule()), false);
+        Map<String, Object> updates = Map.of(
+            "respondToClaimAdmitPartLRspec", Map.of("whenWillThisAmountBePaid", "2026-11-24T00:00:00.000Z")
+        );
+
+        assertThat(centralised.normalise(updates, CaseData.class)).isSameAs(updates);
     }
 
     @Test

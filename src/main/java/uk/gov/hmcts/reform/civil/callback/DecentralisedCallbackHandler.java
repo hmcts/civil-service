@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.PathContainer;
@@ -38,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.helpers.CaseTypeIdentifier.isGeneralAppl
  * the case's data back, which CCD reads as an update, and refuses to a user who cannot update the field.
  */
 @Slf4j
+@ConditionalOnProperty(name = "civil.decentralised.enabled", havingValue = "true")
 @Component
 @RequiredArgsConstructor
 public class DecentralisedCallbackHandler implements JsonCallbackHandler {
