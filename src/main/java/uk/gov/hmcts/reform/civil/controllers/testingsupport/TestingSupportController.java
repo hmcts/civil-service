@@ -65,6 +65,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsPostcodeMapper;
 
 import java.util.List;
 
@@ -76,6 +77,8 @@ import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
 @RequiredArgsConstructor
 @ConditionalOnExpression("${testing.support.enabled:false}")
 public class TestingSupportController {
+
+    private final RoboticsPostcodeMapper roboticsPostcodeMapper;
 
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
@@ -205,7 +208,7 @@ public class TestingSupportController {
         produces = "application/json")
     public String getRPAJsonInformationForCaseData(
         @RequestBody CaseData caseData) throws JsonProcessingException {
-        return roboticsDataMapper.toRoboticsCaseData(caseData, getSystemUserToken()).toJsonString();
+        return roboticsPostcodeMapper.prepareJson(roboticsDataMapper.toRoboticsCaseData(caseData, getSystemUserToken()));
     }
 
     @PostMapping(
@@ -213,7 +216,7 @@ public class TestingSupportController {
         produces = "application/json")
     public String getRPAJsonInformationForSpecCaseData(
         @RequestBody CaseData caseData) throws JsonProcessingException {
-        return roboticsSpecDataMapper.toRoboticsCaseData(caseData, getSystemUserToken()).toJsonString();
+        return roboticsPostcodeMapper.prepareJson(roboticsSpecDataMapper.toRoboticsCaseData(caseData, getSystemUserToken()));
     }
 
     @PostMapping(

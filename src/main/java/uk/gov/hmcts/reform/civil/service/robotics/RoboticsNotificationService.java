@@ -109,8 +109,7 @@ public class RoboticsNotificationService {
             roboticsCaseDataDTO = getRoboticsCaseDataDTOForSpec(caseData, authToken);
         } else {
             RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData, authToken);
-            roboticsPostcodeMapper.mapPostcodes(roboticsCaseData.getLitigiousParties(), roboticsCaseData.getSolicitors());
-            roboticsCaseDataDTO = new RoboticsCaseDataDTO(roboticsCaseData.toJsonString().getBytes(), roboticsCaseData.getEvents());
+            roboticsCaseDataDTO = new RoboticsCaseDataDTO(roboticsPostcodeMapper.prepareJson(roboticsCaseData).getBytes(), roboticsCaseData.getEvents());
         }
         return roboticsCaseDataDTO;
     }
@@ -118,8 +117,7 @@ public class RoboticsNotificationService {
     private RoboticsCaseDataDTO getRoboticsCaseDataDTOForSpec(CaseData caseData, String authToken) throws JsonProcessingException {
         RoboticsCaseDataDTO roboticsCaseDataDTO;
         RoboticsCaseDataSpec roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData, authToken);
-        roboticsPostcodeMapper.mapPostcodes(roboticsCaseDataSpec.getLitigiousParties(), roboticsCaseDataSpec.getSolicitors());
-        roboticsCaseDataDTO = new RoboticsCaseDataDTO(roboticsCaseDataSpec.toJsonString().getBytes(), roboticsCaseDataSpec.getEvents());
+        roboticsCaseDataDTO = new RoboticsCaseDataDTO(roboticsPostcodeMapper.prepareJson(roboticsCaseDataSpec).getBytes(), roboticsCaseDataSpec.getEvents());
         return roboticsCaseDataDTO;
     }
 

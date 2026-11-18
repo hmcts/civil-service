@@ -56,10 +56,12 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSp
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsPostcodeMapper;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
+import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -124,6 +126,8 @@ class RoboticsNotificationServiceTest {
     FeatureToggleService featureToggleService;
     @MockBean
     PostcodeLookupService postcodeLookupService;
+    @MockBean
+    JsonSchemaValidationService schemaValidationService;
 
     @Captor
     private ArgumentCaptor<EmailData> emailDataArgumentCaptor;
@@ -151,7 +155,7 @@ class RoboticsNotificationServiceTest {
 
     @BeforeEach
     void setup() {
-        when(postcodeLookupService.validatePostCodeForDefendant(anyString())).thenReturn(true);
+        when(postcodeLookupService.findCountryForPostcode(anyString())).thenReturn(Optional.of("England"));
         localDateTime = LocalDateTime.of(2020, 8, 1, 12, 0, 0);
         when(time.now()).thenReturn(localDateTime);
     }
@@ -213,7 +217,7 @@ class RoboticsNotificationServiceTest {
         build.setLitigiousParties(List.of(new LitigiousParty()
             .setAddresses(new RoboticsAddresses()
                 .setContactAddress(overseasAddress))));
-        when(postcodeLookupService.validatePostCodeForDefendant("EH11AA")).thenReturn(false);
+        when(postcodeLookupService.findCountryForPostcode("EH11AA")).thenReturn(Optional.of("Scotland"));
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
 
         // When
