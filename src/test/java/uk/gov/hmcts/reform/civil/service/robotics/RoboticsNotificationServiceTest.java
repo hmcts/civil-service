@@ -162,8 +162,11 @@ class RoboticsNotificationServiceTest {
     @Test
     void invalidFinalPayloadPreventsEmail() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-        when(schemaValidationService.validate(anyString())).thenReturn(java.util.Set.of(
-            com.networknt.schema.ValidationMessage.builder().message("Invalid payload").build()));
+        caseData.setCaseAccessCategory(SPEC_CLAIM);
+        when(schemaValidationService.validate(anyString())).thenAnswer(invocation ->
+            new JsonSchemaValidationService().validate(invocation.getArgument(0, String.class)));
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN))
+            .thenReturn(new RoboticsCaseDataSpec());
 
         assertThrows(uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException.class,
                      () -> service.notifyRobotics(caseData, false, BEARER_TOKEN));

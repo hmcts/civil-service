@@ -33,7 +33,10 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @RequiredArgsConstructor
 public class RoboticsPostcodeMapper {
 
-    private static final Pattern OUTSIDE_POSTCODE = Pattern.compile("(?:BT|JE|GY|IM|AB|EH|G|KW)\\d{1,2}\\d[A-Z]{2}");
+    private static final Pattern OUTSIDE_POSTCODE = Pattern.compile(
+        "(?:BT|JE|GY|IM|AB|DD|EH|FK|G|HS|IV|KA|KW|KY|ML|PA|PH|ZE)\\d{1,2}\\d[A-Z]{2}");
+
+    private static final Pattern BORDER_POSTCODE = Pattern.compile("(?:CA|DG|TD)\\d{1,2}\\d[A-Z]{2}");
 
     private static final Set<String> OUTSIDE_COUNTRIES = Locale.getISOCountries(Locale.IsoCountryCode.PART1_ALPHA2)
         .stream().filter(code -> !"GB".equals(code))
@@ -58,6 +61,8 @@ public class RoboticsPostcodeMapper {
             mapPostcodes(data.getLitigiousParties(), data.getSolicitors());
         } else if (payload instanceof RoboticsCaseDataSpec data) {
             mapPostcodes(data.getLitigiousParties(), data.getSolicitors());
+        } else {
+            throw new IllegalArgumentException("Expected a specified or unspecified RPA payload");
         }
         return payload.toJsonString();
     }
@@ -97,6 +102,9 @@ public class RoboticsPostcodeMapper {
                 relocatePostcode(address, postcode);
                 return;
             }
+            if (!BORDER_POSTCODE.matcher(lookupPostcode).matches()) {
+                return;
+            }
             country = Objects.toString(countries.get(lookupPostcode, key -> postcodeLookupService
                 .findCountryForPostcode(key).map(name -> name.trim().toUpperCase(Locale.UK)).orElse(null)), "");
         }
@@ -108,19 +116,23 @@ public class RoboticsPostcodeMapper {
     private void relocatePostcode(RoboticsAddress address, String postcode) {
         String line3 = address.getAddressLine3();
         String combined = isBlank(line3) ? postcode : line3 + " - " + postcode;
-        if (combined.length() <= 35) {
+        if (combined.length() <= AddressLinesMapper.LINE_LIMIT) {
             address.setAddressLine3(combined);
             address.setPostCode(null);
             return;
         }
 
-        if (postcode.length() <= 35 && isBlank(address.getAddressLine5())) {
+        if (postcode.length() <= AddressLinesMapper.LINE_LIMIT && isBlank(address.getAddressLine5())) {
             if (isBlank(address.getAddressLine4())) {
                 address.setAddressLine4(postcode);
             } else {
                 address.setAddressLine5(postcode);
             }
-        } else if (address.getAddressLine5() != null && (address.getAddressLine5() + " - " + postcode).length() <= 35) {
+        } else if (postcode.length() <= AddressLinesMapper.LINE_LIMIT && isBlank(address.getAddressLine4())
+            && address.getAddressLine5().length() <= AddressLinesMapper.LINE_LIMIT) {
+            address.setAddressLine4(address.getAddressLine5());
+            address.setAddressLine5(postcode);
+        } else if (address.getAddressLine5() != null && (address.getAddressLine5() + " - " + postcode).length() <= AddressLinesMapper.LINE_LIMIT) {
             address.setAddressLine5(address.getAddressLine5() + " - " + postcode);
         } else {
             log.warn("RPA postcode relocation exceeds address capacity; retaining the original address");

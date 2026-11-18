@@ -20,7 +20,7 @@ import static java.util.Objects.requireNonNull;
 @Component
 public class AddressLinesMapper {
 
-    private static final int LINE_LIMIT = 35;
+    static final int LINE_LIMIT = 35;
     private static final String STRING_EMPTY = "";
     private static final String STRING_SPACE = " ";
     private static final String STRING_COMMA = ",";
