@@ -226,7 +226,6 @@ withNightlyPipeline(type, product, component) {
   env.PLAYWRIGHT_BOOTSTRAP_TEST_RESULTS_DIR = 'civil-service-bootstrap'
   env.PLAYWRIGHT_SMOKE_TEST_RESULTS_DIR = 'civil-service-nightly-smoke'
   env.PLAYWRIGHT_FUNCTIONAL_TEST_RESULTS_DIR = 'civil-service-nightly'
-  env.GRADLE_OPTS = "-Dorg.gradle.workers.max=3"
   env.FORCE_GREEN_BUILD=params.FORCE_GREEN_BUILD
   env.RUN_FAILED_TESTS=params.RUN_FAILED_TESTS
   env.PLAYWRIGHT_WORKERS=params.PLAYWRIGHT_WORKERS
