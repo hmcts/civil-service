@@ -71,6 +71,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -166,7 +167,7 @@ class RoboticsNotificationServiceTest {
     @ValueSource(booleans = {true, false})
     void invalidFinalPayloadPreventsEmail(boolean specified) {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-        var unspecMapper = org.mockito.Mockito.mock(RoboticsDataMapperForUnspec.class);
+        var unspecMapper = mock(RoboticsDataMapperForUnspec.class);
         if (specified) {
             caseData.setCaseAccessCategory(SPEC_CLAIM);
             when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN))
