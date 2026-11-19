@@ -90,20 +90,7 @@ public class GenerateJsonAndTransferTaskHandler extends GenerateMediationFileAnd
                 List<MediationCase> casesList = new ArrayList<>();
                 List<CaseData> successfulCases = new ArrayList<>();
                 for (CaseData caseData : inMediationCases) {
-                    try {
-                        MediationCase mediationCase = generateJsonForCase(caseData);
-                        casesList.add(mediationCase);
-                        successfulCases.add(caseData);
-                    } catch (Exception e) {
-                        log.error("Generate mediation JSON failed for case with id: '{}'",
-                                  caseData.getCcdCaseReference(), e);
-                        caseTaskTrackingService.trackCaseTask(
-                            caseData.getCcdCaseReference().toString(),
-                            SUBJECT,
-                            FILENAME,
-                            null
-                        );
-                    }
+                    addGeneratedCase(caseData, casesList, successfulCases);
                 }
 
                 if (casesList.isEmpty()) {
@@ -123,6 +110,25 @@ public class GenerateJsonAndTransferTaskHandler extends GenerateMediationFileAnd
             log.error(e.getMessage());
         }
         return new ExternalTaskData();
+    }
+
+    private void addGeneratedCase(CaseData caseData,
+                                  List<MediationCase> casesList,
+                                  List<CaseData> successfulCases) {
+        try {
+            MediationCase mediationCase = generateJsonForCase(caseData);
+            casesList.add(mediationCase);
+            successfulCases.add(caseData);
+        } catch (Exception e) {
+            log.error("Generate mediation JSON failed for case with id: '{}'",
+                      caseData.getCcdCaseReference(), e);
+            caseTaskTrackingService.trackCaseTask(
+                caseData.getCcdCaseReference().toString(),
+                SUBJECT,
+                FILENAME,
+                null
+            );
+        }
     }
 
     private Optional<EmailData> prepareEmail(MediationDTO mediationDTO) {
