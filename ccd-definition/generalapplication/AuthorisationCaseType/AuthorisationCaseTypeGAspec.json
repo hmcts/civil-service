@@ -1,0 +1,31 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "UserRoles": [
+      "caseworker-civil-systemupdate",
+      "caseworker-caa"
+    ],
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "UserRoles": [
+      "caseworker-civil-admin",
+      "caseworker-civil-staff",
+      "caseworker-civil-solicitor",
+      "judge-profile",
+      "civil-administrator-standard",
+      "legal-adviser"
+    ],
+    "CRUD": "RU"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "UserRoles": [
+      "civil-administrator-basic",
+      "ga-basic-access",
+      "caseworker-ras-validation"
+    ],
+    "CRUD": "R"
+  }
+]

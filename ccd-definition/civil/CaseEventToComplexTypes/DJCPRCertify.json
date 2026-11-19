@@ -1,0 +1,10 @@
+[
+  {
+    "ID": "CPRCertifyElectionDJ",
+    "CaseEventID": "DEFAULT_JUDGEMENT",
+    "CaseFieldID": "CPRCertifyElectionDJ",
+    "ListElementCode": "CPRCertifyElectionDJ",
+    "ElementLabel": "Choose your preferred type of hearing",
+    "DisplayContext": "MANDATORY"
+  }
+]

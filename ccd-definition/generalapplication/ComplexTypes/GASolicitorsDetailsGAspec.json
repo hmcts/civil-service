@@ -1,0 +1,23 @@
+[
+  {
+    "ID": "GASolicitorsDetailsGAspec",
+    "ListElementCode": "caseDataId",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GASolicitorsDetailsGAspec",
+    "ListElementCode": "userId",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GASolicitorsDetailsGAspec",
+    "ListElementCode": "caseRole",
+    "FieldType": "Text",
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  }
+]

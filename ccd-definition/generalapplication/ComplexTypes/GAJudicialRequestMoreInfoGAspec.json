@@ -1,0 +1,51 @@
+[
+  {
+    "ID": "GAJudicialRequestMoreInfoGAspec",
+    "ListElementCode": "requestMoreInfoOption",
+    "ElementLabel": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "GAJudgeRequestMoreInfoOptionGAspec",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "isWithNotice=\"No\""
+  },
+  {
+    "ID": "GAJudicialRequestMoreInfoGAspec",
+    "ListElementCode": "judgeRequestMoreInfoText",
+    "ElementLabel": "Enter the information required",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "requestMoreInfoOption=\"REQUEST_MORE_INFORMATION\" OR isWithNotice=\"Yes\""
+  },
+  {
+    "ID": "GAJudicialRequestMoreInfoGAspec",
+    "ListElementCode": "judgeRecitalText",
+    "ElementLabel": "Judge’s recital",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "requestMoreInfoOption=\"REQUEST_MORE_INFORMATION\" OR isWithNotice=\"Yes\""
+  },
+  {
+    "ID": "GAJudicialRequestMoreInfoGAspec",
+    "ListElementCode": "judgeRequestMoreInfoByDate",
+    "ElementLabel": "When should this application be referred to a Judge again?",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "requestMoreInfoOption=\"REQUEST_MORE_INFORMATION\" OR isWithNotice=\"Yes\""
+  },
+  {
+    "ID": "GAJudicialRequestMoreInfoGAspec",
+    "ListElementCode": "deadlineForMoreInfoSubmission",
+    "ElementLabel": " ",
+    "FieldType": "DateTime",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "requestMoreInfoOption=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "ID": "GAJudicialRequestMoreInfoGAspec",
+    "ListElementCode": "isWithNotice",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "requestMoreInfoOption=\"DO_NOT_SHOW_IN_UI\""
+  }
+]

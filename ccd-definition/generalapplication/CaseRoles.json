@@ -1,0 +1,98 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "[APPLICANTSOLICITORONE]",
+    "Name": "Applicant Solicitor 1",
+    "Description": "Applicant Solicitor 1 role",
+    "JurisdictionID": "CIVIL",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "[APPLICANTSOLICITORTWO]",
+    "Name": "Applicant Solicitor 2",
+    "Description": "Applicant Solicitor 2 role",
+    "JurisdictionID": "CIVIL",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "[RESPONDENTSOLICITORONE]",
+    "Name": "Respondent Solicitor 1",
+    "Description": "Respondent Solicitor 1 role",
+    "JurisdictionID": "CIVIL",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "[RESPONDENTSOLICITORTWO]",
+    "Name": "Respondent Solicitor 2",
+    "Description": "Respondent Solicitor 2 role",
+    "JurisdictionID": "CIVIL",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "[APPLICANTSOLICITORONESPEC]",
+    "Name": "Applicant Spec Solicitor 1",
+    "Description": "Applicant Solicitor 1 role spec",
+    "JurisdictionID": "CIVIL",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "[APPLICANTSOLICITORTWOSPEC]",
+    "Name": "Applicant Spec Solicitor 2",
+    "Description": "Applicant Solicitor 2 role spec",
+    "JurisdictionID": "CIVIL",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "[RESPONDENTSOLICITORONESPEC]",
+    "Name": "Respondent Spec Solicitor 1",
+    "Description": "Respondent Solicitor 1 role spec",
+    "JurisdictionID": "CIVIL",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "[RESPONDENTSOLICITORTWOSPEC]",
+    "Name": "Respondent Spec Solicitor 2",
+    "Description": "Respondent Solicitor 2 role spec",
+    "JurisdictionID": "CIVIL",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "[CREATOR]",
+    "Name": "Creator",
+    "Description": "Creator of case",
+    "JurisdictionID": "CIVIL",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "[JUDGE]",
+    "Name": "Judge",
+    "Description": "Judge",
+    "JurisdictionID": "CIVIL",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "[CLAIMANT]",
+    "Name": "CUI Claimant",
+    "Description": "CUI Claimant role spec",
+    "JurisdictionID": "CIVIL",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ID": "[DEFENDANT]",
+    "Name": "CUI Defendant",
+    "Description": "CUI Defendant role spec",
+    "JurisdictionID": "CIVIL",
+    "SecurityClassification": "Public"
+  }
+]

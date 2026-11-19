@@ -1,0 +1,35 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "assistedOrderAppealFirstOptionLabelA",
+    "ID": "AssistedOrderAppealFirstOptionRefused",
+    "ElementLabel": "at the appropriate appeal centre prescribed in  \n\n<a target=\"_blank\" href=\"https://www.justice.gov.uk/courts/procedure-rules/civil/rules/part52/practice-direction-52b-appeals-in-the-county-courts-and-high-court\">CPR52PDB Table A.</a> \n\n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "assistedOrderAppealFirstOptionLabel2A",
+    "ID": "AssistedOrderAppealFirstOptionRefused",
+    "ElementLabel": "Any further application for permission to appeal shall be made to the above appeal centre and heard by a  Circuit Judge of the County Court.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "assistedOrderAppealFirstOptionDateLabelA",
+    "ID": "AssistedOrderAppealFirstOptionRefused",
+    "ElementLabel": "### The appellant's notice, including any further application for permission to appeal, shall be filed no later than 4pm on",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "assistedOrderAppealDate",
+    "ID": "AssistedOrderAppealFirstOptionRefused",
+    "ElementLabel": " ",
+    "HintText": "For example, 16 4 2021",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
+  }
+]

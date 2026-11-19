@@ -1,0 +1,100 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "EVIDENCE_UPLOAD_APPLICANT",
+    "CaseFieldID": "disclosureLabel",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "DocumentSelectionFastTrack",
+    "PageDisplayOrder": 3,
+    "PageLabel": "Select the type of document you would like to upload",
+    "ShowSummaryChangeOption": "N",
+    "PageShowCondition": "caseProgAllocatedTrack = \"FAST_CLAIM\" OR caseProgAllocatedTrack = \"MULTI_CLAIM\" OR caseProgAllocatedTrack = \"INTERMEDIATE_CLAIM\"",
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/createShowCondition"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "EVIDENCE_UPLOAD_APPLICANT",
+    "CaseFieldID": "bundleLabel",
+    "PageFieldDisplayOrder": 13,
+    "DisplayContext": "READONLY",
+    "PageID": "DocumentSelectionFastTrack",
+    "FieldShowCondition": "caseProgAllocatedTrack = \"MULTI_CLAIM\" OR caseProgAllocatedTrack = \"INTERMEDIATE_CLAIM\"",
+    "RetainHiddenValue": "Y",
+    "PageDisplayOrder": 3,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "EVIDENCE_UPLOAD_APPLICANT",
+    "CaseFieldID": "bundleSelectionEvidence",
+    "PageFieldDisplayOrder": 14,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "DocumentSelectionFastTrack",
+    "FieldShowCondition": "caseProgAllocatedTrack = \"MULTI_CLAIM\" OR caseProgAllocatedTrack = \"INTERMEDIATE_CLAIM\"",
+    "RetainHiddenValue": "Y",
+    "PageDisplayOrder": 3,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "EVIDENCE_UPLOAD_APPLICANT",
+    "CaseFieldID": "bundleEvidence",
+    "PageFieldDisplayOrder": 17,
+    "DisplayContext": "MANDATORY",
+    "PageID": "DocumentUpload",
+    "PageDisplayOrder": 4,
+    "ShowSummaryChangeOption": "Y",
+    "RetainHiddenValue": "Y",
+    "FieldShowCondition":"bundleSelectionEvidence CONTAINS \"BUNDLE_UPLOAD\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "EVIDENCE_UPLOAD_RESPONDENT",
+    "CaseFieldID": "disclosureLabelRes",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "DocumentSelectionFastTrack",
+    "PageDisplayOrder": 3,
+    "PageLabel": "Select the type of document you would like to upload",
+    "ShowSummaryChangeOption": "N",
+    "PageShowCondition": "caseProgAllocatedTrack = \"FAST_CLAIM\" OR caseProgAllocatedTrack = \"MULTI_CLAIM\" OR caseProgAllocatedTrack = \"INTERMEDIATE_CLAIM\"",
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/createShowCondition"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "EVIDENCE_UPLOAD_RESPONDENT",
+    "CaseFieldID": "bundleLabel",
+    "PageFieldDisplayOrder": 13,
+    "DisplayContext": "READONLY",
+    "PageID": "DocumentSelectionFastTrack",
+    "FieldShowCondition": "caseProgAllocatedTrack = \"MULTI_CLAIM\" OR caseProgAllocatedTrack = \"INTERMEDIATE_CLAIM\"",
+    "RetainHiddenValue": "Y",
+    "PageDisplayOrder": 3,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "EVIDENCE_UPLOAD_RESPONDENT",
+    "CaseFieldID": "bundleSelectionEvidence",
+    "PageFieldDisplayOrder": 14,
+    "DisplayContext": "OPTIONAL",
+    "PageID": "DocumentSelectionFastTrack",
+    "FieldShowCondition": "caseProgAllocatedTrack = \"MULTI_CLAIM\" OR caseProgAllocatedTrack = \"INTERMEDIATE_CLAIM\"",
+    "RetainHiddenValue": "Y",
+    "PageDisplayOrder": 3,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "EVIDENCE_UPLOAD_RESPONDENT",
+    "CaseFieldID": "bundleEvidence",
+    "PageFieldDisplayOrder": 17,
+    "DisplayContext": "MANDATORY",
+    "PageID": "DocumentUpload",
+    "PageDisplayOrder": 4,
+    "ShowSummaryChangeOption": "Y",
+    "RetainHiddenValue": "Y",
+    "FieldShowCondition":"bundleSelectionEvidence CONTAINS \"BUNDLE_UPLOAD\""
+  }
+]
