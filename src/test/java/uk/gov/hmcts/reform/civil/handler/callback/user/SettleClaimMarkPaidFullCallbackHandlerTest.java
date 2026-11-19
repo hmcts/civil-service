@@ -131,6 +131,30 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
             assertThat(response.getState()).isNull();
         }
 
+        @Test
+        void should_clear_judgment_online_data_when_marking_a_pending_judgment_paid_in_full() {
+            CaseData caseData = CaseDataBuilder.builder().atStateJudgmentRequested().build();
+            caseData.setJoDJCreatedDate(java.time.LocalDateTime.now());
+            caseData.setMarkPaidForAllClaimants(YesOrNo.YES);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+
+            assertThat(caseData.getJoDJCreatedDate()).isNull();
+        }
+
+        @Test
+        void should_preserve_judgment_online_data_when_not_marking_a_pending_judgment_paid_in_full() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            caseData.setJoDJCreatedDate(java.time.LocalDateTime.now());
+            caseData.setMarkPaidForAllClaimants(YesOrNo.YES);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+
+            assertThat(caseData.getJoDJCreatedDate()).isNotNull();
+        }
+
     }
 
     @Nested

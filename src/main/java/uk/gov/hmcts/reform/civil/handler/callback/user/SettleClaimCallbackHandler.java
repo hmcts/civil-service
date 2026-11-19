@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
@@ -24,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARENT_CLAIM_SETTLED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDGMENT_REQUESTED;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +57,9 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse saveJudgmentPaidInFullDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        CaseState previousCCDState = callbackParams.getCaseData().getCcdState();
+
+        clearPendingJudgmentRequestIfRequired(caseData, previousCCDState);
         caseData.setPreviousCCDState(callbackParams.getCaseData().getCcdState());
 
         deleteMainCaseDashboardNotifications(caseData);
@@ -97,6 +103,12 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
         if (caseData.isRespondent1LiP()) {
             dashboardNotificationService.deleteByReferenceAndCitizenRole(
                 caseData.getCcdCaseReference().toString(), DEFENDANT);
+        }
+    }
+
+    private void clearPendingJudgmentRequestIfRequired(CaseData caseData, CaseState previousCaseState) {
+        if (JUDGMENT_REQUESTED.equals(previousCaseState)) {
+            JudgmentsOnlineHelper.clearJOCaseData(caseData);
         }
     }
 }
