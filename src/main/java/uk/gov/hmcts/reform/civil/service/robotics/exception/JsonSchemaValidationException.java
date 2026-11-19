@@ -14,6 +14,6 @@ public class JsonSchemaValidationException extends RuntimeException {
 
     public JsonSchemaValidationException(String message, Set<ValidationMessage> errors) {
         super(message);
-        log.error("Schema validation errors: {}", errors);
+        log.error("{}: {}", message, errors);
     }
 }

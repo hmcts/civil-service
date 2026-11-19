@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,8 @@ import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
 import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
+import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
+import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.postcode.PostcodeLookupService;
@@ -159,19 +162,27 @@ class RoboticsNotificationServiceTest {
         when(time.now()).thenReturn(localDateTime);
     }
 
-    @Test
-    void invalidFinalPayloadPreventsEmail() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void invalidFinalPayloadPreventsEmail(boolean specified) {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-        caseData.setCaseAccessCategory(SPEC_CLAIM);
-        when(schemaValidationService.validate(anyString())).thenAnswer(invocation ->
-            new JsonSchemaValidationService().validate(invocation.getArgument(0, String.class)));
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN))
-            .thenReturn(new RoboticsCaseDataSpec());
+        var unspecMapper = org.mockito.Mockito.mock(RoboticsDataMapperForUnspec.class);
+        if (specified) {
+            caseData.setCaseAccessCategory(SPEC_CLAIM);
+            when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN))
+                .thenReturn(new RoboticsCaseDataSpec());
+        } else {
+            caseData.setCaseAccessCategory(uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM);
+            when(unspecMapper.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(new RoboticsCaseData());
+        }
+        var sender = new RoboticsNotificationService(sendGridClient, emailConfiguration, unspecMapper,
+            roboticsDataMapperForSpec, featureToggleService, new RoboticsPostcodeMapper(postcodeLookupService),
+            new JsonSchemaValidationService());
 
-        assertThrows(uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException.class,
-                     () -> service.notifyRobotics(caseData, false, BEARER_TOKEN));
+        var error = assertThrows(JsonSchemaValidationException.class,
+                                 () -> sender.notifyRobotics(caseData, false, BEARER_TOKEN));
 
-        verify(schemaValidationService).validate(anyString());
+        assertThat(error.getMessage()).isEqualTo("Invalid RPA Json payload for " + caseData.getLegacyCaseReference());
         org.mockito.Mockito.verifyNoInteractions(sendGridClient);
     }
 
