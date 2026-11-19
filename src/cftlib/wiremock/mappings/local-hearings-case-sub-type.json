@@ -1,0 +1,74 @@
+{
+  "priority": 5,
+  "request": {
+    "method": "GET",
+    "urlPath": "/refdata/commondata/lov/categories/caseSubType",
+    "queryParameters": {
+      "serviceId": {
+        "matches": "AAA[67]"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "list_of_values": [
+        {
+          "category_key": "caseSubType",
+          "key": "{{request.query.serviceId}}-SMALL_CLAIM",
+          "value_en": "Small Claims",
+          "value_cy": "Hawliadau Bychain",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": 1,
+          "parent_category": "caseType",
+          "parent_key": "{{request.query.serviceId}}-SMALL_CLAIM",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "caseSubType",
+          "key": "{{request.query.serviceId}}-FAST_CLAIM",
+          "value_en": "Fast Track",
+          "value_cy": "Llwybr Carlam",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": 2,
+          "parent_category": "caseType",
+          "parent_key": "{{request.query.serviceId}}-FAST_CLAIM",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "caseSubType",
+          "key": "{{request.query.serviceId}}-INTERMEDIATE_CLAIM",
+          "value_en": "Intermediate Track",
+          "value_cy": "Llwybr Canolradd",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": 3,
+          "parent_category": "caseType",
+          "parent_key": "{{request.query.serviceId}}-INTERMEDIATE_CLAIM",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "caseSubType",
+          "key": "{{request.query.serviceId}}-MULTI_CLAIM",
+          "value_en": "Multi Track",
+          "value_cy": "Llwybr Aml-drywydd",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": 4,
+          "parent_category": "caseType",
+          "parent_key": "{{request.query.serviceId}}-MULTI_CLAIM",
+          "active_flag": "Y",
+          "child_nodes": null
+        }
+      ]
+    }
+  }
+}
