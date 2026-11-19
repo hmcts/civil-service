@@ -68,8 +68,9 @@ public class RequestAHearingCallbackHandler extends CallbackHandler {
 
     private CallbackResponse startDashboardUpdate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        boolean isReturningFromDecisionOutcome = CaseState.DECISION_OUTCOME.toString()
-            .equals(callbackParams.getRequest().getCaseDetails().getState());
+        var previousCaseDetails = callbackParams.getRequest().getCaseDetailsBefore();
+        boolean isReturningFromDecisionOutcome = previousCaseDetails != null
+            && CaseState.DECISION_OUTCOME.name().equals(previousCaseDetails.getState());
         if (isReturningFromDecisionOutcome) {
             caseData.setBusinessProcess(BusinessProcess.ready(HEARING_SCHEDULED_RETRIGGER));
         }
