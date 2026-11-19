@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.exceptions.UpstreamUnavailableException;
 import java.net.ConnectException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -35,6 +36,8 @@ public final class CallbackFailureClassifier {
 
     private static final Pattern RETRYABLE_CALLBACK_ERROR =
         Pattern.compile("\"callbackErrors\"\\s*:\\s*\\[\\s*\"" + Pattern.quote(RETRYABLE));
+    private static final Pattern NOT_RETRYABLE_CALLBACK_ERROR =
+        Pattern.compile("\"callbackErrors\"\\s*:\\s*\\[\\s*\"(" + Pattern.quote(NOT_RETRYABLE) + "(?:[^\"\\\\]|\\\\.)*)\"");
 
     static final String DOCMOSIS_RENDER_PATH = "/rs/render";
     static final String REF_DATA_HOST = "rd-professional-api";
@@ -90,6 +93,18 @@ public final class CallbackFailureClassifier {
         }
         String body = exception.contentUTF8();
         return StringUtils.isNotBlank(body) && RETRYABLE_CALLBACK_ERROR.matcher(body).find();
+    }
+
+    /**
+     * The NOT RETRYABLE callback error in a CCD response body (for example a failed external task's
+     * error details), or null if the first callback error is not labelled NOT RETRYABLE.
+     */
+    public static String notRetryableCallbackError(String ccdResponseBody) {
+        if (StringUtils.isBlank(ccdResponseBody)) {
+            return null;
+        }
+        Matcher matcher = NOT_RETRYABLE_CALLBACK_ERROR.matcher(ccdResponseBody);
+        return matcher.find() ? matcher.group(1).replace("\\\"", "\"") : null;
     }
 
     /**

@@ -512,6 +512,79 @@ class IncidentRetryEventHandlerTest {
     }
 
     // Helper methods
+    // DTSCCI-7107: the incident message is cut off before CCD's callbackErrors, so the handler reads the
+    // failed external task's full error details.
+    private static final String CUT_OFF_MESSAGE = "[422 ] during [POST] to [http://ccd-data-store-api/cases/1/events]: "
+        + "[{\"exception\":\"uk.gov.hmcts.ccd.endpoint.exceptions.ApiException\",\"status\":422,"
+        + "\"message\":\"Unable to proceed because there are one or more callback Errors or Warnings\",\"pa... (659 bytes)]";
+
+    private CamundaIncident runSingleFailedExternalTaskIncident(String errorDetails) {
+        CamundaIncident incident = newIncident("proc1", "inc1", "task1");
+        incident.setIncidentType("failedExternalTask");
+        incident.setIncidentMessage(CUT_OFF_MESSAGE);
+
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
+            .thenReturn(List.of(newProcessInstance("proc1")));
+        when(casesStuckCheckSearchService.getCases("7")).thenReturn(Collections.emptySet());
+        when(camundaRuntimeApi.getProcessVariables("proc1", "serviceAuth"))
+            .thenReturn(processVariables("1777000000000001", "CASE_PROGRESSION", "CASE_EVENT"));
+        doReturn(List.of(incident), List.of()).when(camundaRuntimeApi).getLatestOpenIncidentForProcessInstance(
+            any(), anyBoolean(), eq("proc1"), any(), any(), anyInt());
+        if (errorDetails == null) {
+            when(camundaRuntimeApi.getExternalTaskErrorDetails("task1", "serviceAuth"))
+                .thenThrow(new RuntimeException("camunda unavailable"));
+        } else {
+            when(camundaRuntimeApi.getExternalTaskErrorDetails("task1", "serviceAuth")).thenReturn(errorDetails);
+        }
+
+        handler.handleTask(externalTask);
+        return incident;
+    }
+
+    @Test
+    void shouldCompleteActivityWhenAlreadyProcessedIsOnlyInTaskErrorDetails() {
+        runSingleFailedExternalTaskIncident(
+            "{\"status\":422,\"callbackErrors\":[\"Event GENERALAPPLICATION-ASSIGN_GA_ROLES is already processed\"]}");
+
+        verify(camundaRuntimeApi).modifyProcessInstance(
+            eq("serviceAuth"), eq("proc1"), argThat(IncidentRetryEventHandlerTest::matches));
+    }
+
+    @Test
+    void shouldNotRetryNotRetryableIncidentAndRecordTheCause() {
+        runSingleFailedExternalTaskIncident(
+            "{\"status\":422,\"callbackErrors\":[\"NOT RETRYABLE: java.lang.NullPointerException: "
+                + "Cannot invoke \\\"Party.getPartyName()\\\" because respondent1 is null\"]}");
+
+        verify(camundaRuntimeApi, never()).modifyProcessInstance(any(), any(), anyMap());
+        verify(caseTaskTrackingService).trackCaseTask(
+            eq("1777000000000001"),
+            eq("incidentRetry"),
+            eq("StuckCaseDetected"),
+            argThat(properties -> "not_retryable".equals(properties.get("retryStatus"))
+                && ("NOT RETRYABLE: java.lang.NullPointerException: Cannot invoke \"Party.getPartyName()\" "
+                    + "because respondent1 is null").equals(properties.get("retryFailureReason")))
+        );
+    }
+
+    @Test
+    void shouldRetryRetryableIncident() {
+        runSingleFailedExternalTaskIncident(
+            "{\"status\":422,\"callbackErrors\":[\"RETRYABLE: feign.FeignException$BadGateway: [502 Bad Gateway]\"]}");
+
+        verify(camundaRuntimeApi).modifyProcessInstance(
+            eq("serviceAuth"), eq("proc1"), argThat(req -> !matches(req)));
+    }
+
+    @Test
+    void shouldFallBackToIncidentMessageWhenTaskErrorDetailsCannotBeRead() {
+        runSingleFailedExternalTaskIncident(null);
+
+        verify(camundaRuntimeApi).modifyProcessInstance(
+            eq("serviceAuth"), eq("proc1"), argThat(req -> !matches(req)));
+    }
+
     private CamundaProcessInstance newProcessInstance(String id) {
         CamundaProcessInstance pi = new CamundaProcessInstance();
         pi.setId(id);

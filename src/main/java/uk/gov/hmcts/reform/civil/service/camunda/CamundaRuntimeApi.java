@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.camunda;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,6 +61,17 @@ public interface CamundaRuntimeApi {
     @GetMapping("/history/external-task-log/{incidentId}/error-details")
     Map<String, Object> fetchErrorDetails(
         @PathVariable("incidentId") String incidentId,
+        @RequestHeader("ServiceAuthorization") String serviceAuthorization
+    );
+
+    /**
+     * Full error details of a failed external task, as the task handler reported them (for a CCD
+     * rejection, CCD's whole response including callbackErrors). Plain text. The incident message is
+     * cut off and does not reach callbackErrors.
+     */
+    @GetMapping(value = "/external-task/{externalTaskId}/errorDetails", produces = MediaType.TEXT_PLAIN_VALUE)
+    String getExternalTaskErrorDetails(
+        @PathVariable("externalTaskId") String externalTaskId,
         @RequestHeader("ServiceAuthorization") String serviceAuthorization
     );
 
