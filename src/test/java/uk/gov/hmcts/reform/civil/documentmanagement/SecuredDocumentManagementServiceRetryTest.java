@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.util.unit.DataSize;
@@ -60,7 +60,7 @@ import static org.mockito.Mockito.when;
         DocumentManagementConfiguration.class, Tika.class})
 class SecuredDocumentManagementServiceRetryTest {
 
-    public static final String BEARER_TOKEN = "Bearer Token";
+    static final String BEARER_TOKEN = "Bearer Token";
     private static final String DOCUMENT_PATH = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
 
     // proxyTargetClass = true so the retry proxy is a CGLIB subclass of the concrete service,
@@ -71,15 +71,15 @@ class SecuredDocumentManagementServiceRetryTest {
     static class TestRetryConfig {
     }
 
-    @MockBean
+    @MockitoBean
     private CaseDocumentClientApi caseDocumentClientApi;
-    @MockBean
+    @MockitoBean
     private CaseDocumentBinaryApiClient caseDocumentBinaryApiClient;
-    @MockBean
+    @MockitoBean
     private DocumentDownloadClientApi documentDownloadClient;
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
-    @MockBean
+    @MockitoBean
     private UserService userService;
     @Autowired
     private SecuredDocumentManagementService documentManagementService;
@@ -90,7 +90,7 @@ class SecuredDocumentManagementServiceRetryTest {
         .build();
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         when(authTokenGenerator.generate()).thenReturn(BEARER_TOKEN);
         when(userService.getUserInfo(anyString())).thenReturn(userInfo);
     }
