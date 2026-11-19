@@ -1,0 +1,21 @@
+{
+  "Topics": [
+    {
+      "Name": "hmc-to-cft",
+      "Subscriptions": [
+        {
+          "Name": "hmc-to-civil-subscription",
+          "Rules": [
+            {
+              "Name": "civil-services",
+              "Properties": {
+                "FilterType": "Sql",
+                "SqlFilter": {"SqlExpression": "hmctsServiceId IN ('AAA7','AAA6')"}
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
