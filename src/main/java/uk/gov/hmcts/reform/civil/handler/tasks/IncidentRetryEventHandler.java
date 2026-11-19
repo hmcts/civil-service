@@ -26,6 +26,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -172,35 +173,26 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         String incidentEndTime,
         String incidentMessageLike
     ) {
-        int firstResult = 0;
-        List<CamundaProcessInstance> processInstancesBatch;
+        // Collect every matching process instance before retrying any of them. Retrying an incident resolves
+        // it, so the instance stops matching withIncidents; paging by offset while retrying made the next page
+        // skip the instances that moved up into the first page (2 Nov 2026: up to 50 skipped per extra page).
+        List<String> processInstanceIds = fetchAllProcessInstanceIds(
+            retryContext.serviceAuthorization, incidentStartTime, incidentEndTime, incidentMessageLike
+        );
+        log.info("Found {} process instances with incidents between {} and {}",
+                 processInstanceIds.size(), incidentStartTime, incidentEndTime);
 
-        do {
-            log.info("Calling process instances for {}, {}, {}, {}",
-                     incidentStartTime, incidentEndTime, incidentMessageLike, firstResult);
-            processInstancesBatch = fetchProcessInstances(
-                retryContext.serviceAuthorization, incidentStartTime, incidentEndTime, incidentMessageLike, firstResult
-            );
+        for (int from = 0; from < processInstanceIds.size(); from += PAGE_SIZE) {
+            List<String> batch = processInstanceIds.subList(from, Math.min(from + PAGE_SIZE, processInstanceIds.size()));
 
-            log.info("Extracted process instances for {}, {}, {}, {}",
-                     incidentStartTime, incidentEndTime, incidentMessageLike, firstResult);
-
-            if (processInstancesBatch.isEmpty()) {
-                return;
-            }
-
-            List<String> processInstanceIds = processInstancesBatch.stream()
-                .map(CamundaProcessInstance::getId)
-                .toList();
-
-            log.info("Calling incidents for {} process instances with firstResult {}", processInstanceIds.size(), firstResult);
+            log.info("Calling incidents for {} process instances from {}", batch.size(), from);
 
             List<CamundaIncident> incidents = getLatestIncidentsForProcessInstances(
                 retryContext.serviceAuthorization,
-                processInstanceIds
+                batch
             );
 
-            log.info("Extracted {} incidents with firstResult {}", incidents.size(), firstResult);
+            log.info("Extracted {} incidents from {}", incidents.size(), from);
 
             if (!incidents.isEmpty()) {
                 retryIncidents(
@@ -208,9 +200,36 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                     retryContext
                 );
             }
+        }
+    }
+
+    private List<String> fetchAllProcessInstanceIds(
+        String serviceAuthorization,
+        String incidentStartTime,
+        String incidentEndTime,
+        String incidentMessageLike
+    ) {
+        Set<String> processInstanceIds = new LinkedHashSet<>();
+        int firstResult = 0;
+        List<CamundaProcessInstance> processInstancesBatch;
+
+        do {
+            log.info("Calling process instances for {}, {}, {}, {}",
+                     incidentStartTime, incidentEndTime, incidentMessageLike, firstResult);
+            processInstancesBatch = fetchProcessInstances(
+                serviceAuthorization, incidentStartTime, incidentEndTime, incidentMessageLike, firstResult
+            );
+            log.info("Extracted {} process instances for {}, {}, {}, {}",
+                     processInstancesBatch.size(), incidentStartTime, incidentEndTime, incidentMessageLike, firstResult);
+
+            processInstancesBatch.stream()
+                .map(CamundaProcessInstance::getId)
+                .forEach(processInstanceIds::add);
 
             firstResult += PAGE_SIZE;
         } while (processInstancesBatch.size() == PAGE_SIZE);
+
+        return new ArrayList<>(processInstanceIds);
     }
 
     private void retryIncidents(
