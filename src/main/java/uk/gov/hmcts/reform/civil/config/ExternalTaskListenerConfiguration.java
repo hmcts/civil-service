@@ -139,7 +139,10 @@ public class ExternalTaskListenerConfiguration {
      * The client every listener injects. Routes each subscription to the real clients below, so
      * none of the 39 listeners needs to know there is more than one, or how many.
      */
-    @Bean
+    // Spring infers close() or shutdown() as destroy methods, never stop(). Without this, every
+    // client keeps its subscription thread running after the context closes. In unit tests that
+    // thread has no subscriptions, so it spins on a full core for the life of the test JVM.
+    @Bean(destroyMethod = "stop")
     @Primary
     public ExternalTaskClient client(
         CaseDrivenExternalTaskClients caseDrivenClients,
