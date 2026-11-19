@@ -81,6 +81,17 @@ public final class CallbackFailureClassifier {
     }
 
     /**
+     * A handler's own callback error for a caught failure, labelled like an uncaught one so the Camunda
+     * task and the incident retry scheduler can tell a dependency outage from a permanent fault:
+     * {@code RETRYABLE: Technical error occurred (feign.FeignException$GatewayTimeout: ...)}.
+     */
+    public static String labelledError(String message, Throwable cause) {
+        String label = isTransient(cause) ? RETRYABLE : NOT_RETRYABLE;
+        String detail = cause.getClass().getName() + ": " + StringUtils.defaultString(cause.getMessage());
+        return StringUtils.abbreviate(label + message + " (" + detail + ")", MAX_ERROR_LENGTH);
+    }
+
+    /**
      * True when CCD rejected an event because a callback returned a {@link #RETRYABLE} error. CCD
      * did not save the event, so the caller may retry the submit.
      */

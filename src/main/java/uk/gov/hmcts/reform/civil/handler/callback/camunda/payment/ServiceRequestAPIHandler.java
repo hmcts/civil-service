@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackFailureClassifier;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -88,7 +89,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
                 } catch (FeignException e) {
                     log.error("Failed creating a payment service request for case {}. Http status: {}. Exception: {}",
                               caseData.getCcdCaseReference(), e.status(), e);
-                    errors.add(ERROR_MESSAGE);
+                    errors.add(CallbackFailureClassifier.labelledError(ERROR_MESSAGE, e));
                 }
             }
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -112,7 +113,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
         } catch (FeignException e) {
             log.error("Failed creating a payment service request for case {}. Http status: {}. Exception: {}",
                       caseData.getCcdCaseReference(), e.status(), e);
-            errors.add(ERROR_MESSAGE);
+            errors.add(CallbackFailureClassifier.labelledError(ERROR_MESSAGE, e));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
