@@ -268,11 +268,14 @@ public abstract class BpmnBaseTest {
         String expectedTopicName = externalTask.getTopicName();
         List<LockedExternalTask> lockedProcessTask = fetchAndLockTask(expectedTopicName);
 
-        assertExternalTask(externalTask, expectedTopicName, caseEvent, activityId, lockedProcessTask);
+        assertExternalTask(expectedTopicName, caseEvent, activityId, lockedProcessTask);
 
         completeTask(lockedProcessTask.get(0).getId(), variables);
     }
 
+    // topicName is unused here. The GA bases and existing call sites share this signature,
+    // and the topic is read from the task.
+    @SuppressWarnings("java:S1172")
     public void assertFailExternalTask(
         ExternalTask externalTask,
         String topicName,
@@ -282,7 +285,7 @@ public abstract class BpmnBaseTest {
         String expectedTopicName = externalTask.getTopicName();
         List<LockedExternalTask> lockedProcessTask = fetchAndLockTask(expectedTopicName);
 
-        assertExternalTask(externalTask, expectedTopicName, caseEvent, activityId, lockedProcessTask);
+        assertExternalTask(expectedTopicName, caseEvent, activityId, lockedProcessTask);
 
         failTask(lockedProcessTask.get(0).getId());
     }
@@ -330,14 +333,12 @@ public abstract class BpmnBaseTest {
     /**
      * Checks that external task matches the rest of parameters.
      *
-     * @param externalTask      the task
      * @param topicName         should be equal to task.topicName
      * @param caseEvent         the only element of locked process task should have this caseEvent
      * @param activityId        if not null, the only element of locked process task should have this id
      * @param lockedProcessTask should have only one item
      */
     private void assertExternalTask(
-        ExternalTask externalTask,
         String topicName,
         String caseEvent,
         String activityId,

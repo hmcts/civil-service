@@ -6,9 +6,11 @@ const path = require('node:path');
 // Execute the actual inline workflow script with simulated API and filesystem
 // clients. No checked-out helper, child process or real network client is used.
 const workflow = fs.readFileSync(path.join(__dirname, '../workflows/deploy-email-docs.yml'), 'utf8');
-assert.ok(!workflow.includes('actions/checkout@'), 'Publication must not check out repository code');
 const scriptMarker = '          script: |\n';
-assert.equal(workflow.split(scriptMarker).length, 2, 'Expected one inline publication script');
+test('publication script is inline and does not check out the repository', () => {
+  assert.ok(!workflow.includes('actions/checkout@'), 'Publication must not check out repository code');
+  assert.equal(workflow.split(scriptMarker).length, 2, 'Expected one inline publication script');
+});
 const scriptLines = [];
 for (const line of workflow.split(scriptMarker)[1].split('\n')) {
   if (line.trim() && !line.startsWith('            ')) break;

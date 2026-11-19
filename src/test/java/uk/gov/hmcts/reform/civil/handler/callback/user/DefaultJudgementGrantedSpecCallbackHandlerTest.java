@@ -35,9 +35,16 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @ExtendWith(MockitoExtension.class)
 class DefaultJudgementGrantedSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    private static final String REPAYMENT_SUMMARY_OBJECT = "The judgment will order the defendant to pay £1172.00, "
-        + "including the claim fee and interest, if applicable, as shown:\n### Claim amount \n £1000.00\n "
-        + "### Fixed cost amount \n£102.00\n### Claim fee amount \n £70.00\n ## Subtotal \n £1172.00";
+    private static final String REPAYMENT_SUMMARY_OBJECT = """
+        The judgment will order the defendant to pay £1172.00, including the claim fee and interest, if applicable, as shown:
+        ### Claim amount\s
+         £1000.00
+         ### Fixed cost amount\s
+        £102.00
+        ### Claim fee amount\s
+         £70.00
+         ## Subtotal\s
+         £1172.00""";
 
     @Spy
     private ObjectMapper objectMapper = ObjectMapperFactory.instance();

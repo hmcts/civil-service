@@ -1592,7 +1592,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
             CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
             caseLocationCivil.setBaseLocation("0123");
-            caseLocationCivil.setRegion("0321");;
+            caseLocationCivil.setRegion("0321");
             caseData.setCaseManagementLocation(caseLocationCivil);
             DynamicListElement element = new DynamicListElement(null, "John Smith");
             DynamicList list = new DynamicList();

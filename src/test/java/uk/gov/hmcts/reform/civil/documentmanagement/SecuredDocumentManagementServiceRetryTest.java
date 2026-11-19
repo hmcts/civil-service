@@ -60,7 +60,7 @@ import static org.mockito.Mockito.when;
         DocumentManagementConfiguration.class, Tika.class})
 class SecuredDocumentManagementServiceRetryTest {
 
-    public static final String BEARER_TOKEN = "Bearer Token";
+    static final String BEARER_TOKEN = "Bearer Token";
     private static final String DOCUMENT_PATH = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b7";
 
     // proxyTargetClass = true so the retry proxy is a CGLIB subclass of the concrete service,
@@ -90,7 +90,7 @@ class SecuredDocumentManagementServiceRetryTest {
         .build();
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         when(authTokenGenerator.generate()).thenReturn(BEARER_TOKEN);
         when(userService.getUserInfo(anyString())).thenReturn(userInfo);
     }

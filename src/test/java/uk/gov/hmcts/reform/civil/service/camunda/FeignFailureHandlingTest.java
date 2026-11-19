@@ -112,7 +112,7 @@ class FeignFailureHandlingTest {
             requestLog.add(exchange.getRequestMethod() + " " + exchange.getRequestURI().getPath() + " " + body);
             if (responseDelayMs > 0) {
                 try {
-                    Thread.sleep(responseDelayMs);
+                    delayResponse();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -129,6 +129,12 @@ class FeignFailureHandlingTest {
     @AfterAll
     static void stopServer() {
         server.stop(0);
+    }
+
+    // Simulated upstream delay inside the local HTTP server, not a test waiting for a condition.
+    @SuppressWarnings("java:S2925")
+    private static void delayResponse() throws InterruptedException {
+        Thread.sleep(responseDelayMs);
     }
 
     @DynamicPropertySource

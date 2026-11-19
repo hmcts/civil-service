@@ -65,8 +65,9 @@ class DraftClaimServiceTest {
             OffsetDateTime createdAt = OffsetDateTime.now().minusDays(1);
             DraftStoreEntity existingBlankDraft = draft(null, createdAt, createdAt.plusDays(RETENTION_DAYS));
             when(draftStoreService.getBlankDraft(USER_ID, DRAFT_TYPE)).thenReturn(Optional.of(existingBlankDraft));
+            Map<String, Object> payload = Map.of("step", "new");
 
-            assertThatThrownBy(() -> draftClaimService.createDraftClaim(USER_ID, Map.of("step", "new")))
+            assertThatThrownBy(() -> draftClaimService.createDraftClaim(USER_ID, payload))
                 .isInstanceOf(DraftClaimAlreadyExistsException.class);
 
             verify(draftStoreService).getBlankDraft(USER_ID, DRAFT_TYPE);
