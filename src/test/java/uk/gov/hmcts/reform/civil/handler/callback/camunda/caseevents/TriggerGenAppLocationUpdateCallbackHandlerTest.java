@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import feign.FeignException;
+import feign.Request;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,6 +28,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +41,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackFailureClassifier.NOT_RETRYABLE;
+import static uk.gov.hmcts.reform.civil.callback.CallbackFailureClassifier.RETRYABLE;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_LOCATION_UPDATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_TASK_RECONFIG;
@@ -258,8 +263,55 @@ class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandler
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getErrors()).isNotNull();
-            assertThat(response.getErrors()).contains(expectedErrorMessage);
+            assertThat(response.getErrors()).singleElement().asString()
+                .startsWith(NOT_RETRYABLE + expectedErrorMessage);
+        }
+
+        @Test
+        void childGaWithOngoingBusinessProcessIsLabelledNotRetryable() {
+            // CCD refuses TRIGGER_LOCATION_UPDATE on a GA whose own process is still running (EXC-CS-179)
+            CaseData baseCaseData = CaseDataBuilder.builder().build();
+            baseCaseData.setCcdCaseReference(1234L);
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithDetails(baseCaseData, true, true, true, true,
+                                            getOriginalStatusOfGeneralApplication());
+            Request request = Request.create(Request.HttpMethod.POST, "http://ccd-data-store-api/cases/1/events",
+                                             Map.of(), null, StandardCharsets.UTF_8, null);
+            when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
+            when(helperService.triggerEvent(caseData, TRIGGER_LOCATION_UPDATE))
+                .thenThrow(new FeignException.UnprocessableEntity("[422 Unprocessable Entity]", request, null, null));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(gaLocationParams(caseData));
+
+            assertThat(response.getErrors()).singleElement().asString()
+                .startsWith(NOT_RETRYABLE + "Could not trigger event to update location on application under case: " + caseData.getCcdCaseReference())
+                .contains("FeignException$UnprocessableEntity");
+        }
+
+        @Test
+        void transientFailureIsLabelledRetryable() {
+            CaseData baseCaseData = CaseDataBuilder.builder().build();
+            baseCaseData.setCcdCaseReference(1234L);
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithDetails(baseCaseData, true, true, true, true,
+                                            getOriginalStatusOfGeneralApplication());
+            Request request = Request.create(Request.HttpMethod.POST, "http://ccd-data-store-api/cases/1/events",
+                                             Map.of(), null, StandardCharsets.UTF_8, null);
+            when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
+            when(helperService.triggerEvent(caseData, TRIGGER_LOCATION_UPDATE))
+                .thenThrow(new FeignException.GatewayTimeout("[504 Gateway Timeout]", request, null, null));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(gaLocationParams(caseData));
+
+            assertThat(response.getErrors()).singleElement().asString()
+                .startsWith(RETRYABLE + "Could not trigger event to update location on application under case: " + caseData.getCcdCaseReference());
+        }
+
+        private CallbackParams gaLocationParams(CaseData caseData) {
+            return CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId(TRIGGER_UPDATE_GA_LOCATION.name()).build())
+                .build();
         }
 
         @Test
