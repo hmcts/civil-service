@@ -86,9 +86,13 @@ class PurgeDocStoreDocumentTaskTest {
 
     @Test
     void shouldThrowAndNotDeleteWhenDocumentIdMissing() {
-        assertThatThrownBy(() -> task.migrateCaseData(CaseData.builder().build(), reference(CASE_ID, null)))
+        CaseData caseData = CaseData.builder().build();
+        var missingDocument = reference(CASE_ID, null);
+        var blankDocument = reference(CASE_ID, "  ");
+
+        assertThatThrownBy(() -> task.migrateCaseData(caseData, missingDocument))
             .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> task.migrateCaseData(CaseData.builder().build(), reference(CASE_ID, "  ")))
+        assertThatThrownBy(() -> task.migrateCaseData(caseData, blankDocument))
             .isInstanceOf(IllegalArgumentException.class);
         verifyNoInteractions(documentManagementService);
     }

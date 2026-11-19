@@ -29,6 +29,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -125,7 +126,7 @@ class AsyncCaseMigrationServiceTest {
         MigrationTask<DraftClaimReference> migrationTask = mock(MigrationTask.class);
         DraftClaimReference failed = draftReference("draft-1", "user-1");
         DraftClaimReference successful = draftReference("draft-2", "user-2");
-        org.mockito.Mockito.doThrow(new RuntimeException("failure"))
+        doThrow(new RuntimeException("failure"))
             .when(migrationTask).migrateUserDrafts(failed);
 
         asyncCaseMigrationService.migrateUserDrafts(migrationTask, List.of(failed, successful));
