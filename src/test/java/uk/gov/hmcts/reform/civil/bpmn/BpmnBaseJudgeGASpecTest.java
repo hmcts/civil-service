@@ -227,7 +227,7 @@ public abstract class BpmnBaseJudgeGASpecTest {
         String expectedTopicName = expectedTopicName(topicName, caseEvent);
         List<LockedExternalTask> lockedProcessTask = fetchAndLockTask(expectedTopicName);
 
-        assertExternalTask(externalTask, expectedTopicName, caseEvent, activityId, lockedProcessTask);
+        assertExternalTask(expectedTopicName, caseEvent, activityId, lockedProcessTask);
 
         completeTask(lockedProcessTask.get(0).getId(), variables);
     }
@@ -241,7 +241,7 @@ public abstract class BpmnBaseJudgeGASpecTest {
         String expectedTopicName = expectedTopicName(topicName, caseEvent);
         List<LockedExternalTask> lockedProcessTask = fetchAndLockTask(expectedTopicName);
 
-        assertExternalTask(externalTask, expectedTopicName, caseEvent, activityId, lockedProcessTask);
+        assertExternalTask(expectedTopicName, caseEvent, activityId, lockedProcessTask);
 
         failTask(lockedProcessTask.get(0).getId());
     }
@@ -292,7 +292,6 @@ public abstract class BpmnBaseJudgeGASpecTest {
     }
 
     private void assertExternalTask(
-        ExternalTask externalTask,
         String topicName,
         String caseEvent,
         String activityId,

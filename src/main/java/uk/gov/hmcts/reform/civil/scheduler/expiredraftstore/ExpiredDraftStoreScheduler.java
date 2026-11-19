@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.scheduler.common.TaskResult;
 import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -76,7 +77,7 @@ public class ExpiredDraftStoreScheduler implements CivilScheduler {
     }
 
     private TaskResult<List<UUID>> getExpiredBatches() {
-        OffsetDateTime now = OffsetDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now(ZoneId.systemDefault());
         int effectiveBatchSize = Math.max(1, batchSize);
         int effectiveMaxBatches = Math.max(1, maxBatchesPerRun);
 
