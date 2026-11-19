@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.IndividualDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.OrganisationDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PartyDetailsModel;
@@ -28,12 +29,15 @@ import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.DATE_RANGE;
+import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.SINGLE_DATE;
 import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.IND;
 import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.ORG;
 import static uk.gov.hmcts.reform.civil.enums.hearing.UnavailabilityType.ALL_DAY;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingsPartyMapper.buildPartyObjectForHearingPayload;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
 class HearingsPartyMapperTest {
@@ -1092,6 +1096,68 @@ class HearingsPartyMapperTest {
             .build();
 
         assertThat(buildPartyObjectForHearingPayload(caseData, organisationService)).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldSkipUnavailableDates_whenTheyHaveNoFromOrToDate() {
+        LocalDate singleDate = LocalDate.now().plusDays(3);
+        LocalDate rangeFrom = LocalDate.now().plusDays(5);
+        LocalDate rangeTo = LocalDate.now().plusDays(7);
+        LocalDate rangeDateOnly = LocalDate.now().plusDays(9);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefence()
+            .build()
+            .toBuilder()
+            .ccdCaseReference(1786442787415357L)
+            .respondent1(new Party()
+                             .setPartyID(RESPONDENT_ONE_PARTY_ID)
+                             .setOrganisationName(RESPONDENT_ONE_ORG_NAME)
+                             .setType(COMPANY)
+                             .setUnavailableDates(wrapElements(
+                                 new UnavailableDate().setUnavailableDateType(DATE_RANGE),
+                                 new UnavailableDate().setUnavailableDateType(SINGLE_DATE),
+                                 new UnavailableDate().setUnavailableDateType(DATE_RANGE).setFromDate(rangeFrom),
+                                 new UnavailableDate().setUnavailableDateType(SINGLE_DATE).setDate(singleDate),
+                                 new UnavailableDate().setUnavailableDateType(DATE_RANGE)
+                                     .setFromDate(rangeFrom).setToDate(rangeTo),
+                                 new UnavailableDate().setUnavailableDateType(DATE_RANGE).setDate(rangeDateOnly))))
+            .build();
+
+        List<PartyDetailsModel> parties = buildPartyObjectForHearingPayload(caseData, organisationService);
+
+        assertThat(parties)
+            .filteredOn(party -> RESPONDENT_ONE_PARTY_ID.equals(party.getPartyID()))
+            .singleElement()
+            .extracting(PartyDetailsModel::getUnavailabilityRanges)
+            .isEqualTo(List.of(
+                buildUnavailabilityDateRange(singleDate, singleDate),
+                buildUnavailabilityDateRange(rangeFrom, rangeTo),
+                buildUnavailabilityDateRange(rangeDateOnly, rangeDateOnly)
+            ));
+    }
+
+    @Test
+    void shouldReturnEmptyUnavailabilityRanges_whenAllUnavailableDatesAreIncomplete() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefence()
+            .build()
+            .toBuilder()
+            .respondent1(new Party()
+                             .setPartyID(RESPONDENT_ONE_PARTY_ID)
+                             .setOrganisationName(RESPONDENT_ONE_ORG_NAME)
+                             .setType(COMPANY)
+                             .setUnavailableDates(wrapElements(
+                                 new UnavailableDate().setUnavailableDateType(DATE_RANGE)
+                                     .setDateAdded(LocalDate.now()).setEventAdded("Defendant Response Event"))))
+            .build();
+
+        List<PartyDetailsModel> parties = buildPartyObjectForHearingPayload(caseData, organisationService);
+
+        assertThat(parties)
+            .filteredOn(party -> RESPONDENT_ONE_PARTY_ID.equals(party.getPartyID()))
+            .singleElement()
+            .extracting(PartyDetailsModel::getUnavailabilityRanges)
+            .isEqualTo(emptyList());
     }
 
     private PartyDetailsModel buildExpectedIndividualPartyDetails(String partyId, String firstName, String lastName,
