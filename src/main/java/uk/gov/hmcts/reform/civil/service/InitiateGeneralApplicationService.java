@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationTypeLR;
 import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
@@ -92,6 +93,7 @@ public class InitiateGeneralApplicationService {
         ));
         caseData.setGeneralApplications(applications);
         caseData.setGeneralAppType(new GAApplicationType());
+        caseData.setGeneralAppTypeLR(new GAApplicationTypeLR());
         caseData.setGeneralAppRespondentAgreement(new GARespondentOrderAgreement());
         caseData.setGeneralAppPBADetails(new GAPbaDetails());
         caseData.setGeneralAppDetailsOfOrder(EMPTY);
