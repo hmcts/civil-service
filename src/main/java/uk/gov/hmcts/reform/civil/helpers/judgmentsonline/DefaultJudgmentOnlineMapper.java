@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Slf4j
 @Service
@@ -50,7 +51,7 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
             .setState(getJudgmentState(caseData))
             .setIsRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
             .setRtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
-            .setIssueDate(LocalDate.now())
+            .setIssueDate(LocalDate.now(ZoneId.systemDefault()))
             .setOrderedAmount(orderAmount.toString())
             .setClaimFeeAmount(claimFee.toString())
             .setCosts(costs.toString())

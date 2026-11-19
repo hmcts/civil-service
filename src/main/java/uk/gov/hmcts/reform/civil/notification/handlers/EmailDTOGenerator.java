@@ -67,6 +67,8 @@ public abstract class EmailDTOGenerator<T extends NotifiableCaseData> {
 
     protected abstract String getEmailTemplateId(T caseData);
 
+    // taskId is the extension point used by overrides. The default template does not depend on it.
+    @SuppressWarnings("java:S1172")
     protected String getEmailTemplateId(T caseData, String taskId) {
         return getEmailTemplateId(caseData);
     }
