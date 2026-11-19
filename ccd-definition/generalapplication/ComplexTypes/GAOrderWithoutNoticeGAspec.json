@@ -1,0 +1,17 @@
+[
+  {
+    "ID": "GAOrderWithoutNoticeGAspec",
+    "ListElementCode": "orderWithoutNotice",
+    "ElementLabel": "Order without notice",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAOrderWithoutNoticeGAspec",
+    "ListElementCode": "orderWithoutNoticeDate",
+    "ElementLabel": "Please enter date",
+    "FieldType": "Date",
+    "HintText": "For example, 16 4 2021",
+    "SecurityClassification": "Public"
+  }
+]

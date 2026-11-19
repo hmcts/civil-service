@@ -1,0 +1,169 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "defendantDetails",
+    "Label": "Against which Defendant are you requesting default judgment?",
+    "FieldType": "DynamicRadioList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "CPRcertify",
+    "Label": "* The time for responding to the claim has expired. \n* The Defendant has not responded to the claim. \n* There is no outstanding application by the Defendant to strike out the claim for summary judgment. \n* The Defendant has not satisfied the whole claim, including costs. \n* The Defendant has not filed an admission together with request for time to pay.\n\n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "CPRcertifys",
+    "Label": "\n* The time for responding to the claim has expired. \n* The Defendant has not responded to the claim. \n* There is no outstanding application by the Defendant to strike out the claim for summary judgment. \n* The Defendant has not satisfied the whole claim, including costs. \n* The Defendant has not filed an admission together with request for time to pay.\n\n",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "CPRAcceptanceLabel",
+    "Label": "Select if the statements all apply to the defendant",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "CPRAcceptance",
+    "Label": " ",
+    "FieldType": "CPRCertifyAcceptanceDJ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "CPRAcceptance2DefLabel",
+    "Label": "Select if the statements all apply to the defendants",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "CPRAcceptance2Def",
+    "Label": " ",
+    "FieldType": "CPRCertifyAcceptanceDJ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "bothDefendants",
+    "Label": "Both Defendants",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingLabel",
+    "Label": "## How would you like the court to decide the amount of damages?\n While your preference will be taken into account, the court will make the final decision",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingSelection",
+    "Label": "Hearing type",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "HearingSelection",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingDisposalText",
+    "Label": "This is a hearing that lasts a maximum of 30 minutes, where information is presented only on paper, with no spoken evidence.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingTrialText",
+    "Label": "This is a hearing which lasts longer than 30 minutes, where the court will receive evidence on paper and listen to any spoken evidence that you wish it to consider when deciding the amount of damages.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingDirectionsLabel",
+    "Label": "## What directions would you like the court to give?",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "detailsOfDirection",
+    "Label": "Draft order",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "hearingSupportRequirementsDJ",
+    "Label": "Hearing requirements",
+    "FieldType": "HearingSupportRequirementsListDJ",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "defaultJudgmentDocuments",
+    "Label": "System generated Case Documents",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseDocument",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "setRequestDJDamagesFlagForWA",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "isOtherRemedyAbandoned",
+    "Label": "Are you confirming that you are abandoning your request for an other remedy \n(e.g. injunction, rescission, declaration)?",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "isOtherRemedyAbandonedText",
+    "Label": "<div class=\"govuk-inset-text\">The system only allows default judgment when a claim for other remedy has been abandoned. If you are not abandoning the request for other remedy, you must make an application for judgment.</div>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "otherRemedyAbandonedDate",
+    "Label": "Date Other Remedy abandoned",
+    "FieldType": "Date",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "isOtherRemedyAbandonedBoldLabel",
+    "Label": "## Do you wish to abandon your request for an other remedy?",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

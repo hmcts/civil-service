@@ -1,0 +1,62 @@
+[
+  {
+    "ID": "HearingSupportRequirements",
+    "ListElementCode": "requirements",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "HearingSupportRequirements",
+    "ElementLabel": "Select any support you, your client(s) and any experts or witnesses would require for a court hearing",
+    "FieldShowCondition": "requirements CONTAINS \"DO NOT SHOW IN UI\"",
+    "SecurityClassification": "Public",
+    "Comment": "FIELDS REQUIRED FOR PRODUCTION - PART OF LEGAL REP UPLIFTS - QUERY PROD BEFORE DELETING",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HearingSupportRequirements",
+    "ListElementCode": "signLanguageRequired",
+    "FieldType": "Text",
+    "ElementLabel": "Enter the sign language you need",
+    "FieldShowCondition": "requirements CONTAINS \"DO NOT SHOW IN UI\"",
+    "SecurityClassification": "Public",
+    "Comment": "FIELDS REQUIRED FOR PRODUCTION - PART OF LEGAL REP UPLIFTS - QUERY PROD BEFORE DELETING",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HearingSupportRequirements",
+    "ListElementCode": "languageToBeInterpreted",
+    "FieldType": "Text",
+    "ElementLabel": "What language needs to be interpreted?",
+    "HintText": "You may have to arrange and pay for interpreters except for Welsh. The court will tell you",
+    "FieldShowCondition": "requirements CONTAINS \"DO NOT SHOW IN UI\"",
+    "SecurityClassification": "Public",
+    "Comment": "FIELDS REQUIRED FOR PRODUCTION - PART OF LEGAL REP UPLIFTS - QUERY PROD BEFORE DELETING",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HearingSupportRequirements",
+    "ListElementCode": "otherSupport",
+    "FieldType": "TextArea",
+    "ElementLabel": "Tell us the other support that's needed - the court cannot guarantee it, but will consider physical or mental health impairments",
+    "FieldShowCondition": "requirements CONTAINS \"DO NOT SHOW IN UI\"",
+    "SecurityClassification": "Public",
+    "Comment": "FIELDS REQUIRED FOR PRODUCTION - PART OF LEGAL REP UPLIFTS - QUERY PROD BEFORE DELETING",
+    "Searchable": "N"
+  },
+  {
+    "ID": "HearingSupportRequirements",
+    "ListElementCode": "supportRequirements",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Does anyone require support for a court hearing?",
+    "SecurityClassification": "Public",
+    "Searchable": "N",
+    "Publish": "Y"
+  },
+  {
+    "ID": "HearingSupportRequirements",
+    "ListElementCode": "supportRequirementsAdditional",
+    "ElementLabel": "Please name all people who need support and the kind of support they will need. For example, Jane Smith: requires wheelchair access.",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "supportRequirements=\"Yes\"",
+    "Searchable": "N"
+  }
+]

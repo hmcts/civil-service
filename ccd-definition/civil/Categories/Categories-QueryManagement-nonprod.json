@@ -1,0 +1,9 @@
+[
+  {
+  "CaseTypeID": "CIVIL",
+  "CategoryID": "CaseWorkerQueryDocumentsDocumentAttachments",
+  "CategoryLabel": "Caseworker uploaded documents",
+  "DisplayOrder": "3",
+  "ParentCategoryID": "QueryDocuments"
+  }
+]

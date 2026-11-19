@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "PhysicalTrialBundleOptions",
+    "ListElementCode": "NONE",
+    "ListElement": "None",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "PhysicalTrialBundleOptions",
+    "ListElementCode": "PARTY",
+    "ListElement": "Party",
+    "DisplayOrder": 2
+  }
+]

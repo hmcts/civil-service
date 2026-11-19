@@ -1,0 +1,42 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "showOldDJFixedCostsScreen",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fixedCosts",
+    "Label": "Fixed Costs",
+    "FieldType": "FixedCosts",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "fixedCostsHint",
+    "Label": "<details><summary>More information about fixed commencement costs</summary><div class=\"panel panel-border-narrow\"><p>For information as to how fixed commencement costs are calculated and the amounts allowed please see <a target=\"_blank\" href=\"https://www.justice.gov.uk/courts/procedure-rules/civil/rules/part45-fixed-costs/practice-direction-45-fixed-costs#2\">Civil Procedure Rules Practice Direction 45 Table 2</a> and <a target=\"_blank\" href=\"https://www.justice.gov.uk/courts/procedure-rules/civil/rules/practice-direction-51r-online-court-pilot\">Practice Direction 51R</a>.</p>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "showDJFixedCostsScreen",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "claimFixedCostsOnEntryDJ",
+    "Label": "Would you like to claim for fixed costs on entry of judgment?",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

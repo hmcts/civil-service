@@ -1,0 +1,38 @@
+[
+  {
+    "ID": "GAPaymentDetails",
+    "ListElementCode": "status",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "PaymentStatus",
+    "ElementLabel": "Payment status",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAPaymentDetails",
+    "ListElementCode": "reference",
+    "FieldType": "Text",
+    "ElementLabel": "Payment reference returned from successful Payments API call",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAPaymentDetails",
+    "ListElementCode": "errorMessage",
+    "FieldType": "Text",
+    "ElementLabel": "Payment error message returned from failed Payments API call",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAPaymentDetails",
+    "ListElementCode": "errorCode",
+    "FieldType": "Text",
+    "ElementLabel": "Payment error code returned from failed Payments API call",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "GAPaymentDetails",
+    "ListElementCode": "customerReference",
+    "FieldType": "Text",
+    "ElementLabel": "Customer reference",
+    "SecurityClassification": "Public"
+  }
+]

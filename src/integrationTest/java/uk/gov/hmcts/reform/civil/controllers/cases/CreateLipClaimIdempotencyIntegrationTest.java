@@ -29,6 +29,8 @@ import uk.gov.hmcts.reform.draftstore.repositories.DraftStoreRepository;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -84,7 +86,7 @@ class CreateLipClaimIdempotencyIntegrationTest extends BaseIntegrationTest {
     void setUp() {
         draftStoreRepository.deleteAll();
         draftId = UUID.randomUUID();
-        OffsetDateTime createdAt = OffsetDateTime.parse("2026-10-12T10:00:00Z");
+        OffsetDateTime createdAt = OffsetDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.SECONDS);
         submissionId = USER_ID + ":" + draftId + ":" + createdAt;
 
         given(userService.getUserInfo(anyString()))

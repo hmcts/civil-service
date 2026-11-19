@@ -1,0 +1,95 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "INVALID_HWF_REFERENCE_GA",
+    "CaseFieldID": "claimant1PartyName",
+    "DisplayContext": "READONLY",
+    "PageID": "InValidHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "FieldShowCondition": "caseTitleWithHWFGaFeeNumber=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "INVALID_HWF_REFERENCE_GA",
+    "CaseFieldID": "defendant1PartyName",
+    "DisplayContext": "READONLY",
+    "PageID": "InValidHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "FieldShowCondition": "caseTitleWithHWFGaFeeNumber=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "INVALID_HWF_REFERENCE_GA",
+    "CaseFieldID": "generalAppHelpWithFees",
+    "DisplayContext": "READONLY",
+    "PageID": "InValidHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 3,
+    "FieldShowCondition": "caseTitleWithHWFGaFeeNumber=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "INVALID_HWF_REFERENCE_GA",
+    "CaseFieldID": "caseTitleWithHWFGaFeeNumber",
+    "DisplayContext": "READONLY",
+    "PageID": "InValidHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 5,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "INVALID_HWF_REFERENCE_GA",
+    "CaseFieldID": "caseTitleWithHwFDetails",
+    "DisplayContext": "READONLY",
+    "PageID": "InValidHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 6,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "INVALID_HWF_REFERENCE_GA",
+    "CaseFieldID": "gaFeeLabel",
+    "DisplayContext": "READONLY",
+    "PageID": "InValidHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 7,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "hwfFeeType=\"APPLICATION\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "INVALID_HWF_REFERENCE_GA",
+    "CaseFieldID": "additionalFeeLabel",
+    "DisplayContext": "READONLY",
+    "PageID": "InValidHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 8,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "hwfFeeType=\"ADDITIONAL\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "INVALID_HWF_REFERENCE_GA",
+    "CaseFieldID": "hwfFeeType",
+    "DisplayContext": "READONLY",
+    "PageID": "InValidHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 9,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "caseTitleWithHWFGaFeeNumber=\"DO_NOT_SHOW_IN_UI\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "CaseEventID": "INVALID_HWF_REFERENCE_GA",
+    "CaseFieldID": "caseLabelGaReference",
+    "DisplayContext": "READONLY",
+    "PageID": "InValidHWF",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 10,
+    "ShowSummaryChangeOption": "N"
+  }
+]

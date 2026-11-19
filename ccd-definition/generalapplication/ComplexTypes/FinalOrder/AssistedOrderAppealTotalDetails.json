@@ -1,0 +1,63 @@
+[
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "label",
+    "ID": "AssistedOrderAppealDetails",
+    "ElementLabel": "### The",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "appealOrigin",
+    "ID": "AssistedOrderAppealDetails",
+    "ElementLabel": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "AppealOriginTypes",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "otherOriginText",
+    "ID": "AssistedOrderAppealDetails",
+    "ElementLabel": "Please specify",
+    "FieldType": "Text",
+    "FieldShowCondition": "appealOrigin = \"OTHER\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "applicationLabel",
+    "ID": "AssistedOrderAppealDetails",
+    "ElementLabel": "### application for permission to appeal is",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "permissionToAppeal",
+    "ID": "AssistedOrderAppealDetails",
+    "ElementLabel": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "PermissionToAppealTypes",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "assistedOrderAppealDropdownGranted",
+    "ID": "AssistedOrderAppealDetails",
+    "ElementLabel": " ",
+    "FieldType": "AssistedOrderAppealChoiceListGranted",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "permissionToAppeal = \"GRANTED\""
+  },
+  {
+    "CaseTypeID": "GENERALAPPLICATION",
+    "ListElementCode": "assistedOrderAppealDropdownRefused",
+    "ID": "AssistedOrderAppealDetails",
+    "ElementLabel": " ",
+    "FieldType": "AssistedOrderAppealChoiceListRefuse",
+    "SecurityClassification": "Public",
+    "FieldShowCondition": "permissionToAppeal = \"REFUSED\""
+  }
+]

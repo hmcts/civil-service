@@ -1,0 +1,76 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "ADD_UNAVAILABLE_DATES",
+    "CaseFieldID": "hidePartyChoice",
+    "PageLabel": "Add unavailable dates",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "ShowSummaryChangeOption": "N",
+    "PageID": "PartySelection",
+    "FieldShowCondition": "partyChosen=\"DO NOT SHOW IN UI\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "ADD_UNAVAILABLE_DATES",
+    "CaseFieldID": "additionalUnavailableDatesPartyChoiceQuestion",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "READONLY",
+    "ShowSummaryChangeOption": "N",
+    "PageID": "PartySelection"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "ADD_UNAVAILABLE_DATES",
+    "CaseFieldID": "additionalUnavailableDatesPartyChoiceSubText",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "READONLY",
+    "ShowSummaryChangeOption": "N",
+    "PageID": "PartySelection"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "ADD_UNAVAILABLE_DATES",
+    "CaseFieldID": "partyChosen",
+    "CaseEventFieldLabel": "",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY",
+    "ShowSummaryChangeOption": "Y",
+    "PageID": "PartySelection",
+    "PageShowCondition": "hidePartyChoice=\"No\""
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "ADD_UNAVAILABLE_DATES",
+    "CaseFieldID": "additionalUnavailableDatesTitle",
+    "PageLabel": "Add unavailable dates",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": "AddAdditionalDates"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "ADD_UNAVAILABLE_DATES",
+    "CaseFieldID": "additionalUnavailableDatesSubText",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "READONLY",
+    "PageID": "AddAdditionalDates"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "CaseEventID": "ADD_UNAVAILABLE_DATES",
+    "CaseFieldID": "additionalUnavailableDates",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "COMPLEX",
+    "ShowSummaryChangeOption": "Y",
+    "PageID": "AddAdditionalDates",
+    "CallBackURLMidEvent": "${CCD_DEF_CASE_SERVICE_BASE_URL}/cases/callbacks/mid/validate-unavailable-dates"
+  }
+]

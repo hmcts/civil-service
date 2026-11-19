@@ -1,0 +1,90 @@
+[
+  {
+    "ID": "DQExtraDetailsLip",
+    "ListElementCode": "wantPhoneOrVideoHearing",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DQExtraDetailsLip",
+    "ListElementCode": "whyPhoneOrVideoHearing",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DQExtraDetailsLip",
+    "ListElementCode": "whyUnavailableForHearing",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DQExtraDetailsLip",
+    "ListElementCode": "giveEvidenceYourSelf",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DQExtraDetailsLip",
+    "ListElementCode": "triedToSettle",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DQExtraDetailsLip",
+    "ListElementCode": "determinationWithoutHearingRequired",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DQExtraDetailsLip",
+    "ListElementCode": "determinationWithoutHearingReason",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DQExtraDetailsLip",
+    "ListElementCode": "requestExtra4weeks",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DQExtraDetailsLip",
+    "ListElementCode": "considerClaimantDocuments",
+    "ElementLabel": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DQExtraDetailsLip",
+    "ListElementCode": "considerClaimantDocumentsDetails",
+    "ElementLabel": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "DQExtraDetailsLip",
+    "ListElementCode": "respondent1DQLiPExpert",
+    "ElementLabel": " ",
+    "FieldType": "ExpertLiP",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

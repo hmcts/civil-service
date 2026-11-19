@@ -1,0 +1,52 @@
+[
+  {
+    "ID": "UnavailableDate",
+    "CaseEventID": "ADD_UNAVAILABLE_DATES",
+    "CaseFieldID": "additionalUnavailableDates",
+    "ListElementCode": "unavailableDateType",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "UnavailableDate",
+    "CaseEventID": "ADD_UNAVAILABLE_DATES",
+    "CaseFieldID": "additionalUnavailableDates",
+    "ListElementCode": "date",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "UnavailableDate",
+    "CaseEventID": "ADD_UNAVAILABLE_DATES",
+    "CaseFieldID": "additionalUnavailableDates",
+    "ListElementCode": "fromDate",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "UnavailableDate",
+    "CaseEventID": "ADD_UNAVAILABLE_DATES",
+    "CaseFieldID": "additionalUnavailableDates",
+    "ListElementCode": "toDate",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "UnavailableDate",
+    "CaseEventID": "ADD_UNAVAILABLE_DATES",
+    "CaseFieldID": "additionalUnavailableDates",
+    "ListElementCode": "eventAdded",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "additionalUnavailableDates=\"DO NOT SHOW IN UI\""
+  },
+  {
+    "ID": "UnavailableDate",
+    "CaseEventID": "ADD_UNAVAILABLE_DATES",
+    "CaseFieldID": "additionalUnavailableDates",
+    "ListElementCode": "dateAdded",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "additionalUnavailableDates=\"DO NOT SHOW IN UI\""
+  }
+]

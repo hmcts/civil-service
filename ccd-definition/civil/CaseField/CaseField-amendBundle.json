@@ -1,0 +1,34 @@
+[
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "bundleWarning",
+    "Label": "<div class=\"govuk-warning-text\"><span class=\"govuk-warning-text__icon\" aria-hidden=\"true\">!</span><strong class=\"govuk-warning-text__text\"><span class=\"govuk-warning-text__assistive\">Warning</span>You must make sure you have taken action to address the failed bundle before you attempt to restitch.</strong></div>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "bundleError",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "bundleEvent",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "CIVIL",
+    "ID": "bundleText",
+    "Label": "## Amend and restitch bundle\nMake sure you have taken the correct action to amend the bundle before you restitch.  \nThe restitched bundle will replace the existing bundle.  \nAll parties will be notified.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

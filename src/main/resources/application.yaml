@@ -622,7 +622,6 @@ notifications:
   notifyLrDefendantSuccessfulMediation: "4a941565-10a8-4da5-b498-08ded5501f4e"
   notifyLrDefendantSuccessfulMediationForLipVLrClaim: "565caf87-d0e6-44d4-aadb-08110653344d"
 
-  notifyLrRecordJudgmentDeterminationMeansTemplate: "176148d0-379f-449e-b686-3ff417b0e357"
   notifyClaimantLipForDefendantRepresentedTemplate: "6b4d2b15-c537-4603-9542-f0c7c89d7024"
   notifyDefendantLipForNoLongerAccessTemplate: "187436dd-b5e2-495b-a96e-54a0937a33d1"
   notifyDefendantLrAfterNoticeOfChangeTemplate: "633b2b9f-14e0-4b22-80a5-4db95401045c"
@@ -804,6 +803,9 @@ async:
     clientBackoffFactor: ${EVENT_CLIENT_BACKOFF_FACTOR:2}
     clientBackoffMax: ${EVENT_CLIENT_BACKOFF_MAX:60000}
     httpValidateAfterInactivityMs: ${EVENT_HTTP_VALIDATE_AFTER_INACTIVITY_MS:2000}
+    caseDrivenClients: ${EVENT_CASE_DRIVEN_CLIENTS:2}
+    caseDrivenMaxTasks: ${EVENT_CASE_DRIVEN_MAX_TASKS:1}
+    schedulerMaxTasks: ${EVENT_SCHEDULER_MAX_TASKS:1}
 
 feign:
   client:
