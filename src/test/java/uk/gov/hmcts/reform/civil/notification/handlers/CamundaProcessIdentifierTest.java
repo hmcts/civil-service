@@ -122,10 +122,10 @@ class CamundaProcessIdentifierTest {
 
         assertThat(values)
             .satisfies(v -> assertThat(v[0]).isEqualTo(CamundaProcessIdentifier.ClaimDismissedNotifyParties))
-            .satisfies(v -> assertThat(v[75]).isEqualTo(CamundaProcessIdentifier.RequestJudgementByAdmissionNotifyParties))                                                                                                                                                                                  
-            .satisfies(v -> assertThat(v[76]).isEqualTo(CamundaProcessIdentifier.StayCaseNotifyParties))                                                                                                                                                                                                     
-            .satisfies(v -> assertThat(v[77]).isEqualTo(CamundaProcessIdentifier.StayLiftedNotifyParties))                                                                                                                                                                                                   
-            .satisfies(v -> assertThat(v[78]).isEqualTo(CamundaProcessIdentifier.CoscApplicationAfterPaymentNotifyParties))                                                                                                                                                                                  
-            .satisfies(v -> assertThat(v[79]).isEqualTo(CamundaProcessIdentifier.StayUpdateRequestedNotifyParties));    
+            .satisfies(v -> assertThat(v[75]).isEqualTo(CamundaProcessIdentifier.RequestJudgementByAdmissionNotifyParties))
+            .satisfies(v -> assertThat(v[76]).isEqualTo(CamundaProcessIdentifier.StayCaseNotifyParties))
+            .satisfies(v -> assertThat(v[77]).isEqualTo(CamundaProcessIdentifier.StayLiftedNotifyParties))
+            .satisfies(v -> assertThat(v[78]).isEqualTo(CamundaProcessIdentifier.CoscApplicationAfterPaymentNotifyParties))
+            .satisfies(v -> assertThat(v[79]).isEqualTo(CamundaProcessIdentifier.StayUpdateRequestedNotifyParties));
     }
 }
