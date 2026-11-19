@@ -1,0 +1,48 @@
+{
+  "priority": 5,
+  "request": {
+    "method": "GET",
+    "urlPath": "/refdata/commondata/lov/categories/ActualCancellationReasonCodes",
+    "queryParameters": {
+      "serviceId": {
+        "matches": "AAA[67]"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "list_of_values": [
+        {
+          "category_key": "ActualCancellationReasonCodes",
+          "key": "unwell",
+          "value_en": "Party unwell",
+          "value_cy": "",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": 1,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "ActualCancellationReasonCodes",
+          "key": "other",
+          "value_en": "Other",
+          "value_cy": "",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": 2,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        }
+      ]
+    }
+  }
+}

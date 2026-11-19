@@ -1034,6 +1034,28 @@ def fetchCftlibWaDmns = tasks.register('fetchCftlibWaDmns') {
   }
 }
 
+/**
+ * ExUI's hearing journeys look court venues up by ePIMS id and search them by name, which civil-wiremock-mappings
+ * doesn't stub. Answer both from its court venues, filtering them in the response template.
+ */
+def writeHearingVenueStubs(File dir) {
+  def venues = new File(dir, '__files/location-ref-data-court-venues.json').text
+  def term = 'request.query.search-string'
+  def stub = { String name, Map request, String filter ->
+    def body = "{{#assign 'venues'}}${venues}{{/assign}}{{{toJson (jsonPath venues (join ${filter} ''))}}}"
+    new File(dir, "mappings/local-hearings-court-venues-${name}.json").text = groovy.json.JsonOutput.toJson([
+      priority: 1,
+      request : [method: 'GET'] + request,
+      response: [status: 200, headers: ['Content-Type': 'application/json'], body: body]
+    ])
+  }
+  // epimms_id can list several, separated by commas.
+  stub('by-id', [urlPath: '/refdata/location/court-venues', queryParameters: [epimms_id: [matches: '.+']]],
+    "'\$[?(@.epimms_id =~ /^(' (replace request.query.epimms_id ',' '|') ')\$/)]'")
+  stub('search', [urlPath: '/refdata/location/court-venues/venue-search'],
+    "'\$[?(@.court_name =~ /.*' ${term} '.*/i || @.site_name =~ /.*' ${term} '.*/i || @.postcode =~ /.*' ${term} '.*/i)]'")
+}
+
 def startCftlibWiremock = tasks.register('startCftlibWiremock') {
   description = 'Starts wiremock with civil-wiremock-mappings and the local stubs in src/cftlib/wiremock, on port 8765.'
   def root = cftlibDir.map { it.dir('wiremock') }
@@ -1054,6 +1076,7 @@ def startCftlibWiremock = tasks.register('startCftlibWiremock') {
       from('src/cftlib/wiremock')
       into dir
     }
+    writeHearingVenueStubs(dir)
     new ProcessBuilder('docker', 'rm', '-f', 'civil-cftlib-wiremock').inheritIO().start().waitFor()
     def started = new ProcessBuilder('docker', 'run', '-d', '--name', 'civil-cftlib-wiremock', '-p', '8765:8080',
       '-v', "${dir}/mappings:/home/wiremock/mappings".toString(),
@@ -1088,6 +1111,14 @@ tasks.withType(CftlibExec).configureEach {
   environment 'POSTGRES_VERSION', '15'
   environment 'RSE_LIB_ADDITIONAL_DATABASES', 'cmc'
   environment 'XUI_JURISDICTIONS', 'CIVIL'
+  // ExUI's hearings journeys read civil's hearing values from this service, and their reference data (lists of
+  // values, court venues, judges, case flags) from wiremock. ExUI runs in a container, which reaches the host on
+  // host.docker.internal; cftlib rewrites it to localhost when ExUI runs on the host.
+  environment 'RSE_LIB_XUI_ENV_SERVICES_HEARINGS_COMPONENT_API_CIVIL', 'http://host.docker.internal:4000'
+  ['SERVICES_PRD_COMMONDATA_API', 'SERVICES_PRD_LOCATION_API', 'SERVICES_LOCATION_API', 'SERVICES_LOCATION_REF_API_URL',
+   'SERVICES_PRD_JUDICIAL_API', 'SERVICES_CASE_JUDICIAL_API'].each {
+    environment "RSE_LIB_XUI_ENV_${it}", 'http://host.docker.internal:8765'
+  }
   environment 'CIVIL_CFTLIB_CCD_DEFINITIONS_DIR', definitions
   environment 'CIVIL_CFTLIB_CCD_TEMPLATE', cftlibDir.get().file('ccd-template.xlsx').asFile.path
   environment 'CIVIL_CFTLIB_CAMUNDA_DIR', file('src/main/resources').path
@@ -1133,6 +1164,9 @@ tasks.withType(CftlibExec).configureEach {
   environment 'HMC_HEARINGS_TOPIC_NAME', 'hmc-to-cft'
   environment 'HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME', 'hmc-to-civil-subscription'
   environment 'STITCHING_API_ENABLED', 'false'
+  // As in preview and AAT: civil-ccd-definition's API tests assign case roles and wait on business processes
+  // through the testing-support endpoints.
+  environment 'TESTING_SUPPORT_ENABLED', 'true'
   // Robotics emails go to SendGrid, which civil-wiremock-mappings stubs; test mode sends them over plain HTTP.
   environment 'SENDGRID_API_KEY', 'cftlib'
   environment 'SENDGRID_HOST', 'localhost:8765'

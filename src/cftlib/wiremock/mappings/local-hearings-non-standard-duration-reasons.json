@@ -1,0 +1,48 @@
+{
+  "priority": 5,
+  "request": {
+    "method": "GET",
+    "urlPath": "/refdata/commondata/lov/categories/NonStdDurationReasonCodes",
+    "queryParameters": {
+      "serviceId": {
+        "matches": "AAA[67]"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "list_of_values": [
+        {
+          "category_key": "NonStdDurationReasonCodes",
+          "key": "complex",
+          "value_en": "Complex case",
+          "value_cy": "Achos cymhleth",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": 1,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "NonStdDurationReasonCodes",
+          "key": "interpreter",
+          "value_en": "Interpreter required",
+          "value_cy": "Angen cyfieithydd",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": 2,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        }
+      ]
+    }
+  }
+}

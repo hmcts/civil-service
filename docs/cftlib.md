@@ -33,6 +33,7 @@ Nothing reaches AAT, so no VPN is needed.
   - The system update user also holds the `hearing-manager` and `hearing-viewer` roles HMC checks.
 - **Stand-ins for services outside CCD:**
   - Wiremock serves [civil-wiremock-mappings](https://github.com/hmcts/civil-wiremock-mappings) (fees, Docmosis, PRD, location ref data, send-letter, SendGrid and more), plus the stubs in `src/cftlib/wiremock` for GOV.UK Notify and the payments service request.
+  - ExUI's hearing journeys read their reference data from wiremock too: the lists of values (hearing types, case types, facilities, judge types, cancellation reasons and more) and case flags in `src/cftlib/wiremock/mappings/local-hearings-*.json`, the local judges, and civil-wiremock-mappings' court venues, which `startCftlibWiremock` makes searchable.
   - cftlib's runtime stands in for dm-store, keeping documents as files under `build/cftlib/dm-store`, and answers IDAM's `/loginUser`, which civil's Playwright tests sign in with and the IDAM simulator lacks.
 
 Everything under `src/cftlib` runs only under cftlib. It holds configuration, and stand-ins only for what is particular to civil, such as its GOV.UK Notify client.
@@ -56,7 +57,10 @@ It is not part of `check`, since it needs Docker and access to `hmctsprod.azurec
 
 ## Testing hearings by hand
 
-There is no List Assist locally. When a hearing is requested for a case, HMC sends the request to cftlib's stand-in for HMI, which accepts it, and the hearing waits in `AWAITING_LISTING` for an answer. Give it one at http://localhost:8489/hmi, which lists each hearing HMC has sent a request for, newest first, with its status in HMC:
+There is no List Assist locally. A hearing goes from request to listing like this:
+
+1. **Request it in ExUI.** Sign in as a hearing centre admin, such as Hearing Centre Admin Region 1, open the case, and choose **Request a hearing** on its **Hearings** tab. ExUI builds the request from this service's `serviceHearingValues` and the reference data in wiremock, and sends it to the local HMC. A case at judicial referral or later works; civil-ccd-definition's API tests make one, for example `yarn playwright test playwright-e2e/tests/api-tests/hearings/api_1v2SS_spec_fast_hearings.test.ts --project civil-service-nightly --no-deps`.
+2. **Answer it at http://localhost:8489/hmi.** HMC sends the request to cftlib's stand-in for HMI, which accepts it, and the hearing waits in `AWAITING_LISTING`. The page lists each hearing HMC has sent a request for since the stack started, newest first, with its status in HMC, and offers the answers HMC accepts in that status:
 
 | Answer on the page | Offered when the hearing is | HMC moves it to | This service then triggers |
 |---|---|---|---|
@@ -108,6 +112,8 @@ PLAYWRIGHT_RUN_CUI_USER_SETUP=false
 PLAYWRIGHT_RUN_CUI_USER_DATA_SETUP=false
 ```
 
+This service's testing-support endpoints are on, as in preview, so the API tests can assign case roles and wait for business processes.
+
 Then run the civil-service smoke tests, which take about 35 seconds:
 
 ```bash
@@ -122,4 +128,5 @@ yarn playwright test --project civil-service-master-pr-smoke --no-deps
 
 - **`DB not yet available...` repeats forever:** the shared `cftlib` Postgres volume was created by a different major version. civil uses Postgres 15, as dtsse-ccd-config-generator's e2e does. `RSE_LIB_CLEAN_BOOT=1` recreates the containers and their data.
 - **`/health` returns 405:** one health indicator fails against a library version on cftlib's classpath. `/health/liveness` and `/health/readiness` work.
+- **Hearing updates stop reaching this service after a few:** HMC's log shows `Failed to obtain a send link. entityPath:hmc-to-cft`. HMC opens a new Service Bus connection for each update without closing it, and the local Service Bus emulator stops accepting more. HMC still records the hearing's status, but this service doesn't hear about it. Restart `bootWithCCD`.
 - **Startup hangs in a Flyway migration:** a `CREATE INDEX CONCURRENTLY` migration waits on a transactional Flyway lock. bootWithCCD sets `SPRING_FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK=false`, as preview does.
