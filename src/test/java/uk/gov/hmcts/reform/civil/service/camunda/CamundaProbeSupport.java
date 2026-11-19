@@ -185,6 +185,11 @@ class CamundaProbeSupport {
         }
 
         @Override
+        public String getExternalTaskErrorDetails(String externalTaskId, String auth) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public List<CamundaIncident> getLatestOpenIncidentForProcessInstance(
             String a, boolean o, String p, String sb, String so, int mr) {
             throw new UnsupportedOperationException();

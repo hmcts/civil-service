@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,6 +36,7 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -512,6 +514,120 @@ class IncidentRetryEventHandlerTest {
     }
 
     // Helper methods
+    // DTSCCI-7107: the incident message is cut off before CCD's callbackErrors, so the handler reads the
+    // failed external task's full error details.
+    private static final String CUT_OFF_MESSAGE = "[422 ] during [POST] to [http://ccd-data-store-api/cases/1/events]: "
+        + "[{\"exception\":\"uk.gov.hmcts.ccd.endpoint.exceptions.ApiException\",\"status\":422,"
+        + "\"message\":\"Unable to proceed because there are one or more callback Errors or Warnings\",\"pa... (659 bytes)]";
+
+    private CamundaIncident runSingleFailedExternalTaskIncident(String errorDetails) {
+        CamundaIncident incident = newIncident("proc1", "inc1", "task1");
+        incident.setIncidentType("failedExternalTask");
+        incident.setIncidentMessage(CUT_OFF_MESSAGE);
+
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
+            .thenReturn(List.of(newProcessInstance("proc1")));
+        when(casesStuckCheckSearchService.getCases("7")).thenReturn(Collections.emptySet());
+        when(camundaRuntimeApi.getProcessVariables("proc1", "serviceAuth"))
+            .thenReturn(processVariables("1777000000000001", "CASE_PROGRESSION", "CASE_EVENT"));
+        doReturn(List.of(incident), List.of()).when(camundaRuntimeApi).getLatestOpenIncidentForProcessInstance(
+            any(), anyBoolean(), eq("proc1"), any(), any(), anyInt());
+        if (errorDetails == null) {
+            when(camundaRuntimeApi.getExternalTaskErrorDetails("task1", "serviceAuth"))
+                .thenThrow(new RuntimeException("camunda unavailable"));
+        } else {
+            when(camundaRuntimeApi.getExternalTaskErrorDetails("task1", "serviceAuth")).thenReturn(errorDetails);
+        }
+
+        handler.handleTask(externalTask);
+        return incident;
+    }
+
+    @Test
+    void shouldCompleteActivityWhenAlreadyProcessedIsOnlyInTaskErrorDetails() {
+        runSingleFailedExternalTaskIncident(
+            "{\"status\":422,\"callbackErrors\":[\"Event GENERALAPPLICATION-ASSIGN_GA_ROLES is already processed\"]}");
+
+        verify(camundaRuntimeApi).modifyProcessInstance(
+            eq("serviceAuth"), eq("proc1"), argThat(IncidentRetryEventHandlerTest::matches));
+    }
+
+    @Test
+    void shouldNotRetryNotRetryableIncidentAndRecordTheCause() {
+        runSingleFailedExternalTaskIncident(
+            "{\"status\":422,\"callbackErrors\":[\"NOT RETRYABLE: java.lang.NullPointerException: "
+                + "Cannot invoke \\\"Party.getPartyName()\\\" because respondent1 is null\"]}");
+
+        verify(camundaRuntimeApi, never()).modifyProcessInstance(any(), any(), anyMap());
+        verify(caseTaskTrackingService).trackCaseTask(
+            eq("1777000000000001"),
+            eq("incidentRetry"),
+            eq("StuckCaseDetected"),
+            argThat(properties -> "not_retryable".equals(properties.get("retryStatus"))
+                && ("NOT RETRYABLE: java.lang.NullPointerException: Cannot invoke \"Party.getPartyName()\" "
+                    + "because respondent1 is null").equals(properties.get("retryFailureReason")))
+        );
+    }
+
+    @Test
+    void shouldRetryRetryableIncident() {
+        runSingleFailedExternalTaskIncident(
+            "{\"status\":422,\"callbackErrors\":[\"RETRYABLE: feign.FeignException$BadGateway: [502 Bad Gateway]\"]}");
+
+        verify(camundaRuntimeApi).modifyProcessInstance(
+            eq("serviceAuth"), eq("proc1"), argThat(req -> !matches(req)));
+    }
+
+    @Test
+    void shouldFallBackToIncidentMessageWhenTaskErrorDetailsCannotBeRead() {
+        runSingleFailedExternalTaskIncident(null);
+
+        verify(camundaRuntimeApi).modifyProcessInstance(
+            eq("serviceAuth"), eq("proc1"), argThat(req -> !matches(req)));
+    }
+
+    @Test
+    void shouldRetryEveryInstanceWhenRetriesShrinkTheIncidentListBetweenPages() {
+        // Camunda resolves an incident as soon as it is retried, so the instance drops out of withIncidents.
+        // Paging by offset while retrying skipped the instances that moved up into the first page (2 Nov 2026).
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+        when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
+        when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
+        when(casesStuckCheckSearchService.getCases("7")).thenReturn(Collections.emptySet());
+
+        List<String> withIncidents = new CopyOnWriteArrayList<>();
+        for (int i = 0; i < 60; i++) {
+            withIncidents.add(String.format("proc%02d", i));
+        }
+        final List<String> allInstances = List.copyOf(withIncidents);
+
+        when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), any(), any(), anyMap()))
+            .thenAnswer(invocation -> {
+                int firstResult = invocation.getArgument(1);
+                int maxResults = invocation.getArgument(2);
+                return withIncidents.stream().skip(firstResult).limit(maxResults).map(this::newProcessInstance).toList();
+            });
+        when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(any(), anyBoolean(), anyString(), any(), any(), anyInt()))
+            .thenAnswer(invocation -> {
+                String processInstanceId = invocation.getArgument(2);
+                return withIncidents.contains(processInstanceId)
+                    ? List.of(newIncident(processInstanceId, "inc-" + processInstanceId, "job-" + processInstanceId))
+                    : List.of();
+            });
+        when(camundaRuntimeApi.getProcessVariables(anyString(), eq("serviceAuth")))
+            .thenAnswer(invocation -> processVariables("case-" + invocation.getArgument(0), "CASE_PROGRESSION", "CASE_EVENT"));
+        doAnswer(invocation -> withIncidents.remove((String) invocation.getArgument(1)))
+            .when(camundaRuntimeApi).modifyProcessInstance(eq("serviceAuth"), anyString(), anyMap());
+
+        handler.handleTask(externalTask);
+
+        for (String processInstanceId : allInstances) {
+            verify(camundaRuntimeApi).modifyProcessInstance(eq("serviceAuth"), eq(processInstanceId), anyMap());
+        }
+        assertThat(withIncidents).isEmpty();
+    }
+
     private CamundaProcessInstance newProcessInstance(String id) {
         CamundaProcessInstance pi = new CamundaProcessInstance();
         pi.setId(id);

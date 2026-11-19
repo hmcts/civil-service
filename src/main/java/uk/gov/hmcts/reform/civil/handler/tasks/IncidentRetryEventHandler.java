@@ -6,6 +6,7 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.callback.CallbackFailureClassifier;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -25,6 +26,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -104,6 +106,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
     private static final Pattern ALREADY_PROCESSED_PATTERN =
         Pattern.compile("already processed|already performed", Pattern.CASE_INSENSITIVE);
     private static final String ACTIVITY_ID = "activityId";
+    private static final String FAILED_EXTERNAL_TASK_INCIDENT_TYPE = "failedExternalTask";
     private static final String INCIDENT_TIMESTAMP = "incidentTimestamp";
     private static final String SEARCH_RESULT_INCIDENT_MESSAGE =
         "Detected by CasesStuckCheckSearchService after incident retry processing";
@@ -170,35 +173,26 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         String incidentEndTime,
         String incidentMessageLike
     ) {
-        int firstResult = 0;
-        List<CamundaProcessInstance> processInstancesBatch;
+        // Collect every matching process instance before retrying any of them. Retrying an incident resolves
+        // it, so the instance stops matching withIncidents; paging by offset while retrying made the next page
+        // skip the instances that moved up into the first page (2 Nov 2026: up to 50 skipped per extra page).
+        List<String> processInstanceIds = fetchAllProcessInstanceIds(
+            retryContext.serviceAuthorization, incidentStartTime, incidentEndTime, incidentMessageLike
+        );
+        log.info("Found {} process instances with incidents between {} and {}",
+                 processInstanceIds.size(), incidentStartTime, incidentEndTime);
 
-        do {
-            log.info("Calling process instances for {}, {}, {}, {}",
-                     incidentStartTime, incidentEndTime, incidentMessageLike, firstResult);
-            processInstancesBatch = fetchProcessInstances(
-                retryContext.serviceAuthorization, incidentStartTime, incidentEndTime, incidentMessageLike, firstResult
-            );
+        for (int from = 0; from < processInstanceIds.size(); from += PAGE_SIZE) {
+            List<String> batch = processInstanceIds.subList(from, Math.min(from + PAGE_SIZE, processInstanceIds.size()));
 
-            log.info("Extracted process instances for {}, {}, {}, {}",
-                     incidentStartTime, incidentEndTime, incidentMessageLike, firstResult);
-
-            if (processInstancesBatch.isEmpty()) {
-                return;
-            }
-
-            List<String> processInstanceIds = processInstancesBatch.stream()
-                .map(CamundaProcessInstance::getId)
-                .toList();
-
-            log.info("Calling incidents for {} process instances with firstResult {}", processInstanceIds.size(), firstResult);
+            log.info("Calling incidents for {} process instances from {}", batch.size(), from);
 
             List<CamundaIncident> incidents = getLatestIncidentsForProcessInstances(
                 retryContext.serviceAuthorization,
-                processInstanceIds
+                batch
             );
 
-            log.info("Extracted {} incidents with firstResult {}", incidents.size(), firstResult);
+            log.info("Extracted {} incidents from {}", incidents.size(), from);
 
             if (!incidents.isEmpty()) {
                 retryIncidents(
@@ -206,9 +200,36 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                     retryContext
                 );
             }
+        }
+    }
+
+    private List<String> fetchAllProcessInstanceIds(
+        String serviceAuthorization,
+        String incidentStartTime,
+        String incidentEndTime,
+        String incidentMessageLike
+    ) {
+        Set<String> processInstanceIds = new LinkedHashSet<>();
+        int firstResult = 0;
+        List<CamundaProcessInstance> processInstancesBatch;
+
+        do {
+            log.info("Calling process instances for {}, {}, {}, {}",
+                     incidentStartTime, incidentEndTime, incidentMessageLike, firstResult);
+            processInstancesBatch = fetchProcessInstances(
+                serviceAuthorization, incidentStartTime, incidentEndTime, incidentMessageLike, firstResult
+            );
+            log.info("Extracted {} process instances for {}, {}, {}, {}",
+                     processInstancesBatch.size(), incidentStartTime, incidentEndTime, incidentMessageLike, firstResult);
+
+            processInstancesBatch.stream()
+                .map(CamundaProcessInstance::getId)
+                .forEach(processInstanceIds::add);
 
             firstResult += PAGE_SIZE;
         } while (processInstancesBatch.size() == PAGE_SIZE);
+
+        return new ArrayList<>(processInstanceIds);
     }
 
     private void retryIncidents(
@@ -250,6 +271,27 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         } catch (Exception e) {
             retryContext.failedRetries.incrementAndGet();
             log.error("Unexpected error retrying incident {}: {}", incident.getId(), e.getMessage(), e);
+        }
+    }
+
+    /**
+     * The failed task's full error details when the incident is a failed external task (the incident's
+     * configuration is the external task id), followed by the incident message. Falls back to the
+     * incident message alone if the details cannot be read.
+     */
+    private String resolveErrorText(CamundaIncident incident, String serviceAuthorization) {
+        String message = incident.getIncidentMessage();
+        if (!FAILED_EXTERNAL_TASK_INCIDENT_TYPE.equals(incident.getIncidentType())
+            || StringUtils.isBlank(incident.getConfiguration())) {
+            return message;
+        }
+        try {
+            String details = camundaRuntimeApi.getExternalTaskErrorDetails(incident.getConfiguration(), serviceAuthorization);
+            return StringUtils.isBlank(details) ? message : details + "\n" + StringUtils.defaultString(message);
+        } catch (Exception e) {
+            log.warn("Could not read error details for external task {} (incident {}): {}",
+                     incident.getConfiguration(), incident.getId(), e.getMessage());
+            return message;
         }
     }
 
@@ -312,8 +354,26 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 incident.getId(), processInstanceId, jobId, incidentCaseId, failedActivityId
             );
 
-            boolean alreadyProcessed = incident.getIncidentMessage() != null
-                && ALREADY_PROCESSED_PATTERN.matcher(incident.getIncidentMessage()).find();
+            // The incident message is cut off before CCD's callbackErrors, so read the task's full error
+            // details for the already-processed check and the NOT RETRYABLE label (DTSCCI-7107).
+            String errorText = resolveErrorText(incident, retryContext.serviceAuthorization);
+            boolean alreadyProcessed = errorText != null && ALREADY_PROCESSED_PATTERN.matcher(errorText).find();
+            String notRetryableError = alreadyProcessed ? null : CallbackFailureClassifier.notRetryableCallbackError(errorText);
+            if (notRetryableError != null) {
+                log.info(
+                    "Not retrying incident {} for processInstanceId={} (caseId={}, activityId={}): {}",
+                    incident.getId(), processInstanceId, incidentCaseId, failedActivityId, notRetryableError
+                );
+                retryContext.stuckCasesForManualIntervention.add(new StuckCaseSummaryItem(
+                    incidentCaseId,
+                    defaultIfBlank(incident.getId()),
+                    defaultIfBlank(processInstanceId),
+                    defaultIfBlank(failedActivityId)
+                ));
+                retryContext.trackedStuckCaseIds.add(incidentCaseId);
+                trackStuckCaseEvent(incident, incidentCaseId, stateId, lastEventId, "not_retryable", notRetryableError);
+                return false;
+            }
             boolean retrySucceeded;
             if (alreadyProcessed) {
                 retrySucceeded = completeAlreadyProcessedIncident(

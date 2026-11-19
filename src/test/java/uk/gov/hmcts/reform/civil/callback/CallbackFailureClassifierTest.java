@@ -107,6 +107,20 @@ class CallbackFailureClassifierTest {
     }
 
     @Test
+    void notRetryableCallbackErrorIsExtractedFromCcdResponse() {
+        String body = "{\"status\":422,\"callbackErrors\":[\"NOT RETRYABLE: java.lang.NullPointerException: "
+            + "Cannot invoke \\\"Party.getPartyName()\\\"\"],\"callbackWarnings\":[]}";
+
+        assertThat(CallbackFailureClassifier.notRetryableCallbackError(body))
+            .isEqualTo("NOT RETRYABLE: java.lang.NullPointerException: Cannot invoke \"Party.getPartyName()\"");
+        assertThat(CallbackFailureClassifier.notRetryableCallbackError(
+            "{\"callbackErrors\":[\"RETRYABLE: feign.FeignException$BadGateway: x\"]}")).isNull();
+        assertThat(CallbackFailureClassifier.notRetryableCallbackError(
+            "{\"callbackErrors\":[\"Event X is already processed\"]}")).isNull();
+        assertThat(CallbackFailureClassifier.notRetryableCallbackError(null)).isNull();
+    }
+
+    @Test
     void codeFaultsAreNotTransient() {
         assertThat(CallbackFailureClassifier.isTransient(new NullPointerException("repayment plan is null"))).isFalse();
         assertThat(CallbackFailureClassifier.isTransient(new IllegalArgumentException("Unexpected hearing type"))).isFalse();
