@@ -6,6 +6,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
@@ -26,11 +27,15 @@ import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-/** Prepares postcodes for Caseman without changing the source case addresses. */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class RoboticsPostcodeMapper {
+
+    // contactAddressType in rpa-json-schema.json permits 60 characters per address line.
+    private static final int RPA_LINE_LIMIT = 60;
+    private static final Pattern US_ZIP = Pattern.compile("\\d{5}(?:-\\d{4})?");
+    private static final Pattern IRISH_EIRCODE = Pattern.compile("(?:[AC-FHKNPRTV-Y]\\d{2}|D6W)[0-9AC-FHKNPRTV-Y]{4}");
 
     private static final Pattern OUTSIDE_POSTCODE = Pattern.compile(
         "(?:BT|JE|GY|IM|AB|DD|EH|FK|G|HS|IV|KA|KW|KY|ML|PA|PH|ZE)\\d{1,2}\\d[A-Z]{2}");
@@ -47,7 +52,8 @@ public class RoboticsPostcodeMapper {
 
     private static final Set<String> DOMESTIC_COUNTRIES = Set.of(CountriesAllowed.ENGLAND.name(), CountriesAllowed.WALES.name(), "CYMRU");
     private static final Set<String> OUTSIDE_NAMES = Set.of(CountriesAllowed.SCOTLAND.name(), "NORTHERN IRELAND",
-                                                            "USA", "EIRE", "ÉIRE", "REPUBLIC OF IRELAND");
+                                                            "USA", "U.S.", "U.S.A.", "UNITED STATES OF AMERICA",
+                                                            "HOLLAND", "EIRE", "ÉIRE", "REPUBLIC OF IRELAND");
 
     private static boolean isOutsideCountry(String country) {
         return OUTSIDE_COUNTRIES.contains(country) || OUTSIDE_NAMES.contains(country);
@@ -62,27 +68,27 @@ public class RoboticsPostcodeMapper {
         throws JsonProcessingException {
         return switch (payload) {
             case RoboticsCaseData data -> {
-                mapPostcodes(data.getLitigiousParties(), data.getSolicitors());
+                mapPostcodes(data.getHeader(), data.getLitigiousParties(), data.getSolicitors());
                 yield data.toJsonString();
             }
             case RoboticsCaseDataSpec data -> {
-                mapPostcodes(data.getLitigiousParties(), data.getSolicitors());
+                mapPostcodes(data.getHeader(), data.getLitigiousParties(), data.getSolicitors());
                 yield data.toJsonString();
             }
             case null, default -> throw new IllegalArgumentException("Expected a specified or unspecified RPA payload");
         };
     }
 
-    public void mapPostcodes(List<LitigiousParty> parties, List<Solicitor> solicitors) {
+    void mapPostcodes(CaseHeader header, List<LitigiousParty> parties, List<Solicitor> solicitors) {
         if (parties != null) {
-            parties.forEach(party -> mapAddress(party.getAddresses()));
+            parties.forEach(party -> mapAddress(party.getAddresses(), header));
         }
         if (solicitors != null) {
-            solicitors.forEach(solicitor -> mapAddress(solicitor.getAddresses()));
+            solicitors.forEach(solicitor -> mapAddress(solicitor.getAddresses(), header));
         }
     }
 
-    private void mapAddress(RoboticsAddresses addresses) {
+    private void mapAddress(RoboticsAddresses addresses, CaseHeader header) {
         if (addresses == null || addresses.getContactAddress() == null) {
             return;
         }
@@ -93,45 +99,54 @@ public class RoboticsPostcodeMapper {
         }
         String lookupPostcode = postcode.replaceAll("\\s", "").toUpperCase(Locale.UK);
         String country = Objects.toString(address.getCountry(), "").trim().toUpperCase(Locale.UK);
-        if (!isOutsideCountry(country) && !DOMESTIC_COUNTRIES.contains(country)) {
-            if (OUTSIDE_POSTCODE.matcher(lookupPostcode).matches() || SCOTTISH_DISTRICT.matcher(lookupPostcode).matches()) {
-                relocatePostcode(address, postcode);
-                return;
-            }
-            if (!BORDER_POSTCODE.matcher(lookupPostcode).matches()) {
-                return;
-            }
-            country = Objects.toString(countries.get(lookupPostcode, key -> postcodeLookupService
-                .findCountryForPostcode(key).map(name -> name.trim().toUpperCase(Locale.UK)).orElse(null)), "");
-        }
-        if (isOutsideCountry(country)) {
-            relocatePostcode(address, postcode);
+        if (shouldRelocate(lookupPostcode, country)) {
+            relocatePostcode(address, postcode, header);
         }
     }
 
-    private void relocatePostcode(RoboticsAddress address, String postcode) {
+    private boolean shouldRelocate(String postcode, String country) {
+        if (isOutsideCountry(country) || OUTSIDE_POSTCODE.matcher(postcode).matches()
+            || SCOTTISH_DISTRICT.matcher(postcode).matches()) {
+            return true;
+        }
+        if (DOMESTIC_COUNTRIES.contains(country)) {
+            return false;
+        }
+        if (US_ZIP.matcher(postcode).matches() || IRISH_EIRCODE.matcher(postcode).matches()) {
+            return true;
+        }
+        if (!BORDER_POSTCODE.matcher(postcode).matches()) {
+            return false;
+        }
+        String resolvedCountry = countries.get(postcode, key -> postcodeLookupService.findCountryForPostcode(key)
+            .map(name -> name.trim().toUpperCase(Locale.UK)).orElse(null));
+        return resolvedCountry != null && isOutsideCountry(resolvedCountry);
+    }
+
+    private void relocatePostcode(RoboticsAddress address, String postcode, CaseHeader header) {
         String line3 = address.getAddressLine3();
         String combined = isBlank(line3) ? postcode : line3 + " - " + postcode;
-        if (combined.length() <= AddressLinesMapper.LINE_LIMIT) {
+        if (combined.length() <= RPA_LINE_LIMIT) {
             address.setAddressLine3(combined);
             address.setPostCode(null);
             return;
         }
 
-        if (postcode.length() <= AddressLinesMapper.LINE_LIMIT && isBlank(address.getAddressLine5())) {
+        if (postcode.length() <= RPA_LINE_LIMIT && isBlank(address.getAddressLine5())) {
             if (isBlank(address.getAddressLine4())) {
                 address.setAddressLine4(postcode);
             } else {
                 address.setAddressLine5(postcode);
             }
-        } else if (postcode.length() <= AddressLinesMapper.LINE_LIMIT && isBlank(address.getAddressLine4())
-            && address.getAddressLine5().length() <= AddressLinesMapper.LINE_LIMIT) {
+        } else if (postcode.length() <= RPA_LINE_LIMIT && isBlank(address.getAddressLine4())
+            && address.getAddressLine5().length() <= RPA_LINE_LIMIT) {
             address.setAddressLine4(address.getAddressLine5());
             address.setAddressLine5(postcode);
-        } else if (address.getAddressLine5() != null && (address.getAddressLine5() + " - " + postcode).length() <= AddressLinesMapper.LINE_LIMIT) {
+        } else if (address.getAddressLine5() != null && (address.getAddressLine5() + " - " + postcode).length() <= RPA_LINE_LIMIT) {
             address.setAddressLine5(address.getAddressLine5() + " - " + postcode);
         } else {
-            log.warn("RPA postcode relocation exceeds address capacity; retaining the original address");
+            log.warn("RPA postcode relocation exceeds address capacity for case {}",
+                     header == null ? null : header.getCaseNumber());
             return;
         }
         address.setPostCode(null);

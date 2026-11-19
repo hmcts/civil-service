@@ -40,7 +40,7 @@ class RoboticsPostcodeMapperTest {
         List<LitigiousParty> parties = List.of(new LitigiousParty().setAddresses(wrap(partyAddress)));
         List<Solicitor> solicitors = List.of(Solicitor.builder().addresses(wrap(solicitorAddress)).build());
 
-        mapper.mapPostcodes(parties, solicitors);
+        mapper.mapPostcodes(null, parties, solicitors);
 
         RoboticsCaseDataSpec spec = new RoboticsCaseDataSpec().setLitigiousParties(parties).setSolicitors(solicitors);
         RoboticsCaseData unspec = new RoboticsCaseData().setLitigiousParties(parties).setSolicitors(solicitors);
@@ -64,7 +64,7 @@ class RoboticsPostcodeMapperTest {
         RoboticsAddress address = address(postcode, "Existing line");
         RoboticsAddress expected = address(postcode, "Existing line");
 
-        mapper.mapPostcodes(List.of(new LitigiousParty().setAddresses(wrap(address))), null);
+        mapper.mapPostcodes(null, List.of(new LitigiousParty().setAddresses(wrap(address))), null);
 
         assertThat(address).isEqualTo(expected);
         verifyNoInteractions(lookup);
@@ -75,9 +75,9 @@ class RoboticsPostcodeMapperTest {
     @ValueSource(strings = {"  "})
     void handlesMissingPostcodesAndAddresses(String postcode) {
         RoboticsAddress address = address(postcode, "Existing line");
-        mapper.mapPostcodes(List.of(new LitigiousParty(), new LitigiousParty().setAddresses(wrap(address))),
+        mapper.mapPostcodes(null, List.of(new LitigiousParty(), new LitigiousParty().setAddresses(wrap(address))),
                             List.of(Solicitor.builder().addresses(new RoboticsAddresses()).build()));
-        mapper.mapPostcodes(null, null);
+        mapper.mapPostcodes(null, null, null);
         assertThat(address.getPostCode()).isEqualTo(postcode);
         assertThat(address.getAddressLine3()).isEqualTo("Existing line");
         verifyNoInteractions(lookup);
@@ -87,29 +87,20 @@ class RoboticsPostcodeMapperTest {
     @ValueSource(strings = {"UK", "GBR", "Unknown", "U.K.", "CY"})
     void preservesUnknownPostcodes(String country) {
         RoboticsAddress address = address("SW1A 1AA", "Existing line").setCountry(country);
-        mapper.mapPostcodes(List.of(new LitigiousParty().setAddresses(wrap(address))), null);
+        mapper.mapPostcodes(null, List.of(new LitigiousParty().setAddresses(wrap(address))), null);
         assertThat(address.getPostCode()).isEqualTo("SW1A 1AA");
         assertThat(address.getAddressLine3()).isEqualTo("Existing line");
     }
 
-    @Test
-    void retainsLongAddressTextAndPostcodeWithinLineLimits() {
-        RoboticsAddress address = address("EH12 9AB", "A".repeat(35)).setCountry("Scotland");
-        mapper.mapPostcodes(List.of(new LitigiousParty().setAddresses(wrap(address))), null);
+    @ParameterizedTest
+    @CsvSource({"10001,", "10001-1234, United Kingdom", "D02 X285,", "BT1 1AA, England", "EH1 1AA, Wales",
+        "ABC, United States of America", "ABC, U.S.", "ABC, Holland"})
+    void movesIdentifiableOutsidePostcodes(String postcode, String country) {
+        RoboticsAddress address = address(postcode, null).setCountry(country);
+        mapper.mapPostcodes(null, List.of(new LitigiousParty().setAddresses(wrap(address))), null);
+        assertThat(address.getAddressLine3()).isEqualTo(postcode);
         assertThat(address.getPostCode()).isNull();
-        assertThat(address.getAddressLine3()).isEqualTo("A".repeat(35));
-        assertThat(address.getAddressLine4()).isEqualTo("Country");
-        assertThat(address.getAddressLine5()).isEqualTo("EH12 9AB");
         verifyNoInteractions(lookup);
-    }
-
-    @Test
-    void preservesAddressWhenOverflowCannotFit() {
-        RoboticsAddress address = address("EH12 9AB", "A".repeat(35)).setCountry("Scotland")
-            .setAddressLine4("B".repeat(35)).setAddressLine5("C".repeat(35));
-        mapper.mapPostcodes(List.of(new LitigiousParty().setAddresses(wrap(address))), null);
-        assertThat(address.getPostCode()).isEqualTo("EH12 9AB");
-        assertThat(address.getAddressLine3()).isEqualTo("A".repeat(35));
     }
 
     @Test
@@ -170,13 +161,33 @@ class RoboticsPostcodeMapperTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {25, 26})
-    void movesToFourthLineOnlyWhenCombinedTextExceeds35Characters(int length) {
+    @ValueSource(ints = {25, 26, 50, 51})
+    void usesLineThreeThroughTheSchemaLimitThenFallsBackLosslessly(int length) {
         String existing = "A".repeat(length);
         RoboticsAddress address = address("BT1 1AA", existing).setAddressLine4(null);
-        mapper.mapPostcodes(List.of(new LitigiousParty().setAddresses(wrap(address))), null);
-        assertThat(address.getAddressLine3()).isEqualTo(length == 25 ? existing + " - BT1 1AA" : existing);
-        assertThat(address.getAddressLine4()).isEqualTo(length == 25 ? null : "BT1 1AA");
+        mapper.mapPostcodes(null, List.of(new LitigiousParty().setAddresses(wrap(address))), null);
+        assertThat(address.getAddressLine3()).isEqualTo(length <= 50 ? existing + " - BT1 1AA" : existing);
+        assertThat(address.getAddressLine4()).isEqualTo(length <= 50 ? null : "BT1 1AA");
+        assertThat(address.getPostCode()).isNull();
+    }
+
+    @Test
+    void retainsAllFieldsWhenNoLineHasRoomForThePostcode() {
+        RoboticsAddress original = address("BT1 1AA", "A".repeat(60))
+            .setAddressLine4("B".repeat(60)).setAddressLine5("C".repeat(60));
+        mapper.mapPostcodes(null, List.of(new LitigiousParty().setAddresses(wrap(original))), null);
+        assertThat(original.getAddressLine3()).isEqualTo("A".repeat(60));
+        assertThat(original.getAddressLine4()).isEqualTo("B".repeat(60));
+        assertThat(original.getAddressLine5()).isEqualTo("C".repeat(60));
+        assertThat(original.getPostCode()).isEqualTo("BT1 1AA");
+    }
+
+    @Test
+    void appendsPostcodeToTheTownWhenItOccupiesMappedLineThree() {
+        Address source = new Address("10 High Street", "Building B", null, "Edinburgh", null, null, "EH1 1AA");
+        RoboticsAddress address = new RoboticsAddressMapper(new AddressLinesMapper()).toRoboticsAddress(source);
+        mapper.mapPostcodes(null, List.of(new LitigiousParty().setAddresses(wrap(address))), null);
+        assertThat(address.getAddressLine3()).isEqualTo("Edinburgh - EH1 1AA");
         assertThat(address.getPostCode()).isNull();
     }
 
@@ -217,7 +228,7 @@ class RoboticsPostcodeMapperTest {
     void cachesPostcodeCountriesAcrossPayloads() {
         when(lookup.findCountryForPostcode("TD124AA")).thenReturn(java.util.Optional.of("Scotland"));
         for (int index = 0; index < 2; index++) {
-            mapper.mapPostcodes(List.of(new LitigiousParty().setAddresses(wrap(address("TD12 4AA", null)))), null);
+            mapper.mapPostcodes(null, List.of(new LitigiousParty().setAddresses(wrap(address("TD12 4AA", null)))), null);
         }
         verify(lookup).findCountryForPostcode("TD124AA");
     }
@@ -229,7 +240,7 @@ class RoboticsPostcodeMapperTest {
         "ML3 6BU", "PA31 8QX", "PH21 1LU", "ZE1 0HA"})
     void resolvesOutsideAreasWithGenericCountry(String postcode) {
         RoboticsAddress address = address(postcode, null).setCountry("United Kingdom");
-        mapper.mapPostcodes(List.of(new LitigiousParty().setAddresses(wrap(address))), null);
+        mapper.mapPostcodes(null, List.of(new LitigiousParty().setAddresses(wrap(address))), null);
         assertThat(address.getAddressLine3()).isEqualTo(postcode);
         assertThat(address.getPostCode()).isNull();
         verifyNoInteractions(lookup);
@@ -240,9 +251,9 @@ class RoboticsPostcodeMapperTest {
         when(lookup.findCountryForPostcode("TD124AA")).thenReturn(Optional.empty()).thenReturn(Optional.of("Scotland"));
         RoboticsAddress address = address("TD12 4AA", null);
         var parties = List.of(new LitigiousParty().setAddresses(wrap(address)));
-        mapper.mapPostcodes(parties, null);
+        mapper.mapPostcodes(null, parties, null);
         assertThat(address.getPostCode()).isEqualTo("TD12 4AA");
-        mapper.mapPostcodes(parties, null);
+        mapper.mapPostcodes(null, parties, null);
         assertThat(address.getPostCode()).isNull();
     }
 
@@ -252,7 +263,7 @@ class RoboticsPostcodeMapperTest {
         String key = postcode.replace(" ", "");
         when(lookup.findCountryForPostcode(key)).thenReturn(Optional.of("England"));
         RoboticsAddress address = address(postcode, null).setCountry("United Kingdom");
-        mapper.mapPostcodes(List.of(new LitigiousParty().setAddresses(wrap(address))), null);
+        mapper.mapPostcodes(null, List.of(new LitigiousParty().setAddresses(wrap(address))), null);
         verify(lookup).findCountryForPostcode(key);
         assertThat(address.getPostCode()).isEqualTo(postcode);
         assertThat(address.getAddressLine3()).isNull();
@@ -262,21 +273,22 @@ class RoboticsPostcodeMapperTest {
     @ValueSource(strings = {"USA", "Eire", "Éire", "Republic of Ireland"})
     void recognisesExplicitOverseasCountryAliases(String country) {
         RoboticsAddress address = address("12345", null).setCountry(country);
-        mapper.mapPostcodes(List.of(new LitigiousParty().setAddresses(wrap(address))), null);
+        mapper.mapPostcodes(null, List.of(new LitigiousParty().setAddresses(wrap(address))), null);
         assertThat(address.getAddressLine3()).isEqualTo("12345");
         assertThat(address.getPostCode()).isNull();
         verifyNoInteractions(lookup);
     }
 
     @Test
-    void usesSpareFourthLineAndKeepsPostcodeLast() {
+    void keepsLongThirdLineAndTownInPlaceWhenPostcodeFits() {
         Address source = new Address("10 High Street", "Building B", "A".repeat(35), " ", "Dundee", null, "DD1 2HS");
         RoboticsAddress address = new RoboticsAddressMapper(new AddressLinesMapper()).toRoboticsAddress(source);
         assertThat(address.getAddressLine4()).isBlank();
         assertThat(address.getAddressLine5()).isEqualTo("Dundee");
-        mapper.mapPostcodes(List.of(new LitigiousParty().setAddresses(wrap(address))), null);
-        assertThat(address.getAddressLine4()).isEqualTo("Dundee");
-        assertThat(address.getAddressLine5()).isEqualTo("DD1 2HS");
+        mapper.mapPostcodes(null, List.of(new LitigiousParty().setAddresses(wrap(address))), null);
+        assertThat(address.getAddressLine3()).isEqualTo("A".repeat(35) + " - DD1 2HS");
+        assertThat(address.getAddressLine4()).isBlank();
+        assertThat(address.getAddressLine5()).isEqualTo("Dundee");
         assertThat(address.getPostCode()).isNull();
     }
 
