@@ -46,6 +46,67 @@ class CallbackFailureClassifierTest {
     }
 
     @Test
+    void docmosisInternalNullPointerOnRenderIsTransient() {
+        // Docmosis's own glitch: 400 with its internal NPE, seen in bursts across unrelated templates
+        FeignException docmosisGlitch = new FeignException.BadRequest(
+            "[400 Bad Request] during [POST] to [https://docmosis/rs/render]", request(Request.HttpMethod.POST),
+            "{\"succeeded\":false,\"shortMsg\":\"java.lang.NullPointerException\"}".getBytes(StandardCharsets.UTF_8), null);
+
+        assertThat(CallbackFailureClassifier.isTransient(docmosisGlitch)).isTrue();
+        assertThat(CallbackFailureClassifier.isTransient(new RuntimeException("render failed", docmosisGlitch))).isTrue();
+        assertThat(CallbackFailureClassifier.describe(docmosisGlitch)).startsWith(RETRYABLE);
+    }
+
+    @Test
+    void otherDocmosisBadRequestsAreNotTransient() {
+        FeignException badTemplate = new FeignException.BadRequest(
+            "[400 Bad Request]", request(Request.HttpMethod.POST),
+            "{\"succeeded\":false,\"shortMsg\":\"Template not found: CV-XXX.docx\"}".getBytes(StandardCharsets.UTF_8), null);
+
+        assertThat(CallbackFailureClassifier.isTransient(badTemplate)).isFalse();
+    }
+
+    @Test
+    void nullPointerBodyFromAnotherServiceIsNotTransient() {
+        Request otherService = Request.create(Request.HttpMethod.POST, "http://ccd-data-store-api/cases/1/events",
+                                              Map.of(), null, StandardCharsets.UTF_8, null);
+        FeignException badRequest = new FeignException.BadRequest(
+            "[400 Bad Request]", otherService,
+            "{\"succeeded\":false,\"shortMsg\":\"java.lang.NullPointerException\"}".getBytes(StandardCharsets.UTF_8), null);
+
+        assertThat(CallbackFailureClassifier.isTransient(badRequest)).isFalse();
+    }
+
+    @Test
+    void refDataAuthBlipsOnOrganisationLookupsAreTransient() {
+        Request orgLookup = Request.create(Request.HttpMethod.GET,
+            "http://rd-professional-api-prod.service.core-compute-prod.internal/refdata/internal/v1/organisations?id=4GY5ONN",
+            Map.of(), null, StandardCharsets.UTF_8, null);
+        FeignException forbidden = new FeignException.Forbidden("[403 Forbidden]", orgLookup,
+            "{\"errorMessage\":null,\"errorDescription\":null}".getBytes(StandardCharsets.UTF_8), null);
+        FeignException unauthorised = new FeignException.Unauthorized("[401 Unauthorized]", orgLookup,
+            "{\"errorMessage\":\"Error while invoking UP\"}".getBytes(StandardCharsets.UTF_8), null);
+
+        assertThat(CallbackFailureClassifier.isTransient(forbidden)).isTrue();
+        assertThat(CallbackFailureClassifier.isTransient(new RuntimeException("rpa feed", unauthorised))).isTrue();
+    }
+
+    @Test
+    void refDataNotFoundAndOtherServicesAuthFailuresAreNotTransient() {
+        Request orgLookup = Request.create(Request.HttpMethod.GET,
+            "http://rd-professional-api-prod.service.core-compute-prod.internal/refdata/internal/v1/organisations?id=XXXXXXX",
+            Map.of(), null, StandardCharsets.UTF_8, null);
+        Request cdam = Request.create(Request.HttpMethod.POST,
+            "http://ccd-case-document-am-api-prod.service.core-compute-prod.internal/cases/documents",
+            Map.of(), null, StandardCharsets.UTF_8, null);
+
+        assertThat(CallbackFailureClassifier.isTransient(
+            new FeignException.NotFound("[404 Not Found]", orgLookup, null, null))).isFalse();
+        assertThat(CallbackFailureClassifier.isTransient(
+            new FeignException.Forbidden("[403 Forbidden]", cdam, null, null))).isFalse();
+    }
+
+    @Test
     void codeFaultsAreNotTransient() {
         assertThat(CallbackFailureClassifier.isTransient(new NullPointerException("repayment plan is null"))).isFalse();
         assertThat(CallbackFailureClassifier.isTransient(new IllegalArgumentException("Unexpected hearing type"))).isFalse();

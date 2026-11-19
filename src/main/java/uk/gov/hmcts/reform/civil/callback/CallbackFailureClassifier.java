@@ -36,6 +36,12 @@ public final class CallbackFailureClassifier {
     private static final Pattern RETRYABLE_CALLBACK_ERROR =
         Pattern.compile("\"callbackErrors\"\\s*:\\s*\\[\\s*\"" + Pattern.quote(RETRYABLE));
 
+    static final String DOCMOSIS_RENDER_PATH = "/rs/render";
+    static final String REF_DATA_HOST = "rd-professional-api";
+    static final String REF_DATA_PATH = "/refdata/";
+    private static final Pattern DOCMOSIS_INTERNAL_NPE =
+        Pattern.compile("\"shortMsg\"\\s*:\\s*\"java\\.lang\\.NullPointerException\"");
+
     private CallbackFailureClassifier() {
         // Utility class
     }
@@ -51,7 +57,9 @@ public final class CallbackFailureClassifier {
                 return true;
             }
             if (current instanceof FeignException feignException) {
-                return isTransientStatus(feignException.status());
+                return isTransientStatus(feignException.status())
+                    || isDocmosisInternalError(feignException)
+                    || isRefDataAuthBlip(feignException);
             }
             if (current instanceof HttpStatusCodeException httpException) {
                 return isTransientStatus(httpException.getStatusCode().value());
@@ -82,6 +90,40 @@ public final class CallbackFailureClassifier {
         }
         String body = exception.contentUTF8();
         return StringUtils.isNotBlank(body) && RETRYABLE_CALLBACK_ERROR.matcher(body).find();
+    }
+
+    /**
+     * Docmosis Tornado answers 400 with {@code {"succeeded":false,"shortMsg":"java.lang.NullPointerException"}}
+     * when it fails internally. In production these come in short bursts across unrelated templates
+     * (6, 9, 13 and 18 November 2026) and render fine on retry, so they are treated as transient.
+     * Any other Docmosis 400 (bad template or input) stays not retryable.
+     */
+    static boolean isDocmosisInternalError(FeignException exception) {
+        if (exception.status() != 400 || exception.request() == null || exception.request().url() == null) {
+            return false;
+        }
+        String path = exception.request().url().replaceFirst("\\?.*$", "");
+        if (!path.endsWith(DOCMOSIS_RENDER_PATH)) {
+            return false;
+        }
+        String body = exception.contentUTF8();
+        return StringUtils.isNotBlank(body) && DOCMOSIS_INTERNAL_NPE.matcher(body).find();
+    }
+
+    /**
+     * Professional reference data answers 401 or 403 on organisation lookups during short auth blips,
+     * including 401 "Error while invoking UP" when its own call to user-profile fails. Over 30 days to
+     * 19 November 2026 these were one-offs scattered across 26 ten-minute windows, and a later attempt on
+     * the same case and event succeeded for 86% (403) and 75% (401). An unknown organisation is a 404,
+     * which stays not retryable.
+     */
+    static boolean isRefDataAuthBlip(FeignException exception) {
+        int status = exception.status();
+        if ((status != 401 && status != 403) || exception.request() == null || exception.request().url() == null) {
+            return false;
+        }
+        String url = exception.request().url();
+        return url.contains(REF_DATA_HOST) && url.contains(REF_DATA_PATH);
     }
 
     private static boolean isTransientStatus(int status) {
