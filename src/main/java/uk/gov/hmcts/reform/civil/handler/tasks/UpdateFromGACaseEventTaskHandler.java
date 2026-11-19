@@ -25,12 +25,17 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Long.parseLong;
@@ -55,6 +60,7 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
                                                                           "hearingNotice", "hearingOrder", "requestForInfo");
     private static final String GA_DRAFT_DOCUMENT = "gaDraftDocument";
     private static final String GA_DRAFT = "gaDraft";
+    private static final List<String> DRAFT_DOCUMENT_PREFIXES = List.of("Draft_application_", "Translated_draft_application_");
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
@@ -250,28 +256,43 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
         }
     }
 
+    /**
+     * Syncs a GA's draft application documents into a main case collection.
+     *
+     * <p>Only drafts this GA has superseded (older drafts in its own list with the same name prefix) are removed
+     * from the main case. Every other main case document, including the GA's current draft and drafts belonging
+     * to other GAs, is kept, because the document store checks access against the main case and a draft missing
+     * from it can no longer be opened from either case. Current GA drafts not yet on the main case are added.</p>
+     */
     protected <T> List<Element<T>> checkDraftDocumentsInMainCase(List<Element<T>> civilDocs, List<Element<T>> gaDocs) {
-        List<UUID> ids = gaDocs.stream().map(Element::getId).toList();
-        List<Element<T>> civilDocsCopy = newArrayList();
+        Set<UUID> supersededIds = findSupersededDraftIds(gaDocs);
+        civilDocs.removeIf(civilDoc -> supersededIds.contains(civilDoc.getId()));
 
-        for (Element<T> civilDoc : civilDocs) {
-            if (!ids.contains(civilDoc.getId())) {
-                civilDocsCopy.add(civilDoc);
-            }
-        }
-
-        List<UUID> civilIds = civilDocs.stream().map(Element::getId).toList();
+        Set<UUID> civilIds = civilDocs.stream().map(Element::getId).collect(Collectors.toSet());
         for (Element<T> gaDoc : gaDocs) {
-            if (!civilIds.contains(gaDoc.getId())) {
-                civilDocsCopy.add(gaDoc);
+            if (!supersededIds.contains(gaDoc.getId()) && !civilIds.contains(gaDoc.getId())) {
+                civilDocs.add(gaDoc);
             }
         }
-
-        civilDocs.clear();
-        civilDocs.addAll(civilDocsCopy);
-        civilDocsCopy.clear();
 
         return civilDocs;
+    }
+
+    private <T> Set<UUID> findSupersededDraftIds(List<Element<T>> gaDocs) {
+        Set<UUID> supersededIds = new HashSet<>();
+        for (String prefix : DRAFT_DOCUMENT_PREFIXES) {
+            List<Element<T>> draftsNewestFirst = gaDocs.stream()
+                .filter(gaDoc -> gaDoc.getValue() instanceof CaseDocument caseDocument
+                    && caseDocument.getDocumentName() != null
+                    && caseDocument.getDocumentName().startsWith(prefix))
+                .sorted(Comparator.comparing(
+                    (Element<T> gaDoc) -> ((CaseDocument) gaDoc.getValue()).getCreatedDatetime(),
+                    Comparator.nullsFirst(Comparator.<LocalDateTime>naturalOrder())
+                ).reversed())
+                .toList();
+            draftsNewestFirst.stream().skip(1).map(Element::getId).forEach(supersededIds::add);
+        }
+        return supersededIds;
     }
 
     private Method getCaseDataGetter(String fieldName) {
