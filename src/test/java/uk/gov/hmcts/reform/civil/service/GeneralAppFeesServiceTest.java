@@ -455,14 +455,10 @@ class GeneralAppFeesServiceTest {
         };
         when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn(GENERAL_APP_WITHOUT_NOTICE);
 
+        List<GeneralApplicationTypes> applicationTypes = List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT);
         IllegalStateException exception = assertThrows(
             IllegalStateException.class,
-            () -> invalidFeeService.getFeeForGALiP(
-                List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT),
-                false,
-                false,
-                null
-            )
+            () -> invalidFeeService.getFeeForGALiP(applicationTypes, false, false, null)
         );
 
         assertThat(exception).hasMessage("General Application fee calculation did not produce a valid fee");

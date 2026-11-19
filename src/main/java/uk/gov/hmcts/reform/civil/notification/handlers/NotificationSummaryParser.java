@@ -48,6 +48,6 @@ public final class NotificationSummaryParser {
         }
 
         String right = combined.substring(delimiterPos + DELIMITER.length());
-        return !right.isBlank() ? right : null;
+        return right.isBlank() ? null : right;
     }
 }
