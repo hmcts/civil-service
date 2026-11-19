@@ -26,7 +26,7 @@ jobs:
           node-version: '26'
 
       - name: Install Mermaid CLI
-        run: npm install -g @mermaid-js/mermaid-cli --ignore-scripts
+        run: npm install -g @mermaid-js/mermaid-cli@11.14.0 --ignore-scripts
 
       - name: Export StateFlow artefacts
         run: python3 scripts/export_stateflow_transitions.py
