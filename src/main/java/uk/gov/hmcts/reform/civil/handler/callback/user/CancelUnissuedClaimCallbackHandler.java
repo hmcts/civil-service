@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -39,6 +40,7 @@ public class CancelUnissuedClaimCallbackHandler extends CallbackHandler {
     private static final String BLANK_REASON_PLACEHOLDER = " ";
 
     private final ObjectMapper objectMapper;
+    private final FeatureToggleService featureToggleService;
 
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_START), this::aboutToStartValidation,
@@ -58,7 +60,8 @@ public class CancelUnissuedClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToStartValidation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        boolean isEligible = CaseState.PENDING_CASE_ISSUED == caseData.getCcdState()
+        boolean isEligible = featureToggleService.isEarlyClaimTerminationEnabled()
+            && CaseState.PENDING_CASE_ISSUED == caseData.getCcdState()
             && caseData.getIssueDate() == null
             && (isLipClaimantEligible(caseData) || isLrClaimantEligible(caseData));
         return AboutToStartOrSubmitCallbackResponse.builder()
