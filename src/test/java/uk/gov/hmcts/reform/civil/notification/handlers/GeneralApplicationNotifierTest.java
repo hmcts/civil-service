@@ -87,10 +87,11 @@ class GeneralApplicationNotifierTest {
             eq("ga-respondent@example.com"), eq("template-b"), anyMap(), eq("ga-ref-2"));
 
         // the summary feeds the GA history tab in DTSCCI-4296, so its shape is asserted not assumed
-        assertThat(summary).startsWith("Attempted: ");
-        assertThat(summary).contains("ga-applicant@example.com : ga-ref-1 : template-a");
-        assertThat(summary).contains("ga-respondent@example.com : ga-ref-2 : template-b");
-        assertThat(summary).endsWith("|| Errors: ");
+        assertThat(summary)
+            .startsWith("Attempted: ")
+            .contains("ga-applicant@example.com : ga-ref-1 : template-a")
+            .contains("ga-respondent@example.com : ga-ref-2 : template-b")
+            .endsWith("|| Errors: ");
     }
 
     @Test
