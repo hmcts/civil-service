@@ -20,6 +20,9 @@ import uk.gov.hmcts.reform.civil.service.robotics.dto.RoboticsCaseDataDTO;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataException;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsPostcodeMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
+import uk.gov.hmcts.reform.civil.model.robotics.ToJsonString;
 import uk.gov.hmcts.reform.civil.service.robotics.params.RoboticsEmailParams;
 
 import jakarta.validation.constraints.NotNull;
@@ -48,6 +51,8 @@ public class RoboticsNotificationService {
     private final RoboticsDataMapperForUnspec roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
     private final FeatureToggleService toggleService;
+    private final RoboticsPostcodeMapper roboticsPostcodeMapper;
+    private final JsonSchemaValidationService schemaValidationService;
 
     public void notifyRobotics(@NotNull CaseData caseData, boolean isMultiParty, String authToken) {
         requireNonNull(caseData);
@@ -107,7 +112,7 @@ public class RoboticsNotificationService {
             roboticsCaseDataDTO = getRoboticsCaseDataDTOForSpec(caseData, authToken);
         } else {
             RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData, authToken);
-            roboticsCaseDataDTO = new RoboticsCaseDataDTO(roboticsCaseData.toJsonString().getBytes(), roboticsCaseData.getEvents());
+            roboticsCaseDataDTO = new RoboticsCaseDataDTO(prepareValidatedJson(roboticsCaseData, caseData).getBytes(), roboticsCaseData.getEvents());
         }
         return roboticsCaseDataDTO;
     }
@@ -115,8 +120,17 @@ public class RoboticsNotificationService {
     private RoboticsCaseDataDTO getRoboticsCaseDataDTOForSpec(CaseData caseData, String authToken) throws JsonProcessingException {
         RoboticsCaseDataDTO roboticsCaseDataDTO;
         RoboticsCaseDataSpec roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData, authToken);
-        roboticsCaseDataDTO = new RoboticsCaseDataDTO(roboticsCaseDataSpec.toJsonString().getBytes(), roboticsCaseDataSpec.getEvents());
+        roboticsCaseDataDTO = new RoboticsCaseDataDTO(prepareValidatedJson(roboticsCaseDataSpec, caseData).getBytes(), roboticsCaseDataSpec.getEvents());
         return roboticsCaseDataDTO;
+    }
+
+    private String prepareValidatedJson(ToJsonString payload, CaseData caseData) throws JsonProcessingException {
+        String json = roboticsPostcodeMapper.prepareJson(payload);
+        var errors = schemaValidationService.validate(json);
+        if (!errors.isEmpty()) {
+            throw new JsonSchemaValidationException("Invalid RPA Json payload for " + caseData.getLegacyCaseReference(), errors);
+        }
+        return json;
     }
 
     private String getMessage(CaseData caseData, boolean isMultiParty) {

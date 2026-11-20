@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.robotics;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,4 +18,7 @@ public class RoboticsAddress {
     private String addressLine4;
     private String addressLine5;
     private String postCode;
+
+    @JsonIgnore
+    private String country;
 }

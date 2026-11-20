@@ -29,7 +29,8 @@ public class RoboticsAddressMapper {
             .setAddressLine3(address.thirdNonNull())
             .setAddressLine4(address.fourthNonNull())
             .setAddressLine5(address.fifthNonNull())
-            .setPostCode(address.getPostCode());
+            .setPostCode(address.getPostCode())
+            .setCountry(address.getCountry());
     }
 
     public RoboticsAddresses toRoboticsAddresses(Address address) {
