@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -39,6 +40,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_GA_LIP;
+import static uk.gov.hmcts.reform.civil.constants.DocumentManagementConstants.CREATED_BY;
 
 public class UploadTranslatedDocumentServiceTest {
 
@@ -396,6 +398,7 @@ public class UploadTranslatedDocumentServiceTest {
         Document originalFile = new Document().setDocumentFileName("final-order.pdf");
         Document translatedFile = new Document().setDocumentFileName("translated-final-order.pdf");
         CaseDocument originalOrder = new CaseDocument()
+            .setCreatedBy(CREATED_BY)
             .setDocumentType(DocumentType.GENERAL_ORDER)
             .setDocumentLink(originalFile)
             .setDocumentName("final-order.pdf");
@@ -430,9 +433,11 @@ public class UploadTranslatedDocumentServiceTest {
     void shouldPreparePublishedFinalOrderForBulkPrintWhenNoPreTranslationCollectionExists(
         GaFinalOrderSelection finalOrderSelection) {
         CaseDocument previousOrder = new CaseDocument()
+            .setCreatedBy(CREATED_BY)
             .setDocumentType(DocumentType.GENERAL_ORDER)
             .setDocumentLink(new Document().setDocumentFileName("previous-order.pdf"));
         CaseDocument originalOrder = new CaseDocument()
+            .setCreatedBy(CREATED_BY)
             .setDocumentType(DocumentType.GENERAL_ORDER)
             .setDocumentLink(new Document().setDocumentFileName("final-order.pdf"));
         CaseDocument previousTranslation = new CaseDocument()
@@ -481,6 +486,20 @@ public class UploadTranslatedDocumentServiceTest {
             .hasMessage("No original final order available for translated approve-or-edit order bulk print");
     }
 
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = " ")
+    void shouldRetainCompatibilityWithPublishedOriginalWithoutAnAuthor(String author) {
+        GeneralApplicationCaseData builder = publishedFinalOrderCaseData(TranslatedDocumentType.APPROVE_OR_EDIT_ORDER);
+        CaseDocument original = builder.getGeneralOrderDocument().getFirst().getValue();
+        original.setCreatedBy(author);
+
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builder);
+
+        assertThat(builder.getOriginalDocumentsBulkPrint()).hasSize(1);
+        assertThat(builder.getOriginalDocumentsBulkPrint().getFirst().getValue()).isEqualTo(original);
+    }
+
     @Test
     void shouldNotReuseFinalOrderForPlainGeneralOrderTranslation() {
         GeneralApplicationCaseData builder = publishedFinalOrderCaseData(TranslatedDocumentType.GENERAL_ORDER);
@@ -511,6 +530,7 @@ public class UploadTranslatedDocumentServiceTest {
             .finalOrderSelection(GaFinalOrderSelection.FREE_FORM_ORDER)
             .generalOrderDocument(new ArrayList<>(List.of(element(new CaseDocument()
                 .setDocumentType(DocumentType.GENERAL_ORDER)
+                .setCreatedBy(CREATED_BY)
                 .setDocumentLink(new Document().setDocumentFileName("english-order.pdf"))))))
             .translatedDocuments(new ArrayList<>(List.of(element(TranslatedDocument.builder()
                 .documentType(type)
