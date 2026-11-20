@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.ga.handler.callback.user;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -349,6 +350,36 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest
                     .sendNotification(any(), eq(FEE_PAYMENT_OUTCOME_GA));
             assertThat(updatedData.getBusinessProcess().getCamundaEvent())
                     .isEqualTo(UPDATE_GA_ADD_HWF.toString());
+        }
+
+        @Test
+        void shouldReturnError_whenNoHwfReferenceAndHwfNumberNotAvailable() {
+            GeneralApplicationCaseData caseData =
+                    new GeneralApplicationCaseData()
+                            .ccdCaseReference(1793116083638547L)
+                            .generalAppPBADetails(
+                                    new GeneralApplicationPbaDetails()
+                                            .setFee(
+                                                    new Fee()
+                                                            .setCalculatedAmountInPence(
+                                                                    BigDecimal.valueOf(10000))
+                                                            .setCode("OOOCM002")))
+                            .feePaymentOutcomeDetails(
+                                    new FeePaymentOutcomeDetails()
+                                            .setHwfNumberAvailable(YesOrNo.NO))
+                            .gaHwfDetails(new HelpWithFeesDetails())
+                            .generalAppType(new GAApplicationType().setTypes(List.of(STRIKE_OUT)))
+                            .hwfFeeType(FeeType.APPLICATION)
+                            .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors())
+                    .containsExactly(GaFeePaymentOutcomeHWFCallBackHandler.HWF_REFERENCE_NUMBER_MISSING);
+            verify(service, never()).processHwf(any());
+            verify(hwfNotificationService, never()).sendNotification(any(), any());
         }
     }
 }

@@ -44,6 +44,8 @@ public class GaFeePaymentOutcomeHWFCallBackHandler extends CallbackHandler imple
     public static final String WRONG_REMISSION_TYPE_SELECTED = "Incorrect remission type selected";
     public static final String CASE_STATE_INVALID = "Case is in invalid state";
     public static final String PROCESS_FEE_PAYMENT_FAILED = "Process fee payment failed";
+    public static final String HWF_REFERENCE_NUMBER_MISSING =
+        "A Help with Fees reference number is required to record the fee payment outcome";
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.FEE_PAYMENT_OUTCOME_GA);
 
     private final ObjectMapper objectMapper;
@@ -112,6 +114,15 @@ public class GaFeePaymentOutcomeHWFCallBackHandler extends CallbackHandler imple
         }
         caseData = caseDataBuilder.build();
         caseData = HwFFeeTypeUtil.updateHwfReferenceNumber(caseData);
+
+        if (Objects.isNull(caseData.getGeneralAppHelpWithFees())
+            || Objects.isNull(caseData.getGeneralAppHelpWithFees().getHelpWithFeesReferenceNumber())) {
+            log.warn("No Help with Fees reference number for fee payment outcome on caseId: {}",
+                     caseData.getCcdCaseReference());
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(HWF_REFERENCE_NUMBER_MISSING))
+                .build();
+        }
 
         GeneralApplicationCaseData processedCaseData = paymentRequestUpdateCallbackService.processHwf(caseData);
 
