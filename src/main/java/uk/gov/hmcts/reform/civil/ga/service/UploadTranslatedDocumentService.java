@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.ga.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -275,7 +276,8 @@ public class UploadTranslatedDocumentService {
                 moveGeneralOrder(
                     context.caseDataBuilder(),
                     context.preTranslationGaDocuments(),
-                    context.bulkPrintOriginalDocuments()
+                    context.bulkPrintOriginalDocuments(),
+                    documentType
                 );
                 break;
             case HEARING_NOTICE:
@@ -376,17 +378,26 @@ public class UploadTranslatedDocumentService {
 
     private void moveGeneralOrder(GeneralApplicationCaseData caseDataBuilder,
                                   List<Element<CaseDocument>> preTranslationGaDocuments,
-                                  List<Element<CaseDocument>> bulkPrintOriginalDocuments) {
+                                  List<Element<CaseDocument>> bulkPrintOriginalDocuments,
+                                  TranslatedDocumentType translatedDocumentType) {
         Optional<Element<CaseDocument>> originalDocument = findAndRemovePreTranslationDocument(
             preTranslationGaDocuments,
             item -> item.getDocumentType() == DocumentType.GENERAL_ORDER
         );
         List<Element<CaseDocument>> generalOrderDocuments = getCaseDocuments(caseDataBuilder.build().getGeneralOrderDocument());
         if (originalDocument.isEmpty()
-            && caseDataBuilder.getFinalOrderSelection() != null
-            && !generalOrderDocuments.isEmpty()) {
-            // Final orders already published in English are not held in the pre-translation collection.
-            bulkPrintOriginalDocuments.add(generalOrderDocuments.getLast());
+            && translatedDocumentType == TranslatedDocumentType.APPROVE_OR_EDIT_ORDER
+            && caseDataBuilder.getFinalOrderSelection() != null) {
+            // Generated English orders have no author; translated orders are attributed to the translator.
+            Element<CaseDocument> publishedOriginal = generalOrderDocuments.reversed().stream()
+                .filter(document -> document.getValue().getDocumentType() == DocumentType.GENERAL_ORDER)
+                .filter(document -> StringUtils.isBlank(document.getValue().getCreatedBy()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(
+                    "No original final order available for translated approve-or-edit order bulk print"));
+            if (!bulkPrintOriginalDocuments.contains(publishedOriginal)) {
+                bulkPrintOriginalDocuments.add(publishedOriginal);
+            }
             caseDataBuilder.originalDocumentsBulkPrint(bulkPrintOriginalDocuments);
             return;
         }

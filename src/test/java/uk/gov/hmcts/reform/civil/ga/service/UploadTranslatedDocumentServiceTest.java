@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
@@ -433,13 +435,17 @@ public class UploadTranslatedDocumentServiceTest {
         CaseDocument originalOrder = new CaseDocument()
             .setDocumentType(DocumentType.GENERAL_ORDER)
             .setDocumentLink(new Document().setDocumentFileName("final-order.pdf"));
+        CaseDocument previousTranslation = new CaseDocument()
+            .setDocumentType(DocumentType.GENERAL_ORDER)
+            .setCreatedBy("Previous translator")
+            .setDocumentLink(new Document().setDocumentFileName("previous-welsh-order.pdf"));
         TranslatedDocument translation = TranslatedDocument.builder()
             .documentType(TranslatedDocumentType.APPROVE_OR_EDIT_ORDER)
             .file(new Document().setDocumentFileName("translated-final-order.pdf"))
             .build();
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .finalOrderSelection(finalOrderSelection)
-            .generalOrderDocument(new ArrayList<>(List.of(element(previousOrder), element(originalOrder))))
+            .generalOrderDocument(new ArrayList<>(List.of(element(previousOrder), element(originalOrder), element(previousTranslation))))
             .translatedDocuments(new ArrayList<>(List.of(element(translation))))
             .build();
         GeneralApplicationCaseData builder = caseData.copy();
@@ -452,9 +458,65 @@ public class UploadTranslatedDocumentServiceTest {
         assertThat(updated.getOriginalDocumentsBulkPrint().getFirst().getValue()).isEqualTo(originalOrder);
         assertThat(updated.getTranslatedDocumentsBulkPrint()).hasSize(1);
         assertThat(updated.getTranslatedDocumentsBulkPrint().getFirst().getValue()).isEqualTo(translation);
-        assertThat(updated.getGeneralOrderDocument()).hasSize(3);
+        assertThat(updated.getGeneralOrderDocument()).hasSize(4);
         assertThat(updated.getGeneralOrderDocument().get(0).getValue()).isEqualTo(previousOrder);
         assertThat(updated.getGeneralOrderDocument().get(1).getValue()).isEqualTo(originalOrder);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"missing", "empty", "translationsOnly"})
+    void shouldRejectApproveOrEditTranslationWithoutAnEnglishOriginal(String collectionState) {
+        GeneralApplicationCaseData builder = publishedFinalOrderCaseData(TranslatedDocumentType.APPROVE_OR_EDIT_ORDER);
+        if (collectionState.equals("missing")) {
+            builder.generalOrderDocument(null);
+        } else if (collectionState.equals("empty")) {
+            builder.generalOrderDocument(new ArrayList<>());
+        } else {
+            builder.generalOrderDocument(new ArrayList<>(List.of(element(new CaseDocument()
+                .setDocumentType(DocumentType.GENERAL_ORDER).setCreatedBy("A different translator")))));
+        }
+
+        assertThatThrownBy(() -> uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builder))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("No original final order available for translated approve-or-edit order bulk print");
+    }
+
+    @Test
+    void shouldNotReuseFinalOrderForPlainGeneralOrderTranslation() {
+        GeneralApplicationCaseData builder = publishedFinalOrderCaseData(TranslatedDocumentType.GENERAL_ORDER);
+
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builder);
+
+        assertThat(builder.getOriginalDocumentsBulkPrint()).isNull();
+        assertThat(builder.getGeneralOrderDocument()).hasSize(1);
+    }
+
+    @Test
+    void shouldNotDuplicatePublishedOriginalForMultipleApproveOrEditTranslations() {
+        GeneralApplicationCaseData builder = publishedFinalOrderCaseData(TranslatedDocumentType.APPROVE_OR_EDIT_ORDER);
+        final CaseDocument original = builder.getGeneralOrderDocument().getFirst().getValue();
+        builder.getTranslatedDocuments().add(element(TranslatedDocument.builder()
+            .documentType(TranslatedDocumentType.APPROVE_OR_EDIT_ORDER)
+            .file(new Document().setDocumentFileName("second-translation.pdf"))
+            .build()));
+
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builder);
+
+        assertThat(builder.getOriginalDocumentsBulkPrint()).hasSize(1);
+        assertThat(builder.getOriginalDocumentsBulkPrint().getFirst().getValue()).isEqualTo(original);
+    }
+
+    private GeneralApplicationCaseData publishedFinalOrderCaseData(TranslatedDocumentType type) {
+        return new GeneralApplicationCaseData()
+            .finalOrderSelection(GaFinalOrderSelection.FREE_FORM_ORDER)
+            .generalOrderDocument(new ArrayList<>(List.of(element(new CaseDocument()
+                .setDocumentType(DocumentType.GENERAL_ORDER)
+                .setDocumentLink(new Document().setDocumentFileName("english-order.pdf"))))))
+            .translatedDocuments(new ArrayList<>(List.of(element(TranslatedDocument.builder()
+                .documentType(type)
+                .file(new Document().setDocumentFileName("welsh-order.pdf"))
+                .build()))))
+            .build();
     }
 
     @Test

@@ -113,7 +113,7 @@ public class EndBusinessProcessGASpecWithoutWATaskHandlerTest {
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = "5678")
-    void shouldFinishTheGeneralApplicationWhenParentAndApplicationIdsArePresent(String generalApplicationCaseId) {
+    void shouldFinishGaProcessUsingApplicationIdWhenPresentElseCaseId(String generalApplicationCaseId) {
         String targetCaseId = generalApplicationCaseId == null ? CASE_ID : generalApplicationCaseId;
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
             .businessProcess(new BusinessProcess()
