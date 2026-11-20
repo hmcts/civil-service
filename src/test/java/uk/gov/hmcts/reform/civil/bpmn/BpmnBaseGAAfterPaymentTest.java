@@ -225,6 +225,9 @@ public abstract class BpmnBaseGAAfterPaymentTest {
         completeTask(lockedProcessTask.get(0).getId(), variables);
     }
 
+    // externalTask is unused here. The signature matches BpmnBaseTest.assertFailExternalTask
+    // and the existing call sites; this copy resolves the topic from topicName.
+    @SuppressWarnings("java:S1172")
     public void assertFailExternalTask(
         ExternalTask externalTask,
         String topicName,

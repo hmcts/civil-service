@@ -375,7 +375,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private SdoNarrativeService sdoNarrativeService;
 
-    @MockBean
+    @MockitoBean
     protected LocationReferenceDataService locationRefDataService;
 
     @MockBean
