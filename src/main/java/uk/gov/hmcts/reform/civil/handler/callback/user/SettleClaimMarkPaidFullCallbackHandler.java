@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.helpers.settlediscontinue.SettleClaimHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -27,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARKED_PAID_IN_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDGMENT_REQUESTED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -88,7 +90,11 @@ public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
             AboutToStartOrSubmitCallbackResponse.builder();
 
         if (caseData.getMarkPaidForAllClaimants() == null || YES.equals(caseData.getMarkPaidForAllClaimants())) {
-            caseData.setPreStayState(caseData.getCcdState().toString());
+            CaseState previousCCDState = caseData.getCcdState();
+
+            clearPendingJudgmentRequestIfRequired(caseData, previousCCDState);
+
+            caseData.setPreStayState(String.valueOf(previousCCDState));
             caseData.setBusinessProcess(BusinessProcess.ready(SETTLE_CLAIM_MARKED_PAID_IN_FULL));
             aboutToStartOrSubmitCallbackResponseBuilder.state(CaseState.CASE_STAYED.name());
         }
@@ -116,5 +122,11 @@ public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
             return format(REQUEST_BEING_REVIEWED_HEADER);
         }
         return format(CLOSED_HEADER);
+    }
+
+    private void clearPendingJudgmentRequestIfRequired(CaseData caseData, CaseState previousCaseState) {
+        if (JUDGMENT_REQUESTED.equals(previousCaseState)) {
+            JudgmentsOnlineHelper.clearJOCaseData(caseData);
+        }
     }
 }
