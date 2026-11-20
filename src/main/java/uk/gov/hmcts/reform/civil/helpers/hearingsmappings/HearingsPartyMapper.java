@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.helpers.hearingsmappings;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.hearing.PartyRole;
@@ -53,6 +54,7 @@ import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
+@Slf4j
 public class HearingsPartyMapper {
 
     private static final String FULL_NAME = "%s %s";
@@ -101,7 +103,7 @@ public class HearingsPartyMapper {
             return;
         }
 
-        parties.add(getDetailsForPartyObject(caseData.getRespondent2(), DEFENDANT_ROLE.getPartyRoleValue()));
+        parties.add(getDetailsForPartyObject(caseData, caseData.getRespondent2(), DEFENDANT_ROLE.getPartyRoleValue()));
         addOrganisationIndividuals(parties, DEFENDANT_ROLE, caseData.getRespondent2(), caseData.getRespondent2OrgIndividuals());
         addRespondent2Solicitor(caseData, organisationService, parties);
         if (shouldAddRespondent2ExpertsAndWitnesses(caseData)) {
@@ -111,7 +113,7 @@ public class HearingsPartyMapper {
     }
 
     private static void addRespondent1Objects(CaseData caseData, OrganisationService organisationService, List<PartyDetailsModel> parties) {
-        parties.add(getDetailsForPartyObject(caseData.getRespondent1(), DEFENDANT_ROLE.getPartyRoleValue()));
+        parties.add(getDetailsForPartyObject(caseData, caseData.getRespondent1(), DEFENDANT_ROLE.getPartyRoleValue()));
         addOrganisationIndividuals(parties, DEFENDANT_ROLE, caseData.getRespondent1(), caseData.getRespondent1OrgIndividuals());
         addSolicitorOrganisation(parties, caseData.getRespondent1OrganisationPolicy(), organisationService);
         addExpertsAndWitnesses(parties, caseData.getRespondent1Experts(), caseData.getRespondent1Witnesses());
@@ -120,7 +122,7 @@ public class HearingsPartyMapper {
 
     private static void addApplicant2Objects(CaseData caseData, List<PartyDetailsModel> parties) {
         if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
-            parties.add(getDetailsForPartyObject(caseData.getApplicant2(), CLAIMANT_ROLE.getPartyRoleValue()));
+            parties.add(getDetailsForPartyObject(caseData, caseData.getApplicant2(), CLAIMANT_ROLE.getPartyRoleValue()));
             addOrganisationIndividuals(parties, CLAIMANT_ROLE, caseData.getApplicant2(), caseData.getApplicant2OrgIndividuals());
             if (shouldAddApplicant2ExpertsAndWitnesses(caseData)) {
                 addExpertsAndWitnesses(parties, caseData.getApplicantExperts(), caseData.getApplicantWitnesses());
@@ -130,7 +132,7 @@ public class HearingsPartyMapper {
     }
 
     private static void addApplicant1Objects(CaseData caseData, OrganisationService organisationService, List<PartyDetailsModel> parties) {
-        parties.add(getDetailsForPartyObject(caseData.getApplicant1(), CLAIMANT_ROLE.getPartyRoleValue()));
+        parties.add(getDetailsForPartyObject(caseData, caseData.getApplicant1(), CLAIMANT_ROLE.getPartyRoleValue()));
         addOrganisationIndividuals(parties, CLAIMANT_ROLE, caseData.getApplicant1(), caseData.getApplicant1OrgIndividuals());
         addSolicitorOrganisation(parties, caseData.getApplicant1OrganisationPolicy(), organisationService);
         if (caseData.getApplicant1DQ() != null) {
@@ -139,7 +141,9 @@ public class HearingsPartyMapper {
         addLitigationFriend(parties, caseData.getApplicant1LitigationFriend());
     }
 
-    private static PartyDetailsModel getDetailsForPartyObject(Party party, String partyRole) {
+    private static PartyDetailsModel getDetailsForPartyObject(CaseData caseData, Party party, String partyRole) {
+        List<Element<UnavailableDate>> unavailableDates =
+            withoutIncompleteUnavailableDates(caseData, party, partyRole);
         if (INDIVIDUAL.equals(party.getType())
             || SOLE_TRADER.equals(party.getType())) {
             String firstName = party.getIndividualFirstName() == null
@@ -156,11 +160,11 @@ public class HearingsPartyMapper {
                 party.getPartyEmail(),
                 party.getPartyPhone(),
                 party.getFlags(),
-                party.getUnavailableDates()
+                unavailableDates
             );
         } else {
             return buildOrganisationPartyObject(party.getPartyID(), party.getPartyName(),
-                                                partyRole, null, party.getUnavailableDates());
+                                                partyRole, null, unavailableDates);
         }
     }
 
@@ -358,14 +362,47 @@ public class HearingsPartyMapper {
             .toList();
     }
 
+    /**
+     * HMC rejects the whole hearing request when an unavailability range has no from or to date, so an
+     * incomplete entry (for example a DATE_RANGE saved without dates) is left out rather than block listing.
+     */
+    @SuppressWarnings("java:S1168")
+    private static List<Element<UnavailableDate>> withoutIncompleteUnavailableDates(CaseData caseData,
+                                                                                    Party party,
+                                                                                    String partyRole) {
+        List<Element<UnavailableDate>> unavailableDates = party.getUnavailableDates();
+        if (unavailableDates == null) {
+            return null;
+        }
+        List<Element<UnavailableDate>> complete = new ArrayList<>();
+        for (Element<UnavailableDate> element : unavailableDates) {
+            UnavailableDate date = element.getValue();
+            if (date != null && getFromDate(date) != null && getToDate(date) != null) {
+                complete.add(element);
+            } else {
+                log.warn("Skipping unavailable date with no from or to date for case {}, party {} ({}), type {}",
+                         caseData.getCcdCaseReference(), party.getPartyID(), partyRole,
+                         date == null ? null : date.getUnavailableDateType());
+            }
+        }
+        return complete;
+    }
+
+    private static LocalDate getFromDate(UnavailableDate date) {
+        return SINGLE_DATE.equals(date.getUnavailableDateType())
+            ? date.getDate() : Optional.ofNullable(date.getFromDate()).orElse(date.getDate());
+    }
+
+    private static LocalDate getToDate(UnavailableDate date) {
+        return SINGLE_DATE.equals(date.getUnavailableDateType())
+            ? date.getDate() : Optional.ofNullable(date.getToDate()).orElse(date.getDate());
+    }
+
     private static UnavailabilityRangeModel mapUnAvailableDateToRange(UnavailableDate date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_STRING);
 
-        LocalDate fromDate = SINGLE_DATE.equals(date.getUnavailableDateType())
-            ? date.getDate() : Optional.ofNullable(date.getFromDate()).orElse(date.getDate());
-
-        LocalDate toDate = SINGLE_DATE.equals(date.getUnavailableDateType())
-            ? date.getDate() : Optional.ofNullable(date.getToDate()).orElse(date.getDate());
+        LocalDate fromDate = getFromDate(date);
+        LocalDate toDate = getToDate(date);
 
         UnavailabilityRangeModel unavailabilityRangeModel = new UnavailabilityRangeModel();
         unavailabilityRangeModel.setUnavailabilityType(ALL_DAY);
