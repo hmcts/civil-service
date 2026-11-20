@@ -160,6 +160,7 @@ class CaseDismissDefendantNotificationHandlerTest {
 
         Map<String, String> notificationData = new HashMap<>(commonProps);
         notificationData.put("claimReferenceNumber", "1594901956117591");
+        notificationData.put("claim16DigitNumber", "1594901956117591");
         notificationData.put("name", isRespondent1 ? "Jack Jackson" : "John Johnson");
         notificationData.put("claimantvdefendant", isRespondent1
             ? "John Doe V Jack Jackson"

@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipSubjectProperties;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Component
@@ -30,6 +31,9 @@ public class StayUpdateRequestedEmailHelper {
         if (!lip) {
             properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
             properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
+        }
+        if (lip) {
+            addLipSubjectProperties(caseData, properties);
         }
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isPublicQueryManagementEnabled(caseData));

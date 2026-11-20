@@ -24,7 +24,7 @@ public class TranslatedDocumentUploadedDefendantEmailDTOGenerator extends Defend
     protected String getEmailTemplateId(CaseData caseData) {
         return caseData.isRespondentResponseBilingual()
             ? notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()
-            : notificationsProperties.getRespondent1LipClaimUpdatedTemplate();
+            : notificationsProperties.getNotifyLiPDefendantTranslatedDocumentUploadedTemplate();
     }
 
     @Override

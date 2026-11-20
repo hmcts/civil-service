@@ -35,6 +35,8 @@ import java.util.Objects;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addLipClaimantVDefendant;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addSubjectReferences;
 import static uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil.areRespondentSolicitorsPresent;
 
 @Slf4j
@@ -85,6 +87,8 @@ public class TranslatedDocumentUploadedRespondentNotificationHandler extends Cal
                 GA_LIP_RESP_NAME, Objects.requireNonNull(isLipResName),
                 CASE_REFERENCE, caseData.getParentCaseReference()
             ));
+            addSubjectReferences(mainCaseData, caseData.getParentCaseReference(), properties);
+            addLipClaimantVDefendant(caseData, properties);
             addAllFooterItems(caseData, mainCaseData, properties, configuration,
                               featureToggleService.isPublicQueryManagementEnabledGa(caseData));
             return properties;

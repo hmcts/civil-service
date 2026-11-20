@@ -209,6 +209,8 @@ class NotifyDefendantStayLiftedHandlerTest {
             expectedProperties.put("claimReferenceNumber", "1594901956117591");
             expectedProperties.put("name", "Jack Jackson");
             expectedProperties.put("claimantvdefendant", "John Doe V Jack Jackson");
+            expectedProperties.put("claim16DigitNumber", "1594901956117591");
+            expectedProperties.put("casemanRef", "000DC001");
 
             CallbackResponse response = handler.sendNotification(params);
 

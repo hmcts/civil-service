@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipSubjectProperties;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @RequiredArgsConstructor
@@ -52,6 +53,9 @@ public abstract class StayLiftedEmailDTOGenerator extends CivilEmailDTOGenerator
         if (!isLiP(caseData)) {
             properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
             properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
+        }
+        if (isLiP(caseData)) {
+            addLipSubjectProperties(caseData, properties);
         }
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isPublicQueryManagementEnabled(caseData));

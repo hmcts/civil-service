@@ -26,6 +26,8 @@ import java.util.Objects;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addLipClaimantVDefendant;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addSubjectReferences;
 import static uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil.isNotificationCriteriaSatisfied;
 import static uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil.isUrgentApplnNotificationCriteriaSatisfied;
 
@@ -185,6 +187,10 @@ public class GeneralApplicationCreationNotificationService implements Notificati
 
             CASE_TITLE, Objects.requireNonNull(caseTitle)
         ));
+        addSubjectReferences(mainCaseData, caseData.getGeneralAppParentCaseLink().getCaseReference(), properties);
+        if (gaForLipService.isLipResp(caseData)) {
+            addLipClaimantVDefendant(caseData, properties);
+        }
         addAllFooterItems(caseData, mainCaseData, properties, configuration,
                            featureToggleService.isPublicQueryManagementEnabledGa(caseData));
         return properties;

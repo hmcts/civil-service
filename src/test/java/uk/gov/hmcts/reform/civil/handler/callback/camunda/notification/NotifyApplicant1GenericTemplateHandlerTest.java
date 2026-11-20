@@ -25,7 +25,9 @@ import java.util.Map;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_16_DIGIT_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
@@ -161,6 +163,8 @@ class NotifyApplicant1GenericTemplateHandlerTest {
     public Map<String, String> getNotificationDataMap(CaseData caseData, boolean isLipCase) {
         Map<String, String> expectedProperties = new HashMap<>();
         expectedProperties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
+        expectedProperties.put(CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString());
+        expectedProperties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
         expectedProperties.put(PARTY_NAME, "John Doe");
         expectedProperties.put(CLAIMANT_V_DEFENDANT, "John Doe V Jack Jackson");
         expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());

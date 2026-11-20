@@ -27,6 +27,9 @@ import java.util.Objects;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addLipClaimantVDefendant;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addSubjectReferences;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 
 @Slf4j
 @Service
@@ -55,6 +58,7 @@ public class HearingScheduledNotificationService implements NotificationDataGA {
         int minutes = Integer.parseInt(hourMinute.substring(2, 4));
         LocalTime hearingTime = LocalTime.of(hours, minutes, 0);
 
+        customProps.remove(CLAIMANT_V_DEFENDANT);
         customProps.put(CASE_REFERENCE, caseData.getGeneralAppParentCaseLink().getCaseReference());
         customProps.put(GENAPP_REFERENCE, String.valueOf(Objects.requireNonNull(caseData.getCcdCaseReference())));
         customProps.put(GA_HEARING_DATE, DateFormatHelper
@@ -70,6 +74,7 @@ public class HearingScheduledNotificationService implements NotificationDataGA {
             customProps.remove(GA_LIP_APPLICANT_NAME);
             customProps.remove(GA_LIP_RESP_NAME);
         }
+        addSubjectReferences(mainCaseData, caseData.getGeneralAppParentCaseLink().getCaseReference(), customProps);
         addAllFooterItems(caseData, mainCaseData, customProps, configuration,
                            featureToggleService.isPublicQueryManagementEnabledGa(caseData));
         return customProps;
@@ -92,6 +97,10 @@ public class HearingScheduledNotificationService implements NotificationDataGA {
         }
 
         addProperties(caseData, mainCaseData);
+        if ((gaForLipService.isLipApp(caseData) && gaLipType.equals(APPLICANT))
+            || (gaForLipService.isLipResp(caseData) && gaLipType.equals(RESPONDENT))) {
+            addLipClaimantVDefendant(caseData, customProps);
+        }
         return customProps;
     }
 

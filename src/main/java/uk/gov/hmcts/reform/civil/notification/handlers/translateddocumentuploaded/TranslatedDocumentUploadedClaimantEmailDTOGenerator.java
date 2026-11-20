@@ -24,7 +24,7 @@ public class TranslatedDocumentUploadedClaimantEmailDTOGenerator extends Claiman
     protected String getEmailTemplateId(CaseData caseData) {
         return caseData.isClaimantBilingual()
             ? notificationsProperties.getNotifyLiPClaimantDefendantRespondedWelshLip()
-            : notificationsProperties.getNotifyLiPClaimantDefendantResponded();
+            : notificationsProperties.getNotifyLiPClaimantTranslatedDocumentUploadedTemplate();
     }
 
     @Override

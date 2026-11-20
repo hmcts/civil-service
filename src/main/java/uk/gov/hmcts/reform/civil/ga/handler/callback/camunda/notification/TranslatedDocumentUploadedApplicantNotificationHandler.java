@@ -30,6 +30,8 @@ import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addLipClaimantVDefendant;
+import static uk.gov.hmcts.reform.civil.ga.utils.EmailSubjectUtils.addSubjectReferences;
 
 @Slf4j
 @Service
@@ -72,6 +74,8 @@ public class TranslatedDocumentUploadedApplicantNotificationHandler extends Call
                 GA_LIP_APPLICANT_NAME, Objects.requireNonNull(isLipAppName),
                 CASE_REFERENCE, caseData.getParentCaseReference()
             ));
+            addSubjectReferences(mainCaseData, caseData.getParentCaseReference(), properties);
+            addLipClaimantVDefendant(caseData, properties);
             addAllFooterItems(caseData, mainCaseData, properties, configuration,
                               featureToggleService.isPublicQueryManagementEnabledGa(caseData));
             return properties;
