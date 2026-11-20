@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.documentmanagement;
 
+import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
@@ -16,5 +17,7 @@ public interface DocumentManagementService {
     DownloadedDocumentResponse downloadDocumentWithMetaData(String authorisation, String documentPath);
 
     void deleteDocument(String url, String auth);
+
+    Document getDocumentMetaData(String authorisation, String documentPath);
 
 }
