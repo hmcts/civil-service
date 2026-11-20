@@ -10,6 +10,8 @@ const FILES = [
   '.github/email-docs-sources.json',
 ];
 const DOCUMENTS = FILES.slice(0, 2);
+// Present: the CCD definitions are read from this repository and the manifest is no longer maintained.
+const TOGGLE = 'ccd-definition/SOURCE_OF_TRUTH';
 const BOT_EMAIL = 'civil-service-bot@users.noreply.github.com';
 const COMMIT_MESSAGE = 'chore: regenerate email notification docs';
 
@@ -91,7 +93,9 @@ async function refreshBranch(git, { base, previous, parent }) {
 }
 
 function describeUpdate(files, base) {
-  const sources = JSON.parse(files.readFileSync(FILES[2], 'utf8'));
+  const sources = files.existsSync(TOGGLE)
+    ? { 'CCD definitions': 'ccd-definition/' }
+    : JSON.parse(files.readFileSync(FILES[2], 'utf8'));
   const rows = files.readFileSync(FILES[0], 'utf8').split('\n').filter(line => line.startsWith('|')).length - 2;
   const checksum = crypto.createHash('sha256').update(files.readFileSync(FILES[1])).digest('hex');
   return [
